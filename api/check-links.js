@@ -1,7 +1,7 @@
 // /api/check-links.js — daily cron, runs after /api/sync.
 // Opens every live listing's link the way a student would and hides any that are dead —
 // including pages that load fine but say "no longer available" (what broke v1).
-import { COMPANIES } from "../lib/companies.js";
+import { loadCompanies } from "../lib/companies.js";
 import { fetchWorkdayDetail } from "../lib/fetchers/workday.js";
 import { db, isAuthorizedCron } from "../lib/db.js";
 import { get, mapLimit } from "../lib/http.js";
@@ -43,13 +43,18 @@ export default async function handler(req, res) {
   if (!isAuthorizedCron(req)) return res.status(401).json({ error: "Unauthorized" });
 
   const started = Date.now();
-  const byId = Object.fromEntries(COMPANIES.map((c) => [c.id, c]));
+  const byId = Object.fromEntries((await loadCompanies()).map((c) => [c.id, c]));
   const rows = await db.selectAsAdmin(
     `listings?select=id,company_id,url,ats,external_path&closed_at=is.null&order=link_checked_at.asc.nullsfirst&limit=${BATCH}`
   );
 
   const results = await mapLimit(rows, 10, async (l) => {
     if (Date.now() - started > TIME_BUDGET_MS) return { id: l.id, skipped: true };
+    // Company was turned off (or removed) → take its listings down
+    if (!byId[l.company_id]) {
+      await db.update(`listings?id=eq.${encodeURIComponent(l.id)}`, { closed_at: new Date().toISOString() });
+      return { id: l.id, ok: false, retired: true };
+    }
     const ok = await checkListing(l, byId[l.company_id]);
     if (ok === null) return { id: l.id, unknown: true };
     await db.update(`listings?id=eq.${encodeURIComponent(l.id)}`, { link_ok: ok, link_checked_at: new Date().toISOString() });
