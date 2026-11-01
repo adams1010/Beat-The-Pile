@@ -31,6 +31,30 @@
   @media (max-width:560px){.row{grid-template-columns:1fr}}
   .err{padding:24px;text-align:center;color:var(--muted)}
   footer{font-size:13px;color:var(--muted);padding:12px 0 40px}
+  /* Needs-a-link sheet */
+  .sheet{background:#fff;border:2px solid var(--green);border-radius:var(--r);margin:4px 0 16px;overflow:hidden}
+  .sheet h2{margin:0;padding:14px 16px 2px;font-size:18px;color:var(--navy)}
+  .sheet .why{padding:0 16px 10px;margin:0}
+  .tools{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 12px;align-items:center}
+  .tools input{flex:1;min-width:160px}
+  input{font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink);min-width:0}
+  button{font:inherit;font-size:13px;font-weight:700;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--navy);cursor:pointer}
+  button.go{background:var(--green);border-color:var(--green);color:#fff}
+  button:disabled{opacity:.5;cursor:default}
+  .tbl{width:100%;border-collapse:collapse;font-size:14px}
+  .tbl th{text-align:left;font-size:12px;color:var(--muted);font-weight:700;padding:8px 10px;border-top:1px solid var(--line);background:#FAFCFC}
+  .tbl td{padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+  .tbl td.co{font-weight:600;white-space:nowrap}
+  .tbl .src{display:block;font-size:11px;font-weight:500;color:var(--muted)}
+  .tbl .d{color:var(--muted);font-size:13px}
+  .tbl a{color:var(--green-dark);font-weight:600;text-decoration:none;white-space:nowrap}
+  .linkcell{display:flex;gap:6px}.linkcell input{flex:1;width:100%}
+  .tried{font-size:12px;color:#B45309;margin-top:4px;word-break:break-all}
+  .ok{font-size:12px;color:var(--green-dark);font-weight:700;margin-top:4px}
+  @media (max-width:640px){.tbl thead{display:none}.tbl tr{display:block;border-top:1px solid var(--line);padding:6px 0}.tbl td{display:block;border:0;padding:4px 16px}}
+  .account{font-size:13px;color:#CBD5E1;margin-top:10px}.account button{margin-left:6px;padding:4px 10px}
+  .addco{display:grid;grid-template-columns:1fr 1fr 1.4fr auto;gap:8px;padding:12px 16px;border-top:1px solid var(--line);background:#FAFCFC}
+  @media (max-width:640px){.addco{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -38,9 +62,10 @@
   <a class="brand" href="/jobs/">InternIQ</a>
   <h1>Company coverage</h1>
   <p class="sub">A robot finds each company's real job board and only adds it after proving it belongs to that company.</p>
+  <div class="account" id="account"></div>
 </div></header>
 <main class="wrap" id="app"><div class="err">Loading…</div></main>
-<footer class="wrap">Runs automatically twice a day. Turn any company off in Supabase → company_candidates → enabled.</footer>
+<footer class="wrap">The robot runs every 15 minutes. Turn any company off in Supabase → company_candidates → enabled.</footer>
 
 <script>
 (function(){
@@ -54,13 +79,88 @@
     ["duplicate",       "Duplicate of a live company",           "#D3D1C7", "Same board as one already listed — skipped so jobs don't show twice."],
     ["no_domain",       "Missing website",                       "#D3D1C7", "Needs a website added to the candidate list."],
     ["error",           "Error",                                 "#E24B4A", "Something broke during the check. Retried automatically."],
-    ["pending",         "Queued",                                "#CBD5E1", "Not tried yet. ~25 companies are tried per day."],
+    ["pending",         "Queued",                                "#CBD5E1", "Not tried yet. The robot checks ~24 companies every 15 minutes."],
   ];
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const ago = (ts) => { if (!ts) return ""; const h = Math.round((Date.now() - new Date(ts)) / 36e5); return h < 1 ? "just now" : h < 24 ? h + "h ago" : Math.round(h / 24) + "d ago"; };
 
-  fetch("/api/discovery").then((r) => r.json()).then((d) => {
-    if (d.error) throw new Error(d.error);
+  const NEEDS = ["no_board", "blocked", "board_error", "identity_failed", "error", "no_domain"];
+  const SHORT = { no_board: "No job board found", blocked: "Site blocks robots", board_error: "Board didn't work",
+                  identity_failed: "Couldn't prove it's theirs", error: "Error", no_domain: "No website" };
+  const S = { admin: false, clerk: null, q: "", data: null, saved: new Set() };
+
+  // ── Sign-in (same Clerk account as the app). Only the owner can paste links. ──
+  async function token(){ try { return await S.clerk?.session?.getToken(); } catch { return null; } }
+  async function loadClerk(){
+    try {
+      const cfg = await fetch("/api/config").then((r) => r.json());
+      const pk = cfg.clerkPublishableKey; if (!pk) return;
+      if (!window.Clerk) {
+        const host = atob(pk.replace(/^pk_(test|live)_/, "")).replace(/\$$/, "").trim();
+        if (!/clerk/.test(host)) return;
+        await new Promise((ok, bad) => { const sc = document.createElement("script");
+          sc.src = `https://${host}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`; sc.setAttribute("data-clerk-publishable-key", pk);
+          sc.async = true; sc.crossOrigin = "anonymous"; sc.onload = ok; sc.onerror = bad; document.head.appendChild(sc); });
+      }
+      if (!window.Clerk) return;
+      if (typeof window.Clerk.load === "function" && !window.Clerk.loaded) await window.Clerk.load({});
+      S.clerk = window.Clerk;
+      S.clerk.addListener?.(() => account());
+      account();
+    } catch { /* page still works read-only */ }
+  }
+  function account(){
+    const el = document.getElementById("account"); if (!S.clerk) return;
+    const u = S.clerk.user;
+    const email = u?.primaryEmailAddress?.emailAddress || "";
+    // The server is what actually enforces owner-only; this just decides whether to show the inputs.
+    const was = S.admin; S.admin = !!u;
+    el.innerHTML = u ? `Signed in as ${esc(email)} <button id="so">Sign out</button>` : `Owner? <button id="si">Sign in to paste links</button>`;
+    el.querySelector("#so")?.addEventListener("click", () => S.clerk.signOut());
+    el.querySelector("#si")?.addEventListener("click", () => S.clerk.openSignIn());
+    if (was !== S.admin && S.data) render(S.data);
+  }
+  async function post(body){
+    const r = await fetch("/api/discovery", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || ("Error " + r.status));
+    return j;
+  }
+
+  function sheet(rows){
+    const need = rows.filter((r) => NEEDS.includes(r.status))
+      .sort((a, b) => (b.source || "").localeCompare(a.source || "") || a.company.localeCompare(b.company));
+    const q = S.q.toLowerCase();
+    const shown = need.filter((r) => !q || r.company.toLowerCase().includes(q) || (r.source || "").toLowerCase().includes(q));
+    const g = (r) => "https://www.google.com/search?q=" + encodeURIComponent(r.company + " internships careers");
+    return `<div class="sheet"><h2>Needs a link · ${need.length}</h2>
+      <div class="why">The robot couldn't find these job boards on its own. Paste the company's <b>job search page</b> (the page that lists the jobs) and it re-checks within ~15 minutes. A wrong link can't go live: it still has to prove the board is theirs.</div>
+      <div class="tools"><input id="q" placeholder="Search companies or source…" value="${esc(S.q)}"><button id="csv">Download CSV</button></div>
+      <table class="tbl"><thead><tr><th>Company</th><th>Why</th><th>Find it</th><th>${S.admin ? "Paste job-board link" : "Link tried"}</th></tr></thead><tbody>` +
+      shown.map((r) => `<tr data-id="${esc(r.id)}">
+        <td class="co">${esc(r.company)}<span class="src">${esc(r.source || "")}</span></td>
+        <td class="d">${esc(SHORT[r.status] || r.status)}${r.attempts ? ` · tried ${r.attempts}×` : ""}</td>
+        <td><a href="${g(r)}" target="_blank" rel="noopener">Google ↗</a>${r.domain ? `<br><a href="https://${esc(r.domain)}" target="_blank" rel="noopener">${esc(r.domain)} ↗</a>` : ""}</td>
+        <td>${S.admin ? `<div class="linkcell"><input type="url" placeholder="https://…" aria-label="Job board link for ${esc(r.company)}"><button class="go save">Save</button></div>` : ""}
+          ${r.hint ? `<div class="tried">Tried: ${esc(r.hint)}${r.detail ? " — " + esc(r.detail) : ""}</div>` : ""}
+          ${S.saved.has(r.id) ? `<div class="ok">Saved ✓ — robot checks it soon</div>` : ""}</td></tr>`).join("") +
+      `</tbody></table>` +
+      (S.admin ? `<div class="addco"><input id="nc" placeholder="Add a company (name)"><input id="nd" placeholder="website (acme.com)"><input id="nh" placeholder="job board link (optional)"><button class="go" id="add">Add</button></div>` : "") +
+      `</div>`;
+  }
+  function csv(rows){
+    const need = rows.filter((r) => NEEDS.includes(r.status));
+    const q = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
+    const lines = [["Company","Website","Source","Why","Link tried","Robot note","Paste link here"].map(q).join(",")]
+      .concat(need.map((r) => [r.company, r.domain, r.source, SHORT[r.status] || r.status, r.hint, r.detail, ""].map(q).join(",")));
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv" }));
+    a.download = "interniq-needs-a-link.csv"; a.click();
+  }
+
+  function load(){ return fetch("/api/discovery", { cache: "no-store" }).then((r) => r.json()).then((d) => { if (d.error) throw new Error(d.error); S.data = d; render(d); }); }
+
+  function render(d) {
     const rows = d.rows || [], counts = d.counts || {};
     const total = rows.length, live = (counts.live || 0), hand = (d.handVerified || []).length;
     const tried = total - (counts.pending || 0);
@@ -89,11 +189,34 @@
         list.map((r) => `<div class="row"><div>${esc(r.company)}${k === "live" && r.intern_count ? `<span class="pill">${r.intern_count} interns</span>` : ""}</div><div class="d">${esc(r.detail || "")}${r.checked_at ? " · " + ago(r.checked_at) : ""}</div></div>`).join("") +
         `</details></section>`;
     }
+    html = html.replace(`</div><div class="bar">`, `</div>` + sheet(rows) + `<div class="bar">`);
     if (hand) html += `<section><details><summary>Hand-checked companies <span class="c">${hand}</span></summary><div class="row"><div class="d" style="grid-column:1/-1">${esc(d.handVerified.join(", "))}</div></div></details></section>`;
-    document.getElementById("app").innerHTML = html;
-  }).catch((e) => {
-    document.getElementById("app").innerHTML = `<div class="err">Coverage data isn't available yet (${esc(e.message)}).</div>`;
-  });
+    const app = document.getElementById("app");
+    app.innerHTML = html;
+    wire(app, rows);
+  }
+
+  function wire(app, rows){
+    const q = app.querySelector("#q");
+    q?.addEventListener("input", () => { S.q = q.value; const pos = q.selectionStart; render(S.data); const n = document.getElementById("q"); n.focus(); n.setSelectionRange(pos, pos); });
+    app.querySelector("#csv")?.addEventListener("click", () => csv(rows));
+    app.querySelectorAll("button.save").forEach((b) => b.addEventListener("click", async () => {
+      const tr = b.closest("tr"), input = tr.querySelector("input"), id = tr.dataset.id, hint = input.value.trim();
+      if (!/^https?:\/\//i.test(hint)) { input.focus(); input.placeholder = "Needs a full link (https://…)"; return; }
+      b.disabled = true; b.textContent = "…";
+      try { await post({ id, hint }); S.saved.add(id); const r = S.data.rows.find((x) => x.id === id); if (r) { r.hint = hint; r.detail = "queued"; } render(S.data); }
+      catch (e) { b.disabled = false; b.textContent = "Save"; alert(e.message); }
+    }));
+    app.querySelector("#add")?.addEventListener("click", async (ev) => {
+      const b = ev.currentTarget, company = app.querySelector("#nc").value.trim(), domain = app.querySelector("#nd").value.trim(), hint = app.querySelector("#nh").value.trim();
+      b.disabled = true;
+      try { await post({ company, domain, hint: hint || undefined }); b.textContent = "Added ✓"; setTimeout(load, 800); }
+      catch (e) { b.disabled = false; alert(e.message); }
+    });
+  }
+
+  load().catch((e) => { document.getElementById("app").innerHTML = `<div class="err">Coverage data isn't available yet (${esc(e.message)}).</div>`; });
+  loadClerk();
 })();
 </script>
 </body>
