@@ -26,6 +26,14 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Couldn't update company_candidates — run supabase/discovery.sql first. " + e.message });
   }
 
+  // 1b) New or changed hint (e.g. from a browser pass) → re-test now instead of waiting 2 weeks.
+  //     Still goes through the same proof check; a hint can't make anything go live by itself.
+  const hinted = await db.selectAsAdmin("company_candidates?select=id,hint,config,status&hint=not.is.null&status=neq.live&status=neq.pending&limit=1000");
+  const requeue = hinted.filter((r) => (r.config?.triedHint ?? null) !== r.hint).map((r) => r.id);
+  if (requeue.length) {
+    await db.update(`company_candidates?id=in.(${requeue.map(encodeURIComponent).join(",")})`, { status: "pending", checked_at: null });
+  }
+
   // 2) Boards already live (hand-verified + previously discovered) → never add the same board twice
   const liveRows = await db.selectAsAdmin("company_candidates?select=id,ats,config&enabled=eq.true&limit=1000");
   const taken = new Map(COMPANIES.map((c) => [boardKey(c), c.company]));
@@ -53,7 +61,7 @@ export default async function handler(req, res) {
     await db.update(`company_candidates?id=eq.${encodeURIComponent(c.id)}`, {
       status: r.status,
       ats: r.ats || null,
-      config: r.config || null,
+      config: r.status === "live" ? r.config : { triedHint: c.hint || null },   // remember which hint failed
       enabled: r.status === "live",
       detail: r.detail || null,
       intern_count: r.intern_count ?? null,

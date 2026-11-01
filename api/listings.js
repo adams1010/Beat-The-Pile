@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   const states = String(req.query.state || "").toUpperCase().split(",").map((x) => x.trim()).filter((x) => /^[A-Z]{2}$/.test(x));
   const match = req.query.match === "me" ? "me" : null;
 
-  let q = "listings?select=company,title,location,state,url,match,posted_on,first_seen,link_checked_at"
+  let q = "listings?select=id,company,title,location,state,url,match,posted_on,first_seen,link_checked_at"
         + "&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)"
         + "&order=first_seen.desc&limit=1000";
   // state column holds "VA" or "WA,VA,PA" — match any requested state inside it

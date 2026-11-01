@@ -15,6 +15,8 @@
 //   user_tracker (clerk_user_id text primary key, data jsonb, updated_at timestamptz)
 //   user_resumes (clerk_user_id text primary key, data jsonb, updated_at timestamptz)
 
+import { verifyClerkJWT } from "../lib/auth.js";
+
 const SCHEMA_HEADERS = {
   "Accept-Profile": "public",
   "Content-Profile": "public"
@@ -26,39 +28,11 @@ const TABLES = {
   resumes: "user_resumes"
 };
 
-// Verify a Clerk session token by calling Clerk's API. Returns the user ID if valid, null if not.
-// We hit Clerk's `/v1/sessions/{token}/verify` endpoint with our secret key.
-async function verifyClerkToken(token, clerkSecret) {
-  if (!token || !clerkSecret) return null;
-  try {
-    // Clerk's session verification endpoint
-    const r = await fetch("https://api.clerk.com/v1/sessions/verify", {
-      method: "POST",
-      headers: {
-        "Authorization": "Bearer " + clerkSecret,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ token })
-    });
-    if (!r.ok) {
-      // Fallback path: try the JWT decode approach (Clerk session tokens are JWTs)
-      // We can decode the unverified payload to get the user ID, but this is less secure.
-      // Still, useful as a fallback when the verify endpoint changes.
-      const parts = token.split(".");
-      if (parts.length === 3) {
-        try {
-          const payload = JSON.parse(Buffer.from(parts[1], "base64").toString("utf8"));
-          if (payload && payload.sub) return payload.sub; // 'sub' is the user ID in Clerk JWTs
-        } catch { /* fall through */ }
-      }
-      return null;
-    }
-    const data = await r.json();
-    return data.user_id || (data.session && data.session.user_id) || null;
-  } catch (e) {
-    console.warn("[usersync] Clerk verify failed:", e.message);
-    return null;
-  }
+// Verify the Clerk session token's signature (lib/auth.js). The old version fell back to reading
+// the user id from an UNVERIFIED token, which let anyone impersonate any user. Removed.
+async function verifyClerkToken(token) {
+  try { return await verifyClerkJWT(token); }
+  catch (e) { console.warn("[usersync] Clerk key fetch failed:", e.message); return null; }
 }
 
 export default async function handler(req, res) {
@@ -77,7 +51,7 @@ export default async function handler(req, res) {
   // Pull session token from Authorization header
   const auth = req.headers.authorization || "";
   const token = auth.replace(/^Bearer\s+/i, "").trim();
-  const userId = await verifyClerkToken(token, CLERK_SECRET);
+  const userId = await verifyClerkToken(token);
   if (!userId) return res.status(401).json({ error: "Not signed in" });
 
   let body = req.body;
