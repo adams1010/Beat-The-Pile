@@ -1,5 +1,5 @@
-// /api/discover.js — the discovery robot (cron, twice a day).
-// Each run: refresh the candidate list, then try ~16 queued companies: find their job board,
+// /api/discover.js — the discovery robot (Vercel cron 2x/day + GitHub Actions every 15 min).
+// Each run: refresh the candidate list, then try ~24 queued companies: find their job board,
 // prove it's theirs, and enable it. Results (good or bad, with reasons) go to company_candidates.
 import { CANDIDATES } from "../lib/candidates.js";
 import { COMPANIES, boardKey } from "../lib/companies.js";
@@ -9,7 +9,7 @@ import { mapLimit } from "../lib/http.js";
 
 export const config = { maxDuration: 60 };
 
-const PER_RUN = 16;
+const PER_RUN = 24;
 const START_BUDGET_MS = 30000;
 const RETRY_AFTER_DAYS = 14;
 
@@ -46,7 +46,7 @@ export default async function handler(req, res) {
     `&order=checked_at.asc.nullsfirst&limit=${PER_RUN}`
   );
 
-  const results = await mapLimit(rows, 4, async (c) => {
+  const results = await mapLimit(rows, 6, async (c) => {
     if (Date.now() - t0 > START_BUDGET_MS) return { id: c.id, skipped: true };
     let r;
     try { r = await discoverOne(c, { deadline: t0 + 47000 }); }
