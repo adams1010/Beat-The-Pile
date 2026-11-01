@@ -120,7 +120,9 @@ export default async function handler(req, res) {
   // Step 3: Supplement with AI if below threshold — always aim for 25+ total
   let aiSupplement = [];
   let aiUsed = false;
-  if (results.length < 21 && process.env.ANTHROPIC_API_KEY) {
+  // OFF by default: this asked an LLM to name companies, which is where the wrong/fake
+  // companies came from. Only real board data is shown now. Set ALLOW_AI_COMPANIES=1 to re-enable.
+  if (process.env.ALLOW_AI_COMPANIES === "1" && results.length < 21 && process.env.ANTHROPIC_API_KEY) {
     console.log(`DB returned ${results.length} results — supplementing with AI`);
     try {
       const prompt = `You are helping a college student find real internship opportunities. List real companies that hire ${major} interns near ${city}, ${state} (ZIP ${zip}) within ${actualRadius} miles.
