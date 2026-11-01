@@ -65,6 +65,21 @@
   @keyframes sh{to{background-position:-200% 0}}
   @media (prefers-reduced-motion:reduce){.skel{animation:none}}
 
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .acct{display:flex;align-items:center;gap:8px;font-size:13px}
+  .acct button{font:inherit;font-size:13px;font-weight:700;border-radius:999px;padding:6px 14px;cursor:pointer}
+  .acct .signin{background:var(--green);color:#fff;border:0}
+  .acct .signout{background:transparent;color:#CBD5E1;border:1px solid rgba(255,255,255,.25)}
+  .acct .who{color:#CBD5E1;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .chip{font:inherit;font-size:14px;font-weight:600;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 12px;cursor:pointer}
+  .chip[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .mine{display:flex;gap:6px;justify-content:flex-end}
+  .ic{font:inherit;font-size:12px;font-weight:700;border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:8px;padding:5px 9px;cursor:pointer;white-space:nowrap}
+  .ic[aria-pressed="true"].save{background:#FFF1F2;border-color:#FECDD3;color:#BE123C}
+  .ic[aria-pressed="true"].done{background:var(--green-light);border-color:#B3F0DA;color:var(--green-dark)}
+  .card.applied{opacity:.72}
+  .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:14px;padding:10px 16px;border-radius:10px;z-index:20;max-width:90vw}
+  @media (max-width:560px){ .mine{justify-content:stretch} .mine .ic{flex:1} }
   footer{border-top:1px solid var(--line);padding:20px 0 40px;font-size:13px;color:var(--muted)}
   footer p{margin:6px 0}
 </style>
@@ -72,7 +87,7 @@
 <body>
 <header>
   <div class="wrap">
-    <a class="brand" href="/">InternIQ</a>
+    <div class="topbar"><a class="brand" href="/">InternIQ</a><div class="acct" id="acct"></div></div>
     <h1>Mechanical engineering internships, straight from the source</h1>
     <p class="sub">Pulled straight from each company's own job board. No reposts, no recruiters, no dead links.</p>
     <div class="trust" id="trust" hidden><span class="dot"></span><span id="trustText"></span></div>
@@ -88,6 +103,7 @@
       </div>
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">Pick a state</option></select>
       <label class="toggle"><input type="checkbox" id="meOnly"> Mechanical only</label>
+      <button class="chip" id="savedOnly" aria-pressed="false">♡ Saved <span id="savedN"></span></button>
       <input class="search" id="q" type="search" placeholder="Search company or role" aria-label="Search company or role">
     </div>
     <div class="count" id="count" aria-live="polite"></div>
@@ -111,7 +127,8 @@
 
 <script>
 (function(){
-  const state = { all: [], st: ["VA","PA"], meOnly: false, q: "" };   // st: array of states, or "ALL"
+  const state = { all: [], st: ["VA","PA"], meOnly: false, q: "", savedOnly: false,   // st: array of states, or "ALL"
+                  user: null, clerk: null, mine: { saved: new Set(), applied: new Set() } };
   const NAMES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"Washington DC",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
   const statesOf = (j) => String(j.state || "").split(",").filter(Boolean);
   const inView = (j) => state.st === "ALL" || statesOf(j).some((s) => state.st.includes(s));
@@ -176,37 +193,45 @@
   }
 
   function render(){
+    if (!state.loaded) return;
     const q = state.q.toLowerCase();
     const matches = (j) => (!state.meOnly || j.match === "me") &&
       (!q || (j.company + " " + j.title + " " + j.location).toLowerCase().includes(q));
-    const filtered = state.all.filter((j) => inView(j) && matches(j));
+    // "Saved" view shows everything you saved, in any state
+    const filtered = state.savedOnly
+      ? state.all.filter((j) => state.mine.saved.has(j.id) && matches(j))
+      : state.all.filter((j) => inView(j) && matches(j));
     const nationwide = new Set(state.all.filter(matches).map((j) => (j.company + "|" + j.title + "|" + j.location).toLowerCase())).size;
 
     // Merge identical postings (same company + title + place) into one card: "2 openings"
     const groups = new Map();
     for (const j of filtered) {
       const k = (j.company + "|" + j.title + "|" + cleanLocation(j)).toLowerCase();
-      if (groups.has(k)) groups.get(k).count++; else groups.set(k, { ...j, count: 1 });
+      if (groups.has(k)) { const g = groups.get(k); g.count++; g.ids.push(j.id); } else groups.set(k, { ...j, count: 1, ids: [j.id] });
     }
     const rows = [...groups.values()];
+    const has = (list, j) => j.ids.some((id) => state.mine[list].has(id));
+    $("savedN").textContent = state.mine.saved.size ? `(${state.mine.saved.size})` : "";
 
     // "New" = appeared after the first import, within the last 3 days (so day-one data isn't all "New")
     const firstImport = Math.min(...state.all.map((j) => new Date(j.first_seen).getTime()));
     const isNew = (j) => { const t = new Date(j.first_seen).getTime(); return t - firstImport > DAY && Date.now() - t < 3 * DAY; };
 
     const companies = new Set(rows.map((j) => j.company)).size;
-    const where = state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
+    const where = state.savedOnly ? "saved" : state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
     $("count").textContent = rows.length
       ? `${rows.length} internship${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"} ${where}` +
-        (state.st === "ALL" ? "" : ` · ${nationwide} nationwide`)
+        (state.st === "ALL" || state.savedOnly ? "" : ` · ${nationwide} nationwide`)
       : "";
 
     if (!rows.length){
-      $("list").innerHTML = `<div class="empty">No matches ${where}${state.all.length ? " for these filters" : " right now"}. ${state.all.length ? "Try “All US” or turn off “Mechanical only.”" : "New postings are pulled every morning."}</div>`;
+      $("list").innerHTML = state.savedOnly
+        ? `<div class="empty">${state.user ? "Nothing saved yet. Tap ♡ Save on any internship to keep it here." : "Sign in to save internships and track where you've applied."}</div>`
+        : `<div class="empty">No matches ${where}${state.all.length ? " for these filters" : " right now"}. ${state.all.length ? "Try “All US” or turn off “Mechanical only.”" : "New postings are pulled every morning."}</div>`;
       return;
     }
     $("list").innerHTML = rows.map((j) => `
-      <article class="card">
+      <article class="card${has("applied", j) ? " applied" : ""}">
         <div>
           <div class="co">${esc(j.company)}</div>
           <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">NEW</span>' : ""}${j.match === "me" ? '<span class="tag me">ME</span>' : ""}${j.count > 1 ? `<span class="tag multi">${j.count} openings</span>` : ""}</div>
@@ -215,6 +240,10 @@
         <div class="applycol">
           <a class="apply" href="${esc(j.url)}" target="_blank" rel="noopener" data-co="${esc(j.company)}">Apply →</a>
           <span class="src">on ${esc(domain(j.url))}</span>
+          <div class="mine">
+            <button class="ic save" data-act="saved" data-id="${esc(j.id)}" aria-pressed="${has("saved", j)}">${has("saved", j) ? "♥ Saved" : "♡ Save"}</button>
+            <button class="ic done" data-act="applied" data-id="${esc(j.id)}" aria-pressed="${has("applied", j)}">${has("applied", j) ? "✓ Applied" : "Mark applied"}</button>
+          </div>
         </div>
       </article>`).join("");
   }
@@ -239,6 +268,72 @@
       .sort((a, b) => (NAMES[a] || a).localeCompare(NAMES[b] || b))
       .map((s) => `<option value="${s}">${esc(NAMES[s] || s)} (${counts[s]})</option>`).join("");
   }
+  // ── Sign-in (Clerk — same account as the main InternIQ app) ───────────────
+  function toast(msg){
+    const t = document.createElement("div"); t.className = "toast"; t.textContent = msg;
+    document.body.appendChild(t); setTimeout(() => t.remove(), 3200);
+  }
+  async function token(){ try { return await state.clerk?.session?.getToken(); } catch { return null; } }
+  async function api(method, body){
+    const r = await fetch("/api/me", { method, headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) }, body: body ? JSON.stringify(body) : undefined });
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.status);
+    return r.json();
+  }
+  function setMine(d){ state.mine = { saved: new Set(d.saved || []), applied: new Set(d.applied || []) }; }
+  function renderAcct(){
+    const el = $("acct");
+    if (!state.clerk) { el.innerHTML = ""; return; }
+    if (state.user) {
+      const who = state.user.primaryEmailAddress?.emailAddress || state.user.firstName || "Signed in";
+      el.innerHTML = `<span class="who">${esc(who)}</span><button class="signout">Sign out</button>`;
+      el.querySelector(".signout").onclick = async () => { await state.clerk.signOut(); };
+    } else {
+      el.innerHTML = `<button class="signin">Sign in</button>`;
+      el.querySelector(".signin").onclick = () => state.clerk.openSignIn();
+    }
+  }
+  async function onUser(user){
+    state.user = user || null;
+    if (state.user) { try { setMine(await api("GET")); } catch { toast("Couldn't load your saved list"); } }
+    else setMine({});
+    renderAcct(); render();
+  }
+  async function loadClerk(){
+    try {
+      const cfg = await fetch("/api/config").then((r) => r.json());
+      const pk = cfg.clerkPublishableKey; if (!pk) return;
+      if (!window.Clerk) {
+        const host = atob(pk.replace(/^pk_(test|live)_/, "")).replace(/\$$/, "").trim();
+        if (!/clerk/.test(host)) return;
+        await new Promise((ok, bad) => { const s = document.createElement("script");
+          s.src = `https://${host}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`; s.setAttribute("data-clerk-publishable-key", pk);
+          s.async = true; s.crossOrigin = "anonymous"; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
+      }
+      if (!window.Clerk) return;
+      if (typeof window.Clerk.load === "function" && !window.Clerk.loaded) await window.Clerk.load({});
+      state.clerk = window.Clerk;
+      let last = state.clerk.user?.id || null;
+      state.clerk.addListener?.(({ user }) => { const id = user?.id || null; if (id !== last) { last = id; onUser(user); } });
+      await onUser(state.clerk.user);
+    } catch (e) { console.warn("[jobs] sign-in unavailable:", e); renderAcct(); }
+  }
+  async function toggle(list, id, btn){
+    if (!state.clerk) return toast("Sign-in is unavailable right now");
+    if (!state.user) { toast(list === "saved" ? "Sign in to save internships" : "Sign in to track applications"); return state.clerk.openSignIn(); }
+    const on = !state.mine[list].has(id);
+    on ? state.mine[list].add(id) : state.mine[list].delete(id);   // instant, then confirm with server
+    render();
+    try { setMine(await api("POST", { list, id, on })); render(); }
+    catch { on ? state.mine[list].delete(id) : state.mine[list].add(id); render(); toast("Couldn't save that — try again"); }
+  }
+  $("list").addEventListener("click", (e) => {
+    const b = e.target.closest(".ic"); if (b) toggle(b.dataset.act, b.dataset.id, b);
+  });
+  $("savedOnly").addEventListener("click", () => {
+    state.savedOnly = !state.savedOnly; $("savedOnly").setAttribute("aria-pressed", String(state.savedOnly)); render();
+  });
+  loadClerk();
+
   $("meOnly").addEventListener("change", (e) => { state.meOnly = e.target.checked; render(); });
   $("q").addEventListener("input", (e) => { state.q = e.target.value.trim(); render(); });
 
@@ -246,6 +341,7 @@
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then((d) => {
       state.all = (d.listings || []).sort((a, b) => sortKey(b) - sortKey(a));
+      state.loaded = true;
       const lastCheck = state.all.map((j) => j.link_checked_at).filter(Boolean).sort().pop();
       const stamp = lastCheck || d.meta?.lastSync;
       if (stamp){ $("trustText").textContent = `Every link checked ${timeOfDay(stamp)}`; $("trust").hidden = false; }
