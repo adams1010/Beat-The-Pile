@@ -16,6 +16,7 @@ const DEAD_PHRASES = [
   "position has been filled", "job has expired", "this job is closed",
   "job you are looking for", "page you are looking for", "job not found",
   "posting has been removed", "not currently accepting",
+  "requested job could not be found",
 ];
 
 /** @returns {Promise<true|false|null>} true=live, false=dead, null=couldn't tell (leave as is) */
@@ -25,7 +26,9 @@ export async function checkListing(l, cfg) {
       const d = await fetchWorkdayDetail(cfg, l.external_path);
       return !!(d && d.canApply);
     }
-    const res = await get(l.url, { timeoutMs: 10000 });
+    // iCIMS pages wrap the real content in an iframe — ask for the inner page directly
+    const url = l.ats === "icims" ? l.url + (l.url.includes("?") ? "&" : "?") + "in_iframe=1" : l.url;
+    const res = await get(url, { timeoutMs: 10000 });
     if (res.status === 404 || res.status === 410) return false;
     if (res.status >= 500 || res.status === 429 || res.status === 403) return null; // site hiccup or bot block — don't punish
     if (!res.ok) return false;

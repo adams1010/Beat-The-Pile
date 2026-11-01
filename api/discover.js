@@ -34,6 +34,14 @@ export default async function handler(req, res) {
     await db.update(`company_candidates?id=in.(${requeue.map(encodeURIComponent).join(",")})`, { status: "pending", checked_at: null });
   }
 
+  // 1c) A job system we just learned to read → re-test every company parked as "unsupported" on it
+  const NOW_READABLE = /\b(iCIMS)\b/;
+  const parked = await db.selectAsAdmin("company_candidates?select=id,detail&status=eq.unsupported&limit=1000");
+  const unpark = parked.filter((r) => NOW_READABLE.test(r.detail || "")).map((r) => r.id);
+  if (unpark.length) {
+    await db.update(`company_candidates?id=in.(${unpark.map(encodeURIComponent).join(",")})`, { status: "pending", checked_at: null });
+  }
+
   // 2) Boards already live (hand-verified + previously discovered) → never add the same board twice
   const liveRows = await db.selectAsAdmin("company_candidates?select=id,ats,config&enabled=eq.true&limit=1000");
   const taken = new Map(COMPANIES.map((c) => [boardKey(c), c.company]));
