@@ -1,7 +1,10 @@
 {
   "crons": [
     { "path": "/api/sync",        "schedule": "0 9 * * *" },
+    { "path": "/api/sync",        "schedule": "0 15 * * *" },
     { "path": "/api/check-links", "schedule": "30 9 * * *" },
-    { "path": "/api/check-links", "schedule": "30 21 * * *" }
+    { "path": "/api/check-links", "schedule": "30 21 * * *" },
+    { "path": "/api/discover",    "schedule": "0 11 * * *" },
+    { "path": "/api/discover",    "schedule": "0 23 * * *" }
   ]
 }
