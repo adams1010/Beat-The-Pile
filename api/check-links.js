@@ -8,8 +8,8 @@ import { get, mapLimit } from "../lib/http.js";
 
 export const config = { maxDuration: 60 };
 
-const BATCH = 120;          // oldest-checked first; everything gets covered across runs
-const TIME_BUDGET_MS = 48000;
+const BATCH = 400;          // oldest-checked first; runs twice a day so everything is re-checked daily
+const TIME_BUDGET_MS = 50000;
 
 const DEAD_PHRASES = [
   "no longer available", "no longer accepting", "no longer open",
@@ -48,7 +48,7 @@ export default async function handler(req, res) {
     `listings?select=id,company_id,url,ats,external_path&closed_at=is.null&order=link_checked_at.asc.nullsfirst&limit=${BATCH}`
   );
 
-  const results = await mapLimit(rows, 6, async (l) => {
+  const results = await mapLimit(rows, 10, async (l) => {
     if (Date.now() - started > TIME_BUDGET_MS) return { id: l.id, skipped: true };
     const ok = await checkListing(l, byId[l.company_id]);
     if (ok === null) return { id: l.id, unknown: true };
