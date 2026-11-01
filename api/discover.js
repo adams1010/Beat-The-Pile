@@ -19,9 +19,12 @@ export default async function handler(req, res) {
 
   // 1) Sync the candidate list into the table (adds new rows; keeps each row's status/results)
   try {
-    await db.upsert("company_candidates", CANDIDATES.map((c) => ({
-      id: c.id, company: c.company, domain: c.domain || null, key: c.key || null, hint: c.hint || null, source: c.source || null,
-    })));
+    // Two batches so a link pasted on /discovery (stored only in the DB) is never wiped by a code row without one
+    const row = (c) => ({ id: c.id, company: c.company, domain: c.domain || null, key: c.key || null, source: c.source || null });
+    const withHint = CANDIDATES.filter((c) => c.hint).map((c) => ({ ...row(c), hint: c.hint }));
+    const noHint = CANDIDATES.filter((c) => !c.hint).map(row);
+    if (withHint.length) await db.upsert("company_candidates", withHint);
+    if (noHint.length) await db.upsert("company_candidates", noHint);
   } catch (e) {
     return res.status(500).json({ error: "Couldn't update company_candidates — run supabase/discovery.sql first. " + e.message });
   }
@@ -29,13 +32,13 @@ export default async function handler(req, res) {
   // 1b) New or changed hint (e.g. from a browser pass) → re-test now instead of waiting 2 weeks.
   //     Still goes through the same proof check; a hint can't make anything go live by itself.
   const hinted = await db.selectAsAdmin("company_candidates?select=id,hint,config,status&hint=not.is.null&status=neq.live&status=neq.pending&limit=1000");
-  const requeue = hinted.filter((r) => (r.config?.triedHint ?? null) !== r.hint).map((r) => r.id);
+  const requeue = hinted.filter((r) => r.hint && (r.config?.triedHint ?? null) !== r.hint).map((r) => r.id);
   if (requeue.length) {
     await db.update(`company_candidates?id=in.(${requeue.map(encodeURIComponent).join(",")})`, { status: "pending", checked_at: null });
   }
 
   // 1c) A job system we just learned to read → re-test every company parked as "unsupported" on it
-  const NOW_READABLE = /\b(iCIMS)\b/;
+  const NOW_READABLE = /\b(iCIMS)\b/;   // add a system here when a new reader ships
   const parked = await db.selectAsAdmin("company_candidates?select=id,detail&status=eq.unsupported&limit=1000");
   const unpark = parked.filter((r) => NOW_READABLE.test(r.detail || "")).map((r) => r.id);
   if (unpark.length) {
