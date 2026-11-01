@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>InternIQ — ME Internships in VA & PA</title>
+<title>InternIQ — Mechanical Engineering Internships</title>
 <meta name="description" content="Mechanical engineering internships in Virginia and Pennsylvania, pulled straight from company job boards and link-checked every day.">
 <style>
   :root{
@@ -30,6 +30,9 @@
   .seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:10px;padding:3px}
   .seg button{border:0;background:none;font:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:6px 12px;border-radius:7px;cursor:pointer}
   .seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+  .statesel{font:inherit;font-size:14px;font-weight:600;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 10px;cursor:pointer}
+  .statesel.on{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy)}
+  .tag.multi{background:#EEF2FF;color:#3730A3}
   .toggle{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer;user-select:none;
           background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 12px}
   .toggle input{accent-color:var(--green);width:16px;height:16px;margin:0}
@@ -70,7 +73,7 @@
 <header>
   <div class="wrap">
     <a class="brand" href="/">InternIQ</a>
-    <h1>Mechanical engineering internships in Virginia &amp; Pennsylvania</h1>
+    <h1>Mechanical engineering internships, straight from the source</h1>
     <p class="sub">Pulled straight from each company's own job board. No reposts, no recruiters, no dead links.</p>
     <div class="trust" id="trust" hidden><span class="dot"></span><span id="trustText"></span></div>
   </div>
@@ -79,11 +82,11 @@
 <div class="controls">
   <div class="wrap">
     <div class="row">
-      <div class="seg" role="group" aria-label="State">
-        <button data-state="ALL" aria-pressed="true">All</button>
-        <button data-state="VA" aria-pressed="false">VA</button>
-        <button data-state="PA" aria-pressed="false">PA</button>
+      <div class="seg" role="group" aria-label="Where">
+        <button data-state="VA,PA" aria-pressed="true">VA &amp; PA</button>
+        <button data-state="ALL" aria-pressed="false">All US</button>
       </div>
+      <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">Pick a state</option></select>
       <label class="toggle"><input type="checkbox" id="meOnly"> Mechanical only</label>
       <input class="search" id="q" type="search" placeholder="Search company or role" aria-label="Search company or role">
     </div>
@@ -108,17 +111,35 @@
 
 <script>
 (function(){
-  const state = { all: [], st: "ALL", meOnly: false, q: "" };
+  const state = { all: [], st: ["VA","PA"], meOnly: false, q: "" };   // st: array of states, or "ALL"
+  const NAMES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"Washington DC",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
+  const statesOf = (j) => String(j.state || "").split(",").filter(Boolean);
+  const inView = (j) => state.st === "ALL" || statesOf(j).some((s) => state.st.includes(s));
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const DAY = 86400000;
 
-  function cleanLocation(loc){
+  function cleanOne(s){
     // "Salem, VA, US, 24153" → "Salem, VA"; "Newport News, Virginia, United States" → "Newport News, VA"
-    let s = String(loc || "").split("|")[0];
-    s = s.replace(/\bVirginia\b/i, "VA").replace(/\bPennsylvania\b/i, "PA")
-         .replace(/,?\s*(US|USA|United States)\b.*$/i, "").replace(/^USA?\s*-\s*/i, "").trim();
+    // "USA - Pennsylvania - West Point" → "West Point, PA"; "US-VA-STERLING-291 ~ 22640 Davis Dr" → "Sterling, VA"
+    s = String(s || "").split("~")[0].trim();
+    let m = s.match(/^USA?\s*-\s*([A-Z]{2})\s*-\s*([A-Za-z .'-]+?)(?:-\d+)?\s*$/);
+    if (m) return m[2].toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) + ", " + m[1];
+    m = s.match(/^(?:USA?|United States)\s*-\s*([A-Za-z ]+?)\s*-\s*(.+)$/);
+    if (m) { const code = Object.keys(NAMES).find((k) => NAMES[k].toLowerCase() === m[1].trim().toLowerCase()); if (code) return m[2].trim() + ", " + code; }
+    for (const [code, name] of Object.entries(NAMES).sort((a, b) => b[1].length - a[1].length)) {
+      s = s.replace(new RegExp("\\b" + name + "\\b", "i"), code);
+    }
+    s = s.replace(/^USA?\s*-\s*/i, "").replace(/,\s*(US|USA|United States( of America)?)\b.*$/i, "").trim();
     return s.replace(/\s*,\s*$/, "");
+  }
+  function cleanLocation(j){
+    const sites = String(j.location || "").split("|").map((x) => x.trim()).filter(Boolean);
+    if (sites.length <= 1) return cleanOne(sites[0] || "");
+    // Multi-site posting: show a site in the states being viewed, then "+N more"
+    const want = state.st === "ALL" ? null : state.st;
+    const pick = (want && sites.find((x) => want.some((s) => new RegExp("\\b(" + s + "|" + NAMES[s] + ")\\b", "i").test(x)))) || sites[0];
+    return cleanOne(pick) + " +" + (sites.length - 1) + " more";
   }
   function niceTitle(t){
     t = String(t || "");
@@ -156,30 +177,40 @@
 
   function render(){
     const q = state.q.toLowerCase();
-    const rows = state.all.filter((j) =>
-      (state.st === "ALL" || j.state === state.st) &&
-      (!state.meOnly || j.match === "me") &&
-      (!q || (j.company + " " + j.title + " " + j.location).toLowerCase().includes(q)));
+    const matches = (j) => (!state.meOnly || j.match === "me") &&
+      (!q || (j.company + " " + j.title + " " + j.location).toLowerCase().includes(q));
+    const filtered = state.all.filter((j) => inView(j) && matches(j));
+    const nationwide = new Set(state.all.filter(matches).map((j) => (j.company + "|" + j.title + "|" + j.location).toLowerCase())).size;
+
+    // Merge identical postings (same company + title + place) into one card: "2 openings"
+    const groups = new Map();
+    for (const j of filtered) {
+      const k = (j.company + "|" + j.title + "|" + cleanLocation(j)).toLowerCase();
+      if (groups.has(k)) groups.get(k).count++; else groups.set(k, { ...j, count: 1 });
+    }
+    const rows = [...groups.values()];
 
     // "New" = appeared after the first import, within the last 3 days (so day-one data isn't all "New")
     const firstImport = Math.min(...state.all.map((j) => new Date(j.first_seen).getTime()));
     const isNew = (j) => { const t = new Date(j.first_seen).getTime(); return t - firstImport > DAY && Date.now() - t < 3 * DAY; };
 
     const companies = new Set(rows.map((j) => j.company)).size;
+    const where = state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
     $("count").textContent = rows.length
-      ? `${rows.length} internship${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"}`
+      ? `${rows.length} internship${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"} ${where}` +
+        (state.st === "ALL" ? "" : ` · ${nationwide} nationwide`)
       : "";
 
     if (!rows.length){
-      $("list").innerHTML = `<div class="empty">No matches${state.all.length ? " for these filters" : " right now"}. ${state.all.length ? "Try All states or turn off “Mechanical only.”" : "New postings are pulled every morning."}</div>`;
+      $("list").innerHTML = `<div class="empty">No matches ${where}${state.all.length ? " for these filters" : " right now"}. ${state.all.length ? "Try “All US” or turn off “Mechanical only.”" : "New postings are pulled every morning."}</div>`;
       return;
     }
     $("list").innerHTML = rows.map((j) => `
       <article class="card">
         <div>
           <div class="co">${esc(j.company)}</div>
-          <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">NEW</span>' : ""}${j.match === "me" ? '<span class="tag me">ME</span>' : ""}</div>
-          <div class="meta"><span>📍 ${esc(cleanLocation(j.location))}</span><span>${esc(postedText(j))}</span></div>
+          <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">NEW</span>' : ""}${j.match === "me" ? '<span class="tag me">ME</span>' : ""}${j.count > 1 ? `<span class="tag multi">${j.count} openings</span>` : ""}</div>
+          <div class="meta"><span>📍 ${esc(cleanLocation(j))}</span><span>${esc(postedText(j))}</span></div>
         </div>
         <div class="applycol">
           <a class="apply" href="${esc(j.url)}" target="_blank" rel="noopener" data-co="${esc(j.company)}">Apply →</a>
@@ -188,21 +219,37 @@
       </article>`).join("");
   }
 
-  document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () => {
-    state.st = b.dataset.state;
-    document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  function setView(st, btn){
+    state.st = st;
+    document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === btn)));
+    $("stateSel").classList.toggle("on", !btn);
+    if (btn) $("stateSel").value = "";
     render();
-  }));
+  }
+  document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () =>
+    setView(b.dataset.state === "ALL" ? "ALL" : b.dataset.state.split(","), b)));
+  $("stateSel").addEventListener("change", (e) => {
+    if (!e.target.value) return setView(["VA","PA"], document.querySelector('.seg button[data-state="VA,PA"]'));
+    setView([e.target.value], null);
+  });
+  function fillStates(){
+    const counts = {};
+    state.all.forEach((j) => statesOf(j).forEach((s) => { counts[s] = (counts[s] || 0) + 1; }));
+    $("stateSel").innerHTML = '<option value="">Pick a state</option>' + Object.keys(counts)
+      .sort((a, b) => (NAMES[a] || a).localeCompare(NAMES[b] || b))
+      .map((s) => `<option value="${s}">${esc(NAMES[s] || s)} (${counts[s]})</option>`).join("");
+  }
   $("meOnly").addEventListener("change", (e) => { state.meOnly = e.target.checked; render(); });
   $("q").addEventListener("input", (e) => { state.q = e.target.value.trim(); render(); });
 
-  fetch("/api/listings?state=VA,PA")
+  fetch("/api/listings")
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then((d) => {
       state.all = (d.listings || []).sort((a, b) => sortKey(b) - sortKey(a));
       const lastCheck = state.all.map((j) => j.link_checked_at).filter(Boolean).sort().pop();
       const stamp = lastCheck || d.meta?.lastSync;
       if (stamp){ $("trustText").textContent = `Every link checked ${timeOfDay(stamp)}`; $("trust").hidden = false; }
+      fillStates();
       render();
     })
     .catch(() => { $("list").innerHTML = '<div class="err">Couldn’t load internships right now. Refresh in a minute.</div>'; });
