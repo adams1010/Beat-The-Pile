@@ -4,7 +4,7 @@
 //          { id, hint }                 paste a job-board link for a company the robot couldn't find
 //          { company, domain, hint? }   add a brand-new company to the robot's list
 //          A pasted link is never trusted by itself — the robot re-checks it and must still prove it's theirs.
-import { db } from "../lib/db.js";
+import { db, isAuthorizedCron } from "../lib/db.js";
 import { COMPANIES } from "../lib/companies.js";
 import { verifyClerkJWT, bearer } from "../lib/auth.js";
 
@@ -27,7 +27,9 @@ export default async function handler(req, res) {
   if (req.method === "POST") {
     res.setHeader("Cache-Control", "no-store");
     let who;
-    try { who = await adminEmail(req); } catch { return res.status(503).json({ error: "Sign-in check unavailable" }); }
+    // The nightly browser pass (GitHub Actions, holds CRON_SECRET) may also suggest links — they get the same proof checks
+    if (isAuthorizedCron(req)) who = "robot";
+    else try { who = await adminEmail(req); } catch { return res.status(503).json({ error: "Sign-in check unavailable" }); }
     if (!who) return res.status(403).json({ error: "Only the InternIQ owner can edit the robot's list" });
 
     let b = req.body; if (typeof b === "string") { try { b = JSON.parse(b); } catch { b = {}; } }
@@ -35,7 +37,8 @@ export default async function handler(req, res) {
       if (b?.id) {                                        // link for an existing company
         const hint = cleanUrl(b.hint);
         if (!hint) return res.status(400).json({ error: "That doesn't look like a link (needs https://…)" });
-        await db.update(`company_candidates?id=eq.${encodeURIComponent(b.id)}`, { hint, status: "pending", checked_at: null, detail: "Link added — robot will check it within ~15 min" });
+        await db.update(`company_candidates?id=eq.${encodeURIComponent(b.id)}`, { hint, status: "pending", checked_at: null,
+          detail: who === "robot" ? "Browser pass found a job board — robot will verify it" : "Link added — robot will check it within the hour" });
         return res.status(200).json({ ok: true });
       }
       const company = String(b?.company || "").trim().slice(0, 80);

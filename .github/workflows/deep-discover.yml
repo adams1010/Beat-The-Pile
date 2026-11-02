@@ -1,0 +1,20 @@
+# Nightly browser pass: opens careers pages that need JavaScript and hands any job board it finds to the robot,
+# which still has to prove the board belongs to that company. Uses the CRON_SECRET repo secret.
+name: deep-discover
+on:
+  schedule:
+    - cron: "30 8 * * *"
+  workflow_dispatch:
+    inputs:
+      args: { description: "e.g. --dry --limit=15", required: false, default: "--limit=60" }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm i --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
+      - run: node scripts/deep-discover.mjs ${{ inputs.args || '--limit=60' }}
+        env: { CRON_SECRET: "${{ secrets.CRON_SECRET }}" }
