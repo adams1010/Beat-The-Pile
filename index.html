@@ -129,14 +129,24 @@ function schoolMatches(option,query){
   if(q.length>=2&&acr.includes(q)) return true;
   return false;
 }
-const TESTIMONIALS=[
-  {quote:"I had no idea where to start. InternIQ literally showed me 24 companies near me I'd never heard of — I applied to 6 and got 2 interviews.",name:"Priya S.",detail:"Junior, Finance · Rutgers",stars:5,avatar:"PS"},
-  {quote:"The match percentages felt honest for once. I stopped applying to Google and focused on realistic shots. Got an offer from a company 8 miles from my house.",name:"Marcus T.",detail:"Sophomore, CS · Penn State",stars:5,avatar:"MT"},
-  {quote:"The quiz took like 90 seconds and the results were actually tailored to mechanical engineering near my zip code. Other sites just spam you with LinkedIn jobs.",name:"Alyssa R.",detail:"Junior, Mech E · Drexel",stars:5,avatar:"AR"},
-  {quote:"The follow-up email tool is lowkey the best part. I forgot to follow up on 3 applications and it drafted the emails for me. One of them turned into an interview.",name:"Jordan K.",detail:"Senior, Marketing · Temple",stars:5,avatar:"JK"},
-  {quote:"As a first-gen student I had zero connections. This gave me a real list and told me exactly why each company was a good fit. Game changer.",name:"Destiny M.",detail:"Sophomore, Biology · Howard",stars:5,avatar:"DM"},
-  {quote:"Showed this to my advisor and she said the match scoring is more honest than anything she's seen. The 'Reach' labels saved me from wasting apps.",name:"Ethan L.",detail:"Junior, Finance · NYU",stars:5,avatar:"EL"},
-];
+// Live numbers from our own data (replaces unsourced industry stats)
+const LiveStats=()=>{
+  const [d,setD]=React.useState(null);
+  React.useEffect(()=>{
+    Promise.all([fetch("/api/listings").then(r=>r.json()),fetch("/api/discovery").then(r=>r.json())])
+      .then(([l,c])=>{const L=l.listings||[];setD({n:L.length,me:L.filter(x=>x.match==="me").length,cos:new Set(L.map(x=>x.company)).size,boards:(c.counts?.live||0)+(c.handVerified||[]).length,last:l.meta?.lastSync});})
+      .catch(()=>{});
+  },[]);
+  const fmt=(n)=>n==null?"—":n.toLocaleString();
+  const items=[{v:d?.n,l:"open internships right now",c:"#00C285"},{v:d?.me,l:"tagged mechanical engineering",c:"#FF8C00"},{v:d?.cos,l:"companies hiring interns",c:"#2563EB"},{v:d?.boards,l:"company job boards checked hourly",c:"#7C3AED"}];
+  return (<div style={{maxWidth:760,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:"1rem"}}>
+    {items.map((s,i)=>(<div key={i} style={{background:"#fff",border:"1px solid #E6FBF4",borderRadius:14,padding:"1.75rem 1.25rem",textAlign:"center",boxShadow:"0 2px 8px rgba(0,194,133,0.06)"}}>
+      <div style={{fontSize:38,fontWeight:800,color:s.c,lineHeight:1,marginBottom:"0.5rem",letterSpacing:"-1.5px"}}>{fmt(s.v)}</div>
+      <p style={{fontSize:12,color:"#4A5568",lineHeight:1.5,fontWeight:500}}>{s.l}</p></div>))}
+  </div>);
+};
+// Real student quotes go here once real students give them (with permission). Never invent these.
+const TESTIMONIALS=[];
 const UNIVERSITIES=["American University","Appalachian State University","Arizona State University","Auburn University","Ball State University","Baylor University","Binghamton University","Boise State University","Boston College","Boston University","Bowling Green State University","Brandeis University","Brigham Young University","Brown University","Bucknell University","Butler University","Cal Poly SLO","California State University, Fullerton","California State University, Long Beach","Carnegie Mellon University","Case Western Reserve University","Chapman University","Clemson University","Colgate University","College of Charleston","College of William & Mary","Colorado School of Mines","Colorado State University","Columbia University","Cornell University","Creighton University","Dartmouth College","DePaul University","Drexel University","Duke University","East Carolina University","Elon University","Emory University","Fairfield University","Florida Atlantic University","Florida Gulf Coast University","Florida International University","Florida State University","Fordham University","George Mason University","George Washington University","Georgetown University","Georgia State University","Georgia Tech","Gonzaga University","Harvard University","High Point University","Hofstra University","Howard University","Illinois State University","Indiana University Bloomington","Iowa State University","James Madison University","Johns Hopkins University","Kansas State University","Kennesaw State University","Kent State University","Lafayette College","Lehigh University","Louisiana State University","Loyola Marymount University","Loyola University Chicago","Marquette University","MIT","Miami University (Ohio)","Michigan State University","Mississippi State University","Missouri State University","Montclair State University","NC State University","New York University (NYU)","Northeastern University","Northern Arizona University","Northern Illinois University","Northwestern University","Notre Dame","Oakland University","Ohio State University","Ohio University","Oklahoma State University","Old Dominion University","Oregon State University","Pace University","Penn State University","Pepperdine University","Princeton University","Purdue University","Quinnipiac University","Rensselaer Polytechnic Institute (RPI)","Rice University","RIT","Rowan University","Rutgers University","Saint Joseph's University","Saint Louis University","Salisbury University","San Diego State University","San Jose State University","Santa Clara University","Seton Hall University","Southern Methodist University (SMU)","Stanford University","Stevens Institute of Technology","Stony Brook University","SUNY Albany","Syracuse University","Temple University","Texas A&M University","Texas Christian University (TCU)","Texas State University","Texas Tech University","Towson University","Tufts University","Tulane University","UC Berkeley","UC Davis","UC Irvine","UC Riverside","UC San Diego","UC Santa Barbara","UCLA","University at Buffalo","University of Alabama","University of Arizona","University of Arkansas","University of Central Florida","University of Chicago","University of Cincinnati","University of Colorado Boulder","University of Connecticut","University of Dayton","University of Delaware","University of Denver","University of Florida","University of Georgia","University of Houston","University of Illinois Chicago","University of Illinois Urbana-Champaign","University of Iowa","University of Kansas","University of Kentucky","University of Louisville","University of Maryland","UMass Amherst","University of Miami","University of Michigan","University of Minnesota","University of Mississippi (Ole Miss)","University of Missouri","University of Nebraska-Lincoln","University of Nevada, Las Vegas","University of New Hampshire","UNC Chapel Hill","University of North Carolina at Charlotte","University of North Texas","University of Oklahoma","University of Oregon","University of Pennsylvania","University of Pittsburgh","University of Rhode Island","University of Richmond","University of Rochester","University of San Diego","University of South Carolina","University of South Florida","University of Southern California","University of Tennessee","UT Austin","University of Texas at Dallas","University of Utah","University of Vermont","University of Virginia","University of Washington","UW-Madison","Vanderbilt University","Villanova University","Virginia Commonwealth University","Virginia Tech","Wake Forest University","Washington University in St. Louis","Wayne State University","West Virginia University","Western Michigan University","Yale University","Borough of Manhattan Community College","Broward College","Cuyahoga Community College","Dallas College","De Anza College","Foothill College","Houston Community College","Lone Star College","Miami Dade College","Mt. San Antonio College","Northern Virginia Community College (NOVA)","Pasadena City College","Santa Monica College","Tarrant County College","Valencia College","Wake Tech Community College","Other Community College","Other"].sort();
 
 const MAJORS=["Accounting","Actuarial Science","Advertising","Aerospace Engineering","Agricultural Science","Animation","Anthropology","Applied Mathematics","Architecture","Art History","Artificial Intelligence","Astronomy","Athletic Training","Biochemistry","Bioinformatics","Biology","Biomedical Engineering","Business Administration","Business Analytics","Chemical Engineering","Chemistry","Civil Engineering","Classics","Cognitive Science","Communications","Computer Engineering","Computer Science","Construction Management","Criminal Justice","Culinary Arts","Cybersecurity","Dance","Data Science","Dental (Pre-Dental)","Early Childhood Education","Economics","Education","Electrical Engineering","English / Literature","Entrepreneurship","Environmental Engineering","Environmental Science","Exercise Science / Kinesiology","Fashion Design","Film & Television","Finance","Fine Arts","Food Science","Forensic Science","Game Design","Geography","Geology","Graphic Design","Health Sciences","History","Hospitality Management","Human Resources","Industrial Design","Industrial Engineering","Information Systems","Information Technology","Interior Design","International Business","International Relations","Journalism","Law (Pre-Law)","Liberal Arts","Linguistics","Management","Management Information Systems","Marketing","Materials Science","Mathematics","Mechanical Engineering","Medicine (Pre-Med)","Microbiology","Music","Music Production","Neuroscience","Nursing","Nutrition & Dietetics","Occupational Therapy","Operations Management","Pharmacy (Pre-Pharmacy)","Philosophy","Photography","Physical Therapy","Physician Assistant (Pre-PA)","Physics","Political Science","Psychology","Public Health","Public Policy","Public Relations","Real Estate","Religious Studies","Robotics","Social Work","Sociology","Software Engineering","Spanish","Sports Management","Statistics","Supply Chain Management","Sustainability","Theater Arts","Urban Planning","Veterinary (Pre-Vet)","Women's & Gender Studies","Other"].sort();
@@ -3274,7 +3284,7 @@ Return ONLY this exact JSON structure, no markdown, no extra text:
         <span className="nav-logo-text" style={{fontWeight:800,fontSize:17,color:"#0A1628",letterSpacing:"-0.5px"}}>InternIQ</span>
       </button>
       <div className="nav-links" style={{display:"flex",gap:2,alignItems:"center"}}>
-        {[["/jobs/","Jobs"],["/fair/","Career Fair"]].map(([href,l])=>(
+        {[["/jobs/","Jobs"],["/fair/","Career Fair"],["/demo/","▶ Demo"]].map(([href,l])=>(
           <a key={href} className="nav-tab" href={href} style={{color:"#4A5568",padding:"7px 12px",borderRadius:var_r,fontSize:14,fontWeight:600,fontFamily:"var(--font)",textDecoration:"none"}}>{l}</a>
         ))}
         {[["wall","Community"],["community","Tips"],["dashboard","Dashboard"],["resumebuilder","📄 Resume"],["profile","Profile"]].map(([p,l])=>(
@@ -3310,37 +3320,23 @@ Return ONLY this exact JSON structure, no markdown, no extra text:
           Stop applying blind.<br/><span style={{color:G}}>Start applying smart.</span>
         </h1>
         <p style={{fontSize:18,color:"#4A5568",lineHeight:1.7,maxWidth:500,margin:"0 auto 2rem"}}>
-          Get honest odds on internships that match your major — and the tools to actually land them.
+          Engineering internships pulled straight from each company's own job board and link-checked every day — plus Career Fair Mode for the day you walk in.
         </p>
         <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
-          {results.length>0?(
-            <button onClick={()=>setPage("results")} style={{background:`linear-gradient(135deg,${G},${GD})`,border:"none",color:"#fff",padding:"15px 32px",borderRadius:var_rl,fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"var(--font)",boxShadow:`0 4px 20px ${G}50`,letterSpacing:"-0.3px"}}>
-              Welcome back — view your matches →
-            </button>
-          ):(
-            <button onClick={()=>{setStep(0);setPage("quiz");}} style={{background:`linear-gradient(135deg,${G},${GD})`,border:"none",color:"#fff",padding:"15px 32px",borderRadius:var_rl,fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"var(--font)",boxShadow:`0 4px 20px ${G}50`,letterSpacing:"-0.3px"}}>
-              Find My Matches — Free →
-            </button>
-          )}
+          <a href="/jobs/" style={{background:`linear-gradient(135deg,${G},${GD})`,color:"#fff",padding:"15px 32px",borderRadius:var_rl,fontSize:16,fontWeight:700,textDecoration:"none",fontFamily:"var(--font)",boxShadow:`0 4px 20px ${G}50`,letterSpacing:"-0.3px"}}>Browse internships →</a>
+          <a href="/demo/" style={{background:"#fff",color:"#0A1628",border:"1.5px solid #CBD5E0",padding:"15px 28px",borderRadius:var_rl,fontSize:16,fontWeight:700,textDecoration:"none",fontFamily:"var(--font)"}}>▶ Watch the demo</a>
         </div>
-        <p style={{fontSize:13,color:"#9CA3AF",marginTop:16}}>Takes 2 minutes · No account required · Free to start</p>
+        <p style={{fontSize:13,color:"#9CA3AF",marginTop:16}}>Free · No account needed to browse · <a href="/fair/" style={{color:GD,fontWeight:600}}>Going to a career fair? →</a></p>
       </div>
 
       {/* Stats */}
       <div style={{background:"#F8FFFE",borderTop:`1px solid ${GL}`,borderBottom:`1px solid ${GL}`,padding:"3rem 2rem"}}>
-        <p style={{fontSize:10,fontWeight:700,color:"#9CA3AF",letterSpacing:"3px",textTransform:"uppercase",textAlign:"center",marginBottom:"2rem"}}>The reality check</p>
-        <div style={{maxWidth:760,margin:"0 auto",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:"1rem"}}>
-          {[{v:52,s:"+",l:"Avg applications per student",c:G},{v:8,s:"%",l:"Cold application response rate",c:AM},{v:85,s:"%",l:"Never send a follow-up email",c:CR},{v:3,s:"x",l:"Higher callback with follow-up",c:"#2563EB"}].map((s,i)=>(
-            <div key={i} style={{background:"#fff",border:`1px solid ${GL}`,borderRadius:var_rl,padding:"1.75rem 1.25rem",textAlign:"center",boxShadow:"0 2px 8px rgba(0,194,133,0.06)"}}>
-              <div style={{fontSize:38,fontWeight:800,color:s.c,lineHeight:1,marginBottom:"0.5rem",letterSpacing:"-1.5px"}}><Counter target={s.v} suffix={s.s}/></div>
-              <p style={{fontSize:12,color:"#4A5568",lineHeight:1.5,fontWeight:500}}>{s.l}</p>
-            </div>
-          ))}
-        </div>
+        <p style={{fontSize:10,fontWeight:700,color:"#9CA3AF",letterSpacing:"3px",textTransform:"uppercase",textAlign:"center",marginBottom:"2rem"}}>Live right now</p>
+        <LiveStats/>
       </div>
 
-      {/* Student testimonials */}
-      <div style={{padding:"3.5rem 2rem",maxWidth:820,margin:"0 auto"}}>
+      {/* Student testimonials — only real ones */}
+      {TESTIMONIALS.length>0&&<div style={{padding:"3.5rem 2rem",maxWidth:820,margin:"0 auto"}}>
         <p style={{fontSize:10,fontWeight:700,color:"#9CA3AF",letterSpacing:"3px",textTransform:"uppercase",textAlign:"center",marginBottom:"0.5rem"}}>From students like you</p>
         <h2 style={{fontSize:"clamp(1.4rem,3vw,2rem)",fontWeight:800,letterSpacing:"-0.8px",textAlign:"center",marginBottom:"2rem",color:"#0A1628"}}>Real students. Real results.</h2>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:"1rem"}}>
@@ -3361,17 +3357,17 @@ Return ONLY this exact JSON structure, no markdown, no extra text:
         <div style={{textAlign:"center",marginTop:"1.75rem"}}>
           <button onClick={()=>setPage("wall")} style={{background:"none",border:`1.5px solid ${GL}`,color:GD,padding:"10px 24px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:13.5,fontWeight:700}}>See more from the community →</button>
         </div>
-      </div>
+      </div>}
 
       {/* How it works */}
       <div style={{padding:"4rem 2rem",maxWidth:760,margin:"0 auto"}}>
         <p style={{fontSize:10,fontWeight:700,color:"#9CA3AF",letterSpacing:"3px",textTransform:"uppercase",textAlign:"center",marginBottom:"0.5rem"}}>How it works</p>
-        <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.4rem)",fontWeight:800,letterSpacing:"-1px",textAlign:"center",marginBottom:"2.5rem",color:"#0A1628"}}>Three steps to your internship.</h2>
+        <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.4rem)",fontWeight:800,letterSpacing:"-1px",textAlign:"center",marginBottom:"2.5rem",color:"#0A1628"}}>One place for the whole search.</h2>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:"1.25rem"}}>
           {[
-            {icon:"🎯",num:"01",title:"Build your profile",desc:"School, major, GPA, activities, and zip code. 2 minutes.",color:G},
-            {icon:"🎯",num:"02",title:"Get matched to real firms",desc:"We show real companies that hire interns in your field — including ones you've never heard of — with your honest odds for each.",color:AM},
-            {icon:"📧",num:"03",title:"Apply and follow up",desc:"Real apply links plus auto-fill and a tailored cover letter. We track follow-up timing and draft the email — you send it as you.",color:"#2563EB"},
+            {icon:"🔎",num:"01",title:"Browse real internships",desc:"Pulled straight from each company's own job board. A robot proves every board is really theirs, and dead links come down within the day.",color:G},
+            {icon:"♡",num:"02",title:"Save and track",desc:"Save the ones you like, mark what you've applied to, and filter by state — VA & PA by default, or anywhere in the US.",color:AM},
+            {icon:"🎯",num:"03",title:"Crush the career fair",desc:"Your resume as a QR code, every company at the fair with booth numbers and open roles, notes after each talk, and follow-up emails drafted for you.",color:"#2563EB"},
           ].map((s,i)=>(
             <div key={i} style={{background:"#fff",border:`1px solid ${GL}`,borderRadius:var_rl,padding:"1.75rem",boxShadow:"0 2px 12px rgba(0,194,133,0.06)"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"1rem"}}>
@@ -3388,8 +3384,8 @@ Return ONLY this exact JSON structure, no markdown, no extra text:
       <div style={{padding:"2rem 2rem 5rem"}}>
         <div style={{background:`linear-gradient(135deg,${GL},#fff)`,border:`1.5px solid ${GM}`,borderRadius:var_rxl,padding:"3rem 2rem",maxWidth:520,margin:"0 auto",textAlign:"center",boxShadow:`0 8px 32px ${G}15`}}>
           <h2 style={{fontSize:"clamp(1.4rem,3vw,2rem)",fontWeight:800,letterSpacing:"-0.8px",marginBottom:"0.75rem",color:"#0A1628"}}>Ready to find your real shot?</h2>
-          <p style={{color:"#4A5568",marginBottom:"1.5rem",fontSize:15,lineHeight:1.6}}>Free to start. Takes 2 minutes. Real firms in your field, not just the big names.</p>
-          <button onClick={()=>{setStep(0);setPage("quiz");}} style={{background:`linear-gradient(135deg,${G},${GD})`,border:"none",color:"#fff",padding:"15px 40px",borderRadius:var_rl,fontSize:16,fontWeight:700,cursor:"pointer",fontFamily:"var(--font)",boxShadow:`0 4px 20px ${G}40`}}>Find My Matches — Free</button>
+          <p style={{color:"#4A5568",marginBottom:"1.5rem",fontSize:15,lineHeight:1.6}}>Free. Real firms in your field, not just the big names.</p>
+          <a href="/jobs/" style={{display:"inline-block",background:`linear-gradient(135deg,${G},${GD})`,color:"#fff",padding:"15px 40px",borderRadius:var_rl,fontSize:16,fontWeight:700,textDecoration:"none",fontFamily:"var(--font)",boxShadow:`0 4px 20px ${G}40`}}>Browse internships →</a>
         </div>
       </div>
       <div style={{textAlign:"center",padding:"1.5rem",color:"#9CA3AF",fontSize:13,borderTop:`1px solid ${GL}`}}>© 2026 InternIQ · Built for students · <span style={{color:G,cursor:"pointer"}} onClick={()=>setShowProModal(true)}>Go Pro ⚡</span></div>
@@ -4374,7 +4370,7 @@ Thank you for your time,
 
           {/* Testimonials carousel — same data as the landing page, compact horizontal scroll here */}
           <div style={{marginBottom:26}}>
-            <p style={{fontSize:11,fontWeight:700,color:"#9CA3AF",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:10}}>What students are saying</p>
+            {TESTIMONIALS.length>0&&<p style={{fontSize:11,fontWeight:700,color:"#9CA3AF",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:10}}>What students are saying</p>}
             <div style={{display:"flex",gap:10,overflowX:"auto",paddingBottom:6,scrollbarWidth:"thin"}}>
               {TESTIMONIALS.map((t,i)=>(
                 <div key={i} style={{background:"#F8FFFE",border:`1.5px solid ${GL}`,borderRadius:var_rl,padding:"1rem 1.1rem",display:"flex",flexDirection:"column",gap:8,minWidth:230,maxWidth:230,flexShrink:0}}>

@@ -26,6 +26,15 @@ async function adminEmail(req) {
 export default async function handler(req, res) {
   if (req.method === "POST") {
     res.setHeader("Cache-Control", "no-store");
+    let fb = req.body; if (typeof fb === "string") { try { fb = JSON.parse(fb); } catch { fb = {}; } }
+    // Public "Report a problem" button (any page). Stored privately; nobody can read it back through the API.
+    if (fb?.action === "feedback") {
+      const clip = (v, n) => String(v ?? "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, n);
+      const message = clip(fb.message, 2000);
+      if (message.length < 3) return res.status(400).json({ error: "Tell us a bit more" });
+      await db.insert("feedback", [{ page: clip(fb.page, 120), kind: clip(fb.kind, 40), message, contact: clip(fb.contact, 120) || null, listing_id: clip(fb.listingId, 200) || null }]);
+      return res.status(200).json({ ok: true });
+    }
     let who;
     // The nightly browser pass (GitHub Actions, holds CRON_SECRET) may also suggest links — they get the same proof checks
     if (isAuthorizedCron(req)) who = "robot";

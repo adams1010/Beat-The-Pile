@@ -61,6 +61,7 @@
   .applycol{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
   .apply{display:inline-block;background:var(--green);color:#fff;text-decoration:none;font-weight:700;font-size:14px;padding:10px 16px;border-radius:10px;white-space:nowrap}
   .apply:hover{background:var(--green-dark)}
+  .src a.rep{color:var(--faint);text-decoration:underline}
   .src{font-size:11px;color:var(--faint)}
   @media (max-width:560px){
     .card{grid-template-columns:1fr}
@@ -101,6 +102,7 @@
     <p class="sub">Pulled straight from each company's own job board. No reposts, no recruiters, no dead links.</p>
     <div class="trust" id="trust" hidden><span class="dot"></span><span id="trustText"></span></div>
     <a class="fairlink" href="/fair/">🎯 Going to a career fair? <b>Career Fair Mode →</b></a>
+    <a class="fairlink" href="/demo/" style="margin-top:6px">▶ New here? <b>Watch the 2-minute demo</b></a>
   </div>
 </header>
 
@@ -179,6 +181,11 @@
     return year || "";
   }
   const needsClearance = (t) => /\b(clearance|u\.?s\.? citizen(ship)?|us person)\b/i.test(String(t || ""));
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a.rep"); if (!a) return;
+    e.preventDefault();
+    if (window.iqReport) window.iqReport({ listingId: a.dataset.rep, message: `Problem with: ${a.dataset.what}\n` });
+  });
   function niceTitle(t){
     t = String(t || "");
     if (t.length < 8 || t !== t.toUpperCase()) return t;   // only fix ALL-CAPS titles
@@ -260,7 +267,7 @@
         </div>
         <div class="applycol">
           <a class="apply" href="${esc(j.url)}" target="_blank" rel="noopener" data-co="${esc(j.company)}">Apply →</a>
-          <span class="src">on ${esc(domain(j.url))}</span>
+          <span class="src">on ${esc(domain(j.url))} · <a href="#" class="rep" data-rep="${esc(j.id)}" data-what="${esc(j.company + " — " + j.title)}">Report</a></span>
           <div class="mine">
             <button class="ic save" data-act="saved" data-id="${esc(j.id)}" aria-pressed="${has("saved", j)}">${has("saved", j) ? "♥ Saved" : "♡ Save"}</button>
             <button class="ic done" data-act="applied" data-id="${esc(j.id)}" aria-pressed="${has("applied", j)}">${has("applied", j) ? "✓ Applied" : "Mark applied"}</button>
@@ -372,5 +379,6 @@
     .catch(() => { $("list").innerHTML = '<div class="err">Couldn’t load internships right now. Refresh in a minute.</div>'; });
 })();
 </script>
+<script src="/feedback.js" defer></script>
 </body>
 </html>
