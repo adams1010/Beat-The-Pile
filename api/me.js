@@ -7,6 +7,10 @@
 //   POST /api/me { action:"share", on }            → turn the QR link on/off
 //   POST /api/me { action:"note", note }           → add/update a career-fair conversation note
 //   POST /api/me { action:"note_delete", id }
+//   POST /api/me { action:"star", company, on }     → follow a company (fair game plan + new-job alerts)
+//   POST /api/me { action:"seen" }                 → mark "new internships" as seen (jobs page)
+//   POST /api/me { action:"brief", companyId }     → AI company brief (cached for everyone, 30 days)
+//   POST /api/me { action:"polish", note }         → AI-written follow-up email from your notes
 //   GET  /api/me?r=<token>   (no sign-in)          → the QR target: redirects to the resume if sharing is on
 //                                                    (vercel.json maps /r/<token> here)
 // Requires a genuine Clerk session token (signature-checked in lib/auth.js) for everything except ?r=.
@@ -21,6 +25,60 @@ const MAX_PDF = 3 * 1024 * 1024;             // 3 MB (Vercel caps request bodies
 const ID_OK = /^[a-z0-9-]+:.{1,200}$/;
 const TOKEN_OK = /^[A-Za-z0-9_-]{16,64}$/;
 const BUCKET = "resumes";
+const CO_OK = /^[a-z0-9-]{1,80}$/;
+const MAX_STARS = 300;
+const BRIEF_DAYS = 30;
+const AI_PER_HOUR = 30;
+const aiHits = new Map();               // uid -> [timestamps] (per server instance)
+function aiLimited(uid) {
+  const now = Date.now(), list = (aiHits.get(uid) || []).filter((t) => now - t < 36e5);
+  list.push(now); aiHits.set(uid, list); if (aiHits.size > 5000) aiHits.clear();
+  return list.length > AI_PER_HOUR;
+}
+async function claude(prompt, max_tokens = 700) {
+  const key = process.env.ANTHROPIC_API_KEY;
+  if (!key) throw new Error("AI is not configured");
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST", headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" },
+    body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens, temperature: 0.3, messages: [{ role: "user", content: prompt }] }),
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error("AI is busy — try again in a minute");
+  return (d.content || []).filter((b) => b.type === "text").map((b) => b.text).join("");
+}
+function parseJson(text) {
+  const m = String(text).match(/\{[\s\S]*\}/);
+  if (!m) throw new Error("AI gave an unreadable answer — try again");
+  return JSON.parse(m[0]);
+}
+const strArr = (a, n, len) => (Array.isArray(a) ? a : []).map((x) => clean(x, len)).filter(Boolean).slice(0, n);
+
+async function companyBrief(companyId) {
+  const cached = await db.selectAsAdmin(`company_briefs?select=brief,created_at&company_id=eq.${encodeURIComponent(companyId)}&limit=1`);
+  if (cached[0] && Date.now() - new Date(cached[0].created_at) < BRIEF_DAYS * 864e5) return { ...cached[0].brief, cached: true };
+  const [cand, jobs] = await Promise.all([
+    db.selectAsAdmin(`company_candidates?select=company,domain&id=eq.${encodeURIComponent(companyId)}&limit=1`),
+    db.selectAsAdmin(`listings?select=company,title,location&company_id=eq.${encodeURIComponent(companyId)}&limit=20`),
+  ]);
+  const name = cand[0]?.company || jobs[0]?.company;
+  if (!name) return null;
+  const domain = cand[0]?.domain || "";
+  const titles = [...new Set(jobs.map((j) => j.title))].slice(0, 12);
+  const prompt = `You write short, factual company briefs for engineering students about to talk to a recruiter at a career fair.
+
+Company: ${name}${domain ? `\nWebsite: ${domain}` : ""}
+${titles.length ? `Internships they have open right now:\n- ${titles.join("\n- ")}` : "They have no internships posted right now."}
+
+Reply with ONLY this JSON:
+{"known": true|false, "about": "1-2 sentences: what the company does and who its customers are", "engineers": "1-2 sentences: what engineers (especially mechanical) typically work on there", "ask": ["3 specific, smart questions a student could ask their recruiter"]}
+
+Rules: be factual and plain. If you are not confident you know this specific company (common for small or local firms), set "known": false, keep "about" to what the website domain and job titles clearly show, and do not invent facts like size, revenue, or projects.`;
+  const j = parseJson(await claude(prompt));
+  const brief = { known: j.known !== false, about: clean(j.about, 400), engineers: clean(j.engineers, 400), ask: strArr(j.ask, 3, 200) };
+  if (!brief.about) throw new Error("AI gave an empty answer — try again");
+  await db.upsert("company_briefs", [{ company_id: companyId, brief, created_at: new Date().toISOString() }], "company_id");
+  return brief;
+}
 
 // ── Supabase Storage (private bucket; files are only ever handed out as short-lived signed links) ──
 function storageHeaders(extra = {}) {
@@ -104,7 +162,8 @@ export default async function handler(req, res) {
     const rows = await db.selectAsAdmin(`user_jobs?select=*&clerk_user_id=eq.${encodeURIComponent(uid)}&limit=1`);
     return rows[0] || null;
   };
-  const view = (row) => ({ saved: row?.saved || [], applied: row?.applied || [], resume: publicResume(row), notes: row?.fair_notes || [] });
+  const view = (row) => ({ saved: row?.saved || [], applied: row?.applied || [], resume: publicResume(row), notes: row?.fair_notes || [],
+                            starred: row?.starred || [], seenAt: row?.seen_at || null });
   const save = (patch) => db.upsert("user_jobs", [{ clerk_user_id: uid, ...patch, updated_at: new Date().toISOString() }], "clerk_user_id");
 
   try {
@@ -134,6 +193,53 @@ export default async function handler(req, res) {
       if (!row?.resume_path) return res.status(400).json({ error: "Upload a resume first" });
       await save({ resume_share: body.on === true });
       return res.status(200).json(view({ ...row, resume_share: body.on === true }));
+    }
+
+    // ── Follow companies (fair game plan + alerts) ──
+    if (body?.action === "star") {
+      const co = String(body.company || "");
+      if (!CO_OK.test(co)) return res.status(400).json({ error: "Bad company" });
+      const set = new Set(row?.starred || []);
+      if (body.on === true) set.add(co); else set.delete(co);
+      if (set.size > MAX_STARS) return res.status(400).json({ error: `You can follow up to ${MAX_STARS} companies` });
+      await save({ starred: [...set] });
+      return res.status(200).json(view({ ...row, starred: [...set] }));
+    }
+    if (body?.action === "seen") {
+      await save({ seen_at: new Date().toISOString() });
+      return res.status(200).json({ ok: true });
+    }
+
+    // ── AI helpers ──
+    if (body?.action === "brief") {
+      const co = String(body.companyId || "");
+      if (!CO_OK.test(co)) return res.status(400).json({ error: "Bad company" });
+      const cached = await db.selectAsAdmin(`company_briefs?select=brief&company_id=eq.${encodeURIComponent(co)}&created_at=gt.${new Date(Date.now() - BRIEF_DAYS * 864e5).toISOString()}&limit=1`);
+      if (cached[0]) return res.status(200).json({ brief: cached[0].brief });
+      if (aiLimited(uid)) return res.status(429).json({ error: "That's a lot of briefs — try again in a bit" });
+      const brief = await companyBrief(co);
+      if (!brief) return res.status(404).json({ error: "We don't have that company yet" });
+      return res.status(200).json({ brief });
+    }
+    if (body?.action === "polish") {
+      const n = cleanNote(body.note);
+      if (!n.company) return res.status(400).json({ error: "Which company was it?" });
+      if (aiLimited(uid)) return res.status(429).json({ error: "Too many requests — try again in a bit" });
+      const me = clean(body.name, 80) || "[Your name]", link = clean(body.resumeLink, 200);
+      const prompt = `Write a short follow-up email from a college engineering student to a recruiter they just met at a career fair.
+
+Student: ${me}
+Company: ${n.company}
+Recruiter: ${n.contact || "(name not noted)"}
+Fair: ${n.fair || "a career fair"}
+Roles discussed: ${n.roles || "(not noted)"}
+Student's notes from the conversation: ${n.said || "(none)"}
+${link ? `Resume link to include: ${link}` : "Say the resume is attached."}
+
+Rules: under 130 words. Warm but professional, not over the top. Mention one or two specific things from the notes so the recruiter remembers them. Never invent details that aren't in the notes. Don't claim the student already applied unless the notes say so. Refer to "the fair" instead of saying "today" or "yesterday". Sign off with the student's name.
+Reply with ONLY this JSON: {"subject": "...", "body": "..."}`;
+      const j = parseJson(await claude(prompt, 600));
+      return res.status(200).json({ subject: clean(j.subject, 160), body: String(j.body || "").slice(0, 2000) });
     }
 
     // ── Career fair: conversation notes ──

@@ -84,6 +84,27 @@
   .job a{color:var(--green-dark);font-weight:700;text-decoration:none;white-space:nowrap}
   .tag{font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:var(--green-light);color:var(--green-dark);margin-left:4px}
 
+  /* Game plan + briefs */
+  .cohead{display:flex;align-items:stretch}
+  .cohead > button.exp{all:unset;box-sizing:border-box;flex:1;display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 14px 12px 4px;cursor:pointer;min-width:0}
+  .cohead > button.exp:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
+  .star{all:unset;cursor:pointer;font-size:22px;line-height:1;padding:12px 6px 12px 12px;color:#CBD5E1}
+  .star[aria-pressed="true"]{color:#F59E0B}
+  .star:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
+  .route{background:var(--navy);color:#fff;border-radius:12px;padding:14px;margin-bottom:10px}
+  .route b{color:var(--green)}
+  .route .stops{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .route .stops span{font-size:12px;font-weight:700;background:rgba(255,255,255,.1);border-radius:999px;padding:4px 9px}
+  .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+  .fact{background:#F8FAFC;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
+  .fact b{display:block;font-size:22px;color:var(--navy);line-height:1.1}
+  .fact span{font-size:11.5px;color:var(--muted)}
+  .ai{background:#F5F3FF;border:1px solid #DDD6FE;border-radius:12px;padding:12px 14px;margin-top:12px;font-size:14px}
+  .ai h4{margin:8px 0 2px;font-size:13px;color:#5B21B6}
+  .ai h4:first-child{margin-top:0}
+  .ai ul{margin:4px 0 0;padding-left:18px}
+  .warn{font-size:12px;color:var(--amber);margin-top:8px}
+
   /* Follow-ups */
   .fu{border-left:4px solid var(--line)}
   .fu.due{border-left-color:var(--amber)} .fu.late{border-left-color:var(--red)} .fu.done{opacity:.6}
@@ -163,6 +184,10 @@
   <div class="when" id="nWhen"><button type="button" data-h="24">In 24 hrs</button><button type="button" data-h="48">In 48 hrs</button><button type="button" data-h="168">In 1 week</button></div>
   <div class="row" style="margin-top:16px"><button class="btn go" id="noteSave" style="flex:1">Save notes</button></div>
 </div>
+<div class="sheet" id="bsheet" role="dialog" aria-modal="true" aria-label="Company brief">
+  <div class="row" style="justify-content:space-between;margin-bottom:6px"><span class="muted small" style="font-weight:700">COMPANY BRIEF</span><button class="btn ghost" id="briefClose">Close</button></div>
+  <div id="briefBody"></div>
+</div>
 <input type="file" id="file" accept="application/pdf,.pdf" class="hidden">
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -172,7 +197,7 @@
   const $ = (s, el = document) => el.querySelector(s);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const S = { fairs: [], fair: null, listings: {}, q: "", filter: "all", open: new Set(), tab: "fair",
-              clerk: null, user: null, me: { resume: null, notes: [] }, loaded: false, draft: null };
+              clerk: null, user: null, me: { resume: null, notes: [], starred: [] }, loaded: false, draft: null, briefs: {}, polished: {} };
   let toastT;
   const toast = (m) => { const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2600); };
   const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k, v){ try { localStorage.setItem(k, v); } catch {} } };
@@ -199,7 +224,7 @@
     } catch { renderAcct(); }
   }
   async function onUser(u){
-    S.user = u || null; S.me = { resume: null, notes: [] }; S.loaded = false;
+    S.user = u || null; S.me = { resume: null, notes: [], starred: [] }; S.loaded = false;
     renderAcct();
     if (S.user) { try { S.me = await api("GET"); S.loaded = true; } catch (e) { toast(e.message); } }
     renderAll();
@@ -300,40 +325,100 @@
   function renderCompanies(){
     if (!S.fair) return;
     const t = talked();
-    const all = S.fair.companies.map((c) => ({ ...c, jobs: (c.id && S.listings[c.id]) || [], talked: t.has(c.id || c.name) }));
+    const stars = new Set(S.me.starred || []);
+    const all = S.fair.companies.map((c) => ({ ...c, jobs: (c.id && S.listings[c.id]) || [], talked: t.has(c.id || c.name), star: !!c.id && stars.has(c.id) }));
     const hiring = all.filter((c) => c.jobs.length).length;
-    $("#chips").innerHTML = [["all", `All ${all.length}`], ["hiring", `Open internships ${hiring}`], ["talked", `Talked to ${all.filter((c) => c.talked).length}`]]
+    $("#chips").innerHTML = [["all", `All ${all.length}`], ["plan", `★ My plan ${all.filter((c) => c.star).length}`], ["hiring", `Open internships ${hiring}`], ["talked", `Talked to ${all.filter((c) => c.talked).length}`]]
       .map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${S.filter === k}">${esc(l)}</button>`).join("");
     const q = S.q.toLowerCase();
     let list = all.filter((c) => !q || c.name.toLowerCase().includes(q) || (c.booth || "") === q);
     if (S.filter === "hiring") list = list.filter((c) => c.jobs.length);
     if (S.filter === "talked") list = list.filter((c) => c.talked);
-    list.sort((a, b) => (b.jobs.length > 0) - (a.jobs.length > 0) || a.name.localeCompare(b.name));
-    $("#cos").innerHTML = list.length ? list.map((c) => {
+    const boothNum = (c) => c.booth ? parseInt(c.booth, 10) || 9999 : 99999;
+    if (S.filter === "plan") list = list.filter((c) => c.star).sort((a, b) => boothNum(a) - boothNum(b) || a.name.localeCompare(b.name));
+    else list.sort((a, b) => (b.jobs.length > 0) - (a.jobs.length > 0) || a.name.localeCompare(b.name));
+    const left = list.filter((c) => !c.talked);
+    const route = S.filter !== "plan" ? "" : !list.length
+      ? `<div class="route"><b>Build your game plan.</b><div class="small" style="color:#CBD5E1;margin-top:4px">Tap ☆ on the companies you want to hit. We'll put them in booth order so you can walk the fair in one loop.</div></div>`
+      : `<div class="route"><b>Your route</b> · ${left.length} to go${list.length - left.length ? `, ${list.length - left.length} done ✓` : ""}
+          <div class="stops">${list.map((c) => `<span${c.talked ? ' style="opacity:.45;text-decoration:line-through"' : ""}>${c.booth ? "#" + esc(c.booth) + " " : ""}${esc(c.name.split(/[ (]/)[0])}</span>`).join("")}</div></div>`;
+    $("#cos").innerHTML = route + (list.length ? list.map((c) => {
       const me = c.jobs.filter((j) => j.match === "me").length;
       const key = c.id || c.name;
       const pill = c.talked ? `<span class="pill talk">Talked ✓</span>` : c.jobs.length ? `<span class="pill hire">${c.jobs.length} open</span>` : `<span class="pill none">No listings yet</span>`;
       const jobs = c.jobs.slice(0, 12).map((j) => `<div class="job"><div>${esc(j.title)}${j.match === "me" ? `<span class="tag">ME</span>` : ""}<div class="muted small">${esc(j.location || j.state)}</div></div><a href="${esc(j.url)}" target="_blank" rel="noopener">Apply ↗</a></div>`).join("");
       return `<div class="co${S.open.has(key) ? " open" : ""}" data-key="${esc(key)}">
-        <button aria-expanded="${S.open.has(key)}"><span class="coname">${esc(c.name)}${c.booth ? `<span class="booth">Booth ${esc(c.booth)}</span>` : ""}</span>${pill}
-          <span class="cosub">${c.jobs.length ? `${c.jobs.length} internship${c.jobs.length > 1 ? "s" : ""}${me ? ` · ${me} ME` : ""}` : (c.id ? "We'll show internships as soon as their board posts them" : "Not tracked yet")}</span></button>
+        <div class="cohead">${c.id ? `<button class="star" aria-pressed="${c.star}" aria-label="${c.star ? "Remove from" : "Add to"} my plan">${c.star ? "★" : "☆"}</button>` : `<span style="width:16px"></span>`}<button class="exp" aria-expanded="${S.open.has(key)}"><span class="coname">${esc(c.name)}${c.booth ? `<span class="booth">Booth ${esc(c.booth)}</span>` : ""}</span>${pill}
+          <span class="cosub">${c.jobs.length ? `${c.jobs.length} internship${c.jobs.length > 1 ? "s" : ""}${me ? ` · ${me} ME` : ""}` : (c.id ? "We'll show internships as soon as their board posts them" : "Not tracked yet")}</span></button></div>
         <div class="codetail">
           ${jobs || `<p class="muted small" style="margin:4px 0 10px">No open internships on their job board right now. Still worth a conversation — ask what's coming.</p>`}
           ${c.jobs.length > 12 ? `<p class="muted small">+ ${c.jobs.length - 12} more on the <a href="/jobs/">jobs page</a></p>` : ""}
           <div class="row" style="margin-top:10px"><button class="btn go note">📝 ${c.talked ? "Add more notes" : "I talked to them"}</button>
+          ${c.id ? `<button class="btn brief">📋 Brief</button>` : ""}
           ${c.domain ? `<a class="btn" href="https://${esc(c.domain)}" target="_blank" rel="noopener">Website ↗</a>` : ""}</div>
         </div></div>`;
-    }).join("") : `<div class="empty">No companies match.</div>`;
+    }).join("") : (S.filter === "plan" ? "" : `<div class="empty">No companies match.</div>`));
   }
   $("#q").addEventListener("input", (e) => { S.q = e.target.value.trim(); renderCompanies(); });
   $("#chips").addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (!b) return; S.filter = b.dataset.f; renderCompanies(); });
   $("#cos").addEventListener("click", (e) => {
     const co = e.target.closest(".co"); if (!co) return;
     const key = co.dataset.key;
-    if (e.target.closest(".note")) { const c = S.fair.companies.find((x) => (x.id || x.name) === key); return openNote(c.name, c.id || null); }
-    if (e.target.closest(".co > button")) { S.open.has(key) ? S.open.delete(key) : S.open.add(key); renderCompanies(); }
+    const c = S.fair.companies.find((x) => (x.id || x.name) === key);
+    if (e.target.closest(".note")) return openNote(c.name, c.id || null);
+    if (e.target.closest(".brief")) return openBrief(c);
+    if (e.target.closest(".star")) return toggleStar(c);
+    if (e.target.closest(".exp")) { S.open.has(key) ? S.open.delete(key) : S.open.add(key); renderCompanies(); }
   });
   $("#fairsel").onchange = (e) => pickFair(e.target.value);
+
+  // ── Game plan (★) ──
+  async function toggleStar(c){
+    if (!S.user) return signIn("Sign in to build your game plan");
+    const on = !(S.me.starred || []).includes(c.id);
+    S.me.starred = on ? [...(S.me.starred || []), c.id] : S.me.starred.filter((x) => x !== c.id); renderCompanies();
+    try { S.me = { ...S.me, ...(await api("POST", { action: "star", company: c.id, on })) }; if (on) toast(`★ ${c.name} added to your plan — we'll flag new internships from them`); }
+    catch (e) { toast(e.message); }
+    renderCompanies();
+  }
+
+  // ── Company brief ──
+  function ago(ts){ const d = Math.floor((Date.now() - new Date(ts)) / 864e5); return d <= 0 ? "today" : d === 1 ? "yesterday" : d < 30 ? d + " days ago" : Math.floor(d / 30) + " mo ago"; }
+  function openBrief(c){
+    const jobs = (c.id && S.listings[c.id]) || [];
+    const me = jobs.filter((j) => j.match === "me").length;
+    const states = Object.entries(jobs.reduce((m, j) => { for (const s of String(j.state || "").split(",").filter(Boolean)) m[s] = (m[s] || 0) + 1; return m; }, {})).sort((a, b) => b[1] - a[1]).map(([s]) => s);
+    const newest = jobs.map((j) => j.first_seen).filter(Boolean).sort().pop();
+    const others = S.fairs.filter((f) => f.id !== S.fair.id && f.companies.some((x) => x.id === c.id)).map((f) => f.name);
+    $("#briefBody").innerHTML = `
+      <div class="row" style="justify-content:space-between"><strong style="font-size:19px;color:var(--navy)">${esc(c.name)}</strong>${c.booth ? `<span class="booth">Booth ${esc(c.booth)}</span>` : ""}</div>
+      <div class="facts">
+        <div class="fact"><b>${jobs.length}</b><span>open internships</span></div>
+        <div class="fact"><b>${me}</b><span>mechanical</span></div>
+        <div class="fact"><b>${newest ? esc(ago(newest)) : "—"}</b><span>newest posting</span></div>
+      </div>
+      ${states.length ? `<div class="small"><b>Where:</b> ${esc(states.slice(0, 6).join(", "))}${states.length > 6 ? ` +${states.length - 6} more` : ""}</div>` : ""}
+      ${jobs.length ? `<div class="small" style="margin-top:4px"><b>Roles:</b> ${esc([...new Set(jobs.map((j) => j.title))].slice(0, 4).join(" · "))}</div>` : `<div class="small muted">Nothing posted right now. Ask the recruiter when their internships open.</div>`}
+      ${others.length ? `<div class="small" style="margin-top:4px"><b>Also at:</b> ${esc(others.join(", "))}</div>` : ""}
+      <div class="ai" id="aiBrief">${S.user ? `<span class="muted">✨ Writing the brief…</span>` : `<b>✨ AI brief</b> — what they do, what engineers work on, and smart questions to ask. <button class="btn go" id="briefSign" style="margin-top:8px">Sign in to see it</button>`}</div>
+      <div class="row" style="margin-top:14px"><button class="btn go" id="briefStar">${(S.me.starred || []).includes(c.id) ? "★ In my plan" : "☆ Add to my plan"}</button>${c.domain ? `<a class="btn" href="https://${esc(c.domain)}" target="_blank" rel="noopener">Website ↗</a>` : ""}</div>`;
+    $("#briefSign")?.addEventListener("click", () => signIn());
+    $("#briefStar").onclick = async () => { await toggleStar(c); openBrief(c); };
+    $("#scrim").classList.add("on"); $("#bsheet").classList.add("on");
+    if (S.user) loadBrief(c);
+  }
+  async function loadBrief(c){
+    const el = () => $("#aiBrief");
+    try {
+      const b = S.briefs[c.id] || (S.briefs[c.id] = (await api("POST", { action: "brief", companyId: c.id })).brief);
+      if (!el()) return;
+      el().innerHTML = `<h4>✨ What they do</h4>${esc(b.about)}${b.engineers ? `<h4>What engineers work on</h4>${esc(b.engineers)}` : ""}
+        ${b.ask?.length ? `<h4>Good questions to ask</h4><ul>${b.ask.map((q) => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}
+        <div class="warn">${b.known === false ? "We couldn't find much on this company — double-check their website. " : ""}AI-written summary. It can be wrong, so confirm on their site.</div>`;
+    } catch (e) { if (el()) el().innerHTML = `<span class="muted">${esc(e.message)}</span>`; }
+  }
+  function closeBrief(){ $("#bsheet").classList.remove("on"); if (!$("#sheet").classList.contains("on")) $("#scrim").classList.remove("on"); }
+  $("#briefClose").onclick = closeBrief;
 
   // ── Notes ──
   let editing = null;
@@ -351,8 +436,8 @@
   function setPressed(sel, attr, v){ document.querySelectorAll(`${sel} button`).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset[attr] === v))); }
   $("#nFeel").onclick = (e) => { const b = e.target.closest("button"); if (b) setPressed("#nFeel", "v", b.dataset.v); };
   $("#nWhen").onclick = (e) => { const b = e.target.closest("button"); if (b) setPressed("#nWhen", "h", b.dataset.h); };
-  $("#noteClose").onclick = closeNote; $("#scrim").onclick = closeNote;
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeNote(); $("#full").classList.remove("on"); } });
+  $("#noteClose").onclick = closeNote; $("#scrim").onclick = () => { closeNote(); closeBrief(); };
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeNote(); closeBrief(); $("#full").classList.remove("on"); } });
   $("#noteSave").onclick = async () => {
     const feel = $("#nFeel button[aria-pressed=true]")?.dataset.v || "good";
     const hours = +($("#nWhen button[aria-pressed=true]")?.dataset.h || 24);
@@ -399,6 +484,20 @@ Thanks again,
 ${me}${email ? "\n" + email : ""}`;
     return { subject, body };
   }
+  // Calendar reminders — real phone notifications, no texting service needed
+  const icsDate = (d) => new Date(d).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  function reminderTimes(n){ let t = new Date(n.followUpAt); if (t < new Date()) t = new Date(Date.now() + 30 * 6e4); t.setMinutes(0, 0, 0); if (t.getHours() < 9 || t.getHours() > 19) t.setHours(t.getHours() < 9 ? 10 : 34, 0); return [t, new Date(t.getTime() + 15 * 6e4)]; }
+  function reminderText(n){ return { title: `Follow up with ${n.contact ? n.contact.split(",")[0] + " at " : ""}${n.company}`, details: `Your follow-up email is ready in InternIQ: ${location.origin}/fair/\n\n${n.roles ? "Roles: " + n.roles + "\n" : ""}${n.said || ""}` }; }
+  function gcal(n){ const [a, b] = reminderTimes(n), t = reminderText(n);
+    return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(t.title)}&dates=${icsDate(a)}/${icsDate(b)}&details=${encodeURIComponent(t.details)}`; }
+  function downloadIcs(n){
+    const [a, b] = reminderTimes(n), t = reminderText(n), escI = (x) => String(x).replace(/([,;\\])/g, "\\$1").replace(/\n/g, "\\n");
+    const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//InternIQ//EN","BEGIN:VEVENT",`UID:${n.id}@interniq`,`DTSTAMP:${icsDate(new Date())}`,`DTSTART:${icsDate(a)}`,`DTEND:${icsDate(b)}`,
+      `SUMMARY:${escI(t.title)}`,`DESCRIPTION:${escI(t.details)}`,"BEGIN:VALARM","TRIGGER:PT0M","ACTION:DISPLAY",`DESCRIPTION:${escI(t.title)}`,"END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
+    const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
+    const el = document.createElement("a"); el.href = url; el.download = `follow-up-${n.company.replace(/\W+/g, "-").toLowerCase()}.ics`; el.click();
+    setTimeout(() => URL.revokeObjectURL(url), 5000); toast("Open the file to add the reminder");
+  }
   function renderFollow(){
     const el = $("#tab-follow");
     const due = S.me.notes.filter((n) => !n.done && new Date(n.followUpAt) - Date.now() <= 24 * 36e5).length;
@@ -408,7 +507,7 @@ ${me}${email ? "\n" + email : ""}`;
     const rank = { late: 0, due: 1, soon: 2, done: 3 };
     const notes = [...S.me.notes].sort((a, b) => rank[fuState(a)[0]] - rank[fuState(b)[0]] || new Date(a.followUpAt) - new Date(b.followUpAt));
     el.innerHTML = notes.map((n) => {
-      const [k, label] = fuState(n), d = draft(n);
+      const [k, label] = fuState(n), d = S.polished[n.id] || draft(n);
       const mail = `mailto:${encodeURIComponent(n.contactEmail || "")}?subject=${encodeURIComponent(d.subject)}&body=${encodeURIComponent(d.body)}`;
       return `<div class="card fu ${k}" data-id="${esc(n.id)}">
         <div class="row" style="justify-content:space-between"><strong style="color:var(--navy);font-size:17px">${esc(n.company)}</strong><span class="status ${k}">${esc(label)}</span></div>
@@ -417,7 +516,8 @@ ${me}${email ? "\n" + email : ""}`;
         ${n.said ? `<div class="small" style="margin-top:4px;white-space:pre-wrap">${esc(n.said)}</div>` : ""}
         <details ${k === "due" || k === "late" ? "open" : ""} style="margin-top:10px"><summary>Follow-up email draft</summary>
           <div class="draft"><b>Subject:</b> ${esc(d.subject)}\n\n${esc(d.body)}</div>
-          <div class="row"><a class="btn go" href="${esc(mail)}">Open in email</a><button class="btn copy">Copy</button></div></details>
+          <div class="row"><a class="btn go" href="${esc(mail)}">Open in email</a><button class="btn copy">Copy</button><button class="btn polish">✨ ${S.polished[n.id] ? "Rewrite again" : "Write it with AI"}</button></div></details>
+        ${n.done ? "" : `<div class="row" style="margin-top:8px"><span class="small muted">Remind me on my phone:</span><a class="btn ghost" href="${esc(gcal(n))}" target="_blank" rel="noopener">📅 Google Calendar</a><button class="btn ghost ics">📅 iPhone / Outlook</button></div>`}
         <div class="row" style="margin-top:10px"><button class="btn done">${n.done ? "Mark not done" : "✓ I followed up"}</button><button class="btn ghost edit">Edit</button><button class="btn ghost del">Delete</button></div>
       </div>`;
     }).join("");
@@ -425,7 +525,14 @@ ${me}${email ? "\n" + email : ""}`;
   $("#tab-follow").addEventListener("click", async (e) => {
     const card = e.target.closest(".fu"); if (!card) return;
     const n = S.me.notes.find((x) => x.id === card.dataset.id); if (!n) return;
-    if (e.target.closest(".copy")) { const d = draft(n); try { await navigator.clipboard.writeText(`Subject: ${d.subject}\n\n${d.body}`); toast("Email copied"); } catch { toast("Couldn't copy — select the text instead"); } return; }
+    if (e.target.closest(".ics")) return downloadIcs(n);
+    if (e.target.closest(".polish")) {
+      const b = e.target.closest(".polish"); b.disabled = true; b.textContent = "✨ Writing…";
+      try { S.polished[n.id] = await api("POST", { action: "polish", note: n, name: S.user?.fullName || "", resumeLink: S.me.resume?.share ? resumeUrl() : "" }); toast("Done — read it over before you send"); }
+      catch (err) { toast(err.message); }
+      return renderFollow();
+    }
+    if (e.target.closest(".copy")) { const d = S.polished[n.id] || draft(n); try { await navigator.clipboard.writeText(`Subject: ${d.subject}\n\n${d.body}`); toast("Email copied"); } catch { toast("Couldn't copy — select the text instead"); } return; }
     if (e.target.closest(".edit")) return openNote(n.company, n.companyId, n);
     if (e.target.closest(".done") || e.target.closest(".del")) {
       const body = e.target.closest(".del") ? { action: "note_delete", id: n.id } : { action: "note", note: { ...n, done: !n.done } };
