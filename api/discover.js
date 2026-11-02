@@ -85,7 +85,7 @@ export default async function handler(req, res) {
   const cutoff = new Date(Date.now() - RETRY_AFTER_DAYS * 86400000).toISOString();
   const rows = await db.selectAsAdmin(
     `company_candidates?select=*&or=(status.eq.pending,and(status.in.(error,blocked,no_board,board_error),checked_at.lt.${cutoff},attempts.lt.4))` +
-    `&order=checked_at.asc.nullsfirst&limit=${PER_RUN}`
+    `&order=checked_at.asc.nullsfirst&limit=${Math.min(+req.query?.n || PER_RUN, PER_RUN)}`
   );
 
   if (mark("select")) return res.status(200).json({ marks, rows: rows.length });
@@ -124,7 +124,7 @@ export default async function handler(req, res) {
   mark("discover");
   const done = results.filter((r) => !r.skipped);
   return res.status(200).json({
-    tried: done.length, marks,
+    tried: done.length, marks, ms: Date.now() - t0,
     wentLive: done.filter((r) => r.status === "live").map((r) => r.company),
     results: done,
   });
