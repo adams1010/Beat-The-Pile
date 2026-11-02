@@ -20,8 +20,8 @@ for (const f of files) for (const x of JSON.parse(fs.readFileSync(f, "utf8"))) {
 }
 // Most recent postings first, so each company's hint is its newest board link
 const all = [...byId.values()].sort((a, b) => (b.date_posted || 0) - (a.date_posted || 0));
-const picked = pickCompanies(all, new Set(COMPANIES.map((c) => normName(c.company))), new Set(COMPANIES.map(boardKey)), { minGen: 1, ownSites: true });
-const out = picked.map((p) => ({ company: p.company, key: p.key, hint: p.hint || undefined, domain: p.domain || undefined }));
+const picked = pickCompanies(all, new Set(COMPANIES.map((c) => normName(c.company))), new Set(COMPANIES.map(boardKey)), { minGen: 1, ownSites: true, anyMajor: true });
+const out = picked.map((p) => ({ company: p.company, key: p.key, hint: p.hint || undefined, domain: p.domain || undefined, priority: p.priority }));
 fs.mkdirSync("data", { recursive: true });
 fs.writeFileSync("data/backlog.json", JSON.stringify({ built: new Date().toISOString(), count: out.length, companies: out }));
 console.log(`backlog: ${out.length} companies from ${byId.size} postings in ${files.length} files`);

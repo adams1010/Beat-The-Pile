@@ -91,22 +91,24 @@ export default async function handler(req, res) {
       const [settings, runs, cands, ai, listings, users, feedback] = await Promise.all([
         db.selectAsAdmin("bot_settings?select=bot,enabled,updated_at,updated_by"),
         db.selectAsAdmin(`bot_runs?select=bot,ran_at,ok,summary,stats&ran_at=gt.${new Date(Date.now() - 7 * 864e5).toISOString()}&order=ran_at.desc&limit=1500`),
-        db.selectAsAdmin("company_candidates?select=id,company,status,verified_at,checked_at,detail&limit=5000"),
+        db.selectAllAsAdmin("company_candidates?select=id,company,status,verified_at,checked_at,detail"),
         aiSummary().catch(() => null),
         (async () => { const out = []; for (let off = 0; off < 10000; off += 1000) {           // Supabase returns ≤1000 rows per request
-          const pg = await db.selectAsAdmin(`listings?select=company_id,match,first_seen&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)&order=id.asc&limit=1000&offset=${off}`);
+          const pg = await db.selectAsAdmin(`listings?select=company_id,match,field,first_seen&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)&order=id.asc&limit=1000&offset=${off}`);
           out.push(...pg); if (pg.length < 1000) break; } return out; })().catch(() => []),
-        db.selectAsAdmin("user_jobs?select=clerk_user_id,updated_at,apps,starred,resume_path&limit=10000").catch(() => []),
+        db.selectAllAsAdmin("user_jobs?select=clerk_user_id,updated_at,apps,starred,resume_path&order=clerk_user_id.asc").catch(() => []),
         db.selectAsAdmin("feedback?select=created_at&limit=10000").catch(() => []),
       ]);
       // Whole-system numbers for the live map + "where to spend time"
       const unsupportedBy = {};
       for (const c of cands) if (c.status === "unsupported") { const m = /Uses (.+?) —/.exec(c.detail || ""); const k = m ? m[1] : "Other"; unsupportedBy[k] = (unsupportedBy[k] || 0) + 1; }
       const week = Date.now() - 7 * 864e5;
+      const eng = listings.filter((l) => l.match);
+      const byField = {}; for (const l of listings) byField[l.field || "untagged"] = (byField[l.field || "untagged"] || 0) + 1;
       const system = {
-        listings: listings.length, me: listings.filter((l) => l.match === "me").length,
-        companiesWithJobs: new Set(listings.map((l) => l.company_id)).size,
-        newListings24h: listings.filter((l) => Date.parse(l.first_seen) > Date.now() - 864e5).length,
+        listings: eng.length, me: eng.filter((l) => l.match === "me").length, allMajors: listings.length, byField,
+        companiesWithJobs: new Set(eng.map((l) => l.company_id)).size,
+        newListings24h: eng.filter((l) => Date.parse(l.first_seen) > Date.now() - 864e5).length,
         users: users.length, activeUsers7d: users.filter((u) => Date.parse(u.updated_at) > week).length,
         applications: users.reduce((n, u) => n + (Array.isArray(u.apps) ? u.apps.length : 0), 0),
         resumes: users.filter((u) => u.resume_path).length,
@@ -131,7 +133,7 @@ export default async function handler(req, res) {
     } catch (e) { return res.status(500).json({ error: e.message }); }
   }
   try {
-    const rows = await db.select("company_candidates?select=id,company,domain,hint,status,ats,detail,intern_count,attempts,checked_at,verified_at,source&order=company.asc&limit=2000");
+    const rows = await db.selectAll("company_candidates?select=id,company,domain,hint,status,ats,detail,intern_count,attempts,checked_at,verified_at,source&order=company.asc,id.asc");
     const counts = {};
     for (const r of rows) counts[r.status] = (counts[r.status] || 0) + 1;
     return res.status(200).json({

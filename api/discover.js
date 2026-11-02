@@ -12,7 +12,7 @@ import BACKLOG from "../data/backlog.json" with { type: "json" };
 
 export const config = { maxDuration: 60 };
 
-const PER_RUN = 24;
+const PER_RUN = 36;               // most queued companies now come with a board link, so each check is quick
 const START_BUDGET_MS = 22000;   // don't start a company after this
 const HARD_STOP_MS = 50000;      // give up on any company still running (Vercel kills the function at 60s)
 const READERS_UPDATED_AT = "2026-11-02T22:00:00Z";   // bump when a new reader ships → re-test companies parked before it
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
       const r = await get(SIMPLIFY_URL, { timeoutMs: 20000 });
       if (!r.ok) throw new Error(`list answered ${r.status}`);
       const listings = await r.json();
-      const rows = await db.selectAsAdmin("company_candidates?select=company,ats,config&limit=5000");
+      const rows = await db.selectAllAsAdmin("company_candidates?select=id,company,ats,config");
       const names = new Set([...rows, ...COMPANIES].map((c) => normName(c.company)));
       const boards = new Set(COMPANIES.map(boardKey));
       for (const x of rows) if (x.ats && x.config) boards.add(boardKey({ ats: x.ats, ...x.config }));
@@ -65,7 +65,7 @@ export default async function handler(req, res) {
   if (mark("upsert")) return res.status(200).json({ marks });
   // 1b) New or changed hint (e.g. from a browser pass) → re-test now instead of waiting 2 weeks.
   //     Still goes through the same proof check; a hint can't make anything go live by itself.
-  const hinted = await db.selectAsAdmin("company_candidates?select=id,hint,config,status&hint=not.is.null&status=neq.live&status=neq.pending&limit=1000");
+  const hinted = await db.selectAllAsAdmin("company_candidates?select=id,hint,config,status&hint=not.is.null&status=neq.live&status=neq.pending");
   const requeue = hinted.filter((r) => r.hint && (r.config?.triedHint ?? null) !== r.hint).map((r) => r.id);
   if (requeue.length) {
     await db.update(`company_candidates?id=in.(${requeue.map(encodeURIComponent).join(",")})`, { status: "pending", checked_at: null });
@@ -75,7 +75,7 @@ export default async function handler(req, res) {
   // 1c) A job system we just learned to read → re-test every company parked as "unsupported" on it
   const NOW_READABLE = /\b(iCIMS|Oracle|Ashby|Eightfold|SmartRecruiters|Paylocity|ADP|Jibe)\b/;   // add a system here when a new reader ships
   // Only companies parked BEFORE the latest readers shipped — otherwise ones that are still unreadable loop forever
-  const parked = await db.selectAsAdmin(`company_candidates?select=id,detail&status=eq.unsupported&checked_at=lt.${READERS_UPDATED_AT}&limit=1000`);
+  const parked = await db.selectAllAsAdmin(`company_candidates?select=id,detail&status=eq.unsupported&checked_at=lt.${READERS_UPDATED_AT}`);
   const unpark = parked.filter((r) => NOW_READABLE.test(r.detail || "")).map((r) => r.id);
   if (unpark.length) {
     await db.update(`company_candidates?id=in.(${unpark.map(encodeURIComponent).join(",")})`, { status: "pending", checked_at: null });
@@ -87,7 +87,7 @@ export default async function handler(req, res) {
   let promoted = [];
   try { promoted = await refillFromBacklog(); } catch (e) { marks.push("backlog-error:" + String(e.message).slice(0, 80)); }
   // 2) Boards already live (hand-verified + previously discovered) → never add the same board twice
-  const liveRows = await db.selectAsAdmin("company_candidates?select=id,ats,config&enabled=eq.true&limit=1000");
+  const liveRows = await db.selectAllAsAdmin("company_candidates?select=id,ats,config&enabled=eq.true");
   const taken = new Map(COMPANIES.map((c) => [boardKey(c), c.company]));
   for (const r of liveRows) if (r.ats && r.config) taken.set(boardKey({ ats: r.ats, ...r.config }), r.id);
 
@@ -96,11 +96,11 @@ export default async function handler(req, res) {
   const cutoff = new Date(Date.now() - RETRY_AFTER_DAYS * 86400000).toISOString();
   const rows = await db.selectAsAdmin(
     `company_candidates?select=*&or=(status.eq.pending,and(status.in.(error,blocked,no_board,board_error),checked_at.lt.${cutoff},attempts.lt.4))` +
-    `&order=checked_at.asc.nullsfirst&limit=${Math.min(+req.query?.n || PER_RUN, PER_RUN)}`
+    `&order=priority.desc,checked_at.asc.nullsfirst&limit=${Math.min(+req.query?.n || PER_RUN, PER_RUN)}`
   );
 
   if (mark("select")) return res.status(200).json({ marks, rows: rows.length });
-  const results = await mapLimit(rows, 6, async (c) => {
+  const results = await mapLimit(rows, 8, async (c) => {
     if (Date.now() - t0 > START_BUDGET_MS) return { id: c.id, skipped: true };
     let r;
     // Each company gets ~25s of its own (never past the hard stop), so slow careers sites can't sink the whole run
@@ -152,7 +152,7 @@ const slug = (s) => String(s).toLowerCase().replace(/&/g, "and").replace(/[^a-z0
 export async function refillFromBacklog() {
   const pending = await db.selectAsAdmin(`company_candidates?select=id&status=eq.pending&limit=${REFILL_BELOW}`);
   if (pending.length >= REFILL_BELOW) return [];
-  const rows = await db.selectAsAdmin("company_candidates?select=id,company,ats,config&limit=5000");
+  const rows = await db.selectAllAsAdmin("company_candidates?select=id,company,ats,config");
   const ids = new Set(rows.map((r) => r.id));
   const names = new Set([...rows, ...COMPANIES].map((c) => normName(c.company)));
   const known = (n) => names.has(n) || [...names].some((k) => k.length >= 5 && (k.startsWith(n) || n.startsWith(k)));
@@ -160,7 +160,7 @@ export async function refillFromBacklog() {
   for (const b of BACKLOG.companies || []) {
     const n = normName(b.company), id = "s-" + slug(b.company);
     if (n.length < 3 || ids.has(id) || known(n)) continue;
-    next.push({ id, company: b.company, domain: b.domain || null, key: b.key || keyFor(b.company), hint: b.hint || null, source: "Backlog (SimplifyJobs history)", status: "pending" });
+    next.push({ id, company: b.company, domain: b.domain || null, key: b.key || keyFor(b.company), hint: b.hint || null, source: "Backlog (SimplifyJobs history)", status: "pending", priority: b.priority ?? 10 });
     names.add(n); ids.add(id);
     if (next.length >= REFILL_SIZE) break;
   }

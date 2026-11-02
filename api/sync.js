@@ -56,7 +56,7 @@ export default async function handler(req, res) {
   const companies = (await loadCompanies()).filter((c) => c.enabled);
   const last = {};
   try {
-    const runs = await db.selectAsAdmin("feed_runs?select=company_id,ran_at&order=ran_at.desc&limit=3000");
+    const runs = await db.selectAllAsAdmin("feed_last?select=company_id,ran_at&order=company_id.asc");
     for (const r of runs) if (!last[r.company_id]) last[r.company_id] = r.ran_at;
   } catch { /* first run */ }
   companies.sort((a, b) => (last[a.id] || "").localeCompare(last[b.id] || ""));   // never-synced first
