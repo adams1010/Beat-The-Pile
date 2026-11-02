@@ -11,7 +11,9 @@ import { SIMPLIFY_URL, pickCompanies, normName } from "../lib/simplify.js";
 export const config = { maxDuration: 60 };
 
 const PER_RUN = 24;
-const START_BUDGET_MS = 30000;
+const START_BUDGET_MS = 22000;   // don't start a company after this
+const HARD_STOP_MS = 50000;      // give up on any company still running (Vercel kills the function at 60s)
+const READERS_UPDATED_AT = "2026-11-02T13:30:00Z";   // bump when a new reader ships → re-test companies parked before it
 const RETRY_AFTER_DAYS = 14;
 
 export default async function handler(req, res) {
@@ -61,7 +63,8 @@ export default async function handler(req, res) {
 
   // 1c) A job system we just learned to read → re-test every company parked as "unsupported" on it
   const NOW_READABLE = /\b(iCIMS|Oracle|Ashby|Eightfold|SmartRecruiters|Paylocity|ADP)\b/;   // add a system here when a new reader ships
-  const parked = await db.selectAsAdmin("company_candidates?select=id,detail&status=eq.unsupported&limit=1000");
+  // Only companies parked BEFORE the latest readers shipped — otherwise ones that are still unreadable loop forever
+  const parked = await db.selectAsAdmin(`company_candidates?select=id,detail&status=eq.unsupported&checked_at=lt.${READERS_UPDATED_AT}&limit=1000`);
   const unpark = parked.filter((r) => NOW_READABLE.test(r.detail || "")).map((r) => r.id);
   if (unpark.length) {
     await db.update(`company_candidates?id=in.(${unpark.map(encodeURIComponent).join(",")})`, { status: "pending", checked_at: null });
@@ -82,7 +85,13 @@ export default async function handler(req, res) {
   const results = await mapLimit(rows, 6, async (c) => {
     if (Date.now() - t0 > START_BUDGET_MS) return { id: c.id, skipped: true };
     let r;
-    try { r = await discoverOne(c, { deadline: t0 + 47000 }); }
+    // Each company gets ~25s of its own (never past the hard stop), so slow careers sites can't sink the whole run
+    const deadline = Math.min(Date.now() + 25000, t0 + HARD_STOP_MS - 12000);
+    const left = t0 + HARD_STOP_MS - Date.now();
+    try {
+      r = await Promise.race([discoverOne(c, { deadline }),
+        new Promise((ok) => setTimeout(() => ok({ status: "no_board", detail: "Careers site too slow to check — retried in 2 weeks" }), left))]);
+    }
     catch (e) { r = { status: "error", detail: String(e.message || e).slice(0, 300) }; }
 
     if (r.status === "live") {
