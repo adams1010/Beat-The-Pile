@@ -1,0 +1,25 @@
+# Hourly: pull fresh internships from every live company, then re-check links.
+# (Vercel's free plan only allows a couple of daily runs; with 80+ companies the sync needs more passes.)
+# Uses the same CRON_SECRET repo secret as discover.yml.
+name: sync
+on:
+  schedule:
+    - cron: "7 * * * *"
+  workflow_dispatch: {}
+concurrency: { group: sync, cancel-in-progress: false }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Sync listings
+        env: { CRON_SECRET: "${{ secrets.CRON_SECRET }}" }
+        run: |
+          code=$(curl -s -o out.json -w '%{http_code}' --max-time 70 -H "Authorization: Bearer $CRON_SECRET" https://intern-iq-psi.vercel.app/api/sync)
+          head -c 1500 out.json; echo; echo "HTTP $code"; [ "$code" = 200 ]
+      - name: Check links
+        if: always()
+        env: { CRON_SECRET: "${{ secrets.CRON_SECRET }}" }
+        run: |
+          code=$(curl -s -o out.json -w '%{http_code}' --max-time 70 -H "Authorization: Bearer $CRON_SECRET" https://intern-iq-psi.vercel.app/api/check-links)
+          head -c 600 out.json; echo; echo "HTTP $code"; [ "$code" = 200 ]
