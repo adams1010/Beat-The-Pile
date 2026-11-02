@@ -1,0 +1,1774 @@
+{
+ "updated": "2026-11-01",
+ "fairs": [
+  {
+   "id": "vt-construction",
+   "name": "Construction Industry Career Fair",
+   "school": "Virginia Tech",
+   "when": "Spring 2026 (Feb 18) — Spring 2027 list added when posted",
+   "where": "Blacksburg, VA",
+   "companies": [
+    {
+     "name": "A M King",
+     "booth": "311",
+     "id": "x-a-m-king",
+     "domain": "amkinggroup.com"
+    },
+    {
+     "name": "Adams Construction",
+     "booth": "609",
+     "id": "x-adams-construction",
+     "domain": "adamspaving.com"
+    },
+    {
+     "name": "Administrative Controls Management"
+    },
+    {
+     "name": "Allan Myers",
+     "booth": "801",
+     "id": "x-allan-myers",
+     "domain": "allanmyers.com"
+    },
+    {
+     "name": "American Contracting & Environmental Services",
+     "booth": "702",
+     "id": "x-american-contracting-and-environmental-services",
+     "domain": "aceservinc.com"
+    },
+    {
+     "name": "AnderCorp",
+     "id": "x-andercorp",
+     "domain": "andercorp.com"
+    },
+    {
+     "name": "Annandale Millwork",
+     "id": "x-annandale-millwork",
+     "domain": "amcasc.com"
+    },
+    {
+     "name": "Archer Western (Walsh Group)",
+     "booth": "807",
+     "id": "x-the-walsh-group",
+     "domain": "walshgroup.com"
+    },
+    {
+     "name": "ARCO Design/Build",
+     "booth": "1007",
+     "id": "x-arco-design-build",
+     "domain": "thearcoway.com"
+    },
+    {
+     "name": "ATCS",
+     "booth": "405",
+     "id": "x-atcs",
+     "domain": "atcsplc.com"
+    },
+    {
+     "name": "B&S Site Development",
+     "id": "x-bands-site-development",
+     "domain": "bandssite.com"
+    },
+    {
+     "name": "Baker Construction",
+     "booth": "604",
+     "id": "x-baker-construction",
+     "domain": "bakerconstruction.com"
+    },
+    {
+     "name": "Barton Malow",
+     "booth": "106",
+     "id": "x-barton-malow",
+     "domain": "bartonmalow.com"
+    },
+    {
+     "name": "Beazer Homes",
+     "booth": "705",
+     "id": "x-beazer-homes",
+     "domain": "beazer.com"
+    },
+    {
+     "name": "Branch Group",
+     "booth": "804",
+     "id": "x-branch-group",
+     "domain": "branchgroup.com"
+    },
+    {
+     "name": "Branscome",
+     "booth": "203",
+     "id": "x-branscome",
+     "domain": "branscome.com"
+    },
+    {
+     "name": "Breeden Construction",
+     "booth": "709",
+     "id": "x-breeden-construction",
+     "domain": "breedenconstruction.com"
+    },
+    {
+     "name": "Brinkmann Constructors",
+     "booth": "508",
+     "id": "x-brinkmann-constructors",
+     "domain": "brinkmannconstructors.com"
+    },
+    {
+     "name": "Britt, Peters & Associates",
+     "id": "x-britt-peters-and-associates",
+     "domain": "brittpeters.com"
+    },
+    {
+     "name": "Caton Construction Group",
+     "booth": "408",
+     "id": "x-caton-construction-group",
+     "domain": "ccg-builds.com"
+    },
+    {
+     "name": "CBG Building Company",
+     "booth": "402",
+     "id": "x-cbg-building-company",
+     "domain": "cbgbuildingcompany.com"
+    },
+    {
+     "name": "Century Concrete",
+     "booth": "809",
+     "id": "x-century-concrete",
+     "domain": "centuryconcreteinc.com"
+    },
+    {
+     "name": "Chesapeake Controls",
+     "booth": "1008",
+     "id": "x-chesapeake-controls",
+     "domain": "chesapeakecontrols.com"
+    },
+    {
+     "name": "Chiaramonte Construction"
+    },
+    {
+     "name": "Cianbro",
+     "booth": "711",
+     "id": "x-cianbro",
+     "domain": "cianbro.com"
+    },
+    {
+     "name": "Clancy & Theys",
+     "booth": "309",
+     "id": "x-clancy-and-theys",
+     "domain": "clancytheys.com"
+    },
+    {
+     "name": "Clark Construction",
+     "booth": "805",
+     "id": "x-clark-construction",
+     "domain": "clarkconstruction.com"
+    },
+    {
+     "name": "Coastal Construction",
+     "booth": "707",
+     "id": "x-coastal-construction",
+     "domain": "coastalconstruction.com"
+    },
+    {
+     "name": "ColonialWebb",
+     "booth": "211",
+     "id": "x-colonialwebb",
+     "domain": "colonialwebb.com"
+    },
+    {
+     "name": "Concorde Construction",
+     "booth": "703",
+     "id": "x-concorde-construction",
+     "domain": "concordeconst.com"
+    },
+    {
+     "name": "Consigli",
+     "id": "x-consigli",
+     "domain": "consigli.com"
+    },
+    {
+     "name": "Crowder Construction",
+     "booth": "511",
+     "id": "x-crowder-construction",
+     "domain": "crowderusa.com"
+    },
+    {
+     "name": "D.R. Horton",
+     "booth": "1004",
+     "id": "x-d-r-horton",
+     "domain": "drhorton.com"
+    },
+    {
+     "name": "DAVIS Construction",
+     "booth": "202",
+     "id": "x-davis-construction",
+     "domain": "davisconstruction.com"
+    },
+    {
+     "name": "DPR Construction",
+     "booth": "108",
+     "id": "x-dpr-construction",
+     "domain": "dpr.com"
+    },
+    {
+     "name": "Dustin Construction",
+     "booth": "210",
+     "id": "x-dustin-construction",
+     "domain": "dustinconstruction.com"
+    },
+    {
+     "name": "E.C. Pace",
+     "booth": "509",
+     "id": "x-e-c-pace",
+     "domain": "ecpace.com"
+    },
+    {
+     "name": "Eagle Construction of VA",
+     "booth": "506"
+    },
+    {
+     "name": "English Construction",
+     "booth": "603",
+     "id": "x-english-construction",
+     "domain": "englishconst.com"
+    },
+    {
+     "name": "Evans General Contractors",
+     "booth": "606",
+     "id": "x-evans-general-contractors",
+     "domain": "evansgeneralcontractors.com"
+    },
+    {
+     "name": "Faulconer Construction",
+     "id": "x-faulconer-construction",
+     "domain": "faulconerconstruction.com"
+    },
+    {
+     "name": "FlatironDragados",
+     "booth": "305",
+     "id": "x-flatirondragados",
+     "domain": "fdcorp.com"
+    },
+    {
+     "name": "Garney Construction",
+     "id": "x-garney-construction",
+     "domain": "garney.com"
+    },
+    {
+     "name": "George Harms Construction",
+     "booth": "1009",
+     "id": "x-george-harms-construction",
+     "domain": "ghcci.com"
+    },
+    {
+     "name": "Gilbane",
+     "booth": "410",
+     "id": "x-gilbane",
+     "domain": "gilbaneco.com"
+    },
+    {
+     "name": "Greenwood Homes",
+     "booth": "406"
+    },
+    {
+     "name": "Harkins Builders",
+     "booth": "113",
+     "id": "x-harkins-builders",
+     "domain": "harkinsbuilders.com"
+    },
+    {
+     "name": "Haskell",
+     "booth": "501",
+     "id": "x-haskell",
+     "domain": "haskell.com"
+    },
+    {
+     "name": "Hazen and Sawyer",
+     "booth": "209",
+     "id": "x-hazen-and-sawyer",
+     "domain": "hazenandsawyer.com"
+    },
+    {
+     "name": "Helix Electric",
+     "booth": "212",
+     "id": "x-helix-electric",
+     "domain": "helixelectric.com"
+    },
+    {
+     "name": "Henderson Inc",
+     "booth": "710",
+     "id": "x-henderson-inc",
+     "domain": "hendersoninc.com"
+    },
+    {
+     "name": "Hensel Phelps",
+     "booth": "109",
+     "id": "x-hensel-phelps",
+     "domain": "henselphelps.com"
+    },
+    {
+     "name": "HITT Contracting",
+     "booth": "802",
+     "id": "x-hitt-contracting",
+     "domain": "hitt.com"
+    },
+    {
+     "name": "Hoar Construction",
+     "booth": "411",
+     "id": "x-hoar-construction",
+     "domain": "hoar.com"
+    },
+    {
+     "name": "Hoffman & Hoffman",
+     "booth": "605",
+     "id": "x-hoffman-and-hoffman",
+     "domain": "hoffman-hoffman.com"
+    },
+    {
+     "name": "Holder Construction",
+     "booth": "803",
+     "id": "x-holder-construction",
+     "domain": "holderconstruction.com"
+    },
+    {
+     "name": "Hourigan",
+     "booth": "102",
+     "id": "x-hourigan",
+     "domain": "hourigan.group"
+    },
+    {
+     "name": "I. L. Long Construction",
+     "booth": "510"
+    },
+    {
+     "name": "Innovative Refrigeration Systems",
+     "id": "x-innovative-refrigeration-systems",
+     "domain": "r717.net"
+    },
+    {
+     "name": "Jamerson Lewis Construction",
+     "booth": "708",
+     "id": "x-jamerson-lewis-construction",
+     "domain": "jamersonlewis.com"
+    },
+    {
+     "name": "JCM Associates",
+     "booth": "409",
+     "id": "x-jcm-associates",
+     "domain": "gojcm.com"
+    },
+    {
+     "name": "JE Dunn Construction",
+     "booth": "205",
+     "id": "x-je-dunn-construction",
+     "domain": "jedunn.com"
+    },
+    {
+     "name": "KBS Inc",
+     "booth": "602",
+     "id": "x-kbs-inc",
+     "domain": "kbsgc.com"
+    },
+    {
+     "name": "Kjellstrom + Lee",
+     "booth": "704",
+     "id": "x-kjellstrom-lee",
+     "domain": "kjellstromandlee.com"
+    },
+    {
+     "name": "Kokosing",
+     "booth": "110",
+     "id": "x-kokosing",
+     "domain": "kokosing.biz"
+    },
+    {
+     "name": "L.F. Jennings",
+     "booth": "1002",
+     "id": "x-l-f-jennings",
+     "domain": "lfjennings.com"
+    },
+    {
+     "name": "Lithko Contracting",
+     "booth": "308",
+     "id": "x-lithko-contracting",
+     "domain": "lithko.com"
+    },
+    {
+     "name": "Manganaro",
+     "booth": "610",
+     "id": "x-manganaro",
+     "domain": "manganaro.com"
+    },
+    {
+     "name": "Mark Turner Construction",
+     "booth": "608",
+     "id": "x-mark-turner-construction",
+     "domain": "markturnerconstruction.com"
+    },
+    {
+     "name": "Martin Horn",
+     "id": "x-martin-horn",
+     "domain": "martinhorn.com"
+    },
+    {
+     "name": "MBP",
+     "booth": "505",
+     "id": "x-mbp",
+     "domain": "mbpce.com"
+    },
+    {
+     "name": "MEB",
+     "booth": "100",
+     "id": "x-meb",
+     "domain": "meb.group"
+    },
+    {
+     "name": "Miller Construction Services",
+     "booth": "407"
+    },
+    {
+     "name": "Miller Electric Company",
+     "booth": "607",
+     "id": "x-miller-electric-company",
+     "domain": "mecojax.com"
+    },
+    {
+     "name": "Momentum Earthworks",
+     "booth": "403",
+     "id": "x-momentum-earthworks",
+     "domain": "momentumearthworks.com"
+    },
+    {
+     "name": "Moore's Electrical & Mechanical",
+     "booth": "206",
+     "id": "x-moore-s-electrical-and-mechanical",
+     "domain": "mooreselectrical.com"
+    },
+    {
+     "name": "New Dominion Construction",
+     "booth": "201"
+    },
+    {
+     "name": "New South Construction",
+     "id": "x-new-south-construction",
+     "domain": "newsouthconstruction.com"
+    },
+    {
+     "name": "Otis",
+     "booth": "507",
+     "id": "x-otis",
+     "domain": "otis.com"
+    },
+    {
+     "name": "PC Construction",
+     "booth": "312",
+     "id": "x-pc-construction",
+     "domain": "pcconstruction.com"
+    },
+    {
+     "name": "Performance Contracting",
+     "booth": "112",
+     "id": "x-performance-contracting",
+     "domain": "performancecontracting.com"
+    },
+    {
+     "name": "Pizzano Contractors",
+     "booth": "306"
+    },
+    {
+     "name": "Plano-Coudon",
+     "booth": "207"
+    },
+    {
+     "name": "Precision Walls",
+     "booth": "808",
+     "id": "x-precision-walls",
+     "domain": "precisionwalls.com"
+    },
+    {
+     "name": "Procon Consulting",
+     "booth": "107",
+     "id": "x-procon-consulting",
+     "domain": "proconconsulting.com"
+    },
+    {
+     "name": "R.W. Murray",
+     "booth": "101",
+     "id": "x-r-w-murray",
+     "domain": "rwmurray.com"
+    },
+    {
+     "name": "rand* construction",
+     "booth": "302",
+     "id": "x-rand-construction",
+     "domain": "randcc.com"
+    },
+    {
+     "name": "RK&K",
+     "booth": "103",
+     "id": "x-rkandk",
+     "domain": "rkk.com"
+    },
+    {
+     "name": "Robbins Construction Group",
+     "booth": "310"
+    },
+    {
+     "name": "Rosendin",
+     "booth": "601",
+     "id": "x-rosendin",
+     "domain": "rosendin.com"
+    },
+    {
+     "name": "Ruston Paving",
+     "id": "x-ruston-paving",
+     "domain": "rustonpaving.com"
+    },
+    {
+     "name": "Sargent Corporation",
+     "booth": "503",
+     "id": "x-sargent-corporation",
+     "domain": "sargent.us"
+    },
+    {
+     "name": "Shirley Contracting",
+     "booth": "204",
+     "id": "x-shirley-contracting",
+     "domain": "shirleycontracting.com"
+    },
+    {
+     "name": "Skanska",
+     "booth": "806",
+     "id": "x-skanska",
+     "domain": "skanska.com"
+    },
+    {
+     "name": "Southland Concrete",
+     "booth": "300"
+    },
+    {
+     "name": "Southland Industries",
+     "booth": "104",
+     "id": "x-southland-industries",
+     "domain": "southlandind.com"
+    },
+    {
+     "name": "Swinerton",
+     "booth": "111",
+     "id": "x-swinerton",
+     "domain": "swinerton.com"
+    },
+    {
+     "name": "T5 Data Centers",
+     "booth": "307",
+     "id": "x-t5-data-centers",
+     "domain": "t5datacenters.com"
+    },
+    {
+     "name": "Terra Site Constructors",
+     "booth": "208",
+     "id": "x-terra-site-constructors",
+     "domain": "terrasiteco.com"
+    },
+    {
+     "name": "The Christman Company",
+     "booth": "105",
+     "id": "x-the-christman-company",
+     "domain": "christmanco.com"
+    },
+    {
+     "name": "The NRP Group",
+     "id": "x-the-nrp-group",
+     "domain": "nrpgroup.com"
+    },
+    {
+     "name": "The Old Dominion Group"
+    },
+    {
+     "name": "The Poole and Kent Corporation",
+     "id": "x-poole-and-kent",
+     "domain": "poole-kent.com"
+    },
+    {
+     "name": "TMG Construction"
+    },
+    {
+     "name": "Turner Construction",
+     "id": "x-turner-construction",
+     "domain": "turnerconstruction.com"
+    },
+    {
+     "name": "Ulliman Schutte Construction",
+     "id": "x-ulliman-schutte-construction",
+     "domain": "ullimanschutte.com"
+    },
+    {
+     "name": "W. M. Jordan",
+     "id": "x-w-m-jordan",
+     "domain": "wmjordan.com"
+    },
+    {
+     "name": "Whiting-Turner",
+     "id": "x-whiting-turner",
+     "domain": "whiting-turner.com"
+    },
+    {
+     "name": "William A. Hazel",
+     "id": "x-william-a-hazel",
+     "domain": "wahazel.com"
+    },
+    {
+     "name": "Winmar Construction",
+     "id": "x-winmar-construction",
+     "domain": "winmarconstruction.com"
+    },
+    {
+     "name": "WRA",
+     "id": "x-wra",
+     "domain": "wrallp.com"
+    }
+   ]
+  },
+  {
+   "id": "vt-expo",
+   "name": "Engineering Expo",
+   "school": "Virginia Tech",
+   "when": "Fall 2026 · employers recruiting MEs",
+   "where": "Blacksburg, VA",
+   "companies": [
+    {
+     "name": "ABB",
+     "id": "x-abb",
+     "domain": "abb.com"
+    },
+    {
+     "name": "Abbott Laboratories",
+     "id": "x-abbott",
+     "domain": "abbott.com"
+    },
+    {
+     "name": "AECOM",
+     "id": "x-aecom",
+     "domain": "aecom.com"
+    },
+    {
+     "name": "Affiliated Engineers, Inc.",
+     "id": "x-affiliated-engineers",
+     "domain": "aeieng.com"
+    },
+    {
+     "name": "AFSC Science and Engineering"
+    },
+    {
+     "name": "Alaire Technologies",
+     "id": "x-alaire-technologies",
+     "domain": "alairetech.com"
+    },
+    {
+     "name": "Alpine Consulting Partners, LLC",
+     "id": "x-alpine-consulting-partners",
+     "domain": "alpineconsultingpartners.com"
+    },
+    {
+     "name": "Altec Industries, Inc.",
+     "id": "x-altec",
+     "domain": "altec.com"
+    },
+    {
+     "name": "Altria",
+     "id": "x-altria",
+     "domain": "altria.com"
+    },
+    {
+     "name": "Amazon Leo",
+     "id": "x-amazon-project-leo",
+     "domain": "amazon.jobs"
+    },
+    {
+     "name": "American Bureau of Shipping",
+     "id": "x-american-bureau-of-shipping",
+     "domain": "eagle.org"
+    },
+    {
+     "name": "American Electric Power",
+     "id": "x-american-electric-power",
+     "domain": "aep.com"
+    },
+    {
+     "name": "Andersen Windows",
+     "id": "x-andersen-windows",
+     "domain": "andersenwindows.com"
+    },
+    {
+     "name": "Annapolis Micro Systems",
+     "id": "x-annapolis-micro-systems",
+     "domain": "annapmicro.com"
+    },
+    {
+     "name": "ASSA ABLOY",
+     "id": "x-assa-abloy",
+     "domain": "assaabloy.com"
+    },
+    {
+     "name": "Atlantic Constructors",
+     "id": "x-atlantic-constructors",
+     "domain": "atlanticconstructors.com"
+    },
+    {
+     "name": "Austal USA Advanced Technologies",
+     "id": "x-austal-usa",
+     "domain": "austalusa.com"
+    },
+    {
+     "name": "Automated Logic",
+     "id": "x-automated-logic",
+     "domain": "automatedlogic.com"
+    },
+    {
+     "name": "Bahnson Mechanical Systems",
+     "id": "x-bahnson",
+     "domain": "bahnson.com"
+    },
+    {
+     "name": "Bala Consulting Engineers",
+     "id": "x-bala-consulting-engineers",
+     "domain": "bala.com"
+    },
+    {
+     "name": "Barnhart Crane & Rigging",
+     "id": "x-barnhart-crane-and-rigging",
+     "domain": "barnhartcrane.com"
+    },
+    {
+     "name": "Black & Veatch",
+     "id": "x-black-and-veatch",
+     "domain": "bv.com"
+    },
+    {
+     "name": "Booz Allen",
+     "id": "x-booz-allen",
+     "domain": "boozallen.com"
+    },
+    {
+     "name": "BSA"
+    },
+    {
+     "name": "Burdette, Koehler, Murphy, and Associates (BKM)"
+    },
+    {
+     "name": "Burns & McDonnell",
+     "id": "x-burns-and-mcdonnell",
+     "domain": "burnsmcd.com"
+    },
+    {
+     "name": "BWX Technologies",
+     "id": "bwxt"
+    },
+    {
+     "name": "Carmeuse",
+     "id": "x-carmeuse",
+     "domain": "carmeuse.com"
+    },
+    {
+     "name": "Carter Machinery",
+     "id": "x-carter-machinery",
+     "domain": "cartermachinery.com"
+    },
+    {
+     "name": "Caterpillar Inc.",
+     "id": "x-caterpillar",
+     "domain": "caterpillar.com"
+    },
+    {
+     "name": "Celanese",
+     "id": "x-celanese",
+     "domain": "celanese.com"
+    },
+    {
+     "name": "Cianbro Corporation",
+     "id": "x-cianbro",
+     "domain": "cianbro.com"
+    },
+    {
+     "name": "CMTA",
+     "id": "x-cmta",
+     "domain": "cmta.com"
+    },
+    {
+     "name": "Colonna's Shipyard, Inc.",
+     "id": "x-colonna-s-shipyard",
+     "domain": "colonnaship.com"
+    },
+    {
+     "name": "Corning",
+     "id": "x-corning",
+     "domain": "corning.com"
+    },
+    {
+     "name": "Corvid Technologies",
+     "id": "x-corvid-technologies",
+     "domain": "corvidtec.com"
+    },
+    {
+     "name": "Coty Inc.",
+     "id": "x-coty",
+     "domain": "coty.com"
+    },
+    {
+     "name": "Danone North America",
+     "id": "x-danone-north-america",
+     "domain": "danonenorthamerica.com"
+    },
+    {
+     "name": "Delta Star Inc.",
+     "id": "x-delta-star",
+     "domain": "deltastar.com"
+    },
+    {
+     "name": "DES"
+    },
+    {
+     "name": "Dewberry",
+     "id": "x-dewberry",
+     "domain": "dewberry.com"
+    },
+    {
+     "name": "DMC Inc.",
+     "id": "x-dmc",
+     "domain": "dmcinfo.com"
+    },
+    {
+     "name": "Dominion Energy",
+     "id": "x-dominion-energy",
+     "domain": "dominionenergy.com"
+    },
+    {
+     "name": "Draper",
+     "id": "x-draper",
+     "domain": "draper.com"
+    },
+    {
+     "name": "DuPont",
+     "id": "x-dupont",
+     "domain": "dupont.com"
+    },
+    {
+     "name": "Eastern Research Group, Inc. (ERG)",
+     "id": "x-eastern-research-group",
+     "domain": "erg.com"
+    },
+    {
+     "name": "Eastman Chemical",
+     "id": "x-eastman-chemical",
+     "domain": "eastman.com"
+    },
+    {
+     "name": "Elbit Systems of America - Warfighter Systems",
+     "id": "x-elbit-systems-of-america",
+     "domain": "elbitamerica.com"
+    },
+    {
+     "name": "Elveo",
+     "id": "x-elveo",
+     "domain": "elveo.com"
+    },
+    {
+     "name": "Emerson - NI Test and Measurement",
+     "id": "x-emerson-ni-test-and-measurement",
+     "domain": "emerson.com"
+    },
+    {
+     "name": "EQT Corporation",
+     "id": "x-eqt",
+     "domain": "eqt.com"
+    },
+    {
+     "name": "Evapco",
+     "id": "x-evapco",
+     "domain": "evapco.com"
+    },
+    {
+     "name": "Fibertek, Inc.",
+     "id": "x-fibertek",
+     "domain": "fibertek.com"
+    },
+    {
+     "name": "Flowers Foods",
+     "id": "x-flowers-foods",
+     "domain": "flowersfoods.com"
+    },
+    {
+     "name": "Flowserve",
+     "id": "x-flowserve",
+     "domain": "flowserve.com"
+    },
+    {
+     "name": "FM",
+     "id": "x-fm",
+     "domain": "fm.com"
+    },
+    {
+     "name": "Framatome",
+     "id": "x-framatome",
+     "domain": "framatome.com"
+    },
+    {
+     "name": "GALLO",
+     "id": "x-e-and-j-gallo",
+     "domain": "gallo.com"
+    },
+    {
+     "name": "Garmin International",
+     "id": "x-garmin",
+     "domain": "garmin.com"
+    },
+    {
+     "name": "GE Vernova",
+     "id": "x-ge-vernova",
+     "domain": "gevernova.com"
+    },
+    {
+     "name": "General Dynamics Electric Boat",
+     "id": "x-general-dynamics-electric-boat",
+     "domain": "gdeb.com"
+    },
+    {
+     "name": "General Dynamics Mission Systems",
+     "id": "x-general-dynamics-mission-systems",
+     "domain": "gdmissionsystems.com"
+    },
+    {
+     "name": "General Dynamics-Applied Physical Sciences",
+     "id": "x-general-dynamics-applied-physical-sciences",
+     "domain": "gd-aps.com"
+    },
+    {
+     "name": "General Motors",
+     "id": "x-general-motors",
+     "domain": "gm.com"
+    },
+    {
+     "name": "Georgia-Pacific",
+     "id": "x-georgia-pacific",
+     "domain": "gp.com"
+    },
+    {
+     "name": "Gerdau",
+     "id": "x-gerdau",
+     "domain": "gerdau.com"
+    },
+    {
+     "name": "GHT Limited",
+     "id": "x-ght-limited",
+     "domain": "ghtltd.com"
+    },
+    {
+     "name": "Global Technical Systems",
+     "id": "x-global-technical-systems",
+     "domain": "gts-inc.com"
+    },
+    {
+     "name": "GM Motorsports"
+    },
+    {
+     "name": "GrayMatter Systems",
+     "id": "x-graymatter-systems",
+     "domain": "graymattersystems.com"
+    },
+    {
+     "name": "Groundswell"
+    },
+    {
+     "name": "Hanwha Azdel",
+     "id": "x-hanwha-azdel",
+     "domain": "azdel.com"
+    },
+    {
+     "name": "Henderson Engineers",
+     "id": "x-henderson-engineers",
+     "domain": "hendersonengineers.com"
+    },
+    {
+     "name": "Hensel Phelps Services",
+     "id": "x-hensel-phelps",
+     "domain": "henselphelps.com"
+    },
+    {
+     "name": "HII - Newport News Shipbuilding Division",
+     "id": "hii-nns"
+    },
+    {
+     "name": "HII Mission Technologies",
+     "id": "x-hii-mission-technologies",
+     "domain": "hii.com"
+    },
+    {
+     "name": "Hillphoenix",
+     "id": "x-hillphoenix",
+     "domain": "hillphoenix.com"
+    },
+    {
+     "name": "Hitachi Energy",
+     "id": "x-hitachi-energy",
+     "domain": "hitachienergy.com"
+    },
+    {
+     "name": "Hoffman & Hoffman",
+     "id": "x-hoffman-and-hoffman",
+     "domain": "hoffman-hoffman.com"
+    },
+    {
+     "name": "Hood Patterson & Dewar",
+     "id": "x-hood-patterson-and-dewar",
+     "domain": "hpd-inc.com"
+    },
+    {
+     "name": "Howmet Aerospace",
+     "id": "x-howmet-aerospace",
+     "domain": "howmet.com"
+    },
+    {
+     "name": "Huitt-Zollars Inc",
+     "id": "x-huitt-zollars",
+     "domain": "huitt-zollars.com"
+    },
+    {
+     "name": "Index AR Solutions",
+     "id": "x-index-ar-solutions",
+     "domain": "indexarsolutions.com"
+    },
+    {
+     "name": "Infineon",
+     "id": "x-infineon",
+     "domain": "infineon.com"
+    },
+    {
+     "name": "Ingersoll Rand",
+     "id": "x-ingersoll-rand",
+     "domain": "irco.com"
+    },
+    {
+     "name": "Innovative Refrigeration Systems",
+     "id": "x-innovative-refrigeration-systems",
+     "domain": "r717.net"
+    },
+    {
+     "name": "Insteel Industries, Inc",
+     "id": "x-insteel-industries",
+     "domain": "insteel.com"
+    },
+    {
+     "name": "IperionX",
+     "id": "x-iperionx",
+     "domain": "iperionx.com"
+    },
+    {
+     "name": "Isaac Operations",
+     "id": "x-isaac-operations",
+     "domain": "isaacoperations.com"
+    },
+    {
+     "name": "ITAC"
+    },
+    {
+     "name": "James Hardie Building Products",
+     "id": "x-james-hardie",
+     "domain": "jameshardie.com"
+    },
+    {
+     "name": "James Posey Associates, Inc.",
+     "id": "x-james-posey-associates",
+     "domain": "jamesposey.com"
+    },
+    {
+     "name": "JE Dunn Construction",
+     "id": "x-je-dunn-construction",
+     "domain": "jedunn.com"
+    },
+    {
+     "name": "Jefferson Lab",
+     "id": "x-jefferson-lab",
+     "domain": "jlab.org"
+    },
+    {
+     "name": "JLG",
+     "id": "x-jlg",
+     "domain": "jlg.com"
+    },
+    {
+     "name": "Johns Hopkins University Applied Physics Laboratory",
+     "id": "x-johns-hopkins-apl",
+     "domain": "jhuapl.edu"
+    },
+    {
+     "name": "Johnson Controls",
+     "id": "x-johnson-controls",
+     "domain": "johnsoncontrols.com"
+    },
+    {
+     "name": "Joint Warfare Analysis Center"
+    },
+    {
+     "name": "Keurig Dr Pepper",
+     "id": "x-keurig-dr-pepper",
+     "domain": "keurigdrpepper.com"
+    },
+    {
+     "name": "Kingspan North America",
+     "id": "x-kingspan",
+     "domain": "kingspan.com"
+    },
+    {
+     "name": "L3Harris",
+     "id": "l3harris"
+    },
+    {
+     "name": "LANXESS Corporation",
+     "id": "x-lanxess",
+     "domain": "lanxess.com"
+    },
+    {
+     "name": "Liebherr Mining Equipment",
+     "id": "x-liebherr",
+     "domain": "liebherr.com"
+    },
+    {
+     "name": "Lilly",
+     "id": "x-eli-lilly",
+     "domain": "lilly.com"
+    },
+    {
+     "name": "Lockheed Martin",
+     "id": "x-lockheed-martin",
+     "domain": "lockheedmartin.com"
+    },
+    {
+     "name": "M.C. Dean",
+     "id": "x-m-c-dean",
+     "domain": "mcdean.com"
+    },
+    {
+     "name": "Mainstream Engineering Corporation",
+     "id": "x-mainstream-engineering",
+     "domain": "mainstream-engr.com"
+    },
+    {
+     "name": "Marvin",
+     "id": "x-marvin",
+     "domain": "marvin.com"
+    },
+    {
+     "name": "Mason & Hanger",
+     "id": "x-mason-and-hanger",
+     "domain": "masonhanger.com"
+    },
+    {
+     "name": "Material Curiosity",
+     "id": "x-material-curiosity",
+     "domain": "materialcuriosity.com"
+    },
+    {
+     "name": "McQ Inc",
+     "id": "x-mcq",
+     "domain": "mcqinc.com"
+    },
+    {
+     "name": "MEB",
+     "id": "x-meb",
+     "domain": "meb.group"
+    },
+    {
+     "name": "Mechanical Dynamics & Analysis, LLC",
+     "id": "x-mechanical-dynamics-and-analysis",
+     "domain": "mdaturbines.com"
+    },
+    {
+     "name": "Merck",
+     "id": "merck"
+    },
+    {
+     "name": "Merrick & Company",
+     "id": "x-merrick-and-company",
+     "domain": "merrick.com"
+    },
+    {
+     "name": "Micron Technology",
+     "id": "x-micron-technology",
+     "domain": "micron.com"
+    },
+    {
+     "name": "Military Sealift Command"
+    },
+    {
+     "name": "Milliken & Company",
+     "id": "x-milliken",
+     "domain": "milliken.com"
+    },
+    {
+     "name": "MIT Lincoln Laboratory",
+     "id": "x-mit-lincoln-laboratory",
+     "domain": "ll.mit.edu"
+    },
+    {
+     "name": "MITRE",
+     "id": "x-mitre",
+     "domain": "mitre.org"
+    },
+    {
+     "name": "Modine Manufacturing Company",
+     "id": "x-modine",
+     "domain": "modine.com"
+    },
+    {
+     "name": "Molson Coors Beverage Company",
+     "id": "x-molson-coors",
+     "domain": "molsoncoors.com"
+    },
+    {
+     "name": "Moog Inc.",
+     "id": "x-moog",
+     "domain": "moog.com"
+    },
+    {
+     "name": "Moore's Electrical & Mechanical",
+     "id": "x-moore-s-electrical-and-mechanical",
+     "domain": "mooreselectrical.com"
+    },
+    {
+     "name": "MPR Associates, Inc.",
+     "id": "x-mpr-associates",
+     "domain": "mpr.com"
+    },
+    {
+     "name": "National Institute of Standards and Technology- NIST"
+    },
+    {
+     "name": "NAVAIR Fleet Readiness Center East"
+    },
+    {
+     "name": "Naval Air Systems Command (NAVAIR)"
+    },
+    {
+     "name": "Naval Information Warfare Center (NIWC) Atlantic"
+    },
+    {
+     "name": "Naval Nuclear Laboratory",
+     "id": "x-naval-nuclear-laboratory",
+     "domain": "navalnuclearlab.energy.gov"
+    },
+    {
+     "name": "Norfolk Naval Shipyard"
+    },
+    {
+     "name": "Novonesis",
+     "id": "x-novonesis",
+     "domain": "novonesis.com"
+    },
+    {
+     "name": "P&G"
+    },
+    {
+     "name": "Packaging Corporation of America",
+     "id": "x-packaging-corporation-of-america",
+     "domain": "packagingcorp.com"
+    },
+    {
+     "name": "Parsons Corporation",
+     "id": "x-parsons",
+     "domain": "parsons.com"
+    },
+    {
+     "name": "PEPSICO",
+     "id": "x-pepsico",
+     "domain": "pepsico.com"
+    },
+    {
+     "name": "Plexus Corp.",
+     "id": "x-plexus",
+     "domain": "plexus.com"
+    },
+    {
+     "name": "Posillico",
+     "id": "x-posillico",
+     "domain": "posillico.com"
+    },
+    {
+     "name": "Potter Global Technologies",
+     "id": "x-potter-global-technologies",
+     "domain": "pottersignal.com"
+    },
+    {
+     "name": "Printpack",
+     "id": "x-printpack",
+     "domain": "printpack.com"
+    },
+    {
+     "name": "Process Alliance",
+     "id": "x-process-alliance",
+     "domain": "processalliance.com"
+    },
+    {
+     "name": "Progressive Design, Inc.",
+     "id": "x-progressive-design",
+     "domain": "progressivedesigninc.com"
+    },
+    {
+     "name": "ProLift Rigging",
+     "id": "x-prolift-rigging",
+     "domain": "proliftrigging.com"
+    },
+    {
+     "name": "Prometheus Group",
+     "id": "x-prometheus-group",
+     "domain": "prometheusgroup.com"
+    },
+    {
+     "name": "R.E. Mason",
+     "id": "x-r-e-mason",
+     "domain": "remason.com"
+    },
+    {
+     "name": "Regal Rexnord",
+     "id": "x-regal-rexnord",
+     "domain": "regalrexnord.com"
+    },
+    {
+     "name": "Rhenus Automotive Salem LLC",
+     "id": "x-rhenus",
+     "domain": "rhenus.com"
+    },
+    {
+     "name": "RoviSys",
+     "id": "x-rovisys",
+     "domain": "rovisys.com"
+    },
+    {
+     "name": "RTX",
+     "id": "rtx"
+    },
+    {
+     "name": "Sargent & Lundy",
+     "id": "x-sargent-and-lundy",
+     "domain": "sargentlundy.com"
+    },
+    {
+     "name": "Savannah River Nuclear Solutions",
+     "id": "x-savannah-river-nuclear-solutions",
+     "domain": "savannahrivernuclearsolutions.com"
+    },
+    {
+     "name": "Scout Motors Inc.",
+     "id": "x-scout-motors",
+     "domain": "scoutmotors.com"
+    },
+    {
+     "name": "SEW-EURODRIVE, Inc",
+     "id": "x-sew-eurodrive",
+     "domain": "seweurodrive.com"
+    },
+    {
+     "name": "SimVentions",
+     "id": "x-simventions",
+     "domain": "simventions.com"
+    },
+    {
+     "name": "Smurfit Westrock",
+     "id": "x-smurfit-westrock",
+     "domain": "smurfitwestrock.com"
+    },
+    {
+     "name": "Southland Industries",
+     "id": "x-southland-industries",
+     "domain": "southlandind.com"
+    },
+    {
+     "name": "Southwest Research Institute",
+     "id": "x-southwest-research-institute",
+     "domain": "swri.org"
+    },
+    {
+     "name": "Stanley Black & Decker",
+     "id": "x-stanley-black-and-decker",
+     "domain": "stanleyblackanddecker.com"
+    },
+    {
+     "name": "Stratus"
+    },
+    {
+     "name": "Structures.Aero",
+     "id": "x-structures-aero",
+     "domain": "structures.aero"
+    },
+    {
+     "name": "Summer Consultants, Inc.",
+     "id": "x-summer-consultants",
+     "domain": "summerconsultants.com"
+    },
+    {
+     "name": "Super Radiator Coils",
+     "id": "x-super-radiator-coils",
+     "domain": "superradiatorcoils.com"
+    },
+    {
+     "name": "Symrise Inc",
+     "id": "x-symrise",
+     "domain": "symrise.com"
+    },
+    {
+     "name": "Team Submarine"
+    },
+    {
+     "name": "Technomics",
+     "id": "x-technomics",
+     "domain": "technomics.net"
+    },
+    {
+     "name": "Tencarva Machinery Company",
+     "id": "x-tencarva-machinery",
+     "domain": "tencarva.com"
+    },
+    {
+     "name": "Texas Instruments",
+     "id": "x-texas-instruments",
+     "domain": "ti.com"
+    },
+    {
+     "name": "Textron Systems",
+     "id": "x-textron-systems",
+     "domain": "textronsystems.com"
+    },
+    {
+     "name": "The Clorox Company",
+     "id": "x-clorox",
+     "domain": "thecloroxcompany.com"
+    },
+    {
+     "name": "The Poole and Kent Corporation",
+     "id": "x-poole-and-kent",
+     "domain": "poole-kent.com"
+    },
+    {
+     "name": "The Whiting-Turner Contracting Company",
+     "id": "x-whiting-turner",
+     "domain": "whiting-turner.com"
+    },
+    {
+     "name": "Thermo Fisher Scientific",
+     "id": "x-thermo-fisher-scientific",
+     "domain": "thermofisher.com"
+    },
+    {
+     "name": "Thompson & Litton",
+     "id": "x-thompson-and-litton",
+     "domain": "t-l.com"
+    },
+    {
+     "name": "Titan America / Roanoke Cement Company",
+     "id": "x-titan-america",
+     "domain": "titanamerica.com"
+    },
+    {
+     "name": "TMEIC Corporation Americas",
+     "id": "x-tmeic",
+     "domain": "tmeic.com"
+    },
+    {
+     "name": "Toyota Racing Development",
+     "id": "x-toyota-racing-development",
+     "domain": "trdusa.com"
+    },
+    {
+     "name": "Trane Technologies",
+     "id": "x-trane-technologies",
+     "domain": "tranetechnologies.com"
+    },
+    {
+     "name": "Trex Company Inc",
+     "id": "x-trex",
+     "domain": "trex.com"
+    },
+    {
+     "name": "Triad Systems Engineering, Inc.",
+     "id": "x-triad-systems-engineering",
+     "domain": "triadse.com"
+    },
+    {
+     "name": "TSMC",
+     "id": "x-tsmc",
+     "domain": "tsmc.com"
+    },
+    {
+     "name": "TTI - RYOBI"
+    },
+    {
+     "name": "TTM Technologies",
+     "id": "x-ttm-technologies",
+     "domain": "ttm.com"
+    },
+    {
+     "name": "Ulliman Schutte Construction",
+     "id": "x-ulliman-schutte-construction",
+     "domain": "ullimanschutte.com"
+    },
+    {
+     "name": "United States Gypsum Co."
+    },
+    {
+     "name": "United States Patent and Trademark Office"
+    },
+    {
+     "name": "US Army Corps of Engineers Huntington District"
+    },
+    {
+     "name": "US Conec",
+     "id": "x-us-conec",
+     "domain": "usconec.com"
+    },
+    {
+     "name": "Vadum Inc",
+     "id": "x-vadum",
+     "domain": "vadum.com"
+    },
+    {
+     "name": "Venture Global",
+     "id": "x-venture-global",
+     "domain": "venturegloballng.com"
+    },
+    {
+     "name": "Volvo Group",
+     "id": "volvo-group"
+    },
+    {
+     "name": "VPT, Inc.",
+     "id": "x-vpt",
+     "domain": "vptpower.com"
+    },
+    {
+     "name": "W R Systems, Ltd.",
+     "id": "x-w-r-systems",
+     "domain": "wrsystems.com"
+    },
+    {
+     "name": "Washington Metropolitan Area Transit Authority"
+    },
+    {
+     "name": "Westinghouse Electric Company",
+     "id": "westinghouse"
+    },
+    {
+     "name": "Wiley|Wilson",
+     "id": "x-wiley-wilson",
+     "domain": "wileywilson.com"
+    },
+    {
+     "name": "Woodward, Inc",
+     "id": "x-woodward",
+     "domain": "woodward.com"
+    },
+    {
+     "name": "WRA",
+     "id": "x-wra",
+     "domain": "wrallp.com"
+    },
+    {
+     "name": "WSP",
+     "id": "x-wsp",
+     "domain": "wsp.com"
+    },
+    {
+     "name": "X-Energy",
+     "id": "x-x-energy",
+     "domain": "x-energy.com"
+    },
+    {
+     "name": "ZIM Aircraft Cabin Solutions",
+     "id": "x-zim-aircraft-cabin-solutions",
+     "domain": "zim-aircraft-seating.com"
+    }
+   ]
+  },
+  {
+   "id": "vt-aero-defense",
+   "name": "Aerospace, Defense & Intelligence Career Fair",
+   "school": "Virginia Tech",
+   "when": "Fall 2026 (Sep 22)",
+   "where": "Squires, Blacksburg, VA",
+   "companies": [
+    {
+     "name": "AeroVironment",
+     "id": "x-aerovironment",
+     "domain": "avinc.com"
+    },
+    {
+     "name": "AST SpaceMobile",
+     "id": "x-ast-spacemobile",
+     "domain": "ast-science.com"
+    },
+    {
+     "name": "Bechtel Plant Machinery",
+     "id": "x-bechtel-plant-machinery",
+     "domain": "bpmionline.com"
+    },
+    {
+     "name": "CACI"
+    },
+    {
+     "name": "CIA"
+    },
+    {
+     "name": "CNA"
+    },
+    {
+     "name": "CoAspire"
+    },
+    {
+     "name": "Deloitte"
+    },
+    {
+     "name": "Elbit Systems of America",
+     "id": "x-elbit-systems-of-america",
+     "domain": "elbitamerica.com"
+    },
+    {
+     "name": "FAA"
+    },
+    {
+     "name": "Fincantieri Marine Group",
+     "id": "x-fincantieri-marine-group",
+     "domain": "webuildships.com"
+    },
+    {
+     "name": "GE Aerospace",
+     "id": "x-ge-aerospace",
+     "domain": "geaerospace.com"
+    },
+    {
+     "name": "General Dynamics Information Technology"
+    },
+    {
+     "name": "GRVTY"
+    },
+    {
+     "name": "Hanwha Philly Shipyard",
+     "id": "x-hanwha-philly-shipyard",
+     "domain": "hanwhaphillyshipyard.com"
+    },
+    {
+     "name": "Integration Innovation (i3)"
+    },
+    {
+     "name": "IQT"
+    },
+    {
+     "name": "L3Harris Technologies",
+     "id": "l3harris"
+    },
+    {
+     "name": "Leonardo DRS",
+     "id": "x-leonardo-drs",
+     "domain": "leonardodrs.com"
+    },
+    {
+     "name": "Military Operations Research Society"
+    },
+    {
+     "name": "MIT Lincoln Laboratory",
+     "id": "x-mit-lincoln-laboratory",
+     "domain": "ll.mit.edu"
+    },
+    {
+     "name": "MITRE",
+     "id": "x-mitre",
+     "domain": "mitre.org"
+    },
+    {
+     "name": "Moog",
+     "id": "x-moog",
+     "domain": "moog.com"
+    },
+    {
+     "name": "National Geospatial-Intelligence Agency"
+    },
+    {
+     "name": "National Space Intelligence Center"
+    },
+    {
+     "name": "NAVAIR"
+    },
+    {
+     "name": "Naval Civilian Careers"
+    },
+    {
+     "name": "Naval Research Laboratory"
+    },
+    {
+     "name": "Naval Sea Systems Command"
+    },
+    {
+     "name": "NCIS"
+    },
+    {
+     "name": "Northrop Grumman",
+     "id": "northrop"
+    },
+    {
+     "name": "Penn State Applied Research Lab",
+     "id": "x-penn-state-applied-research-lab",
+     "domain": "arl.psu.edu"
+    },
+    {
+     "name": "Precise Systems"
+    },
+    {
+     "name": "Renaissance Strategic Advisors"
+    },
+    {
+     "name": "Rocket Lab",
+     "id": "x-rocket-lab",
+     "domain": "rocketlabusa.com"
+    },
+    {
+     "name": "Saronic",
+     "id": "x-saronic",
+     "domain": "saronic.com"
+    },
+    {
+     "name": "Sedaro",
+     "id": "x-sedaro",
+     "domain": "sedaro.com"
+    },
+    {
+     "name": "Sierra Nevada Corporation",
+     "id": "x-sierra-nevada-corporation",
+     "domain": "sncorp.com"
+    },
+    {
+     "name": "Stoke Space",
+     "id": "x-stoke-space",
+     "domain": "stokespace.com"
+    },
+    {
+     "name": "Systems Planning and Analysis",
+     "id": "x-systems-planning-and-analysis",
+     "domain": "spa.com"
+    },
+    {
+     "name": "The Aerospace Corporation",
+     "id": "x-the-aerospace-corporation",
+     "domain": "aerospace.org"
+    },
+    {
+     "name": "The MIL Corporation",
+     "id": "x-the-mil-corporation",
+     "domain": "milcorp.com"
+    },
+    {
+     "name": "U.S. Air Force & Space Force"
+    },
+    {
+     "name": "U.S. Space Force"
+    },
+    {
+     "name": "US Army DEVCOM CBC"
+    }
+   ]
+  }
+ ]
+}

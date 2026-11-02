@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>InternIQ — Career Fair Mode</title>
+<meta name="description" content="Your resume as a QR code, every company at the fair with their open internships, conversation notes, and follow-up reminders — in one place.">
+<meta name="theme-color" content="#0A1628">
+<style>
+  :root{
+    --green:#00C285; --green-dark:#009E6C; --green-light:#E6FBF4;
+    --navy:#0A1628; --ink:#1E293B; --muted:#64748B; --faint:#94A3B8;
+    --bg:#F8FFFE; --card:#FFFFFF; --line:#E2EEEA; --amber:#B45309; --amber-light:#FFF4E6; --red:#B91C1C; --red-light:#FEF2F2;
+    --r:14px; --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:720px;margin:0 auto;padding:0 16px}
+  header{background:var(--navy);color:#fff;padding:18px 0 0}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .brand{font-weight:800;font-size:15px;color:var(--green);text-decoration:none}
+  .acct{font-size:13px;color:#CBD5E1;display:flex;align-items:center;gap:8px;min-width:0}
+  .acct span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px}
+  .acct button{font:inherit;font-size:13px;font-weight:700;border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;border-radius:8px;padding:5px 10px;cursor:pointer}
+  h1{font-size:clamp(22px,5vw,28px);margin:10px 0 2px;letter-spacing:-.02em}
+  .fairsel{margin:10px 0 0;width:100%;font:inherit;font-size:15px;font-weight:600;padding:10px 12px;border-radius:10px;border:0;background:#13233D;color:#fff}
+  .fairmeta{font-size:13px;color:#94A3B8;margin:6px 0 0}
+  nav.tabs{display:flex;gap:4px;margin-top:14px}
+  nav.tabs button{flex:1;font:inherit;font-size:14px;font-weight:700;color:#CBD5E1;background:transparent;border:0;border-bottom:3px solid transparent;padding:10px 4px;cursor:pointer;position:relative}
+  nav.tabs button[aria-selected="true"]{color:#fff;border-bottom-color:var(--green)}
+  .badge{display:inline-block;min-width:18px;padding:0 5px;margin-left:5px;border-radius:999px;background:var(--amber);color:#fff;font-size:11px;line-height:18px;vertical-align:1px}
+  main{padding:16px 0 90px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:12px}
+  .muted{color:var(--muted)} .small{font-size:13px}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-size:14px;font-weight:700;padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--navy);cursor:pointer;text-decoration:none}
+  .btn.go{background:var(--green);border-color:var(--green);color:#fff}
+  .btn.go:hover{background:var(--green-dark)}
+  .btn.ghost{background:transparent}
+  .btn:disabled{opacity:.55;cursor:default}
+  .btn:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+  /* QR */
+  .qrbox{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
+  .qr{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;width:156px;height:156px;display:grid;place-items:center;cursor:zoom-in}
+  .qr svg{width:100%;height:100%;display:block}
+  .qrtitle{font-size:18px;font-weight:800;color:var(--navy);margin:0 0 2px}
+  .switch{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;cursor:pointer;user-select:none}
+  .switch input{width:18px;height:18px;accent-color:var(--green);margin:0}
+  .off{color:var(--red);font-weight:700}
+  @media (max-width:480px){.qrbox{grid-template-columns:1fr;justify-items:center;text-align:center}.qr{width:220px;height:220px}.qrbox .row{justify-content:center}}
+  .full{position:fixed;inset:0;background:#fff;z-index:50;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+  .full.on{display:flex}
+  .full .big{width:min(82vw,62vh);height:min(82vw,62vh)}
+  .full .big svg{width:100%;height:100%}
+  .full h2{margin:18px 0 4px;color:var(--navy)}
+
+  /* Companies */
+  .search{width:100%;font:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 12px}
+  .chip{font:inherit;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer}
+  .chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  .co{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
+  .co > button{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 14px;cursor:pointer}
+  .co > button:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
+  .coname{font-weight:700;color:var(--navy)}
+  .cosub{font-size:13px;color:var(--muted);grid-column:1}
+  .pill{font-size:11px;font-weight:800;padding:2px 8px;border-radius:999px;white-space:nowrap;align-self:center}
+  .pill.hire{background:var(--green-light);color:var(--green-dark)}
+  .pill.none{background:#F1F5F9;color:var(--faint)}
+  .pill.talk{background:#EEF2FF;color:#3730A3}
+  .booth{font-size:11px;font-weight:800;color:var(--amber);background:var(--amber-light);padding:1px 7px;border-radius:999px;margin-left:6px;vertical-align:1px}
+  .codetail{border-top:1px solid var(--line);padding:10px 14px 14px;display:none}
+  .co.open .codetail{display:block}
+  .job{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:14px}
+  .job:last-of-type{border-bottom:0}
+  .job a{color:var(--green-dark);font-weight:700;text-decoration:none;white-space:nowrap}
+  .tag{font-size:10px;font-weight:800;padding:1px 6px;border-radius:999px;background:var(--green-light);color:var(--green-dark);margin-left:4px}
+
+  /* Follow-ups */
+  .fu{border-left:4px solid var(--line)}
+  .fu.due{border-left-color:var(--amber)} .fu.late{border-left-color:var(--red)} .fu.done{opacity:.6}
+  .status{font-size:12px;font-weight:800;padding:2px 8px;border-radius:999px}
+  .status.due{background:var(--amber-light);color:var(--amber)} .status.late{background:var(--red-light);color:var(--red)}
+  .status.soon{background:#F1F5F9;color:var(--muted)} .status.done{background:var(--green-light);color:var(--green-dark)}
+  .draft{white-space:pre-wrap;font-size:13.5px;background:#F8FAFC;border:1px solid var(--line);border-radius:10px;padding:12px;margin:10px 0;max-height:260px;overflow:auto}
+  details summary{cursor:pointer;font-weight:700;font-size:14px;color:var(--navy)}
+
+  /* Sheet (note form) */
+  .scrim{position:fixed;inset:0;background:rgba(10,22,40,.45);z-index:40;display:none}
+  .scrim.on{display:block}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:#fff;border-radius:18px 18px 0 0;max-height:92vh;overflow:auto;padding:18px 16px calc(18px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .2s ease}
+  .sheet.on{transform:none}
+  @media (min-width:720px){.sheet{left:50%;right:auto;width:640px;margin-left:-320px}}
+  label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin:12px 0 4px}
+  input[type=text],input[type=email],textarea,select{width:100%;font:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--ink)}
+  textarea{min-height:96px;resize:vertical}
+  .feel{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .feel button,.when button{font:inherit;font-size:14px;font-weight:700;padding:9px 6px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer}
+  .feel button[aria-pressed="true"],.when button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  .when{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .empty{text-align:center;color:var(--muted);padding:28px 12px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;font-size:14px;font-weight:600;padding:10px 16px;border-radius:10px;opacity:0;transition:.2s;z-index:60;pointer-events:none;max-width:90vw}
+  .toast.on{opacity:1;transform:translateX(-50%)}
+  .hidden{display:none !important}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top"><a class="brand" href="/jobs/">InternIQ</a><div class="acct" id="acct"></div></div>
+    <h1>Career Fair Mode</h1>
+    <select class="fairsel" id="fairsel" aria-label="Choose a career fair"></select>
+    <p class="fairmeta" id="fairmeta"></p>
+    <nav class="tabs" role="tablist">
+      <button role="tab" data-tab="fair" aria-selected="true">At the fair</button>
+      <button role="tab" data-tab="follow" aria-selected="false">Follow-ups<span class="badge hidden" id="dueBadge"></span></button>
+      <button role="tab" data-tab="resume" aria-selected="false">My resume</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="tab-fair">
+    <div class="card" id="qrcard"></div>
+    <input class="search" id="q" placeholder="Search companies at this fair…" aria-label="Search companies">
+    <div class="chips" id="chips"></div>
+    <div id="cos"><div class="empty">Loading companies…</div></div>
+  </section>
+  <section id="tab-follow" class="hidden"></section>
+  <section id="tab-resume" class="hidden"></section>
+</main>
+
+<div class="full" id="full" role="dialog" aria-label="Resume QR code">
+  <div class="big" id="bigqr"></div>
+  <h2 id="fullname"></h2>
+  <p class="muted small">Recruiters: point your phone camera here to open my resume.</p>
+  <button class="btn" id="closefull">Done</button>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="noteTitle">
+  <div class="row" style="justify-content:space-between"><strong id="noteTitle" style="font-size:18px;color:var(--navy)">Conversation notes</strong><button class="btn ghost" id="noteClose">Close</button></div>
+  <div class="muted small" id="noteCo"></div>
+  <label for="nContact">Who did you talk to?</label>
+  <input type="text" id="nContact" placeholder="Name, title (e.g. Sarah Lee, ME recruiter)" autocomplete="off">
+  <label for="nEmail">Their email (from their card, optional)</label>
+  <input type="email" id="nEmail" placeholder="sarah.lee@company.com" autocomplete="off">
+  <label for="nRoles">Roles you discussed</label>
+  <input type="text" id="nRoles" placeholder="e.g. Mechanical Design Intern, Summer 2027" autocomplete="off">
+  <label for="nSaid">What was said</label>
+  <textarea id="nSaid" placeholder="What they're looking for, next steps they mentioned, anything to bring up in your follow-up…"></textarea>
+  <label>How did it go?</label>
+  <div class="feel" id="nFeel"><button type="button" data-v="great">🔥 Great</button><button type="button" data-v="good">👍 Good</button><button type="button" data-v="meh">😐 Meh</button></div>
+  <label>Remind me to follow up</label>
+  <div class="when" id="nWhen"><button type="button" data-h="24">In 24 hrs</button><button type="button" data-h="48">In 48 hrs</button><button type="button" data-h="168">In 1 week</button></div>
+  <div class="row" style="margin-top:16px"><button class="btn go" id="noteSave" style="flex:1">Save notes</button></div>
+</div>
+<input type="file" id="file" accept="application/pdf,.pdf" class="hidden">
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="/fair/qrcode.js"></script>
+<script>
+(function(){
+  const $ = (s, el = document) => el.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const S = { fairs: [], fair: null, listings: {}, q: "", filter: "all", open: new Set(), tab: "fair",
+              clerk: null, user: null, me: { resume: null, notes: [] }, loaded: false, draft: null };
+  let toastT;
+  const toast = (m) => { const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2600); };
+  const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k, v){ try { localStorage.setItem(k, v); } catch {} } };
+
+  // ── Sign-in (same Clerk account as the rest of InternIQ). Browsing never needs it. ──
+  async function token(){ try { return await S.clerk?.session?.getToken(); } catch { return null; } }
+  async function loadClerk(){
+    try {
+      const cfg = await fetch("/api/config").then((r) => r.json());
+      const pk = cfg.clerkPublishableKey; if (!pk) return renderAcct();
+      if (!window.Clerk) {
+        const host = atob(pk.replace(/^pk_(test|live)_/, "")).replace(/\$$/, "").trim();
+        if (!/clerk/.test(host)) return renderAcct();
+        await new Promise((ok, bad) => { const s = document.createElement("script");
+          s.src = `https://${host}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`; s.setAttribute("data-clerk-publishable-key", pk);
+          s.async = true; s.crossOrigin = "anonymous"; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
+      }
+      if (!window.Clerk) return renderAcct();
+      if (typeof window.Clerk.load === "function" && !window.Clerk.loaded) await window.Clerk.load({});
+      S.clerk = window.Clerk;
+      let last = S.clerk.user?.id || null;
+      S.clerk.addListener?.(({ user }) => { const id = user?.id || null; if (id !== last) { last = id; onUser(user); } });
+      await onUser(S.clerk.user);
+    } catch { renderAcct(); }
+  }
+  async function onUser(u){
+    S.user = u || null; S.me = { resume: null, notes: [] }; S.loaded = false;
+    renderAcct();
+    if (S.user) { try { S.me = await api("GET"); S.loaded = true; } catch (e) { toast(e.message); } }
+    renderAll();
+    if (S.user && S.draft) { const d = S.draft; S.draft = null; openNote(d.company, d.companyId, d); }
+  }
+  function signIn(why){ if (!S.clerk) return toast("Sign-in is unavailable right now"); if (why) toast(why); S.clerk.openSignIn(); }
+  function renderAcct(){
+    const el = $("#acct");
+    if (!S.clerk) { el.innerHTML = ""; return; }
+    el.innerHTML = S.user
+      ? `<span>${esc(S.user.primaryEmailAddress?.emailAddress || S.user.fullName || "")}</span><button id="so">Sign out</button>`
+      : `<button id="si">Sign in</button>`;
+    $("#so", el)?.addEventListener("click", () => S.clerk.signOut());
+    $("#si", el)?.addEventListener("click", () => signIn());
+  }
+  async function api(method, body){
+    const r = await fetch("/api/me", { method, headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) }, body: body ? JSON.stringify(body) : undefined });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || "Something went wrong");
+    return j;
+  }
+
+  // ── Data ──
+  async function loadFairs(){
+    const d = await fetch("/fair/fairs.json").then((r) => r.json());
+    S.fairs = d.fairs || [];
+    const want = new URLSearchParams(location.search).get("fair") || store.get("iq_fair") || S.fairs[0]?.id;
+    $("#fairsel").innerHTML = S.fairs.map((f) => `<option value="${esc(f.id)}">${esc(f.school + " — " + f.name)}</option>`).join("");
+    pickFair(S.fairs.find((f) => f.id === want) ? want : S.fairs[0].id);
+  }
+  async function pickFair(id){
+    S.fair = S.fairs.find((f) => f.id === id); store.set("iq_fair", id);
+    $("#fairsel").value = id; S.open.clear();
+    $("#fairmeta").textContent = `${S.fair.when} · ${S.fair.where} · ${S.fair.companies.length} employers`;
+    renderCompanies();
+    const ids = [...new Set(S.fair.companies.map((c) => c.id).filter(Boolean))];
+    if (!ids.length) return;
+    try {
+      const d = await fetch("/api/listings?companies=" + encodeURIComponent(ids.join(","))).then((r) => r.json());
+      S.listings = {};
+      for (const l of d.listings || []) (S.listings[l.company_id] = S.listings[l.company_id] || []).push(l);
+    } catch { toast("Couldn't load internships — showing companies only"); }
+    renderCompanies();
+  }
+
+  // ── QR ──
+  const resumeUrl = () => S.me.resume ? `${location.origin}/r/${S.me.resume.token}` : null;
+  function qrSvg(text){ const q = qrcode(0, "M"); q.addData(text); q.make(); return q.createSvgTag({ cellSize: 6, margin: 2, scalable: true }); }
+  function renderQR(){
+    const el = $("#qrcard"), r = S.me.resume;
+    if (!S.user) {
+      el.innerHTML = `<div class="qrtitle">Your resume, as a QR code</div>
+        <p class="muted small" style="margin:4px 0 12px">Recruiters scan it with their phone camera — no app needed. Sign in to set it up; browsing the fair is free.</p>
+        <button class="btn go" id="qrSign">Sign in to get your QR</button>`;
+      $("#qrSign").onclick = () => signIn();
+      return;
+    }
+    if (!S.loaded) { el.innerHTML = `<div class="muted">Loading your resume…</div>`; return; }
+    if (!r) {
+      el.innerHTML = `<div class="qrtitle">Add your resume to get a QR code</div>
+        <p class="muted small" style="margin:4px 0 12px">PDF, under 3 MB. Only people who scan your QR can open it, and you can turn it off anytime.</p>
+        <button class="btn go" id="up">Upload resume (PDF)</button>`;
+      $("#up").onclick = () => $("#file").click();
+      return;
+    }
+    el.innerHTML = `<div class="qrbox">
+      <div class="qr" id="qrmini" role="button" tabindex="0" aria-label="Show QR full screen">${r.share ? qrSvg(resumeUrl()) : `<span class="off small">Sharing off</span>`}</div>
+      <div><div class="qrtitle">Scan for my resume</div>
+        <div class="muted small">${esc(r.name)}</div>
+        <div class="row" style="margin-top:10px">
+          ${r.share ? `<button class="btn go" id="bigBtn">Show full screen</button>` : ""}
+          <label class="switch"><input type="checkbox" id="share" ${r.share ? "checked" : ""}> QR link ${r.share ? "on" : '<span class="off">off</span>'}</label>
+        </div></div></div>`;
+    const big = () => { if (!r.share) return; $("#bigqr").innerHTML = qrSvg(resumeUrl()); $("#fullname").textContent = S.user.fullName || "My resume"; $("#full").classList.add("on"); };
+    $("#qrmini").onclick = big; $("#qrmini").onkeydown = (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); big(); } };
+    $("#bigBtn")?.addEventListener("click", big);
+    $("#share").onchange = (e) => setShare(e.target.checked);
+  }
+  async function setShare(on){
+    try { S.me = await api("POST", { action: "share", on }); toast(on ? "QR link is on" : "QR link is off — scans show 'not shared'"); }
+    catch (e) { toast(e.message); }
+    renderAll();
+  }
+  $("#closefull").onclick = () => $("#full").classList.remove("on");
+  $("#file").onchange = async (e) => {
+    const f = e.target.files[0]; e.target.value = ""; if (!f) return;
+    if (!/pdf$/i.test(f.type) && !/\.pdf$/i.test(f.name)) return toast("Please choose a PDF");
+    if (f.size > 3 * 1024 * 1024) return toast("Resume must be under 3 MB");
+    toast("Uploading…");
+    const data = await new Promise((ok, bad) => { const rd = new FileReader(); rd.onload = () => ok(String(rd.result).split(",")[1]); rd.onerror = bad; rd.readAsDataURL(f); });
+    try { S.me = await api("POST", { action: "resume", name: f.name, data }); toast("Resume saved — your QR is ready"); }
+    catch (err) { toast(err.message); }
+    renderAll();
+  };
+
+  // ── Companies at the fair ──
+  const talked = () => new Set(S.me.notes.filter((n) => n.fair === S.fair?.name).map((n) => n.companyId || n.company));
+  function renderCompanies(){
+    if (!S.fair) return;
+    const t = talked();
+    const all = S.fair.companies.map((c) => ({ ...c, jobs: (c.id && S.listings[c.id]) || [], talked: t.has(c.id || c.name) }));
+    const hiring = all.filter((c) => c.jobs.length).length;
+    $("#chips").innerHTML = [["all", `All ${all.length}`], ["hiring", `Open internships ${hiring}`], ["talked", `Talked to ${all.filter((c) => c.talked).length}`]]
+      .map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${S.filter === k}">${esc(l)}</button>`).join("");
+    const q = S.q.toLowerCase();
+    let list = all.filter((c) => !q || c.name.toLowerCase().includes(q) || (c.booth || "") === q);
+    if (S.filter === "hiring") list = list.filter((c) => c.jobs.length);
+    if (S.filter === "talked") list = list.filter((c) => c.talked);
+    list.sort((a, b) => (b.jobs.length > 0) - (a.jobs.length > 0) || a.name.localeCompare(b.name));
+    $("#cos").innerHTML = list.length ? list.map((c) => {
+      const me = c.jobs.filter((j) => j.match === "me").length;
+      const key = c.id || c.name;
+      const pill = c.talked ? `<span class="pill talk">Talked ✓</span>` : c.jobs.length ? `<span class="pill hire">${c.jobs.length} open</span>` : `<span class="pill none">No listings yet</span>`;
+      const jobs = c.jobs.slice(0, 12).map((j) => `<div class="job"><div>${esc(j.title)}${j.match === "me" ? `<span class="tag">ME</span>` : ""}<div class="muted small">${esc(j.location || j.state)}</div></div><a href="${esc(j.url)}" target="_blank" rel="noopener">Apply ↗</a></div>`).join("");
+      return `<div class="co${S.open.has(key) ? " open" : ""}" data-key="${esc(key)}">
+        <button aria-expanded="${S.open.has(key)}"><span class="coname">${esc(c.name)}${c.booth ? `<span class="booth">Booth ${esc(c.booth)}</span>` : ""}</span>${pill}
+          <span class="cosub">${c.jobs.length ? `${c.jobs.length} internship${c.jobs.length > 1 ? "s" : ""}${me ? ` · ${me} ME` : ""}` : (c.id ? "We'll show internships as soon as their board posts them" : "Not tracked yet")}</span></button>
+        <div class="codetail">
+          ${jobs || `<p class="muted small" style="margin:4px 0 10px">No open internships on their job board right now. Still worth a conversation — ask what's coming.</p>`}
+          ${c.jobs.length > 12 ? `<p class="muted small">+ ${c.jobs.length - 12} more on the <a href="/jobs/">jobs page</a></p>` : ""}
+          <div class="row" style="margin-top:10px"><button class="btn go note">📝 ${c.talked ? "Add more notes" : "I talked to them"}</button>
+          ${c.domain ? `<a class="btn" href="https://${esc(c.domain)}" target="_blank" rel="noopener">Website ↗</a>` : ""}</div>
+        </div></div>`;
+    }).join("") : `<div class="empty">No companies match.</div>`;
+  }
+  $("#q").addEventListener("input", (e) => { S.q = e.target.value.trim(); renderCompanies(); });
+  $("#chips").addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (!b) return; S.filter = b.dataset.f; renderCompanies(); });
+  $("#cos").addEventListener("click", (e) => {
+    const co = e.target.closest(".co"); if (!co) return;
+    const key = co.dataset.key;
+    if (e.target.closest(".note")) { const c = S.fair.companies.find((x) => (x.id || x.name) === key); return openNote(c.name, c.id || null); }
+    if (e.target.closest(".co > button")) { S.open.has(key) ? S.open.delete(key) : S.open.add(key); renderCompanies(); }
+  });
+  $("#fairsel").onchange = (e) => pickFair(e.target.value);
+
+  // ── Notes ──
+  let editing = null;
+  function openNote(company, companyId, existing){
+    editing = existing?.id ? { ...existing } : { company, companyId, fair: S.fair?.name || null, feel: "good", hours: 24 };
+    $("#noteCo").textContent = `${editing.company}${editing.fair ? " · " + editing.fair : ""}`;
+    $("#nContact").value = editing.contact || ""; $("#nEmail").value = editing.contactEmail || "";
+    $("#nRoles").value = editing.roles || ""; $("#nSaid").value = editing.said || "";
+    setPressed("#nFeel", "v", editing.feel || "good");
+    const h = editing.followUpAt && editing.talkedAt ? Math.round((new Date(editing.followUpAt) - new Date(editing.talkedAt)) / 36e5) : (editing.hours || 24);
+    setPressed("#nWhen", "h", String([24, 48, 168].includes(h) ? h : 24));
+    $("#scrim").classList.add("on"); $("#sheet").classList.add("on"); setTimeout(() => $("#nContact").focus(), 150);
+  }
+  function closeNote(){ $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); }
+  function setPressed(sel, attr, v){ document.querySelectorAll(`${sel} button`).forEach((b) => b.setAttribute("aria-pressed", String(b.dataset[attr] === v))); }
+  $("#nFeel").onclick = (e) => { const b = e.target.closest("button"); if (b) setPressed("#nFeel", "v", b.dataset.v); };
+  $("#nWhen").onclick = (e) => { const b = e.target.closest("button"); if (b) setPressed("#nWhen", "h", b.dataset.h); };
+  $("#noteClose").onclick = closeNote; $("#scrim").onclick = closeNote;
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeNote(); $("#full").classList.remove("on"); } });
+  $("#noteSave").onclick = async () => {
+    const feel = $("#nFeel button[aria-pressed=true]")?.dataset.v || "good";
+    const hours = +($("#nWhen button[aria-pressed=true]")?.dataset.h || 24);
+    const talkedAt = editing.talkedAt || new Date().toISOString();
+    const note = { ...editing, contact: $("#nContact").value, contactEmail: $("#nEmail").value, roles: $("#nRoles").value, said: $("#nSaid").value,
+                   feel, talkedAt, followUpAt: new Date(new Date(talkedAt).getTime() + hours * 36e5).toISOString() };
+    if (!S.user) { S.draft = note; closeNote(); return signIn("Sign in to save your notes — they'll be waiting"); }
+    const b = $("#noteSave"); b.disabled = true;
+    try { S.me = await api("POST", { action: "note", note }); closeNote(); toast(`Saved — follow-up reminder set for ${hours === 168 ? "1 week" : hours + " hrs"}`); }
+    catch (e) { toast(e.message); }
+    b.disabled = false; renderAll();
+  };
+
+  // ── Follow-ups (the dashboard) ──
+  function fuState(n){
+    if (n.done) return ["done", "Followed up ✓"];
+    const ms = new Date(n.followUpAt) - Date.now(), h = ms / 36e5;
+    if (h < -24) return ["late", `Overdue ${Math.floor(-h / 24)}d`];
+    if (h <= 0) return ["due", "Follow up today"];
+    if (h <= 24) return ["due", `Due in ${Math.max(1, Math.round(h))}h`];
+    return ["soon", `In ${Math.round(h / 24)}d`];
+  }
+  function when(ts){
+    const d = new Date(ts), days = Math.floor((new Date().setHours(0,0,0,0) - new Date(ts).setHours(0,0,0,0)) / 864e5);
+    return days <= 0 ? "today" : days === 1 ? "yesterday" : "on " + d.toLocaleDateString(undefined, { weekday: "long", month: "short", day: "numeric" });
+  }
+  function draft(n){
+    const first = (n.contact || "").split(/[ ,]/)[0];
+    const me = S.user?.fullName || "[Your name]";
+    const email = S.user?.primaryEmailAddress?.emailAddress || "";
+    const fair = n.fair ? `the ${n.fair}` : "the career fair";
+    const role = n.roles ? `the ${n.roles} role` : `internship opportunities at ${n.company}`;
+    const link = S.me.resume?.share ? resumeUrl() : null;
+    const subject = `Great meeting you at ${n.fair || "the career fair"} — ${me}`;
+    const body = `Hi ${first || "there"},
+
+Thank you for taking the time to talk with me at ${fair} ${when(n.talkedAt)}. I really enjoyed learning more about ${n.company} and ${role}.
+
+[Add one specific thing you two talked about — it's what makes them remember you.]
+
+I'm very interested in ${n.roles ? "the role" : "interning with your team"} and would love to hear about next steps. ${link ? `My resume is here for easy reference: ${link}` : "I've attached my resume for easy reference."}
+
+Thanks again,
+${me}${email ? "\n" + email : ""}`;
+    return { subject, body };
+  }
+  function renderFollow(){
+    const el = $("#tab-follow");
+    const due = S.me.notes.filter((n) => !n.done && new Date(n.followUpAt) - Date.now() <= 24 * 36e5).length;
+    const b = $("#dueBadge"); b.textContent = due; b.classList.toggle("hidden", !due);
+    if (!S.user) { el.innerHTML = `<div class="card empty"><p><b>Your follow-ups live here.</b><br>After each conversation, tap "I talked to them" — we'll remind you to follow up and draft the email.</p><button class="btn go" id="fs">Sign in</button></div>`; $("#fs").onclick = () => signIn(); return; }
+    if (!S.me.notes.length) { el.innerHTML = `<div class="card empty"><p><b>No conversations yet.</b><br>At the fair, open a company and tap <b>📝 I talked to them</b>. It lands here with a reminder and a ready-to-send email.</p></div>`; return; }
+    const rank = { late: 0, due: 1, soon: 2, done: 3 };
+    const notes = [...S.me.notes].sort((a, b) => rank[fuState(a)[0]] - rank[fuState(b)[0]] || new Date(a.followUpAt) - new Date(b.followUpAt));
+    el.innerHTML = notes.map((n) => {
+      const [k, label] = fuState(n), d = draft(n);
+      const mail = `mailto:${encodeURIComponent(n.contactEmail || "")}?subject=${encodeURIComponent(d.subject)}&body=${encodeURIComponent(d.body)}`;
+      return `<div class="card fu ${k}" data-id="${esc(n.id)}">
+        <div class="row" style="justify-content:space-between"><strong style="color:var(--navy);font-size:17px">${esc(n.company)}</strong><span class="status ${k}">${esc(label)}</span></div>
+        <div class="muted small">${esc([n.contact, n.fair, "talked " + when(n.talkedAt), { great: "🔥", good: "👍", meh: "😐" }[n.feel]].filter(Boolean).join(" · "))}</div>
+        ${n.roles ? `<div class="small" style="margin-top:6px"><b>Roles:</b> ${esc(n.roles)}</div>` : ""}
+        ${n.said ? `<div class="small" style="margin-top:4px;white-space:pre-wrap">${esc(n.said)}</div>` : ""}
+        <details ${k === "due" || k === "late" ? "open" : ""} style="margin-top:10px"><summary>Follow-up email draft</summary>
+          <div class="draft"><b>Subject:</b> ${esc(d.subject)}\n\n${esc(d.body)}</div>
+          <div class="row"><a class="btn go" href="${esc(mail)}">Open in email</a><button class="btn copy">Copy</button></div></details>
+        <div class="row" style="margin-top:10px"><button class="btn done">${n.done ? "Mark not done" : "✓ I followed up"}</button><button class="btn ghost edit">Edit</button><button class="btn ghost del">Delete</button></div>
+      </div>`;
+    }).join("");
+  }
+  $("#tab-follow").addEventListener("click", async (e) => {
+    const card = e.target.closest(".fu"); if (!card) return;
+    const n = S.me.notes.find((x) => x.id === card.dataset.id); if (!n) return;
+    if (e.target.closest(".copy")) { const d = draft(n); try { await navigator.clipboard.writeText(`Subject: ${d.subject}\n\n${d.body}`); toast("Email copied"); } catch { toast("Couldn't copy — select the text instead"); } return; }
+    if (e.target.closest(".edit")) return openNote(n.company, n.companyId, n);
+    if (e.target.closest(".done") || e.target.closest(".del")) {
+      const body = e.target.closest(".del") ? { action: "note_delete", id: n.id } : { action: "note", note: { ...n, done: !n.done } };
+      if (body.action === "note_delete" && !confirm(`Delete your notes for ${n.company}?`)) return;
+      try { S.me = await api("POST", body); toast(body.action === "note_delete" ? "Deleted" : n.done ? "Marked not done" : "Nice — marked as followed up"); }
+      catch (err) { toast(err.message); }
+      renderAll();
+    }
+  });
+
+  // ── My resume ──
+  function renderResume(){
+    const el = $("#tab-resume"), r = S.me.resume;
+    if (!S.user) { el.innerHTML = `<div class="card empty"><p><b>Upload your resume once</b> and get a QR code recruiters can scan at any fair.</p><button class="btn go" id="rs">Sign in</button></div>`; $("#rs").onclick = () => signIn(); return; }
+    el.innerHTML = `<div class="card"><div class="qrtitle">Resume</div>
+      ${r ? `<p class="small muted" style="margin:4px 0 12px">${esc(r.name)} · updated ${esc(new Date(r.uploadedAt).toLocaleDateString())}</p>
+        <div class="row"><a class="btn" href="${esc(resumeUrl())}" target="_blank" rel="noopener">Open what recruiters see ↗</a><button class="btn" id="rep">Replace PDF</button></div>
+        <label class="switch" style="margin-top:14px"><input type="checkbox" id="share2" ${r.share ? "checked" : ""}> QR link is ${r.share ? "on" : '<span class="off">off</span>'}</label>
+        <p class="muted small" style="margin:8px 0 0">Your resume isn't listed or searchable anywhere. Only someone with your QR (or its link) can open it, and turning this off blocks it right away.</p>
+        ${r.share ? `<div class="row" style="margin-top:12px"><button class="btn" id="copyLink">Copy resume link</button><button class="btn" id="dlqr">Download QR image</button></div>` : ""}`
+      : `<p class="muted small">No resume yet.</p><button class="btn go" id="rep">Upload resume (PDF)</button>`}</div>`;
+    $("#rep")?.addEventListener("click", () => $("#file").click());
+    $("#share2")?.addEventListener("change", (e) => setShare(e.target.checked));
+    $("#copyLink")?.addEventListener("click", async () => { try { await navigator.clipboard.writeText(resumeUrl()); toast("Link copied"); } catch { toast(resumeUrl()); } });
+    $("#dlqr")?.addEventListener("click", () => { const q = qrcode(0, "M"); q.addData(resumeUrl()); q.make(); const a = document.createElement("a"); a.href = q.createDataURL(12, 3); a.download = "my-resume-qr.gif"; a.click(); });
+  }
+
+  // ── Tabs ──
+  document.querySelector("nav.tabs").addEventListener("click", (e) => {
+    const b = e.target.closest("button[data-tab]"); if (!b) return;
+    S.tab = b.dataset.tab;
+    document.querySelectorAll("nav.tabs button").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+    ["fair", "follow", "resume"].forEach((t) => $("#tab-" + t).classList.toggle("hidden", t !== S.tab));
+    $("#fairsel").classList.toggle("hidden", S.tab !== "fair"); $("#fairmeta").classList.toggle("hidden", S.tab !== "fair");
+    window.scrollTo(0, 0);
+  });
+
+  function renderAll(){ renderQR(); renderCompanies(); renderFollow(); renderResume(); }
+  renderAll();
+  loadFairs().catch(() => { $("#cos").innerHTML = `<div class="empty">Couldn't load the fair list. Refresh to try again.</div>`; });
+  loadClerk();
+})();
+</script>
+</body>
+</html>
