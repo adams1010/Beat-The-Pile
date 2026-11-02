@@ -11,6 +11,9 @@
 //   POST /api/me { action:"seen" }                 → mark "new internships" as seen (jobs page)
 //   POST /api/me { action:"brief", companyId }     → AI company brief (cached for everyone, 30 days)
 //   POST /api/me { action:"polish", note }         → AI-written follow-up email from your notes
+//   POST /api/me { action:"app", app }              → add/update an application on My Season (stage, dates)
+//   POST /api/me { action:"app_delete", id }
+//   POST /api/me { action:"goal", goal }            → weekly application goal
 //   GET  /api/me?r=<token>   (no sign-in)          → the QR target: redirects to the resume if sharing is on
 //                                                    (vercel.json maps /r/<token> here)
 // Requires a genuine Clerk session token (signature-checked in lib/auth.js) for everything except ?r=.
@@ -27,6 +30,21 @@ const TOKEN_OK = /^[A-Za-z0-9_-]{16,64}$/;
 const BUCKET = "resumes";
 const CO_OK = /^[a-z0-9-]{1,80}$/;
 const MAX_STARS = 300;
+const MAX_APPS = 500;
+const STAGES = ["applied", "interview", "offer", "rejected"];
+function cleanApp(a) {
+  const iso = (v) => { const d = new Date(v); return isNaN(d) ? null : d.toISOString(); };
+  const id = String(a?.id || "");
+  return {
+    id: ID_OK.test(id) ? id : "m:" + crypto.randomUUID(),           // listing id, or m:<uuid> for one added by hand
+    company: clean(a?.company, 100), title: clean(a?.title, 160),
+    url: /^https?:\/\//.test(String(a?.url || "")) ? clean(a.url, 400) : null,
+    stage: STAGES.includes(a?.stage) ? a.stage : "applied",
+    appliedAt: iso(a?.appliedAt) || new Date().toISOString(),
+    postedAt: iso(a?.postedAt),
+    updatedAt: new Date().toISOString(),
+  };
+}
 const BRIEF_DAYS = 30;
 const AI_PER_HOUR = 30;
 const aiHits = new Map();               // uid -> [timestamps] (per server instance)
@@ -163,7 +181,7 @@ export default async function handler(req, res) {
     return rows[0] || null;
   };
   const view = (row) => ({ saved: row?.saved || [], applied: row?.applied || [], resume: publicResume(row), notes: row?.fair_notes || [],
-                            starred: row?.starred || [], seenAt: row?.seen_at || null });
+                            starred: row?.starred || [], seenAt: row?.seen_at || null, apps: row?.apps || [], goal: row?.weekly_goal ?? null });
   const save = (patch) => db.upsert("user_jobs", [{ clerk_user_id: uid, ...patch, updated_at: new Date().toISOString() }], "clerk_user_id");
 
   try {
@@ -208,6 +226,32 @@ export default async function handler(req, res) {
     if (body?.action === "seen") {
       await save({ seen_at: new Date().toISOString() });
       return res.status(200).json({ ok: true });
+    }
+
+    // ── My Season: applications pipeline + weekly goal ──
+    if (body?.action === "app" || body?.action === "app_delete") {
+      let apps = Array.isArray(row?.apps) ? row.apps : [];
+      if (body.action === "app_delete") apps = apps.filter((a) => a.id !== body.id);
+      else {
+        const a = cleanApp(body.app);
+        if (!a.company) return res.status(400).json({ error: "Which company?" });
+        const i = apps.findIndex((x) => x.id === a.id);
+        if (i >= 0) apps[i] = { ...apps[i], ...a, appliedAt: body.app?.appliedAt ? a.appliedAt : apps[i].appliedAt, postedAt: a.postedAt || apps[i].postedAt };
+        else apps.unshift(a);
+        if (apps.length > MAX_APPS) return res.status(400).json({ error: `Up to ${MAX_APPS} applications` });
+      }
+      // keep the jobs page's "Applied" marks in step with the pipeline
+      const applied = new Set(row?.applied || []);
+      if (body.action === "app_delete" && ID_OK.test(String(body.id)) && !String(body.id).startsWith("m:")) applied.delete(body.id);
+      for (const a of apps) if (!a.id.startsWith("m:")) applied.add(a.id);
+      await save({ apps, applied: [...applied] });
+      return res.status(200).json(view({ ...row, apps, applied: [...applied] }));
+    }
+    if (body?.action === "goal") {
+      const g = Math.round(Number(body.goal));
+      if (!(g >= 1 && g <= 50)) return res.status(400).json({ error: "Pick a goal between 1 and 50" });
+      await save({ weekly_goal: g });
+      return res.status(200).json(view({ ...row, weekly_goal: g }));
     }
 
     // ── AI helpers ──
@@ -264,7 +308,16 @@ Reply with ONLY this JSON: {"subject": "...", "body": "..."}`;
     if (on) set.add(id); else set.delete(id);
     if (set.size > MAX) return res.status(400).json({ error: `List is full (${MAX})` });
     const next = { saved: row?.saved || [], applied: row?.applied || [], [list]: [...set] };
-    await save({ saved: next.saved, applied: next.applied });
+    let apps = Array.isArray(row?.apps) ? row.apps : null;
+    if (list === "applied") {
+      apps = apps || [];
+      if (on && !apps.some((a) => a.id === id)) {
+        const l = (await db.selectAsAdmin(`listings?select=company,title,url,first_seen&id=eq.${encodeURIComponent(id)}&limit=1`))[0];
+        if (l) apps.unshift(cleanApp({ id, company: l.company, title: l.title, url: l.url, postedAt: l.first_seen }));
+      }
+      if (!on) apps = apps.filter((a) => !(a.id === id && a.stage === "applied"));   // un-marking only undoes a plain "applied"
+    }
+    await save({ saved: next.saved, applied: next.applied, ...(apps ? { apps } : {}) });
     return res.status(200).json({ saved: next.saved, applied: next.applied });
   } catch (e) {
     return res.status(500).json({ error: "Couldn't update your account", detail: String(e.message || e).slice(0, 160) });

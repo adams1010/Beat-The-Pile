@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>InternIQ — My Season</title>
+<meta name="description" content="Your internship season in one place: every application, where it stands, your weekly goal, and how fast you apply.">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#0A1628">
+<style>
+  :root{--green:#00C285;--green-dark:#009E6C;--green-light:#E6FBF4;--navy:#0A1628;--ink:#1E293B;--muted:#64748B;--faint:#94A3B8;
+        --bg:#F8FFFE;--line:#E2EEEA;--amber:#B45309;--amber-light:#FFF4E6;--blue:#1D4ED8;--blue-light:#EFF6FF;--violet:#6D28D9;--violet-light:#F5F3FF;--red:#B91C1C;--red-light:#FEF2F2;
+        --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:860px;margin:0 auto;padding:0 16px}
+  header{background:var(--navy);color:#fff;padding:18px 0 22px}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .brand{font-weight:800;font-size:15px;color:var(--green);text-decoration:none}
+  .acct{font-size:13px;color:#CBD5E1;display:flex;gap:8px;align-items:center;min-width:0}
+  .acct span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:170px}
+  .acct button{font:inherit;font-size:13px;font-weight:700;color:#fff;background:transparent;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 10px;cursor:pointer}
+  h1{font-size:clamp(26px,6vw,34px);margin:14px 0 2px;letter-spacing:-.02em}
+  .sub{color:#CBD5E1;margin:0;font-size:15px}
+  nav.links{display:flex;gap:14px;margin-top:12px;font-size:13.5px;font-weight:700}
+  nav.links a{color:var(--green);text-decoration:none}
+  main{padding:18px 0 80px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+  .hero{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+  .ring{width:118px;height:118px;position:relative}
+  .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .ring .c{position:absolute;inset:0;display:grid;place-items:center;text-align:center;line-height:1.1}
+  .ring b{font-size:30px;color:var(--navy);letter-spacing:-.03em}
+  .ring small{display:block;font-size:11.5px;color:var(--muted)}
+  .hero h2{margin:0;font-size:19px;color:var(--navy)}
+  .goalpick{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+  .goalpick button{font:inherit;font-size:13px;font-weight:700;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer}
+  .goalpick button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  .streak{font-size:14px;font-weight:700;color:var(--amber);margin-top:6px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center}
+  .stat b{display:block;font-size:24px;color:var(--navy);letter-spacing:-.02em;line-height:1.15}
+  .stat span{font-size:12px;color:var(--muted)}
+  .stat.early b{color:var(--green-dark)}
+  @media (max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}.hero{grid-template-columns:1fr;justify-items:center;text-align:center}.goalpick{justify-content:center}}
+  .nudge{display:flex;gap:10px;align-items:flex-start;background:var(--amber-light);border:1px solid #FCD9A5;color:#7C2D12;border-radius:12px;padding:11px 13px;margin-bottom:8px;font-size:14px}
+  .nudge.good{background:var(--green-light);border-color:#A7F3D0;color:#065F46}
+  .tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:16px 0 10px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs button{flex:0 0 auto;font:inherit;font-size:14px;font-weight:700;padding:8px 13px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer}
+  .tabs button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  .tabs button i{font-style:normal;opacity:.7;margin-left:3px}
+  .app{background:#fff;border:1px solid var(--line);border-left:4px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+  .app.applied{border-left-color:#93C5FD}.app.interview{border-left-color:#C4B5FD}.app.offer{border-left-color:var(--green)}.app.rejected{border-left-color:#E2E8F0;opacity:.7}.app.saved{border-left-color:#FCD34D}
+  .co{font-size:12.5px;font-weight:800;color:var(--green-dark)}
+  .ti{font-weight:750;color:var(--navy);line-height:1.3}
+  .meta{font-size:12.5px;color:var(--muted);margin-top:3px;display:flex;gap:10px;flex-wrap:wrap}
+  .acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:9px}
+  .btn{display:inline-flex;align-items:center;gap:5px;font:inherit;font-size:13px;font-weight:700;padding:7px 11px;border-radius:9px;border:1px solid var(--line);background:#fff;color:var(--navy);cursor:pointer;text-decoration:none}
+  .btn.go{background:var(--green);border-color:var(--green);color:#fff}
+  .btn.int{background:var(--violet-light);border-color:#DDD6FE;color:var(--violet)}
+  .btn.off{background:var(--green-light);border-color:#A7F3D0;color:var(--green-dark)}
+  .btn.ghost{background:transparent;color:var(--muted)}
+  .add{width:100%;justify-content:center;padding:12px;font-size:14.5px;border-style:dashed;color:var(--muted)}
+  .empty{text-align:center;color:var(--muted);padding:26px 12px;font-size:14.5px}
+  .gate{text-align:center;padding:28px 16px}
+  .gate h2{color:var(--navy);margin:0 0 6px}
+  .scrim{position:fixed;inset:0;background:rgba(10,22,40,.45);z-index:40;display:none}.scrim.on{display:block}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:#fff;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .2s,visibility .2s;visibility:hidden}
+  .sheet.on{transform:none;visibility:visible}
+  @media (min-width:720px){.sheet{left:50%;right:auto;width:560px;margin-left:-280px;bottom:auto;top:12vh;border-radius:18px}}
+  label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin:12px 0 4px}
+  input{width:100%;font:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:14px;font-weight:600;padding:10px 16px;border-radius:10px;z-index:60;max-width:90vw}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top"><a class="brand" href="/jobs/">InternIQ</a><div class="acct" id="acct"></div></div>
+    <h1>📈 My Season</h1>
+    <p class="sub">Every application, where it stands, and how you're pacing.</p>
+    <nav class="links"><a href="/jobs/">Internships</a><a href="/radar/">Opening Radar</a><a href="/fair/">Career Fair</a></nav>
+  </div>
+</header>
+<main class="wrap" id="app"><div class="card empty">Loading your season…</div></main>
+
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="addTitle">
+  <div style="display:flex;justify-content:space-between;align-items:center"><strong id="addTitle" style="font-size:18px;color:var(--navy)">Add an application</strong><button class="btn ghost" id="addClose">Close</button></div>
+  <p style="font-size:13.5px;color:var(--muted);margin:4px 0 0">Applied on Handshake, a company site, or anywhere else? Track it here too.</p>
+  <label for="aCo">Company</label><input id="aCo" placeholder="e.g. Garmin" autocomplete="off">
+  <label for="aTi">Role</label><input id="aTi" placeholder="e.g. Mechanical Engineering Intern" autocomplete="off">
+  <label for="aUrl">Link (optional)</label><input id="aUrl" type="url" placeholder="https://…" autocomplete="off">
+  <label for="aDate">Date applied</label><input id="aDate" type="date">
+  <button class="btn go" id="addSave" style="width:100%;justify-content:center;margin-top:16px;padding:12px">Add to My Season</button>
+</div>
+
+<script>
+(function(){
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const DAY = 864e5;
+  const S = { clerk: null, user: null, me: null, listings: {}, tab: "applied", loading: true };
+  const toast = (m) => { const t = document.createElement("div"); t.className = "toast"; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); };
+  const fmt = (t) => new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const daysAgo = (t) => Math.floor((Date.now() - Date.parse(t)) / DAY);
+  const weekStart = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x.getTime(); };   // Monday
+
+  async function token(){ try { return await S.clerk?.session?.getToken(); } catch { return null; } }
+  async function api(method, body){
+    const r = await fetch("/api/me", { method, headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) }, body: body ? JSON.stringify(body) : undefined });
+    const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Something went wrong"); return j;
+  }
+
+  function stats(){
+    const apps = S.me.apps || [], goal = S.me.goal || 5;
+    const thisWeek = weekStart(Date.now());
+    const week = apps.filter((a) => Date.parse(a.appliedAt) >= thisWeek).length;
+    // streak = consecutive past weeks (before this one) that hit the goal, plus this week if already hit
+    const perWeek = {}; for (const a of apps) { const w = weekStart(a.appliedAt); perWeek[w] = (perWeek[w] || 0) + 1; }
+    let streak = 0; for (let w = thisWeek - 7 * DAY; (perWeek[w] || 0) >= goal; w -= 7 * DAY) streak++;
+    if (week >= goal) streak++;
+    const speeds = apps.filter((a) => a.postedAt).map((a) => Math.max(0, (Date.parse(a.appliedAt) - Date.parse(a.postedAt)) / DAY));
+    const speed = speeds.length >= 2 ? speeds.reduce((x, y) => x + y, 0) / speeds.length : null;
+    const n = (s) => apps.filter((a) => a.stage === s).length;
+    return { apps, goal, week, streak, speed, speeds: speeds.length, applied: apps.length, interview: n("interview"), offer: n("offer"), rejected: n("rejected") };
+  }
+
+  function ring(v, goal){
+    const p = Math.min(1, v / goal), C = 2 * Math.PI * 50;
+    return `<div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#E2EEEA" stroke-width="12"/><circle cx="60" cy="60" r="50" fill="none" stroke="${p >= 1 ? "#00C285" : "#0A1628"}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - p)}"/></svg>
+      <div class="c"><div><b>${v}/${goal}</b><small>this week</small></div></div></div>`;
+  }
+
+  function appCard(a){
+    const d = daysAgo(a.appliedAt);
+    const speed = a.postedAt ? Math.max(0, Math.round((Date.parse(a.appliedAt) - Date.parse(a.postedAt)) / DAY)) : null;
+    const acts = {
+      applied: `<button class="btn int" data-stage="interview">🎤 Got an interview</button><button class="btn off" data-stage="offer">🎉 Offer</button><button class="btn ghost" data-stage="rejected">Rejected</button>`,
+      interview: `<button class="btn off" data-stage="offer">🎉 Offer</button><button class="btn ghost" data-stage="rejected">Rejected</button><button class="btn ghost" data-stage="applied">Back to applied</button>`,
+      offer: `<button class="btn ghost" data-stage="interview">Back to interview</button>`,
+      rejected: `<button class="btn ghost" data-stage="applied">Undo</button>`,
+    }[a.stage] || "";
+    return `<div class="app ${esc(a.stage)}" data-id="${esc(a.id)}">
+      <div class="co">${esc(a.company)}</div><div class="ti">${esc(a.title || "Internship")}</div>
+      <div class="meta"><span>Applied ${esc(fmt(a.appliedAt))} · ${d === 0 ? "today" : d + "d ago"}</span>${speed != null ? `<span>${speed <= 3 ? "🐦 " : ""}${speed === 0 ? "same day it posted" : speed + "d after it posted"}</span>` : ""}</div>
+      <div class="acts">${acts}${a.url ? `<a class="btn ghost" href="${esc(a.url)}" target="_blank" rel="noopener">Open ↗</a>` : ""}<button class="btn ghost" data-del>Remove</button></div></div>`;
+  }
+
+  function render(){
+    const el = $("#app");
+    if (!S.user) {
+      el.innerHTML = `<div class="card gate"><h2>Your internship season, organized</h2><p style="color:var(--muted);margin:0 0 14px">Track every application from applied to offer, set a weekly goal, and see how fast you apply after jobs post.</p>${S.clerk ? `<button class="btn go" id="gs" style="padding:12px 18px;font-size:15px">Sign in to start</button>` : `<p style="color:var(--muted)">Loading sign-in…</p>`}</div>`;
+      $("#gs")?.addEventListener("click", () => S.clerk.openSignIn()); return;
+    }
+    if (!S.me) { el.innerHTML = `<div class="card empty">Loading your season…</div>`; return; }
+    const st = stats();
+    const appIds = new Set(st.apps.map((a) => a.id));
+    const saved = (S.me.saved || []).filter((id) => !appIds.has(id)).map((id) => S.listings[id]).filter(Boolean);
+    const stale = st.apps.filter((a) => a.stage === "applied" && daysAgo(a.appliedAt) >= 14);
+    const counts = { applied: st.apps.filter((a) => a.stage === "applied").length, interview: st.interview, offer: st.offer, rejected: st.rejected, saved: saved.length };
+    const list = S.tab === "saved" ? saved : st.apps.filter((a) => a.stage === S.tab).sort((a, b) => Date.parse(b.appliedAt) - Date.parse(a.appliedAt));
+    const left = Math.max(0, st.goal - st.week);
+    el.innerHTML = `
+      <section class="card hero">${ring(st.week, st.goal)}
+        <div><h2>${left ? `${left} more application${left > 1 ? "s" : ""} to hit this week's goal` : "Weekly goal hit 🎯"}</h2>
+          <div class="streak">${st.streak ? `🔥 ${st.streak} week${st.streak > 1 ? "s" : ""} in a row` : "Hit your goal to start a streak"}</div>
+          <div class="goalpick" aria-label="Weekly goal">${[3, 5, 10, 15].map((g) => `<button data-goal="${g}" aria-pressed="${g === st.goal}">${g}/week</button>`).join("")}</div></div>
+      </section>
+      <div class="stats">
+        <div class="stat"><b>${st.applied}</b><span>applications</span></div>
+        <div class="stat"><b>${st.interview + st.offer}</b><span>interviews</span></div>
+        <div class="stat"><b>${st.offer}</b><span>offers</span></div>
+        <div class="stat early"><b>${st.speed == null ? "—" : st.speed < 1 ? "<1d" : st.speed.toFixed(1) + "d"}</b><span>${st.speed == null ? "apply speed (needs 2+)" : "avg. after posting"}</span></div>
+      </div>
+      ${st.speed != null ? (st.speed <= 3 ? `<div class="nudge good">🐦 <span><b>Early bird.</b> You apply ${st.speed < 1 ? "the same day" : `about ${st.speed.toFixed(1)} days`} after a job posts, before most of the pile shows up.</span></div>`
+        : `<div class="nudge">⏱ <span>You apply about <b>${st.speed.toFixed(1)} days</b> after a job posts. Popular internships get 100+ applicants, so try to get in within 3 days. <a href="/radar/">Opening Radar</a> tells you when companies open.</span></div>`) : ""}
+      ${stale.slice(0, 3).map((a) => `<div class="nudge">📨 <span><b>${esc(a.company)}</b>: applied ${daysAgo(a.appliedAt)} days ago with no update. A short follow-up email to the recruiter is fair game now.</span></div>`).join("")}
+      <div class="tabs" role="group" aria-label="Pipeline">${[["applied", "📨 Applied"], ["interview", "🎤 Interview"], ["offer", "🎉 Offer"], ["saved", "♡ Saved"], ["rejected", "Rejected"]]
+        .map(([k, l]) => `<button data-tab="${k}" aria-pressed="${S.tab === k}">${l}<i>${counts[k]}</i></button>`).join("")}</div>
+      <div id="list">${list.length ? (S.tab === "saved"
+          ? list.map((l) => `<div class="app saved" data-lid="${esc(l.id)}"><div class="co">${esc(l.company)}</div><div class="ti">${esc(l.title)}</div><div class="meta"><span>📍 ${esc(l.location || l.state || "")}</span></div>
+              <div class="acts"><a class="btn go" href="${esc(l.url)}" target="_blank" rel="noopener">Apply →</a><button class="btn" data-applied>✓ I applied</button></div></div>`).join("")
+          : list.map(appCard).join(""))
+        : `<div class="empty">${{ applied: "No applications yet. Tap <b>Mark applied</b> on any internship, or add one you applied to elsewhere.", interview: "No interviews yet. When you get one, tap 🎤 on the application.", offer: "No offers yet. You've got this.", saved: "Nothing saved that you haven't applied to.", rejected: "None. 🙌" }[S.tab]}</div>`}</div>
+      <button class="btn add" id="addBtn">＋ Add an application from somewhere else</button>`;
+  }
+
+  async function act(body, msg){ try { S.me = await api("POST", body); if (msg) toast(msg); } catch (e) { toast(e.message); } render(); }
+  $("#app").addEventListener("click", (e) => {
+    const g = e.target.closest("[data-goal]"); if (g) return act({ action: "goal", goal: +g.dataset.goal }, `Goal set: ${g.dataset.goal} a week`);
+    const t = e.target.closest("[data-tab]"); if (t) { S.tab = t.dataset.tab; return render(); }
+    if (e.target.closest("#addBtn")) return openAdd();
+    const card = e.target.closest(".app"); if (!card) return;
+    if (card.dataset.lid && e.target.closest("[data-applied]")) {
+      const l = S.listings[card.dataset.lid];
+      return act({ action: "app", app: { id: l.id, company: l.company, title: l.title, url: l.url, postedAt: l.first_seen } }, `Added ${l.company} to Applied`);
+    }
+    const a = (S.me.apps || []).find((x) => x.id === card.dataset.id); if (!a) return;
+    const s = e.target.closest("[data-stage]");
+    if (s) return act({ action: "app", app: { ...a, stage: s.dataset.stage } }, { interview: "Interview! Nice work 🎤", offer: "Offer! Huge 🎉", rejected: "Moved to rejected. On to the next one", applied: "Moved back" }[s.dataset.stage]);
+    if (e.target.closest("[data-del]") && confirm(`Remove ${a.company} from My Season?`)) return act({ action: "app_delete", id: a.id }, "Removed");
+  });
+
+  function openAdd(){ $("#aCo").value = $("#aTi").value = $("#aUrl").value = ""; $("#aDate").value = new Date().toISOString().slice(0, 10); $("#scrim").classList.add("on"); $("#sheet").classList.add("on"); setTimeout(() => $("#aCo").focus(), 150); }
+  const closeAdd = () => { $("#scrim").classList.remove("on"); $("#sheet").classList.remove("on"); };
+  $("#addClose").onclick = closeAdd; $("#scrim").onclick = closeAdd;
+  $("#addSave").onclick = async () => {
+    if ($("#aCo").value.trim().length < 2) return toast("Which company?");
+    closeAdd(); S.tab = "applied";
+    await act({ action: "app", app: { company: $("#aCo").value, title: $("#aTi").value, url: $("#aUrl").value.trim() || null, appliedAt: $("#aDate").value ? $("#aDate").value + "T12:00:00" : null } }, "Added to My Season");
+  };
+
+  async function onUser(u){
+    S.user = u || null; S.me = null; acct(); render();
+    if (!S.user) return;
+    try { S.me = await api("GET"); } catch (e) { toast(e.message); }
+    render();
+    if ((S.me?.saved || []).length) {
+      try { const d = await fetch("/api/listings").then((r) => r.json()); for (const l of d.listings || []) S.listings[l.id] = l; render(); } catch {}
+    }
+  }
+  function acct(){
+    const el = $("#acct"); if (!S.clerk) { el.innerHTML = ""; return; }
+    el.innerHTML = S.user ? `<span>${esc(S.user.primaryEmailAddress?.emailAddress || "")}</span><button id="so">Sign out</button>` : `<button id="si">Sign in</button>`;
+    $("#so")?.addEventListener("click", () => S.clerk.signOut()); $("#si")?.addEventListener("click", () => S.clerk.openSignIn());
+  }
+  async function loadClerk(){
+    try {
+      const pk = (await fetch("/api/config").then((r) => r.json())).clerkPublishableKey; if (!pk) return render();
+      if (!window.Clerk) {
+        const host = atob(pk.replace(/^pk_(test|live)_/, "")).replace(/\$$/, "").trim(); if (!/clerk/.test(host)) return render();
+        await new Promise((ok, bad) => { const s = document.createElement("script"); s.src = `https://${host}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`;
+          s.setAttribute("data-clerk-publishable-key", pk); s.async = true; s.crossOrigin = "anonymous"; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
+      }
+      if (typeof window.Clerk.load === "function" && !window.Clerk.loaded) await window.Clerk.load({});
+      S.clerk = window.Clerk;
+      let last = S.clerk.user?.id || null;
+      S.clerk.addListener?.(({ user }) => { const id = user?.id || null; if (id !== last) { last = id; onUser(user); } });
+      await onUser(S.clerk.user);
+    } catch { render(); }
+  }
+  render(); loadClerk();
+})();
+</script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>
