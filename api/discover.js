@@ -5,7 +5,8 @@ import { CANDIDATES } from "../lib/candidates.js";
 import { COMPANIES, boardKey } from "../lib/companies.js";
 import { discoverOne } from "../lib/discover.js";
 import { db, isAuthorizedCron } from "../lib/db.js";
-import { mapLimit } from "../lib/http.js";
+import { mapLimit, get } from "../lib/http.js";
+import { SIMPLIFY_URL, pickCompanies, normName } from "../lib/simplify.js";
 
 export const config = { maxDuration: 60 };
 
@@ -16,6 +17,27 @@ const RETRY_AFTER_DAYS = 14;
 export default async function handler(req, res) {
   if (!isAuthorizedCron(req)) return res.status(401).json({ error: "Unauthorized" });
   const t0 = Date.now();
+
+  // 0) Once a day (07:00–07:59 UTC, or ?import=1): look for brand-new companies on the SimplifyJobs list.
+  //    That run only imports; the new companies are then checked by the normal runs (same proof rules).
+  const hour = new Date().getUTCHours();
+  if (req.query?.import === "1" || hour === 7) {
+    try {
+      const r = await get(SIMPLIFY_URL, { timeoutMs: 20000 });
+      if (!r.ok) throw new Error(`list answered ${r.status}`);
+      const listings = await r.json();
+      const rows = await db.selectAsAdmin("company_candidates?select=company,ats,config&limit=5000");
+      const names = new Set([...rows, ...COMPANIES].map((c) => normName(c.company)));
+      const boards = new Set(COMPANIES.map(boardKey));
+      for (const x of rows) if (x.ats && x.config) boards.add(boardKey({ ats: x.ats, ...x.config }));
+      const fresh = pickCompanies(listings, names, boards);
+      for (let i = 0; i < fresh.length; i += 200) await db.insertIgnore("company_candidates", fresh.slice(i, i + 200));
+      return res.status(200).json({ imported: fresh.length, companies: fresh.slice(0, 50).map((f) => f.company) });
+    } catch (e) {
+      if (req.query?.import === "1") return res.status(500).json({ error: "Import failed: " + String(e.message || e).slice(0, 200) });
+      // scheduled import failed → just carry on with a normal discovery run
+    }
+  }
 
   // 1) Sync the candidate list into the table (adds new rows; keeps each row's status/results)
   try {
