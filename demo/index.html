@@ -96,6 +96,26 @@
   /* slide 10 — coming */
   .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
   .chips span{font-size:14px;font-weight:650;background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.35);color:#E9E3FF;border-radius:999px;padding:8px 12px}
+  /* comparison */
+  .vs{display:grid;grid-template-columns:.9fr 1fr 1fr 1.1fr;gap:5px;margin-top:16px;font-size:12px;line-height:1.3}
+  .vs > div{background:rgba(255,255,255,.06);border-radius:8px;padding:8px 7px;color:#CBD5E1}
+  .vs .vh{background:none;font-weight:800;color:#fff;font-size:11.5px;padding:2px 7px}
+  .vs .vl{background:none;font-weight:700;color:#94A3B8;padding-left:0}
+  .vs .win{background:rgba(0,194,133,.16);color:#fff;font-weight:700;border:1px solid rgba(0,194,133,.4)}
+  .steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+  .steps3 span{text-align:center;font-weight:800;font-size:15px;background:rgba(0,194,133,.14);border:1px solid rgba(0,194,133,.35);border-radius:12px;padding:14px 4px}
+  .routecard{background:rgba(255,255,255,.07);border-radius:14px;padding:13px;margin-top:16px;font-size:14px}
+  .routecard .stops,.stops{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .routecard .stops span{font-size:12px;font-weight:700;background:rgba(255,255,255,.1);border-radius:999px;padding:4px 9px}
+  .briefcard{background:#fff;color:var(--ink);border-radius:14px;padding:12px 13px;margin-top:10px}
+  .briefcard .bt{font-weight:800;color:var(--navy);font-size:15px}
+  .boothp{font-size:10px;font-weight:800;color:#B45309;background:#FFF4E6;border-radius:999px;padding:1px 7px;margin-left:4px;vertical-align:2px}
+  .bf{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:9px 0}
+  .bf div{background:#F8FAFC;border:1px solid #E2EEEA;border-radius:9px;padding:6px;text-align:center;font-size:10.5px;color:var(--muted)}
+  .bf b{display:block;font-size:17px;color:var(--navy)}
+  .ba{background:#F5F3FF;border-radius:9px;padding:8px 10px;font-size:12.5px;color:#4C1D95}
+  .alertcard{background:#FFF7E6;border:1px solid #FCD9A5;color:#92400E;border-radius:14px;padding:13px 14px;margin-top:16px;font-weight:800;font-size:15px}
+
   /* CTA */
   .cta{display:grid;gap:10px;margin-top:26px}
   .btn{display:block;text-align:center;font:800 17px var(--font);padding:16px;border-radius:16px;text-decoration:none;color:#fff;border:1px solid rgba(255,255,255,.22);position:relative;z-index:15}
@@ -171,48 +191,73 @@
   </section>
 
   <!-- 7 -->
-  <section class="slide" data-dur="6500" aria-label="Accurate">
-    <div class="kick rise">No wasted applications</div>
-    <p class="big rise d1">If it's on InternIQ, it's real.</p>
-    <div class="checks">
-      <div class="chk rise d2"><i class="y">✓</i><span>Pulled from the company's <b>own</b> job board — never a repost</span></div>
-      <div class="chk rise d3"><i class="y">✓</i><span>A robot proves every board really belongs to that company</span></div>
-      <div class="chk rise d4"><i class="x">✕</i><span>Dead links are gone within the day</span></div>
+  <section class="slide" data-dur="8000" aria-label="Why not LinkedIn or Handshake">
+    <div class="kick rise">"Why not just use LinkedIn?"</div>
+    <p class="big rise d1">Different job. Use both.</p>
+    <div class="vs rise d2">
+      <div class="vh"></div><div class="vh">LinkedIn / Indeed</div><div class="vh">Handshake</div><div class="vh g">InternIQ</div>
+      <div class="vl">Where jobs come from</div><div>Anyone posts: reposts, recruiters, agencies</div><div>Only jobs employers chose to post there</div><div class="win">The company's own careers site</div>
+      <div class="vl">Closed jobs</div><div>Can linger after they close</div><div>Up to the employer</div><div class="win">Re-checked twice a day</div>
+      <div class="vl">At the career fair</div><div>—</div><div>Register + booth check-in</div><div class="win">Your route, briefs, notes, follow-ups</div>
     </div>
+    <p class="mid rise d3">Keep Handshake for signing up for fairs. Use InternIQ to <b>find what's not there</b> and to <b>win the fair.</b></p>
   </section>
 
   <!-- 8 -->
-  <section class="slide" data-dur="7500" aria-label="Career Fair Mode">
-    <div class="kick rise">Career Fair Mode</div>
-    <p class="big rise d1">Walk in with a QR code. Not a stack of paper.</p>
-    <div class="seq">
-      <div class="phone rise d2"><div class="ph-t">Scan for my resume</div><div class="qr" id="qr"></div><div class="ph-s">Construction Industry Fair · Booth 109</div></div>
-      <div class="bubble b1">📷 Recruiter scans it<small>Your resume opens on their phone — no app</small></div>
-      <div class="bubble b2">📝 You save a note<small>"Sarah — wants field engineers, apply by Dec 1"</small></div>
-      <div class="bubble b3">✉️ Follow-up drafted<small>Reminder set for tomorrow</small></div>
-    </div>
+  <section class="slide" data-dur="6000" aria-label="Career fairs">
+    <div class="kick rise">Remember the 109 applicants?</div>
+    <p class="big rise d1">At a career fair, you skip the line.</p>
+    <p class="mid rise d2">You're a face and a name, not resume #87. But most students show up with no plan and never follow up.</p>
+    <p class="mid rise d3"><b class="g">Career Fair Mode fixes all three:</b></p>
+    <div class="steps3 rise d4"><span>1 · Before</span><span>2 · During</span><span>3 · After</span></div>
   </section>
 
   <!-- 9 -->
-  <section class="slide" data-dur="9000" aria-label="Follow-up email written for you">
-    <div class="kick rise">The part everyone forgets</div>
-    <p class="big rise d1">Your follow-up email? Already written.</p>
-    <div class="mail rise d2"><div class="h">To: sarah.lee@company.com<br>Subject: Great meeting you at the Construction Fair</div><div class="body" id="mail"></div></div>
-    <div class="remind rise d3"><span>⏰ Follow up with Sarah</span><span>Today</span></div>
+  <section class="slide" data-dur="8000" aria-label="Before the fair">
+    <div class="kick rise">1 · Before the fair</div>
+    <p class="big rise d1">Star who you want. Get your route.</p>
+    <div class="routecard rise d2"><b class="g">Your route</b> · 4 to go
+      <div class="stops"><span>#104 Southland</span><span>#109 Hensel</span><span>#410 Gilbane</span><span>#802 HITT</span></div></div>
+    <div class="briefcard rise d3"><div class="bt">📋 Southland Industries <span class="boothp">Booth 104</span></div>
+      <div class="bf"><div><b>2</b>open internships</div><div><b>2</b>mechanical</div><div><b>VA, CA</b>locations</div></div>
+      <div class="ba">✨ <b>What they do</b> · what engineers work on · <b>3 smart questions to ask</b></div></div>
+    <p class="mid rise d4">Walk up already knowing their open roles.</p>
   </section>
 
   <!-- 10 -->
-  <section class="slide" data-dur="6000" aria-label="Coming next">
-    <div class="kick rise" style="color:var(--violet)">Coming next</div>
-    <p class="big rise d1">And we're just getting started.</p>
-    <div class="chips rise d2"><span>🔔 Alerts when your companies post</span><span>📲 Text reminders</span><span>🗂 Company briefs before the fair</span><span>🤖 AI career helper</span><span>🎓 How students actually got hired</span><span>🏢 Recruiter side</span></div>
+  <section class="slide" data-dur="7500" aria-label="During the fair">
+    <div class="kick rise">2 · During the fair</div>
+    <p class="big rise d1">Your resume is a QR code. Not a stack of paper.</p>
+    <div class="seq">
+      <div class="phone rise d2"><div class="ph-t">Scan for my resume</div><div class="qr" id="qr"></div><div class="ph-s">Construction Industry Fair · Booth 104</div></div>
+      <div class="bubble b1">📷 Recruiter scans it<small>Your resume opens on their phone. No app needed.</small></div>
+      <div class="bubble b2">📝 10-second note<small>"Mike: HVAC design, data centers, email him after"</small></div>
+      <div class="bubble b3">✓ Route updates<small>3 booths to go</small></div>
+    </div>
   </section>
 
   <!-- 11 -->
+  <section class="slide" data-dur="9000" aria-label="After the fair">
+    <div class="kick rise">3 · After the fair</div>
+    <p class="big rise d1">AI writes your follow-up from your notes.</p>
+    <div class="mail rise d2"><div class="h">To: mtorres@southlandind.com<br>Subject: Great talking HVAC design at the Construction Fair</div><div class="body" id="mail"></div></div>
+    <div class="remind rise d3"><span>📅 Follow up with Mike — added to your calendar</span><span>10:00</span></div>
+  </section>
+
+  <!-- 12 -->
+  <section class="slide" data-dur="6500" aria-label="Alerts">
+    <div class="kick rise">Every day after</div>
+    <p class="big rise d1">Follow a company. Know when it posts.</p>
+    <div class="alertcard rise d2">🔔 2 new internships from companies you follow</div>
+    <div class="job rise d3" style="margin-top:10px"><div class="c">Southland Industries ★</div><div class="t">Mechanical Engineering Intern (HVAC Design)<span class="tag" style="background:#FFF4E6;color:#B45309">NEW</span><span class="tag">ME</span></div><div class="m">📍 Dulles, VA · Found today</div></div>
+    <p class="mid rise d4">Apply in the first days, not after 109 other people.</p>
+  </section>
+
+  <!-- 13 -->
   <section class="slide" data-dur="0" aria-label="Get started">
     <div class="kick rise">Your move</div>
     <p class="big rise d1">Find your internship in 30 seconds.</p>
-    <p class="mid rise d2">Free. No account needed to browse.</p>
+    <p class="mid rise d2">Free. No account needed to browse. Recruiter tools coming next.</p>
     <div class="cta rise d3">
       <a class="btn go" href="/jobs/">Browse internships →</a>
       <a class="btn" href="/fair/">Open Career Fair Mode</a>
@@ -287,7 +332,7 @@
   const fnd = (r, c) => { for (const [r0, c0] of [[0,0],[0,14],[14,0]]) if (r >= r0 && r < r0 + 7 && c >= c0 && c < c0 + 7) { const a = r - r0, b = c - c0; return a === 0 || a === 6 || b === 0 || b === 6 || (a > 1 && a < 5 && b > 1 && b < 5); } return null; };
   for (let r = 0; r < 21; r++) for (let c = 0; c < 21; c++) { const f = fnd(r, c); const el = document.createElement("i"); el.style.background = (f === null ? rnd() > .55 : f) ? "#0A1628" : "#fff"; qr.appendChild(el); }
   // typing email
-  const MAIL = `Hi Sarah,\n\nThanks for taking the time to talk with me at the Construction Industry Career Fair today. I really enjoyed hearing about your field engineering internship.\n\nI'm applying before the Dec 1 deadline and would love to stay in touch about next steps.\n\nBest,\nAdam`;
+  const MAIL = `Hi Mike,\n\nThanks for walking me through Southland's HVAC design work at the Construction Industry Career Fair. Hearing how interns support data center projects from layout through commissioning made me even more excited about the role.\n\nMy resume is linked here for easy reference.\n\nThanks again,\nAdam`;
   let typing = 0;
   function typeMail(){
     const el = document.getElementById("mail"); const id = ++typing; let n = 0;
