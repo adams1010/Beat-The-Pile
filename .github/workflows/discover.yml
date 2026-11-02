@@ -10,6 +10,10 @@ on:
         description: "Also pull brand-new companies from the SimplifyJobs list now"
         type: boolean
         default: false
+      query:
+        description: "Extra query string (debug), e.g. stage=3"
+        required: false
+        default: ""
 concurrency: { group: discover, cancel-in-progress: false }
 jobs:
   run:
@@ -22,7 +26,7 @@ jobs:
         run: |
           if [ -z "$CRON_SECRET" ]; then echo "Add the CRON_SECRET repo secret first"; exit 1; fi
           code=$(curl -s -o out.json -w '%{http_code}' --max-time 70 \
-            -H "Authorization: Bearer $CRON_SECRET" "https://intern-iq-psi.vercel.app/api/discover${{ inputs.import && '?import=1' || '' }}")
+            -H "Authorization: Bearer $CRON_SECRET" "https://intern-iq-psi.vercel.app/api/discover?x=1${{ inputs.import && '&import=1' || '' }}${{ inputs.query && format('&{0}', inputs.query) || '' }}")
           cat out.json | head -c 2000; echo
           echo "HTTP $code"
           [ "$code" = 200 ]

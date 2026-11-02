@@ -19,6 +19,8 @@ const RETRY_AFTER_DAYS = 14;
 export default async function handler(req, res) {
   if (!isAuthorizedCron(req)) return res.status(401).json({ error: "Unauthorized" });
   const t0 = Date.now();
+  const marks = [];
+  const mark = (name) => { marks.push(`${name}:${Date.now() - t0}ms`); return req.query?.stage && marks.length >= +req.query.stage; };
 
   // 0) Once a day (07:00–07:59 UTC, or ?import=1): look for brand-new companies on the SimplifyJobs list.
   //    That run only imports; the new companies are then checked by the normal runs (same proof rules).
@@ -53,6 +55,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Couldn't update company_candidates — run supabase/discovery.sql first. " + e.message });
   }
 
+  if (mark("upsert")) return res.status(200).json({ marks });
   // 1b) New or changed hint (e.g. from a browser pass) → re-test now instead of waiting 2 weeks.
   //     Still goes through the same proof check; a hint can't make anything go live by itself.
   const hinted = await db.selectAsAdmin("company_candidates?select=id,hint,config,status&hint=not.is.null&status=neq.live&status=neq.pending&limit=1000");
@@ -61,6 +64,7 @@ export default async function handler(req, res) {
     await db.update(`company_candidates?id=in.(${requeue.map(encodeURIComponent).join(",")})`, { status: "pending", checked_at: null });
   }
 
+  if (mark("hints")) return res.status(200).json({ marks });
   // 1c) A job system we just learned to read → re-test every company parked as "unsupported" on it
   const NOW_READABLE = /\b(iCIMS|Oracle|Ashby|Eightfold|SmartRecruiters|Paylocity|ADP)\b/;   // add a system here when a new reader ships
   // Only companies parked BEFORE the latest readers shipped — otherwise ones that are still unreadable loop forever
@@ -70,11 +74,13 @@ export default async function handler(req, res) {
     await db.update(`company_candidates?id=in.(${unpark.map(encodeURIComponent).join(",")})`, { status: "pending", checked_at: null });
   }
 
+  if (mark("unpark")) return res.status(200).json({ marks });
   // 2) Boards already live (hand-verified + previously discovered) → never add the same board twice
   const liveRows = await db.selectAsAdmin("company_candidates?select=id,ats,config&enabled=eq.true&limit=1000");
   const taken = new Map(COMPANIES.map((c) => [boardKey(c), c.company]));
   for (const r of liveRows) if (r.ats && r.config) taken.set(boardKey({ ats: r.ats, ...r.config }), r.id);
 
+  if (mark("taken")) return res.status(200).json({ marks });
   // 3) Next batch: never-tried first; failures get retried after 2 weeks (max 4 tries)
   const cutoff = new Date(Date.now() - RETRY_AFTER_DAYS * 86400000).toISOString();
   const rows = await db.selectAsAdmin(
@@ -82,6 +88,7 @@ export default async function handler(req, res) {
     `&order=checked_at.asc.nullsfirst&limit=${PER_RUN}`
   );
 
+  if (mark("select")) return res.status(200).json({ marks, rows: rows.length });
   const results = await mapLimit(rows, 6, async (c) => {
     if (Date.now() - t0 > START_BUDGET_MS) return { id: c.id, skipped: true };
     let r;
@@ -114,9 +121,10 @@ export default async function handler(req, res) {
     return { company: c.company, status: r.status, detail: r.detail };
   });
 
+  mark("discover");
   const done = results.filter((r) => !r.skipped);
   return res.status(200).json({
-    tried: done.length,
+    tried: done.length, marks,
     wentLive: done.filter((r) => r.status === "live").map((r) => r.company),
     results: done,
   });
