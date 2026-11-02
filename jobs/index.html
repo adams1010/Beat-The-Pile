@@ -168,6 +168,17 @@
     const pick = (want && sites.find((x) => want.some((s) => new RegExp("\\b(" + s + "|" + NAMES[s] + ")\\b", "i").test(x)))) || sites[0];
     return cleanOne(pick) + " +" + (sites.length - 1) + " more";
   }
+  // Season + clearance from the title (descriptions aren't read yet, so we only show what the title says)
+  function seasonOf(t){
+    t = String(t || "");
+    const m = t.match(/\b(summer|fall|spring|winter|autumn)\b[\s/&,-]*(?:(summer|fall|spring|winter)\b[\s,-]*)?(20\d\d)?/i);
+    const year = (t.match(/\b(20(2[6-9]|3\d))\b/) || [])[1];
+    const cap = (w) => w[0].toUpperCase() + w.slice(1).toLowerCase();
+    if (m) { const s = cap(m[1] === "autumn" ? "fall" : m[1]) + (m[2] ? "/" + cap(m[2]) : ""); return year ? `${s} ${year}` : s; }
+    if (/co-?op/i.test(t)) return year ? `Co-op ${year}` : "Co-op";
+    return year || "";
+  }
+  const needsClearance = (t) => /\b(clearance|u\.?s\.? citizen(ship)?|us person)\b/i.test(String(t || ""));
   function niceTitle(t){
     t = String(t || "");
     if (t.length < 8 || t !== t.toUpperCase()) return t;   // only fix ALL-CAPS titles
@@ -245,7 +256,7 @@
         <div>
           <div class="co">${esc(j.company)}</div>
           <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">NEW</span>' : ""}${j.match === "me" ? '<span class="tag me">ME</span>' : ""}${j.count > 1 ? `<span class="tag multi">${j.count} openings</span>` : ""}</div>
-          <div class="meta"><span>📍 ${esc(cleanLocation(j))}</span><span>${esc(postedText(j))}</span></div>
+          <div class="meta"><span>📍 ${esc(cleanLocation(j))}</span>${seasonOf(j.title) ? `<span>🗓 ${esc(seasonOf(j.title))}</span>` : ""}${needsClearance(j.title) ? `<span>🇺🇸 US citizens / clearance</span>` : ""}<span>${esc(postedText(j))}</span></div>
         </div>
         <div class="applycol">
           <a class="apply" href="${esc(j.url)}" target="_blank" rel="noopener" data-co="${esc(j.company)}">Apply →</a>
