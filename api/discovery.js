@@ -6,6 +6,7 @@
 //          A pasted link is never trusted by itself — the robot re-checks it and must still prove it's theirs.
 import { db, isAuthorizedCron } from "../lib/db.js";
 import { COMPANIES } from "../lib/companies.js";
+import { normName, keyFor } from "../lib/simplify.js";
 import { verifyClerkJWT, bearer } from "../lib/auth.js";
 import { BOTS, BOT_IDS, logRun } from "../lib/bots.js";
 import { aiSummary } from "../lib/aiusage.js";
@@ -57,6 +58,25 @@ export default async function handler(req, res) {
       await db.upsert("bot_settings", [{ bot: "ai", enabled: cap > 0, cap_usd: cap, updated_at: new Date().toISOString(), updated_by: who }], "bot");
       return res.status(200).json({ ok: true, cap });
     }
+    if (b?.action === "scout") {                          // Board Scout (GitHub) hands over boards that have internships
+      if (who !== "robot") return res.status(403).json({ error: "Robot only" });
+      const items = (Array.isArray(b.items) ? b.items : []).slice(0, 300);
+      const rows = await db.selectAllAsAdmin("company_candidates?select=id,company");
+      const ids = new Set(rows.map((r) => r.id));
+      const names = new Set([...rows, ...COMPANIES].map((r) => normName(r.company)));
+      const add = [];
+      for (const it of items) {
+        const company = String(it.company || "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, 80);
+        const hint = cleanUrl(it.hint);
+        const n = normName(company), id = "b-" + slug(company).slice(0, 60);
+        if (company.length < 2 || n.length < 2 || !hint || ids.has(id) || names.has(n)) continue;
+        add.push({ id, company, domain: null, key: keyFor(company), hint, source: `Board Scout (${String(it.ats || "").slice(0, 20)})`, status: "pending",
+                   priority: Math.max(0, Math.min(95, Math.round(Number(it.priority) || 0))) });
+        ids.add(id); names.add(n);
+      }
+      for (let i = 0; i < add.length; i += 200) await db.insertIgnore("company_candidates", add.slice(i, i + 200));
+      return res.status(200).json({ ok: true, received: items.length, added: add.length });
+    }
     if (b?.action === "botlog") {                         // GitHub-run bots (browser pass, radar) report their runs
       if (who !== "robot" || !BOT_IDS.includes(b.bot)) return res.status(403).json({ error: "Robot only" });
       await logRun(b.bot, b.ok !== false, String(b.summary || "").slice(0, 300), b.stats && typeof b.stats === "object" ? b.stats : null);
@@ -84,6 +104,22 @@ export default async function handler(req, res) {
   }
 
   res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
+  if (req.query?.boards !== undefined) {
+    // Board Scout: which boards/companies we already know (so it only probes new ones)
+    try {
+      const rows = await db.selectAllAsAdmin("company_candidates?select=company,ats,config,hint");
+      const known = new Set();
+      const take = (ats, c) => {
+        if (!ats || !c) return;
+        if (ats === "workday" && c.tenant) known.add(`workday:${String(c.tenant).toLowerCase()}`);
+        if (["greenhouse", "lever", "ashby", "smartrecruiters"].includes(ats) && c.token) known.add(`${ats}:${String(c.token).toLowerCase()}`);
+        if (ats === "icims" && c.base) { try { known.add("icims:" + new URL(c.base).hostname.split(".")[0].toLowerCase()); } catch {} }
+      };
+      for (const r of rows) take(r.ats, r.config);
+      for (const c of COMPANIES) take(c.ats, c);
+      return res.status(200).json({ boards: [...known], names: [...new Set([...rows, ...COMPANIES].map((r) => normName(r.company)))] });
+    } catch (e) { return res.status(500).json({ error: e.message }); }
+  }
   if (req.query?.bots !== undefined) {
     // Control room: each bot's switch, last runs, and the company finder's pipeline
     try {
@@ -91,22 +127,24 @@ export default async function handler(req, res) {
       const [settings, runs, cands, ai, listings, users, feedback] = await Promise.all([
         db.selectAsAdmin("bot_settings?select=bot,enabled,updated_at,updated_by"),
         db.selectAsAdmin(`bot_runs?select=bot,ran_at,ok,summary,stats&ran_at=gt.${new Date(Date.now() - 7 * 864e5).toISOString()}&order=ran_at.desc&limit=1500`),
-        db.selectAsAdmin("company_candidates?select=id,company,status,verified_at,checked_at,detail&limit=5000"),
+        db.selectAllAsAdmin("company_candidates?select=id,company,status,verified_at,checked_at,detail"),
         aiSummary().catch(() => null),
         (async () => { const out = []; for (let off = 0; off < 10000; off += 1000) {           // Supabase returns ≤1000 rows per request
-          const pg = await db.selectAsAdmin(`listings?select=company_id,match,first_seen&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)&order=id.asc&limit=1000&offset=${off}`);
+          const pg = await db.selectAsAdmin(`listings?select=company_id,match,field,first_seen&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)&order=id.asc&limit=1000&offset=${off}`);
           out.push(...pg); if (pg.length < 1000) break; } return out; })().catch(() => []),
-        db.selectAsAdmin("user_jobs?select=clerk_user_id,updated_at,apps,starred,resume_path&limit=10000").catch(() => []),
+        db.selectAllAsAdmin("user_jobs?select=clerk_user_id,updated_at,apps,starred,resume_path&order=clerk_user_id.asc").catch(() => []),
         db.selectAsAdmin("feedback?select=created_at&limit=10000").catch(() => []),
       ]);
       // Whole-system numbers for the live map + "where to spend time"
       const unsupportedBy = {};
       for (const c of cands) if (c.status === "unsupported") { const m = /Uses (.+?) —/.exec(c.detail || ""); const k = m ? m[1] : "Other"; unsupportedBy[k] = (unsupportedBy[k] || 0) + 1; }
       const week = Date.now() - 7 * 864e5;
+      const eng = listings.filter((l) => l.match);
+      const byField = {}; for (const l of listings) byField[l.field || "untagged"] = (byField[l.field || "untagged"] || 0) + 1;
       const system = {
-        listings: listings.length, me: listings.filter((l) => l.match === "me").length,
-        companiesWithJobs: new Set(listings.map((l) => l.company_id)).size,
-        newListings24h: listings.filter((l) => Date.parse(l.first_seen) > Date.now() - 864e5).length,
+        listings: eng.length, me: eng.filter((l) => l.match === "me").length, allMajors: listings.length, byField,
+        companiesWithJobs: new Set(eng.map((l) => l.company_id)).size,
+        newListings24h: eng.filter((l) => Date.parse(l.first_seen) > Date.now() - 864e5).length,
         users: users.length, activeUsers7d: users.filter((u) => Date.parse(u.updated_at) > week).length,
         applications: users.reduce((n, u) => n + (Array.isArray(u.apps) ? u.apps.length : 0), 0),
         resumes: users.filter((u) => u.resume_path).length,
@@ -131,7 +169,7 @@ export default async function handler(req, res) {
     } catch (e) { return res.status(500).json({ error: e.message }); }
   }
   try {
-    const rows = await db.select("company_candidates?select=id,company,domain,hint,status,ats,detail,intern_count,attempts,checked_at,verified_at,source&order=company.asc&limit=2000");
+    const rows = await db.selectAll("company_candidates?select=id,company,domain,hint,status,ats,detail,intern_count,attempts,checked_at,verified_at,source&order=company.asc,id.asc");
     const counts = {};
     for (const r of rows) counts[r.status] = (counts[r.status] || 0) + 1;
     return res.status(200).json({

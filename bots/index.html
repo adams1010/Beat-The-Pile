@@ -132,7 +132,7 @@
   const S = { d: null, clerk: null, user: null, busy: {} };
   const ago = (t) => { if (!t) return "never"; const m = Math.round((Date.now() - Date.parse(t)) / 6e4); return m < 1 ? "just now" : m < 60 ? m + " min ago" : m < 1440 ? Math.round(m / 60) + " hr ago" : Math.round(m / 1440) + " d ago"; };
   // How long without a run before a bot looks stuck
-  const STALE_MIN = { finder: 120, import: 26 * 60, browser: 26 * 60, sync: 120, links: 14 * 60, radar: 26 * 60 };
+  const STALE_MIN = { scout: 8 * 1440, finder: 120, import: 26 * 60, browser: 26 * 60, sync: 120, links: 14 * 60, radar: 26 * 60 };
   function toast(m){ const t = document.createElement("div"); t.className = "toast"; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
 
   function status(b){
@@ -170,6 +170,7 @@
     return `<section class="card" style="margin-top:16px"><div class="row"><div class="name">🗺 Live system map</div><span class="how">Updates every minute</span></div>
       <div class="map">
         <div class="col"><h4>1 · Sources</h4><div class="nodes">
+          ${node(B.scout?.enabled ? "" : "idle", dot("scout") + "🛰 Board Scout", B.scout?.runs[0]?.stats?.found ?? "—", B.scout?.runs[0] ? `of ${(B.scout.runs[0].stats?.boards || 0).toLocaleString()} job boards are hiring interns` : "first scan Sunday (or run it now)")}
           ${node("", "📚 Backlog", f.backlogLeft.toLocaleString(), "companies waiting their turn")}
           ${node("", dot("import") + "🔭 Nightly scout", B.import.runs[0]?.stats?.imported ?? "—", "new companies last night")}
           ${node(parked > 50 ? "need" : "", "🔗 Needs your link", parked, "<a href='/discovery/'>no board / blocked →</a>")}
@@ -263,7 +264,7 @@
       <h3 style="margin:22px 0 10px">Support bots</h3>
       <div class="grid">${others.map((b) => { const [k2, l2] = status(b); return `
         <section class="card ${b.enabled ? "" : "off"}">
-          <div class="row"><div class="name">${{ import: "🔭", browser: "🌐", sync: "🔄", links: "🔗", radar: "📡" }[b.id] || "⚙️"} ${esc(b.name)}</div>${sw(b)}</div>
+          <div class="row"><div class="name">${{ scout: "🛰", import: "🔭", browser: "🌐", sync: "🔄", links: "🔗", radar: "📡" }[b.id] || "⚙️"} ${esc(b.name)}</div>${sw(b)}</div>
           <p class="what">${esc(b.what)}</p>
           <div class="state"><span class="dot ${k2}"></span>${esc(l2)} <span class="how">· ${esc(b.how)}</span></div>
           ${dots(b)}${lastLine(b)}

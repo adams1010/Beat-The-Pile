@@ -1,0 +1,31 @@
+# Weekly: the Board Scout reads Common Crawl's public index for every company job board, probes the ones we don't
+# track for US internships, and hands the hiring ones to the Company Finder (which still proves each one).
+# Remembers what it probed in data/scout-state.json (re-probes after 30 days, since internships are seasonal).
+name: board-scout
+on:
+  schedule:
+    - cron: "0 7 * * 0"
+  workflow_dispatch:
+    inputs:
+      args: { description: "e.g. --dry --limit=300", required: false, default: "" }
+permissions: { contents: write }
+concurrency: { group: board-scout, cancel-in-progress: false }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Scout
+        run: node scripts/board-scout.mjs ${{ inputs.args }}
+        env: { CRON_SECRET: "${{ secrets.CRON_SECRET }}" }
+      - name: Save what was probed
+        if: always()
+        run: |
+          [ -f data/scout-state.json ] || exit 0
+          git config user.name "interniq-scout"; git config user.email "scout@users.noreply.github.com"
+          git add data/scout-state.json
+          git diff --cached --quiet && { echo "no change"; exit 0; }
+          git commit -q -m "Board Scout: probe state" && git pull --rebase -q && git push -q
