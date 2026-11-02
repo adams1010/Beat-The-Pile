@@ -1,0 +1,11 @@
+import assert from "node:assert/strict";
+process.env.ANTHROPIC_API_KEY = "k"; let calls = 0, sent;
+globalThis.fetch = async (u, o) => { calls++; sent = JSON.parse(o.body); return { ok: true, status: 200, json: async () => ({ content: [{ type: "text", text: "hi" }] }) }; };
+const g = (await import("../api/generate.js")).default;
+const call = async (headers, body) => { const r = {}; r.status = (s) => (r.code = s, r); r.json = (b) => (r.body = b, r); r.setHeader = () => {}; await g({ method: "POST", headers: { host: "intern-iq-psi.vercel.app", "x-forwarded-for": "1.2.3.4", ...headers }, body }, r); return r; };
+assert.equal((await call({}, { prompt: "x" })).code, 403, "no origin = blocked");
+assert.equal((await call({ origin: "https://evil.com" }, { prompt: "x" })).code, 403);
+let r = await call({ origin: "https://intern-iq-psi.vercel.app" }, { prompt: "x", max_tokens: 64000 }); assert.equal(r.code, 200); assert.equal(sent.max_tokens, 3500);
+assert.equal((await call({ referer: "https://intern-iq-psi.vercel.app/jobs/" }, { prompt: "y".repeat(30000) })).code, 413);
+let last; for (let i = 0; i < 30; i++) last = await call({ origin: "https://intern-iq-psi.vercel.app" }, { prompt: "x" }); assert.equal(last.code, 429);
+console.log("✓ AI proxy: our site only, token cap, size cap, rate limit");

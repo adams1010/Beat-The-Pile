@@ -1,0 +1,34 @@
+import assert from "node:assert/strict";
+import crypto from "node:crypto";
+process.env.CLERK_SECRET_KEY = "sk_test_x";
+const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
+const evil = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
+const jwk = { ...publicKey.export({ format: "jwk" }), kid: "ins_1", alg: "RS256", use: "sig" };
+let jwksCalls = 0;
+globalThis.fetch = async (u, o) => { jwksCalls++; assert.equal(String(u), "https://api.clerk.com/v1/jwks"); assert.equal(o.headers.Authorization, "Bearer sk_test_x");
+  return { ok: true, status: 200, json: async () => ({ keys: [jwk] }) }; };
+const b64 = (o) => Buffer.from(typeof o === "string" ? o : JSON.stringify(o)).toString("base64url");
+const sign = (payload, key = privateKey, header = { alg: "RS256", kid: "ins_1", typ: "JWT" }) => {
+  const h = b64(header), p = b64(payload);
+  return `${h}.${p}.${crypto.sign("RSA-SHA256", Buffer.from(`${h}.${p}`), key).toString("base64url")}`;
+};
+const { verifyClerkJWT } = await import("../lib/auth.js");
+const now = Math.floor(Date.now() / 1000);
+assert.equal(await verifyClerkJWT(sign({ sub: "user_adam", exp: now + 60 })), "user_adam");
+console.log("✓ real Clerk-signed token accepted");
+// The exact attack the old code allowed: unsigned/forged token claiming to be someone
+const forged = sign({ sub: "user_victim", exp: now + 60 }).split(".").slice(0, 2).join(".") + ".AAAA";
+assert.equal(await verifyClerkJWT(forged), null);
+assert.equal(await verifyClerkJWT(sign({ sub: "user_victim", exp: now + 60 }, evil.privateKey)), null);
+console.log("✓ forged token rejected (bad signature, wrong key)");
+const [h, , s] = sign({ sub: "user_adam", exp: now + 60 }).split(".");
+assert.equal(await verifyClerkJWT(`${h}.${b64({ sub: "user_victim", exp: now + 60 })}.${s}`), null);
+console.log("✓ tampered user id rejected");
+assert.equal(await verifyClerkJWT(sign({ sub: "user_adam", exp: now - 60 })), null);
+assert.equal(await verifyClerkJWT(sign({ sub: "user_adam" })), null);
+console.log("✓ expired / no-expiry tokens rejected");
+assert.equal(await verifyClerkJWT(sign({ sub: "user_adam", exp: now + 60 }, privateKey, { alg: "none", kid: "ins_1" })), null);
+assert.equal(await verifyClerkJWT("garbage"), null); assert.equal(await verifyClerkJWT(""), null);
+console.log("✓ alg:none and junk rejected");
+assert.ok(jwksCalls <= 3);
+console.log(`✓ keys cached (${jwksCalls} fetches for 8 checks)\nAUTH TESTS PASSED`);
