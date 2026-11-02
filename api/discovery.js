@@ -8,7 +8,7 @@ import { db, isAuthorizedCron } from "../lib/db.js";
 import { COMPANIES } from "../lib/companies.js";
 import { verifyClerkJWT, bearer } from "../lib/auth.js";
 
-const ADMINS = (process.env.ADMIN_EMAILS || "shiloniadam10@gmail.com").toLowerCase().split(/[,\s]+/).filter(Boolean);
+const ADMINS = (process.env.ADMIN_EMAILS || "shiloniadam10@gmail.com,mdxp21@gmail.com").toLowerCase().split(/[,\s]+/).filter(Boolean);
 const slug = (s) => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const cleanUrl = (u) => { try { const x = new URL(String(u).trim()); return /^https?:$/.test(x.protocol) ? x.toString() : null; } catch { return null; } };
 const cleanDomain = (d) => String(d || "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/.*$/, "");
