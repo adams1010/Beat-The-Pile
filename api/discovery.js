@@ -93,7 +93,9 @@ export default async function handler(req, res) {
         db.selectAsAdmin(`bot_runs?select=bot,ran_at,ok,summary,stats&ran_at=gt.${new Date(Date.now() - 7 * 864e5).toISOString()}&order=ran_at.desc&limit=1500`),
         db.selectAsAdmin("company_candidates?select=id,company,status,verified_at,checked_at,detail&limit=5000"),
         aiSummary().catch(() => null),
-        db.selectAsAdmin("listings?select=company_id,match,first_seen&closed_at=is.null&limit=10000").catch(() => []),
+        (async () => { const out = []; for (let off = 0; off < 10000; off += 1000) {           // Supabase returns ≤1000 rows per request
+          const pg = await db.selectAsAdmin(`listings?select=company_id,match,first_seen&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)&order=id.asc&limit=1000&offset=${off}`);
+          out.push(...pg); if (pg.length < 1000) break; } return out; })().catch(() => []),
         db.selectAsAdmin("user_jobs?select=clerk_user_id,updated_at,apps,starred,resume_path&limit=10000").catch(() => []),
         db.selectAsAdmin("feedback?select=created_at&limit=10000").catch(() => []),
       ]);
