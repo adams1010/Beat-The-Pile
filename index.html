@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<link rel="manifest" href="/manifest.webmanifest"/>
+<meta name="theme-color" content="#0A1628"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-title" content="InternIQ"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<link rel="apple-touch-icon" href="/icons/icon-180.png"/>
+<link rel="icon" href="/icons/icon-192.png"/>
 <title>InternIQ — Find Your Real Shot</title>
 <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -43,6 +51,15 @@ body{min-height:100vh}
   .nav-logo-text{font-size:16px!important}
   .nav-tab{padding:7px 9px!important;font-size:13px!important}
   .nav-pad{padding:0 0.9rem!important}
+}
+/* Phones: nav scrolls sideways instead of pushing the page wider than the screen */
+html,body{max-width:100%;overflow-x:hidden}
+@media (max-width:820px){
+  .nav-pad{gap:10px}
+  .nav-links{flex:1;min-width:0;overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links > *{flex:0 0 auto;white-space:nowrap}
+  .nav-logo-text{display:none!important}
 }
 @media (max-width:380px){
   .nav-logo-text{display:none!important}
@@ -3257,6 +3274,9 @@ Return ONLY this exact JSON structure, no markdown, no extra text:
         <span className="nav-logo-text" style={{fontWeight:800,fontSize:17,color:"#0A1628",letterSpacing:"-0.5px"}}>InternIQ</span>
       </button>
       <div className="nav-links" style={{display:"flex",gap:2,alignItems:"center"}}>
+        {[["/jobs/","Jobs"],["/fair/","Career Fair"]].map(([href,l])=>(
+          <a key={href} className="nav-tab" href={href} style={{color:"#4A5568",padding:"7px 12px",borderRadius:var_r,fontSize:14,fontWeight:600,fontFamily:"var(--font)",textDecoration:"none"}}>{l}</a>
+        ))}
         {[["wall","Community"],["community","Tips"],["dashboard","Dashboard"],["resumebuilder","📄 Resume"],["profile","Profile"]].map(([p,l])=>(
           <button key={p} className="nav-tab" onClick={()=>setPage(p)} style={{background:page===p?GL:"transparent",border:"none",color:page===p?GD:"#4A5568",padding:"7px 12px",borderRadius:var_r,cursor:"pointer",fontSize:14,fontWeight:page===p?600:400,fontFamily:"var(--font)"}}>{l}</button>
         ))}
@@ -3284,7 +3304,7 @@ Return ONLY this exact JSON structure, no markdown, no extra text:
       {/* Hero */}
       <div style={{padding:"5rem 2rem 4rem",textAlign:"center",maxWidth:680,margin:"0 auto"}}>
         <div style={{display:"inline-flex",alignItems:"center",gap:6,background:GL,color:GD,padding:"6px 16px",borderRadius:99,fontSize:12,fontWeight:700,marginBottom:"1.5rem",border:`1px solid ${GM}`,letterSpacing:"0.3px"}}>
-          <span>✦</span> 2,400+ students matched this month
+          <span>✦</span> Straight from company job boards
         </div>
         <h1 style={{fontSize:"clamp(2.4rem,6vw,4rem)",fontWeight:800,lineHeight:1.05,letterSpacing:"-2.5px",marginBottom:"1.25rem",color:"#0A1628"}}>
           Stop applying blind.<br/><span style={{color:G}}>Start applying smart.</span>
