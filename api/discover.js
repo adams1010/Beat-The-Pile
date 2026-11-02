@@ -5,8 +5,10 @@ import { CANDIDATES } from "../lib/candidates.js";
 import { COMPANIES, boardKey } from "../lib/companies.js";
 import { discoverOne } from "../lib/discover.js";
 import { db, isAuthorizedCron } from "../lib/db.js";
+import { botOn, logRun } from "../lib/bots.js";
 import { mapLimit, get } from "../lib/http.js";
-import { SIMPLIFY_URL, pickCompanies, normName } from "../lib/simplify.js";
+import { SIMPLIFY_URL, pickCompanies, normName, keyFor } from "../lib/simplify.js";
+import BACKLOG from "../data/backlog.json" with { type: "json" };
 
 export const config = { maxDuration: 60 };
 
@@ -25,7 +27,7 @@ export default async function handler(req, res) {
   // 0) Once a day (07:00–07:59 UTC, or ?import=1): look for brand-new companies on the SimplifyJobs list.
   //    That run only imports; the new companies are then checked by the normal runs (same proof rules).
   const hour = new Date().getUTCHours();
-  if (req.query?.import === "1" || hour === 7) {
+  if (req.query?.import === "1" || (hour === 7 && await botOn("import"))) {
     try {
       const r = await get(SIMPLIFY_URL, { timeoutMs: 20000 });
       if (!r.ok) throw new Error(`list answered ${r.status}`);
@@ -36,12 +38,17 @@ export default async function handler(req, res) {
       for (const x of rows) if (x.ats && x.config) boards.add(boardKey({ ats: x.ats, ...x.config }));
       const fresh = pickCompanies(listings, names, boards);
       for (let i = 0; i < fresh.length; i += 200) await db.insertIgnore("company_candidates", fresh.slice(i, i + 200));
+      await logRun("import", true, fresh.length ? `Found ${fresh.length} new companies: ${fresh.slice(0, 5).map((f) => f.company).join(", ")}${fresh.length > 5 ? "…" : ""}` : "No new companies today", { imported: fresh.length });
       return res.status(200).json({ imported: fresh.length, companies: fresh.slice(0, 50).map((f) => f.company) });
     } catch (e) {
+      await logRun("import", false, "Import failed: " + String(e.message || e).slice(0, 150));
       if (req.query?.import === "1") return res.status(500).json({ error: "Import failed: " + String(e.message || e).slice(0, 200) });
       // scheduled import failed → just carry on with a normal discovery run
     }
   }
+
+  // Switched off on /bots → stop here (the nightly import above has its own switch)
+  if (!(await botOn("finder"))) return res.status(200).json({ off: true, bot: "finder" });
 
   // 1) Sync the candidate list into the table (adds new rows; keeps each row's status/results)
   try {
@@ -75,6 +82,10 @@ export default async function handler(req, res) {
   }
 
   if (mark("unpark")) return res.status(200).json({ marks });
+  // 1d) Queue running low → pull the next companies from the backlog (data/backlog.json), so the finder never idles.
+  //     Same proof rules: a backlog company only goes live if the robot proves the board is theirs.
+  let promoted = [];
+  try { promoted = await refillFromBacklog(); } catch (e) { marks.push("backlog-error:" + String(e.message).slice(0, 80)); }
   // 2) Boards already live (hand-verified + previously discovered) → never add the same board twice
   const liveRows = await db.selectAsAdmin("company_candidates?select=id,ats,config&enabled=eq.true&limit=1000");
   const taken = new Map(COMPANIES.map((c) => [boardKey(c), c.company]));
@@ -123,9 +134,36 @@ export default async function handler(req, res) {
 
   mark("discover");
   const done = results.filter((r) => !r.skipped);
+  const live = done.filter((r) => r.status === "live").map((r) => r.company);
+  if (done.length || promoted.length) await logRun("finder", true,
+    `Checked ${done.length} companies · ${live.length} went live${live.length ? ` (${live.slice(0, 4).join(", ")}${live.length > 4 ? "…" : ""})` : ""}${promoted.length ? ` · +${promoted.length} queued from backlog` : ""}`,
+    { tried: done.length, live: live.length, backlog: promoted.length, statuses: done.reduce((m, r) => (m[r.status] = (m[r.status] || 0) + 1, m), {}) });
+  else await logRun("finder", true, "Queue empty, nothing to check", { tried: 0 });
   return res.status(200).json({
-    tried: done.length, marks, ms: Date.now() - t0,
+    tried: done.length, marks, ms: Date.now() - t0, addedFromBacklog: promoted.length,
     wentLive: done.filter((r) => r.status === "live").map((r) => r.company),
     results: done,
   });
+}
+
+// ── Backlog refill ──
+const REFILL_BELOW = PER_RUN * 2, REFILL_SIZE = 30;
+const slug = (s) => String(s).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+export async function refillFromBacklog() {
+  const pending = await db.selectAsAdmin(`company_candidates?select=id&status=eq.pending&limit=${REFILL_BELOW}`);
+  if (pending.length >= REFILL_BELOW) return [];
+  const rows = await db.selectAsAdmin("company_candidates?select=id,company,ats,config&limit=5000");
+  const ids = new Set(rows.map((r) => r.id));
+  const names = new Set([...rows, ...COMPANIES].map((c) => normName(c.company)));
+  const known = (n) => names.has(n) || [...names].some((k) => k.length >= 5 && (k.startsWith(n) || n.startsWith(k)));
+  const next = [];
+  for (const b of BACKLOG.companies || []) {
+    const n = normName(b.company), id = "s-" + slug(b.company);
+    if (n.length < 3 || ids.has(id) || known(n)) continue;
+    next.push({ id, company: b.company, domain: b.domain || null, key: b.key || keyFor(b.company), hint: b.hint || null, source: "Backlog (SimplifyJobs history)", status: "pending" });
+    names.add(n); ids.add(id);
+    if (next.length >= REFILL_SIZE) break;
+  }
+  if (next.length) await db.insertIgnore("company_candidates", next);
+  return next;
 }

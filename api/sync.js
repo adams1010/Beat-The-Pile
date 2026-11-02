@@ -5,6 +5,7 @@
 import { loadCompanies } from "../lib/companies.js";
 import { fetchCompany } from "../lib/fetchers/index.js";
 import { db, isAuthorizedCron } from "../lib/db.js";
+import { botOn, logRun } from "../lib/bots.js";
 import { mapLimit } from "../lib/http.js";
 
 export const config = { maxDuration: 60 };
@@ -48,6 +49,7 @@ async function syncOne(cfg, runStart, msLeft) {
 
 export default async function handler(req, res) {
   if (!isAuthorizedCron(req)) return res.status(401).json({ error: "Unauthorized" });
+  if (!(await botOn("sync"))) return res.status(200).json({ off: true, bot: "sync" });
   const t0 = Date.now();
   const runStart = new Date().toISOString();
 
@@ -64,6 +66,10 @@ export default async function handler(req, res) {
     if (elapsed > START_BUDGET_MS) return { company_id: cfg.id, skipped: true };
     return syncOne(cfg, runStart, HARD_STOP_MS - elapsed);
   });
+  const doneRuns = report.filter((r) => !r.skipped), failed = doneRuns.filter((r) => !r.ok);
+  const kept = doneRuns.reduce((n, r) => n + (r.kept_count || 0), 0);
+  await logRun("sync", failed.length < doneRuns.length, `Synced ${doneRuns.length} companies · ${kept} internships seen${failed.length ? ` · ${failed.length} boards didn't answer` : ""}`,
+    { synced: doneRuns.length, failed: failed.length, kept, deferred: report.length - doneRuns.length });
   return res.status(200).json({
     ranAt: runStart,
     synced: report.filter((r) => !r.skipped).length,

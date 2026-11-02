@@ -4,6 +4,7 @@
 import { loadCompanies } from "../lib/companies.js";
 import { fetchWorkdayDetail } from "../lib/fetchers/workday.js";
 import { db, isAuthorizedCron } from "../lib/db.js";
+import { botOn, logRun } from "../lib/bots.js";
 import { get, mapLimit } from "../lib/http.js";
 
 export const config = { maxDuration: 60 };
@@ -48,6 +49,7 @@ export async function checkListing(l, cfg) {
 export default async function handler(req, res) {
   if (!isAuthorizedCron(req)) return res.status(401).json({ error: "Unauthorized" });
 
+  if (!(await botOn("links"))) return res.status(200).json({ off: true, bot: "links" });
   const started = Date.now();
   const byId = Object.fromEntries((await loadCompanies()).map((c) => [c.id, c]));
   const rows = await db.selectAsAdmin(
@@ -68,6 +70,7 @@ export default async function handler(req, res) {
   });
 
   const dead = results.filter((r) => r.ok === false).map((r) => r.id);
+  await logRun("links", true, `Checked ${results.filter((r) => r.ok !== undefined).length} links · ${dead.length} dead removed`, { checked: results.filter((r) => r.ok !== undefined).length, dead: dead.length });
   return res.status(200).json({
     checked: results.filter((r) => r.ok !== undefined).length,
     live: results.filter((r) => r.ok === true).length,

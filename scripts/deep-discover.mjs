@@ -13,6 +13,11 @@ const DEBUG = process.argv.includes("--debug");
 const ONLY = (process.argv.find((a) => a.startsWith("--only=")) || "").split("=")[1];
 const JOBWORD = /career|job|opening|position|search|student|universit|intern|early|graduate|join|opportunit/i;
 
+// On/off switch from the /bots control room (if it can't be read, run anyway)
+const sw = await fetch(`${SITE}/api/discovery?bots=1`).then((r) => r.json()).catch(() => null);
+if (sw?.bots?.find((b) => b.id === "browser")?.enabled === false && !process.argv.includes("--force")) { console.log("Browser pass is switched OFF on /bots — skipping"); process.exit(0); }
+const botlog = (ok, summary, stats) => DRY ? null : fetch(`${SITE}/api/discovery`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.CRON_SECRET}` },
+  body: JSON.stringify({ action: "botlog", bot: "browser", ok, summary, stats }) }).catch(() => null);
 const d = await fetch(`${SITE}/api/discovery`).then((r) => r.json());
 let todo = d.rows.filter((r) => (["no_board", "blocked"].includes(r.status) || (r.status === "pending" && (r.attempts || 0) > 0)) && r.domain && !r.hint);
 if (ONLY) todo = d.rows.filter((r) => ONLY.split(",").includes(r.id));
@@ -78,4 +83,5 @@ for (const c of todo) {
 }
 await browser.close();
 console.log(`DONE: found ${found.length} of ${todo.length}`);
+await botlog(true, `Opened ${todo.length} careers sites · found ${found.length} hidden boards${found.length ? ` (${found.slice(0, 4).map((f) => f.company).join(", ")}${found.length > 4 ? "…" : ""})` : ""}`, { opened: todo.length, found: found.length });
 console.log("FOUND_JSON " + JSON.stringify(found));

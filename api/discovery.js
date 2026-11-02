@@ -7,6 +7,8 @@
 import { db, isAuthorizedCron } from "../lib/db.js";
 import { COMPANIES } from "../lib/companies.js";
 import { verifyClerkJWT, bearer } from "../lib/auth.js";
+import { BOTS, BOT_IDS, logRun } from "../lib/bots.js";
+import BACKLOG from "../data/backlog.json" with { type: "json" };
 
 const ADMINS = (process.env.ADMIN_EMAILS || "shiloniadam10@gmail.com,mdxp21@gmail.com").toLowerCase().split(/[,\s]+/).filter(Boolean);
 const slug = (s) => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -42,6 +44,17 @@ export default async function handler(req, res) {
     if (!who) return res.status(403).json({ error: "Only the InternIQ owner can edit the robot's list" });
 
     let b = req.body; if (typeof b === "string") { try { b = JSON.parse(b); } catch { b = {}; } }
+    // ── Bot control room ──
+    if (b?.action === "bot") {                            // owner flips a bot on/off on /bots
+      if (who === "robot" || !BOT_IDS.includes(b.bot)) return res.status(400).json({ error: "Unknown bot" });
+      await db.upsert("bot_settings", [{ bot: b.bot, enabled: b.on === true, updated_at: new Date().toISOString(), updated_by: who }], "bot");
+      return res.status(200).json({ ok: true, bot: b.bot, enabled: b.on === true });
+    }
+    if (b?.action === "botlog") {                         // GitHub-run bots (browser pass, radar) report their runs
+      if (who !== "robot" || !BOT_IDS.includes(b.bot)) return res.status(403).json({ error: "Robot only" });
+      await logRun(b.bot, b.ok !== false, String(b.summary || "").slice(0, 300), b.stats && typeof b.stats === "object" ? b.stats : null);
+      return res.status(200).json({ ok: true });
+    }
     try {
       if (b?.id) {                                        // link for an existing company
         const hint = cleanUrl(b.hint);
@@ -64,6 +77,31 @@ export default async function handler(req, res) {
   }
 
   res.setHeader("Cache-Control", "s-maxage=60, stale-while-revalidate=300");
+  if (req.query?.bots !== undefined) {
+    // Control room: each bot's switch, last runs, and the company finder's pipeline
+    try {
+      res.setHeader("Cache-Control", "no-store");
+      const [settings, runs, cands] = await Promise.all([
+        db.selectAsAdmin("bot_settings?select=bot,enabled,updated_at,updated_by"),
+        db.selectAsAdmin(`bot_runs?select=bot,ran_at,ok,summary,stats&ran_at=gt.${new Date(Date.now() - 7 * 864e5).toISOString()}&order=ran_at.desc&limit=1500`),
+        db.selectAsAdmin("company_candidates?select=id,company,status,verified_at,checked_at&limit=5000"),
+      ]);
+      const on = Object.fromEntries(settings.map((x) => [x.bot, x]));
+      const counts = {}; for (const c of cands) counts[c.status] = (counts[c.status] || 0) + 1;
+      const slugify = (n) => "s-" + String(n).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+      const ids = new Set(cands.map((c) => c.id));
+      const backlogLeft = (BACKLOG.companies || []).filter((x) => !ids.has(slugify(x.company))).length;
+      const day = Date.now() - 864e5;
+      const recentLive = cands.filter((c) => c.status === "live" && c.verified_at).sort((a, z) => String(z.verified_at).localeCompare(String(a.verified_at))).slice(0, 8).map((c) => ({ company: c.company, at: c.verified_at }));
+      return res.status(200).json({
+        bots: BOTS.map((x) => ({ ...x, enabled: on[x.id]?.enabled !== false, changedAt: on[x.id]?.updated_at || null, changedBy: on[x.id]?.updated_by || null,
+          runs: runs.filter((r) => r.bot === x.id).slice(0, 30) })),
+        finder: { counts, queue: counts.pending || 0, backlogLeft, backlogTotal: (BACKLOG.companies || []).length,
+          checked24h: cands.filter((c) => c.checked_at && Date.parse(c.checked_at) > day).length,
+          live24h: cands.filter((c) => c.status === "live" && c.verified_at && Date.parse(c.verified_at) > day).length, recentLive },
+      });
+    } catch (e) { return res.status(500).json({ error: e.message }); }
+  }
   try {
     const rows = await db.select("company_candidates?select=id,company,domain,hint,status,ats,detail,intern_count,attempts,checked_at,verified_at,source&order=company.asc&limit=2000");
     const counts = {};

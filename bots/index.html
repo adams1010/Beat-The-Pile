@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>InternIQ — Bot Control Room</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#0A1628">
+<style>
+  :root{--green:#00C285;--green-dark:#009E6C;--navy:#0A1628;--navy2:#13233D;--line:rgba(255,255,255,.1);--muted:#94A3B8;--text:#E2E8F0;
+        --amber:#F59E0B;--red:#F87171;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:#06101F;color:var(--text);font-family:var(--font);font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:980px;margin:0 auto;padding:0 16px}
+  header{padding:18px 0 8px}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .brand{font-weight:800;color:var(--green);text-decoration:none}
+  .acct{font-size:13px;color:var(--muted);display:flex;gap:8px;align-items:center}
+  .acct button{font:inherit;font-weight:700;font-size:13px;color:#fff;background:transparent;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 10px;cursor:pointer}
+  h1{font-size:clamp(24px,5vw,32px);margin:14px 0 2px;letter-spacing:-.02em}
+  .sub{color:var(--muted);margin:0}
+  .card{background:var(--navy);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .main{margin:18px 0 14px;border-color:rgba(0,194,133,.45);box-shadow:0 0 0 1px rgba(0,194,133,.15),0 20px 60px rgba(0,194,133,.08)}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .name{font-weight:800;font-size:17px;color:#fff;display:flex;align-items:center;gap:8px}
+  .main .name{font-size:21px}
+  .badge{font-size:10.5px;font-weight:800;letter-spacing:.08em;color:#06101F;background:var(--green);border-radius:999px;padding:2px 8px}
+  .what{color:var(--muted);font-size:13.5px;margin:2px 0 0}
+  .how{font-size:12px;color:var(--muted)}
+  .state{font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:6px;margin-top:10px}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--muted);flex:0 0 auto}
+  .dot.on{background:var(--green);box-shadow:0 0 0 4px rgba(0,194,133,.18);animation:pulse 2s infinite}
+  .dot.warn{background:var(--amber)} .dot.off{background:#475569}
+  @keyframes pulse{50%{box-shadow:0 0 0 8px rgba(0,194,133,0)}}
+  /* switch */
+  .sw{position:relative;width:52px;height:30px;flex:0 0 auto}
+  .sw input{opacity:0;width:0;height:0}
+  .sw span{position:absolute;inset:0;background:#334155;border-radius:999px;cursor:pointer;transition:.2s}
+  .sw span::before{content:"";position:absolute;width:24px;height:24px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+  .sw input:checked + span{background:var(--green)}
+  .sw input:checked + span::before{transform:translateX(22px)}
+  .sw input:disabled + span{opacity:.45;cursor:not-allowed}
+  /* pipeline */
+  .pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0 6px;position:relative}
+  .stage{background:var(--navy2);border-radius:12px;padding:12px 10px;text-align:center;position:relative}
+  .stage b{display:block;font-size:clamp(22px,5vw,30px);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.1}
+  .stage span{font-size:11.5px;color:var(--muted)}
+  .stage.live b{color:var(--green)}
+  .stage:not(:last-child)::after{content:"→";position:absolute;right:-9px;top:50%;transform:translateY(-50%);color:var(--green);font-weight:900;z-index:2}
+  .parked{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .parked b{color:var(--text)}
+  .bar{height:8px;border-radius:99px;background:var(--navy2);overflow:hidden;margin-top:8px}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--green),#5EEAD4)}
+  /* runs */
+  .dots{display:flex;gap:3px;margin-top:10px;flex-wrap:wrap}
+  .dots i{width:10px;height:18px;border-radius:3px;background:var(--green);opacity:.85}
+  .dots i.bad{background:var(--red)} .dots i.idle{background:#334155}
+  .last{font-size:13px;margin-top:8px;color:var(--text)}
+  .last small{color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+  .cols{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-top:12px}
+  @media (max-width:720px){.cols{grid-template-columns:1fr}.pipe{grid-template-columns:repeat(2,1fr)}.stage:nth-child(2)::after{display:none}}
+  h3{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+  ul.log{list-style:none;margin:0;padding:0;font-size:13px}
+  ul.log li{padding:6px 0;border-bottom:1px solid var(--line);display:flex;gap:8px}
+  ul.log li:last-child{border:0}
+  ul.log time{color:var(--muted);white-space:nowrap;font-size:12px;min-width:58px}
+  .off .what,.off .last{opacity:.55}
+  .note{font-size:12.5px;color:var(--muted);margin:18px 0 40px}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#fff;color:var(--navy);font-weight:700;font-size:14px;padding:10px 16px;border-radius:10px;z-index:9}
+  .signin{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);color:#FCD34D;border-radius:12px;padding:10px 14px;font-size:13.5px;margin-top:12px}
+</style>
+</head>
+<body>
+<header class="wrap">
+  <div class="top"><a class="brand" href="/jobs/">InternIQ</a><div class="acct" id="acct"></div></div>
+  <h1>🎛 Bot Control Room</h1>
+  <p class="sub">Every bot that runs InternIQ: what it's doing, when it last ran, and an on/off switch.</p>
+  <div class="signin" id="signinNote" hidden>View only. Sign in as an InternIQ owner to flip switches.</div>
+</header>
+<main class="wrap" id="app"><div class="card">Loading bots…</div></main>
+<p class="wrap note">Switches take effect on each bot's next run. A bot that can't read its switch runs anyway, so a hiccup never silently stops the Company Finder. Run history covers the last 7 days.</p>
+
+<script>
+(function(){
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const S = { d: null, clerk: null, user: null, busy: {} };
+  const ago = (t) => { if (!t) return "never"; const m = Math.round((Date.now() - Date.parse(t)) / 6e4); return m < 1 ? "just now" : m < 60 ? m + " min ago" : m < 1440 ? Math.round(m / 60) + " hr ago" : Math.round(m / 1440) + " d ago"; };
+  // How long without a run before a bot looks stuck
+  const STALE_MIN = { finder: 120, import: 26 * 60, browser: 26 * 60, sync: 120, links: 14 * 60, radar: 26 * 60 };
+  function toast(m){ const t = document.createElement("div"); t.className = "toast"; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
+
+  function status(b){
+    const last = b.runs[0];
+    if (!b.enabled) return ["off", "Switched off"];
+    if (!last) return ["warn", "On · waiting for first logged run"];
+    const mins = (Date.now() - Date.parse(last.ran_at)) / 6e4;
+    if (mins > STALE_MIN[b.id]) return ["warn", `On · no run for ${ago(last.ran_at).replace(" ago", "")}`];
+    if (!last.ok) return ["warn", "On · last run had problems"];
+    return ["on", "Running"];
+  }
+  function sw(b){
+    const can = !!S.user;
+    return `<label class="sw" title="${can ? "" : "Sign in to change"}"><input type="checkbox" data-bot="${esc(b.id)}" ${b.enabled ? "checked" : ""} ${can && !S.busy[b.id] ? "" : "disabled"} aria-label="${esc(b.name)} on/off"><span></span></label>`;
+  }
+  function dots(b){
+    const runs = b.runs.slice(0, 30).reverse();
+    if (!runs.length) return "";
+    return `<div class="dots" aria-label="Last ${runs.length} runs">${runs.map((r) => `<i class="${!r.ok ? "bad" : r.stats && r.stats.tried === 0 ? "idle" : ""}" title="${esc(new Date(r.ran_at).toLocaleString())}: ${esc(r.summary)}"></i>`).join("")}</div>`;
+  }
+  function lastLine(b){
+    const r = b.runs[0];
+    return r ? `<div class="last">${esc(r.summary)} <small>· ${esc(ago(r.ran_at))}</small></div>` : `<div class="last"><small>No runs logged yet. History starts with the next run.</small></div>`;
+  }
+
+  function render(){
+    const d = S.d; if (!d) return;
+    const f = d.finder, finder = d.bots.find((b) => b.id === "finder");
+    const [k, label] = status(finder);
+    const c = f.counts, parked = (c.no_board || 0) + (c.blocked || 0) + (c.unsupported || 0) + (c.board_error || 0) + (c.identity_failed || 0);
+    const day = Date.now() - 864e5;
+    const fruns = finder.runs.filter((r) => Date.parse(r.ran_at) > day);
+    const liveToday = fruns.reduce((n, r) => n + (r.stats?.live || 0), 0), checkedToday = fruns.reduce((n, r) => n + (r.stats?.tried || 0), 0);
+    const used = f.backlogTotal - f.backlogLeft;
+    const others = d.bots.filter((b) => !b.main);
+    $("#app").innerHTML = `
+      <section class="card main ${finder.enabled ? "" : "off"}">
+        <div class="row"><div><div class="name">🤖 ${esc(finder.name)} <span class="badge">MAIN BOT</span></div><p class="what">${esc(finder.what)}</p></div>${sw(finder)}</div>
+        <div class="state"><span class="dot ${k}"></span>${esc(label)} <span class="how">· ${esc(finder.how)}</span></div>
+        <div class="pipe">
+          <div class="stage"><b>${f.backlogLeft.toLocaleString()}</b><span>in backlog</span></div>
+          <div class="stage"><b>${(f.queue || 0).toLocaleString()}</b><span>queued to check</span></div>
+          <div class="stage"><b>${checkedToday.toLocaleString()}</b><span>checked today</span></div>
+          <div class="stage live"><b>${(c.live || 0).toLocaleString()}</b><span>verified live${liveToday ? ` · +${liveToday} today` : ""}</span></div>
+        </div>
+        <div class="parked">Parked for a retry or a link from you: <b>${parked}</b> (no board found ${c.no_board || 0} · blocks robots ${c.blocked || 0} · job system we can't read yet ${c.unsupported || 0} · board errors ${c.board_error || 0} · couldn't prove ${c.identity_failed || 0}). <a href="/discovery/">Add links →</a></div>
+        <div class="bar" title="Backlog worked through"><i style="width:${f.backlogTotal ? Math.round(used / f.backlogTotal * 100) : 0}%"></i></div>
+        <div class="how" style="margin-top:4px">Backlog: ${used} of ${f.backlogTotal} worked through</div>
+        <div class="cols">
+          <div><h3>Recent runs</h3>${dots(finder)}<ul class="log" style="margin-top:8px">${finder.runs.slice(0, 6).map((r) => `<li><time>${esc(ago(r.ran_at))}</time><span>${r.ok ? "" : "⚠️ "}${esc(r.summary)}</span></li>`).join("") || `<li><span class="how">History starts with the next run.</span></li>`}</ul></div>
+          <div><h3>Recently verified</h3><ul class="log">${f.recentLive.map((x) => `<li><time>${esc(ago(x.at))}</time><span>✅ ${esc(x.company)}</span></li>`).join("")}</ul></div>
+        </div>
+      </section>
+      <h3 style="margin:22px 0 10px">Support bots</h3>
+      <div class="grid">${others.map((b) => { const [k2, l2] = status(b); return `
+        <section class="card ${b.enabled ? "" : "off"}">
+          <div class="row"><div class="name">${{ import: "🔭", browser: "🌐", sync: "🔄", links: "🔗", radar: "📡" }[b.id] || "⚙️"} ${esc(b.name)}</div>${sw(b)}</div>
+          <p class="what">${esc(b.what)}</p>
+          <div class="state"><span class="dot ${k2}"></span>${esc(l2)} <span class="how">· ${esc(b.how)}</span></div>
+          ${dots(b)}${lastLine(b)}
+          ${b.changedBy && b.changedAt ? `<div class="how" style="margin-top:6px">Switch last changed ${esc(ago(b.changedAt))} by ${esc(b.changedBy)}</div>` : ""}
+        </section>`; }).join("")}</div>`;
+  }
+
+  $("#app").addEventListener("change", async (e) => {
+    const i = e.target.closest("input[data-bot]"); if (!i) return;
+    const bot = i.dataset.bot, on = i.checked, b = S.d.bots.find((x) => x.id === bot);
+    if (b.main && !on && !confirm("Turn off the Company Finder? No new companies will be found until you turn it back on.")) { i.checked = true; return; }
+    S.busy[bot] = true; b.enabled = on; render();
+    try {
+      const r = await fetch("/api/discovery", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await S.clerk.session.getToken()) }, body: JSON.stringify({ action: "bot", bot, on }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(j.error || "Couldn't change it");
+      toast(`${b.name} ${on ? "ON" : "OFF"}. Takes effect on its next run`);
+    } catch (err) { b.enabled = !on; toast(err.message); }
+    S.busy[bot] = false; render();
+  });
+
+  async function load(){
+    try { S.d = await fetch("/api/discovery?bots=1", { cache: "no-store" }).then((r) => r.json()); if (!S.d.bots) throw 0; render(); }
+    catch { $("#app").innerHTML = `<div class="card">Couldn't load the bots. Refresh in a minute.</div>`; }
+  }
+
+  // Sign-in (same Clerk account as the rest of InternIQ); only owners' switch changes are accepted by the server
+  async function loadClerk(){
+    try {
+      const pk = (await fetch("/api/config").then((r) => r.json())).clerkPublishableKey; if (!pk) return;
+      if (!window.Clerk) {
+        const host = atob(pk.replace(/^pk_(test|live)_/, "")).replace(/\$$/, "").trim(); if (!/clerk/.test(host)) return;
+        await new Promise((ok, bad) => { const s = document.createElement("script"); s.src = `https://${host}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`;
+          s.setAttribute("data-clerk-publishable-key", pk); s.async = true; s.crossOrigin = "anonymous"; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
+      }
+      if (typeof window.Clerk.load === "function" && !window.Clerk.loaded) await window.Clerk.load({});
+      S.clerk = window.Clerk;
+      const set = (u) => { S.user = u || null; acct(); render(); };
+      S.clerk.addListener?.(({ user }) => set(user)); set(S.clerk.user);
+    } catch { acct(); }
+  }
+  function acct(){
+    const el = $("#acct"); $("#signinNote").hidden = !!S.user;
+    if (!S.clerk) { el.innerHTML = ""; return; }
+    el.innerHTML = S.user ? `<span>${esc(S.user.primaryEmailAddress?.emailAddress || "")}</span><button id="so">Sign out</button>` : `<button id="si">Sign in</button>`;
+    $("#so")?.addEventListener("click", () => S.clerk.signOut()); $("#si")?.addEventListener("click", () => S.clerk.openSignIn());
+  }
+
+  load(); loadClerk(); setInterval(load, 60000);
+})();
+</script>
+</body>
+</html>
