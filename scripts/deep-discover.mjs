@@ -9,6 +9,7 @@ import { scanHtml } from "../lib/discover.js";
 const SITE = process.env.SITE || "https://intern-iq-psi.vercel.app";
 const DRY = process.argv.includes("--dry");
 const LIMIT = +(process.argv.find((a) => a.startsWith("--limit=")) || "--limit=40").split("=")[1];
+const DEBUG = process.argv.includes("--debug");
 const ONLY = (process.argv.find((a) => a.startsWith("--only=")) || "").split("=")[1];
 const JOBWORD = /career|job|opening|position|search|student|universit|intern|early|graduate|join|opportunit/i;
 
@@ -42,6 +43,7 @@ for (const c of todo) {
   try {
     for (const start of [`https://www.${c.domain}/careers`, `https://${c.domain}`]) {
       const g = await grab(page, start);
+      if (DEBUG) console.log(`    [${c.company}] ${start} → ${g ? page.url() : "FAILED"} | title: ${g ? (await page.title().catch(() => "")).slice(0, 60) : ""} | links: ${g ? g.links.length : 0} | jobby: ${g ? g.links.filter((l) => JOBWORD.test(l.href + " " + l.text)).slice(0, 6).map((l) => l.href.slice(0, 90)).join(" , ") : ""}`);
       if (!g) continue;
       boards = [...scanHtml(g.html, start).boards, ...scanHtml(g.extra, null).boards];
       if (boards.length) break;
