@@ -1,6 +1,7 @@
 // InternIQ backend — proxy to the Anthropic API for the homepage's AI features.
 // Locked down: only our own pages may call it (no cross-site use), prompt/answer sizes are capped,
-// and each visitor is rate-limited. The real backstop is the monthly spend limit in the Anthropic console.
+// and each visitor is rate-limited. Every call is costed and logged (lib/aiusage.js) and stops at the monthly cap set on /bots.
+import { aiAllowed, logAI, MODEL } from "../lib/aiusage.js";
 const MAX_TOKENS = 3500;
 const MAX_PROMPT = 24000;               // characters
 const WINDOW_MS = 10 * 60 * 1000, PER_WINDOW = 25;
@@ -27,6 +28,7 @@ export default async function handler(req, res) {
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) return res.status(500).json({ error: "AI is not configured" });
+  if (!(await aiAllowed())) return res.status(503).json({ error: "AI features are paused for the rest of the month" });
 
   try {
     let body = req.body;
@@ -40,10 +42,11 @@ export default async function handler(req, res) {
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01" },
-      body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens, temperature, messages: [{ role: "user", content: prompt }] }),
+      body: JSON.stringify({ model: MODEL, max_tokens, temperature, messages: [{ role: "user", content: prompt }] }),
     });
     const data = await r.json();
     if (!r.ok) return res.status(r.status).json({ error: data.error?.message || "AI error" });
+    await logAI("homepage", MODEL, data.usage);
     const text = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("");
     return res.status(200).json({ text });
   } catch (err) {

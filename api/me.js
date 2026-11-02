@@ -20,6 +20,7 @@
 import crypto from "node:crypto";
 import { verifyClerkJWT, bearer } from "../lib/auth.js";
 import { db } from "../lib/db.js";
+import { aiAllowed, logAI, MODEL } from "../lib/aiusage.js";
 
 const LISTS = ["saved", "applied"];
 const MAX = 500;
@@ -53,15 +54,17 @@ function aiLimited(uid) {
   list.push(now); aiHits.set(uid, list); if (aiHits.size > 5000) aiHits.clear();
   return list.length > AI_PER_HOUR;
 }
-async function claude(prompt, max_tokens = 700) {
+async function claude(prompt, max_tokens = 700, feature = "other") {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) throw new Error("AI is not configured");
+  if (!(await aiAllowed())) throw new Error("AI features are paused for the rest of the month");
   const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST", headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({ model: "claude-haiku-4-5-20251001", max_tokens, temperature: 0.3, messages: [{ role: "user", content: prompt }] }),
+    body: JSON.stringify({ model: MODEL, max_tokens, temperature: 0.3, messages: [{ role: "user", content: prompt }] }),
   });
   const d = await r.json();
   if (!r.ok) throw new Error("AI is busy — try again in a minute");
+  await logAI(feature, MODEL, d.usage);
   return (d.content || []).filter((b) => b.type === "text").map((b) => b.text).join("");
 }
 function parseJson(text) {
@@ -91,7 +94,7 @@ Reply with ONLY this JSON:
 {"known": true|false, "about": "1-2 sentences: what the company does and who its customers are", "engineers": "1-2 sentences: what engineers (especially mechanical) typically work on there", "ask": ["3 specific, smart questions a student could ask their recruiter"]}
 
 Rules: be factual and plain. If you are not confident you know this specific company (common for small or local firms), set "known": false, keep "about" to what the website domain and job titles clearly show, and do not invent facts like size, revenue, or projects.`;
-  const j = parseJson(await claude(prompt));
+  const j = parseJson(await claude(prompt, 700, "brief"));
   const brief = { known: j.known !== false, about: clean(j.about, 400), engineers: clean(j.engineers, 400), ask: strArr(j.ask, 3, 200) };
   if (!brief.about) throw new Error("AI gave an empty answer — try again");
   await db.upsert("company_briefs", [{ company_id: companyId, brief, created_at: new Date().toISOString() }], "company_id");
@@ -282,7 +285,7 @@ ${link ? `Resume link to include: ${link}` : "Say the resume is attached."}
 
 Rules: under 130 words. Warm but professional, not over the top. Mention one or two specific things from the notes so the recruiter remembers them. Never invent details that aren't in the notes. Don't claim the student already applied unless the notes say so. Refer to "the fair" instead of saying "today" or "yesterday". Sign off with the student's name.
 Reply with ONLY this JSON: {"subject": "...", "body": "..."}`;
-      const j = parseJson(await claude(prompt, 600));
+      const j = parseJson(await claude(prompt, 600, "followup_email"));
       return res.status(200).json({ subject: clean(j.subject, 160), body: String(j.body || "").slice(0, 2000) });
     }
 

@@ -8,6 +8,7 @@ import { db, isAuthorizedCron } from "../lib/db.js";
 import { COMPANIES } from "../lib/companies.js";
 import { verifyClerkJWT, bearer } from "../lib/auth.js";
 import { BOTS, BOT_IDS, logRun } from "../lib/bots.js";
+import { aiSummary } from "../lib/aiusage.js";
 import BACKLOG from "../data/backlog.json" with { type: "json" };
 
 const ADMINS = (process.env.ADMIN_EMAILS || "shiloniadam10@gmail.com,mdxp21@gmail.com").toLowerCase().split(/[,\s]+/).filter(Boolean);
@@ -50,6 +51,12 @@ export default async function handler(req, res) {
       await db.upsert("bot_settings", [{ bot: b.bot, enabled: b.on === true, updated_at: new Date().toISOString(), updated_by: who }], "bot");
       return res.status(200).json({ ok: true, bot: b.bot, enabled: b.on === true });
     }
+    if (b?.action === "aicap") {                          // owner sets the monthly AI budget (0 = AI off)
+      const cap = Math.round(Number(b.cap) * 100) / 100;
+      if (who === "robot" || !(cap >= 0 && cap <= 500)) return res.status(400).json({ error: "Pick a budget between $0 and $500" });
+      await db.upsert("bot_settings", [{ bot: "ai", enabled: cap > 0, cap_usd: cap, updated_at: new Date().toISOString(), updated_by: who }], "bot");
+      return res.status(200).json({ ok: true, cap });
+    }
     if (b?.action === "botlog") {                         // GitHub-run bots (browser pass, radar) report their runs
       if (who !== "robot" || !BOT_IDS.includes(b.bot)) return res.status(403).json({ error: "Robot only" });
       await logRun(b.bot, b.ok !== false, String(b.summary || "").slice(0, 300), b.stats && typeof b.stats === "object" ? b.stats : null);
@@ -81,11 +88,29 @@ export default async function handler(req, res) {
     // Control room: each bot's switch, last runs, and the company finder's pipeline
     try {
       res.setHeader("Cache-Control", "no-store");
-      const [settings, runs, cands] = await Promise.all([
+      const [settings, runs, cands, ai, listings, users, feedback] = await Promise.all([
         db.selectAsAdmin("bot_settings?select=bot,enabled,updated_at,updated_by"),
         db.selectAsAdmin(`bot_runs?select=bot,ran_at,ok,summary,stats&ran_at=gt.${new Date(Date.now() - 7 * 864e5).toISOString()}&order=ran_at.desc&limit=1500`),
-        db.selectAsAdmin("company_candidates?select=id,company,status,verified_at,checked_at&limit=5000"),
+        db.selectAsAdmin("company_candidates?select=id,company,status,verified_at,checked_at,detail&limit=5000"),
+        aiSummary().catch(() => null),
+        db.selectAsAdmin("listings?select=company_id,match,first_seen&closed_at=is.null&limit=10000").catch(() => []),
+        db.selectAsAdmin("user_jobs?select=clerk_user_id,updated_at,apps,starred,resume_path&limit=10000").catch(() => []),
+        db.selectAsAdmin("feedback?select=created_at&limit=10000").catch(() => []),
       ]);
+      // Whole-system numbers for the live map + "where to spend time"
+      const unsupportedBy = {};
+      for (const c of cands) if (c.status === "unsupported") { const m = /Uses (.+?) —/.exec(c.detail || ""); const k = m ? m[1] : "Other"; unsupportedBy[k] = (unsupportedBy[k] || 0) + 1; }
+      const week = Date.now() - 7 * 864e5;
+      const system = {
+        listings: listings.length, me: listings.filter((l) => l.match === "me").length,
+        companiesWithJobs: new Set(listings.map((l) => l.company_id)).size,
+        newListings24h: listings.filter((l) => Date.parse(l.first_seen) > Date.now() - 864e5).length,
+        users: users.length, activeUsers7d: users.filter((u) => Date.parse(u.updated_at) > week).length,
+        applications: users.reduce((n, u) => n + (Array.isArray(u.apps) ? u.apps.length : 0), 0),
+        resumes: users.filter((u) => u.resume_path).length,
+        feedback: feedback.length, feedback7d: feedback.filter((f) => Date.parse(f.created_at) > week).length,
+        unsupportedBy,
+      };
       const on = Object.fromEntries(settings.map((x) => [x.bot, x]));
       const counts = {}; for (const c of cands) counts[c.status] = (counts[c.status] || 0) + 1;
       const slugify = (n) => "s-" + String(n).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
@@ -94,6 +119,7 @@ export default async function handler(req, res) {
       const day = Date.now() - 864e5;
       const recentLive = cands.filter((c) => c.status === "live" && c.verified_at).sort((a, z) => String(z.verified_at).localeCompare(String(a.verified_at))).slice(0, 8).map((c) => ({ company: c.company, at: c.verified_at }));
       return res.status(200).json({
+        ai, system,
         bots: BOTS.map((x) => ({ ...x, enabled: on[x.id]?.enabled !== false, changedAt: on[x.id]?.updated_at || null, changedBy: on[x.id]?.updated_by || null,
           runs: runs.filter((r) => r.bot === x.id).slice(0, 30) })),
         finder: { counts, queue: counts.pending || 0, backlogLeft, backlogTotal: (BACKLOG.companies || []).length,

@@ -69,6 +69,48 @@
   ul.log time{color:var(--muted);white-space:nowrap;font-size:12px;min-width:58px}
   .off .what,.off .last{opacity:.55}
   .note{font-size:12.5px;color:var(--muted);margin:18px 0 40px}
+  /* live system map */
+  .map{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:14px;align-items:stretch}
+  .col{display:flex;flex-direction:column;gap:8px;position:relative;padding:0 14px}
+  .col:first-child{padding-left:0}.col:last-child{padding-right:0}
+  .col h4{margin:0 0 2px;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .node{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:9px 10px;position:relative}
+  .node .t{font-size:12.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px}
+  .node .n{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.15;margin-top:2px}
+  .node .s{font-size:11.5px;color:var(--muted);line-height:1.3}
+  .node.hot{border-color:rgba(0,194,133,.55)} .node.need{border-color:rgba(245,158,11,.6)} .node.idle{opacity:.6}
+  .node.hot .n{color:var(--green)} .node.need .n{color:#FCD34D}
+  .node .d{width:7px;height:7px;border-radius:50%;background:#475569;flex:0 0 auto}
+  .node .d.on{background:var(--green);animation:pulse 2s infinite} .node .d.warn{background:var(--amber)}
+  .flow{position:absolute;right:-14px;top:30px;bottom:30px;width:14px;overflow:hidden}
+  .flow::before{content:"";position:absolute;left:0;right:0;top:50%;height:2px;background:repeating-linear-gradient(90deg,var(--green) 0 5px,transparent 5px 10px);background-size:20px 2px;animation:flow 1s linear infinite}
+  .flow.stop::before{animation:none;background:repeating-linear-gradient(90deg,#475569 0 5px,transparent 5px 10px)}
+  @keyframes flow{to{background-position:20px 0}}
+  @media (max-width:820px){.map{grid-template-columns:1fr;gap:6px}.col{padding:0}.flow{position:relative;right:auto;top:auto;bottom:auto;width:2px;height:16px;margin:0 auto}
+    .flow::before{top:0;bottom:0;left:0;width:2px;height:auto;background:repeating-linear-gradient(180deg,var(--green) 0 5px,transparent 5px 10px);background-size:2px 20px;animation:flowv 1s linear infinite}
+    .flow.stop::before{background:repeating-linear-gradient(180deg,#475569 0 5px,transparent 5px 10px)} .col .nodes{display:grid;grid-template-columns:1fr 1fr;gap:8px}}
+  @keyframes flowv{to{background-position:0 20px}}
+  .col .nodes{display:flex;flex-direction:column;gap:8px}
+  /* focus list */
+  .focus{list-style:none;margin:0;padding:0;counter-reset:f}
+  .focus li{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:start;padding:11px 0;border-bottom:1px solid var(--line)}
+  .focus li:last-child{border:0}
+  .focus li::before{counter-increment:f;content:counter(f);width:26px;height:26px;border-radius:50%;background:var(--navy2);display:grid;place-items:center;font-weight:800;font-size:13px;color:#fff}
+  .focus b{color:#fff}
+  .focus .why{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .tag{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:1px}
+  .tag.high{background:rgba(248,113,113,.15);color:#FCA5A5}.tag.med{background:rgba(245,158,11,.15);color:#FCD34D}.tag.low{background:rgba(148,163,184,.15);color:#CBD5E1}
+  .who{font-size:11.5px;font-weight:700;color:var(--muted);white-space:nowrap;text-align:right}
+  .who a{color:var(--green);text-decoration:none;display:block;margin-top:3px}
+  /* AI spend */
+  .spend{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+  .spend b{font-size:30px;color:#fff;letter-spacing:-.03em}
+  .caps{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .caps button{font:inherit;font-size:12.5px;font-weight:700;padding:5px 11px;border-radius:999px;border:1px solid var(--line);background:var(--navy2);color:var(--muted);cursor:pointer}
+  .caps button[aria-pressed="true"]{background:#fff;color:var(--navy);border-color:#fff}
+  .caps button:disabled{opacity:.45;cursor:not-allowed}
+  .feat{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:13px;margin-top:10px}
+  .feat span:nth-child(even){color:var(--muted);text-align:right}
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#fff;color:var(--navy);font-weight:700;font-size:14px;padding:10px 16px;border-radius:10px;z-index:9}
   .signin{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);color:#FCD34D;border-radius:12px;padding:10px 14px;font-size:13.5px;margin-top:12px}
 </style>
@@ -77,7 +119,7 @@
 <header class="wrap">
   <div class="top"><a class="brand" href="/jobs/">InternIQ</a><div class="acct" id="acct"></div></div>
   <h1>🎛 Bot Control Room</h1>
-  <p class="sub">Every bot that runs InternIQ: what it's doing, when it last ran, and an on/off switch.</p>
+  <p class="sub">Everything happening in InternIQ at once: the live pipeline, where to spend time, and every bot's switch.</p>
   <div class="signin" id="signinNote" hidden>View only. Sign in as an InternIQ owner to flip switches.</div>
 </header>
 <main class="wrap" id="app"><div class="card">Loading bots…</div></main>
@@ -116,6 +158,78 @@
     return r ? `<div class="last">${esc(r.summary)} <small>· ${esc(ago(r.ran_at))}</small></div>` : `<div class="last"><small>No runs logged yet. History starts with the next run.</small></div>`;
   }
 
+  const fmtUsd = (n) => n == null ? "—" : n < 0.01 && n > 0 ? "<$0.01" : "$" + n.toFixed(2);
+  function mapHtml(d){
+    const f = d.finder, c = f.counts, sys = d.system || {}, B = Object.fromEntries(d.bots.map((b) => [b.id, b]));
+    const st = (id) => status(B[id])[0];
+    const flowing = (id) => B[id]?.enabled && st(id) === "on";
+    const dot = (id) => `<span class="d ${{ on: "on", warn: "warn" }[st(id)] || ""}"></span>`;
+    const parked = (c.no_board || 0) + (c.blocked || 0);
+    const day = Date.now() - 864e5, fr = B.finder.runs.filter((r) => Date.parse(r.ran_at) > day);
+    const node = (cls, t, n, sub) => `<div class="node ${cls}"><div class="t">${t}</div><div class="n">${n}</div><div class="s">${sub}</div></div>`;
+    return `<section class="card" style="margin-top:16px"><div class="row"><div class="name">🗺 Live system map</div><span class="how">Updates every minute</span></div>
+      <div class="map">
+        <div class="col"><h4>1 · Sources</h4><div class="nodes">
+          ${node("", "📚 Backlog", f.backlogLeft.toLocaleString(), "companies waiting their turn")}
+          ${node("", dot("import") + "🔭 Nightly scout", B.import.runs[0]?.stats?.imported ?? "—", "new companies last night")}
+          ${node(parked > 50 ? "need" : "", "🔗 Needs your link", parked, "<a href='/discovery/'>no board / blocked →</a>")}
+        </div><div class="flow ${flowing("finder") ? "" : "stop"}"></div></div>
+        <div class="col"><h4>2 · Find + prove</h4><div class="nodes">
+          ${node(B.finder.enabled ? "hot" : "idle", dot("finder") + "🤖 Company Finder", (f.queue || 0) + " queued", `${fr.reduce((n, r) => n + (r.stats?.tried || 0), 0)} checked today · +${fr.reduce((n, r) => n + (r.stats?.live || 0), 0)} live`)}
+          ${node(B.browser.enabled ? "" : "idle", dot("browser") + "🌐 Browser pass", B.browser.runs[0]?.stats?.found ?? "—", "hidden boards found last night")}
+        </div><div class="flow ${flowing("sync") ? "" : "stop"}"></div></div>
+        <div class="col"><h4>3 · Companies</h4><div class="nodes">
+          ${node("hot", "✅ Verified", (c.live || 0).toLocaleString(), `${(sys.companiesWithJobs || 0)} hiring interns now`)}
+          ${node("", "🛠 Can't read yet", (c.unsupported || 0) + (c.board_error || 0), "unsupported or erroring boards")}
+        </div><div class="flow ${flowing("sync") ? "" : "stop"}"></div></div>
+        <div class="col"><h4>4 · Internships</h4><div class="nodes">
+          ${node("hot", dot("sync") + "💼 Open internships", (sys.listings || 0).toLocaleString(), `${(sys.me || 0).toLocaleString()} mechanical · +${sys.newListings24h || 0} today`)}
+          ${node(B.links.enabled ? "" : "idle", dot("links") + "🔗 Link checker", B.links.runs[0]?.stats?.dead ?? "—", "dead links removed last run")}
+        </div><div class="flow ${(sys.users || 0) > 2 ? "" : "stop"}"></div></div>
+        <div class="col"><h4>5 · Students</h4><div class="nodes">
+          ${node((sys.users || 0) < 25 ? "need" : "hot", "👩‍🎓 Accounts", sys.users ?? "—", `${sys.activeUsers7d ?? 0} active this week · ${sys.applications ?? 0} apps tracked`)}
+          ${node("", dot("radar") + "📡 Radar · 🤖 AI", fmtUsd(d.ai?.month), `AI spend this month of ${fmtUsd(d.ai?.cap)} cap`)}
+        </div></div>
+      </div></section>`;
+  }
+  function focusHtml(d){
+    const f = d.finder, c = f.counts, sys = d.system || {}, items = [];
+    const day = Date.now() - 864e5, checkedToday = d.bots[0].runs.filter((r) => Date.parse(r.ran_at) > day).reduce((n, r) => n + (r.stats?.tried || 0), 0);
+    const add = (score, impact, title, why, who, link) => items.push({ score, impact, title, why, who, link });
+    if ((sys.users || 0) < 25) add(100, "high", `Get students on it: ${sys.users || 0} accounts so far`, "Everything upstream works. The biggest gap is people using it. Demo it before the next fair and ask friends to save one internship.", "You", "/demo/");
+    add(90, "high", "Turn on email alerts", "Banners only work when people open the site. Emails bring them back. Blocked on a free Resend account.", "You (5 min) → Claude", null);
+    const parked = (c.no_board || 0) + (c.blocked || 0);
+    if (parked) add(parked > 60 ? 80 : 50, parked > 60 ? "high" : "med", `Paste careers links for ${parked} parked companies`, "The robot couldn't find their board on its own. About a minute each: open their careers page, copy the job-search link.", "You + cousin", "/discovery/");
+    const ub = Object.entries(sys.unsupportedBy || {}).sort((a, b) => b[1] - a[1]);
+    const readable = ub.filter(([k]) => /iCIMS|Eightfold/i.test(k)).reduce((n, [, v]) => n + v, 0);
+    if (readable) add(75, "high", `Re-check ${readable} companies parked as iCIMS/Eightfold`, "We already read those systems, so these look misfiled. Likely a quick fix that adds companies with no work from you.", "Claude", null);
+    const other = ub.filter(([k]) => !/iCIMS|Eightfold/i.test(k));
+    if (other.length) add(40, "med", `New readers: ${other.slice(0, 4).map(([k, v]) => `${k} (${v})`).join(", ")}`, "Each new job-system reader unlocks every company that uses it, now and later.", "Claude", null);
+    const broken = (c.board_error || 0) + (c.identity_failed || 0);
+    if (broken) add(35, "med", `Fix ${broken} boards that error or couldn't be proven`, "Found a board but it errored, or couldn't prove it's theirs (Garmin and Corning are in here).", "Claude", null);
+    if (checkedToday > 0) { const days = Math.ceil(f.backlogLeft / Math.max(1, checkedToday)); if (days < 7) add(30, days < 3 ? "med" : "low", `Backlog runs out in ~${days} day${days > 1 ? "s" : ""}`, "After that the finder relies on the nightly scout and your links. A new company source would keep it fed.", "Claude", null); }
+    if ((sys.feedback7d || 0) > 0) add(60, "med", `Read ${sys.feedback7d} new feedback note${sys.feedback7d > 1 ? "s" : ""}`, "Straight from students who used it this week.", "You", null);
+    if (d.ai && d.ai.cap > 0 && d.ai.month >= d.ai.cap * 0.8) add(70, "high", "AI budget almost used up", `${fmtUsd(d.ai.month)} of ${fmtUsd(d.ai.cap)} this month. Raise the cap below or AI pauses.`, "You", null);
+    items.sort((a, b) => b.score - a.score);
+    return `<section class="card" style="margin-top:12px"><div class="row"><div class="name">🎯 Where to spend time</div><span class="how">Ranked by impact, from live numbers</span></div>
+      <ol class="focus" style="margin-top:8px">${items.slice(0, 7).map((i) => `<li><div><b>${esc(i.title)}</b><span class="tag ${i.impact}">${i.impact.toUpperCase()}</span><div class="why">${esc(i.why)}</div></div>
+        <div class="who">${esc(i.who)}${i.link ? `<a href="${esc(i.link)}">Go →</a>` : ""}</div></li>`).join("")}</ol></section>`;
+  }
+  function aiHtml(d){
+    const a = d.ai; if (!a) return "";
+    const pct = a.cap ? Math.min(100, Math.round(a.month / a.cap * 100)) : 100;
+    const can = !!S.user;
+    const feats = Object.entries(a.byFeature || {}).sort((x, y) => y[1].usd - x[1].usd);
+    const label = { brief: "Company briefs", followup_email: "AI follow-up emails", homepage: "Homepage AI", other: "Other" };
+    return `<section class="card" style="margin-top:12px"><div class="row"><div class="name">🤖 AI spend (Anthropic)</div><span class="how">${esc(a.priceNote)}</span></div>
+      <div class="spend" style="margin-top:8px"><b>${fmtUsd(a.month)}</b><span class="how">this month · ${fmtUsd(a.today)} today · ${a.calls} calls</span></div>
+      <div class="bar"><i style="width:${pct}%;${pct >= 80 ? "background:linear-gradient(90deg,#F59E0B,#F87171)" : ""}"></i></div>
+      <div class="how" style="margin-top:4px">${a.cap ? `${pct}% of your ${fmtUsd(a.cap)} monthly cap. AI features pause automatically at the cap.` : "AI is switched off (cap $0)."}${a.paused && a.cap ? " <b style='color:#FCA5A5'>Paused for this month.</b>" : ""}</div>
+      ${feats.length ? `<div class="feat">${feats.map(([k, v]) => `<span>${esc(label[k] || k)} · ${v.calls} calls</span><span>${fmtUsd(v.usd)}</span>`).join("")}</div>` : `<div class="how" style="margin-top:8px">No AI calls logged yet this month.</div>`}
+      <div class="caps" aria-label="Monthly AI cap">${[0, 5, 10, 25, 50].map((v) => `<button data-cap="${v}" aria-pressed="${a.cap === v}" ${can ? "" : "disabled"}>${v === 0 ? "AI off" : "$" + v + "/mo"}</button>`).join("")}</div>
+      <div class="how" style="margin-top:8px">Counts every AI call InternIQ makes. Your actual balance lives at console.anthropic.com.</div></section>`;
+  }
+
   function render(){
     const d = S.d; if (!d) return;
     const f = d.finder, finder = d.bots.find((b) => b.id === "finder");
@@ -126,7 +240,8 @@
     const liveToday = fruns.reduce((n, r) => n + (r.stats?.live || 0), 0), checkedToday = fruns.reduce((n, r) => n + (r.stats?.tried || 0), 0);
     const used = f.backlogTotal - f.backlogLeft;
     const others = d.bots.filter((b) => !b.main);
-    $("#app").innerHTML = `
+    $("#app").innerHTML = mapHtml(d) + focusHtml(d) + `
+      <h3 style="margin:22px 0 10px">Main bot</h3>
       <section class="card main ${finder.enabled ? "" : "off"}">
         <div class="row"><div><div class="name">🤖 ${esc(finder.name)} <span class="badge">MAIN BOT</span></div><p class="what">${esc(finder.what)}</p></div>${sw(finder)}</div>
         <div class="state"><span class="dot ${k}"></span>${esc(label)} <span class="how">· ${esc(finder.how)}</span></div>
@@ -144,6 +259,7 @@
           <div><h3>Recently verified</h3><ul class="log">${f.recentLive.map((x) => `<li><time>${esc(ago(x.at))}</time><span>✅ ${esc(x.company)}</span></li>`).join("")}</ul></div>
         </div>
       </section>
+      ${aiHtml(d)}
       <h3 style="margin:22px 0 10px">Support bots</h3>
       <div class="grid">${others.map((b) => { const [k2, l2] = status(b); return `
         <section class="card ${b.enabled ? "" : "off"}">
@@ -155,6 +271,16 @@
         </section>`; }).join("")}</div>`;
   }
 
+  $("#app").addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-cap]"); if (!b || b.disabled) return;
+    const cap = +b.dataset.cap;
+    if (cap === 0 && !confirm("Turn AI features off? Company briefs and AI emails stop until you pick a budget again.")) return;
+    try {
+      const r = await fetch("/api/discovery", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await S.clerk.session.getToken()) }, body: JSON.stringify({ action: "aicap", cap }) });
+      const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Couldn't change it");
+      S.d.ai.cap = cap; S.d.ai.paused = S.d.ai.month >= cap; render(); toast(cap ? `AI budget set to $${cap}/month` : "AI features off");
+    } catch (err) { toast(err.message); }
+  });
   $("#app").addEventListener("change", async (e) => {
     const i = e.target.closest("input[data-bot]"); if (!i) return;
     const bot = i.dataset.bot, on = i.checked, b = S.d.bots.find((x) => x.id === bot);
