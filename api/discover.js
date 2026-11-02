@@ -60,7 +60,7 @@ export default async function handler(req, res) {
   }
 
   // 1c) A job system we just learned to read → re-test every company parked as "unsupported" on it
-  const NOW_READABLE = /\b(iCIMS|Oracle|Ashby|Eightfold|SmartRecruiters)\b/;   // add a system here when a new reader ships
+  const NOW_READABLE = /\b(iCIMS|Oracle|Ashby|Eightfold|SmartRecruiters|Paylocity|ADP)\b/;   // add a system here when a new reader ships
   const parked = await db.selectAsAdmin("company_candidates?select=id,detail&status=eq.unsupported&limit=1000");
   const unpark = parked.filter((r) => NOW_READABLE.test(r.detail || "")).map((r) => r.id);
   if (unpark.length) {

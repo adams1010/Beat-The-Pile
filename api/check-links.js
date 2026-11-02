@@ -28,7 +28,7 @@ export async function checkListing(l, cfg) {
     }
     // These job pages are blank shells filled in by script — a page fetch can't tell open from closed.
     // Their listings are closed by the hourly sync instead (gone from the company's feed = closed).
-    if (["ashby", "smartrecruiters", "oracle", "eightfold"].includes(l.ats)) return null;
+    if (["ashby", "smartrecruiters", "oracle", "eightfold", "paylocity", "adp"].includes(l.ats)) return null;
     // iCIMS pages wrap the real content in an iframe — ask for the inner page directly
     const url = l.ats === "icims" ? l.url + (l.url.includes("?") ? "&" : "?") + "in_iframe=1" : l.url;
     const res = await get(url, { timeoutMs: 10000 });
