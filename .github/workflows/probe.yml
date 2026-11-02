@@ -1,0 +1,16 @@
+# Manual only: lets Claude test readers against real job sites (its own workspace can't reach them).
+name: probe
+on:
+  workflow_dispatch:
+    inputs:
+      code: { description: "JS to run (async, has fetch)", required: true }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/probe.mjs "$CODE"
+        env: { CODE: "${{ inputs.code }}" }
