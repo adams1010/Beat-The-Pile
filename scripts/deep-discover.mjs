@@ -14,7 +14,7 @@ const ONLY = (process.argv.find((a) => a.startsWith("--only=")) || "").split("="
 const JOBWORD = /career|job|opening|position|search|student|universit|intern|early|graduate|join|opportunit/i;
 
 const d = await fetch(`${SITE}/api/discovery`).then((r) => r.json());
-let todo = d.rows.filter((r) => ["no_board", "blocked"].includes(r.status) && r.domain && !r.hint);
+let todo = d.rows.filter((r) => (["no_board", "blocked"].includes(r.status) || (r.status === "pending" && (r.attempts || 0) > 0)) && r.domain && !r.hint);
 if (ONLY) todo = d.rows.filter((r) => ONLY.split(",").includes(r.id));
 // Big, well-known companies first: fair attendees, then the rest; least-recently tried first
 const rank = (r) => (/Expo|Fair/.test(r.source || "") ? 0 : 1);
