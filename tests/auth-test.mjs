@@ -30,5 +30,17 @@ console.log("✓ expired / no-expiry tokens rejected");
 assert.equal(await verifyClerkJWT(sign({ sub: "user_adam", exp: now + 60 }, privateKey, { alg: "none", kid: "ins_1" })), null);
 assert.equal(await verifyClerkJWT("garbage"), null); assert.equal(await verifyClerkJWT(""), null);
 console.log("✓ alg:none and junk rejected");
+// issuer + authorized party (azp): checked against our Clerk instance and our own sites
+process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY = "pk_live_" + Buffer.from("clerk.beatthepile.com$").toString("base64");
+const iss = "https://clerk.beatthepile.com";
+assert.equal(await verifyClerkJWT(sign({ sub: "user_adam", exp: now + 60, iss, azp: "https://beatthepile.com" })), "user_adam");
+assert.equal(await verifyClerkJWT(sign({ sub: "user_adam", exp: now + 60, iss, azp: "https://intern-iq-psi.vercel.app" })), "user_adam");
+assert.equal(await verifyClerkJWT(sign({ sub: "user_adam", exp: now + 60, iss, azp: "https://intern-iq-git-fix-adams.vercel.app" })), "user_adam", "our preview deploys");
+assert.equal(await verifyClerkJWT(sign({ sub: "user_adam", exp: now + 60, iss })), "user_adam", "no azp claim is fine");
+assert.equal(await verifyClerkJWT(sign({ sub: "user_adam", exp: now + 60, iss: "https://clerk.other-app.com" })), null, "wrong issuer");
+assert.equal(await verifyClerkJWT(sign({ sub: "user_adam", exp: now + 60, iss, azp: "https://evil.com" })), null, "token minted for another site");
+assert.equal(await verifyClerkJWT(sign({ sub: "user_adam", exp: now + 60, iss, azp: "https://beatthepile.com.evil.com" })), null);
+delete process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
+console.log("✓ issuer and authorized-party (azp) checked");
 assert.ok(jwksCalls <= 3);
 console.log(`✓ keys cached (${jwksCalls} fetches for 8 checks)\nAUTH TESTS PASSED`);

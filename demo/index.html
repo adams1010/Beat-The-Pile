@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>InternIQ — Demo</title>
-<meta name="description" content="Why InternIQ: real internships from company job boards, checked hourly, plus Career Fair Mode. A 60-second story.">
+<title>Demo — Beat the Pile</title>
+<meta name="description" content="Why Beat the Pile: real internships from company job boards, re-read at least twice a day, plus Career Fair Mode. A 90-second story you can tap through at your own pace.">
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="InternIQ">
+<meta name="apple-mobile-web-app-title" content="Beat the Pile">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="theme-color" content="#0A1628">
@@ -130,7 +130,7 @@
 <div class="frame" id="frame">
   <div class="bars" id="bars"></div>
   <div class="head">
-    <a class="brand" href="/"><b>IQ</b>InternIQ</a>
+    <a class="brand" href="/"><b>BP</b>Beat the Pile</a>
     <div class="ctrl"><button id="pp" aria-label="Pause">❚❚</button><a href="/jobs/">Skip →</a></div>
   </div>
   <div class="tapL" id="tapL" aria-hidden="true"></div><div class="tapR" id="tapR" aria-hidden="true"></div>
@@ -138,7 +138,7 @@
   <!-- 1 -->
   <section class="slide" data-dur="6500" aria-label="1 in 3 seniors graduate without an internship">
     <div class="kick rise">The reality</div>
-    <p class="huge rise d1"><span class="r">1</span> in <span class="r">3</span></p>
+    <p class="huge rise d1">~<span class="r">1</span> in <span class="r">3</span></p>
     <p class="big rise d2">college seniors graduate without a single internship.</p>
     <p class="mid rise d3">Don't be one of them.</p>
     <div class="src">NACE 2024 Student Survey: "more than two-thirds" of 2024 graduating seniors had an internship. <a href="https://naceweb.org/job-market/internships/students-recognize-the-importance-of-gaining-internship-experience" target="_blank" rel="noopener">source</a></div>
@@ -172,12 +172,12 @@
   </section>
 
   <!-- 5 -->
-  <section class="slide" data-dur="7000" aria-label="InternIQ did the searching">
-    <div class="kick rise">InternIQ</div>
+  <section class="slide" data-dur="7000" aria-label="Beat the Pile did the searching">
+    <div class="kick rise">Beat the Pile</div>
     <p class="big rise d1">We already opened every tab.</p>
     <div class="counters rise d2">
-      <div class="counter"><span class="n g" data-live="boards">—</span><span class="l">company job boards checked <b>every hour</b></span></div>
-      <div class="counter"><span class="n" data-live="n">—</span><span class="l">real internships open <b>right now</b></span></div>
+      <div class="counter"><span class="n g" data-live="boards">—</span><span class="l">company job boards we read <b>directly</b> — each re-read at least twice a day</span></div>
+      <div class="counter"><span class="n" data-live="n">—</span><span class="l">real engineering internships open <b>right now</b></span></div>
       <div class="counter"><span class="n a" data-live="me">—</span><span class="l">for <b>mechanical engineers</b></span></div>
     </div>
     <p class="mid rise d4">All in one list. Free.</p>
@@ -188,6 +188,7 @@
     <div class="kick rise">Live right now</div>
     <p class="big rise d1">Real. Open. Straight from the company.</p>
     <div class="feed rise d2"><div class="track" id="feed"></div></div>
+    <p class="mid rise d3" id="feedNote" hidden>Live data didn't load just now. <a href="/jobs/" style="color:#7DF0C8">See today's list on the jobs page →</a></p>
   </section>
 
   <!-- 7 -->
@@ -195,12 +196,12 @@
     <div class="kick rise">"Why not just use LinkedIn?"</div>
     <p class="big rise d1">Different job. Use both.</p>
     <div class="vs rise d2">
-      <div class="vh"></div><div class="vh">LinkedIn / Indeed</div><div class="vh">Handshake</div><div class="vh g">InternIQ</div>
+      <div class="vh"></div><div class="vh">LinkedIn / Indeed</div><div class="vh">Handshake</div><div class="vh g">Beat the Pile</div>
       <div class="vl">Where jobs come from</div><div>Anyone posts: reposts, recruiters, agencies</div><div>Only jobs employers chose to post there</div><div class="win">The company's own careers site</div>
-      <div class="vl">Closed jobs</div><div>Can linger after they close</div><div>Up to the employer</div><div class="win">Re-checked twice a day</div>
+      <div class="vl">Closed jobs</div><div>Can linger after they close</div><div>Up to the employer</div><div class="win">Board re-read at least twice a day; gone = removed</div>
       <div class="vl">At the career fair</div><div>—</div><div>Register + booth check-in</div><div class="win">Your route, briefs, notes, follow-ups</div>
     </div>
-    <p class="mid rise d3">Keep Handshake for signing up for fairs. Use InternIQ to <b>find what's not there</b> and to <b>win the fair.</b></p>
+    <p class="mid rise d3">Keep Handshake for signing up for fairs. Use Beat the Pile to <b>find what's not there</b> and to <b>win the fair.</b></p>
   </section>
 
   <!-- 8 -->
@@ -216,6 +217,7 @@
   <section class="slide" data-dur="8000" aria-label="Before the fair">
     <div class="kick rise">1 · Before the fair</div>
     <p class="big rise d1">Star who you want. Get your route.</p>
+    <div class="src rise d1" style="position:static;margin:-4px 0 6px">Example screen (sample route and brief)</div>
     <div class="routecard rise d2"><b class="g">Your route</b> · 4 to go
       <div class="stops"><span>#104 Southland</span><span>#109 Hensel</span><span>#410 Gilbane</span><span>#802 HITT</span></div></div>
     <div class="briefcard rise d3"><div class="bt">📋 Southland Industries <span class="boothp">Booth 104</span></div>
@@ -228,6 +230,7 @@
   <section class="slide" data-dur="7500" aria-label="During the fair">
     <div class="kick rise">2 · During the fair</div>
     <p class="big rise d1">Your resume is a QR code. Not a stack of paper.</p>
+    <div class="src rise d1" style="position:static;margin:-4px 0 6px">Example screen — you choose when the QR link is on</div>
     <div class="seq">
       <div class="phone rise d2"><div class="ph-t">Scan for my resume</div><div class="qr" id="qr"></div><div class="ph-s">Construction Industry Fair · Booth 104</div></div>
       <div class="bubble b1">📷 Recruiter scans it<small>Your resume opens on their phone. No app needed.</small></div>
@@ -239,15 +242,17 @@
   <!-- 11 -->
   <section class="slide" data-dur="9000" aria-label="After the fair">
     <div class="kick rise">3 · After the fair</div>
-    <p class="big rise d1">AI writes your follow-up from your notes.</p>
-    <div class="mail rise d2"><div class="h">To: mtorres@southlandind.com<br>Subject: Great talking HVAC design at the Construction Fair</div><div class="body" id="mail"></div></div>
-    <div class="remind rise d3"><span>📅 Follow up with Mike — added to your calendar</span><span>10:00</span></div>
+    <p class="big rise d1">AI drafts your follow-up from your notes.</p>
+    <div class="src rise d1" style="position:static;margin:-4px 0 6px">Example email (sample recruiter) — you read it and send it yourself</div>
+    <div class="mail rise d2"><div class="h">To: recruiter@company-example.com<br>Subject: Great talking HVAC design at the Construction Fair</div><div class="body" id="mail"></div></div>
+    <div class="remind rise d3"><span>📅 Follow up with Mike — you can add it to your calendar</span><span>10:00</span></div>
   </section>
 
   <!-- 12 -->
   <section class="slide" data-dur="6500" aria-label="Alerts">
     <div class="kick rise">Every day after</div>
     <p class="big rise d1">Follow a company. Know when it posts.</p>
+    <div class="src rise d1" style="position:static;margin:-4px 0 6px">Example alert</div>
     <div class="alertcard rise d2">🔔 2 new internships from companies you follow</div>
     <div class="job rise d3" style="margin-top:10px"><div class="c">Southland Industries ★</div><div class="t">Mechanical Engineering Intern (HVAC Design)<span class="tag" style="background:#FFF4E6;color:#B45309">NEW</span><span class="tag">ME</span></div><div class="m">📍 Dulles, VA · Found today</div></div>
     <p class="mid rise d4">Apply in the first days, not after 109 other people.</p>
@@ -256,11 +261,13 @@
   <!-- 13 -->
   <section class="slide" data-dur="0" aria-label="Get started">
     <div class="kick rise">Your move</div>
-    <p class="big rise d1">Find your internship in 30 seconds.</p>
-    <p class="mid rise d2">Free. No account needed to browse. Recruiter tools coming next.</p>
+    <p class="big rise d1">Start browsing in 30 seconds.</p>
+    <p class="mid rise d2">Free. No account needed to browse.</p>
     <div class="cta rise d3">
       <a class="btn go" href="/jobs/">Browse internships →</a>
       <a class="btn" href="/fair/">Open Career Fair Mode</a>
+      <a class="btn" href="/season/">My Season</a>
+      <a class="btn" href="/radar/">Opening Radar</a>
       <a class="btn" href="#" id="fbBtn">💬 Tell us what you think</a>
     </div>
   </section>
@@ -274,7 +281,7 @@
   slides.forEach(() => { const s = document.createElement("span"); s.innerHTML = "<i></i>"; bars.appendChild(s); });
   const fills = [...bars.querySelectorAll("i")];
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let i = 0, t0 = 0, raf = 0, paused = false, held = false, elapsed = 0;
+  let i = 0, t0 = 0, raf = 0, paused = reduce, held = false, elapsed = 0;     // reduced motion → no auto-advance; tap Next
   const live = { n: null, me: null, boards: null };
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
@@ -312,6 +319,7 @@
   const pp = document.getElementById("pp");
   const setPaused = (v) => { paused = v; pp.textContent = v ? "▶" : "❚❚"; pp.setAttribute("aria-label", v ? "Play" : "Pause"); };
   pp.onclick = () => setPaused(!paused);
+  setPaused(paused);
   // hold to pause (like Stories)
   const frame = document.getElementById("frame");
   frame.addEventListener("pointerdown", (e) => { if (e.target.closest("a,button")) return; held = true; });
@@ -341,17 +349,22 @@
     setTimeout(step, 700);
   }
 
-  // live data
-  Promise.all([fetch("/api/listings").then((r) => r.json()), fetch("/api/discovery").then((r) => r.json())]).then(([l, d]) => {
-    const L = l.listings || [];
-    live.n = L.length; live.me = L.filter((x) => x.match === "me").length; live.boards = (d.counts?.live || 0) + (d.handVerified || []).length;
+  // live data: tiny summary for the counters + a small sample of real ME listings for the feed
+  const ok = (r) => { if (!r.ok) throw new Error(r.status); return r.json(); };
+  const fail = () => { document.getElementById("feedNote").hidden = false; };
+  fetch("/api/listings?summary=1").then(ok).then((d) => {
+    live.n = d.engineering; live.me = d.me; live.boards = d.companies;
     if (slides[i].querySelector("[data-live]")) enter(i);
+  }).catch(() => {});
+  fetch("/api/listings?match=me&limit=300").then(ok).then((l) => {
+    const L = l.listings || [];
+    if (!L.length) return fail();
     const seen = new Set(), pick = [];
     const pri = [...L.filter((x) => x.match === "me" && /(^|,)(VA|PA)(,|$)/.test(x.state)), ...L.filter((x) => x.match === "me")];
     for (const x of pri) { if (seen.has(x.company)) continue; seen.add(x.company); pick.push(x); if (pick.length === 10) break; }
     const html = pick.map((x) => `<div class="job"><div class="c">${esc(x.company)}</div><div class="t">${esc(x.title)}<span class="tag">ME</span></div><div class="m">📍 ${esc(x.location || x.state)}</div></div>`).join("");
     document.getElementById("feed").innerHTML = html + html;   // doubled for a seamless loop
-  }).catch(() => {});
+  }).catch(fail);
 
   show(0); raf = requestAnimationFrame(tick);
 })();

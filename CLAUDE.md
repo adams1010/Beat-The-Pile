@@ -1,12 +1,16 @@
-# InternIQ — read this first
+# Beat the Pile (formerly InternIQ) — read this first
 
-InternIQ (intern-iq-psi.vercel.app) shows students **real internships pulled straight from each company's own job
-board**, plus Career Fair Mode, My Season, and the Opening Radar. Owner: Adam Shiloni (VT mechanical engineering).
+**Beat the Pile** (beatthepile.com; still also served at intern-iq-psi.vercel.app) shows students **real internships
+pulled straight from each company's own job board**, plus Career Fair Mode, My Season, and the Opening Radar.
+Owner: Adam Shiloni (VT mechanical engineering). The repo/Vercel project/database keep the old "InternIQ" names — only
+the brand changed. All student-facing copy says "Beat the Pile".
 Admins (can flip bot switches, paste links): `ADMIN_EMAILS` env, default shiloniadam10@gmail.com, mdxp21@gmail.com.
 
 **Non-negotiables**
 - Never show a listing from a board the robot hasn't *proven* belongs to that company (see Proof rules below).
-- Never fabricate stats, testimonials or reviews. Every number on the site/demo is live data or cited.
+- Never fabricate stats, testimonials or reviews. Every number on the site/demo is live data or cited. Example screens
+  in the demo are labeled "Example". No AI-generated company lists anywhere (the homepage quiz shows real listings only).
+- Estimates are labeled as estimates (match %, resume scores, Radar opening dates, "Posted ~" dates).
 - Ask the owner before anything that sends messages as him, spends money, enters passwords, or deletes data.
 - Never print secrets (CRON_SECRET, Supabase keys, Anthropic key). Never paste them into chat.
 
@@ -24,11 +28,40 @@ The Claude workspace **can't reach company websites**. To test against real site
 then read `PROBE_RESULT` from the run logs. In the JS, `await import(process.cwd() + "/lib/….js")` works. Use real
 tab/newline escapes (`"\t"`, `"\n"`) — the code is passed through bash single quotes.
 
+## Homepage build step (important)
+The homepage app is **`src/home.jsx`** (edit this). Browsers load the built **`home.js`** with production React (no
+in-browser Babel). After editing `src/home.jsx`: `npm install && node scripts/build-home.mjs`, then commit both.
+`tests/home-build-test.mjs` fails if `home.js` is stale. `index.html` is just the shell (head, styles, script tags).
+Homepage screens have hash URLs (`/#quiz`, `/#dashboard`, `/#score`, …) so Back/refresh/sharing work.
+
 ## Pages
-`/jobs` internships (engineering view) · `/fair` Career Fair Mode (QR resume, route, briefs, notes, follow-ups) ·
-`/season` My Season (pipeline, weekly goal, apply speed) · `/radar` Opening Radar · `/bots` **Bot Control Room**
-(live system map, "where to spend time", every bot's switch + run log, AI spend) · `/discovery` robot's company list +
-"Needs a link" sheet · `/demo` story-style demo · `/` homepage (older, large file).
+`/jobs` internships (engineering view; filters live in the URL: `?state=all|VA,PA&me=1&q=&view=saved|following`) ·
+`/fair` Career Fair Mode (QR resume, route, briefs, notes, follow-ups) · `/season` My Season (pipeline, weekly goal,
+apply speed, **Delete all my data**) · `/radar` Opening Radar · `/privacy` plain-words privacy page · `/bots` **Bot
+Control Room** (owner sign-in required to see numbers) · `/discovery` robot's company list + "Needs a link" sheet ·
+`/demo` story-style demo · `/` homepage (built from `src/home.jsx`).
+Every student page includes **`/nav.js`** (one shared top bar: Jobs · Career Fair · My Season · Radar) and
+`/feedback.js` (Report a problem). Owner tools are not in the student nav.
+
+## Privacy, AI and data-integrity rules (from the Nov 2026 audit — keep them)
+- **Resume QR**: new uploads start **private** (`resume_share=false`); students turn it on. `rotate` = new token (old QR
+  dies), `resume_delete` = file + link gone. QR redirects hand out **2-minute** signed links.
+- **AI**: every call goes through `callClaude()` in `lib/aiusage.js` — atomic budget reservation (Postgres
+  `ai_reserve`, one lock), real cost settled after, **fails closed** if the budget table can't be read.
+  `/api/generate` takes `{feature, input}` only — prompts are server-side templates (no free-form prompts).
+  Rate limits are durable + shared: Postgres `rate_take(key, window_s, max)` via `rateOk()`. Fails closed.
+- **Community wall** (`/api/community`, tables `community_posts/_replies` in the main DB): everything starts
+  `pending`; AI approves/hides; AI down/over budget/unclear → stays pending for owner review (`admin_list`,
+  `admin_review` with Clerk admin sign-in). 3 reports → back to pending. Only public fields are returned.
+- **Concurrent saves**: every write to `user_jobs` goes through `mutate()` in `lib/userdata.js` (version column,
+  retry on conflict). `user_home` (homepage sync) is versioned the same way in `api/usersync.js`, which also
+  **merges** devices on sign-in and mirrors homepage tracker entries into My Season (`apps` ids `h:…`).
+- **Dates**: `posted_on` (employer text) ≠ `first_seen` (our robot). `lib/dates.js postedInfo()` → exact, estimated
+  ("Posted 3 Days Ago"), or null ("30+ days", junk). Apply-speed stats only use employer dates.
+- **Auth**: `lib/auth.js` checks signature, expiry, **issuer** (from the publishable key) and **azp** (our domains,
+  this project's previews, localhost; add others with `ALLOWED_ORIGINS`). Rejections are logged as `[auth] rejected`.
+- **Errors**: APIs never return raw database errors; a failed load is 503/500 with a plain message, never an empty
+  list that looks like "no jobs". Pages show "couldn't load" differently from "nothing found".
 
 ## The bots (all visible + switchable on /bots; details in docs/BOTS.md)
 | Bot | Runs | Where | Code |
@@ -38,7 +71,7 @@ tab/newline escapes (`"\t"`, `"\n"`) — the code is passed through bash single 
 | 🔭 New-Company Scout (SimplifyJobs import) | daily 07:xx UTC inside the finder | Vercel | `lib/simplify.js` |
 | 🌐 Browser Pass | nightly 08:30 UTC | GitHub `deep-discover.yml` (Playwright) | `scripts/deep-discover.mjs` |
 | 🔄 Internship Sync | hourly | Vercel `api/sync.js` (+ GitHub `sync.yml`) | `lib/fetchers/*` |
-| 🔗 Link Checker | 09:45 + 21:45 UTC | Vercel `api/check-links.js` | |
+| 🔗 Link Checker | hourly (GitHub `sync.yml` step) + 09:45/21:45 UTC (Vercel) | Vercel `api/check-links.js` | hides only after 2 dead checks in a row; skips script-only ATS pages |
 | 📡 Opening Radar | daily 10:40 UTC | GitHub `radar.yml` | `scripts/build-radar.mjs` |
 
 Every bot calls `botOn(id)` before working and `logRun(id, ok, summary, stats)` after (`lib/bots.js`).
@@ -82,14 +115,18 @@ majors. **To launch all majors:** add a major picker to `/jobs` (and `/fair`) th
 
 ## Data model (Supabase)
 `company_candidates` (robot queue + results: status, ats, config, hint, priority, detail) · `listings` (match, field,
-first_seen, closed_at, link_ok) · `feed_runs` + view `feed_last` · `user_jobs` (saved, applied, apps, starred,
-seen_at, fair_notes, resume_*, weekly_goal) · `company_briefs` · `feedback` · `bot_settings` (switches; row `ai` holds
-`cap_usd`) · `bot_runs` · `ai_usage`. Storage bucket `resumes` (private, signed links).
+first_seen, closed_at, link_ok, link_fails) · `feed_runs` + view `feed_last` · `user_jobs` (saved, applied, apps,
+starred, seen_at, fair_notes, resume_*, weekly_goal, **version**) · `user_home` (homepage profile/tracker/resumes,
+version) · `community_posts` / `community_replies` (status pending/approved/hidden) · `company_briefs` · `feedback` ·
+`bot_settings` (switches; row `ai` holds `cap_usd`) · `bot_runs` · `ai_usage` (reserved flag) · `rate_hits`.
+Functions: `rate_take`, `ai_reserve` (service role only). Storage bucket `resumes` (private, signed links).
+`/api/listings` extras: `?summary=1` (counts only), `?ids=` (your history incl. closed), `?limit=&offset=` (paging).
+`/api/discovery?bots=1` is public **switches only**; full control-room data needs an owner token or CRON_SECRET.
 
 ## Working on it
 - Clone: `/home/claude/interniq` (repo adams1010/InternIQ). Push to `main` deploys (check
   `gh api repos/adams1010/InternIQ/commits/<sha>/status`).
-- Tests: `bash tests/run.sh` (offline, everything faked). Add a test for every bot/reader change.
+- Tests: `bash tests/run.sh` (offline, everything faked via `tests/fakedb.mjs`). Add a test for every bot/reader/API change.
 - Risky robot changes: push a branch, run `probe.yml` with `ref=<branch>` against real sites, then merge.
 - Secrets in GitHub: `CRON_SECRET` only. Everything else lives in Vercel env.
 - Owner prefs: short bullets, honest pushback, visuals, small targeted changes, test before deploying.

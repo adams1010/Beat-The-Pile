@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>InternIQ — Bot Control Room</title>
+<title>Beat the Pile — Bot Control Room</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="theme-color" content="#0A1628">
@@ -117,10 +117,10 @@
 </head>
 <body>
 <header class="wrap">
-  <div class="top"><a class="brand" href="/jobs/">InternIQ</a><div class="acct" id="acct"></div></div>
+  <div class="top"><a class="brand" href="/jobs/">Beat the Pile</a><div class="acct" id="acct"></div></div>
   <h1>🎛 Bot Control Room</h1>
-  <p class="sub">Everything happening in InternIQ at once: the live pipeline, where to spend time, and every bot's switch.</p>
-  <div class="signin" id="signinNote" hidden>View only. Sign in as an InternIQ owner to flip switches.</div>
+  <p class="sub">Everything happening in Beat the Pile at once: the live pipeline, where to spend time, and every bot's switch.</p>
+  <div class="signin" id="signinNote" hidden>View only. Sign in as an Beat the Pile owner to flip switches.</div>
 </header>
 <main class="wrap" id="app"><div class="card">Loading bots…</div></main>
 <p class="wrap note">Switches take effect on each bot's next run. A bot that can't read its switch runs anyway, so a hiccup never silently stops the Company Finder. Run history covers the last 7 days.</p>
@@ -228,11 +228,16 @@
       <div class="how" style="margin-top:4px">${a.cap ? `${pct}% of your ${fmtUsd(a.cap)} monthly cap. AI features pause automatically at the cap.` : "AI is switched off (cap $0)."}${a.paused && a.cap ? " <b style='color:#FCA5A5'>Paused for this month.</b>" : ""}</div>
       ${feats.length ? `<div class="feat">${feats.map(([k, v]) => `<span>${esc(label[k] || k)} · ${v.calls} calls</span><span>${fmtUsd(v.usd)}</span>`).join("")}</div>` : `<div class="how" style="margin-top:8px">No AI calls logged yet this month.</div>`}
       <div class="caps" aria-label="Monthly AI cap">${[0, 5, 10, 25, 50].map((v) => `<button data-cap="${v}" aria-pressed="${a.cap === v}" ${can ? "" : "disabled"}>${v === 0 ? "AI off" : "$" + v + "/mo"}</button>`).join("")}</div>
-      <div class="how" style="margin-top:8px">Counts every AI call InternIQ makes. Your actual balance lives at console.anthropic.com.</div></section>`;
+      <div class="how" style="margin-top:8px">Counts every AI call Beat the Pile makes. Your actual balance lives at console.anthropic.com.</div></section>`;
   }
 
   function render(){
     const d = S.d; if (!d) return;
+    if (d.public) {                       // not signed in as an owner: the server only shares the on/off switches
+      $("#app").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">Owner only</h2><p>The control room shows private numbers (users, AI spend, run logs).
+        Sign in with an owner account to see it.</p><p class="muted">${d.bots.map((b) => `${esc(b.name || b.id)}: ${b.enabled ? "on" : "off"}`).join(" · ")}</p></div>`;
+      return;
+    }
     const f = d.finder, finder = d.bots.find((b) => b.id === "finder");
     const [k, label] = status(finder);
     const c = f.counts, parked = (c.no_board || 0) + (c.blocked || 0) + (c.unsupported || 0) + (c.board_error || 0) + (c.identity_failed || 0);
@@ -297,11 +302,15 @@
   });
 
   async function load(){
-    try { S.d = await fetch("/api/discovery?bots=1", { cache: "no-store" }).then((r) => r.json()); if (!S.d.bots) throw 0; render(); }
+    try {
+      const t = S.user ? await S.clerk.session?.getToken().catch(() => null) : null;
+      S.d = await fetch("/api/discovery?bots=1", { cache: "no-store", headers: t ? { Authorization: "Bearer " + t } : {} }).then((r) => r.json());
+      if (!S.d.bots) throw 0; render();
+    }
     catch { $("#app").innerHTML = `<div class="card">Couldn't load the bots. Refresh in a minute.</div>`; }
   }
 
-  // Sign-in (same Clerk account as the rest of InternIQ); only owners' switch changes are accepted by the server
+  // Sign-in (same Clerk account as the rest of Beat the Pile); only owners' switch changes are accepted by the server
   async function loadClerk(){
     try {
       const pk = (await fetch("/api/config").then((r) => r.json())).clerkPublishableKey; if (!pk) return;
@@ -312,7 +321,7 @@
       }
       if (typeof window.Clerk.load === "function" && !window.Clerk.loaded) await window.Clerk.load({});
       S.clerk = window.Clerk;
-      const set = (u) => { S.user = u || null; acct(); render(); };
+      const set = (u) => { const had = !!S.user; S.user = u || null; acct(); if (had !== !!S.user) load(); else render(); };
       S.clerk.addListener?.(({ user }) => set(user)); set(S.clerk.user);
     } catch { acct(); }
   }

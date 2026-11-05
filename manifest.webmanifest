@@ -1,6 +1,6 @@
 {
-  "name": "InternIQ",
-  "short_name": "InternIQ",
+  "name": "Beat the Pile",
+  "short_name": "Beat the Pile",
   "description": "Real internships straight from company job boards, plus Career Fair Mode.",
   "start_url": "/jobs/",
   "scope": "/",

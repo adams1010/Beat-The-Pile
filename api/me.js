@@ -4,7 +4,10 @@
 //   GET  /api/me                                   → { saved, applied, resume, notes }
 //   POST /api/me { list, id, on }                  → save / mark-applied toggle for a listing
 //   POST /api/me { action:"resume", name, data }   → upload resume PDF (base64) → gets a private QR link
-//   POST /api/me { action:"share", on }            → turn the QR link on/off
+//   POST /api/me { action:"share", on }            → turn the QR link on/off (new uploads start OFF)
+//   POST /api/me { action:"rotate" }               → new QR link; the old QR/link stops working
+//   POST /api/me { action:"resume_delete" }        → delete the resume file and the link
+//   POST /api/me { action:"delete_all", confirm:"DELETE" } → delete EVERYTHING we store for you (your sign-in itself lives at Clerk)
 //   POST /api/me { action:"note", note }           → add/update a career-fair conversation note
 //   POST /api/me { action:"note_delete", id }
 //   POST /api/me { action:"star", company, on }     → follow a company (fair game plan + new-job alerts)
@@ -17,10 +20,13 @@
 //   GET  /api/me?r=<token>   (no sign-in)          → the QR target: redirects to the resume if sharing is on
 //                                                    (vercel.json maps /r/<token> here)
 // Requires a genuine Clerk session token (signature-checked in lib/auth.js) for everything except ?r=.
+// Every write goes through lib/userdata.js mutate(): versioned, so two tabs saving at once can't erase each other.
 import crypto from "node:crypto";
 import { verifyClerkJWT, bearer } from "../lib/auth.js";
 import { db } from "../lib/db.js";
-import { aiAllowed, logAI, MODEL } from "../lib/aiusage.js";
+import { callClaude, rateOk, AIError } from "../lib/aiusage.js";
+import { mutate, loadRow, Conflict } from "../lib/userdata.js";
+import { postedInfo } from "../lib/dates.js";
 
 const LISTS = ["saved", "applied"];
 const MAX = 500;
@@ -34,7 +40,7 @@ const MAX_STARS = 300;
 const MAX_APPS = 500;
 const STAGES = ["applied", "interview", "offer", "rejected"];
 function cleanApp(a) {
-  const iso = (v) => { const d = new Date(v); return isNaN(d) ? null : d.toISOString(); };
+  const iso = (v) => { if (v == null || v === "") return null; const d = new Date(v); return isNaN(d) ? null : d.toISOString(); };
   const id = String(a?.id || "");
   return {
     id: ID_OK.test(id) ? id : "m:" + crypto.randomUUID(),           // listing id, or m:<uuid> for one added by hand
@@ -42,35 +48,20 @@ function cleanApp(a) {
     url: /^https?:\/\//.test(String(a?.url || "")) ? clean(a.url, 400) : null,
     stage: STAGES.includes(a?.stage) ? a.stage : "applied",
     appliedAt: iso(a?.appliedAt) || new Date().toISOString(),
-    postedAt: iso(a?.postedAt),
+    postedAt: iso(a?.postedAt),                                    // the employer's posting date (null if unknown)
+    postedEstimate: a?.postedEstimate === true,                    // true = worked out from "posted N days ago"
+    firstSeenAt: iso(a?.firstSeenAt),                              // when our robot first saw it on their board
     updatedAt: new Date().toISOString(),
   };
 }
 const BRIEF_DAYS = 30;
-const AI_PER_HOUR = 30;
-const aiHits = new Map();               // uid -> [timestamps] (per server instance)
-function aiLimited(uid) {
-  const now = Date.now(), list = (aiHits.get(uid) || []).filter((t) => now - t < 36e5);
-  list.push(now); aiHits.set(uid, list); if (aiHits.size > 5000) aiHits.clear();
-  return list.length > AI_PER_HOUR;
-}
-async function claude(prompt, max_tokens = 700, feature = "other") {
-  const key = process.env.ANTHROPIC_API_KEY;
-  if (!key) throw new Error("AI is not configured");
-  if (!(await aiAllowed())) throw new Error("AI features are paused for the rest of the month");
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST", headers: { "Content-Type": "application/json", "x-api-key": key, "anthropic-version": "2023-06-01" },
-    body: JSON.stringify({ model: MODEL, max_tokens, temperature: 0.3, messages: [{ role: "user", content: prompt }] }),
-  });
-  const d = await r.json();
-  if (!r.ok) throw new Error("AI is busy — try again in a minute");
-  await logAI(feature, MODEL, d.usage);
-  return (d.content || []).filter((b) => b.type === "text").map((b) => b.text).join("");
-}
+const AI_PER_HOUR = 30;                 // per student, shared across all servers (Postgres rate_take)
+const aiLimited = async (uid) => !(await rateOk(`me-ai:${uid}`, 3600, AI_PER_HOUR));
+const claude = (prompt, maxTokens = 700, feature = "other") => callClaude({ feature, prompt, maxTokens, temperature: 0.3 });
 function parseJson(text) {
   const m = String(text).match(/\{[\s\S]*\}/);
-  if (!m) throw new Error("AI gave an unreadable answer — try again");
-  return JSON.parse(m[0]);
+  if (!m) throw new AIError("AI gave an unreadable answer — try again", 502);
+  try { return JSON.parse(m[0]); } catch { throw new AIError("AI gave an unreadable answer — try again", 502); }
 }
 const strArr = (a, n, len) => (Array.isArray(a) ? a : []).map((x) => clean(x, len)).filter(Boolean).slice(0, n);
 
@@ -96,7 +87,7 @@ Reply with ONLY this JSON:
 Rules: be factual and plain. If you are not confident you know this specific company (common for small or local firms), set "known": false, keep "about" to what the website domain and job titles clearly show, and do not invent facts like size, revenue, or projects.`;
   const j = parseJson(await claude(prompt, 700, "brief"));
   const brief = { known: j.known !== false, about: clean(j.about, 400), engineers: clean(j.engineers, 400), ask: strArr(j.ask, 3, 200) };
-  if (!brief.about) throw new Error("AI gave an empty answer — try again");
+  if (!brief.about) throw new AIError("AI gave an empty answer — try again", 502);
   await db.upsert("company_briefs", [{ company_id: companyId, brief, created_at: new Date().toISOString() }], "company_id");
   return brief;
 }
@@ -116,7 +107,18 @@ async function putPdf(path, buf) {
   });
   if (!r.ok) throw new Error(`storage upload ${r.status}: ${(await r.text()).slice(0, 160)}`);
 }
-async function signedLink(path, seconds = 600) {
+async function dbDelete(path) {
+  const key = process.env.INTERNIQ_DB_SERVICE_KEY;
+  const h = { apikey: key, Prefer: "return=minimal" }; if (!String(key).startsWith("sb_")) h.Authorization = `Bearer ${key}`;
+  const r = await fetch(`${process.env.INTERNIQ_DB_URL}/rest/v1/${path}`, { method: "DELETE", headers: h });
+  if (!r.ok) throw new Error(`delete ${r.status}`);
+}
+async function deletePdf(path) {
+  const r = await fetch(storageUrl(`object/${BUCKET}/${path}`), { method: "DELETE", headers: storageHeaders() });
+  if (!r.ok && r.status !== 404 && r.status !== 400) throw new Error(`storage delete ${r.status}`);
+}
+// QR links hand out a 2-minute signed file link, so turning sharing off (or a new link) takes effect within 2 minutes.
+async function signedLink(path, seconds = 120) {
   const r = await fetch(storageUrl(`object/sign/${BUCKET}/${path}`), {
     method: "POST", headers: storageHeaders({ "Content-Type": "application/json" }), body: JSON.stringify({ expiresIn: seconds }),
   });
@@ -128,7 +130,7 @@ async function signedLink(path, seconds = 600) {
 
 const clean = (s, n) => String(s ?? "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, n);
 function cleanNote(n) {
-  const iso = (v) => { const d = new Date(v); return isNaN(d) ? null : d.toISOString(); };
+  const iso = (v) => { if (v == null || v === "") return null; const d = new Date(v); return isNaN(d) ? null : d.toISOString(); };
   return {
     id: /^[a-z0-9-]{6,40}$/i.test(n?.id || "") ? n.id : crypto.randomUUID(),
     company: clean(n?.company, 100),
@@ -147,7 +149,7 @@ function cleanNote(n) {
 
 function publicResume(row) {
   if (!row?.resume_path) return null;
-  return { name: row.resume_name || "resume.pdf", token: row.resume_token, share: row.resume_share !== false, uploadedAt: row.resume_uploaded_at };
+  return { name: row.resume_name || "resume.pdf", token: row.resume_token, share: row.resume_share === true, uploadedAt: row.resume_uploaded_at };
 }
 
 async function resumeRedirect(req, res) {
@@ -156,14 +158,15 @@ async function resumeRedirect(req, res) {
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     return res.status(404).send(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Resume not shared</title>
 <body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;display:grid;place-items:center;min-height:90vh;margin:0;background:#F8FFFE;color:#1E293B">
-<div style="text-align:center;padding:24px"><div style="color:#00C285;font-weight:800">InternIQ</div><h1 style="font-size:22px">This resume isn't shared right now</h1>
-<p style="color:#64748B">The student turned off their QR link.</p></div>`);
+<div style="text-align:center;padding:24px"><div style="color:#00C285;font-weight:800">Beat the Pile</div><h1 style="font-size:22px">This resume isn't shared right now</h1>
+<p style="color:#64748B">The student turned off this link or replaced it with a new one.</p></div>`);
   };
   if (!TOKEN_OK.test(t)) return notShared();
   const rows = await db.selectAsAdmin(`user_jobs?select=resume_path,resume_share&resume_token=eq.${encodeURIComponent(t)}&limit=1`);
   const row = rows[0];
-  if (!row?.resume_path || row.resume_share === false) return notShared();
+  if (!row?.resume_path || row.resume_share !== true) return notShared();
   res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Referrer-Policy", "no-referrer");
   res.setHeader("Location", await signedLink(row.resume_path));
   return res.status(302).end();
 }
@@ -179,24 +182,21 @@ export default async function handler(req, res) {
   catch { return res.status(503).json({ error: "Sign-in check is temporarily unavailable" }); }
   if (!uid) return res.status(401).json({ error: "Not signed in" });
 
-  const load = async () => {
-    const rows = await db.selectAsAdmin(`user_jobs?select=*&clerk_user_id=eq.${encodeURIComponent(uid)}&limit=1`);
-    return rows[0] || null;
-  };
   const view = (row) => ({ saved: row?.saved || [], applied: row?.applied || [], resume: publicResume(row), notes: row?.fair_notes || [],
                             starred: row?.starred || [], seenAt: row?.seen_at || null, apps: row?.apps || [], goal: row?.weekly_goal ?? null });
-  const save = (patch) => db.upsert("user_jobs", [{ clerk_user_id: uid, ...patch, updated_at: new Date().toISOString() }], "clerk_user_id");
+  const send = (out) => out.error ? res.status(out.status || 400).json({ error: out.error }) : res.status(200).json(view(out.row));
+  const stop = (error, status = 400) => ({ error, status });
 
   try {
-    if (req.method === "GET") return res.status(200).json(view(await load()));
+    if (req.method === "GET") return res.status(200).json(view(await loadRow(uid)));
     if (req.method !== "POST") return res.status(405).json({ error: "GET or POST" });
 
     let body = req.body;
     if (typeof body === "string") { try { body = JSON.parse(body); } catch { body = {}; } }
-    const row = await load();
+    const action = body?.action;
 
     // ── Career fair: resume + QR ──
-    if (body?.action === "resume") {
+    if (action === "resume") {
       const b64 = String(body.data || "").replace(/^data:[^,]*,/, "");
       const buf = Buffer.from(b64, "base64");
       if (!buf.length) return res.status(400).json({ error: "No file received" });
@@ -204,74 +204,95 @@ export default async function handler(req, res) {
       if (buf.subarray(0, 5).toString() !== "%PDF-") return res.status(400).json({ error: "Please upload a PDF" });
       const path = `${uid}/resume.pdf`;
       await putPdf(path, buf);
-      const token = row?.resume_token || crypto.randomBytes(18).toString("base64url");
-      const patch = { resume_path: path, resume_name: clean(body.name, 120) || "resume.pdf", resume_token: token,
-                      resume_share: row?.resume_share ?? true, resume_uploaded_at: new Date().toISOString() };
-      await save(patch);
-      return res.status(200).json(view({ ...row, ...patch }));
+      return send(await mutate(uid, (row) => ({
+        resume_path: path, resume_name: clean(body.name, 120) || "resume.pdf",
+        resume_token: row.resume_token || crypto.randomBytes(18).toString("base64url"),
+        // First upload starts PRIVATE. Replacing a file keeps whatever the student already chose.
+        resume_share: row.resume_path ? row.resume_share === true : false,
+        resume_uploaded_at: new Date().toISOString(),
+      })));
     }
-    if (body?.action === "share") {
-      if (!row?.resume_path) return res.status(400).json({ error: "Upload a resume first" });
-      await save({ resume_share: body.on === true });
-      return res.status(200).json(view({ ...row, resume_share: body.on === true }));
+    if (action === "share") {
+      return send(await mutate(uid, (row) => row.resume_path ? { resume_share: body.on === true } : stop("Upload a resume first")));
+    }
+    if (action === "rotate") {
+      return send(await mutate(uid, (row) => row.resume_path ? { resume_token: crypto.randomBytes(18).toString("base64url") } : stop("Upload a resume first")));
+    }
+    if (action === "resume_delete") {
+      const row = await loadRow(uid);
+      if (row?.resume_path) await deletePdf(row.resume_path);
+      return send(await mutate(uid, () => ({ resume_path: null, resume_name: null, resume_token: null, resume_share: false, resume_uploaded_at: null })));
+    }
+
+    // ── Delete everything we store for this student (resume file, saved/applied, notes, season, homepage sync) ──
+    if (action === "delete_all") {
+      if (body.confirm !== "DELETE") return res.status(400).json({ error: "Confirm by sending confirm: \"DELETE\"" });
+      const row = await loadRow(uid);
+      if (row?.resume_path) await deletePdf(row.resume_path);
+      await dbDelete(`user_jobs?clerk_user_id=eq.${encodeURIComponent(uid)}`);
+      await dbDelete(`user_home?clerk_user_id=eq.${encodeURIComponent(uid)}`);
+      return res.status(200).json({ ok: true, deleted: true });
     }
 
     // ── Follow companies (fair game plan + alerts) ──
-    if (body?.action === "star") {
+    if (action === "star") {
       const co = String(body.company || "");
       if (!CO_OK.test(co)) return res.status(400).json({ error: "Bad company" });
-      const set = new Set(row?.starred || []);
-      if (body.on === true) set.add(co); else set.delete(co);
-      if (set.size > MAX_STARS) return res.status(400).json({ error: `You can follow up to ${MAX_STARS} companies` });
-      await save({ starred: [...set] });
-      return res.status(200).json(view({ ...row, starred: [...set] }));
+      return send(await mutate(uid, (row) => {
+        const set = new Set(row.starred || []);
+        if (body.on === true) set.add(co); else set.delete(co);
+        if (set.size > MAX_STARS) return stop(`You can follow up to ${MAX_STARS} companies`);
+        return { starred: [...set] };
+      }));
     }
-    if (body?.action === "seen") {
-      await save({ seen_at: new Date().toISOString() });
+    if (action === "seen") {
+      await mutate(uid, () => ({ seen_at: new Date().toISOString() }));
       return res.status(200).json({ ok: true });
     }
 
     // ── My Season: applications pipeline + weekly goal ──
-    if (body?.action === "app" || body?.action === "app_delete") {
-      let apps = Array.isArray(row?.apps) ? row.apps : [];
-      if (body.action === "app_delete") apps = apps.filter((a) => a.id !== body.id);
-      else {
-        const a = cleanApp(body.app);
-        if (!a.company) return res.status(400).json({ error: "Which company?" });
-        const i = apps.findIndex((x) => x.id === a.id);
-        if (i >= 0) apps[i] = { ...apps[i], ...a, appliedAt: body.app?.appliedAt ? a.appliedAt : apps[i].appliedAt, postedAt: a.postedAt || apps[i].postedAt };
-        else apps.unshift(a);
-        if (apps.length > MAX_APPS) return res.status(400).json({ error: `Up to ${MAX_APPS} applications` });
-      }
-      // keep the jobs page's "Applied" marks in step with the pipeline
-      const applied = new Set(row?.applied || []);
-      if (body.action === "app_delete" && ID_OK.test(String(body.id)) && !String(body.id).startsWith("m:")) applied.delete(body.id);
-      for (const a of apps) if (!a.id.startsWith("m:")) applied.add(a.id);
-      await save({ apps, applied: [...applied] });
-      return res.status(200).json(view({ ...row, apps, applied: [...applied] }));
+    if (action === "app" || action === "app_delete") {
+      const incoming = action === "app" ? cleanApp(body.app) : null;
+      if (incoming && !incoming.company) return res.status(400).json({ error: "Which company?" });
+      return send(await mutate(uid, (row) => {
+        let apps = Array.isArray(row.apps) ? row.apps.slice() : [];
+        if (action === "app_delete") apps = apps.filter((a) => a.id !== body.id);
+        else {
+          const i = apps.findIndex((x) => x.id === incoming.id);
+          if (i >= 0) apps[i] = { ...apps[i], ...incoming, appliedAt: body.app?.appliedAt ? incoming.appliedAt : apps[i].appliedAt,
+                                  postedAt: incoming.postedAt || apps[i].postedAt, firstSeenAt: incoming.firstSeenAt || apps[i].firstSeenAt,
+                                  postedEstimate: incoming.postedAt ? incoming.postedEstimate : apps[i].postedEstimate };
+          else apps.unshift(incoming);
+          if (apps.length > MAX_APPS) return stop(`Up to ${MAX_APPS} applications`);
+        }
+        // keep the jobs page's "Applied" marks in step with the pipeline
+        const applied = new Set(row.applied || []);
+        if (action === "app_delete" && ID_OK.test(String(body.id)) && !/^[mh]:/.test(String(body.id))) applied.delete(body.id);
+        for (const a of apps) if (!/^[mh]:/.test(a.id)) applied.add(a.id);
+        return { apps, applied: [...applied] };
+      }));
     }
-    if (body?.action === "goal") {
+    if (action === "goal") {
       const g = Math.round(Number(body.goal));
       if (!(g >= 1 && g <= 50)) return res.status(400).json({ error: "Pick a goal between 1 and 50" });
-      await save({ weekly_goal: g });
-      return res.status(200).json(view({ ...row, weekly_goal: g }));
+      return send(await mutate(uid, () => ({ weekly_goal: g })));
     }
 
     // ── AI helpers ──
-    if (body?.action === "brief") {
+    if (action === "brief") {
       const co = String(body.companyId || "");
       if (!CO_OK.test(co)) return res.status(400).json({ error: "Bad company" });
       const cached = await db.selectAsAdmin(`company_briefs?select=brief&company_id=eq.${encodeURIComponent(co)}&created_at=gt.${new Date(Date.now() - BRIEF_DAYS * 864e5).toISOString()}&limit=1`);
       if (cached[0]) return res.status(200).json({ brief: cached[0].brief });
-      if (aiLimited(uid)) return res.status(429).json({ error: "That's a lot of briefs — try again in a bit" });
+      if (await aiLimited(uid)) return res.status(429).json({ error: "That's a lot of AI requests — try again in a bit" });
       const brief = await companyBrief(co);
       if (!brief) return res.status(404).json({ error: "We don't have that company yet" });
       return res.status(200).json({ brief });
     }
-    if (body?.action === "polish") {
+    if (action === "polish") {
       const n = cleanNote(body.note);
       if (!n.company) return res.status(400).json({ error: "Which company was it?" });
-      if (aiLimited(uid)) return res.status(429).json({ error: "Too many requests — try again in a bit" });
+      if (await aiLimited(uid)) return res.status(429).json({ error: "Too many requests — try again in a bit" });
       const me = clean(body.name, 80) || "[Your name]", link = clean(body.resumeLink, 200);
       const prompt = `Write a short follow-up email from a college engineering student to a recruiter they just met at a career fair.
 
@@ -290,39 +311,49 @@ Reply with ONLY this JSON: {"subject": "...", "body": "..."}`;
     }
 
     // ── Career fair: conversation notes ──
-    if (body?.action === "note" || body?.action === "note_delete") {
-      let notes = Array.isArray(row?.fair_notes) ? row.fair_notes : [];
-      if (body.action === "note_delete") notes = notes.filter((n) => n.id !== body.id);
-      else {
-        const n = cleanNote(body.note);
-        if (!n.company) return res.status(400).json({ error: "Which company was it?" });
-        const i = notes.findIndex((x) => x.id === n.id);
-        if (i >= 0) notes[i] = n; else notes.unshift(n);
-        if (notes.length > MAX_NOTES) return res.status(400).json({ error: `Notes are full (${MAX_NOTES})` });
-      }
-      await save({ fair_notes: notes });
-      return res.status(200).json(view({ ...row, fair_notes: notes }));
+    if (action === "note" || action === "note_delete") {
+      const incoming = action === "note" ? cleanNote(body.note) : null;
+      if (incoming && !incoming.company) return res.status(400).json({ error: "Which company was it?" });
+      return send(await mutate(uid, (row) => {
+        let notes = Array.isArray(row.fair_notes) ? row.fair_notes.slice() : [];
+        if (action === "note_delete") notes = notes.filter((n) => n.id !== body.id);
+        else {
+          const i = notes.findIndex((x) => x.id === incoming.id);
+          if (i >= 0) notes[i] = incoming; else notes.unshift(incoming);
+          if (notes.length > MAX_NOTES) return stop(`Notes are full (${MAX_NOTES})`);
+        }
+        return { fair_notes: notes };
+      }));
     }
 
     // ── Save / applied toggles (jobs page) ──
     const list = body?.list, id = String(body?.id || ""), on = body?.on === true;
     if (!LISTS.includes(list) || !ID_OK.test(id)) return res.status(400).json({ error: "Bad request" });
-    const set = new Set(row?.[list] || []);
-    if (on) set.add(id); else set.delete(id);
-    if (set.size > MAX) return res.status(400).json({ error: `List is full (${MAX})` });
-    const next = { saved: row?.saved || [], applied: row?.applied || [], [list]: [...set] };
-    let apps = Array.isArray(row?.apps) ? row.apps : null;
-    if (list === "applied") {
-      apps = apps || [];
-      if (on && !apps.some((a) => a.id === id)) {
-        const l = (await db.selectAsAdmin(`listings?select=company,title,url,first_seen&id=eq.${encodeURIComponent(id)}&limit=1`))[0];
-        if (l) apps.unshift(cleanApp({ id, company: l.company, title: l.title, url: l.url, postedAt: l.first_seen }));
+    let listing = null;
+    if (list === "applied" && on) listing = (await db.selectAsAdmin(`listings?select=company,title,url,first_seen,posted_on&id=eq.${encodeURIComponent(id)}&limit=1`))[0] || null;
+    const out = await mutate(uid, (row) => {
+      const set = new Set(row[list] || []);
+      if (on) set.add(id); else set.delete(id);
+      if (set.size > MAX) return stop(`List is full (${MAX})`);
+      const patch = { [list]: [...set] };              // only the list that changed — never rewrite the other one
+      if (list === "applied") {
+        let apps = Array.isArray(row.apps) ? row.apps.slice() : [];
+        if (on && listing && !apps.some((a) => a.id === id)) {
+          const p = postedInfo(listing.posted_on, listing.first_seen);
+          apps.unshift(cleanApp({ id, company: listing.company, title: listing.title, url: listing.url,
+                                  postedAt: p?.date || null, postedEstimate: !!p?.estimate, firstSeenAt: listing.first_seen }));
+        }
+        if (!on) apps = apps.filter((a) => !(a.id === id && a.stage === "applied"));   // un-marking only undoes a plain "applied"
+        patch.apps = apps;
       }
-      if (!on) apps = apps.filter((a) => !(a.id === id && a.stage === "applied"));   // un-marking only undoes a plain "applied"
-    }
-    await save({ saved: next.saved, applied: next.applied, ...(apps ? { apps } : {}) });
-    return res.status(200).json({ saved: next.saved, applied: next.applied });
+      return patch;
+    });
+    if (out.error) return res.status(out.status || 400).json({ error: out.error });
+    return res.status(200).json({ saved: out.row.saved || [], applied: out.row.applied || [] });
   } catch (e) {
-    return res.status(500).json({ error: "Couldn't update your account", detail: String(e.message || e).slice(0, 160) });
+    if (e instanceof AIError) return res.status(e.status).json({ error: e.message });
+    if (e instanceof Conflict) return res.status(409).json({ error: e.message });
+    console.error("[me]", e);
+    return res.status(500).json({ error: "Couldn't update your account — try again" });
   }
 }

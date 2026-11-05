@@ -99,7 +99,8 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true });
     } catch (e) {
       const dup = /duplicate|23505/.test(String(e.message));
-      return res.status(dup ? 409 : 500).json({ error: dup ? "That company is already on the list" : "Couldn't save", detail: String(e.message).slice(0, 160) });
+      if (!dup) console.error("[discovery save]", e);
+      return res.status(dup ? 409 : 500).json({ error: dup ? "That company is already on the list" : "Couldn't save" });
     }
   }
 
@@ -118,12 +119,22 @@ export default async function handler(req, res) {
       for (const r of rows) take(r.ats, r.config);
       for (const c of COMPANIES) take(c.ats, c);
       return res.status(200).json({ boards: [...known], names: [...new Set([...rows, ...COMPANIES].map((r) => normName(r.company)))] });
-    } catch (e) { return res.status(500).json({ error: e.message }); }
+    } catch (e) { console.error("[discovery boards]", e); return res.status(500).json({ error: "Couldn't load boards" }); }
   }
   if (req.query?.bots !== undefined) {
-    // Control room: each bot's switch, last runs, and the company finder's pipeline
+    // Control room. Public callers (GitHub bots reading their switch) get ONLY the on/off switches.
+    // Owners (Clerk admin sign-in) and the robot (CRON_SECRET) get everything: users, AI spend, run logs.
+    res.setHeader("Cache-Control", "no-store");
+    let owner = isAuthorizedCron(req);
+    if (!owner && bearer(req)) owner = !!(await adminEmail(req).catch(() => null));
+    if (!owner) {
+      try {
+        const settings = await db.selectAsAdmin("bot_settings?select=bot,enabled");
+        const on = Object.fromEntries(settings.map((x) => [x.bot, x.enabled !== false]));
+        return res.status(200).json({ public: true, bots: BOTS.map((x) => ({ id: x.id, name: x.name, enabled: on[x.id] !== false })) });
+      } catch { return res.status(503).json({ error: "Couldn't load bot switches" }); }
+    }
     try {
-      res.setHeader("Cache-Control", "no-store");
       const [settings, runs, cands, ai, listings, users, feedback] = await Promise.all([
         db.selectAsAdmin("bot_settings?select=bot,enabled,updated_at,updated_by"),
         db.selectAsAdmin(`bot_runs?select=bot,ran_at,ok,summary,stats&ran_at=gt.${new Date(Date.now() - 7 * 864e5).toISOString()}&order=ran_at.desc&limit=1500`),
@@ -166,7 +177,7 @@ export default async function handler(req, res) {
           checked24h: cands.filter((c) => c.checked_at && Date.parse(c.checked_at) > day).length,
           live24h: cands.filter((c) => c.status === "live" && c.verified_at && Date.parse(c.verified_at) > day).length, recentLive },
       });
-    } catch (e) { return res.status(500).json({ error: e.message }); }
+    } catch (e) { console.error("[discovery bots]", e); return res.status(500).json({ error: "Couldn't load the control room" }); }
   }
   try {
     const rows = await db.selectAll("company_candidates?select=id,company,domain,hint,status,ats,detail,intern_count,attempts,checked_at,verified_at,source&order=company.asc,id.asc");
@@ -178,6 +189,7 @@ export default async function handler(req, res) {
       rows,
     });
   } catch (e) {
-    return res.status(500).json({ error: e.message });
+    console.error("[discovery]", e);
+    return res.status(500).json({ error: "Couldn't load the company list" });
   }
 }

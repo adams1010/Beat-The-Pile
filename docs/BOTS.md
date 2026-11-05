@@ -1,4 +1,4 @@
-# InternIQ bots — runbook
+# Beat the Pile bots — runbook
 
 Everything here is also visible live at **/bots** (system map, ranked "where to spend time", switches, run history).
 
@@ -18,6 +18,9 @@ Everything here is also visible live at **/bots** (system map, ranked "where to 
 | Listings vanish for a company | Board redesign broke the reader; the sync's health guard keeps old listings and flags it | Check `feed_runs` for that company's error; fix the reader |
 | AI features say "paused" | Monthly cap reached on /bots | Raise the cap (signed in as owner) or wait for the 1st |
 | Site errors after a deploy | Bad code | Vercel dashboard → previous deployment → Promote (instant rollback) |
+| Community posts never appear | AI moderation unavailable / over budget → posts wait as "pending" | Review them: `POST /api/community?action=admin_list` then `admin_review` (owner sign-in) |
+| Students say sign-in "works" but saving fails with 401 | New domain not in the token check | Add it to `originAllowed` in lib/auth.js or the `ALLOWED_ORIGINS` env; look for `[auth] rejected` in Vercel logs |
+| Link Checker "never page-checked" stays high | Rotation is behind | It opens ~400/run hourly; script-only systems (Ashby, SmartRecruiters, Jibe…) are skipped on purpose — the sync closes those |
 
 ## Board Scout details
 - Reads `https://data.commoncrawl.org/cc-index/collections/<crawl>/indexes/cluster.idx` (~100 MB), finds the blocks

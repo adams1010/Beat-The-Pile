@@ -1,6 +1,9 @@
-// /api/check-links.js — daily cron, runs after /api/sync.
-// Opens every live listing's link the way a student would and hides any that are dead —
+// /api/check-links.js — cron (Vercel 09:45 + 21:45 UTC, plus GitHub links.yml every few hours).
+// Opens live listings' links the way a student would, oldest-checked first, and hides dead ones —
 // including pages that load fine but say "no longer available" (what broke v1).
+// What this does NOT do: check every link every day. Freshness mainly comes from the sync, which re-reads every
+// company's whole job board at least twice a day and closes jobs that disappear. This is the second net.
+// A listing is only hidden after TWO dead results in a row (one bad answer can be a hiccup or an odd redirect).
 import { loadCompanies } from "../lib/companies.js";
 import { fetchWorkdayDetail } from "../lib/fetchers/workday.js";
 import { db, isAuthorizedCron } from "../lib/db.js";
@@ -9,7 +12,11 @@ import { get, mapLimit } from "../lib/http.js";
 
 export const config = { maxDuration: 60 };
 
-const BATCH = 400;          // oldest-checked first; runs twice a day so everything is re-checked daily
+const BATCH = 400;          // oldest-checked first
+const FAILS_TO_HIDE = 2;
+// These job pages are blank shells filled in by script, so a page fetch can't tell open from closed.
+// They're skipped here (and not queued) — the sync closes them when they leave the company's feed.
+export const PAGE_UNCHECKABLE = ["ashby", "smartrecruiters", "oracle", "eightfold", "paylocity", "adp", "jibe"];
 const TIME_BUDGET_MS = 50000;
 
 const DEAD_PHRASES = [
@@ -29,7 +36,7 @@ export async function checkListing(l, cfg) {
     }
     // These job pages are blank shells filled in by script — a page fetch can't tell open from closed.
     // Their listings are closed by the hourly sync instead (gone from the company's feed = closed).
-    if (["ashby", "smartrecruiters", "oracle", "eightfold", "paylocity", "adp", "jibe"].includes(l.ats)) return null;
+    if (PAGE_UNCHECKABLE.includes(l.ats)) return null;
     // iCIMS pages wrap the real content in an iframe — ask for the inner page directly
     const url = l.ats === "icims" ? l.url + (l.url.includes("?") ? "&" : "?") + "in_iframe=1" : l.url;
     const res = await get(url, { timeoutMs: 10000 });
@@ -53,7 +60,7 @@ export default async function handler(req, res) {
   const started = Date.now();
   const byId = Object.fromEntries((await loadCompanies()).map((c) => [c.id, c]));
   const rows = await db.selectAsAdmin(
-    `listings?select=id,company_id,url,ats,external_path&closed_at=is.null&order=link_checked_at.asc.nullsfirst&limit=${BATCH}`
+    `listings?select=id,company_id,url,ats,external_path,link_fails&closed_at=is.null&ats=not.in.(${PAGE_UNCHECKABLE.join(",")})&order=link_checked_at.asc.nullsfirst&limit=${BATCH}`
   );
 
   const results = await mapLimit(rows, 10, async (l) => {
@@ -64,17 +71,31 @@ export default async function handler(req, res) {
       return { id: l.id, ok: false, retired: true };
     }
     const ok = await checkListing(l, byId[l.company_id]);
-    if (ok === null) return { id: l.id, unknown: true };
-    await db.update(`listings?id=eq.${encodeURIComponent(l.id)}`, { link_ok: ok, link_checked_at: new Date().toISOString() });
-    return { id: l.id, ok };
+    const now = new Date().toISOString();
+    if (ok === null) {                       // can't tell from a page fetch — record that we looked, so the queue moves on
+      await db.update(`listings?id=eq.${encodeURIComponent(l.id)}`, { link_checked_at: now });
+      return { id: l.id, unknown: true };
+    }
+    if (ok) { await db.update(`listings?id=eq.${encodeURIComponent(l.id)}`, { link_ok: true, link_fails: 0, link_checked_at: now }); return { id: l.id, ok }; }
+    const fails = Number(l.link_fails || 0) + 1;
+    await db.update(`listings?id=eq.${encodeURIComponent(l.id)}`, { link_fails: fails, link_checked_at: now, ...(fails >= FAILS_TO_HIDE ? { link_ok: false } : {}) });
+    return { id: l.id, ok: fails >= FAILS_TO_HIDE ? false : undefined, suspect: fails < FAILS_TO_HIDE };
   });
 
   const dead = results.filter((r) => r.ok === false).map((r) => r.id);
-  await logRun("links", true, `Checked ${results.filter((r) => r.ok !== undefined).length} links · ${dead.length} dead removed`, { checked: results.filter((r) => r.ok !== undefined).length, dead: dead.length });
+  const opened = results.filter((r) => !r.skipped && !r.retired).length;
+  const suspect = results.filter((r) => r.suspect).length, unknown = results.filter((r) => r.unknown).length;
+  // How far behind is the rotation? (oldest page check among open listings; never-checked count)
+  let oldestHours = null, neverChecked = null;
+  try {
+    const [o] = await db.selectAsAdmin(`listings?select=link_checked_at&closed_at=is.null&ats=not.in.(${PAGE_UNCHECKABLE.join(",")})&link_checked_at=not.is.null&order=link_checked_at.asc&limit=1`);
+    oldestHours = o ? Math.round((Date.now() - Date.parse(o.link_checked_at)) / 36e5) : null;
+    neverChecked = await db.countAsAdmin(`listings?closed_at=is.null&link_checked_at=is.null&ats=not.in.(${PAGE_UNCHECKABLE.join(",")})`);
+  } catch { /* stats are best-effort */ }
+  await logRun("links", true, `Opened ${opened} links · ${dead.length} dead removed · ${suspect} look dead (re-check before hiding) · ${unknown} can't be checked by page${neverChecked != null ? ` · ${neverChecked} never page-checked yet` : ""}`,
+    { opened, dead: dead.length, suspect, unknown, oldestHours, neverChecked });
   return res.status(200).json({
-    checked: results.filter((r) => r.ok !== undefined).length,
-    live: results.filter((r) => r.ok === true).length,
-    dead, unknown: results.filter((r) => r.unknown).length,
-    skippedForTime: results.filter((r) => r.skipped).length,
+    opened, live: results.filter((r) => r.ok === true).length, dead, suspect, unknown,
+    skippedForTime: results.filter((r) => r.skipped).length, oldestHours, neverChecked,
   });
 }

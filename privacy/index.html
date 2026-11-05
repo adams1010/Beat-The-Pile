@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Privacy — Beat the Pile</title>
+<meta name="description" content="What Beat the Pile stores, where it lives, what goes to AI, who can see your resume, and how to delete it.">
+<link rel="canonical" href="https://beatthepile.com/privacy/">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#0A1628">
+<style>
+  :root{--green:#00C285;--green-dark:#009E6C;--navy:#0A1628;--ink:#1E293B;--muted:#52606D;--line:#E2EEEA;--bg:#F8FFFE;--font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6}
+  main{max-width:720px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
+  h1{font-size:30px;line-height:1.15;color:var(--navy);margin:8px 0 6px;letter-spacing:-.02em}
+  h2{font-size:19px;color:var(--navy);margin:30px 0 8px}
+  p,li{max-width:65ch}
+  .lead{color:var(--muted);margin:0 0 10px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#F1F8F5;color:var(--navy);font-size:13px}
+  tr:last-child td{border-bottom:0}
+  .wrap{overflow-x:auto}
+  .box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  a{color:var(--green-dark)}
+  .small{font-size:13.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main">
+  <h1>Privacy, in plain words</h1>
+  <p class="lead">What we keep, where it lives, what goes to AI, who can see your resume, and how to delete all of it. Last updated November 2026.</p>
+
+  <h2>Browsing needs nothing</h2>
+  <p>You can browse every internship without an account or an email. We count page visits and button taps with PostHog (an analytics tool) so we can see what's working. We don't attach your name or email to it.</p>
+
+  <h2>What's saved, and where</h2>
+  <div class="wrap"><table>
+    <tr><th>What</th><th>Where it lives</th><th>Who can see it</th></tr>
+    <tr><td>Homepage quiz answers, tracker, profile and pasted resume text</td><td>This browser only, until you sign in. When signed in, also your account (our database).</td><td>You.</td></tr>
+    <tr><td>Saved jobs, “applied” marks, followed companies, My Season</td><td>Your account (our database).</td><td>You.</td></tr>
+    <tr><td>Career-fair notes, including recruiter names and emails you type in</td><td>Your account (our database).</td><td>You. Calendar reminders you add only carry the company, recruiter's name and roles — not your notes or their email.</td></tr>
+    <tr><td>Resume PDF for your QR code</td><td>A private file store. It's never public or searchable.</td><td>Nobody until <b>you</b> turn the QR link on (it starts off). Then anyone with your QR or link — and anyone they forward it to.</td></tr>
+    <tr><td>Email you give on the quiz (optional)</td><td>Our email-list provider, MailerLite.</td><td>Us, for internship tips and updates. Unsubscribe from any email.</td></tr>
+  </table></div>
+  <p class="small">Services we use: Clerk (sign-in), Supabase (database and file storage), Vercel (hosting), Anthropic (AI), PostHog (analytics), MailerLite (email list). We don't sell your data.</p>
+
+  <h2>Your resume link</h2>
+  <ul>
+    <li>A new upload starts <b>private</b>. Turn the QR link on in Career Fair Mode when you want recruiters to scan it.</li>
+    <li>Each scan opens the file through a link that expires after 2 minutes, so turning sharing off takes effect within about 2 minutes.</li>
+    <li>If your link got passed around, tap <b>Make a new link</b>: the old QR stops working.</li>
+    <li><b>Delete my resume</b> removes the file and its link for good.</li>
+  </ul>
+
+  <h2>What goes to AI</h2>
+  <p>AI features are optional and only run when you tap them. The text needed for that feature is sent to Anthropic's Claude to write the answer:</p>
+  <ul>
+    <li><b>Company brief</b>: the company's name, website and job titles (nothing about you).</li>
+    <li><b>Follow-up email</b>: the company, recruiter's name, roles and your notes (not their email address).</li>
+    <li><b>Homepage tools</b> (cover letter, resume score, interview prep, starter resume, “why it fits”): the answers and resume text you entered for that tool.</li>
+    <li><b>Community posts</b>: each post is checked by AI before it's shown.</li>
+  </ul>
+  <p>Resume scores and match percentages are <b>our estimates</b> to help you improve — not a prediction from any employer. AI can be wrong, so read everything before you send it.</p>
+
+  <h2>Shared or school computers</h2>
+  <p>Sign out when you're done: signing out on the homepage clears this browser's saved quiz, tracker and profile. If you used the homepage without signing in, that data stays in this browser until you clear it.</p>
+
+  <h2>Delete everything</h2>
+  <div class="box">
+    <p style="margin:0 0 6px">Signed in? Go to <a href="/season/">My Season</a> → <b>Delete all my data</b>. That removes your resume file, saved jobs, notes, applications and synced homepage data right away.</p>
+    <p style="margin:0" class="small">To also close the sign-in account itself, or for any question, use the <b>Report a problem</b> button on any page and choose “Other”. We'll do it and confirm.</p>
+  </div>
+</main>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-// /feedback.js — floating "Report a problem" button for any InternIQ page. Include with <script src="/feedback.js" defer></script>.
+// /feedback.js — floating "Report a problem" button for any Beat the Pile page. Include with <script src="/feedback.js" defer></script>.
 (function () {
   if (window.__iqFeedback) return; window.__iqFeedback = true;
   const css = `.iqfb-btn{position:fixed;right:14px;bottom:14px;z-index:70;font:600 13px -apple-system,Segoe UI,Roboto,sans-serif;background:#0A1628;color:#fff;border:0;border-radius:999px;padding:10px 14px;box-shadow:0 4px 16px rgba(10,22,40,.25);cursor:pointer}
@@ -10,11 +10,12 @@
 .iqfb textarea,.iqfb input{width:100%;box-sizing:border-box;font:16px inherit;padding:10px;border:1px solid #E2EEEA;border-radius:10px;margin-bottom:8px}
 .iqfb textarea{min-height:90px}.iqfb .row{display:flex;gap:8px;justify-content:flex-end}
 .iqfb .row button{font:700 14px inherit;padding:10px 14px;border-radius:10px;border:1px solid #E2EEEA;background:#fff;cursor:pointer}.iqfb .row .go{background:#00C285;border-color:#00C285;color:#fff}
+@media (max-width:560px){.iqfb-btn{padding:10px 12px;font-size:0}.iqfb-btn::before{content:"💬";font-size:16px}}
 @media print{.iqfb-btn{display:none}}`;
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
   const kinds = [["wrong", "Wrong listing"], ["broken", "Broken link"], ["missing", "Missing a company"], ["idea", "Idea"], ["other", "Other"]];
   const wrap = document.createElement("div");
-  wrap.innerHTML = `<button class="iqfb-btn" type="button" aria-haspopup="dialog">💬 Report a problem</button><div class="iqfb-scrim"></div>
+  wrap.innerHTML = `<button class="iqfb-btn" type="button" aria-haspopup="dialog" aria-label="Report a problem">💬 Report a problem</button><div class="iqfb-scrim"></div>
   <div class="iqfb" role="dialog" aria-modal="true" aria-labelledby="iqfbT"><h3 id="iqfbT">Tell us what's off</h3><p>Wrong internship, dead link, company we're missing, or an idea — it goes straight to the team.</p>
   <div class="k">${kinds.map(([v, l], i) => `<button type="button" data-v="${v}" aria-pressed="${i === 0}">${l}</button>`).join("")}</div>
   <textarea aria-label="What happened" placeholder="e.g. 'Boeing Seattle intern link is dead' or 'Add Siemens Energy'"></textarea>

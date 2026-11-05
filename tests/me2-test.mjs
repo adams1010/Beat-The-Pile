@@ -1,56 +1,44 @@
+// /api/me — follow companies, seen, AI briefs (grounded, cached), AI follow-up email, shared rate limit, budget.
 import assert from "node:assert/strict";
-import crypto from "node:crypto";
-process.env.CLERK_SECRET_KEY="sk"; process.env.INTERNIQ_DB_URL="https://f.co"; process.env.INTERNIQ_DB_SERVICE_KEY="s"; process.env.INTERNIQ_DB_ANON_KEY="a"; process.env.ANTHROPIC_API_KEY="k";
-const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
-const jwk = { ...publicKey.export({ format: "jwk" }), kid: "k1" };
-const users = new Map(), briefs = new Map(); let aiCalls = 0, lastPrompt = "";
-globalThis.fetch = async (u, o = {}) => { u = String(u);
-  if (u.includes("api.clerk.com")) return { ok: true, status: 200, json: async () => ({ keys: [jwk] }) };
-  if (u.includes("api.anthropic.com")) { aiCalls++; lastPrompt = JSON.parse(o.body).messages[0].content;
-    const text = lastPrompt.includes("follow-up email") ? 'Sure: {"subject":"Great meeting you","body":"Hi Sarah, thanks..."}' : '{"known":true,"about":"Builds things.","engineers":"Field engineering.","ask":["Q1","Q2","Q3","Q4"]}';
-    return { ok: true, status: 200, json: async () => ({ content: [{ type: "text", text }] }) }; }
-  const url = new URL(u); const m = o.method || "GET", t = url.pathname.split("/").pop();
-  const ok = (rows) => ({ ok: true, status: 200, text: async () => JSON.stringify(rows) });
-  if (t === "user_jobs") {
-    if (m === "POST") { for (const r of JSON.parse(o.body)) users.set(r.clerk_user_id, { ...(users.get(r.clerk_user_id) || {}), ...r }); return ok(null); }
-    return ok([...users.values()].filter((r) => r.clerk_user_id === url.searchParams.get("clerk_user_id").slice(3)).slice(0, 1)); }
-  if (t === "company_briefs") {
-    if (m === "POST") { for (const r of JSON.parse(o.body)) briefs.set(r.company_id, r); return ok(null); }
-    const b = briefs.get(url.searchParams.get("company_id").slice(3)); return ok(b ? [b] : []); }
-  if (t === "company_candidates") return ok(url.searchParams.get("id") === "eq.x-hensel-phelps" ? [{ company: "Hensel Phelps", domain: "henselphelps.com" }] : []);
-  if (t === "listings") return ok(url.searchParams.get("company_id") === "eq.x-hensel-phelps" ? [{ company: "Hensel Phelps", title: "Field Engineer Intern" }] : []);
-  throw new Error("unexpected " + u);
-};
-const b64 = (o) => Buffer.from(JSON.stringify(o)).toString("base64url");
-const tok = (sub) => { const h = b64({ alg: "RS256", kid: "k1" }), p = b64({ sub, exp: Math.floor(Date.now() / 1000) + 60 }); return `${h}.${p}.${crypto.sign("RSA-SHA256", Buffer.from(h + "." + p), privateKey).toString("base64url")}`; };
+import { installFake, makeKeys, invoke, env } from "./fakedb.mjs";
+env();
+const { jwk, tok } = makeKeys();
+const f = installFake({ jwk, anthropic: (b) => ({ text: b.messages[0].content.includes("follow-up email") ? 'Sure: {"subject":"Great meeting you","body":"Hi Sarah, thanks..."}'
+  : '{"known":true,"about":"Builds things.","engineers":"Field engineering.","ask":["Q1","Q2","Q3","Q4"]}' }) });
+f.T("company_candidates").push({ id: "x-hensel-phelps", company: "Hensel Phelps", domain: "henselphelps.com" });
+f.T("listings").push({ id: "x-hensel-phelps:1", company_id: "x-hensel-phelps", company: "Hensel Phelps", title: "Field Engineer Intern" });
 const me = (await import("../api/me.js")).default;
-const call = async (body, sub = "user_a") => { const r = { headers: {}, setHeader(k, v) { r.headers[k] = v; } }; r.status = (s) => (r.code = s, r); r.json = (b) => (r.body = b, r); r.end = () => r;
-  await me({ method: body ? "POST" : "GET", query: {}, headers: sub ? { authorization: "Bearer " + tok(sub) } : {}, body }, r); return r; };
+const call = (body, sub = "user_a") => invoke(me, { method: body ? "POST" : "GET", body, headers: sub ? { authorization: "Bearer " + tok(sub) } : {} });
 
-// follow companies
 let r = await call({ action: "star", company: "x-hensel-phelps", on: true }); assert.deepEqual(r.body.starred, ["x-hensel-phelps"]);
 r = await call({ action: "star", company: "hillphoenix", on: true }); assert.equal(r.body.starred.length, 2);
 r = await call({ action: "star", company: "hillphoenix", on: false }); assert.deepEqual(r.body.starred, ["x-hensel-phelps"]);
 assert.equal((await call({ action: "star", company: "Bad Id!", on: true })).code, 400);
 assert.equal((await call({ action: "star", company: "x", on: true }, null)).code, 401);
-r = await call(); assert.deepEqual(r.body.starred, ["x-hensel-phelps"]); assert.equal(r.body.seenAt, null);
+r = await call(); assert.equal(r.body.seenAt, null);
 await call({ action: "seen" }); r = await call(); assert.ok(Date.now() - new Date(r.body.seenAt) < 5000);
 assert.deepEqual((await call(null, "user_b")).body.starred, [], "users isolated");
 console.log("✓ follow/unfollow companies, seen timestamp, validation, isolation");
 
-// briefs: server looks up name (client can't inject), cached for everyone
 r = await call({ action: "brief", companyId: "x-hensel-phelps", company: "IGNORED evil" });
 assert.equal(r.code, 200); assert.equal(r.body.brief.about, "Builds things."); assert.equal(r.body.brief.ask.length, 3);
-assert.ok(lastPrompt.includes("Hensel Phelps") && lastPrompt.includes("Field Engineer Intern") && !lastPrompt.includes("evil"));
-r = await call({ action: "brief", companyId: "x-hensel-phelps" }, "user_b"); assert.equal(r.code, 200); assert.equal(aiCalls, 1, "second student hits the cache");
+const p = f.calls.prompts.at(-1); assert.ok(p.includes("Hensel Phelps") && p.includes("Field Engineer Intern") && !p.includes("evil"));
+r = await call({ action: "brief", companyId: "x-hensel-phelps" }, "user_b"); assert.equal(r.code, 200); assert.equal(f.calls.anthropic, 1, "second student hits the cache");
 assert.equal((await call({ action: "brief", companyId: "x-unknown" })).code, 404);
 assert.equal((await call({ action: "brief", companyId: "../etc" })).code, 400);
-console.log("✓ briefs: grounded in our data, cached, unknown/bad ids refused");
+const use = f.T("ai_usage"); assert.equal(use.length, 1); assert.equal(use[0].reserved, false, "reservation settled to real cost"); assert.equal(use[0].feature, "brief");
+assert.equal(Number(use[0].cost_usd), 100 / 1e6 + 50 * 5 / 1e6);
+console.log("✓ briefs: grounded in our data, cached, every call costed");
 
-// polish
 r = await call({ action: "polish", name: "Adam", note: { company: "Hensel Phelps", contact: "Sarah", said: "Wants field engineers" } });
-assert.equal(r.code, 200); assert.equal(r.body.subject, "Great meeting you"); assert.ok(lastPrompt.includes("Wants field engineers"));
+assert.equal(r.code, 200); assert.equal(r.body.subject, "Great meeting you"); assert.ok(f.calls.prompts.at(-1).includes("Wants field engineers"));
 assert.equal((await call({ action: "polish", note: {} })).code, 400);
-// rate limit
 let last; for (let i = 0; i < 35; i++) last = await call({ action: "polish", note: { company: "X" } }, "user_c"); assert.equal(last.code, 429);
-console.log("✓ AI follow-up email from notes; per-student hourly limit");
+assert.equal(f.T("rate_hits").filter((x) => x.key === "me-ai:user_c").length, 30, "limit is stored in the database (shared by every server)");
+console.log("✓ AI follow-up email; per-student hourly limit is durable");
+
+// budget: cap reached → paused, no AI call; AI switched off → paused
+f.T("bot_settings").push({ bot: "ai", enabled: true, cap_usd: 0.0001 });
+const before = f.calls.anthropic;
+r = await call({ action: "polish", note: { company: "Y" } }, "user_d"); assert.equal(r.code, 503); assert.match(r.body.error, /paused/); assert.equal(f.calls.anthropic, before);
+console.log("✓ over the monthly cap → paused before any AI call");

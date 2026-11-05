@@ -5,12 +5,13 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="InternIQ">
+<meta name="apple-mobile-web-app-title" content="Beat the Pile">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>InternIQ — Mechanical Engineering Internships</title>
-<meta name="description" content="Mechanical engineering internships in Virginia and Pennsylvania, pulled straight from company job boards and link-checked every day.">
+<title>Engineering Internships — Beat the Pile</title>
+<meta name="description" content="Engineering internships pulled straight from each company's own job board. Boards are re-read at least twice a day, so closed jobs drop off.">
+<link rel="canonical" href="https://beatthepile.com/jobs/">
 <style>
   :root{
     --green:#00C285; --green-dark:#009E6C; --green-light:#E6FBF4;
@@ -94,20 +95,23 @@
   footer p{margin:6px 0}
   .follow{font:inherit;font-size:12px;font-weight:700;border:0;background:none;color:#94A3B8;cursor:pointer;padding:0 0 0 6px}
   .follow[aria-pressed="true"]{color:#D97706}
+  .note{font-size:12.5px;color:var(--muted);margin-top:6px}
+  .note b{color:var(--ink)}
+  .linkbtn{font:inherit;font-size:inherit;font-weight:700;color:var(--green-dark);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+  .card.closed{opacity:.6}
+  .tag.closed{background:#F1F5F9;color:#475569}
   .alert{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#FFF7E6;border:1px solid #FCD9A5;color:#92400E;border-radius:12px;padding:12px 14px;margin:0 0 12px;font-weight:700;font-size:14px;cursor:pointer;width:100%;font-family:inherit;text-align:left}
 </style>
 </head>
 <body>
+<script src="/nav.js"></script>
 <header>
   <div class="wrap">
-    <div class="topbar"><a class="brand" href="/">InternIQ</a><div class="acct" id="acct"></div></div>
-    <h1>Mechanical engineering internships, straight from the source</h1>
-    <p class="sub">Pulled straight from each company's own job board. No reposts, no recruiters, no dead links.</p>
+    <div class="topbar"><span class="brand">Internships</span><div class="acct" id="acct"></div></div>
+    <h1>Engineering internships, straight from the source</h1>
+    <p class="sub">Pulled straight from each company's own job board. No reposts, no recruiters. When a company takes a job down, it drops off here too.</p>
     <div class="trust" id="trust" hidden><span class="dot"></span><span id="trustText"></span></div>
-    <a class="fairlink" href="/fair/">🎯 Going to a career fair? <b>Career Fair Mode →</b></a>
-    <a class="fairlink" href="/season/" style="margin-top:6px">📈 Track every application + your weekly goal: <b>My Season →</b></a>
-    <a class="fairlink" href="/radar/" style="margin-top:6px">📡 Know when companies open internships: <b>Opening Radar →</b></a>
-    <a class="fairlink" href="/demo/" style="margin-top:6px">▶ New here? <b>Watch the 1-minute demo</b></a>
+    <a class="fairlink" href="/demo/">▶ New here? <b>Watch the 90-second demo</b></a>
   </div>
 </header>
 
@@ -116,15 +120,16 @@
     <div class="row">
       <div class="seg" role="group" aria-label="Where">
         <button data-state="VA,PA" aria-pressed="true">VA &amp; PA</button>
-        <button data-state="ALL" aria-pressed="false">All US</button>
+        <button data-state="ALL" aria-pressed="false">All US <span id="allN"></span></button>
       </div>
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">Pick a state</option></select>
-      <label class="toggle"><input type="checkbox" id="meOnly"> Mechanical only</label>
-      <button class="chip" id="savedOnly" aria-pressed="false">♡ Saved <span id="savedN"></span></button>
-      <button class="chip" id="followOnly" aria-pressed="false">🔔 Following <span id="followN"></span></button>
+      <label class="toggle" title="Off: mechanical + general engineering roles. On: only roles that say mechanical (or a close match like manufacturing)."><input type="checkbox" id="meOnly"> Mechanical only</label>
+      <button class="chip" id="savedOnly" aria-pressed="false" title="Jobs you saved with ♡">♡ Saved <span id="savedN"></span></button>
+      <button class="chip" id="followOnly" aria-pressed="false" title="Companies you follow with ☆ — you get flagged when they post">🔔 Following <span id="followN"></span></button>
       <input class="search" id="q" type="search" placeholder="Search company or role" aria-label="Search company or role">
     </div>
     <div class="count" id="count" aria-live="polite"></div>
+    <div class="note" id="note"></div>
   </div>
 </div>
 
@@ -139,14 +144,15 @@
 
 <footer>
   <div class="wrap">
-    <p>Every listing comes from the employer's own careers site and is re-checked daily. If a job closes, it disappears here too.</p>
-    <p>Applying takes you to the company's page. InternIQ isn't affiliated with these employers.</p>
+    <p>Every listing comes from the employer's own careers site. We re-read every company's job board at least twice a day, and we also open job links in rotation to catch dead pages. If a job closes, it disappears here too.</p>
+    <p>“Posted” dates come from the employer's board (“~” means worked out from text like “posted 3 days ago”). “Found” is when our robot first saw it.</p>
+    <p>Applying takes you to the company's page. Beat the Pile isn't affiliated with these employers. · <a href="/privacy/">Privacy</a></p>
   </div>
 </footer>
 
 <script>
 (function(){
-  const state = { all: [], st: ["VA","PA"], meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
+  const state = { all: [], closedSaved: [], st: ["VA","PA"], meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
                   user: null, clerk: null, mine: { saved: new Set(), applied: new Set(), starred: new Set(), seenAt: null } };
   const NAMES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"Washington DC",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
   const statesOf = (j) => String(j.state || "").split(",").filter(Boolean);
@@ -200,13 +206,8 @@
             .replace(/\b(Me|Ii|Iii|Hvac|Cad|Qa|Us|Va|Pa)\b/g, (m) => m.toUpperCase());
   }
   function sortKey(j){
-    const p = (j.posted_on || "").trim();
-    const t = Date.parse(p);
-    if (!isNaN(t)) return t;
-    const m = p.match(/(\d+)\+?\s*days?\s*ago/i);
-    if (m) return Date.now() - Number(m[1]) * DAY;
-    if (/today/i.test(p)) return Date.now();
-    if (/yesterday/i.test(p)) return Date.now() - DAY;
+    const p = postedInfo(j.posted_on, j.first_seen);
+    if (p) return p.date.getTime();
     return new Date(j.first_seen).getTime() - 30 * DAY;      // unknown post date → after dated ones
   }
   function domain(u){ try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } }
@@ -214,12 +215,22 @@
     const d = Math.floor((Date.now() - new Date(ts).getTime()) / DAY);
     return d <= 0 ? "today" : d === 1 ? "yesterday" : d + " days ago";
   }
+  // Employer's posting date vs. when WE first saw it — never mixed up (same rules as lib/dates.js postedInfo)
+  function postedInfo(postedOn, seenAt){
+    const s = String(postedOn || "").trim();
+    if (!s || /\+\s*days?/i.test(s)) return null;
+    const rel = s.match(/(today|just posted|yesterday|(\d{1,3})\s*days?\s*ago)/i);
+    if (rel) { const b = new Date(seenAt); if (isNaN(b)) return null;
+      const n = /today|just/i.test(rel[1]) ? 0 : /yesterday/i.test(rel[1]) ? 1 : Number(rel[2]);
+      return { date: new Date(b.getTime() - n * DAY), estimate: true }; }
+    if (!/\d{4}/.test(s)) return null;
+    const d = new Date(s); if (isNaN(d) || d.getFullYear() < 2015 || d.getTime() > Date.now() + 2 * DAY) return null;
+    return { date: d, estimate: false };
+  }
   function postedText(j){
-    const p = (j.posted_on || "").trim();
-    if (/^posted/i.test(p)) return p;                       // Workday: "Posted 3 Days Ago"
-    const t = Date.parse(p);
-    if (!isNaN(t)) return "Posted " + new Date(t).toLocaleDateString(undefined, {month:"short", day:"numeric"});
-    return "Found " + ago(j.first_seen);
+    const p = postedInfo(j.posted_on, j.first_seen);
+    if (p) return (p.estimate ? "Posted ~" : "Posted ") + p.date.toLocaleDateString(undefined, {month:"short", day:"numeric"});
+    return "Found " + ago(j.first_seen) + " (posting date not shown by employer)";
   }
   function timeOfDay(ts){
     const d = new Date(ts), today = new Date();
@@ -236,7 +247,7 @@
     const followed = (j) => state.mine.starred.has(j.company_id);
     const newForMe = (j) => followed(j) && state.mine.seenAt && new Date(j.first_seen) > new Date(state.mine.seenAt);
     const filtered = state.savedOnly
-      ? state.all.filter((j) => state.mine.saved.has(j.id) && matches(j))
+      ? [...state.all.filter((j) => state.mine.saved.has(j.id) && matches(j)), ...state.closedSaved.filter((j) => state.mine.saved.has(j.id))]
       : state.followOnly ? state.all.filter((j) => followed(j) && matches(j)).sort((a, b) => newForMe(b) - newForMe(a))
       : state.all.filter((j) => inView(j) && matches(j));
     const fresh = state.all.filter(newForMe).length;
@@ -253,6 +264,12 @@
     const rows = [...groups.values()];
     const has = (list, j) => j.ids.some((id) => state.mine[list].has(id));
     $("savedN").textContent = state.mine.saved.size ? `(${state.mine.saved.size})` : "";
+    $("allN").textContent = state.all.length ? `(${state.all.filter(matches).length})` : "";
+    $("note").innerHTML = (state.st !== "ALL" && state.st.join() === "VA,PA" && !state.savedOnly && !state.followOnly
+        ? `Starting with Virginia &amp; Pennsylvania. <button class="linkbtn" id="goAll">See all US</button> or pick a state. `
+        : "") + (state.meOnly ? "Showing roles that say mechanical (or close, like manufacturing)." : "Showing mechanical <b>and</b> general engineering roles.")
+      + (state.user ? " · ☆ Follow = flag new jobs from that company · ♡ Save = keep this job · Mark applied = add it to My Season" : "");
+    syncUrl();
 
     // "New" = appeared after the first import, within the last 3 days (so day-one data isn't all "New")
     const firstImport = Math.min(...state.all.map((j) => new Date(j.first_seen).getTime()));
@@ -271,18 +288,18 @@
         ? `<div class="empty">${state.user ? "Follow companies with ☆ on any internship (or in Career Fair Mode). New postings from them show up here first." : "Sign in to follow companies and get alerted when they post."}</div>`
         : state.savedOnly
         ? `<div class="empty">${state.user ? "Nothing saved yet. Tap ♡ Save on any internship to keep it here." : "Sign in to save internships and track where you've applied."}</div>`
-        : `<div class="empty">No matches ${where}${state.all.length ? " for these filters" : " right now"}. ${state.all.length ? "Try “All US” or turn off “Mechanical only.”" : "New postings are pulled every morning."}</div>`;
+        : `<div class="empty">No matches ${where}${state.all.length ? " for these filters" : " right now"}. ${state.all.length ? `<button class="linkbtn" id="resetF">Reset filters</button>` : "New postings are pulled from company boards every few hours."}</div>`;
       return;
     }
     $("list").innerHTML = rows.map((j) => `
-      <article class="card${has("applied", j) ? " applied" : ""}">
+      <article class="card${has("applied", j) ? " applied" : ""}${j.closed ? " closed" : ""}">
         <div>
           <div class="co">${esc(j.company)}${j.company_id ? `<button class="follow" data-co="${esc(j.company_id)}" aria-pressed="${followed(j)}">${followed(j) ? "★ Following" : "☆ Follow"}</button>` : ""}</div>
-          <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">NEW</span>' : ""}${j.match === "me" ? '<span class="tag me">ME</span>' : ""}${j.count > 1 ? `<span class="tag multi">${j.count} openings</span>` : ""}</div>
+          <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">NEW</span>' : ""}${j.match === "me" ? '<span class="tag me">ME</span>' : ""}${j.count > 1 ? `<span class="tag multi">${j.count} openings</span>` : ""}${j.closed ? '<span class="tag closed">Closed — taken down by the company</span>' : ""}</div>
           <div class="meta"><span>📍 ${esc(cleanLocation(j))}</span>${seasonOf(j.title) ? `<span>🗓 ${esc(seasonOf(j.title))}</span>` : ""}${needsClearance(j.title) ? `<span>🇺🇸 US citizens / clearance</span>` : ""}<span>${esc(postedText(j))}</span></div>
         </div>
         <div class="applycol">
-          <a class="apply" href="${esc(j.url)}" target="_blank" rel="noopener" data-co="${esc(j.company)}">Apply →</a>
+          ${j.closed ? "" : `<a class="apply" href="${esc(j.url)}" target="_blank" rel="noopener" data-co="${esc(j.company)}">Apply →</a>`}
           <span class="src">on ${esc(domain(j.url))} · <a href="#" class="rep" data-rep="${esc(j.id)}" data-what="${esc(j.company + " — " + j.title)}">Report</a></span>
           <div class="mine">
             <button class="ic save" data-act="saved" data-id="${esc(j.id)}" aria-pressed="${has("saved", j)}">${has("saved", j) ? "♥ Saved" : "♡ Save"}</button>
@@ -292,6 +309,40 @@
       </article>`).join("");
   }
 
+  // Filters live in the address bar so a view can be shared, bookmarked, refreshed, or reached with Back.
+  //   /jobs/?state=all|VA|VA,PA &me=1 &q=boeing &view=saved|following
+  let urlReady = false;
+  function syncUrl(){
+    if (!urlReady) return;
+    const p = new URLSearchParams();
+    const st = state.st === "ALL" ? "all" : state.st.join(",");
+    if (st !== "VA,PA") p.set("state", st);
+    if (state.meOnly) p.set("me", "1");
+    if (state.q) p.set("q", state.q);
+    if (state.savedOnly) p.set("view", "saved"); else if (state.followOnly) p.set("view", "following");
+    const url = location.pathname + (p.toString() ? "?" + p : "");
+    if (url !== location.pathname + location.search) history.replaceState(null, "", url);
+  }
+  function readUrl(){
+    const p = new URLSearchParams(location.search);
+    const st = (p.get("state") || "").toUpperCase();
+    state.st = st === "ALL" ? "ALL" : (st.split(",").filter((x) => /^[A-Z]{2}$/.test(x)).length ? st.split(",").filter((x) => /^[A-Z]{2}$/.test(x)) : ["VA","PA"]);
+    state.meOnly = p.get("me") === "1"; $("meOnly").checked = state.meOnly;
+    state.q = (p.get("q") || "").slice(0, 80); $("q").value = state.q;
+    if (state.q && !p.get("state")) state.st = "ALL";              // a search link (e.g. from the Radar) looks nationwide
+    state.savedOnly = p.get("view") === "saved"; state.followOnly = p.get("view") === "following";
+    $("savedOnly").setAttribute("aria-pressed", String(state.savedOnly)); $("followOnly").setAttribute("aria-pressed", String(state.followOnly));
+    const key = state.st === "ALL" ? "ALL" : state.st.join(",");
+    document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.state === key)));
+    const single = state.st !== "ALL" && state.st.length === 1 ? state.st[0] : "";
+    $("stateSel").classList.toggle("on", !!single); if (single) $("stateSel").value = single;
+  }
+  function resetFilters(){ history.replaceState(null, "", location.pathname); readUrl(); state.st = "ALL"; readUrlButtons(); render(); }
+  function readUrlButtons(){ document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.state === "ALL"))); $("stateSel").value = ""; $("stateSel").classList.remove("on"); }
+  document.addEventListener("click", (e) => {
+    if (e.target.closest("#goAll")) setView("ALL", document.querySelector('.seg button[data-state="ALL"]'));
+    if (e.target.closest("#resetF")) resetFilters();
+  });
   function setView(st, btn){
     state.st = st;
     document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === btn)));
@@ -312,7 +363,7 @@
       .sort((a, b) => (NAMES[a] || a).localeCompare(NAMES[b] || b))
       .map((s) => `<option value="${s}">${esc(NAMES[s] || s)} (${counts[s]})</option>`).join("");
   }
-  // ── Sign-in (Clerk — same account as the main InternIQ app) ───────────────
+  // ── Sign-in (Clerk — same account as the main Beat the Pile app) ───────────────
   function toast(msg){
     const t = document.createElement("div"); t.className = "toast"; t.textContent = msg;
     document.body.appendChild(t); setTimeout(() => t.remove(), 3200);
@@ -339,7 +390,7 @@
   }
   async function onUser(user){
     state.user = user || null;
-    if (state.user) { try { setMine(await api("GET")); markSeenSoon(); } catch { toast("Couldn't load your saved list"); } }
+    if (state.user) { try { setMine(await api("GET")); markSeenSoon(); loadClosedSaved(); } catch { toast("Couldn't load your saved list"); } }
     else { state.mine = { saved: new Set(), applied: new Set(), starred: new Set(), seenAt: null }; }
     renderAcct(); render();
   }
@@ -402,23 +453,30 @@
 
   $("meOnly").addEventListener("change", (e) => { state.meOnly = e.target.checked; render(); });
   $("q").addEventListener("input", (e) => { state.q = e.target.value.trim(); render(); });
-  // Deep link from the Opening Radar: /jobs/?q=Boeing → search all US
-  const q0 = new URLSearchParams(location.search).get("q");
-  if (q0) { state.q = q0.slice(0, 80); $("q").value = state.q; state.st = "ALL";
-    document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.state === "ALL"))); }
+  readUrl();
 
   fetch("/api/listings")
     .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
     .then((d) => {
       state.all = (d.listings || []).sort((a, b) => sortKey(b) - sortKey(a));
       state.loaded = true;
-      const lastCheck = state.all.map((j) => j.link_checked_at).filter(Boolean).sort().pop();
-      const stamp = lastCheck || d.meta?.lastSync;
-      if (stamp){ $("trustText").textContent = `Every link checked ${timeOfDay(stamp)}`; $("trust").hidden = false; }
+      const stamp = d.meta?.lastSync;
+      if (stamp){ $("trustText").textContent = `Job boards last re-read ${timeOfDay(stamp)}`; $("trust").hidden = false; }
       fillStates();
+      const single = state.st !== "ALL" && state.st.length === 1 ? state.st[0] : ""; if (single) $("stateSel").value = single;
+      urlReady = true;
       render();
+      loadClosedSaved();
     })
-    .catch(() => { $("list").innerHTML = '<div class="err">Couldn’t load internships right now. Refresh in a minute.</div>'; });
+    .catch(() => { $("list").innerHTML = '<div class="err" role="alert">Couldn’t load internships right now — that’s a problem on our side or your connection, not a sign there are no jobs. Refresh in a minute.</div>'; });
+  // Saved jobs that have since closed stay in your Saved list, marked closed (so your history doesn't vanish)
+  async function loadClosedSaved(){
+    if (!state.loaded || !state.mine.saved.size) return;
+    const have = new Set(state.all.map((j) => j.id)), missing = [...state.mine.saved].filter((id) => !have.has(id)).slice(0, 200);
+    if (!missing.length) { state.closedSaved = []; return; }
+    try { const d = await fetch("/api/listings?ids=" + encodeURIComponent(missing.join(","))).then((r) => r.json());
+          state.closedSaved = (d.listings || []).filter((l) => !have.has(l.id)).map((l) => ({ ...l, closed: true })); render(); } catch { /* keep going without them */ }
+  }
 })();
 </script>
 <script src="/feedback.js" defer></script>

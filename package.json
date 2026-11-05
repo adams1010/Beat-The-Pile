@@ -2,8 +2,15 @@
   "name": "interniq",
   "private": true,
   "type": "module",
-  "engines": { "node": ">=20" },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.45.0"
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "@babel/core": "7.26.0",
+    "@babel/preset-react": "7.26.3"
+  },
+  "scripts": {
+    "build:home": "node scripts/build-home.mjs",
+    "test": "bash tests/run.sh"
   }
 }

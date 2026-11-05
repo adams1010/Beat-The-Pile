@@ -5,11 +5,11 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="InternIQ">
+<meta name="apple-mobile-web-app-title" content="Beat the Pile">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>InternIQ — Career Fair Mode</title>
+<title>Beat the Pile — Career Fair Mode</title>
 <meta name="description" content="Your resume as a QR code, every company at the fair with their open internships, conversation notes, and follow-up reminders — in one place.">
 <meta name="theme-color" content="#0A1628">
 <style>
@@ -134,9 +134,10 @@
 </style>
 </head>
 <body>
+<script src="/nav.js"></script>
 <header>
   <div class="wrap">
-    <div class="top"><a class="brand" href="/jobs/">InternIQ</a><div class="acct" id="acct"></div></div>
+    <div class="top"><span class="brand">Career Fair Mode</span><div class="acct" id="acct"></div></div>
     <h1>Career Fair Mode</h1>
     <select class="fairsel" id="fairsel" aria-label="Choose a career fair"></select>
     <p class="fairmeta" id="fairmeta"></p>
@@ -180,7 +181,7 @@
   <textarea id="nSaid" placeholder="What they're looking for, next steps they mentioned, anything to bring up in your follow-up…"></textarea>
   <label>How did it go?</label>
   <div class="feel" id="nFeel"><button type="button" data-v="great">🔥 Great</button><button type="button" data-v="good">👍 Good</button><button type="button" data-v="meh">😐 Meh</button></div>
-  <label>Remind me to follow up</label>
+  <label>Follow up in</label>
   <div class="when" id="nWhen"><button type="button" data-h="24">In 24 hrs</button><button type="button" data-h="48">In 48 hrs</button><button type="button" data-h="168">In 1 week</button></div>
   <div class="row" style="margin-top:16px"><button class="btn go" id="noteSave" style="flex:1">Save notes</button></div>
 </div>
@@ -202,7 +203,7 @@
   const toast = (m) => { const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2600); };
   const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k, v){ try { localStorage.setItem(k, v); } catch {} } };
 
-  // ── Sign-in (same Clerk account as the rest of InternIQ). Browsing never needs it. ──
+  // ── Sign-in (same Clerk account as the rest of Beat the Pile). Browsing never needs it. ──
   async function token(){ try { return await S.clerk?.session?.getToken(); } catch { return null; } }
   async function loadClerk(){
     try {
@@ -258,7 +259,10 @@
   async function pickFair(id){
     S.fair = S.fairs.find((f) => f.id === id); store.set("iq_fair", id);
     $("#fairsel").value = id; S.open.clear();
-    $("#fairmeta").textContent = `${S.fair.when} · ${S.fair.where} · ${S.fair.companies.length} employers`;
+    const booths = S.fair.companies.filter((c) => c.booth).length;
+    $("#fairmeta").textContent = [S.fair.name, S.fair.when, S.fair.where, `${S.fair.companies.length} employers`,
+      booths ? `booth numbers for ${booths}` : "booth numbers not published yet"].filter(Boolean).join(" · ");
+    S.listingsErr = false;
     renderCompanies();
     const ids = [...new Set(S.fair.companies.map((c) => c.id).filter(Boolean))];
     if (!ids.length) return;
@@ -266,7 +270,7 @@
       const d = await fetch("/api/listings?companies=" + encodeURIComponent(ids.join(","))).then((r) => r.json());
       S.listings = {};
       for (const l of d.listings || []) (S.listings[l.company_id] = S.listings[l.company_id] || []).push(l);
-    } catch { toast("Couldn't load internships — showing companies only"); }
+    } catch { S.listingsErr = true; toast("Couldn't load internships — showing companies only"); }
     renderCompanies();
   }
 
@@ -285,7 +289,7 @@
     if (!S.loaded) { el.innerHTML = `<div class="muted">Loading your resume…</div>`; return; }
     if (!r) {
       el.innerHTML = `<div class="qrtitle">Add your resume to get a QR code</div>
-        <p class="muted small" style="margin:4px 0 12px">PDF, under 3 MB. Only people who scan your QR can open it, and you can turn it off anytime.</p>
+        <p class="muted small" style="margin:4px 0 12px">PDF, under 3 MB. It starts <b>private</b> — nobody can open it until you turn the QR link on. You can turn it off, make a new link, or delete it anytime.</p>
         <button class="btn go" id="up">Upload resume (PDF)</button>`;
       $("#up").onclick = () => $("#file").click();
       return;
@@ -294,6 +298,7 @@
       <div class="qr" id="qrmini" role="button" tabindex="0" aria-label="Show QR full screen">${r.share ? qrSvg(resumeUrl()) : `<span class="off small">Sharing off</span>`}</div>
       <div><div class="qrtitle">Scan for my resume</div>
         <div class="muted small">${esc(r.name)}</div>
+        ${r.share ? "" : `<div class="small" style="margin-top:6px">Your resume is private. Turn the QR link on when you're ready for recruiters to scan it.</div>`}
         <div class="row" style="margin-top:10px">
           ${r.share ? `<button class="btn go" id="bigBtn">Show full screen</button>` : ""}
           <label class="switch"><input type="checkbox" id="share" ${r.share ? "checked" : ""}> QR link ${r.share ? "on" : '<span class="off">off</span>'}</label>
@@ -345,13 +350,15 @@
     $("#cos").innerHTML = route + (list.length ? list.map((c) => {
       const me = c.jobs.filter((j) => j.match === "me").length;
       const key = c.id || c.name;
-      const pill = c.talked ? `<span class="pill talk">Talked ✓</span>` : c.jobs.length ? `<span class="pill hire">${c.jobs.length} open</span>` : `<span class="pill none">No listings yet</span>`;
+      const pill = c.talked ? `<span class="pill talk">Talked ✓</span>` : c.jobs.length ? `<span class="pill hire">${c.jobs.length} open</span>`
+        : S.listingsErr && c.id ? `<span class="pill none">Couldn't check</span>` : `<span class="pill none">No listings yet</span>`;
       const jobs = c.jobs.slice(0, 12).map((j) => `<div class="job"><div>${esc(j.title)}${j.match === "me" ? `<span class="tag">ME</span>` : ""}<div class="muted small">${esc(j.location || j.state)}</div></div><a href="${esc(j.url)}" target="_blank" rel="noopener">Apply ↗</a></div>`).join("");
       return `<div class="co${S.open.has(key) ? " open" : ""}" data-key="${esc(key)}">
         <div class="cohead">${c.id ? `<button class="star" aria-pressed="${c.star}" aria-label="${c.star ? "Remove from" : "Add to"} my plan">${c.star ? "★" : "☆"}</button>` : `<span style="width:16px"></span>`}<button class="exp" aria-expanded="${S.open.has(key)}"><span class="coname">${esc(c.name)}${c.booth ? `<span class="booth">Booth ${esc(c.booth)}</span>` : ""}</span>${pill}
           <span class="cosub">${c.jobs.length ? `${c.jobs.length} internship${c.jobs.length > 1 ? "s" : ""}${me ? ` · ${me} ME` : ""}` : (c.id ? "We'll show internships as soon as their board posts them" : "Not tracked yet")}</span></button></div>
         <div class="codetail">
-          ${jobs || `<p class="muted small" style="margin:4px 0 10px">No open internships on their job board right now. Still worth a conversation — ask what's coming.</p>`}
+          ${jobs || (S.listingsErr && c.id ? `<p class="muted small" style="margin:4px 0 10px">We couldn't load internships just now (our side or your connection) — this doesn't mean they have none. Refresh to try again.</p>`
+            : `<p class="muted small" style="margin:4px 0 10px">No open internships on their job board right now. Still worth a conversation — ask what's coming.</p>`)}
           ${c.jobs.length > 12 ? `<p class="muted small">+ ${c.jobs.length - 12} more on the <a href="/jobs/">jobs page</a></p>` : ""}
           <div class="row" style="margin-top:10px"><button class="btn go note">📝 ${c.talked ? "Add more notes" : "I talked to them"}</button>
           ${c.id ? `<button class="btn brief">📋 Brief</button>` : ""}
@@ -446,7 +453,7 @@
                    feel, talkedAt, followUpAt: new Date(new Date(talkedAt).getTime() + hours * 36e5).toISOString() };
     if (!S.user) { S.draft = note; closeNote(); return signIn("Sign in to save your notes — they'll be waiting"); }
     const b = $("#noteSave"); b.disabled = true;
-    try { S.me = await api("POST", { action: "note", note }); closeNote(); toast(`Saved — follow-up reminder set for ${hours === 168 ? "1 week" : hours + " hrs"}`); }
+    try { S.me = await api("POST", { action: "note", note }); closeNote(); toast(`Saved — it's on your Follow-ups tab, due in ${hours === 168 ? "1 week" : hours + " hrs"}`); }
     catch (e) { toast(e.message); }
     b.disabled = false; renderAll();
   };
@@ -486,13 +493,22 @@ ${me}${email ? "\n" + email : ""}`;
   }
   // Calendar reminders — real phone notifications, no texting service needed
   const icsDate = (d) => new Date(d).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
-  function reminderTimes(n){ let t = new Date(n.followUpAt); if (t < new Date()) t = new Date(Date.now() + 30 * 6e4); t.setMinutes(0, 0, 0); if (t.getHours() < 9 || t.getHours() > 19) t.setHours(t.getHours() < 9 ? 10 : 34, 0); return [t, new Date(t.getTime() + 15 * 6e4)]; }
-  function reminderText(n){ return { title: `Follow up with ${n.contact ? n.contact.split(",")[0] + " at " : ""}${n.company}`, details: `Your follow-up email is ready in InternIQ: ${location.origin}/fair/\n\n${n.roles ? "Roles: " + n.roles + "\n" : ""}${n.said || ""}` }; }
+  // Round UP to the next whole hour (never into the past), keep it between 9am and 7pm, always at least 15 min from now.
+  function reminderTimes(n){
+    const soon = Date.now() + 15 * 6e4;
+    let t = new Date(Math.max(new Date(n.followUpAt).getTime() || 0, soon));
+    if (t.getMinutes() || t.getSeconds() || t.getMilliseconds()) { t.setMinutes(0, 0, 0); t.setHours(t.getHours() + 1); }
+    if (t.getHours() < 9) t.setHours(10, 0, 0, 0); else if (t.getHours() > 19) { t.setDate(t.getDate() + 1); t.setHours(10, 0, 0, 0); }
+    return [t, new Date(t.getTime() + 15 * 6e4)];
+  }
+  // Calendar events can be seen by anyone who shares your calendar, so they only carry the company, the recruiter's
+  // name and the roles — never your private notes or their email.
+  function reminderText(n){ return { title: `Follow up with ${n.contact ? n.contact.split(",")[0] + " at " : ""}${n.company}`, details: `Your follow-up email is ready in Beat the Pile: ${location.origin}/fair/${n.roles ? "\n\nRoles: " + n.roles : ""}` }; }
   function gcal(n){ const [a, b] = reminderTimes(n), t = reminderText(n);
     return `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(t.title)}&dates=${icsDate(a)}/${icsDate(b)}&details=${encodeURIComponent(t.details)}`; }
   function downloadIcs(n){
     const [a, b] = reminderTimes(n), t = reminderText(n), escI = (x) => String(x).replace(/([,;\\])/g, "\\$1").replace(/\n/g, "\\n");
-    const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//InternIQ//EN","BEGIN:VEVENT",`UID:${n.id}@interniq`,`DTSTAMP:${icsDate(new Date())}`,`DTSTART:${icsDate(a)}`,`DTEND:${icsDate(b)}`,
+    const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Beat the Pile//EN","BEGIN:VEVENT",`UID:${n.id}@beatthepile.com`,`DTSTAMP:${icsDate(new Date())}`,`DTSTART:${icsDate(a)}`,`DTEND:${icsDate(b)}`,
       `SUMMARY:${escI(t.title)}`,`DESCRIPTION:${escI(t.details)}`,"BEGIN:VALARM","TRIGGER:PT0M","ACTION:DISPLAY",`DESCRIPTION:${escI(t.title)}`,"END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
     const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
     const el = document.createElement("a"); el.href = url; el.download = `follow-up-${n.company.replace(/\W+/g, "-").toLowerCase()}.ics`; el.click();
@@ -516,8 +532,11 @@ ${me}${email ? "\n" + email : ""}`;
         ${n.said ? `<div class="small" style="margin-top:4px;white-space:pre-wrap">${esc(n.said)}</div>` : ""}
         <details ${k === "due" || k === "late" ? "open" : ""} style="margin-top:10px"><summary>Follow-up email draft</summary>
           <div class="draft"><b>Subject:</b> ${esc(d.subject)}\n\n${esc(d.body)}</div>
-          <div class="row"><a class="btn go" href="${esc(mail)}">Open in email</a><button class="btn copy">Copy</button><button class="btn polish">✨ ${S.polished[n.id] ? "Rewrite again" : "Write it with AI"}</button></div></details>
-        ${n.done ? "" : `<div class="row" style="margin-top:8px"><span class="small muted">Remind me on my phone:</span><a class="btn ghost" href="${esc(gcal(n))}" target="_blank" rel="noopener">📅 Google Calendar</a><button class="btn ghost ics">📅 iPhone / Outlook</button></div>`}
+          <div class="row"><a class="btn go" href="${esc(mail)}">Open in email</a><button class="btn copy">Copy</button><button class="btn polish">✨ ${S.polished[n.id] ? "Rewrite again" : "Write it with AI"}</button></div>
+          <div class="small muted" style="margin-top:6px">“Write it with AI” sends this company, the recruiter's name, the roles and your notes to our AI provider to draft the email. Their email address isn't sent. Read it over before sending.</div></details>
+        ${n.done ? "" : `<div class="small muted" style="margin-top:8px">The due date above is a reminder <b>inside this app</b> (your Follow-ups tab). For a phone notification, add it to your calendar:</div>
+          <div class="row" style="margin-top:4px"><a class="btn ghost" href="${esc(gcal(n))}" target="_blank" rel="noopener">📅 Google Calendar</a><button class="btn ghost ics">📅 iPhone / Outlook</button></div>
+          <div class="small muted" style="margin-top:2px">Event: “${esc(reminderText(n).title)}” at ${esc(reminderTimes(n)[0].toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))} — your notes and their email stay out of your calendar.</div>`}
         <div class="row" style="margin-top:10px"><button class="btn done">${n.done ? "Mark not done" : "✓ I followed up"}</button><button class="btn ghost edit">Edit</button><button class="btn ghost del">Delete</button></div>
       </div>`;
     }).join("");
@@ -528,7 +547,7 @@ ${me}${email ? "\n" + email : ""}`;
     if (e.target.closest(".ics")) return downloadIcs(n);
     if (e.target.closest(".polish")) {
       const b = e.target.closest(".polish"); b.disabled = true; b.textContent = "✨ Writing…";
-      try { S.polished[n.id] = await api("POST", { action: "polish", note: n, name: S.user?.fullName || "", resumeLink: S.me.resume?.share ? resumeUrl() : "" }); toast("Done — read it over before you send"); }
+      try { S.polished[n.id] = await api("POST", { action: "polish", note: { ...n, contactEmail: "" }, name: S.user?.fullName || "", resumeLink: S.me.resume?.share ? resumeUrl() : "" }); toast("Done — read it over before you send"); }
       catch (err) { toast(err.message); }
       return renderFollow();
     }
@@ -551,11 +570,22 @@ ${me}${email ? "\n" + email : ""}`;
       ${r ? `<p class="small muted" style="margin:4px 0 12px">${esc(r.name)} · updated ${esc(new Date(r.uploadedAt).toLocaleDateString())}</p>
         <div class="row"><a class="btn" href="${esc(resumeUrl())}" target="_blank" rel="noopener">Open what recruiters see ↗</a><button class="btn" id="rep">Replace PDF</button></div>
         <label class="switch" style="margin-top:14px"><input type="checkbox" id="share2" ${r.share ? "checked" : ""}> QR link is ${r.share ? "on" : '<span class="off">off</span>'}</label>
-        <p class="muted small" style="margin:8px 0 0">Your resume isn't listed or searchable anywhere. Only someone with your QR (or its link) can open it, and turning this off blocks it right away.</p>
-        ${r.share ? `<div class="row" style="margin-top:12px"><button class="btn" id="copyLink">Copy resume link</button><button class="btn" id="dlqr">Download QR image</button></div>` : ""}`
+        <div class="small" style="margin:10px 0 0;line-height:1.55"><b>Who can open it:</b> ${r.share ? "anyone who has your QR code or its link — for example a recruiter you let scan it, or anyone they forward the link to." : "nobody right now. It's private until you turn the QR link on."}
+          It's never listed or searchable. Turning the link off blocks it within about 2 minutes.
+          If a link got passed around, <b>make a new link</b>: the old QR stops working and you get a fresh one.</div>
+        ${r.share ? `<div class="row" style="margin-top:12px"><button class="btn" id="copyLink">Copy resume link</button><button class="btn" id="dlqr">Download QR image</button></div>` : ""}
+        <div class="row" style="margin-top:12px"><button class="btn ghost" id="rotate">Make a new link</button><button class="btn ghost" id="delres">Delete my resume</button></div>`
       : `<p class="muted small">No resume yet.</p><button class="btn go" id="rep">Upload resume (PDF)</button>`}</div>`;
     $("#rep")?.addEventListener("click", () => $("#file").click());
     $("#share2")?.addEventListener("change", (e) => setShare(e.target.checked));
+    $("#rotate")?.addEventListener("click", async () => {
+      if (!confirm("Make a new link? Your old QR code and link will stop working (reprint or re-download the QR).")) return;
+      try { S.me = await api("POST", { action: "rotate" }); toast("New link ready — the old QR no longer works"); } catch (e) { toast(e.message); } renderAll();
+    });
+    $("#delres")?.addEventListener("click", async () => {
+      if (!confirm("Delete your resume? The file and its QR link are removed for good.")) return;
+      try { S.me = await api("POST", { action: "resume_delete" }); toast("Resume deleted"); } catch (e) { toast(e.message); } renderAll();
+    });
     $("#copyLink")?.addEventListener("click", async () => { try { await navigator.clipboard.writeText(resumeUrl()); toast("Link copied"); } catch { toast(resumeUrl()); } });
     $("#dlqr")?.addEventListener("click", () => { const q = qrcode(0, "M"); q.addData(resumeUrl()); q.make(); const a = document.createElement("a"); a.href = q.createDataURL(12, 3); a.download = "my-resume-qr.gif"; a.click(); });
   }

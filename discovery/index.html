@@ -5,11 +5,11 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="InternIQ">
+<meta name="apple-mobile-web-app-title" content="Beat the Pile">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>InternIQ — Company Coverage</title>
+<title>Beat the Pile — Company Coverage</title>
 <meta name="robots" content="noindex">
 <style>
   :root{--green:#00C285;--green-dark:#009E6C;--navy:#0A1628;--ink:#1E293B;--muted:#64748B;--bg:#F8FFFE;--line:#E2EEEA;--r:12px;
@@ -65,7 +65,7 @@
 </head>
 <body>
 <header><div class="wrap">
-  <a class="brand" href="/jobs/">InternIQ</a>
+  <a class="brand" href="/jobs/">Beat the Pile</a>
   <h1>Company coverage</h1>
   <p class="sub">A robot finds each company's real job board and only adds it after proving it belongs to that company.</p>
   <div class="account" id="account"></div>
@@ -161,7 +161,7 @@
       .concat(need.map((r) => [r.company, r.domain, r.source, SHORT[r.status] || r.status, r.hint, r.detail, ""].map(q).join(",")));
     const a = document.createElement("a");
     a.href = URL.createObjectURL(new Blob([lines.join("\n")], { type: "text/csv" }));
-    a.download = "interniq-needs-a-link.csv"; a.click();
+    a.download = "beatthepile-needs-a-link.csv"; a.click();
   }
 
   function load(){ return fetch("/api/discovery", { cache: "no-store" }).then((r) => r.json()).then((d) => { if (d.error) throw new Error(d.error); S.data = d; render(d); }); }

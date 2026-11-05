@@ -102,6 +102,9 @@ console.log("sync day1 ✓  kept:", open().join(", "));
 
 // link check: Dublin page says "no longer available" → dead
 r = resObj(); await check(cronReq, r);
+assert.ok(!r.body.dead.includes("volvo-group:1400000004") && r.body.suspect >= 1, "one dead answer = suspect, not hidden yet");
+assert.notEqual(T.listings.get("volvo-group:1400000004").link_ok, false);
+r = resObj(); await check(cronReq, r);                                       // second dead answer in a row → hidden
 assert.ok(r.body.dead.includes("volvo-group:1400000004")); assert.ok(!r.body.dead.includes("volvo-group:1400000001"));   // all majors' links are checked now
 assert.equal(T.listings.get("volvo-group:1400000001").link_ok, true);
 console.log("link check ✓  dead:", r.body.dead);

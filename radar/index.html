@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>InternIQ — Opening Radar</title>
+<title>Beat the Pile — Opening Radar</title>
 <meta name="description" content="Know when companies open their summer internships — before everyone else. Based on the last three recruiting seasons.">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
@@ -58,11 +58,12 @@
 </style>
 </head>
 <body>
+<script src="/nav.js"></script>
 <header>
   <div class="wrap">
-    <div class="top"><a class="brand" href="/jobs/">InternIQ</a><a class="nav" href="/jobs/">Internships →</a></div>
+    <div class="top"><span class="brand">Opening Radar</span></div>
     <h1>📡 Opening Radar</h1>
-    <p class="sub">Know when companies open their summer internships, before the other 108 applicants do.</p>
+    <p class="sub">Know when companies usually open their summer internships, so you can apply in the first few days instead of after the pile.</p>
     <div class="trend" id="trend" hidden></div>
   </div>
 </header>
@@ -77,6 +78,7 @@
   </div>
 </div>
 <main class="wrap">
+  <div class="hint" id="fresh" style="font-size:12.5px"></div>
   <p class="hint" id="hint"></p>
   <div id="list"><div class="empty">Loading the radar…</div></div>
 </main>
@@ -100,11 +102,11 @@
     if (at < new Date()) at.setTime(Date.now() + DAY);
     const end = new Date(at.getTime() + 30 * 6e4);
     const title = `${c.name} internships usually open ~${fmt(dateIso)}`;
-    const details = `Summer ${season} internship postings at ${c.name} usually show up around ${fmt(dateIso, true)}. Get your resume ready and check InternIQ: ${location.origin}/radar/?view=${S.view}`;
+    const details = `Summer ${season} internship postings at ${c.name} usually show up around ${fmt(dateIso, true)}. Get your resume ready and check Beat the Pile: ${location.origin}/radar/?view=${S.view}`;
     const z = (d) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
     if (/iPhone|iPad|Macintosh/.test(navigator.userAgent)) {
       const e = (x) => String(x).replace(/([,;\\])/g, "\\$1").replace(/\n/g, "\\n");
-      const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//InternIQ//EN","BEGIN:VEVENT",`UID:radar-${c.k}-${season}@interniq`,`DTSTAMP:${z(new Date())}`,`DTSTART:${z(at)}`,`DTEND:${z(end)}`,`SUMMARY:${e(title)}`,`DESCRIPTION:${e(details)}`,"BEGIN:VALARM","TRIGGER:PT0M","ACTION:DISPLAY",`DESCRIPTION:${e(title)}`,"END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
+      const ics = ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//Beat the Pile//EN","BEGIN:VEVENT",`UID:radar-${c.k}-${season}@beatthepile.com`,`DTSTAMP:${z(new Date())}`,`DTSTART:${z(at)}`,`DTEND:${z(end)}`,`SUMMARY:${e(title)}`,`DESCRIPTION:${e(details)}`,"BEGIN:VALARM","TRIGGER:PT0M","ACTION:DISPLAY",`DESCRIPTION:${e(title)}`,"END:VALARM","END:VEVENT","END:VCALENDAR"].join("\r\n");
       const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
       const a = document.createElement("a"); a.href = url; a.download = `radar-${c.k}.ics`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 5000);
       toast("Open the file to add the reminder");
@@ -113,8 +115,9 @@
     }
   }
 
+  // Three different kinds of information, always labeled: PAST (history), ESTIMATE (from history), NOW (live jobs we track)
   function history(c){
-    return `<div class="hist">${Object.entries(c.history).map(([S, d]) => `<span>Summer ${esc(S)}: <b>${esc(fmt(d, true))}</b></span>`).join("")}</div>`;
+    return `<div class="hist"><span style="font-weight:700">Past seasons:</span>${Object.entries(c.history).map(([S, d]) => `<span>Summer ${esc(S)}: <b>${esc(fmt(d, true))}</b></span>`).join("")}</div>`;
   }
   const conf = (c) => c.confidence === "high" ? "Very consistent year to year" : c.seasons >= 2 ? `Based on ${c.seasons} seasons` : "Based on 1 season, a rough guide";
   function jobsLink(c){ return `<a class="btn go" href="/jobs/?q=${encodeURIComponent(c.name)}">See internships →</a>`; }
@@ -130,13 +133,13 @@
     if (S.view === "next") {
       const n = c.openedNext ? `<span class="pill open">Already posting</span>` : `<span class="pill next">~${esc(fmt(c.typicalNext))}</span>`;
       return `<div class="card"><div class="row1"><div class="name">${esc(c.name)}</div>${n}</div>
-        <div class="big">Summer ${season + 1} internships expected around <b>${esc(fmt(c.typicalNext, true))}</b></div>${history(c)}
+        <div class="big">Estimate: Summer ${season + 1} internships around <b>${esc(fmt(c.typicalNext, true))}</b></div>${history(c)}
         <div class="meta">${esc(conf(c))}</div>
         <div class="acts">${c.openedNext ? (S.onSite.has(c.k) || c.id ? jobsLink(c) : "") : `<button class="btn" data-remind="${esc(c.k)}" data-when="next">📅 Remind me a week before</button>`}</div></div>`;
     }
     const days = daysFrom(c.typical);
     const pill = days >= 0 ? `<span class="pill soon">${days === 0 ? "Any day now" : `In ~${days} day${days === 1 ? "" : "s"}`}</span>` : `<span class="pill late">Late this year</span>`;
-    const line = days >= 0 ? `Usually opens around <b>${esc(fmt(c.typical))}</b>` : `Usually open by <b>${esc(fmt(c.typical))}</b>. Not seen yet this season, so keep checking their careers page.`;
+    const line = days >= 0 ? `Estimate: usually opens around <b>${esc(fmt(c.typical))}</b>` : `Estimate: usually open by <b>${esc(fmt(c.typical))}</b>. Not seen yet this season, so keep checking their careers page.`;
     return `<div class="card"><div class="row1"><div class="name">${esc(c.name)}</div>${pill}</div>
       <div class="big">${line}</div>${history(c)}<div class="meta">${esc(conf(c))}</div>
       <div class="acts">${days >= 0 ? `<button class="btn" data-remind="${esc(c.k)}" data-when="cur">📅 Remind me a week before</button>` : ""}${S.onSite.has(c.k) || c.id ? jobsLink(c) : ""}</div></div>`;
@@ -147,7 +150,7 @@
     document.querySelectorAll(".tabs button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === S.view)));
     const q = S.q.toLowerCase();
     let list = S.d.companies.filter((c) => !q || c.name.toLowerCase().includes(q));
-    // "Open" also counts companies with live internships on InternIQ, even if the public list missed them
+    // "Open" also counts companies with live internships on Beat the Pile, even if the public list missed them
     const isOpen = (c) => c.opened || S.onSite.has(c.k);
     if (S.view === "soon") list = list.filter((c) => !isOpen(c)).sort((a, b) => (daysFrom(a.typical) < 0) - (daysFrom(b.typical) < 0) || a.typical.localeCompare(b.typical) || b.seasons - a.seasons);
     if (S.view === "open") list = list.filter(isOpen).sort((a, b) => String(b.opened || "9").localeCompare(String(a.opened || "9")));
@@ -157,9 +160,12 @@
       : S.view === "open" ? `${n} companies have opened Summer ${season} internships. Most recent first.`
       : `Freshman or sophomore? Summer ${season + 1} recruiting starts next year. Set reminders now and be first in line.`;
     $("#list").innerHTML = n ? list.map((c) => S.view === "open" && !c.opened
-        ? `<div class="card"><div class="row1"><div class="name">${esc(c.name)}</div><span class="pill open">Open</span></div><div class="big">Internships live on InternIQ right now</div>${history(c)}<div class="acts">${jobsLink(c)}</div></div>`
+        ? `<div class="card"><div class="row1"><div class="name">${esc(c.name)}</div><span class="pill open">Open now</span></div><div class="big">Now: internships open on their job board (we track it)</div>${history(c)}<div class="acts">${jobsLink(c)}</div></div>`
         : card(c)).join("")
       : `<div class="empty">No companies match${q ? ` “${esc(S.q)}”` : ""}.</div>`;
+    $("#fresh").innerHTML = `Opening history updated ${esc(new Date(S.d.built).toLocaleDateString())}. ` + (S.liveErr
+      ? `<b style="color:#B45309">We couldn't check which companies have jobs open right now</b> (our side or your connection), so “Open now” may be missing some. That doesn't mean they have none — refresh to try again.`
+      : S.lastSync ? `Current openings checked against company job boards (last re-read ${esc(new Date(S.lastSync).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))}).` : "");
   }
 
   document.querySelector(".tabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; S.view = b.dataset.v; history_(); render(); });
@@ -171,15 +177,17 @@
     b.dataset.when === "next" ? remind(c, c.typicalNext, S.d.season + 1) : remind(c, c.typical, S.d.season);
   });
 
-  Promise.all([fetch("/radar/radar.json").then((r) => r.json()), fetch("/api/listings").then((r) => r.json()).catch(() => ({ listings: [] }))]).then(([d, l]) => {
+  Promise.all([fetch("/radar/radar.json").then((r) => r.json()),
+               fetch("/api/listings").then((r) => { if (!r.ok) throw 0; return r.json(); }).catch(() => null)]).then(([d, l]) => {
     S.d = d;
-    for (const j of l.listings || []) { S.onSite.add(normName(j.company)); }
+    if (!l) S.liveErr = true; else S.lastSync = l.meta?.lastSync || null;
+    for (const j of l?.listings || []) { S.onSite.add(normName(j.company)); }
     if (d.trend && d.trend.companies >= 10) {
       const t = d.trend, pct = Math.round(t.earlier / t.companies * 100);
-      $("#trend").innerHTML = `<div class="n">${pct}%</div><div class="t">of companies opened Summer ${d.season} internships <b>earlier than last year</b>. Only ${Math.round(t.later / t.companies * 100)}% opened later (${t.companies} companies compared). Waiting is how you end up applicant #109.</div>`;
+      $("#trend").innerHTML = `<div class="n">${pct}%</div><div class="t">of companies opened Summer ${d.season} internships <b>earlier than last year</b>. Only ${Math.round(t.later / t.companies * 100)}% opened later (${t.companies} companies compared, from the opening history below).</div>`;
       $("#trend").hidden = false;
     }
-    $("#foot").innerHTML = `How this works: we track the date each company's internship postings first appeared over the last few recruiting seasons (from the public <a href="https://github.com/SimplifyJobs" target="_blank" rel="noopener">SimplifyJobs</a> internship list plus InternIQ's own data). Opening dates are when a company starts posting any summer internships, and estimates aren't guarantees. Updated ${esc(new Date(d.built).toLocaleDateString())}.`;
+    $("#foot").innerHTML = `How this works: we track the date each company's internship postings first appeared over the last few recruiting seasons (from the public <a href="https://github.com/SimplifyJobs" target="_blank" rel="noopener">SimplifyJobs</a> internship list plus our own data). Opening dates are when a company starts posting any summer internships. <b>Estimates</b> come from those past dates and aren't guarantees; <b>Open now</b> means we see internships on their job board today. Updated ${esc(new Date(d.built).toLocaleDateString())}.`;
     render();
   }).catch(() => { $("#list").innerHTML = `<div class="empty">Couldn't load the radar. Refresh to try again.</div>`; });
 })();

@@ -22,8 +22,14 @@ const call = async (mod, { method = "GET", auth, body, query = {} } = {}) => { c
   const r = { headers: {}, setHeader(k, v) { r.headers[k] = v; } }; r.status = (s) => (r.code = s, r); r.json = (b) => (r.body = b, r); r.send = (b) => (r.body = b, r); r.end = () => r;
   await h({ method, query, headers: auth ? { authorization: "Bearer " + auth } : {}, body }, r); return r; };
 
-// Read the control room (public)
+// Public callers only get the switches (no users, AI spend, emails, run logs)
 let r = await call("discovery", { query: { bots: "1" } });
+assert.equal(r.code, 200); assert.equal(r.body.public, true); assert.equal(r.body.bots.length, 7);
+assert.ok(!r.body.system && !r.body.ai && !r.body.finder && !r.body.bots[0].runs && !("changedBy" in r.body.bots[0]), "private numbers hidden");
+assert.ok(r.body.bots.every((b) => b.enabled === true));
+r = await call("discovery", { query: { bots: "1" }, auth: tok("user_rando") }); assert.equal(r.body.public, true, "signed-in non-owner: still public view");
+// Owner (or the robot) gets the full control room
+r = await call("discovery", { query: { bots: "1" }, auth: tok("user_owner") });
 assert.equal(r.code, 200); assert.equal(r.body.bots.length, 7); assert.equal(r.body.bots[0].id, "finder"); assert.ok(r.body.bots[0].main);
 assert.ok(r.body.bots.every((b) => b.enabled), "default ON"); assert.equal(r.body.finder.counts.live, 1); assert.ok(r.body.finder.backlogLeft > 500);
 console.log("✓ control room data: 6 bots, all on by default, finder pipeline + backlog", r.body.finder.backlogLeft);
@@ -49,7 +55,7 @@ console.log("✓ off = the bot skips its run (sync, link checker, company finder
 assert.equal((await call("discovery", { method: "POST", auth: tok("user_owner"), body: { action: "botlog", bot: "radar", summary: "x" } })).code, 403);
 r = await call("discovery", { method: "POST", auth: "cron", body: { action: "botlog", bot: "radar", ok: true, summary: "322 companies tracked" } });
 assert.equal(r.code, 200); assert.equal(runs.at(-1).bot, "radar"); assert.equal(runs.at(-1).summary, "322 companies tracked");
-r = await call("discovery", { query: { bots: "1" } });
+r = await call("discovery", { query: { bots: "1" }, auth: "cron" });
 assert.equal(r.body.bots.find((b) => b.id === "radar").runs[0].summary, "322 companies tracked");
 assert.equal(r.body.bots.find((b) => b.id === "finder").enabled, false);
 console.log("✓ run log: GitHub bots report in; shows on the control room");

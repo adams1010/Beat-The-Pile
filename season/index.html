@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>InternIQ — My Season</title>
+<title>My Season — Beat the Pile</title>
 <meta name="description" content="Your internship season in one place: every application, where it stands, your weekly goal, and how fast you apply.">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
@@ -78,12 +78,12 @@
 </style>
 </head>
 <body>
+<script src="/nav.js"></script>
 <header>
   <div class="wrap">
-    <div class="top"><a class="brand" href="/jobs/">InternIQ</a><div class="acct" id="acct"></div></div>
+    <div class="top"><span class="brand">My Season</span><div class="acct" id="acct"></div></div>
     <h1>📈 My Season</h1>
-    <p class="sub">Every application, where it stands, and how you're pacing.</p>
-    <nav class="links"><a href="/jobs/">Internships</a><a href="/radar/">Opening Radar</a><a href="/fair/">Career Fair</a></nav>
+    <p class="sub">Every application, where it stands, and how you're pacing. Applications you track on the homepage show up here too.</p>
   </div>
 </header>
 <main class="wrap" id="app"><div class="card empty">Loading your season…</div></main>
@@ -108,6 +108,22 @@
   const toast = (m) => { const t = document.createElement("div"); t.className = "toast"; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); };
   const fmt = (t) => new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" });
   const daysAgo = (t) => Math.floor((Date.now() - Date.parse(t)) / DAY);
+  // Employer's posting date vs. when our robot found it. Older entries (before Nov 2026) stored our "found" date
+  // in postedAt, so those are treated as "found", never as the employer's date.
+  const legacy = (a) => !("firstSeenAt" in a);
+  const postedOf = (a) => legacy(a) ? null : a.postedAt;
+  const foundOf = (a) => legacy(a) ? a.postedAt : a.firstSeenAt;
+  function postedInfo(postedOn, seenAt){
+    const s = String(postedOn || "").trim();
+    if (!s || /\+\s*days?/i.test(s)) return null;
+    const rel = s.match(/(today|just posted|yesterday|(\d{1,3})\s*days?\s*ago)/i);
+    if (rel) { const b = new Date(seenAt); if (isNaN(b)) return null;
+      const n = /today|just/i.test(rel[1]) ? 0 : /yesterday/i.test(rel[1]) ? 1 : Number(rel[2]);
+      return { date: new Date(b.getTime() - n * DAY).toISOString(), estimate: true }; }
+    if (!/\d{4}/.test(s)) return null;
+    const d = new Date(s); if (isNaN(d) || d.getFullYear() < 2015 || d.getTime() > Date.now() + 2 * DAY) return null;
+    return { date: d.toISOString(), estimate: false };
+  }
   const weekStart = (d) => { const x = new Date(d); x.setHours(0, 0, 0, 0); x.setDate(x.getDate() - ((x.getDay() + 6) % 7)); return x.getTime(); };   // Monday
 
   async function token(){ try { return await S.clerk?.session?.getToken(); } catch { return null; } }
@@ -124,7 +140,8 @@
     const perWeek = {}; for (const a of apps) { const w = weekStart(a.appliedAt); perWeek[w] = (perWeek[w] || 0) + 1; }
     let streak = 0; for (let w = thisWeek - 7 * DAY; (perWeek[w] || 0) >= goal; w -= 7 * DAY) streak++;
     if (week >= goal) streak++;
-    const speeds = apps.filter((a) => a.postedAt).map((a) => Math.max(0, (Date.parse(a.appliedAt) - Date.parse(a.postedAt)) / DAY));
+    // Apply speed uses ONLY the employer's posting date (exact, or estimated from "posted N days ago"). Unknown dates are left out.
+    const speeds = apps.filter((a) => postedOf(a)).map((a) => Math.max(0, (Date.parse(a.appliedAt) - Date.parse(postedOf(a))) / DAY));
     const speed = speeds.length >= 2 ? speeds.reduce((x, y) => x + y, 0) / speeds.length : null;
     const n = (s) => apps.filter((a) => a.stage === s).length;
     return { apps, goal, week, streak, speed, speeds: speeds.length, applied: apps.length, interview: n("interview"), offer: n("offer"), rejected: n("rejected") };
@@ -138,7 +155,9 @@
 
   function appCard(a){
     const d = daysAgo(a.appliedAt);
-    const speed = a.postedAt ? Math.max(0, Math.round((Date.parse(a.appliedAt) - Date.parse(a.postedAt)) / DAY)) : null;
+    const p = postedOf(a), f = foundOf(a), est = !!a.postedEstimate;
+    const speed = p ? Math.max(0, Math.round((Date.parse(a.appliedAt) - Date.parse(p)) / DAY)) : null;
+    const found = !p && f ? Math.max(0, Math.round((Date.parse(a.appliedAt) - Date.parse(f)) / DAY)) : null;
     const acts = {
       applied: `<button class="btn int" data-stage="interview">🎤 Got an interview</button><button class="btn off" data-stage="offer">🎉 Offer</button><button class="btn ghost" data-stage="rejected">Rejected</button>`,
       interview: `<button class="btn off" data-stage="offer">🎉 Offer</button><button class="btn ghost" data-stage="rejected">Rejected</button><button class="btn ghost" data-stage="applied">Back to applied</button>`,
@@ -147,7 +166,8 @@
     }[a.stage] || "";
     return `<div class="app ${esc(a.stage)}" data-id="${esc(a.id)}">
       <div class="co">${esc(a.company)}</div><div class="ti">${esc(a.title || "Internship")}</div>
-      <div class="meta"><span>Applied ${esc(fmt(a.appliedAt))} · ${d === 0 ? "today" : d + "d ago"}</span>${speed != null ? `<span>${speed <= 3 ? "🐦 " : ""}${speed === 0 ? "same day it posted" : speed + "d after it posted"}</span>` : ""}</div>
+      <div class="meta"><span>Applied ${esc(fmt(a.appliedAt))} · ${d === 0 ? "today" : d + "d ago"}</span>${speed != null ? `<span title="${est ? "Estimated from the board's “posted N days ago” text" : "From the employer's posting date"}">${speed <= 3 ? "🐦 " : ""}${est ? "~" : ""}${speed === 0 ? "same day it posted" : speed + "d after it posted"}</span>`
+        : found != null ? `<span title="The employer didn't show a posting date, so this is from when our robot first saw it">${found === 0 ? "same day we found it" : found + "d after we found it"}</span>` : ""}</div>
       <div class="acts">${acts}${a.url ? `<a class="btn ghost" href="${esc(a.url)}" target="_blank" rel="noopener">Open ↗</a>` : ""}<button class="btn ghost" data-del>Remove</button></div></div>`;
   }
 
@@ -161,6 +181,7 @@
     const st = stats();
     const appIds = new Set(st.apps.map((a) => a.id));
     const saved = (S.me.saved || []).filter((id) => !appIds.has(id)).map((id) => S.listings[id]).filter(Boolean);
+    const savedLoading = (S.me.saved || []).some((id) => !appIds.has(id) && !S.listings[id]) && !S.listingsTried;
     const stale = st.apps.filter((a) => a.stage === "applied" && daysAgo(a.appliedAt) >= 14);
     const counts = { applied: st.apps.filter((a) => a.stage === "applied").length, interview: st.interview, offer: st.offer, rejected: st.rejected, saved: saved.length };
     const list = S.tab === "saved" ? saved : st.apps.filter((a) => a.stage === S.tab).sort((a, b) => Date.parse(b.appliedAt) - Date.parse(a.appliedAt));
@@ -175,7 +196,7 @@
         <div class="stat"><b>${st.applied}</b><span>applications</span></div>
         <div class="stat"><b>${st.interview + st.offer}</b><span>interviews</span></div>
         <div class="stat"><b>${st.offer}</b><span>offers</span></div>
-        <div class="stat early"><b>${st.speed == null ? "—" : st.speed < 1 ? "<1d" : st.speed.toFixed(1) + "d"}</b><span>${st.speed == null ? "apply speed (needs 2+)" : "avg. after posting"}</span></div>
+        <div class="stat early"><b>${st.speed == null ? "—" : st.speed < 1 ? "<1d" : st.speed.toFixed(1) + "d"}</b><span>${st.speed == null ? "apply speed (needs 2+ with a posting date)" : `avg. after posting · ${st.speeds} dated`}</span></div>
       </div>
       ${st.speed != null ? (st.speed <= 3 ? `<div class="nudge good">🐦 <span><b>Early bird.</b> You apply ${st.speed < 1 ? "the same day" : `about ${st.speed.toFixed(1)} days`} after a job posts, before most of the pile shows up.</span></div>`
         : `<div class="nudge">⏱ <span>You apply about <b>${st.speed.toFixed(1)} days</b> after a job posts. Popular internships get 100+ applicants, so try to get in within 3 days. <a href="/radar/">Opening Radar</a> tells you when companies open.</span></div>`) : ""}
@@ -183,11 +204,12 @@
       <div class="tabs" role="group" aria-label="Pipeline">${[["applied", "📨 Applied"], ["interview", "🎤 Interview"], ["offer", "🎉 Offer"], ["saved", "♡ Saved"], ["rejected", "Rejected"]]
         .map(([k, l]) => `<button data-tab="${k}" aria-pressed="${S.tab === k}">${l}<i>${counts[k]}</i></button>`).join("")}</div>
       <div id="list">${list.length ? (S.tab === "saved"
-          ? list.map((l) => `<div class="app saved" data-lid="${esc(l.id)}"><div class="co">${esc(l.company)}</div><div class="ti">${esc(l.title)}</div><div class="meta"><span>📍 ${esc(l.location || l.state || "")}</span></div>
-              <div class="acts"><a class="btn go" href="${esc(l.url)}" target="_blank" rel="noopener">Apply →</a><button class="btn" data-applied>✓ I applied</button></div></div>`).join("")
+          ? list.map((l) => `<div class="app saved" data-lid="${esc(l.id)}"><div class="co">${esc(l.company)}</div><div class="ti">${esc(l.title)}</div><div class="meta"><span>📍 ${esc(l.location || l.state || "")}</span>${l.open === false ? "<span><b>Closed</b> — the company took this job down</span>" : ""}</div>
+              <div class="acts">${l.open === false ? "" : `<a class="btn go" href="${esc(l.url)}" target="_blank" rel="noopener">Apply →</a>`}<button class="btn" data-applied>✓ I applied</button></div></div>`).join("")
           : list.map(appCard).join(""))
-        : `<div class="empty">${{ applied: "No applications yet. Tap <b>Mark applied</b> on any internship, or add one you applied to elsewhere.", interview: "No interviews yet. When you get one, tap 🎤 on the application.", offer: "No offers yet. You've got this.", saved: "Nothing saved that you haven't applied to.", rejected: "None. 🙌" }[S.tab]}</div>`}</div>
-      <button class="btn add" id="addBtn">＋ Add an application from somewhere else</button>`;
+        : `<div class="empty">${{ applied: "No applications yet. Tap <b>Mark applied</b> on any internship, or add one you applied to elsewhere.", interview: "No interviews yet. When you get one, tap 🎤 on the application.", offer: "No offers yet. You've got this.", saved: savedLoading ? "Loading your saved jobs…" : S.listingsErr ? "Couldn't load your saved jobs right now — refresh in a minute." : "Nothing saved that you haven't applied to.", rejected: "None. 🙌" }[S.tab]}</div>`}</div>
+      <button class="btn add" id="addBtn">＋ Add an application from somewhere else</button>
+      <p style="font-size:12.5px;color:var(--muted);margin:22px 0 0">Your data: <a href="/privacy/">what we store</a> · <button class="btn ghost" id="delAll" style="font-size:12.5px;padding:4px 8px">Delete all my data</button></p>`;
   }
 
   async function act(body, msg){ try { S.me = await api("POST", body); if (msg) toast(msg); } catch (e) { toast(e.message); } render(); }
@@ -195,10 +217,16 @@
     const g = e.target.closest("[data-goal]"); if (g) return act({ action: "goal", goal: +g.dataset.goal }, `Goal set: ${g.dataset.goal} a week`);
     const t = e.target.closest("[data-tab]"); if (t) { S.tab = t.dataset.tab; return render(); }
     if (e.target.closest("#addBtn")) return openAdd();
+    if (e.target.closest("#delAll")) {
+      if (!confirm("Delete ALL your Beat the Pile data? This removes your resume file, saved jobs, notes, applications and synced homepage data. It can't be undone.")) return;
+      return api("POST", { action: "delete_all", confirm: "DELETE" }).then(() => { toast("All your data is deleted"); S.me = { apps: [], saved: [], applied: [], notes: [], starred: [] }; render(); })
+        .catch((err) => toast(err.message));
+    }
     const card = e.target.closest(".app"); if (!card) return;
     if (card.dataset.lid && e.target.closest("[data-applied]")) {
       const l = S.listings[card.dataset.lid];
-      return act({ action: "app", app: { id: l.id, company: l.company, title: l.title, url: l.url, postedAt: l.first_seen } }, `Added ${l.company} to Applied`);
+      const pi = postedInfo(l.posted_on, l.first_seen);
+      return act({ action: "app", app: { id: l.id, company: l.company, title: l.title, url: l.url, postedAt: pi?.date || null, postedEstimate: !!pi?.estimate, firstSeenAt: l.first_seen } }, `Added ${l.company} to Applied`);
     }
     const a = (S.me.apps || []).find((x) => x.id === card.dataset.id); if (!a) return;
     const s = e.target.closest("[data-stage]");
@@ -220,8 +248,12 @@
     if (!S.user) return;
     try { S.me = await api("GET"); } catch (e) { toast(e.message); }
     render();
-    if ((S.me?.saved || []).length) {
-      try { const d = await fetch("/api/listings").then((r) => r.json()); for (const l of d.listings || []) S.listings[l.id] = l; render(); } catch {}
+    const ids = (S.me?.saved || []).slice(0, 200);
+    if (ids.length) {          // just your saved jobs — including ones that have since closed (marked closed)
+      try { const r = await fetch("/api/listings?ids=" + encodeURIComponent(ids.join(","))); if (!r.ok) throw 0;
+            const d = await r.json(); for (const l of d.listings || []) S.listings[l.id] = l; }
+      catch { S.listingsErr = true; }
+      S.listingsTried = true; render();
     }
   }
   function acct(){
