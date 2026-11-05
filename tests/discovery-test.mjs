@@ -193,3 +193,17 @@ console.log("\nALL DISCOVERY TESTS PASSED");
   assert.notEqual(r.status, "live"); assert.ok(!r.domain);
   console.log("15 dead board link → website found by full name → live; parked domain refused ✓");
 }
+{
+  // guessed website that links to SOMEONE ELSE's board (revolution.com → Stord) → held back, not live
+  sites["https://api.lever.co/v0/postings/revolution?mode=json"] = json(404, {});
+  sites["https://www.revolution.com/"] = html(200, `<title>Revolution | Investing in companies</title>`, "https://www.revolution.com/");
+  sites["https://www.revolution.com/careers"] = html(200, `<a href="https://stord.wd1.myworkdayjobs.com/en-US/Stord_External_Career">Portfolio jobs</a>`, "https://www.revolution.com/careers");
+  sites["https://stord.wd1.myworkdayjobs.com/wday/cxs/stord/Stord_External_Career/jobs"] = () => json(200, W(30, [{ title: "Ops Intern", externalPath: "/job/s_1" }]));
+  const r = await discoverOne({ company: "Revolution", key: "revolution", hint: "https://jobs.lever.co/revolution" });
+  assert.equal(r.status, "identity_failed", JSON.stringify(r)); assert.match(r.detail, /held back/);
+  // name-proof via the lead word → jobs listed under the organization (config.listAs), company row untouched
+  sites["https://centerstone.wd1.myworkdayjobs.com/wday/cxs/centerstone/CenterstoneCareers/jobs"] = () => json(200, W(25, [{ title: "Clinical Intern", externalPath: "/job/c_1" }]));
+  const r2 = await discoverOne({ company: "Centerstone of Tennessee", key: "centerstoneoftennessee", hint: "https://centerstone.wd1.myworkdayjobs.com/CenterstoneCareers" });
+  assert.equal(r2.status, "live", JSON.stringify(r2)); assert.equal(r2.config.listAs, "Centerstone"); assert.ok(!("company" in r2));
+  console.log("16 guessed website → someone else's board held back; org-wide board listed under its own name ✓");
+}
