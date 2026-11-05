@@ -151,11 +151,7 @@
     <div class="feed">
 <div class="controls">
     <div class="row">
-      <div class="seg" role="group" aria-label="Where">
-        <button data-state="VA,PA" aria-pressed="true">VA &amp; PA</button>
-        <button data-state="ALL" aria-pressed="false">All US</button>
-      </div>
-      <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">Pick a state</option></select>
+      <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">All US states</option></select>
       <select class="statesel" id="majorSel" aria-label="Major">
         <option value="all">All majors</option>
         <optgroup label="Engineering"><option value="eng">All engineering</option><option value="mechanical">Mechanical &amp; Aerospace</option><option value="electrical">Electrical &amp; Computer Eng.</option><option value="civil">Civil, Construction &amp; Architecture</option><option value="chemical">Chemical &amp; Materials</option><option value="industrial">Industrial &amp; Manufacturing</option></optgroup>
@@ -193,7 +189,7 @@
 
 <script>
 (function(){
-  const state = { all: [], savedRows: [], followRows: [], major: "all", st: ["VA","PA"], meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
+  const state = { all: [], savedRows: [], followRows: [], major: "all", st: "ALL", meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
                   user: null, clerk: null, mine: { saved: new Set(), applied: new Set(), starred: new Set(), seenAt: null } };
   const NAMES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"Washington DC",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
   const statesOf = (j) => String(j.state || "").split(",").filter(Boolean);
@@ -263,7 +259,7 @@
     return new Date(j.first_seen).getTime() - 30 * DAY;      // unknown post date → after dated ones
   }
   function initials(n){ const w = String(n || "").replace(/[^A-Za-z0-9& ]/g, " ").split(/\s+/).filter((x) => x && !/^(and|of|the|&|inc|llc|corp|co)$/i.test(x)); if (!w.length) return "·"; return (w.length === 1 ? w[0].slice(0, 2) : w[0][0] + w[1][0]).toUpperCase(); }
-  const coHref = (j) => j.company_id ? `/jobs/?company=${encodeURIComponent(j.company_id)}&major=all` : `/jobs/?q=${encodeURIComponent(j.company)}&state=all`;
+  const coHref = (j) => j.company_id ? `/c/${encodeURIComponent(j.company_id)}` : `/jobs/?q=${encodeURIComponent(j.company)}&state=all`;
   const FIELD_NAME = { software: "Software", data: "Data & AI", cyber_it: "Cyber & IT", mechanical: "Mechanical", electrical: "Electrical", chemical: "Chemical", civil: "Civil & construction", product_design: "Product & design", industrial: "Industrial", finance: "Finance", legal_policy: "Legal & policy", people_hr: "People & HR", consulting: "Consulting", marketing: "Marketing", sales: "Sales", supply_chain: "Supply chain", science_health: "Science & health", education_social: "Education", engineering: "Engineering" };
   function domain(u){ try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } }
   function ago(ts){
@@ -367,8 +363,8 @@
     const rows = [...groups.values()];
     const has = (list, j) => j.ids.some((id) => state.mine[list].has(id));
     $("savedN").textContent = state.mine.saved.size ? `(${state.mine.saved.size})` : "";
-    $("note").innerHTML = (state.st !== "ALL" && state.st.join() === "VA,PA" && !state.savedOnly && !state.followOnly
-        ? `Starting with Virginia &amp; Pennsylvania. <button class="linkbtn" id="goAll">See all US</button> or pick a state. `
+    $("note").innerHTML = (state.st !== "ALL" && !state.savedOnly && !state.followOnly
+        ? `Showing ${esc(state.st.map((x) => NAMES[x] || x).join(" & "))}. <button class="linkbtn" id="goAll">See all US</button> `
         : "") + (state.company ? `One company, every major. <button class="linkbtn" id="allCos">Show all companies</button> ` : "") + (state.savedOnly || state.followOnly ? "Every major and state." : strict ? "Showing roles that say mechanical (or close, like manufacturing)." : `Major: <b>${esc(MAJOR_LABEL())}</b> (change it above).`)
       + (state.user ? " · ☆ Follow = flag new jobs from that company · ♡ Save = keep this job · Mark applied = add it to My Season" : "");
     syncUrl();
@@ -420,7 +416,7 @@
     if (!urlReady) return;
     const p = new URLSearchParams();
     const st = state.st === "ALL" ? "all" : state.st.join(",");
-    if (st !== "VA,PA") p.set("state", st);
+    if (st !== "all") p.set("state", st);
     if (state.company) p.set("company", state.company);
     if (state.major !== "all") p.set("major", state.major);
     if (state.meOnly && STRICT_OK()) p.set("me", "1");
@@ -432,7 +428,7 @@
   function readUrl(){
     const p = new URLSearchParams(location.search);
     const st = (p.get("state") || "").toUpperCase();
-    state.st = st === "ALL" ? "ALL" : (st.split(",").filter((x) => /^[A-Z]{2}$/.test(x)).length ? st.split(",").filter((x) => /^[A-Z]{2}$/.test(x)) : ["VA","PA"]);
+    state.st = st === "ALL" ? "ALL" : (st.split(",").filter((x) => /^[A-Z]{2}$/.test(x)).length ? st.split(",").filter((x) => /^[A-Z]{2}$/.test(x)) : "ALL");
     state.meOnly = p.get("me") === "1"; $("meOnly").checked = state.meOnly;
     const co = (p.get("company") || "").toLowerCase(); state.company = /^[a-z0-9-]{2,80}$/.test(co) ? co : null;   // from the Radar: one company
     const mj = (p.get("major") || "").toLowerCase();
@@ -447,27 +443,27 @@
     $("stateSel").classList.toggle("on", !!single); if (single) $("stateSel").value = single;
   }
   function resetFilters(){ history.replaceState(null, "", location.pathname); readUrl(); state.company = null; state.st = "ALL"; state.major = "all"; $("majorSel").value = "all"; $("meWrap").hidden = true; readUrlButtons(); loadScope(); }
-  function readUrlButtons(){ document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.state === "ALL"))); $("stateSel").value = ""; $("stateSel").classList.remove("on"); }
+  function readUrlButtons(){ const one = state.st !== "ALL" && state.st.length === 1 ? state.st[0] : ""; $("stateSel").value = one; $("stateSel").classList.toggle("on", state.st !== "ALL"); }
   document.addEventListener("click", (e) => {
-    if (e.target.closest("#goAll")) setView("ALL", document.querySelector('.seg button[data-state="ALL"]'));
+    if (e.target.closest("#goAll")) { $("stateSel").value = ""; setView("ALL", null); }
     if (e.target.closest("#resetF")) resetFilters();
     if (e.target.closest("#allCos")) { state.company = null; state.q = ""; $("q").value = ""; loadScope(); }
   });
   function setView(st, btn){
     state.st = st;
     document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === btn)));
-    $("stateSel").classList.toggle("on", !btn);
+    $("stateSel").classList.toggle("on", state.st !== "ALL");
     if (btn) $("stateSel").value = "";
     loadScope();
   }
   document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () =>
     setView(b.dataset.state === "ALL" ? "ALL" : b.dataset.state.split(","), b)));
   $("stateSel").addEventListener("change", (e) => {
-    if (!e.target.value) return setView(["VA","PA"], document.querySelector('.seg button[data-state="VA,PA"]'));
+    if (!e.target.value) return setView("ALL", null);
     setView([e.target.value], null);
   });
   function fillStates(){
-    $("stateSel").innerHTML = '<option value="">Pick a state</option>' + Object.keys(NAMES)
+    $("stateSel").innerHTML = '<option value="">All US states</option>' + Object.keys(NAMES)
       .sort((a, b) => NAMES[a].localeCompare(NAMES[b])).map((s) => `<option value="${s}">${esc(NAMES[s])}</option>`).join("");
   }
   // ── Sign-in (Clerk — same account as the main Beat the Pile app) ───────────────

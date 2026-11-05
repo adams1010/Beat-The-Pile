@@ -159,7 +159,7 @@ function LandingD({onQuiz,onPage}){
       </div>
       {sum?.top?.length>0&&<div style={{position:"relative",borderTop:"1px solid #1A2640",overflow:"hidden",height:44,display:"flex",alignItems:"center"}}>
         <div className="d-tick" style={{display:"flex",gap:40,whiteSpace:"nowrap",...DM,fontSize:12,color:"#8D9AB3",paddingLeft:24}}>
-          {[...sum.top,...sum.top].map((c,i)=><a key={i} href={`/jobs/?company=${encodeURIComponent(c.id)}&major=all`} style={{color:"#8D9AB3",textDecoration:"none"}} tabIndex={i>=sum.top.length?-1:0}>{c.company.toUpperCase()} <b style={{color:"#2FD39A",fontWeight:500}}>{c.n}</b></a>)}
+          {[...sum.top,...sum.top].map((c,i)=><a key={i} href={`/c/${encodeURIComponent(c.id)}`} style={{color:"#8D9AB3",textDecoration:"none"}} tabIndex={i>=sum.top.length?-1:0}>{c.company.toUpperCase()} <b style={{color:"#2FD39A",fontWeight:500}}>{c.n}</b></a>)}
         </div></div>}
     </section>
 
@@ -179,7 +179,7 @@ function LandingD({onQuiz,onPage}){
             <article key={c.id} style={{...card,padding:20,display:"flex",flexDirection:"column",gap:12}}>
               <div style={{display:"flex",gap:12,alignItems:"center"}}><span style={{width:44,height:44,borderRadius:10,background:"#F1F4F9",border:"1px solid #DCE2EC",display:"grid",placeItems:"center",fontWeight:600,flexShrink:0,color:"#0A1426"}}>{coInitials(c.company)}</span><p style={{fontWeight:600,margin:0,color:"#0A1426"}}>{c.company}</p></div>
               <div style={{fontSize:13,borderTop:"1px solid #EEF1F6",paddingTop:12,color:"#0A1426"}}><b style={{...DM,fontWeight:500}}>{c.n}</b> open internships</div>
-              <a href={`/jobs/?company=${encodeURIComponent(c.id)}&major=all`} style={{fontSize:13,fontWeight:600,color:"#0B7A55",textDecoration:"none"}}>See internships →</a>
+              <a href={`/c/${encodeURIComponent(c.id)}`} style={{fontSize:13,fontWeight:600,color:"#0B7A55",textDecoration:"none"}}>See internships →</a>
             </article>))}
         </div>
       </section>}
@@ -2998,7 +2998,7 @@ function App(){
   if(page==="interview"){
     const lastApp=(tracked||[]).slice(-1)[0];
     return(<div style={{background:"#EEF1F6",minHeight:"100vh"}}><Nav/>
-      <InterviewSim major={ans.major||profile.major||""} defaultCompany={lastApp?.company||""} defaultRole={lastApp?.role||""}/></div>);
+      <InterviewSim major={ans.major||profile.major||""} defaultCompany={(()=>{try{return new URLSearchParams(location.search).get("company")||"";}catch(e){return "";}})().slice(0,100)||lastApp?.company||""} defaultRole={lastApp?.role||""}/></div>);
   }
   // LANDING (Direction D: search-first like Glassdoor, live "console" feel; every number is live data)
   if(page==="landing")return(

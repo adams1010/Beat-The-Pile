@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /bots/
+Disallow: /discovery/
+Disallow: /r/
+
+Sitemap: https://www.beatthepile.com/sitemap.xml

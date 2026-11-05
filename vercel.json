@@ -217,6 +217,19 @@
     {
       "source": "/api/remind",
       "destination": "/api/me?cron=remind"
+    },
+    {
+      "source": "/c/:id",
+      "destination": "/api/listings?page=:id"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "/api/listings?sitemap=1"
     }
-  ]
+  ],
+  "functions": {
+    "api/listings.js": {
+      "includeFiles": "radar/radar.json"
+    }
+  }
 }

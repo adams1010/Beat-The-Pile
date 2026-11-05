@@ -9,10 +9,13 @@
 //   GET /api/listings?ids=a:1,b:2                → these exact listings INCLUDING closed ones (your saved/applied history)
 //   GET /api/listings?summary=1                  → just counts + last update time (homepage/demo stats; tiny + cached)
 //   GET /api/listings?names=1                    → just the companies with an open internship right now (any major; Radar)
+//   GET /c/<id>        (→ ?page=<id>)            → the company's page as HTML (server-built so search engines can read it)
+//   GET /sitemap.xml   (→ ?sitemap=1)            → main pages + every company hiring now
 // Bad parameters → 400 with what's wrong. A database problem → 503 (never an empty list that looks like "no jobs").
 import { db } from "../lib/db.js";
 import { FIELDS } from "../lib/fields.js";
 import { COMPANIES } from "../lib/companies.js";
+import { companyPage, radarFor, sitemap } from "../lib/companypage.js";
 
 const FIELD_KEYS = new Set([...FIELDS.map(([k]) => k), "other"]);
 const STATES = new Set("AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY PR".split(" "));
@@ -57,10 +60,37 @@ async function hiringCompanies() {
   return new Map([...seen].map(([id, v]) => [id, v.company]));
 }
 
+const plain = (res, code, title, msg) => {
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  return res.status(code).send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>${title} · Beat the Pile</title><link rel="stylesheet" href="/d.css"></head><body style="margin:0;font-family:Geist,system-ui,sans-serif"><script src="/nav.js"></script><main style="max-width:640px;margin:0 auto;padding:56px 20px"><h1 style="font-weight:600;letter-spacing:-.02em">${title}</h1><p style="color:#55627A">${msg}</p><p><a href="/jobs/" style="color:#0B7A55;font-weight:600">Browse internships →</a></p></main></body></html>`);
+};
+/** /c/<id>: one company's page. Unknown company → 404; database trouble → 503 (never a page that pretends nothing is open). */
+async function companyHtml(id, res) {
+  if (!/^[a-z0-9-]{2,80}$/.test(id)) return plain(res, 404, "Company not found", "That link doesn't match a company we track.");
+  let rows;
+  try { rows = await db.select(`listings?select=${COLS}&${LIVE}&company_id=eq.${id}&order=first_seen.desc&limit=1000`); }
+  catch (e) { console.error("[company page]", e); return plain(res, 503, "Couldn't load this company", "That's a problem on our side, not a sign they have no internships. Try again in a minute."); }
+  const name = rows[0]?.company || "";
+  const radar = radarFor(id, name);
+  if (!rows.length && !radar) return plain(res, 404, "Company not found", "We don't have open internships or hiring history for this company right now.");
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  res.setHeader("Cache-Control", "s-maxage=900, stale-while-revalidate=3600");
+  return res.status(200).send(companyPage({ id, rows, radar }));
+}
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
-  const p = parse(req.query || {});
+  const q0 = req.query || {};
+  if (q0.page != null) return companyHtml(String(q0.page).toLowerCase(), res);
+  if (q0.sitemap === "1") {
+    try {
+      const ids = [...(await hiringCompanies()).keys()].filter((id) => /^[a-z0-9-]{2,80}$/.test(id)).sort();
+      res.setHeader("Content-Type", "application/xml; charset=utf-8"); res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
+      return res.status(200).send(sitemap(ids));
+    } catch (e) { console.error("[sitemap]", e); return res.status(503).send("Sitemap unavailable — try again later"); }
+  }
+  const p = parse(q0);
   if (p.errs.length) return res.status(400).json({ error: p.errs.join("; ") });
 
   try {

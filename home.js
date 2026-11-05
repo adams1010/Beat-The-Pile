@@ -1,4 +1,4 @@
-/* built from src/home.jsx 47ae7a30243186e4 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 4b414bb1090b1d3e — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -833,7 +833,7 @@ function LandingD({
     }
   }, [...sum.top, ...sum.top].map((c, i) => React.createElement("a", {
     key: i,
-    href: `/jobs/?company=${encodeURIComponent(c.id)}&major=all`,
+    href: `/c/${encodeURIComponent(c.id)}`,
     style: {
       color: "#8D9AB3",
       textDecoration: "none"
@@ -976,7 +976,7 @@ function LandingD({
       fontWeight: 500
     }
   }, c.n), " open internships"), React.createElement("a", {
-    href: `/jobs/?company=${encodeURIComponent(c.id)}&major=all`,
+    href: `/c/${encodeURIComponent(c.id)}`,
     style: {
       fontSize: 13,
       fontWeight: 600,
@@ -7401,7 +7401,13 @@ function App() {
       }
     }, React.createElement(Nav, null), React.createElement(InterviewSim, {
       major: ans.major || profile.major || "",
-      defaultCompany: lastApp?.company || "",
+      defaultCompany: (() => {
+        try {
+          return new URLSearchParams(location.search).get("company") || "";
+        } catch (e) {
+          return "";
+        }
+      })().slice(0, 100) || lastApp?.company || "",
       defaultRole: lastApp?.role || ""
     }));
   }
