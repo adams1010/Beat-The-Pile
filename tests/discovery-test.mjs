@@ -163,3 +163,33 @@ console.log("\nALL DISCOVERY TESTS PASSED");
   globalThis.fetch = prev;
   console.log("13 pasted Phenom site → search page → Workday board in escaped JSON ✓", r.detail);
 }
+
+// ---------- Nov 2026: unsticking companies ----------
+{
+  const { boardNameProof } = await import(R + "lib/discover.js");
+  const pass = [["parexel", "Parexel Clinical Research"], ["tri", "Toyota Research Institute"], ["cmt", "Cambridge Mobile Telematics"],
+    ["atcllc", "ATC"], ["lkqcorp", "LKQ"], ["centerstone", "Centerstone of Tennessee"], ["ingevity", "Ingevity Georgia"]];
+  // real wrong boards seen in our data — must STAY rejected
+  const fail = [["christies", "CMW"], ["applied", "Applied Fluid Power"], ["applied", "Applied Intuition"], ["elevancehealth", "CareBridge"],
+    ["eventsandinterns", "GoDaddy"], ["shell", "BS01 Shell Western S&T"], ["gafsgi", "GAF"], ["crestoperations", "Crest Industries"],
+    ["westair", "Western Aircraft"], ["american", "American Express"], ["general", "General Dynamics"], ["ace", "AAA Club Alliance"], ["rb", "Federal Reserve Bank of Richmond"]];
+  for (const [t, c] of pass) assert.ok(boardNameProof(t, c), `${t} should prove ${c}`);
+  for (const [t, c] of fail) assert.equal(boardNameProof(t, c), null, `${t} must NOT prove ${c}`);
+  let renamed = null; boardNameProof("centerstone", "Centerstone of Tennessee", (n) => { renamed = n; });
+  assert.equal(renamed, "Centerstone", "org-wide board → listed under the organization's own name");
+  console.log("14 board-name proof: 7 real matches pass, 13 known-wrong boards still rejected ✓");
+
+  // dead old board link + no website on file → find the website (only if its home page carries the full name), start over
+  sites["https://api.lever.co/v0/postings/aprio?mode=json"] = json(404, {});
+  sites["https://www.aprio.com/"] = html(200, `<title>Aprio | CPA, Advisory and Tax</title>`, "https://www.aprio.com/");
+  sites["https://www.aprio.com/careers"] = html(200, `<a href="https://aprio.wd1.myworkdayjobs.com/en-US/Aprio_Careers">Jobs</a>`, "https://www.aprio.com/careers");
+  sites["https://aprio.wd1.myworkdayjobs.com/wday/cxs/aprio/Aprio_Careers/jobs"] = () => json(200, W(40, [{ title: "Tax Intern", externalPath: "/job/t_1" }]));
+  let r = await discoverOne({ company: "Aprio", key: "aprio", hint: "https://jobs.lever.co/aprio" });
+  assert.equal(r.status, "live"); assert.equal(r.domain, "aprio.com"); assert.match(r.detail, /old board link was dead/);
+  // a parked domain that merely contains the name is NOT accepted
+  sites["https://api.lever.co/v0/postings/zentro?mode=json"] = json(404, {});
+  sites["https://www.zentro.com/"] = html(200, `<title>zentro.com is for sale</title>`, "https://www.zentro.com/");
+  r = await discoverOne({ company: "Zentro", key: "zentro", hint: "https://jobs.lever.co/zentro" });
+  assert.notEqual(r.status, "live"); assert.ok(!r.domain);
+  console.log("15 dead board link → website found by full name → live; parked domain refused ✓");
+}
