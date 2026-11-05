@@ -53,6 +53,8 @@ body{min-height:100vh}
 }
 /* Phones: nav scrolls sideways instead of pushing the page wider than the screen */
 html,body{max-width:100%;overflow-x:hidden}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links > *{flex:0 0 auto}
 @media (max-width:820px){
   .nav-pad{gap:10px}
   .nav-links{flex:1;min-width:0;overflow-x:auto;flex-wrap:nowrap;justify-content:flex-start;-webkit-overflow-scrolling:touch;scrollbar-width:none}

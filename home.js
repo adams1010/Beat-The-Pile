@@ -1,4 +1,4 @@
-/* built from src/home.jsx b1048338b61a7d68 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 8aa979a89d1e114f — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -6774,6 +6774,7 @@ function App() {
   }, "BP")), React.createElement("span", {
     className: "nav-logo-text",
     style: {
+      whiteSpace: "nowrap",
       fontWeight: 800,
       fontSize: 17,
       color: "#0A1628",
@@ -6784,13 +6785,20 @@ function App() {
     style: {
       display: "flex",
       gap: 2,
-      alignItems: "center"
+      alignItems: "center",
+      flex: 1,
+      minWidth: 0,
+      overflowX: "auto",
+      scrollbarWidth: "none",
+      justifyContent: "flex-start",
+      marginLeft: 12
     }
   }, [["/jobs/", "Jobs"], ["/jobs/?view=saved", "♡ Saved"], ["/fair/", "Career Fair"], ["/season/", "My Season"], ["/radar/", "Radar"]].map(([href, l]) => React.createElement("a", {
     key: href,
     className: "nav-tab",
     href: href,
     style: {
+      whiteSpace: "nowrap",
       color: "#4A5568",
       padding: "7px 12px",
       borderRadius: var_r,
@@ -6804,6 +6812,7 @@ function App() {
     className: "nav-tab",
     onClick: () => setPage(p),
     style: {
+      whiteSpace: "nowrap",
       background: page === p ? GL : "transparent",
       border: "none",
       color: page === p ? GD : "#4A5568",
@@ -6817,6 +6826,7 @@ function App() {
   }, l)), !isPro && React.createElement("button", {
     onClick: () => setShowProModal(true),
     style: {
+      whiteSpace: "nowrap",
       background: AL,
       border: `1px solid ${AM}30`,
       color: AM,
@@ -6839,6 +6849,7 @@ function App() {
       }
     },
     style: {
+      whiteSpace: "nowrap",
       background: `linear-gradient(135deg,${G},${GD})`,
       border: "none",
       color: "#fff",

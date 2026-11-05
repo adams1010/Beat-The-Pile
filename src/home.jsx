@@ -2834,17 +2834,17 @@ function App(){
         <div style={{width:32,height:32,background:`linear-gradient(135deg,${G},${GD})`,borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:`0 2px 8px ${G}40`}}>
           <span style={{fontSize:13,fontWeight:800,color:"#fff",letterSpacing:"-0.5px"}}>BP</span>
         </div>
-        <span className="nav-logo-text" style={{fontWeight:800,fontSize:17,color:"#0A1628",letterSpacing:"-0.5px"}}>Beat the Pile</span>
+        <span className="nav-logo-text" style={{whiteSpace:"nowrap",fontWeight:800,fontSize:17,color:"#0A1628",letterSpacing:"-0.5px"}}>Beat the Pile</span>
       </button>
-      <div className="nav-links" style={{display:"flex",gap:2,alignItems:"center"}}>
+      <div className="nav-links" style={{display:"flex",gap:2,alignItems:"center",flex:1,minWidth:0,overflowX:"auto",scrollbarWidth:"none",justifyContent:"flex-start",marginLeft:12}}>
         {[["/jobs/","Jobs"],["/jobs/?view=saved","♡ Saved"],["/fair/","Career Fair"],["/season/","My Season"],["/radar/","Radar"]].map(([href,l])=>(
-          <a key={href} className="nav-tab" href={href} style={{color:"#4A5568",padding:"7px 12px",borderRadius:var_r,fontSize:14,fontWeight:600,fontFamily:"var(--font)",textDecoration:"none"}}>{l}</a>
+          <a key={href} className="nav-tab" href={href} style={{whiteSpace:"nowrap",color:"#4A5568",padding:"7px 12px",borderRadius:var_r,fontSize:14,fontWeight:600,fontFamily:"var(--font)",textDecoration:"none"}}>{l}</a>
         ))}
         {[["quiz","Match quiz"],["dashboard","Dashboard"],["resumebuilder","📄 Resume"],["profile","Profile"],["wall","Community"],["community","Tips"]].map(([p,l])=>(
-          <button key={p} className="nav-tab" onClick={()=>setPage(p)} style={{background:page===p?GL:"transparent",border:"none",color:page===p?GD:"#4A5568",padding:"7px 12px",borderRadius:var_r,cursor:"pointer",fontSize:14,fontWeight:page===p?600:400,fontFamily:"var(--font)"}}>{l}</button>
+          <button key={p} className="nav-tab" onClick={()=>setPage(p)} style={{whiteSpace:"nowrap",background:page===p?GL:"transparent",border:"none",color:page===p?GD:"#4A5568",padding:"7px 12px",borderRadius:var_r,cursor:"pointer",fontSize:14,fontWeight:page===p?600:400,fontFamily:"var(--font)"}}>{l}</button>
         ))}
-        {!isPro&&<button onClick={()=>setShowProModal(true)} style={{background:AL,border:`1px solid ${AM}30`,color:AM,padding:"6px 12px",borderRadius:var_r,cursor:"pointer",fontSize:13,fontWeight:700,fontFamily:"var(--font)",marginLeft:2}}>⚡ Pro</button>}
-        <button className="nav-hide-mobile nav-cta" onClick={()=>{if(results.length>0){setPage("results");}else{setStep(0);setPage("quiz");}}} style={{background:`linear-gradient(135deg,${G},${GD})`,border:"none",color:"#fff",padding:"8px 18px",borderRadius:var_r,cursor:"pointer",fontSize:14,fontWeight:700,marginLeft:4,fontFamily:"var(--font)",boxShadow:`0 2px 8px ${G}40`}}>{results.length>0?"See results":"Get Started"}</button>
+        {!isPro&&<button onClick={()=>setShowProModal(true)} style={{whiteSpace:"nowrap",background:AL,border:`1px solid ${AM}30`,color:AM,padding:"6px 12px",borderRadius:var_r,cursor:"pointer",fontSize:13,fontWeight:700,fontFamily:"var(--font)",marginLeft:2}}>⚡ Pro</button>}
+        <button className="nav-hide-mobile nav-cta" onClick={()=>{if(results.length>0){setPage("results");}else{setStep(0);setPage("quiz");}}} style={{whiteSpace:"nowrap",background:`linear-gradient(135deg,${G},${GD})`,border:"none",color:"#fff",padding:"8px 18px",borderRadius:var_r,cursor:"pointer",fontSize:14,fontWeight:700,marginLeft:4,fontFamily:"var(--font)",boxShadow:`0 2px 8px ${G}40`}}>{results.length>0?"See results":"Get Started"}</button>
       </div>
       {saveNote&&<div role="status" style={{position:"fixed",left:"50%",bottom:22,transform:"translateX(-50%)",background:"#0A1628",color:"#fff",padding:"10px 16px",borderRadius:10,fontSize:13.5,fontWeight:600,zIndex:2000,maxWidth:"90vw",boxShadow:"0 6px 20px rgba(0,0,0,.25)"}}>{saveNote}</div>}
       {/* Sign-in stays visible on phones (outside the scrolling links) */}
