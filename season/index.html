@@ -82,6 +82,7 @@
   .remind{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.rbtns{display:flex;gap:8px;align-items:center}
   .tog{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;cursor:pointer}.tog input{width:18px;height:18px;accent-color:var(--green)}
 </style>
+<link rel="stylesheet" href="/d.css">
 </head>
 <body>
 <script src="/nav.js"></script>
@@ -182,7 +183,17 @@
   function render(){
     const el = $("#app");
     if (!S.user) {
-      el.innerHTML = `<div class="card gate"><h2>Your internship season, organized</h2><p style="color:var(--muted);margin:0 0 14px">Track every application from applied to offer, set a weekly goal, and see how fast you apply after jobs post.</p>${S.clerk ? `<button class="btn go" id="gs" style="padding:12px 18px;font-size:15px">Sign in to start</button>` : `<p style="color:var(--muted)">Loading sign-in…</p>`}</div>`;
+      el.innerHTML = `<div class="card gate"><h2>Your internship season, organized</h2><p style="color:var(--muted);margin:0 0 14px">Track every application from applied to offer, set a weekly goal, and see how fast you apply after jobs post.</p>${S.clerk ? `<button class="btn go" id="gs" style="padding:12px 18px;font-size:15px">Sign in to start</button>` : `<p style="color:var(--muted)">Loading sign-in…</p>`}</div>
+        <section class="card" aria-label="Example season" style="margin-top:12px;padding:18px">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px"><b style="font-size:15px">What it looks like</b><span style="font:500 11px var(--mono,monospace);letter-spacing:.08em;color:var(--faint)">EXAMPLE · NOT REAL DATA</span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;text-align:center;margin-bottom:14px">
+            <div style="background:var(--bg);border-radius:10px;padding:10px"><b style="display:block;font:500 22px var(--mono,monospace)">12</b><span style="font-size:12px;color:var(--muted)">applied</span></div>
+            <div style="background:var(--bg);border-radius:10px;padding:10px"><b style="display:block;font:500 22px var(--mono,monospace)">3</b><span style="font-size:12px;color:var(--muted)">interviews</span></div>
+            <div style="background:var(--bg);border-radius:10px;padding:10px"><b style="display:block;font:500 22px var(--mono,monospace);color:var(--amber)">2</b><span style="font-size:12px;color:var(--muted)">to follow up</span></div>
+          </div>
+          ${[["Mechanical Engineering Intern","Example Aerospace Co.","Interview Thu","var(--green)"],["Finance Summer Analyst","Example Bank","Applied 6 days ago · follow up","var(--amber)"],["Marketing Intern","Example Brands","Applied 2 days ago","var(--muted)"]].map(([t,c,s2,col]) => `<div style="display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--line);font-size:14px"><span style="min-width:0"><b style="font-weight:600">${t}</b><br><span style="color:var(--muted)">${c}</span></span><span style="color:${col};font-size:13px;text-align:right;white-space:nowrap">${s2}</span></div>`).join("")}
+          <p style="font-size:12.5px;color:var(--muted);margin:10px 0 0">Plus a weekly goal, how fast you apply after jobs post, and an optional email nudge when it's time to follow up.</p>
+        </section>`;
       $("#gs")?.addEventListener("click", () => S.clerk.openSignIn()); return;
     }
     if (!S.me) { el.innerHTML = `<div class="card empty">Loading your season…</div>`; return; }
