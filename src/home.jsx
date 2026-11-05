@@ -929,10 +929,35 @@ function ivGrade(turns){const sc=turns.filter(t=>t.scores);if(!sc.length)return 
 const ivClock=(s)=>`${Math.floor(s/60)}:${String(Math.max(0,s)%60).padStart(2,"0")}`;
 const IV_THINK=10;
 
+// Interviewer voice: the browser's own voices, most natural first (neural/"natural"/premium ones), no novelty voices.
+const IV_NOVELTY=/albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|fred|junior|ralph|kathy|princess|deranged|hysterical|pipe|grandma|grandpa|eddy|flo|reed|rocko|sandy|shelley/i;
+function ivVoiceScore(v){const n=v.name||"";let s=0;
+  if(/natural|neural/i.test(n))s+=60;if(/premium|enhanced/i.test(n))s+=45;if(/online/i.test(n))s+=20;if(/^google/i.test(n))s+=30;
+  if(/\b(ava|samantha|allison|susan|zoe|evan|nathan|aria|jenny|guy|davis|emma|brian|andrew|christopher|michelle|libby|sonia|ryan|tom|serena|daniel|karen|moira)\b/i.test(n))s+=15;
+  if(/^en[-_]US/i.test(v.lang))s+=10;else if(/^en/i.test(v.lang))s+=5;if(v.localService===false)s+=3;return s;}
+function ivVoices(){try{return window.speechSynthesis.getVoices().filter(v=>/^en/i.test(v.lang)&&!IV_NOVELTY.test(v.name)).sort((a,b)=>ivVoiceScore(b)-ivVoiceScore(a)).slice(0,10);}catch(x){return[];}}
+function ivVoiceLabel(v){const region={"en-US":"US","en-GB":"UK","en-AU":"Australia","en-CA":"Canada","en-IE":"Ireland","en-IN":"India","en-ZA":"South Africa","en-NZ":"New Zealand"}[String(v.lang).replace("_","-")]||v.lang;
+  const nat=/natural|neural|premium|enhanced/i.test(v.name);
+  const nm=v.name.replace(/^(Microsoft|Google|Apple)\s+/i,"").replace(/\s*Online\s*/i," ").replace(/\s*\((Natural|Neural|Premium|Enhanced)\)/ig,"").replace(/\s*-\s*English.*$/i,"").replace(/\s+/g," ").trim();
+  return `${nm} · ${region}${nat?" · most natural":""}`;}
+const IV_LINE="Hi, thanks for coming in today. Let's start with you — tell me a little about yourself.";
 function InterviewSim({major,defaultCompany,defaultRole}){
   const SR=typeof window!=="undefined"?(window.SpeechRecognition||window.webkitSpeechRecognition):null;
   const canTalk=!!SR, canSpeak=typeof window!=="undefined"&&"speechSynthesis" in window;
-  const [setup,setSetup]=React.useState({company:defaultCompany||"",role:defaultRole||(major?`${major.split(",")[0]} Intern`:"Summer Intern"),kind:"mixed",total:5,limit:90,mode:canTalk?"talk":"type",readAloud:canSpeak});
+  const ls={get(k){try{return localStorage.getItem(k);}catch(x){return null;}},set(k,v){try{localStorage.setItem(k,v);}catch(x){}}};
+  const [setup,setSetup]=React.useState({company:defaultCompany||"",role:defaultRole||(major?`${major.split(",")[0]} Intern`:"Summer Intern"),kind:"mixed",total:5,limit:90,mode:canTalk?"talk":"type",readAloud:canSpeak,
+    voice:ls.get("btp_iv_voice")||"",rate:Number(ls.get("btp_iv_rate"))||1.15});
+  const [voices,setVoices]=React.useState([]);
+  React.useEffect(()=>{if(!canSpeak)return;const load=()=>setVoices(ivVoices());load();window.speechSynthesis.addEventListener?.("voiceschanged",load);
+    return()=>window.speechSynthesis.removeEventListener?.("voiceschanged",load);},[]);
+  const pickVoice=()=>{const all=voices.length?voices:ivVoices();return all.find(v=>v.voiceURI===setup.voice)||all[0]||null;};
+  function say(text,onDone){
+    if(!canSpeak){onDone&&onDone();return;}
+    hush();const u=new SpeechSynthesisUtterance(text);const v=pickVoice();if(v){u.voice=v;u.lang=v.lang;}else u.lang="en-US";
+    u.rate=setup.rate;u.pitch=1;let moved=false;const go=()=>{if(!moved){moved=true;onDone&&onDone();}};
+    u.onend=go;u.onerror=go;if(onDone)setTimeout(go,Math.min(30000,2000+text.length*70/setup.rate));
+    window.speechSynthesis.speak(u);
+  }
   const [turns,setTurns]=React.useState([]);          // [{q,a,feedback,scores,secs,timedOut}]
   const [draft,setDraft]=React.useState("");
   const [interim,setInterim]=React.useState("");
@@ -979,11 +1004,7 @@ function InterviewSim({major,defaultCompany,defaultRole}){
   React.useEffect(()=>{
     if(!waiting)return;sentRef.current=false;setDraft("");setInterim("");
     if(setup.readAloud&&canSpeak){
-      setPhase("reading");hush();
-      const u=new SpeechSynthesisUtterance(cur.q);u.rate=1.02;u.lang="en-US";
-      let moved=false;const go=()=>{if(!moved){moved=true;beginThink();}};
-      u.onend=go;u.onerror=go;setTimeout(go,Math.min(30000,2500+cur.q.length*80));   // never get stuck if the voice fails
-      window.speechSynthesis.speak(u);
+      setPhase("reading");say(cur.q,beginThink);          // say() has a timeout so a broken voice never gets stuck
     }else beginThink();
   },[turns.length,waiting]);
 
@@ -1054,6 +1075,18 @@ function InterviewSim({major,defaultCompany,defaultRole}){
               {!canTalk&&<p style={{fontSize:12.5,color:IV.dim,margin:"6px 0 0"}}>This browser can't turn speech into text — try Chrome, Edge or Safari, or type.</p>}</div>
           </div>
           {canSpeak&&<label style={{display:"flex",alignItems:"center",gap:8,marginTop:16,fontSize:14,cursor:"pointer"}}><input type="checkbox" checked={setup.readAloud} onChange={e=>setSetup(s=>({...s,readAloud:e.target.checked}))} style={{accentColor:IV.acc,width:16,height:16}}/>Read each question out loud</label>}
+          {canSpeak&&setup.readAloud&&<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:"0 14px",alignItems:"end"}}>
+            <div><label style={label} htmlFor="ivVoice">Interviewer voice</label>
+              <select id="ivVoice" style={field} value={(pickVoice()||{}).voiceURI||""} onChange={e=>{const v=e.target.value;ls.set("btp_iv_voice",v);setSetup(s=>({...s,voice:v}));}}>
+                {voices.length?voices.map(v=><option key={v.voiceURI} value={v.voiceURI}>{ivVoiceLabel(v)}</option>):<option value="">Your device's default voice</option>}
+              </select></div>
+            <div><label style={label} htmlFor="ivRate">Speaking speed</label>
+              <select id="ivRate" style={field} value={setup.rate} onChange={e=>{const r=+e.target.value;ls.set("btp_iv_rate",String(r));setSetup(s=>({...s,rate:r}));}}>
+                <option value={1}>Normal</option><option value={1.15}>A bit faster</option><option value={1.3}>Fast</option><option value={1.45}>Very fast</option>
+              </select></div>
+            <div><button type="button" style={{...btn(false),width:"100%",marginTop:14}} onClick={()=>say(IV_LINE)}>▶ Hear it</button></div>
+          </div>}
+          {canSpeak&&setup.readAloud&&<p style={{fontSize:12.5,color:IV.dim,margin:"8px 0 0"}}>Voices come from your device. The ones marked "most natural" sound the most human — on a Mac or iPhone you can download better ones in Settings → Accessibility → Spoken Content → Voices.</p>}
           <button style={{...btn(true),marginTop:18,padding:"12px 22px"}} onClick={start}>Start the interview</button>
           {err&&<p role="alert" style={{color:"#B42318",fontSize:14,marginTop:12}}>{err}</p>}
         </section>

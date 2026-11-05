@@ -37,9 +37,10 @@
 .btpnav summary{list-style:none;display:flex;align-items:center;gap:4px}
 .btpnav summary::-webkit-details-marker{display:none}
 .btpnav summary::after{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);margin-left:4px}
-.btpnav .menu{position:fixed;margin-top:8px;min-width:260px;background:#fff;color:#0B1220;border:1px solid #E3E7ED;border-radius:10px;box-shadow:0 12px 32px rgba(11,18,32,.18);padding:6px;z-index:60}
-.btpnav .menu a{display:block;padding:9px 10px;border-radius:7px;color:#0B1220;text-decoration:none}
-.btpnav .menu a:hover,.btpnav .menu a:focus-visible{background:#F2F4F7}
+.btpnav .menu{position:fixed;margin-top:8px;min-width:280px;background:#fff;color:#0A1426;border:1px solid #DCE2EC;border-radius:12px;box-shadow:0 16px 40px rgba(7,15,30,.22);padding:6px;z-index:60}
+.btpnav .menu a{display:block;padding:10px 12px;border-radius:8px;color:#0A1426;text-decoration:none;transition:background .12s}
+.btpnav .menu a:hover,.btpnav .menu a:focus-visible{background:#F1F4F9;color:#0A1426;box-shadow:inset 3px 0 0 #0B7A55}
+.btpnav .menu a:hover small{color:#55627A}
 .btpnav .menu b{display:block;font-weight:600;font-size:14px}
 .btpnav .menu small{display:block;color:#5B6675;font-size:12.5px;margin-top:2px;font-weight:400}
 .btpnav .right{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:6px}

@@ -1,4 +1,4 @@
-/* built from src/home.jsx a0d1b89ee15f208c — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 47ae7a30243186e4 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -2468,6 +2468,42 @@ function ivGrade(turns) {
 }
 const ivClock = s => `${Math.floor(s / 60)}:${String(Math.max(0, s) % 60).padStart(2, "0")}`;
 const IV_THINK = 10;
+const IV_NOVELTY = /albert|bad news|bahh|bells|boing|bubbles|cellos|good news|jester|organ|superstar|trinoids|whisper|wobble|zarvox|fred|junior|ralph|kathy|princess|deranged|hysterical|pipe|grandma|grandpa|eddy|flo|reed|rocko|sandy|shelley/i;
+function ivVoiceScore(v) {
+  const n = v.name || "";
+  let s = 0;
+  if (/natural|neural/i.test(n)) s += 60;
+  if (/premium|enhanced/i.test(n)) s += 45;
+  if (/online/i.test(n)) s += 20;
+  if (/^google/i.test(n)) s += 30;
+  if (/\b(ava|samantha|allison|susan|zoe|evan|nathan|aria|jenny|guy|davis|emma|brian|andrew|christopher|michelle|libby|sonia|ryan|tom|serena|daniel|karen|moira)\b/i.test(n)) s += 15;
+  if (/^en[-_]US/i.test(v.lang)) s += 10;else if (/^en/i.test(v.lang)) s += 5;
+  if (v.localService === false) s += 3;
+  return s;
+}
+function ivVoices() {
+  try {
+    return window.speechSynthesis.getVoices().filter(v => /^en/i.test(v.lang) && !IV_NOVELTY.test(v.name)).sort((a, b) => ivVoiceScore(b) - ivVoiceScore(a)).slice(0, 10);
+  } catch (x) {
+    return [];
+  }
+}
+function ivVoiceLabel(v) {
+  const region = {
+    "en-US": "US",
+    "en-GB": "UK",
+    "en-AU": "Australia",
+    "en-CA": "Canada",
+    "en-IE": "Ireland",
+    "en-IN": "India",
+    "en-ZA": "South Africa",
+    "en-NZ": "New Zealand"
+  }[String(v.lang).replace("_", "-")] || v.lang;
+  const nat = /natural|neural|premium|enhanced/i.test(v.name);
+  const nm = v.name.replace(/^(Microsoft|Google|Apple)\s+/i, "").replace(/\s*Online\s*/i, " ").replace(/\s*\((Natural|Neural|Premium|Enhanced)\)/ig, "").replace(/\s*-\s*English.*$/i, "").replace(/\s+/g, " ").trim();
+  return `${nm} · ${region}${nat ? " · most natural" : ""}`;
+}
+const IV_LINE = "Hi, thanks for coming in today. Let's start with you — tell me a little about yourself.";
 function InterviewSim({
   major,
   defaultCompany,
@@ -2476,6 +2512,20 @@ function InterviewSim({
   const SR = typeof window !== "undefined" ? window.SpeechRecognition || window.webkitSpeechRecognition : null;
   const canTalk = !!SR,
     canSpeak = typeof window !== "undefined" && "speechSynthesis" in window;
+  const ls = {
+    get(k) {
+      try {
+        return localStorage.getItem(k);
+      } catch (x) {
+        return null;
+      }
+    },
+    set(k, v) {
+      try {
+        localStorage.setItem(k, v);
+      } catch (x) {}
+    }
+  };
   const [setup, setSetup] = React.useState({
     company: defaultCompany || "",
     role: defaultRole || (major ? `${major.split(",")[0]} Intern` : "Summer Intern"),
@@ -2483,8 +2533,48 @@ function InterviewSim({
     total: 5,
     limit: 90,
     mode: canTalk ? "talk" : "type",
-    readAloud: canSpeak
+    readAloud: canSpeak,
+    voice: ls.get("btp_iv_voice") || "",
+    rate: Number(ls.get("btp_iv_rate")) || 1.15
   });
+  const [voices, setVoices] = React.useState([]);
+  React.useEffect(() => {
+    if (!canSpeak) return;
+    const load = () => setVoices(ivVoices());
+    load();
+    window.speechSynthesis.addEventListener?.("voiceschanged", load);
+    return () => window.speechSynthesis.removeEventListener?.("voiceschanged", load);
+  }, []);
+  const pickVoice = () => {
+    const all = voices.length ? voices : ivVoices();
+    return all.find(v => v.voiceURI === setup.voice) || all[0] || null;
+  };
+  function say(text, onDone) {
+    if (!canSpeak) {
+      onDone && onDone();
+      return;
+    }
+    hush();
+    const u = new SpeechSynthesisUtterance(text);
+    const v = pickVoice();
+    if (v) {
+      u.voice = v;
+      u.lang = v.lang;
+    } else u.lang = "en-US";
+    u.rate = setup.rate;
+    u.pitch = 1;
+    let moved = false;
+    const go = () => {
+      if (!moved) {
+        moved = true;
+        onDone && onDone();
+      }
+    };
+    u.onend = go;
+    u.onerror = go;
+    if (onDone) setTimeout(go, Math.min(30000, 2000 + text.length * 70 / setup.rate));
+    window.speechSynthesis.speak(u);
+  }
   const [turns, setTurns] = React.useState([]);
   const [draft, setDraft] = React.useState("");
   const [interim, setInterim] = React.useState("");
@@ -2601,21 +2691,7 @@ function InterviewSim({
     setInterim("");
     if (setup.readAloud && canSpeak) {
       setPhase("reading");
-      hush();
-      const u = new SpeechSynthesisUtterance(cur.q);
-      u.rate = 1.02;
-      u.lang = "en-US";
-      let moved = false;
-      const go = () => {
-        if (!moved) {
-          moved = true;
-          beginThink();
-        }
-      };
-      u.onend = go;
-      u.onerror = go;
-      setTimeout(go, Math.min(30000, 2500 + cur.q.length * 80));
-      window.speechSynthesis.speak(u);
+      say(cur.q, beginThink);
     } else beginThink();
   }, [turns.length, waiting]);
   async function ask(history) {
@@ -2925,7 +3001,71 @@ function InterviewSim({
       width: 16,
       height: 16
     }
-  }), "Read each question out loud"), React.createElement("button", {
+  }), "Read each question out loud"), canSpeak && setup.readAloud && React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
+      gap: "0 14px",
+      alignItems: "end"
+    }
+  }, React.createElement("div", null, React.createElement("label", {
+    style: label,
+    htmlFor: "ivVoice"
+  }, "Interviewer voice"), React.createElement("select", {
+    id: "ivVoice",
+    style: field,
+    value: (pickVoice() || {}).voiceURI || "",
+    onChange: e => {
+      const v = e.target.value;
+      ls.set("btp_iv_voice", v);
+      setSetup(s => ({
+        ...s,
+        voice: v
+      }));
+    }
+  }, voices.length ? voices.map(v => React.createElement("option", {
+    key: v.voiceURI,
+    value: v.voiceURI
+  }, ivVoiceLabel(v))) : React.createElement("option", {
+    value: ""
+  }, "Your device's default voice"))), React.createElement("div", null, React.createElement("label", {
+    style: label,
+    htmlFor: "ivRate"
+  }, "Speaking speed"), React.createElement("select", {
+    id: "ivRate",
+    style: field,
+    value: setup.rate,
+    onChange: e => {
+      const r = +e.target.value;
+      ls.set("btp_iv_rate", String(r));
+      setSetup(s => ({
+        ...s,
+        rate: r
+      }));
+    }
+  }, React.createElement("option", {
+    value: 1
+  }, "Normal"), React.createElement("option", {
+    value: 1.15
+  }, "A bit faster"), React.createElement("option", {
+    value: 1.3
+  }, "Fast"), React.createElement("option", {
+    value: 1.45
+  }, "Very fast"))), React.createElement("div", null, React.createElement("button", {
+    type: "button",
+    style: {
+      ...btn(false),
+      width: "100%",
+      marginTop: 14
+    },
+    onClick: () => say(IV_LINE)
+  }, "\u25B6 Hear it"))), canSpeak && setup.readAloud && React.createElement("p", {
+    style: {
+      fontSize: 12.5,
+      color: IV.dim,
+      margin: "8px 0 0"
+    }
+  }, "Voices come from your device. The ones marked \"most natural\" sound the most human \u2014 on a Mac or iPhone you can download better ones in Settings \u2192 Accessibility \u2192 Spoken Content \u2192 Voices."), React.createElement("button", {
     style: {
       ...btn(true),
       marginTop: 18,
