@@ -8,7 +8,7 @@
   const TOOLS = [
     ["/u/", "My profile", "A shareable page for recruiters"],
     ["/#quiz", "Match quiz", "Real openings matched to your major"],
-    ["/#interview", "Interview practice", "Mock interview with follow-up questions"],
+    ["/#interview", "Interview practice", "Talk it out against a timer, get graded"],
     ["/#resumebuilder", "Resume builder", "Starter resume from your answers"],
     ["/#score", "Resume check", "How a resume reads against a posting"],
     ["/#wall", "Community", "Tips from other students"],

@@ -159,20 +159,24 @@ Return ONLY valid JSON, no markdown:
 Do not state facts about the company unless you are confident they are true.` };
   },
 
-  // Interview practice: one turn at a time. The student answers; we give short honest feedback and the next question.
+  // Interview practice: one turn at a time. The student answers (typed or spoken + auto-transcribed, against a timer);
+  // we give short honest feedback, a rubric score for that answer, and the next question. The page turns scores into the grade.
   interview_turn(i) {
     const company = str(i?.company, 100) || "a company", role = str(i?.role, 120) || "intern", major = str(i?.major, 100);
     const kind = ["behavioral", "technical", "mixed"].includes(i?.kind) ? i.kind : "mixed";
     const total = num(i?.total, 3, 8, 5);
-    const hist = (Array.isArray(i?.history) ? i.history : []).slice(-8).map((h) => ({ q: str(h?.q, 400), a: str(h?.a, 1500) })).filter((h) => h.q);
+    const limit = num(i?.limit, 30, 300, 90);
+    const spoken = i?.spoken === true;
+    const hist = (Array.isArray(i?.history) ? i.history : []).slice(-8).map((h) => ({ q: str(h?.q, 400), a: str(h?.a, 2500), secs: num(h?.secs, 0, 600, 0), out: h?.timedOut === true })).filter((h) => h.q);
     const asked = hist.length, done = asked >= total;
-    const transcript = hist.map((h, n) => `Q${n + 1}: ${h.q}\nStudent: ${h.a || "(no answer)"}`).join("\n\n");
-    return { maxTokens: done ? 700 : 450, temperature: 0.5, prompt: `You are a realistic, friendly but honest interviewer running a mock ${kind} interview for a ${role} internship at ${company}.${major ? ` The student studies ${major}.` : ""}
-Ask one question at a time, like a real first-round interview. Technical questions should fit an intern (fundamentals, projects, how they'd approach a problem), not trivia.
+    const transcript = hist.map((h, n) => `Q${n + 1}: ${h.q}\nStudent (${h.secs ? `${h.secs}s of ${limit}s` : "time not recorded"}${h.out ? ", ran out of time" : ""}): ${h.a || "(no answer)"}`).join("\n\n");
+    const rubric = `"scores":{"relevance":0-5,"structure":0-5,"specifics":0-5,"delivery":0-5} for the LAST answer only — relevance: answers the actual question; structure: clear story (situation, action, result) or clear reasoning; specifics: names real details, tools, numbers; delivery: concise and confident, little filler, used the time well (an empty or "(no answer)" reply scores 0 on everything). Score like a real interviewer: 3 = solid, 5 = rare.`;
+    return { maxTokens: done ? 800 : 520, temperature: 0.4, prompt: `You are a realistic, friendly but honest interviewer running a mock ${kind} interview for a ${role} internship at ${company}.${major ? ` The student studies ${major}.` : ""}
+Ask one question at a time, like a real first-round interview. Technical questions should fit an intern (fundamentals, projects, how they'd approach a problem), not trivia. Each answer has a ${limit}-second limit.${spoken ? " Answers were spoken out loud and auto-transcribed, so ignore spelling and small transcription mistakes; do judge rambling and heavy filler words." : ""}
 ${asked ? `Transcript so far:\n${transcript}\n` : "No questions asked yet."}
 ${done ? `That was the last question. Reply with ONLY this JSON:
-{"feedback":"2-3 sentences on the LAST answer","summary":{"strengths":["2-3 specific strengths seen in their answers"],"improve":["2-3 specific, actionable fixes"],"overall":"2 sentences, honest"}}`
-: asked ? `Reply with ONLY this JSON: {"feedback":"2-3 sentences on the LAST answer: what worked, one concrete way to make it stronger (e.g. use STAR, add a number, name the tool)","next":"the next interview question (question ${asked + 1} of ${total})"}`
+{"feedback":"2-3 sentences on the LAST answer",${rubric},"summary":{"strengths":["2-3 specific strengths seen in their answers"],"improve":["2-3 specific, actionable fixes"],"overall":"2 sentences, honest"}}`
+: asked ? `Reply with ONLY this JSON: {"feedback":"2-3 sentences on the LAST answer: what worked, one concrete way to make it stronger (e.g. use STAR, add a number, name the tool)",${rubric},"next":"the next interview question (question ${asked + 1} of ${total})"}`
 : `Reply with ONLY this JSON: {"next":"your opening question (question 1 of ${total})"}`}
 Never invent facts about the student. If an answer is empty or off-topic, say so kindly and move on.` };
   },

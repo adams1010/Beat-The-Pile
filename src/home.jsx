@@ -118,8 +118,7 @@ function LandingD({onQuiz,onPage}){
   const card={background:"#fff",border:"1px solid #DCE2EC",borderRadius:14};
   const wrap={maxWidth:1240,margin:"0 auto",padding:"0 24px"};
   return(<>
-    <section style={{position:"relative",overflow:"hidden",background:"#070F1E",color:"#E8EDF5",backgroundImage:"linear-gradient(#111C33 1px,transparent 1px),linear-gradient(90deg,#111C33 1px,transparent 1px)",backgroundSize:"32px 32px"}}>
-      <div aria-hidden="true" className="d-scan" style={{position:"absolute",left:0,right:0,top:0,height:120,background:"linear-gradient(transparent,rgba(47,211,154,.07),transparent)"}}/>
+    <section style={{position:"relative",overflow:"hidden",background:"#070F1E",color:"#E8EDF5"}}>
       <div style={{...wrap,position:"relative",paddingTop:64,paddingBottom:48,display:"flex",gap:48,flexWrap:"wrap",alignItems:"center"}}>
         <div style={{flex:"999 1 520px",minWidth:0}}>
           <p style={{...DM,fontSize:12,letterSpacing:".12em",color:"#2FD39A",margin:"0 0 18px",textTransform:"uppercase"}}><span className="d-blink" style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#2FD39A",marginRight:8}}/>
@@ -142,7 +141,11 @@ function LandingD({onQuiz,onPage}){
           </div>
           <p style={{fontSize:13,color:"#8D9AB3",marginTop:18}}>Free · no account needed to browse · <button onClick={onQuiz} style={{background:"none",border:0,padding:0,color:"#2FD39A",cursor:"pointer",font:"inherit",fontWeight:600}}>2-minute match quiz</button> · <a href="/demo/" style={{color:"#2FD39A",fontWeight:600,textDecoration:"none"}}>90-second demo</a></p>
         </div>
-        <aside style={{flex:"1 1 300px",maxWidth:420,minWidth:0,boxSizing:"border-box",width:"100%",background:"rgba(13,22,40,.85)",border:"1px solid #22304D",borderRadius:16,padding:20,...DM}}>
+        <div style={{position:"relative",flex:"1 1 300px",maxWidth:420,minWidth:0,width:"100%"}}>
+        {/* the pile: a few application cards peeking out from under the live panel */}
+        {[["rotate(-9deg) translate(-22px,14px)",.6],["rotate(6deg) translate(18px,8px)",.8],["rotate(-3deg) translate(-6px,-6px)",1]].map(([t,o],i)=>(
+          <div key={i} aria-hidden="true" style={{position:"absolute",inset:0,borderRadius:16,background:"#0A1426",border:"1px solid rgba(174,185,204,.24)",transform:t,opacity:o}}/>))}
+        <aside style={{position:"relative",boxSizing:"border-box",background:"#0D1A2F",border:"1px solid #2A3B5C",borderRadius:16,padding:20,boxShadow:"0 24px 60px rgba(0,0,0,.45)",...DM}}>
           <div style={{display:"flex",justifyContent:"space-between",fontSize:11,letterSpacing:".1em",color:"#8D9AB3",marginBottom:10}}><span>JUST FOUND</span><span style={{color:"#2FD39A"}}>● LIVE</span></div>
           {fresh===null?<div style={{height:200}} aria-hidden="true"/>:fresh.length===0?<p style={{fontSize:13,color:"#8D9AB3",fontFamily:"Geist,sans-serif"}}>Live list didn't load. <a href="/jobs/" style={{color:"#2FD39A"}}>Open the jobs page →</a></p>:
             fresh.map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"flex",justifyContent:"space-between",gap:12,padding:"10px 0",borderTop:"1px solid #1A2640",textDecoration:"none",fontSize:13}}>
@@ -152,6 +155,7 @@ function LandingD({onQuiz,onPage}){
             <div><p style={{fontSize:26,color:"#fff",margin:0}}>{fmt(sum?.hiringNow)}</p><p style={{fontSize:11,color:"#8D9AB3",margin:"4px 0 0",letterSpacing:".06em"}}>COMPANIES HIRING</p></div>
           </div>
         </aside>
+        </div>
       </div>
       {sum?.top?.length>0&&<div style={{position:"relative",borderTop:"1px solid #1A2640",overflow:"hidden",height:44,display:"flex",alignItems:"center"}}>
         <div className="d-tick" style={{display:"flex",gap:40,whiteSpace:"nowrap",...DM,fontSize:12,color:"#8D9AB3",paddingLeft:24}}>
@@ -183,7 +187,7 @@ function LandingD({onQuiz,onPage}){
       <section className="d-grid3">
         {[["OPENING RADAR","Know the week they open.","Estimates from past seasons, with a reminder a week before.","/radar/"],
           ["CAREER FAIR MODE","Walk in with a route.","Booths, open roles, a QR resume and follow-ups in one place.","/fair/"],
-          ["INTERVIEW PRACTICE","Rehearse before the real one.","A mock interviewer for the company and role you pick, with honest feedback.","/#interview"]].map(([k,t,d,h])=>(
+          ["INTERVIEW PRACTICE","Talk it out. Get a grade.","Answer out loud against a timer, get scored on every answer and a letter grade at the end.","/#interview"]].map(([k,t,d,h])=>(
           <a key={k} href={h} onClick={h==="/#interview"?(e)=>{e.preventDefault();onPage("interview");}:undefined} style={{background:"#070F1E",color:"#E8EDF5",borderRadius:14,padding:24,border:"1px solid #1A2640",textDecoration:"none",display:"block"}}>
             <p style={{...DM,fontSize:11,letterSpacing:".1em",color:"#2FD39A",margin:"0 0 10px"}}>{k}</p>
             <p style={{fontSize:18,fontWeight:600,margin:"0 0 8px",color:"#fff"}}>{t}</p>
@@ -913,47 +917,118 @@ function ScoreExplainerCard({ job, profile, isPro, setShowProModal, isExpanded, 
 
 
 // ── Interview practice: a mock interviewer that asks one question at a time and coaches each answer ──
-const IV={ink:"#0B1220",dim:"#5B6675",line:"#E3E7ED",soft:"#F6F7F9",acc:"#0E8A5F",accSoft:"#E8F5EF",font:'"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif'};
+const IV={ink:"#0A1426",dim:"#55627A",line:"#DCE2EC",soft:"#F1F4F9",acc:"#0B7A55",accSoft:"#EAF7F1",font:'"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif'};
+// Grade from the per-answer rubric (relevance/structure/specifics/delivery, 0–5 each). Pure, so it's easy to check.
+const IV_KEYS=[["relevance","Answered the question"],["structure","Structure (STAR)"],["specifics","Specifics & numbers"],["delivery","Delivery & time"]];
+function ivPct(sc){if(!sc)return null;let t=0;for(const[k]of IV_KEYS)t+=Math.max(0,Math.min(5,Number(sc[k])||0));return Math.round(t/20*100);}
+function ivLetter(p){if(p==null)return"—";const L=[[90,"A"],[80,"A-"],[72,"B+"],[64,"B"],[58,"B-"],[52,"C+"],[46,"C"],[40,"C-"],[30,"D"]]/* rubric: 3/5 = "solid" → B-/B, 5/5 is rare */;for(const[m,l]of L)if(p>=m)return l;return"F";}
+function ivGrade(turns){const sc=turns.filter(t=>t.scores);if(!sc.length)return null;
+  const overall=Math.round(sc.reduce((a,t)=>a+ivPct(t.scores),0)/sc.length);
+  const cats=IV_KEYS.map(([k,label])=>({k,label,pct:Math.round(sc.reduce((a,t)=>a+Math.max(0,Math.min(5,Number(t.scores[k])||0)),0)/sc.length*20)}));
+  return {overall,letter:ivLetter(overall),cats,n:sc.length};}
+const ivClock=(s)=>`${Math.floor(s/60)}:${String(Math.max(0,s)%60).padStart(2,"0")}`;
+const IV_THINK=10;
+
 function InterviewSim({major,defaultCompany,defaultRole}){
-  const [setup,setSetup]=React.useState({company:defaultCompany||"",role:defaultRole||(major?`${major.split(",")[0]} Intern`:"Summer Intern"),kind:"mixed",total:5});
-  const [turns,setTurns]=React.useState([]);          // [{q,a,feedback}]
+  const SR=typeof window!=="undefined"?(window.SpeechRecognition||window.webkitSpeechRecognition):null;
+  const canTalk=!!SR, canSpeak=typeof window!=="undefined"&&"speechSynthesis" in window;
+  const [setup,setSetup]=React.useState({company:defaultCompany||"",role:defaultRole||(major?`${major.split(",")[0]} Intern`:"Summer Intern"),kind:"mixed",total:5,limit:90,mode:canTalk?"talk":"type",readAloud:canSpeak});
+  const [turns,setTurns]=React.useState([]);          // [{q,a,feedback,scores,secs,timedOut}]
   const [draft,setDraft]=React.useState("");
+  const [interim,setInterim]=React.useState("");
   const [busy,setBusy]=React.useState(false);
   const [err,setErr]=React.useState("");
+  const [micErr,setMicErr]=React.useState("");
   const [summary,setSummary]=React.useState(null);
+  const [phase,setPhase]=React.useState(null);         // "reading" | "think" | "answer" | null
+  const [deadline,setDeadline]=React.useState(0);
+  const [now,setNow]=React.useState(Date.now());
+  const [recording,setRecording]=React.useState(false);
+  const recRef=React.useRef(null),wantRec=React.useRef(false),answerStart=React.useRef(0),draftRef=React.useRef(""),interimRef=React.useRef(""),sentRef=React.useRef(false);
+  draftRef.current=draft;interimRef.current=interim;
   const started=turns.length>0;
   const endRef=React.useRef(null);
-  React.useEffect(()=>{if(endRef.current)endRef.current.scrollIntoView({behavior:"smooth",block:"end"});},[turns,summary,busy]);
+  const cur=turns[turns.length-1];
+  const waiting=started&&!busy&&!summary&&cur&&!cur.answered;
+  React.useEffect(()=>{if(endRef.current)endRef.current.scrollIntoView({behavior:"smooth",block:"end"});},[turns.length,summary,busy,phase]);
+
+  // ── microphone (speech → text, live) ──
+  function startRec(){
+    if(!SR||recording)return;setMicErr("");
+    try{
+      const rec=new SR();rec.continuous=true;rec.interimResults=true;rec.lang="en-US";
+      rec.onresult=(e)=>{let fin="",tmp="";for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t;else tmp+=t;}
+        if(fin)setDraft(d=>(d+" "+fin).replace(/\s+/g," ").trim());setInterim(tmp);};
+      rec.onerror=(e)=>{if(e.error==="not-allowed"||e.error==="service-not-allowed"||e.error==="audio-capture"){wantRec.current=false;setMicErr("Your microphone is blocked or missing — type your answer instead (or allow the mic in your browser and tap Talk).");}};
+      rec.onend=()=>{if(wantRec.current){try{rec.start();return;}catch(x){}}setRecording(false);setInterim("");};
+      recRef.current=rec;wantRec.current=true;rec.start();setRecording(true);
+    }catch(x){setMicErr("Couldn't start the microphone — type your answer instead.");}
+  }
+  function stopRec(){wantRec.current=false;try{recRef.current&&recRef.current.stop();}catch(x){}setRecording(false);}
+  function hush(){try{canSpeak&&window.speechSynthesis.cancel();}catch(x){}}
+  React.useEffect(()=>()=>{stopRec();hush();},[]);
+
+  // ── clock ──
+  React.useEffect(()=>{if(!phase||phase==="reading")return;const id=setInterval(()=>setNow(Date.now()),200);return()=>clearInterval(id);},[phase]);
+  const left=phase&&phase!=="reading"?Math.max(0,Math.ceil((deadline-now)/1000)):0;
+  function beginAnswer(){setPhase("answer");answerStart.current=Date.now();setDeadline(Date.now()+setup.limit*1000);setNow(Date.now());if(setup.mode==="talk")startRec();}
+  function beginThink(){setPhase("think");setDeadline(Date.now()+IV_THINK*1000);setNow(Date.now());}
+  React.useEffect(()=>{if(phase==="think"&&left<=0)beginAnswer();if(phase==="answer"&&left<=0)submit(true);},[left,phase]);
+
+  // a new question arrived → read it out (optional) → think → answer
+  React.useEffect(()=>{
+    if(!waiting)return;sentRef.current=false;setDraft("");setInterim("");
+    if(setup.readAloud&&canSpeak){
+      setPhase("reading");hush();
+      const u=new SpeechSynthesisUtterance(cur.q);u.rate=1.02;u.lang="en-US";
+      let moved=false;const go=()=>{if(!moved){moved=true;beginThink();}};
+      u.onend=go;u.onerror=go;setTimeout(go,Math.min(30000,2500+cur.q.length*80));   // never get stuck if the voice fails
+      window.speechSynthesis.speak(u);
+    }else beginThink();
+  },[turns.length,waiting]);
+
   async function ask(history){
     setBusy(true);setErr("");
     try{
       const r=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({feature:"interview_turn",input:{...setup,major,history:history.map(t=>({q:t.q,a:t.a}))}})});
+        body:JSON.stringify({feature:"interview_turn",input:{company:setup.company,role:setup.role,kind:setup.kind,total:setup.total,limit:setup.limit,spoken:setup.mode==="talk",major,
+          history:history.map(t=>({q:t.q,a:t.a,secs:t.secs,timedOut:!!t.timedOut}))}})});
       const d=await r.json().catch(()=>({}));
       if(!r.ok)throw new Error(d.error||"The interviewer couldn't answer — try again.");
-      const m=String(d.text||"").match(/\{[\s\S]*\}/);const j=m?JSON.parse(m[0]):null;
+      const m=String(d.text||"").match(/\{[\s\S]*\}/);let j=null;try{j=m?JSON.parse(m[0]):null;}catch(x){}
       if(!j)throw new Error("The interviewer gave an unreadable answer — try again.");
-      const next=history.map((t,i)=>i===history.length-1&&j.feedback?{...t,feedback:j.feedback}:t);
+      const next=history.map((t,i)=>i===history.length-1&&t.answered?{...t,feedback:j.feedback||"",scores:j.scores&&typeof j.scores==="object"?j.scores:null}:t);
       if(j.summary){setTurns(next);setSummary(j.summary);}
-      else if(j.next)setTurns([...next,{q:String(j.next),a:"",feedback:""}]);
+      else if(j.next)setTurns([...next,{q:String(j.next),a:"",feedback:"",answered:false}]);
       else throw new Error("The interviewer gave an unreadable answer — try again.");
     }catch(e){setErr(String(e.message||e));}
     finally{setBusy(false);}
   }
-  function start(){setTurns([]);setSummary(null);ask([]);}
-  function send(){
-    const a=draft.trim();if(!a||busy)return;
-    const h=turns.map((t,i)=>i===turns.length-1?{...t,a}:t);
-    setTurns(h);setDraft("");ask(h);
+  function start(){hush();setTurns([]);setSummary(null);setPhase(null);ask([]);}
+  function submit(timedOut){
+    if(sentRef.current||busy||!waiting)return;
+    const a=(draftRef.current+" "+interimRef.current).replace(/\s+/g," ").trim();
+    if(!a&&!timedOut)return;
+    sentRef.current=true;stopRec();hush();setPhase(null);
+    const secs=phase==="answer"?Math.min(setup.limit,Math.round((Date.now()-answerStart.current)/1000)):0;
+    const h=turns.map((t,i)=>i===turns.length-1?{...t,a,secs,timedOut:!!timedOut,answered:true}:t);
+    setTurns(h);setDraft("");setInterim("");ask(h);
   }
-  const field={width:"100%",padding:"10px 12px",border:`1px solid ${IV.line}`,borderRadius:8,font:`400 15px ${IV.font}`,color:IV.ink,background:"#fff"};
+  function quit(){stopRec();hush();setPhase(null);setTurns([]);setSummary(null);setErr("");}
+
+  const grade=summary?ivGrade(turns):null;
+  const field={width:"100%",padding:"10px 12px",border:`1px solid ${IV.line}`,borderRadius:8,font:`400 15px ${IV.font}`,color:IV.ink,background:"#fff",boxSizing:"border-box"};
   const label={display:"block",font:`600 13px ${IV.font}`,color:IV.ink,margin:"14px 0 6px"};
-  const btn=(primary)=>({font:`600 14px ${IV.font}`,padding:"10px 16px",borderRadius:8,cursor:"pointer",border:`1px solid ${primary?IV.acc:IV.line}`,background:primary?IV.acc:"#fff",color:primary?"#fff":IV.ink});
+  const btn=(primary)=>({font:`600 14px ${IV.font}`,padding:"10px 16px",borderRadius:999,cursor:"pointer",border:`1px solid ${primary?IV.acc:IV.line}`,background:primary?IV.acc:"#fff",color:primary?"#fff":IV.ink});
+  const seg=(on)=>({font:`500 14px ${IV.font}`,padding:"9px 14px",borderRadius:999,cursor:"pointer",border:`1px solid ${on?IV.ink:IV.line}`,background:on?IV.ink:"#fff",color:on?"#fff":IV.ink});
+  const mono={fontFamily:'"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace'};
+  const pctColor=(p)=>p>=64?IV.acc:p>=46?"#B45309":"#B42318";
+  const lowTime=phase==="answer"&&left<=15;
   return (
-    <main id="main" style={{maxWidth:760,margin:"0 auto",padding:"32px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))",fontFamily:IV.font,color:IV.ink}}>
-      <p style={{font:`600 12px ${IV.font}`,letterSpacing:".08em",textTransform:"uppercase",color:IV.acc,margin:0}}>Interview practice</p>
-      <h1 style={{font:`650 clamp(26px,4vw,34px)/1.15 ${IV.font}`,letterSpacing:"-.02em",margin:"6px 0 8px"}}>Practice the interview before the real one.</h1>
-      <p style={{color:IV.dim,fontSize:15.5,lineHeight:1.6,margin:"0 0 22px",maxWidth:"62ch"}}>An AI interviewer asks one question at a time, reacts to your answer, and tells you how to make it stronger. At the end you get what you did well and what to fix. Your answers go to our AI provider to write the feedback; nothing is saved.</p>
+    <main id="main" style={{maxWidth:780,margin:"0 auto",padding:"32px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))",fontFamily:IV.font,color:IV.ink}}>
+      <p style={{...mono,fontSize:12,letterSpacing:".1em",textTransform:"uppercase",color:IV.acc,margin:0}}>Interview practice</p>
+      <h1 style={{font:`600 clamp(26px,4vw,34px)/1.15 ${IV.font}`,letterSpacing:"-.02em",margin:"6px 0 8px"}}>Say it out loud. Beat the clock. Get a grade.</h1>
+      <p style={{color:IV.dim,fontSize:15.5,lineHeight:1.6,margin:"0 0 22px",maxWidth:"64ch"}}>An AI interviewer asks one question at a time. You get {IV_THINK} seconds to think, then the clock runs — talk (or type) your answer, and it sends itself when time's up. Every answer is scored, and you get a letter grade at the end. Grades are an AI estimate, not a hiring decision. Your answers go to our AI provider to write the feedback; nothing is saved{canTalk?" (speech is turned into text by your browser)":""}.</p>
       {!started&&!busy?(
         <section style={{border:`1px solid ${IV.line}`,borderRadius:12,padding:"18px 18px 20px",background:"#fff"}}>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:"0 14px"}}>
@@ -967,46 +1042,92 @@ function InterviewSim({major,defaultCompany,defaultRole}){
               <select id="ivN" style={field} value={setup.total} onChange={e=>setSetup(s=>({...s,total:+e.target.value}))}>
                 <option value={3}>Quick — 3 questions</option><option value={5}>Standard — 5 questions</option><option value={8}>Full — 8 questions</option>
               </select></div>
+            <div><label style={label} htmlFor="ivT">Time per answer</label>
+              <select id="ivT" style={field} value={setup.limit} onChange={e=>setSetup(s=>({...s,limit:+e.target.value}))}>
+                <option value={60}>1 minute (tight)</option><option value={90}>1.5 minutes (typical)</option><option value={120}>2 minutes</option><option value={180}>3 minutes</option>
+              </select></div>
+            <div><span style={label}>How you'll answer</span>
+              <div style={{display:"flex",gap:8,flexWrap:"wrap"}} role="group" aria-label="How you'll answer">
+                <button type="button" style={seg(setup.mode==="talk")} aria-pressed={setup.mode==="talk"} disabled={!canTalk} onClick={()=>setSetup(s=>({...s,mode:"talk"}))}>Talk</button>
+                <button type="button" style={seg(setup.mode==="type")} aria-pressed={setup.mode==="type"} onClick={()=>setSetup(s=>({...s,mode:"type"}))}>Type</button>
+              </div>
+              {!canTalk&&<p style={{fontSize:12.5,color:IV.dim,margin:"6px 0 0"}}>This browser can't turn speech into text — try Chrome, Edge or Safari, or type.</p>}</div>
           </div>
-          <button style={{...btn(true),marginTop:18}} onClick={start}>Start the interview</button>
+          {canSpeak&&<label style={{display:"flex",alignItems:"center",gap:8,marginTop:16,fontSize:14,cursor:"pointer"}}><input type="checkbox" checked={setup.readAloud} onChange={e=>setSetup(s=>({...s,readAloud:e.target.checked}))} style={{accentColor:IV.acc,width:16,height:16}}/>Read each question out loud</label>}
+          <button style={{...btn(true),marginTop:18,padding:"12px 22px"}} onClick={start}>Start the interview</button>
           {err&&<p role="alert" style={{color:"#B42318",fontSize:14,marginTop:12}}>{err}</p>}
         </section>
       ):(
-        <section aria-live="polite" style={{display:"flex",flexDirection:"column",gap:14}}>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:13,color:IV.dim}}>
-            <span>{setup.role}{setup.company?` · ${setup.company}`:""} · {setup.kind}</span>
-            <span>Question {Math.min(turns.length,setup.total)} of {setup.total}</span>
+        <section style={{display:"flex",flexDirection:"column",gap:14}}>
+          <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:13,color:IV.dim,gap:10,flexWrap:"wrap"}}>
+            <span>{setup.role}{setup.company?` · ${setup.company}`:""} · {setup.kind} · {ivClock(setup.limit)} per answer</span>
+            <span style={mono}>Q {Math.min(turns.length,setup.total)}/{setup.total}</span>
           </div>
-          {turns.map((t,i)=>(
+          {turns.map((t,i)=>{const p=ivPct(t.scores);return(
             <div key={i} style={{display:"flex",flexDirection:"column",gap:8}}>
               <div style={{alignSelf:"flex-start",maxWidth:"88%",background:IV.soft,border:`1px solid ${IV.line}`,borderRadius:"12px 12px 12px 4px",padding:"12px 14px",fontSize:15,lineHeight:1.55}}>
                 <div style={{font:`600 12px ${IV.font}`,color:IV.dim,marginBottom:4}}>Interviewer</div>{t.q}</div>
-              {t.a&&<div style={{alignSelf:"flex-end",maxWidth:"88%",background:IV.ink,color:"#fff",borderRadius:"12px 12px 4px 12px",padding:"12px 14px",fontSize:15,lineHeight:1.55,whiteSpace:"pre-wrap"}}>{t.a}</div>}
+              {t.answered&&<div style={{alignSelf:"flex-end",maxWidth:"88%",background:IV.ink,color:"#fff",borderRadius:"12px 12px 4px 12px",padding:"12px 14px",fontSize:15,lineHeight:1.55,whiteSpace:"pre-wrap"}}>
+                {t.a||<i style={{opacity:.7}}>No answer</i>}
+                <div style={{...mono,fontSize:11,opacity:.6,marginTop:6}}>{ivClock(t.secs||0)} used{t.timedOut?" · time ran out":""}</div></div>}
               {t.feedback&&<div style={{borderLeft:`3px solid ${IV.acc}`,background:IV.accSoft,borderRadius:"0 8px 8px 0",padding:"10px 12px",fontSize:14,lineHeight:1.55}}>
-                <div style={{font:`600 12px ${IV.font}`,color:IV.acc,marginBottom:3}}>Coach</div>{t.feedback}</div>}
-            </div>
-          ))}
-          {busy&&<div style={{color:IV.dim,fontSize:14}}>Interviewer is thinking…</div>}
-          {err&&<div role="alert" style={{color:"#B42318",fontSize:14}}>{err} <button style={{...btn(false),padding:"4px 10px",fontSize:13}} onClick={()=>ask(turns)}>Retry</button></div>}
+                <div style={{display:"flex",justifyContent:"space-between",gap:10,alignItems:"baseline",marginBottom:3}}>
+                  <span style={{font:`600 12px ${IV.font}`,color:IV.acc}}>Coach</span>
+                  {p!=null&&<span style={{...mono,fontSize:12,color:pctColor(p)}} title="AI estimate">{ivLetter(p)} · {p}%</span>}</div>
+                {t.feedback}
+                {t.scores&&<div style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:8,...mono,fontSize:11.5,color:IV.dim}}>{IV_KEYS.map(([k,l])=><span key={k}>{l.split(" ")[0]} {Math.max(0,Math.min(5,Number(t.scores[k])||0))}/5</span>)}</div>}
+              </div>}
+            </div>);})}
+          {busy&&<div style={{color:IV.dim,fontSize:14}}>{turns.length&&turns[turns.length-1].answered?"Grading your answer…":"Interviewer is thinking…"}</div>}
+          {err&&<div role="alert" style={{color:"#B42318",fontSize:14}}>{err} <button style={{...btn(false),padding:"4px 12px",fontSize:13}} onClick={()=>ask(turns)}>Retry</button></div>}
           {summary?(
-            <div style={{border:`1px solid ${IV.line}`,borderRadius:12,padding:18,background:"#fff"}}>
-              <h2 style={{font:`650 20px ${IV.font}`,margin:"0 0 10px"}}>How it went</h2>
-              <p style={{fontSize:15,lineHeight:1.6,margin:"0 0 12px"}}>{summary.overall}</p>
-              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:14}}>
+            <div style={{border:`1px solid ${IV.line}`,borderRadius:14,padding:20,background:"#fff"}}>
+              <div style={{display:"flex",gap:20,alignItems:"center",flexWrap:"wrap"}}>
+                <div style={{width:96,height:96,borderRadius:16,background:"#070F1E",color:"#2FD39A",display:"grid",placeItems:"center",...mono,fontSize:40,fontWeight:500}} aria-label={`Grade ${grade?grade.letter:"not available"}`}>{grade?grade.letter:"—"}</div>
+                <div style={{flex:1,minWidth:200}}>
+                  <h2 style={{font:`600 22px ${IV.font}`,margin:"0 0 4px"}}>{grade?`${grade.overall}% overall`:"How it went"}</h2>
+                  <p style={{fontSize:12.5,color:IV.dim,margin:"0 0 8px"}}>AI estimate from {grade?grade.n:0} graded answer{grade&&grade.n===1?"":"s"} · not a hiring decision</p>
+                  <p style={{fontSize:15,lineHeight:1.6,margin:0}}>{summary.overall}</p>
+                </div>
+              </div>
+              {grade&&<div style={{marginTop:18,display:"flex",flexDirection:"column",gap:10}}>
+                {grade.cats.map(c=>(<div key={c.k} style={{display:"grid",gridTemplateColumns:"minmax(120px,170px) 1fr 44px",gap:12,alignItems:"center",fontSize:14}}>
+                  <span>{c.label}</span><div style={{height:8,background:"#EEF1F6",borderRadius:4}}><div style={{width:`${c.pct}%`,height:8,borderRadius:4,background:pctColor(c.pct)}}/></div><span style={{...mono,textAlign:"right"}}>{c.pct}%</span></div>))}
+              </div>}
+              <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:14,marginTop:18}}>
                 <div><h3 style={{font:`600 14px ${IV.font}`,margin:"0 0 6px"}}>Strengths</h3><ul style={{margin:0,paddingLeft:18,fontSize:14.5,lineHeight:1.6}}>{(summary.strengths||[]).map((x,i)=><li key={i}>{x}</li>)}</ul></div>
                 <div><h3 style={{font:`600 14px ${IV.font}`,margin:"0 0 6px"}}>Work on</h3><ul style={{margin:0,paddingLeft:18,fontSize:14.5,lineHeight:1.6}}>{(summary.improve||[]).map((x,i)=><li key={i}>{x}</li>)}</ul></div>
               </div>
-              <button style={{...btn(true),marginTop:16}} onClick={()=>{setTurns([]);setSummary(null);}}>Practice again</button>
+              <button style={{...btn(true),marginTop:16}} onClick={quit}>Practice again</button>
             </div>
-          ):started&&!busy&&turns[turns.length-1]&&!turns[turns.length-1].a?(
-            <div style={{position:"sticky",bottom:12,background:"#fff",border:`1px solid ${IV.line}`,borderRadius:12,padding:10,boxShadow:"0 6px 20px rgba(11,18,32,.08)"}}>
-              <label htmlFor="ivA" style={{position:"absolute",left:-9999}}>Your answer</label>
-              <textarea id="ivA" value={draft} onChange={e=>setDraft(e.target.value)} rows={4} placeholder="Answer like you would out loud. Tip: situation, what you did, the result."
-                onKeyDown={e=>{if(e.key==="Enter"&&(e.metaKey||e.ctrlKey))send();}} style={{...field,border:"none",resize:"vertical",padding:"6px 8px"}}/>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,flexWrap:"wrap"}}>
-                <span style={{fontSize:12,color:IV.dim}}>Ctrl/⌘ + Enter to send</span>
-                <div style={{display:"flex",gap:8}}><button style={btn(false)} onClick={()=>{setTurns([]);setSummary(null);}}>End</button><button style={btn(true)} onClick={send} disabled={!draft.trim()}>Send answer</button></div>
+          ):waiting?(
+            <div style={{position:"sticky",bottom:12,background:"#fff",border:`1px solid ${lowTime?"#F4B4AE":IV.line}`,borderRadius:14,padding:12,boxShadow:"0 6px 20px rgba(11,18,32,.08)"}}>
+              {/* the clock */}
+              <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:10}}>
+                <span style={{...mono,fontSize:22,minWidth:64,color:phase==="think"?"#B45309":lowTime?"#B42318":IV.ink}} aria-live="off">{phase==="reading"?"··":ivClock(left)}</span>
+                <div style={{flex:1}}>
+                  <div style={{fontSize:12.5,color:IV.dim,marginBottom:5}} aria-live="polite">{phase==="reading"?"Listen to the question…":phase==="think"?"Think time — answer starts automatically":lowTime?"Wrap it up — sends when the clock hits 0:00":"Answer now"}</div>
+                  <div style={{height:6,background:"#EEF1F6",borderRadius:3,overflow:"hidden"}}><div style={{height:6,borderRadius:3,transition:"width .2s linear",background:phase==="think"?"#F59E0B":lowTime?"#DC2626":IV.acc,width:`${phase==="think"?left/IV_THINK*100:phase==="answer"?left/setup.limit*100:100}%`}}/></div>
+                </div>
+                {phase==="reading"&&<button style={{...btn(false),padding:"6px 12px",fontSize:13}} onClick={()=>{hush();beginThink();}}>Skip</button>}
+                {phase==="think"&&<button style={{...btn(true),padding:"8px 14px",fontSize:13}} onClick={beginAnswer}>I'm ready</button>}
               </div>
+              {phase==="answer"&&<>
+                {setup.mode==="talk"&&canTalk&&<div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+                  <button type="button" onClick={()=>recording?stopRec():startRec()} aria-pressed={recording} style={{...btn(recording),display:"flex",alignItems:"center",gap:8,background:recording?"#B42318":"#fff",borderColor:recording?"#B42318":IV.line,color:recording?"#fff":IV.ink}}>
+                    <span aria-hidden="true" style={{width:9,height:9,borderRadius:"50%",background:recording?"#fff":"#B42318",animation:recording?"dblink 1.2s infinite":"none"}}/>{recording?"Listening — tap to pause":"Tap to talk"}</button>
+                  <span style={{fontSize:12.5,color:IV.dim}}>Your words show up below — fix anything it misheard.</span>
+                </div>}
+                {micErr&&<p role="alert" style={{fontSize:13,color:"#B42318",margin:"0 0 8px"}}>{micErr}</p>}
+                <label htmlFor="ivA" style={{position:"absolute",left:-9999}}>Your answer</label>
+                <textarea id="ivA" value={draft} onChange={e=>setDraft(e.target.value)} rows={4} autoFocus={setup.mode==="type"} placeholder={setup.mode==="talk"?"Start talking — your answer appears here.":"Type your answer. Tip: situation, what you did, the result."}
+                  onKeyDown={e=>{if(e.key==="Enter"&&(e.metaKey||e.ctrlKey))submit(false);}} style={{...field,resize:"vertical"}}/>
+                {interim&&<p style={{fontSize:14,color:IV.dim,fontStyle:"italic",margin:"6px 2px 0"}}>{interim}</p>}
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,flexWrap:"wrap",marginTop:8}}>
+                  <span style={{fontSize:12,color:IV.dim}}>{setup.mode==="type"?"Ctrl/⌘ + Enter to send":"Done early? Send it — leftover time doesn't hurt you."}</span>
+                  <div style={{display:"flex",gap:8}}><button style={btn(false)} onClick={quit}>End</button><button style={btn(true)} onClick={()=>submit(false)} disabled={!(draft+interim).trim()}>Send answer</button></div>
+                </div>
+              </>}
             </div>
           ):null}
           <div ref={endRef}/>
@@ -2843,7 +2964,7 @@ function App(){
   // INTERVIEW PRACTICE
   if(page==="interview"){
     const lastApp=(tracked||[]).slice(-1)[0];
-    return(<div style={{background:"#FBFBFC",minHeight:"100vh"}}><Nav/>
+    return(<div style={{background:"#EEF1F6",minHeight:"100vh"}}><Nav/>
       <InterviewSim major={ans.major||profile.major||""} defaultCompany={lastApp?.company||""} defaultRole={lastApp?.role||""}/></div>);
   }
   // LANDING (Direction D: search-first like Glassdoor, live "console" feel; every number is live data)

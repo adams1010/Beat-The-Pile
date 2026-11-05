@@ -26,6 +26,18 @@ for (const feat of ["reasons", "resume_builder", "followup", "interview_prep", "
   r = await call({ feature: feat, input }); assert.equal(r.code, 200, feat);
 }
 console.log("✓ feature-only AI: no raw prompts, required fields, capped inputs, server-built prompts");
+// interview practice: timed, spoken answers get a rubric score per answer (the page turns scores into the grade)
+r = await call({ feature: "interview_turn", input: { company: "Boeing", role: "ME Intern", total: 3, limit: 60, spoken: true,
+  history: [{ q: "Tell me about a project", a: "um so I built a go-kart frame", secs: 60, timedOut: true }] } });
+assert.equal(r.code, 200);
+{ const p2 = f.calls.prompts.at(-1);
+  assert.ok(p2.includes('"scores"') && p2.includes("relevance") && p2.includes("delivery"), "asks for a rubric score");
+  assert.ok(p2.includes("auto-transcribed") && p2.includes("60s of 60s") && p2.includes("ran out of time"), "knows it was spoken + timed");
+  assert.ok(p2.includes("60-second limit")); }
+r = await call({ feature: "interview_turn", input: { total: 3, limit: 9999, history: [] } }); assert.equal(r.code, 200);
+assert.ok(f.calls.prompts.at(-1).includes("300-second limit"), "time limit capped");
+console.log("✓ interview practice: rubric scores, spoken + timed answers, limits capped");
+
 
 // per-visitor limit is durable (stored in the database, shared by every server)
 let last; for (let i = 0; i < 25; i++) last = await call({ feature: "intel", input: { name: "Acme" } }, { origin: SITE }, "9.9.9.9");

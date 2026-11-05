@@ -1,4 +1,4 @@
-/* built from src/home.jsx 510f2160eaacf51e — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx a0d1b89ee15f208c — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -465,22 +465,9 @@ function LandingD({
       position: "relative",
       overflow: "hidden",
       background: "#070F1E",
-      color: "#E8EDF5",
-      backgroundImage: "linear-gradient(#111C33 1px,transparent 1px),linear-gradient(90deg,#111C33 1px,transparent 1px)",
-      backgroundSize: "32px 32px"
+      color: "#E8EDF5"
     }
   }, React.createElement("div", {
-    "aria-hidden": "true",
-    className: "d-scan",
-    style: {
-      position: "absolute",
-      left: 0,
-      right: 0,
-      top: 0,
-      height: 120,
-      background: "linear-gradient(transparent,rgba(47,211,154,.07),transparent)"
-    }
-  }), React.createElement("div", {
     style: {
       ...wrap,
       position: "relative",
@@ -697,17 +684,35 @@ function LandingD({
       fontWeight: 600,
       textDecoration: "none"
     }
-  }, "90-second demo"))), React.createElement("aside", {
+  }, "90-second demo"))), React.createElement("div", {
     style: {
+      position: "relative",
       flex: "1 1 300px",
       maxWidth: 420,
       minWidth: 0,
+      width: "100%"
+    }
+  }, [["rotate(-9deg) translate(-22px,14px)", .6], ["rotate(6deg) translate(18px,8px)", .8], ["rotate(-3deg) translate(-6px,-6px)", 1]].map(([t, o], i) => React.createElement("div", {
+    key: i,
+    "aria-hidden": "true",
+    style: {
+      position: "absolute",
+      inset: 0,
+      borderRadius: 16,
+      background: "#0A1426",
+      border: "1px solid rgba(174,185,204,.24)",
+      transform: t,
+      opacity: o
+    }
+  })), React.createElement("aside", {
+    style: {
+      position: "relative",
       boxSizing: "border-box",
-      width: "100%",
-      background: "rgba(13,22,40,.85)",
-      border: "1px solid #22304D",
+      background: "#0D1A2F",
+      border: "1px solid #2A3B5C",
       borderRadius: 16,
       padding: 20,
+      boxShadow: "0 24px 60px rgba(0,0,0,.45)",
       ...DM
     }
   }, React.createElement("div", {
@@ -806,7 +811,7 @@ function LandingD({
       margin: "4px 0 0",
       letterSpacing: ".06em"
     }
-  }, "COMPANIES HIRING"))))), sum?.top?.length > 0 && React.createElement("div", {
+  }, "COMPANIES HIRING")))))), sum?.top?.length > 0 && React.createElement("div", {
     style: {
       position: "relative",
       borderTop: "1px solid #1A2640",
@@ -980,7 +985,7 @@ function LandingD({
     }
   }, "See internships \u2192"))))), React.createElement("section", {
     className: "d-grid3"
-  }, [["OPENING RADAR", "Know the week they open.", "Estimates from past seasons, with a reminder a week before.", "/radar/"], ["CAREER FAIR MODE", "Walk in with a route.", "Booths, open roles, a QR resume and follow-ups in one place.", "/fair/"], ["INTERVIEW PRACTICE", "Rehearse before the real one.", "A mock interviewer for the company and role you pick, with honest feedback.", "/#interview"]].map(([k, t, d, h]) => React.createElement("a", {
+  }, [["OPENING RADAR", "Know the week they open.", "Estimates from past seasons, with a reminder a week before.", "/radar/"], ["CAREER FAIR MODE", "Walk in with a route.", "Booths, open roles, a QR resume and follow-ups in one place.", "/fair/"], ["INTERVIEW PRACTICE", "Talk it out. Get a grade.", "Answer out loud against a timer, get scored on every answer and a letter grade at the end.", "/#interview"]].map(([k, t, d, h]) => React.createElement("a", {
     key: k,
     href: h,
     onClick: h === "/#interview" ? e => {
@@ -2424,38 +2429,195 @@ function ScoreExplainerCard({
   }, 'Unlock Breakdown'))))));
 }
 const IV = {
-  ink: "#0B1220",
-  dim: "#5B6675",
-  line: "#E3E7ED",
-  soft: "#F6F7F9",
-  acc: "#0E8A5F",
-  accSoft: "#E8F5EF",
+  ink: "#0A1426",
+  dim: "#55627A",
+  line: "#DCE2EC",
+  soft: "#F1F4F9",
+  acc: "#0B7A55",
+  accSoft: "#EAF7F1",
   font: '"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif'
 };
+const IV_KEYS = [["relevance", "Answered the question"], ["structure", "Structure (STAR)"], ["specifics", "Specifics & numbers"], ["delivery", "Delivery & time"]];
+function ivPct(sc) {
+  if (!sc) return null;
+  let t = 0;
+  for (const [k] of IV_KEYS) t += Math.max(0, Math.min(5, Number(sc[k]) || 0));
+  return Math.round(t / 20 * 100);
+}
+function ivLetter(p) {
+  if (p == null) return "—";
+  const L = [[90, "A"], [80, "A-"], [72, "B+"], [64, "B"], [58, "B-"], [52, "C+"], [46, "C"], [40, "C-"], [30, "D"]];
+  for (const [m, l] of L) if (p >= m) return l;
+  return "F";
+}
+function ivGrade(turns) {
+  const sc = turns.filter(t => t.scores);
+  if (!sc.length) return null;
+  const overall = Math.round(sc.reduce((a, t) => a + ivPct(t.scores), 0) / sc.length);
+  const cats = IV_KEYS.map(([k, label]) => ({
+    k,
+    label,
+    pct: Math.round(sc.reduce((a, t) => a + Math.max(0, Math.min(5, Number(t.scores[k]) || 0)), 0) / sc.length * 20)
+  }));
+  return {
+    overall,
+    letter: ivLetter(overall),
+    cats,
+    n: sc.length
+  };
+}
+const ivClock = s => `${Math.floor(s / 60)}:${String(Math.max(0, s) % 60).padStart(2, "0")}`;
+const IV_THINK = 10;
 function InterviewSim({
   major,
   defaultCompany,
   defaultRole
 }) {
+  const SR = typeof window !== "undefined" ? window.SpeechRecognition || window.webkitSpeechRecognition : null;
+  const canTalk = !!SR,
+    canSpeak = typeof window !== "undefined" && "speechSynthesis" in window;
   const [setup, setSetup] = React.useState({
     company: defaultCompany || "",
     role: defaultRole || (major ? `${major.split(",")[0]} Intern` : "Summer Intern"),
     kind: "mixed",
-    total: 5
+    total: 5,
+    limit: 90,
+    mode: canTalk ? "talk" : "type",
+    readAloud: canSpeak
   });
   const [turns, setTurns] = React.useState([]);
   const [draft, setDraft] = React.useState("");
+  const [interim, setInterim] = React.useState("");
   const [busy, setBusy] = React.useState(false);
   const [err, setErr] = React.useState("");
+  const [micErr, setMicErr] = React.useState("");
   const [summary, setSummary] = React.useState(null);
+  const [phase, setPhase] = React.useState(null);
+  const [deadline, setDeadline] = React.useState(0);
+  const [now, setNow] = React.useState(Date.now());
+  const [recording, setRecording] = React.useState(false);
+  const recRef = React.useRef(null),
+    wantRec = React.useRef(false),
+    answerStart = React.useRef(0),
+    draftRef = React.useRef(""),
+    interimRef = React.useRef(""),
+    sentRef = React.useRef(false);
+  draftRef.current = draft;
+  interimRef.current = interim;
   const started = turns.length > 0;
   const endRef = React.useRef(null);
+  const cur = turns[turns.length - 1];
+  const waiting = started && !busy && !summary && cur && !cur.answered;
   React.useEffect(() => {
     if (endRef.current) endRef.current.scrollIntoView({
       behavior: "smooth",
       block: "end"
     });
-  }, [turns, summary, busy]);
+  }, [turns.length, summary, busy, phase]);
+  function startRec() {
+    if (!SR || recording) return;
+    setMicErr("");
+    try {
+      const rec = new SR();
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.lang = "en-US";
+      rec.onresult = e => {
+        let fin = "",
+          tmp = "";
+        for (let i = e.resultIndex; i < e.results.length; i++) {
+          const t = e.results[i][0].transcript;
+          if (e.results[i].isFinal) fin += t;else tmp += t;
+        }
+        if (fin) setDraft(d => (d + " " + fin).replace(/\s+/g, " ").trim());
+        setInterim(tmp);
+      };
+      rec.onerror = e => {
+        if (e.error === "not-allowed" || e.error === "service-not-allowed" || e.error === "audio-capture") {
+          wantRec.current = false;
+          setMicErr("Your microphone is blocked or missing — type your answer instead (or allow the mic in your browser and tap Talk).");
+        }
+      };
+      rec.onend = () => {
+        if (wantRec.current) {
+          try {
+            rec.start();
+            return;
+          } catch (x) {}
+        }
+        setRecording(false);
+        setInterim("");
+      };
+      recRef.current = rec;
+      wantRec.current = true;
+      rec.start();
+      setRecording(true);
+    } catch (x) {
+      setMicErr("Couldn't start the microphone — type your answer instead.");
+    }
+  }
+  function stopRec() {
+    wantRec.current = false;
+    try {
+      recRef.current && recRef.current.stop();
+    } catch (x) {}
+    setRecording(false);
+  }
+  function hush() {
+    try {
+      canSpeak && window.speechSynthesis.cancel();
+    } catch (x) {}
+  }
+  React.useEffect(() => () => {
+    stopRec();
+    hush();
+  }, []);
+  React.useEffect(() => {
+    if (!phase || phase === "reading") return;
+    const id = setInterval(() => setNow(Date.now()), 200);
+    return () => clearInterval(id);
+  }, [phase]);
+  const left = phase && phase !== "reading" ? Math.max(0, Math.ceil((deadline - now) / 1000)) : 0;
+  function beginAnswer() {
+    setPhase("answer");
+    answerStart.current = Date.now();
+    setDeadline(Date.now() + setup.limit * 1000);
+    setNow(Date.now());
+    if (setup.mode === "talk") startRec();
+  }
+  function beginThink() {
+    setPhase("think");
+    setDeadline(Date.now() + IV_THINK * 1000);
+    setNow(Date.now());
+  }
+  React.useEffect(() => {
+    if (phase === "think" && left <= 0) beginAnswer();
+    if (phase === "answer" && left <= 0) submit(true);
+  }, [left, phase]);
+  React.useEffect(() => {
+    if (!waiting) return;
+    sentRef.current = false;
+    setDraft("");
+    setInterim("");
+    if (setup.readAloud && canSpeak) {
+      setPhase("reading");
+      hush();
+      const u = new SpeechSynthesisUtterance(cur.q);
+      u.rate = 1.02;
+      u.lang = "en-US";
+      let moved = false;
+      const go = () => {
+        if (!moved) {
+          moved = true;
+          beginThink();
+        }
+      };
+      u.onend = go;
+      u.onerror = go;
+      setTimeout(go, Math.min(30000, 2500 + cur.q.length * 80));
+      window.speechSynthesis.speak(u);
+    } else beginThink();
+  }, [turns.length, waiting]);
   async function ask(history) {
     setBusy(true);
     setErr("");
@@ -2468,11 +2630,18 @@ function InterviewSim({
         body: JSON.stringify({
           feature: "interview_turn",
           input: {
-            ...setup,
+            company: setup.company,
+            role: setup.role,
+            kind: setup.kind,
+            total: setup.total,
+            limit: setup.limit,
+            spoken: setup.mode === "talk",
             major,
             history: history.map(t => ({
               q: t.q,
-              a: t.a
+              a: t.a,
+              secs: t.secs,
+              timedOut: !!t.timedOut
             }))
           }
         })
@@ -2480,11 +2649,15 @@ function InterviewSim({
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d.error || "The interviewer couldn't answer — try again.");
       const m = String(d.text || "").match(/\{[\s\S]*\}/);
-      const j = m ? JSON.parse(m[0]) : null;
+      let j = null;
+      try {
+        j = m ? JSON.parse(m[0]) : null;
+      } catch (x) {}
       if (!j) throw new Error("The interviewer gave an unreadable answer — try again.");
-      const next = history.map((t, i) => i === history.length - 1 && j.feedback ? {
+      const next = history.map((t, i) => i === history.length - 1 && t.answered ? {
         ...t,
-        feedback: j.feedback
+        feedback: j.feedback || "",
+        scores: j.scores && typeof j.scores === "object" ? j.scores : null
       } : t);
       if (j.summary) {
         setTurns(next);
@@ -2492,7 +2665,8 @@ function InterviewSim({
       } else if (j.next) setTurns([...next, {
         q: String(j.next),
         a: "",
-        feedback: ""
+        feedback: "",
+        answered: false
       }]);else throw new Error("The interviewer gave an unreadable answer — try again.");
     } catch (e) {
       setErr(String(e.message || e));
@@ -2501,21 +2675,42 @@ function InterviewSim({
     }
   }
   function start() {
+    hush();
     setTurns([]);
     setSummary(null);
+    setPhase(null);
     ask([]);
   }
-  function send() {
-    const a = draft.trim();
-    if (!a || busy) return;
+  function submit(timedOut) {
+    if (sentRef.current || busy || !waiting) return;
+    const a = (draftRef.current + " " + interimRef.current).replace(/\s+/g, " ").trim();
+    if (!a && !timedOut) return;
+    sentRef.current = true;
+    stopRec();
+    hush();
+    setPhase(null);
+    const secs = phase === "answer" ? Math.min(setup.limit, Math.round((Date.now() - answerStart.current) / 1000)) : 0;
     const h = turns.map((t, i) => i === turns.length - 1 ? {
       ...t,
-      a
+      a,
+      secs,
+      timedOut: !!timedOut,
+      answered: true
     } : t);
     setTurns(h);
     setDraft("");
+    setInterim("");
     ask(h);
   }
+  function quit() {
+    stopRec();
+    hush();
+    setPhase(null);
+    setTurns([]);
+    setSummary(null);
+    setErr("");
+  }
+  const grade = summary ? ivGrade(turns) : null;
   const field = {
     width: "100%",
     padding: "10px 12px",
@@ -2523,7 +2718,8 @@ function InterviewSim({
     borderRadius: 8,
     font: `400 15px ${IV.font}`,
     color: IV.ink,
-    background: "#fff"
+    background: "#fff",
+    boxSizing: "border-box"
   };
   const label = {
     display: "block",
@@ -2534,16 +2730,30 @@ function InterviewSim({
   const btn = primary => ({
     font: `600 14px ${IV.font}`,
     padding: "10px 16px",
-    borderRadius: 8,
+    borderRadius: 999,
     cursor: "pointer",
     border: `1px solid ${primary ? IV.acc : IV.line}`,
     background: primary ? IV.acc : "#fff",
     color: primary ? "#fff" : IV.ink
   });
+  const seg = on => ({
+    font: `500 14px ${IV.font}`,
+    padding: "9px 14px",
+    borderRadius: 999,
+    cursor: "pointer",
+    border: `1px solid ${on ? IV.ink : IV.line}`,
+    background: on ? IV.ink : "#fff",
+    color: on ? "#fff" : IV.ink
+  });
+  const mono = {
+    fontFamily: '"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace'
+  };
+  const pctColor = p => p >= 64 ? IV.acc : p >= 46 ? "#B45309" : "#B42318";
+  const lowTime = phase === "answer" && left <= 15;
   return React.createElement("main", {
     id: "main",
     style: {
-      maxWidth: 760,
+      maxWidth: 780,
       margin: "0 auto",
       padding: "32px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))",
       fontFamily: IV.font,
@@ -2551,27 +2761,28 @@ function InterviewSim({
     }
   }, React.createElement("p", {
     style: {
-      font: `600 12px ${IV.font}`,
-      letterSpacing: ".08em",
+      ...mono,
+      fontSize: 12,
+      letterSpacing: ".1em",
       textTransform: "uppercase",
       color: IV.acc,
       margin: 0
     }
   }, "Interview practice"), React.createElement("h1", {
     style: {
-      font: `650 clamp(26px,4vw,34px)/1.15 ${IV.font}`,
+      font: `600 clamp(26px,4vw,34px)/1.15 ${IV.font}`,
       letterSpacing: "-.02em",
       margin: "6px 0 8px"
     }
-  }, "Practice the interview before the real one."), React.createElement("p", {
+  }, "Say it out loud. Beat the clock. Get a grade."), React.createElement("p", {
     style: {
       color: IV.dim,
       fontSize: 15.5,
       lineHeight: 1.6,
       margin: "0 0 22px",
-      maxWidth: "62ch"
+      maxWidth: "64ch"
     }
-  }, "An AI interviewer asks one question at a time, reacts to your answer, and tells you how to make it stronger. At the end you get what you did well and what to fix. Your answers go to our AI provider to write the feedback; nothing is saved."), !started && !busy ? React.createElement("section", {
+  }, "An AI interviewer asks one question at a time. You get ", IV_THINK, " seconds to think, then the clock runs \u2014 talk (or type) your answer, and it sends itself when time's up. Every answer is scored, and you get a letter grade at the end. Grades are an AI estimate, not a hiring decision. Your answers go to our AI provider to write the feedback; nothing is saved", canTalk ? " (speech is turned into text by your browser)" : "", "."), !started && !busy ? React.createElement("section", {
     style: {
       border: `1px solid ${IV.line}`,
       borderRadius: 12,
@@ -2641,10 +2852,84 @@ function InterviewSim({
     value: 5
   }, "Standard \u2014 5 questions"), React.createElement("option", {
     value: 8
-  }, "Full \u2014 8 questions")))), React.createElement("button", {
+  }, "Full \u2014 8 questions"))), React.createElement("div", null, React.createElement("label", {
+    style: label,
+    htmlFor: "ivT"
+  }, "Time per answer"), React.createElement("select", {
+    id: "ivT",
+    style: field,
+    value: setup.limit,
+    onChange: e => setSetup(s => ({
+      ...s,
+      limit: +e.target.value
+    }))
+  }, React.createElement("option", {
+    value: 60
+  }, "1 minute (tight)"), React.createElement("option", {
+    value: 90
+  }, "1.5 minutes (typical)"), React.createElement("option", {
+    value: 120
+  }, "2 minutes"), React.createElement("option", {
+    value: 180
+  }, "3 minutes"))), React.createElement("div", null, React.createElement("span", {
+    style: label
+  }, "How you'll answer"), React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      flexWrap: "wrap"
+    },
+    role: "group",
+    "aria-label": "How you'll answer"
+  }, React.createElement("button", {
+    type: "button",
+    style: seg(setup.mode === "talk"),
+    "aria-pressed": setup.mode === "talk",
+    disabled: !canTalk,
+    onClick: () => setSetup(s => ({
+      ...s,
+      mode: "talk"
+    }))
+  }, "Talk"), React.createElement("button", {
+    type: "button",
+    style: seg(setup.mode === "type"),
+    "aria-pressed": setup.mode === "type",
+    onClick: () => setSetup(s => ({
+      ...s,
+      mode: "type"
+    }))
+  }, "Type")), !canTalk && React.createElement("p", {
+    style: {
+      fontSize: 12.5,
+      color: IV.dim,
+      margin: "6px 0 0"
+    }
+  }, "This browser can't turn speech into text \u2014 try Chrome, Edge or Safari, or type."))), canSpeak && React.createElement("label", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      marginTop: 16,
+      fontSize: 14,
+      cursor: "pointer"
+    }
+  }, React.createElement("input", {
+    type: "checkbox",
+    checked: setup.readAloud,
+    onChange: e => setSetup(s => ({
+      ...s,
+      readAloud: e.target.checked
+    })),
+    style: {
+      accentColor: IV.acc,
+      width: 16,
+      height: 16
+    }
+  }), "Read each question out loud"), React.createElement("button", {
     style: {
       ...btn(true),
-      marginTop: 18
+      marginTop: 18,
+      padding: "12px 22px"
     },
     onClick: start
   }, "Start the interview"), err && React.createElement("p", {
@@ -2655,7 +2940,6 @@ function InterviewSim({
       marginTop: 12
     }
   }, err)) : React.createElement("section", {
-    "aria-live": "polite",
     style: {
       display: "flex",
       flexDirection: "column",
@@ -2667,65 +2951,109 @@ function InterviewSim({
       justifyContent: "space-between",
       alignItems: "center",
       fontSize: 13,
-      color: IV.dim
-    }
-  }, React.createElement("span", null, setup.role, setup.company ? ` · ${setup.company}` : "", " \xB7 ", setup.kind), React.createElement("span", null, "Question ", Math.min(turns.length, setup.total), " of ", setup.total)), turns.map((t, i) => React.createElement("div", {
-    key: i,
-    style: {
-      display: "flex",
-      flexDirection: "column",
-      gap: 8
-    }
-  }, React.createElement("div", {
-    style: {
-      alignSelf: "flex-start",
-      maxWidth: "88%",
-      background: IV.soft,
-      border: `1px solid ${IV.line}`,
-      borderRadius: "12px 12px 12px 4px",
-      padding: "12px 14px",
-      fontSize: 15,
-      lineHeight: 1.55
-    }
-  }, React.createElement("div", {
-    style: {
-      font: `600 12px ${IV.font}`,
       color: IV.dim,
-      marginBottom: 4
+      gap: 10,
+      flexWrap: "wrap"
     }
-  }, "Interviewer"), t.q), t.a && React.createElement("div", {
-    style: {
-      alignSelf: "flex-end",
-      maxWidth: "88%",
-      background: IV.ink,
-      color: "#fff",
-      borderRadius: "12px 12px 4px 12px",
-      padding: "12px 14px",
-      fontSize: 15,
-      lineHeight: 1.55,
-      whiteSpace: "pre-wrap"
-    }
-  }, t.a), t.feedback && React.createElement("div", {
-    style: {
-      borderLeft: `3px solid ${IV.acc}`,
-      background: IV.accSoft,
-      borderRadius: "0 8px 8px 0",
-      padding: "10px 12px",
-      fontSize: 14,
-      lineHeight: 1.55
-    }
-  }, React.createElement("div", {
-    style: {
-      font: `600 12px ${IV.font}`,
-      color: IV.acc,
-      marginBottom: 3
-    }
-  }, "Coach"), t.feedback))), busy && React.createElement("div", {
+  }, React.createElement("span", null, setup.role, setup.company ? ` · ${setup.company}` : "", " \xB7 ", setup.kind, " \xB7 ", ivClock(setup.limit), " per answer"), React.createElement("span", {
+    style: mono
+  }, "Q ", Math.min(turns.length, setup.total), "/", setup.total)), turns.map((t, i) => {
+    const p = ivPct(t.scores);
+    return React.createElement("div", {
+      key: i,
+      style: {
+        display: "flex",
+        flexDirection: "column",
+        gap: 8
+      }
+    }, React.createElement("div", {
+      style: {
+        alignSelf: "flex-start",
+        maxWidth: "88%",
+        background: IV.soft,
+        border: `1px solid ${IV.line}`,
+        borderRadius: "12px 12px 12px 4px",
+        padding: "12px 14px",
+        fontSize: 15,
+        lineHeight: 1.55
+      }
+    }, React.createElement("div", {
+      style: {
+        font: `600 12px ${IV.font}`,
+        color: IV.dim,
+        marginBottom: 4
+      }
+    }, "Interviewer"), t.q), t.answered && React.createElement("div", {
+      style: {
+        alignSelf: "flex-end",
+        maxWidth: "88%",
+        background: IV.ink,
+        color: "#fff",
+        borderRadius: "12px 12px 4px 12px",
+        padding: "12px 14px",
+        fontSize: 15,
+        lineHeight: 1.55,
+        whiteSpace: "pre-wrap"
+      }
+    }, t.a || React.createElement("i", {
+      style: {
+        opacity: .7
+      }
+    }, "No answer"), React.createElement("div", {
+      style: {
+        ...mono,
+        fontSize: 11,
+        opacity: .6,
+        marginTop: 6
+      }
+    }, ivClock(t.secs || 0), " used", t.timedOut ? " · time ran out" : "")), t.feedback && React.createElement("div", {
+      style: {
+        borderLeft: `3px solid ${IV.acc}`,
+        background: IV.accSoft,
+        borderRadius: "0 8px 8px 0",
+        padding: "10px 12px",
+        fontSize: 14,
+        lineHeight: 1.55
+      }
+    }, React.createElement("div", {
+      style: {
+        display: "flex",
+        justifyContent: "space-between",
+        gap: 10,
+        alignItems: "baseline",
+        marginBottom: 3
+      }
+    }, React.createElement("span", {
+      style: {
+        font: `600 12px ${IV.font}`,
+        color: IV.acc
+      }
+    }, "Coach"), p != null && React.createElement("span", {
+      style: {
+        ...mono,
+        fontSize: 12,
+        color: pctColor(p)
+      },
+      title: "AI estimate"
+    }, ivLetter(p), " \xB7 ", p, "%")), t.feedback, t.scores && React.createElement("div", {
+      style: {
+        display: "flex",
+        gap: 10,
+        flexWrap: "wrap",
+        marginTop: 8,
+        ...mono,
+        fontSize: 11.5,
+        color: IV.dim
+      }
+    }, IV_KEYS.map(([k, l]) => React.createElement("span", {
+      key: k
+    }, l.split(" ")[0], " ", Math.max(0, Math.min(5, Number(t.scores[k]) || 0)), "/5")))));
+  }), busy && React.createElement("div", {
     style: {
       color: IV.dim,
       fontSize: 14
     }
-  }, "Interviewer is thinking\u2026"), err && React.createElement("div", {
+  }, turns.length && turns[turns.length - 1].answered ? "Grading your answer…" : "Interviewer is thinking…"), err && React.createElement("div", {
     role: "alert",
     style: {
       color: "#B42318",
@@ -2734,33 +3062,100 @@ function InterviewSim({
   }, err, " ", React.createElement("button", {
     style: {
       ...btn(false),
-      padding: "4px 10px",
+      padding: "4px 12px",
       fontSize: 13
     },
     onClick: () => ask(turns)
   }, "Retry")), summary ? React.createElement("div", {
     style: {
       border: `1px solid ${IV.line}`,
-      borderRadius: 12,
-      padding: 18,
+      borderRadius: 14,
+      padding: 20,
       background: "#fff"
+    }
+  }, React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 20,
+      alignItems: "center",
+      flexWrap: "wrap"
+    }
+  }, React.createElement("div", {
+    style: {
+      width: 96,
+      height: 96,
+      borderRadius: 16,
+      background: "#070F1E",
+      color: "#2FD39A",
+      display: "grid",
+      placeItems: "center",
+      ...mono,
+      fontSize: 40,
+      fontWeight: 500
+    },
+    "aria-label": `Grade ${grade ? grade.letter : "not available"}`
+  }, grade ? grade.letter : "—"), React.createElement("div", {
+    style: {
+      flex: 1,
+      minWidth: 200
     }
   }, React.createElement("h2", {
     style: {
-      font: `650 20px ${IV.font}`,
-      margin: "0 0 10px"
+      font: `600 22px ${IV.font}`,
+      margin: "0 0 4px"
     }
-  }, "How it went"), React.createElement("p", {
+  }, grade ? `${grade.overall}% overall` : "How it went"), React.createElement("p", {
+    style: {
+      fontSize: 12.5,
+      color: IV.dim,
+      margin: "0 0 8px"
+    }
+  }, "AI estimate from ", grade ? grade.n : 0, " graded answer", grade && grade.n === 1 ? "" : "s", " \xB7 not a hiring decision"), React.createElement("p", {
     style: {
       fontSize: 15,
       lineHeight: 1.6,
-      margin: "0 0 12px"
+      margin: 0
     }
-  }, summary.overall), React.createElement("div", {
+  }, summary.overall))), grade && React.createElement("div", {
+    style: {
+      marginTop: 18,
+      display: "flex",
+      flexDirection: "column",
+      gap: 10
+    }
+  }, grade.cats.map(c => React.createElement("div", {
+    key: c.k,
+    style: {
+      display: "grid",
+      gridTemplateColumns: "minmax(120px,170px) 1fr 44px",
+      gap: 12,
+      alignItems: "center",
+      fontSize: 14
+    }
+  }, React.createElement("span", null, c.label), React.createElement("div", {
+    style: {
+      height: 8,
+      background: "#EEF1F6",
+      borderRadius: 4
+    }
+  }, React.createElement("div", {
+    style: {
+      width: `${c.pct}%`,
+      height: 8,
+      borderRadius: 4,
+      background: pctColor(c.pct)
+    }
+  })), React.createElement("span", {
+    style: {
+      ...mono,
+      textAlign: "right"
+    }
+  }, c.pct, "%")))), React.createElement("div", {
     style: {
       display: "grid",
       gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))",
-      gap: 14
+      gap: 14,
+      marginTop: 18
     }
   }, React.createElement("div", null, React.createElement("h3", {
     style: {
@@ -2795,21 +3190,117 @@ function InterviewSim({
       ...btn(true),
       marginTop: 16
     },
-    onClick: () => {
-      setTurns([]);
-      setSummary(null);
-    }
-  }, "Practice again")) : started && !busy && turns[turns.length - 1] && !turns[turns.length - 1].a ? React.createElement("div", {
+    onClick: quit
+  }, "Practice again")) : waiting ? React.createElement("div", {
     style: {
       position: "sticky",
       bottom: 12,
       background: "#fff",
-      border: `1px solid ${IV.line}`,
-      borderRadius: 12,
-      padding: 10,
+      border: `1px solid ${lowTime ? "#F4B4AE" : IV.line}`,
+      borderRadius: 14,
+      padding: 12,
       boxShadow: "0 6px 20px rgba(11,18,32,.08)"
     }
-  }, React.createElement("label", {
+  }, React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 12,
+      marginBottom: 10
+    }
+  }, React.createElement("span", {
+    style: {
+      ...mono,
+      fontSize: 22,
+      minWidth: 64,
+      color: phase === "think" ? "#B45309" : lowTime ? "#B42318" : IV.ink
+    },
+    "aria-live": "off"
+  }, phase === "reading" ? "··" : ivClock(left)), React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }, React.createElement("div", {
+    style: {
+      fontSize: 12.5,
+      color: IV.dim,
+      marginBottom: 5
+    },
+    "aria-live": "polite"
+  }, phase === "reading" ? "Listen to the question…" : phase === "think" ? "Think time — answer starts automatically" : lowTime ? "Wrap it up — sends when the clock hits 0:00" : "Answer now"), React.createElement("div", {
+    style: {
+      height: 6,
+      background: "#EEF1F6",
+      borderRadius: 3,
+      overflow: "hidden"
+    }
+  }, React.createElement("div", {
+    style: {
+      height: 6,
+      borderRadius: 3,
+      transition: "width .2s linear",
+      background: phase === "think" ? "#F59E0B" : lowTime ? "#DC2626" : IV.acc,
+      width: `${phase === "think" ? left / IV_THINK * 100 : phase === "answer" ? left / setup.limit * 100 : 100}%`
+    }
+  }))), phase === "reading" && React.createElement("button", {
+    style: {
+      ...btn(false),
+      padding: "6px 12px",
+      fontSize: 13
+    },
+    onClick: () => {
+      hush();
+      beginThink();
+    }
+  }, "Skip"), phase === "think" && React.createElement("button", {
+    style: {
+      ...btn(true),
+      padding: "8px 14px",
+      fontSize: 13
+    },
+    onClick: beginAnswer
+  }, "I'm ready")), phase === "answer" && React.createElement(React.Fragment, null, setup.mode === "talk" && canTalk && React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      marginBottom: 8
+    }
+  }, React.createElement("button", {
+    type: "button",
+    onClick: () => recording ? stopRec() : startRec(),
+    "aria-pressed": recording,
+    style: {
+      ...btn(recording),
+      display: "flex",
+      alignItems: "center",
+      gap: 8,
+      background: recording ? "#B42318" : "#fff",
+      borderColor: recording ? "#B42318" : IV.line,
+      color: recording ? "#fff" : IV.ink
+    }
+  }, React.createElement("span", {
+    "aria-hidden": "true",
+    style: {
+      width: 9,
+      height: 9,
+      borderRadius: "50%",
+      background: recording ? "#fff" : "#B42318",
+      animation: recording ? "dblink 1.2s infinite" : "none"
+    }
+  }), recording ? "Listening — tap to pause" : "Tap to talk"), React.createElement("span", {
+    style: {
+      fontSize: 12.5,
+      color: IV.dim
+    }
+  }, "Your words show up below \u2014 fix anything it misheard.")), micErr && React.createElement("p", {
+    role: "alert",
+    style: {
+      fontSize: 13,
+      color: "#B42318",
+      margin: "0 0 8px"
+    }
+  }, micErr), React.createElement("label", {
     htmlFor: "ivA",
     style: {
       position: "absolute",
@@ -2820,45 +3311,49 @@ function InterviewSim({
     value: draft,
     onChange: e => setDraft(e.target.value),
     rows: 4,
-    placeholder: "Answer like you would out loud. Tip: situation, what you did, the result.",
+    autoFocus: setup.mode === "type",
+    placeholder: setup.mode === "talk" ? "Start talking — your answer appears here." : "Type your answer. Tip: situation, what you did, the result.",
     onKeyDown: e => {
-      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) send();
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit(false);
     },
     style: {
       ...field,
-      border: "none",
-      resize: "vertical",
-      padding: "6px 8px"
+      resize: "vertical"
     }
-  }), React.createElement("div", {
+  }), interim && React.createElement("p", {
+    style: {
+      fontSize: 14,
+      color: IV.dim,
+      fontStyle: "italic",
+      margin: "6px 2px 0"
+    }
+  }, interim), React.createElement("div", {
     style: {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
       gap: 10,
-      flexWrap: "wrap"
+      flexWrap: "wrap",
+      marginTop: 8
     }
   }, React.createElement("span", {
     style: {
       fontSize: 12,
       color: IV.dim
     }
-  }, "Ctrl/\u2318 + Enter to send"), React.createElement("div", {
+  }, setup.mode === "type" ? "Ctrl/⌘ + Enter to send" : "Done early? Send it — leftover time doesn't hurt you."), React.createElement("div", {
     style: {
       display: "flex",
       gap: 8
     }
   }, React.createElement("button", {
     style: btn(false),
-    onClick: () => {
-      setTurns([]);
-      setSummary(null);
-    }
+    onClick: quit
   }, "End"), React.createElement("button", {
     style: btn(true),
-    onClick: send,
-    disabled: !draft.trim()
-  }, "Send answer")))) : null, React.createElement("div", {
+    onClick: () => submit(false),
+    disabled: !(draft + interim).trim()
+  }, "Send answer"))))) : null, React.createElement("div", {
     ref: endRef
   })));
 }
@@ -6761,7 +7256,7 @@ function App() {
     const lastApp = (tracked || []).slice(-1)[0];
     return React.createElement("div", {
       style: {
-        background: "#FBFBFC",
+        background: "#EEF1F6",
         minHeight: "100vh"
       }
     }, React.createElement(Nav, null), React.createElement(InterviewSim, {
