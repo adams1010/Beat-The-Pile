@@ -66,6 +66,14 @@ r = await get({ state: "VA" }); assert.deepEqual(r.body.listings.map((l) => l.co
 r = await get({ limit: "2", offset: "0" }); assert.equal(r.body.listings.length, 2); assert.equal(r.body.meta.more, true);
 r = await get({ ids: "e:1,a:1" }); assert.equal(r.body.listings.length, 2); assert.equal(r.body.listings.find((l) => l.id === "e:1").open, false, "closed jobs kept in your history, marked closed");
 r = await get({ summary: "1" }); assert.equal(r.code, 200); assert.equal(typeof r.body.engineering, "number"); assert.ok(r.body.companies > 0);
+// names=1: every company hiring now, any major, once each (Radar)
+r = await get({ names: "1" }); assert.equal(r.code, 200);
+const nm = r.body.companies.map((c) => c.company); assert.ok(nm.includes("Delta"), "non-engineering companies included"); assert.equal(new Set(nm).size, nm.length, "each company once");
+assert.ok(r.body.companies.every((c) => c.id && c.company), "id + name only"); assert.ok(!("listings" in r.body));
+// field=all paging returns every major; default stays the engineering view
+r = await get({ field: "all", limit: "2", offset: "0" }); assert.equal(r.body.listings.length, 2); assert.equal(r.body.meta.more, true);
+const engOnly = (await get({})).body.listings; assert.ok(engOnly.every((l) => l.match), "default = engineering view");
+assert.ok((await get({ field: "all" })).body.listings.some((l) => !l.match), "field=all includes other majors");
 f.failNext = () => true; r = await get({}); assert.equal(r.code, 503); assert.ok(!/DB|rest|boom/.test(r.body.error), "no raw backend errors");
 console.log("✓ listings API: validation, paging, history incl. closed, summary, error ≠ empty");
 console.log("HOME TESTS PASSED");

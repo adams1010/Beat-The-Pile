@@ -177,8 +177,8 @@
     <p class="big rise d1">We already opened every tab.</p>
     <div class="counters rise d2">
       <div class="counter"><span class="n g" data-live="boards">—</span><span class="l">company job boards we read <b>directly</b> — each re-read at least twice a day</span></div>
-      <div class="counter"><span class="n" data-live="n">—</span><span class="l">real engineering internships open <b>right now</b></span></div>
-      <div class="counter"><span class="n a" data-live="me">—</span><span class="l">for <b>mechanical engineers</b></span></div>
+      <div class="counter"><span class="n" data-live="n">—</span><span class="l">real internships open <b>right now</b>, every major</span></div>
+      <div class="counter"><span class="n a" data-live="me">—</span><span class="l">of them in <b>engineering</b></span></div>
     </div>
     <p class="mid rise d4">All in one list. Free.</p>
   </section>
@@ -221,8 +221,8 @@
     <div class="routecard rise d2"><b class="g">Your route</b> · 4 to go
       <div class="stops"><span>#104 Southland</span><span>#109 Hensel</span><span>#410 Gilbane</span><span>#802 HITT</span></div></div>
     <div class="briefcard rise d3"><div class="bt">Southland Industries <span class="boothp">Booth 104</span></div>
-      <div class="bf"><div><b>2</b>open internships</div><div><b>2</b>mechanical</div><div><b>VA, CA</b>locations</div></div>
-      <div class="ba"><b>What they do</b> · what engineers work on · <b>3 smart questions to ask</b></div></div>
+      <div class="bf"><div><b>2</b>open internships</div><div><b>2</b>in your major</div><div><b>VA, CA</b>locations</div></div>
+      <div class="ba"><b>What they do</b> · what interns work on · <b>3 smart questions to ask</b></div></div>
     <p class="mid rise d4">Walk up already knowing their open roles.</p>
   </section>
 
@@ -349,20 +349,25 @@
     setTimeout(step, 700);
   }
 
-  // live data: tiny summary for the counters + a small sample of real ME listings for the feed
+  // live data: tiny summary for the counters + a small sample of real listings (a mix of majors) for the feed
   const ok = (r) => { if (!r.ok) throw new Error(r.status); return r.json(); };
   const fail = () => { document.getElementById("feedNote").hidden = false; };
   fetch("/api/listings?summary=1").then(ok).then((d) => {
-    live.n = d.engineering; live.me = d.me; live.boards = d.companies;
+    live.n = d.allMajors; live.me = d.engineering; live.boards = d.companies;
     if (slides[i].querySelector("[data-live]")) enter(i);
   }).catch(() => {});
-  fetch("/api/listings?match=me&limit=300").then(ok).then((l) => {
+  const SHORT = { mechanical: "Mech", electrical: "EE", civil: "Civil", chemical: "ChemE", industrial: "Mfg", software: "CS", data: "Data", cyber_it: "IT", product_design: "Design",
+    finance: "Finance", consulting: "Consulting", marketing: "Marketing", sales: "Sales", supply_chain: "Ops", people_hr: "HR", science_health: "Science", legal_policy: "Policy", education_social: "Education", engineering: "Eng" };
+  fetch("/api/listings?field=all&limit=400").then(ok).then((l) => {
     const L = l.listings || [];
     if (!L.length) return fail();
     const seen = new Set(), pick = [];
-    const pri = [...L.filter((x) => x.match === "me" && /(^|,)(VA|PA)(,|$)/.test(x.state)), ...L.filter((x) => x.match === "me")];
-    for (const x of pri) { if (seen.has(x.company)) continue; seen.add(x.company); pick.push(x); if (pick.length === 10) break; }
-    const html = pick.map((x) => `<div class="job"><div class="c">${esc(x.company)}</div><div class="t">${esc(x.title)}<span class="tag">ME</span></div><div class="m">${esc(x.location || x.state)}</div></div>`).join("");
+    // one per company, rotating through majors so the feed shows the range (real, newest listings)
+    const byField = {}; for (const x of L) if (SHORT[x.field]) (byField[x.field] ||= []).push(x);
+    const order = Object.keys(byField);
+    for (let round = 0; pick.length < 12 && round < 40; round++) for (const f of order) {
+      const x = byField[f].find((y) => !seen.has(y.company)); if (!x) continue; seen.add(x.company); pick.push(x); if (pick.length === 12) break; }
+    const html = pick.map((x) => `<div class="job"><div class="c">${esc(x.company)}</div><div class="t">${esc(x.title)}<span class="tag">${esc(SHORT[x.field])}</span></div><div class="m">${esc(x.location || x.state)}</div></div>`).join("");
     document.getElementById("feed").innerHTML = html + html;   // doubled for a seamless loop
   }).catch(fail);
 

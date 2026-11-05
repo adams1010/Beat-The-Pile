@@ -131,6 +131,9 @@
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;font-size:14px;font-weight:600;padding:10px 16px;border-radius:10px;opacity:0;transition:.2s;z-index:60;pointer-events:none;max-width:90vw}
   .toast.on{opacity:1;transform:translateX(-50%)}
   .hidden{display:none !important}
+  .majorrow{display:flex;align-items:center;gap:8px;margin:10px 0 2px;font-size:14px;font-weight:600;color:var(--navy)}
+  .majorsel{font:inherit;font-size:14px;border:1px solid var(--line);border-radius:10px;padding:7px 10px;background:#fff;color:var(--ink);max-width:100%;min-width:0;flex:1 1 auto}
+  .tag.mine{background:#EEF6F2;color:#0B6E4B}
 </style>
 </head>
 <body>
@@ -153,6 +156,13 @@
   <section id="tab-fair">
     <div class="card" id="qrcard"></div>
     <input class="search" id="q" placeholder="Search companies at this fair…" aria-label="Search companies">
+    <label class="majorrow">Your major <select class="majorsel" id="majorSel" aria-label="Your major">
+        <option value="all">Any major</option>
+        <optgroup label="Engineering"><option value="eng">All engineering</option><option value="mechanical">Mechanical &amp; Aerospace</option><option value="electrical">Electrical &amp; Computer Eng.</option><option value="civil">Civil, Construction &amp; Architecture</option><option value="chemical">Chemical &amp; Materials</option><option value="industrial">Industrial &amp; Manufacturing</option></optgroup>
+        <optgroup label="Tech"><option value="software">Software &amp; Computer Science</option><option value="data">Data &amp; AI</option><option value="cyber_it">Cybersecurity &amp; IT</option><option value="product_design">Product &amp; Design</option></optgroup>
+        <optgroup label="Business"><option value="finance">Finance, Accounting &amp; Insurance</option><option value="consulting">Consulting &amp; Strategy</option><option value="marketing">Marketing, Media &amp; Communications</option><option value="sales">Sales &amp; Business Development</option><option value="supply_chain">Supply Chain, Operations &amp; Projects</option><option value="people_hr">HR &amp; People</option></optgroup>
+        <optgroup label="Science, policy &amp; more"><option value="science_health">Science, Health &amp; Environment</option><option value="legal_policy">Legal, Policy &amp; Government</option><option value="education_social">Education &amp; Social Impact</option><option value="other">Other / general</option></optgroup>
+      </select></label>
     <div class="chips" id="chips"></div>
     <div id="cos"><div class="empty">Loading companies…</div></div>
   </section>
@@ -172,11 +182,11 @@
   <div class="row" style="justify-content:space-between"><strong id="noteTitle" style="font-size:18px;color:var(--navy)">Conversation notes</strong><button class="btn ghost" id="noteClose">Close</button></div>
   <div class="muted small" id="noteCo"></div>
   <label for="nContact">Who did you talk to?</label>
-  <input type="text" id="nContact" placeholder="Name, title (e.g. Sarah Lee, ME recruiter)" autocomplete="off">
+  <input type="text" id="nContact" placeholder="Name, title (e.g. Sarah Lee, campus recruiter)" autocomplete="off">
   <label for="nEmail">Their email (from their card, optional)</label>
   <input type="email" id="nEmail" placeholder="sarah.lee@company.com" autocomplete="off">
   <label for="nRoles">Roles you discussed</label>
-  <input type="text" id="nRoles" placeholder="e.g. Mechanical Design Intern, Summer 2027" autocomplete="off">
+  <input type="text" id="nRoles" placeholder="e.g. Summer 2027 Intern" autocomplete="off">
   <label for="nSaid">What was said</label>
   <textarea id="nSaid" placeholder="What they're looking for, next steps they mentioned, anything to bring up in your follow-up…"></textarea>
   <label>How did it go?</label>
@@ -199,9 +209,17 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const S = { fairs: [], fair: null, listings: {}, q: "", filter: "all", open: new Set(), tab: "fair",
               clerk: null, user: null, me: { resume: null, notes: [], starred: [] }, loaded: false, draft: null, briefs: {}, polished: {} };
+  // Your major (shared with /jobs through localStorage "btp_major"): highlights matching internships at each booth
+  function inMajor(j){
+    if (S.major === "all") return false;
+    if (S.major === "eng") return !!j.match;
+    if (S.major === "mechanical") return j.match === "me" || j.field === "mechanical";
+    return j.field === S.major;
+  }
   let toastT;
   const toast = (m) => { const t = $("#toast"); t.textContent = m; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove("on"), 2600); };
   const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k, v){ try { localStorage.setItem(k, v); } catch {} } };
+  S.major = (() => { const v = store.get("btp_major"); return v && document.querySelector(`#majorSel option[value="${v}"]`) ? v : "all"; })();
 
   // ── Sign-in (same Clerk account as the rest of Beat the Pile). Browsing never needs it. ──
   async function token(){ try { return await S.clerk?.session?.getToken(); } catch { return null; } }
@@ -267,7 +285,7 @@
     const ids = [...new Set(S.fair.companies.map((c) => c.id).filter(Boolean))];
     if (!ids.length) return;
     try {
-      const d = await fetch("/api/listings?companies=" + encodeURIComponent(ids.join(","))).then((r) => r.json());
+      const d = await fetch("/api/listings?field=all&companies=" + encodeURIComponent(ids.join(","))).then((r) => { if (!r.ok) throw 0; return r.json(); });
       S.listings = {};
       for (const l of d.listings || []) (S.listings[l.company_id] = S.listings[l.company_id] || []).push(l);
     } catch { S.listingsErr = true; toast("Couldn't load internships — showing companies only"); }
@@ -331,7 +349,8 @@
     if (!S.fair) return;
     const t = talked();
     const stars = new Set(S.me.starred || []);
-    const all = S.fair.companies.map((c) => ({ ...c, jobs: (c.id && S.listings[c.id]) || [], talked: t.has(c.id || c.name), star: !!c.id && stars.has(c.id) }));
+    const all = S.fair.companies.map((c) => { const jobs = ((c.id && S.listings[c.id]) || []).slice().sort((a, b) => inMajor(b) - inMajor(a));
+      return { ...c, jobs, mine: jobs.filter(inMajor).length, talked: t.has(c.id || c.name), star: !!c.id && stars.has(c.id) }; });
     const hiring = all.filter((c) => c.jobs.length).length;
     $("#chips").innerHTML = [["all", `All ${all.length}`], ["plan", `★ My plan ${all.filter((c) => c.star).length}`], ["hiring", `Open internships ${hiring}`], ["talked", `Talked to ${all.filter((c) => c.talked).length}`]]
       .map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${S.filter === k}">${esc(l)}</button>`).join("");
@@ -341,21 +360,20 @@
     if (S.filter === "talked") list = list.filter((c) => c.talked);
     const boothNum = (c) => c.booth ? parseInt(c.booth, 10) || 9999 : 99999;
     if (S.filter === "plan") list = list.filter((c) => c.star).sort((a, b) => boothNum(a) - boothNum(b) || a.name.localeCompare(b.name));
-    else list.sort((a, b) => (b.jobs.length > 0) - (a.jobs.length > 0) || a.name.localeCompare(b.name));
+    else list.sort((a, b) => (b.mine > 0) - (a.mine > 0) || (b.jobs.length > 0) - (a.jobs.length > 0) || a.name.localeCompare(b.name));
     const left = list.filter((c) => !c.talked);
     const route = S.filter !== "plan" ? "" : !list.length
       ? `<div class="route"><b>Build your game plan.</b><div class="small" style="color:#CBD5E1;margin-top:4px">Tap ☆ on the companies you want to hit. We'll put them in booth order so you can walk the fair in one loop.</div></div>`
       : `<div class="route"><b>Your route</b> · ${left.length} to go${list.length - left.length ? `, ${list.length - left.length} done ✓` : ""}
           <div class="stops">${list.map((c) => `<span${c.talked ? ' style="opacity:.45;text-decoration:line-through"' : ""}>${c.booth ? "#" + esc(c.booth) + " " : ""}${esc(c.name.split(/[ (]/)[0])}</span>`).join("")}</div></div>`;
     $("#cos").innerHTML = route + (list.length ? list.map((c) => {
-      const me = c.jobs.filter((j) => j.match === "me").length;
       const key = c.id || c.name;
       const pill = c.talked ? `<span class="pill talk">Talked ✓</span>` : c.jobs.length ? `<span class="pill hire">${c.jobs.length} open</span>`
         : S.listingsErr && c.id ? `<span class="pill none">Couldn't check</span>` : `<span class="pill none">No listings yet</span>`;
-      const jobs = c.jobs.slice(0, 12).map((j) => `<div class="job"><div>${esc(j.title)}${j.match === "me" ? `<span class="tag">ME</span>` : ""}<div class="muted small">${esc(j.location || j.state)}</div></div><a href="${esc(j.url)}" target="_blank" rel="noopener">Apply ↗</a></div>`).join("");
+      const jobs = c.jobs.slice(0, 12).map((j) => `<div class="job"><div>${esc(j.title)}${inMajor(j) ? `<span class="tag mine">Your major</span>` : ""}<div class="muted small">${esc(j.location || j.state)}</div></div><a href="${esc(j.url)}" target="_blank" rel="noopener">Apply ↗</a></div>`).join("");
       return `<div class="co${S.open.has(key) ? " open" : ""}" data-key="${esc(key)}">
         <div class="cohead">${c.id ? `<button class="star" aria-pressed="${c.star}" aria-label="${c.star ? "Remove from" : "Add to"} my plan">${c.star ? "★" : "☆"}</button>` : `<span style="width:16px"></span>`}<button class="exp" aria-expanded="${S.open.has(key)}"><span class="coname">${esc(c.name)}${c.booth ? `<span class="booth">Booth ${esc(c.booth)}</span>` : ""}</span>${pill}
-          <span class="cosub">${c.jobs.length ? `${c.jobs.length} internship${c.jobs.length > 1 ? "s" : ""}${me ? ` · ${me} ME` : ""}` : (c.id ? "We'll show internships as soon as their board posts them" : "Not tracked yet")}</span></button></div>
+          <span class="cosub">${c.jobs.length ? `${c.jobs.length} internship${c.jobs.length > 1 ? "s" : ""}${c.mine ? ` · ${c.mine} in your major` : ""}` : (c.id ? "We'll show internships as soon as their board posts them" : "Not tracked yet")}</span></button></div>
         <div class="codetail">
           ${jobs || (S.listingsErr && c.id ? `<p class="muted small" style="margin:4px 0 10px">We couldn't load internships just now (our side or your connection) — this doesn't mean they have none. Refresh to try again.</p>`
             : `<p class="muted small" style="margin:4px 0 10px">No open internships on their job board right now. Still worth a conversation — ask what's coming.</p>`)}
@@ -367,6 +385,8 @@
     }).join("") : (S.filter === "plan" ? "" : `<div class="empty">No companies match.</div>`));
   }
   $("#q").addEventListener("input", (e) => { S.q = e.target.value.trim(); renderCompanies(); });
+  $("#majorSel").value = S.major;
+  $("#majorSel").addEventListener("change", (e) => { S.major = e.target.value; store.set("btp_major", S.major); renderCompanies(); });
   $("#chips").addEventListener("click", (e) => { const b = e.target.closest(".chip"); if (!b) return; S.filter = b.dataset.f; renderCompanies(); });
   $("#cos").addEventListener("click", (e) => {
     const co = e.target.closest(".co"); if (!co) return;
@@ -393,7 +413,7 @@
   function ago(ts){ const d = Math.floor((Date.now() - new Date(ts)) / 864e5); return d <= 0 ? "today" : d === 1 ? "yesterday" : d < 30 ? d + " days ago" : Math.floor(d / 30) + " mo ago"; }
   function openBrief(c){
     const jobs = (c.id && S.listings[c.id]) || [];
-    const me = jobs.filter((j) => j.match === "me").length;
+    const mine = jobs.filter(inMajor).length;
     const states = Object.entries(jobs.reduce((m, j) => { for (const s of String(j.state || "").split(",").filter(Boolean)) m[s] = (m[s] || 0) + 1; return m; }, {})).sort((a, b) => b[1] - a[1]).map(([s]) => s);
     const newest = jobs.map((j) => j.first_seen).filter(Boolean).sort().pop();
     const others = S.fairs.filter((f) => f.id !== S.fair.id && f.companies.some((x) => x.id === c.id)).map((f) => f.name);
@@ -401,13 +421,13 @@
       <div class="row" style="justify-content:space-between"><strong style="font-size:19px;color:var(--navy)">${esc(c.name)}</strong>${c.booth ? `<span class="booth">Booth ${esc(c.booth)}</span>` : ""}</div>
       <div class="facts">
         <div class="fact"><b>${jobs.length}</b><span>open internships</span></div>
-        <div class="fact"><b>${me}</b><span>mechanical</span></div>
+        ${S.major !== "all" ? `<div class="fact"><b>${mine}</b><span>in your major</span></div>` : `<div class="fact"><b>${new Set(jobs.map((j) => j.field)).size}</b><span>kinds of roles</span></div>`}
         <div class="fact"><b>${newest ? esc(ago(newest)) : "—"}</b><span>newest posting</span></div>
       </div>
       ${states.length ? `<div class="small"><b>Where:</b> ${esc(states.slice(0, 6).join(", "))}${states.length > 6 ? ` +${states.length - 6} more` : ""}</div>` : ""}
       ${jobs.length ? `<div class="small" style="margin-top:4px"><b>Roles:</b> ${esc([...new Set(jobs.map((j) => j.title))].slice(0, 4).join(" · "))}</div>` : `<div class="small muted">Nothing posted right now. Ask the recruiter when their internships open.</div>`}
       ${others.length ? `<div class="small" style="margin-top:4px"><b>Also at:</b> ${esc(others.join(", "))}</div>` : ""}
-      <div class="ai" id="aiBrief">${S.user ? `<span class="muted">Writing the brief…</span>` : `<b>AI brief</b> — what they do, what engineers work on, and smart questions to ask. <button class="btn go" id="briefSign" style="margin-top:8px">Sign in to see it</button>`}</div>
+      <div class="ai" id="aiBrief">${S.user ? `<span class="muted">Writing the brief…</span>` : `<b>AI brief</b> — what they do, what interns work on, and smart questions to ask. <button class="btn go" id="briefSign" style="margin-top:8px">Sign in to see it</button>`}</div>
       <div class="row" style="margin-top:14px"><button class="btn go" id="briefStar">${(S.me.starred || []).includes(c.id) ? "★ In my plan" : "☆ Add to my plan"}</button>${c.domain ? `<a class="btn" href="https://${esc(c.domain)}" target="_blank" rel="noopener">Website ↗</a>` : ""}</div>`;
     $("#briefSign")?.addEventListener("click", () => signIn());
     $("#briefStar").onclick = async () => { await toggleStar(c); openBrief(c); };
@@ -419,7 +439,7 @@
     try {
       const b = S.briefs[c.id] || (S.briefs[c.id] = (await api("POST", { action: "brief", companyId: c.id })).brief);
       if (!el()) return;
-      el().innerHTML = `<h4>What they do</h4>${esc(b.about)}${b.engineers ? `<h4>What engineers work on</h4>${esc(b.engineers)}` : ""}
+      el().innerHTML = `<h4>What they do</h4>${esc(b.about)}${b.engineers ? `<h4>What interns work on</h4>${esc(b.engineers)}` : ""}
         ${b.ask?.length ? `<h4>Good questions to ask</h4><ul>${b.ask.map((q) => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}
         <div class="warn">${b.known === false ? "We couldn't find much on this company — double-check their website. " : ""}AI-written summary. It can be wrong, so confirm on their site.</div>`;
     } catch (e) { if (el()) el().innerHTML = `<span class="muted">${esc(e.message)}</span>`; }

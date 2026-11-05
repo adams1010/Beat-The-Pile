@@ -85,13 +85,13 @@ async function companyBrief(companyId) {
   if (!name) return null;
   const domain = cand[0]?.domain || "";
   const titles = [...new Set(jobs.map((j) => j.title))].slice(0, 12);
-  const prompt = `You write short, factual company briefs for engineering students about to talk to a recruiter at a career fair.
+  const prompt = `You write short, factual company briefs for college students (any major) about to talk to a recruiter at a career fair.
 
 Company: ${name}${domain ? `\nWebsite: ${domain}` : ""}
 ${titles.length ? `Internships they have open right now:\n- ${titles.join("\n- ")}` : "They have no internships posted right now."}
 
 Reply with ONLY this JSON:
-{"known": true|false, "about": "1-2 sentences: what the company does and who its customers are", "engineers": "1-2 sentences: what engineers (especially mechanical) typically work on there", "ask": ["3 specific, smart questions a student could ask their recruiter"]}
+{"known": true|false, "about": "1-2 sentences: what the company does and who its customers are", "engineers": "1-2 sentences: what interns typically work on there, based on the internships listed (name the teams or kinds of work)", "ask": ["3 specific, smart questions a student could ask their recruiter"]}
 
 Rules: be factual and plain. If you are not confident you know this specific company (common for small or local firms), set "known": false, keep "about" to what the website domain and job titles clearly show, and do not invent facts like size, revenue, or projects.`;
   const j = parseJson(await claude(prompt, 700, "brief"));
@@ -324,7 +324,7 @@ export default async function handler(req, res) {
       const to = await emailFor(uid);
       if (!to) return res.status(400).json({ error: "Your account has no verified email address" });
       const due = dueFollowUps(row.row.apps);
-      const sample = due.length ? due : [{ company: "Example Company", title: "Example — Mechanical Engineering Intern", appliedAt: new Date(Date.now() - 6 * 864e5).toISOString() }];
+      const sample = due.length ? due : [{ company: "Example Company", title: "Example — Summer Intern", appliedAt: new Date(Date.now() - 6 * 864e5).toISOString() }];
       const mail = buildEmail(sample, row.row.remind_unsub);
       if (!due.length) mail.subject = "Test: this is what a follow-up reminder looks like";
       await sendEmail(to, mail);
@@ -397,7 +397,7 @@ export default async function handler(req, res) {
       if (!n.company) return res.status(400).json({ error: "Which company was it?" });
       if (await aiLimited(uid)) return res.status(429).json({ error: "Too many requests — try again in a bit" });
       const me = clean(body.name, 80) || "[Your name]", link = clean(body.resumeLink, 200);
-      const prompt = `Write a short follow-up email from a college engineering student to a recruiter they just met at a career fair.
+      const prompt = `Write a short follow-up email from a college student to a recruiter they just met at a career fair.
 
 Student: ${me}
 Company: ${n.company}

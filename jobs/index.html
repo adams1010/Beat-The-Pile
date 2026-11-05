@@ -9,8 +9,8 @@
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Engineering Internships — Beat the Pile</title>
-<meta name="description" content="Engineering internships pulled straight from each company's own job board. Boards are re-read at least twice a day, so closed jobs drop off.">
+<title>Internships — Beat the Pile</title>
+<meta name="description" content="Internships for every major, pulled straight from each company's own job board. Boards are re-read at least twice a day, so closed jobs drop off.">
 <link rel="canonical" href="https://www.beatthepile.com/jobs/">
 <style>
   :root{
@@ -104,6 +104,7 @@
   .sites{margin-top:6px;font-size:13px}.sites summary{cursor:pointer;color:var(--green-dark,#0B6E4B);font-weight:600}
   .sites ul{margin:6px 0 0;padding-left:18px;max-height:220px;overflow:auto;columns:2;column-gap:18px}.sites li{break-inside:avoid;margin:2px 0}
   @media(max-width:560px){.sites ul{columns:1}}
+  [hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -111,8 +112,8 @@
 <header>
   <div class="wrap">
     <div class="topbar"><span class="brand">Internships</span><div class="acct" id="acct"></div></div>
-    <h1>Engineering internships, straight from the source</h1>
-    <p class="sub">Pulled straight from each company's own job board. No reposts, no recruiters. When a company takes a job down, it drops off here too.</p>
+    <h1>Internships, straight from the source</h1>
+    <p class="sub">Every major, pulled straight from each company's own job board. No reposts, no recruiters. When a company takes a job down, it drops off here too.</p>
     <div class="trust" id="trust" hidden><span class="dot"></span><span id="trustText"></span></div>
     <a class="fairlink" href="/demo/">▶ New here? <b>Watch the 90-second demo</b></a>
   </div>
@@ -123,10 +124,17 @@
     <div class="row">
       <div class="seg" role="group" aria-label="Where">
         <button data-state="VA,PA" aria-pressed="true">VA &amp; PA</button>
-        <button data-state="ALL" aria-pressed="false">All US <span id="allN"></span></button>
+        <button data-state="ALL" aria-pressed="false">All US</button>
       </div>
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">Pick a state</option></select>
-      <label class="toggle" title="Off: mechanical + general engineering roles. On: only roles that say mechanical (or a close match like manufacturing)."><input type="checkbox" id="meOnly"> Mechanical only</label>
+      <select class="statesel" id="majorSel" aria-label="Major">
+        <option value="all">All majors</option>
+        <optgroup label="Engineering"><option value="eng">All engineering</option><option value="mechanical">Mechanical &amp; Aerospace</option><option value="electrical">Electrical &amp; Computer Eng.</option><option value="civil">Civil, Construction &amp; Architecture</option><option value="chemical">Chemical &amp; Materials</option><option value="industrial">Industrial &amp; Manufacturing</option></optgroup>
+        <optgroup label="Tech"><option value="software">Software &amp; Computer Science</option><option value="data">Data &amp; AI</option><option value="cyber_it">Cybersecurity &amp; IT</option><option value="product_design">Product &amp; Design</option></optgroup>
+        <optgroup label="Business"><option value="finance">Finance, Accounting &amp; Insurance</option><option value="consulting">Consulting &amp; Strategy</option><option value="marketing">Marketing, Media &amp; Communications</option><option value="sales">Sales &amp; Business Development</option><option value="supply_chain">Supply Chain, Operations &amp; Projects</option><option value="people_hr">HR &amp; People</option></optgroup>
+        <optgroup label="Science, policy &amp; more"><option value="science_health">Science, Health &amp; Environment</option><option value="legal_policy">Legal, Policy &amp; Government</option><option value="education_social">Education &amp; Social Impact</option><option value="other">Other / general</option></optgroup>
+      </select>
+      <label class="toggle" id="meWrap" title="Only roles that say mechanical (or a close match like manufacturing)."><input type="checkbox" id="meOnly"> Strictly mechanical</label>
       <button class="chip" id="savedOnly" aria-pressed="false" title="Jobs you saved with ♡">♡ Saved <span id="savedN"></span></button>
       <button class="chip" id="followOnly" aria-pressed="false" title="Companies you follow with ☆ — you get flagged when they post">Following <span id="followN"></span></button>
       <input class="search" id="q" type="search" placeholder="Search company or role" aria-label="Search company or role">
@@ -155,14 +163,25 @@
 
 <script>
 (function(){
-  const state = { all: [], closedSaved: [], st: ["VA","PA"], meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
+  const state = { all: [], savedRows: [], followRows: [], major: "all", st: ["VA","PA"], meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
                   user: null, clerk: null, mine: { saved: new Set(), applied: new Set(), starred: new Set(), seenAt: null } };
   const NAMES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"Washington DC",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
   const statesOf = (j) => String(j.state || "").split(",").filter(Boolean);
-  const inView = (j) => state.st === "ALL" || statesOf(j).some((s) => state.st.includes(s));
+  const inView = (j) => !!state.company || state.st === "ALL" || statesOf(j).some((s) => state.st.includes(s));
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const DAY = 86400000;
+  // Majors (keys from lib/fields.js; "eng" = the engineering view, "all" = everything). tests/fields-test.mjs checks this list.
+  const MAJOR_KEYS = [...document.querySelectorAll("#majorSel option")].map((o) => o.value);
+  const MAJOR_LABEL = () => state.major === "all" ? "every major" : (document.querySelector(`#majorSel option[value="${state.major}"]`)?.textContent || "");
+  const STRICT_OK = () => state.major === "eng" || state.major === "mechanical";
+  const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k, v){ try { localStorage.setItem(k, v); } catch {} } };
+  function defaultMajor(){
+    const saved = store.get("btp_major"); if (saved && MAJOR_KEYS.includes(saved)) return saved;
+    try { const m = JSON.parse(store.get("iq_session") || "{}")?.ans?.major || ""; if (/engineer/i.test(m)) return /mechanical|aerospace/i.test(m) ? "mechanical" : "eng"; } catch {}
+    return "all";
+  }
+  const majorParam = () => state.major === "eng" ? "" : `field=${encodeURIComponent(state.major)}`;
 
   function cleanOne(s){
     // "Salem, VA, US, 24153" → "Salem, VA"; "Newport News, Virginia, United States" → "Newport News, VA"
@@ -244,19 +263,20 @@
   function render(){
     if (!state.loaded) return;
     const q = state.q.toLowerCase();
-    const matches = (j) => (!state.meOnly || j.match === "me") &&
+    const strict = state.meOnly && STRICT_OK();
+    const matches = (j) => (!strict || j.match === "me") &&
       (!q || (j.company + " " + j.title + " " + j.location).toLowerCase().includes(q));
     // "Saved" view shows everything you saved, in any state
     const followed = (j) => state.mine.starred.has(j.company_id);
     const newForMe = (j) => followed(j) && state.mine.seenAt && new Date(j.first_seen) > new Date(state.mine.seenAt);
+    // Saved + Following views cover every major and state; the main list is the chosen major + place (loaded from the server)
     const filtered = state.savedOnly
-      ? [...state.all.filter((j) => state.mine.saved.has(j.id) && matches(j)), ...state.closedSaved.filter((j) => state.mine.saved.has(j.id))]
-      : state.followOnly ? state.all.filter((j) => followed(j) && matches(j)).sort((a, b) => newForMe(b) - newForMe(a))
+      ? state.savedRows.filter((j) => state.mine.saved.has(j.id) && matches(j))
+      : state.followOnly ? state.followRows.filter((j) => followed(j) && matches(j)).sort((a, b) => newForMe(b) - newForMe(a))
       : state.all.filter((j) => inView(j) && matches(j));
-    const fresh = state.all.filter(newForMe).length;
+    const fresh = state.followRows.filter(newForMe).length;
     $("followN").textContent = state.mine.starred.size ? `(${state.mine.starred.size})` : "";
     $("alert").innerHTML = fresh && !state.followOnly ? `<button class="alert" id="alertBtn"><span>${fresh} new internship${fresh > 1 ? "s" : ""} from companies you follow</span><span>See →</span></button>` : "";
-    const nationwide = new Set(state.all.filter(matches).map((j) => (j.company + "|" + niceTitle(j.title)).toLowerCase().replace(/\s+/g, " "))).size;
 
     // Same company + same title = one card. Different places become "N locations" with a list of each one's own link.
     const groups = new Map();
@@ -269,10 +289,9 @@
     const rows = [...groups.values()];
     const has = (list, j) => j.ids.some((id) => state.mine[list].has(id));
     $("savedN").textContent = state.mine.saved.size ? `(${state.mine.saved.size})` : "";
-    $("allN").textContent = state.all.length ? `(${state.all.filter(matches).length})` : "";
     $("note").innerHTML = (state.st !== "ALL" && state.st.join() === "VA,PA" && !state.savedOnly && !state.followOnly
         ? `Starting with Virginia &amp; Pennsylvania. <button class="linkbtn" id="goAll">See all US</button> or pick a state. `
-        : "") + (state.meOnly ? "Showing roles that say mechanical (or close, like manufacturing)." : "Showing mechanical <b>and</b> general engineering roles.")
+        : "") + (state.company ? `One company, every major. <button class="linkbtn" id="allCos">Show all companies</button> ` : "") + (state.savedOnly || state.followOnly ? "Every major and state." : strict ? "Showing roles that say mechanical (or close, like manufacturing)." : `Major: <b>${esc(MAJOR_LABEL())}</b> (change it above).`)
       + (state.user ? " · ☆ Follow = flag new jobs from that company · ♡ Save = keep this job · Mark applied = add it to My Season" : "");
     syncUrl();
 
@@ -285,7 +304,7 @@
     const where = state.savedOnly ? "saved" : state.followOnly ? "you follow" : state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
     $("count").textContent = rows.length
       ? `${rows.length} internship${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"} ${where}` +
-        (state.st === "ALL" || state.savedOnly || state.followOnly ? "" : ` · ${nationwide} nationwide`)
+        (state.savedOnly || state.followOnly ? "" : ` · ${MAJOR_LABEL()}`)
       : "";
 
     if (!rows.length){
@@ -323,7 +342,9 @@
     const p = new URLSearchParams();
     const st = state.st === "ALL" ? "all" : state.st.join(",");
     if (st !== "VA,PA") p.set("state", st);
-    if (state.meOnly) p.set("me", "1");
+    if (state.company) p.set("company", state.company);
+    if (state.major !== "all") p.set("major", state.major);
+    if (state.meOnly && STRICT_OK()) p.set("me", "1");
     if (state.q) p.set("q", state.q);
     if (state.savedOnly) p.set("view", "saved"); else if (state.followOnly) p.set("view", "following");
     const url = location.pathname + (p.toString() ? "?" + p : "");
@@ -334,6 +355,9 @@
     const st = (p.get("state") || "").toUpperCase();
     state.st = st === "ALL" ? "ALL" : (st.split(",").filter((x) => /^[A-Z]{2}$/.test(x)).length ? st.split(",").filter((x) => /^[A-Z]{2}$/.test(x)) : ["VA","PA"]);
     state.meOnly = p.get("me") === "1"; $("meOnly").checked = state.meOnly;
+    const co = (p.get("company") || "").toLowerCase(); state.company = /^[a-z0-9-]{2,80}$/.test(co) ? co : null;   // from the Radar: one company
+    const mj = (p.get("major") || "").toLowerCase();
+    state.major = MAJOR_KEYS.includes(mj) ? mj : state.meOnly ? "mechanical" : defaultMajor();   // old ?me=1 links still work
     state.q = (p.get("q") || "").slice(0, 80); $("q").value = state.q;
     if (state.q && !p.get("state")) state.st = "ALL";              // a search link (e.g. from the Radar) looks nationwide
     state.savedOnly = p.get("view") === "saved"; state.followOnly = p.get("view") === "following";
@@ -343,18 +367,19 @@
     const single = state.st !== "ALL" && state.st.length === 1 ? state.st[0] : "";
     $("stateSel").classList.toggle("on", !!single); if (single) $("stateSel").value = single;
   }
-  function resetFilters(){ history.replaceState(null, "", location.pathname); readUrl(); state.st = "ALL"; readUrlButtons(); render(); }
+  function resetFilters(){ history.replaceState(null, "", location.pathname); readUrl(); state.company = null; state.st = "ALL"; state.major = "all"; $("majorSel").value = "all"; $("meWrap").hidden = true; readUrlButtons(); loadScope(); }
   function readUrlButtons(){ document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.state === "ALL"))); $("stateSel").value = ""; $("stateSel").classList.remove("on"); }
   document.addEventListener("click", (e) => {
     if (e.target.closest("#goAll")) setView("ALL", document.querySelector('.seg button[data-state="ALL"]'));
     if (e.target.closest("#resetF")) resetFilters();
+    if (e.target.closest("#allCos")) { state.company = null; state.q = ""; $("q").value = ""; loadScope(); }
   });
   function setView(st, btn){
     state.st = st;
     document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === btn)));
     $("stateSel").classList.toggle("on", !btn);
     if (btn) $("stateSel").value = "";
-    render();
+    loadScope();
   }
   document.querySelectorAll(".seg button").forEach((b) => b.addEventListener("click", () =>
     setView(b.dataset.state === "ALL" ? "ALL" : b.dataset.state.split(","), b)));
@@ -363,11 +388,8 @@
     setView([e.target.value], null);
   });
   function fillStates(){
-    const counts = {};
-    state.all.forEach((j) => statesOf(j).forEach((s) => { counts[s] = (counts[s] || 0) + 1; }));
-    $("stateSel").innerHTML = '<option value="">Pick a state</option>' + Object.keys(counts)
-      .sort((a, b) => (NAMES[a] || a).localeCompare(NAMES[b] || b))
-      .map((s) => `<option value="${s}">${esc(NAMES[s] || s)} (${counts[s]})</option>`).join("");
+    $("stateSel").innerHTML = '<option value="">Pick a state</option>' + Object.keys(NAMES)
+      .sort((a, b) => NAMES[a].localeCompare(NAMES[b])).map((s) => `<option value="${s}">${esc(NAMES[s])}</option>`).join("");
   }
   // ── Sign-in (Clerk — same account as the main Beat the Pile app) ───────────────
   function toast(msg){
@@ -396,8 +418,8 @@
   }
   async function onUser(user){
     state.user = user || null;
-    if (state.user) { try { setMine(await api("GET")); markSeenSoon(); loadClosedSaved(); } catch { toast("Couldn't load your saved list"); } }
-    else { state.mine = { saved: new Set(), applied: new Set(), starred: new Set(), seenAt: null }; }
+    if (state.user) { try { setMine(await api("GET")); markSeenSoon(); loadSaved(); loadFollowed(); } catch { toast("Couldn't load your saved list"); } }
+    else { state.mine = { saved: new Set(), applied: new Set(), starred: new Set(), seenAt: null }; state.savedRows = []; state.followRows = []; }
     renderAcct(); render();
   }
   async function loadClerk(){
@@ -431,7 +453,7 @@
     if (!state.user) { toast("Sign in to follow companies"); return state.clerk.openSignIn(); }
     const on = !state.mine.starred.has(co);
     on ? state.mine.starred.add(co) : state.mine.starred.delete(co); render();
-    try { const d = await api("POST", { action: "star", company: co, on }); setMine(d); render();
+    try { const d = await api("POST", { action: "star", company: co, on }); setMine(d); render(); loadFollowed();
           if (on) toast(`Following ${name} — new internships from them get flagged here`); }
     catch { on ? state.mine.starred.delete(co) : state.mine.starred.add(co); render(); toast("Couldn't save that — try again"); }
   }
@@ -441,7 +463,7 @@
     const on = !state.mine[list].has(id);
     on ? state.mine[list].add(id) : state.mine[list].delete(id);   // instant, then confirm with server
     render();
-    try { setMine(await api("POST", { list, id, on })); render();
+    try { setMine(await api("POST", { list, id, on })); render(); if (list === "saved") loadSaved();
           if (on) toast(list === "saved" ? "Saved ♥ — find it anytime under “♡ Saved” (top of this page) or in My Season → Saved" : "Marked applied ✓ — it's in My Season → Applied"); }
     catch { on ? state.mine[list].delete(id) : state.mine[list].add(id); render(); toast("Couldn't save that — try again"); }
   }
@@ -462,28 +484,62 @@
   $("q").addEventListener("input", (e) => { state.q = e.target.value.trim(); render(); });
   readUrl();
 
-  fetch("/api/listings")
-    .then((r) => { if (!r.ok) throw new Error(r.status); return r.json(); })
-    .then((d) => {
-      state.all = (d.listings || []).sort((a, b) => sortKey(b) - sortKey(a));
+  // ── Loading: one major + one place at a time, in pages of 1,000 (the full all-majors list is too big for one response) ──
+  const cache = new Map();
+  let loadSeq = 0;
+  async function getAll(qs){
+    const rows = [];
+    for (let off = 0; off <= 20000; off += 1000) {
+      const r = await fetch(`/api/listings?${qs}${qs ? "&" : ""}limit=1000&offset=${off}`);
+      if (!r.ok) throw new Error(r.status);
+      const d = await r.json(); rows.push(...(d.listings || []));
+      if (d.meta?.lastSync) state.lastSync = d.meta.lastSync;
+      if (!d.meta?.more) break;
+    }
+    return rows;
+  }
+  async function loadScope(){
+    const where = state.st === "ALL" ? "" : `state=${state.st.join(",")}`;
+    const qs = state.company ? `field=all&companies=${state.company}` : [majorParam(), where].filter(Boolean).join("&");
+    const seq = ++loadSeq;
+    if (!cache.has(qs)) { state.loaded = false; $("list").innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>'; $("count").textContent = ""; }
+    try {
+      const rows = cache.get(qs) || await getAll(qs);
+      cache.set(qs, rows);
+      if (seq !== loadSeq) return;                                   // a newer choice is already loading
+      state.all = rows.slice().sort((a, b) => sortKey(b) - sortKey(a));
       state.loaded = true;
-      const stamp = d.meta?.lastSync;
-      if (stamp){ $("trustText").textContent = `Job boards last re-read ${timeOfDay(stamp)}`; $("trust").hidden = false; }
-      fillStates();
-      const single = state.st !== "ALL" && state.st.length === 1 ? state.st[0] : ""; if (single) $("stateSel").value = single;
+      if (state.lastSync) { $("trustText").textContent = `Job boards last re-read ${timeOfDay(state.lastSync)}`; $("trust").hidden = false; }
       urlReady = true;
       render();
-      loadClosedSaved();
-    })
-    .catch(() => { $("list").innerHTML = '<div class="err" role="alert">Couldn’t load internships right now — that’s a problem on our side or your connection, not a sign there are no jobs. Refresh in a minute.</div>'; });
-  // Saved jobs that have since closed stay in your Saved list, marked closed (so your history doesn't vanish)
-  async function loadClosedSaved(){
-    if (!state.loaded || !state.mine.saved.size) return;
-    const have = new Set(state.all.map((j) => j.id)), missing = [...state.mine.saved].filter((id) => !have.has(id)).slice(0, 200);
-    if (!missing.length) { state.closedSaved = []; return; }
-    try { const d = await fetch("/api/listings?ids=" + encodeURIComponent(missing.join(","))).then((r) => r.json());
-          state.closedSaved = (d.listings || []).filter((l) => !have.has(l.id)).map((l) => ({ ...l, closed: true })); render(); } catch { /* keep going without them */ }
+    } catch {
+      if (seq !== loadSeq) return;
+      $("list").innerHTML = '<div class="err" role="alert">Couldn’t load internships right now — that’s a problem on our side or your connection, not a sign there are no jobs. Refresh in a minute.</div>';
+    }
   }
+  // Saved jobs (every major, open or closed — closed ones stay marked so your history doesn't vanish)
+  async function loadSaved(){
+    const ids = [...state.mine.saved]; if (!ids.length) { state.savedRows = []; return render(); }
+    try {
+      const rows = [];
+      for (let i = 0; i < ids.length; i += 200) {
+        const d = await fetch("/api/listings?ids=" + encodeURIComponent(ids.slice(i, i + 200).join(","))).then((r) => { if (!r.ok) throw 0; return r.json(); });
+        rows.push(...(d.listings || []).map((l) => ({ ...l, closed: l.open === false })));
+      }
+      state.savedRows = rows.sort((a, b) => (a.closed - b.closed) || (sortKey(b) - sortKey(a))); render();
+    } catch { /* the main list still works */ }
+  }
+  // Companies you follow (every major, all US) — powers the "new from companies you follow" alert
+  async function loadFollowed(){
+    const cos = [...state.mine.starred]; if (!cos.length) { state.followRows = []; return render(); }
+    try { state.followRows = await getAll(`field=all&companies=${cos.slice(0, 400).join(",")}`); render(); } catch {}
+  }
+  $("majorSel").addEventListener("change", (e) => { state.company = null; state.major = e.target.value; store.set("btp_major", state.major); $("meWrap").hidden = !STRICT_OK(); loadScope(); });
+  if (!MAJOR_KEYS.includes(state.major)) state.major = "all";
+  $("majorSel").value = state.major; $("meWrap").hidden = !STRICT_OK();
+  fillStates();
+  { const single = state.st !== "ALL" && state.st.length === 1 ? state.st[0] : ""; if (single) { $("stateSel").value = single; $("stateSel").classList.add("on"); } }
+  loadScope();
 })();
 </script>
 <script src="/feedback.js" defer></script>

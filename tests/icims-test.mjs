@@ -28,3 +28,17 @@ globalThis.fetch = async (u) => ({ ok: true, status: 200, url: String(u), text: 
 const fb = await fetchIcims({ id: "x-dewberry", base: "https://careers-dewberry.icims.com" });
 assert.ok(fb.length >= 1 && fb.every((j) => /intern|co-?op/i.test(j.title)), "fallback browse keeps intern titles");
 console.log("icims ok");
+
+// Newer card layout (Liberty Mutual, Nov 2026): locations come BEFORE the title link — each job keeps its OWN cities
+{
+  const { parseIcimsPage } = await import("../lib/fetchers/icims.js");
+  const card = (id, title, locs) => `<li class="iCIMS_JobCardItem"> <div class="row"> <div class="col-xs-6 header left"> <span class="sr-only field-label">Job Locations</span> <span > ${locs}</span> </div> <div class="col-xs-12 title"> <a href="https://campus-x.icims.com/jobs/${id}/${title.toLowerCase().replace(/\W+/g, "-")}/job?in_iframe=1" class="iCIMS_Anchor"> <span class="sr-only field-label">Title</span> <h3 > ${title}</h3> </a> </div> <div class="col-xs-12 description"> In-Person Summer 2027 Internship US-ZZ-Nowhere</div> <dl><dt>ID</dt><dd><span> 2026-${id}</span></dd></dl> </div> </li>`;
+  const html = `<ul class="iCIMS_JobsTable">${card(262369, "Northeast - Sales Internship NY-NJ-CT", "US-CT-Glastonbury | US-NY-Buffalo | US-NJ-Freehold...")}${card(261754, "Central - Sales Internship MN-IA-IL", "US-IL-Saint Charles | US-MN-Edina")}${card(261753, "PacWest - Sales Internship", "US-AZ-Chandler | CA-ON-Toronto")}</ul><a href="?pr=1">2</a>`;
+  const { jobs, lastPage } = parseIcimsPage(html, "https://campus-x.icims.com");
+  assert.deepEqual(jobs.map((j) => [j.sourceId, j.location]), [
+    ["262369", "Glastonbury, CT | Buffalo, NY | Freehold, NJ"],
+    ["261754", "Saint Charles, IL | Edina, MN"],
+    ["261753", "Chandler, AZ"]], "each job keeps its own locations (not the next card's)");
+  assert.equal(jobs[0].title, "Northeast - Sales Internship NY-NJ-CT"); assert.equal(lastPage, 1);
+  console.log("✓ iCIMS card layout: locations stay with their own job");
+}

@@ -6,7 +6,7 @@
 //
 // A company's "opening date" for Summer S = the first day any of its Summer-S internships appeared
 // (big employers open their intern requisitions in one wave). We only keep companies that hire
-// engineers (at least one engineering/hardware internship title ever).
+// real posting history (all majors since Nov 2026).
 import fs from "node:fs";
 import { normName } from "../lib/simplify.js";
 
@@ -28,7 +28,8 @@ function fold(rows, into = {}) {
     const k = normName(x.company_name); if (!k) continue;
     const c = into[k] || (into[k] = { name: x.company_name, seasons: {}, eng: 0, all: 0, me: 0, roles: {} });
     const title = String(x.title || ""); c.all = (+c.all || 0) + 1;
-    if (ENG.test(title)) { c.eng = (+c.eng || 0) + 1; c.roles[title] = (c.roles[title] || 0) + 1; }
+    if (ENG.test(title)) c.eng = (+c.eng || 0) + 1;
+    c.roles[title] = (c.roles[title] || 0) + 1;                       // all majors: remember every role title
     if (!S || !inWindow(t, S) || !usOnly(x.locations)) continue;
     if (!c.seasons[S] || t < c.seasons[S]) c.seasons[S] = t;
     if (ME.test(title)) c.me++;
@@ -78,9 +79,12 @@ const out = [];
 for (const [k, c] of Object.entries(merged)) {
   const eng = +c.eng || 0, id = tracked.get(k) || null;
   // Keep: companies on InternIQ, big engineering employers, or clearly hardware-focused companies
-  if (!id && !MAJORS.includes(k) && !(eng >= 8 && eng / Math.max(1, +c.all || 1) >= 0.4 && !/bank|financ|capital|state of|university|insurance|entertainment|wrestling|holdings|^wwe$|^square$|mitsubishi ufg|alluxio|sciencelogic|persistent systems|workstream|^arc$|fulfil/i.test(c.name))) continue;
+  // Keep (all majors, Nov 2026): companies on Beat the Pile, big employers students ask about, or any company with a real
+  // posting history (5+ internships in the public list). Tiny or one-off posters are left out — their dates mean little.
+  if (!id && !MAJORS.includes(k) && (+c.all || 0) < 5) continue;
   const past = Object.keys(c.seasons).map(Number).filter((S) => S < CUR && S >= CUR - 4).sort();
   if (!past.length) continue;
+  if (!id && !MAJORS.includes(k) && past.length < 2) continue;         // one season of history is a guess, not a pattern
   const days = past.map((S) => cycleDay(c.seasons[S], S));
   const typ = past.length >= 3 ? median(days) : days[days.length - 1];    // 3+ seasons: median; else most recent
   const opened = c.seasons[CUR];
@@ -97,6 +101,7 @@ for (const [k, c] of Object.entries(merged)) {
     diff: opened ? cycleDay(opened, CUR) - typ : null,                    // negative = earlier than usual
     openedNext: c.seasons[CUR + 1] ? ymd(c.seasons[CUR + 1]) : null,
     me: c.me > 0,
+    eng: eng > 0,
     roles: roles.slice(0, 3),
   });
 }

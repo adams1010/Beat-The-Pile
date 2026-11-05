@@ -33,8 +33,7 @@ export default async function handler(req, res) {
   const fields = fieldsForMajor(major);
   let base = "listings?select=id,company_id,company,title,location,state,url,posted_on,first_seen"
            + "&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)&order=first_seen.desc,id.asc";
-  if (fields) base += `&field=in.(${fields.join(",")})`;
-  else base += "&match=not.is.null";
+  if (fields) base += `&field=in.(${fields.join(",")})`;      // unknown major ("Other") → every major
   if (remote) base += "&location=ilike.*remote*";
 
   const rings = remote ? [{ states: null, label: null }] : [
@@ -58,7 +57,7 @@ export default async function handler(req, res) {
     return res.status(200).json({
       results,
       meta: { studentState: state, radiusExpanded: !!used.label, expansionLabel: used.label, remote,
-              fields: fields || ["engineering"], dbCount: results.length, total: results.length, aiUsed: false, aiCount: 0 },
+              fields: fields || ["all"], dbCount: results.length, total: results.length, aiUsed: false, aiCount: 0 },
     });
   } catch (e) {
     console.error("[results]", e);
