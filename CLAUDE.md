@@ -1,6 +1,6 @@
 # Beat the Pile (formerly InternIQ) — read this first
 
-**Beat the Pile** (beatthepile.com; still also served at intern-iq-psi.vercel.app) shows students **real internships
+**Beat the Pile** (www.beatthepile.com — the bare domain redirects there; still also served at intern-iq-psi.vercel.app) shows students **real internships
 pulled straight from each company's own job board**, plus Career Fair Mode, My Season, and the Opening Radar.
 Owner: Adam Shiloni (VT mechanical engineering). The repo/Vercel project/database keep the old "InternIQ" names — only
 the brand changed. All student-facing copy says "Beat the Pile".
