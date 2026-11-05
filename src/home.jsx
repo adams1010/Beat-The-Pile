@@ -11,16 +11,16 @@ const LOAD_MSGS=[
   "Searching for internships near you...",
   "Tip: Apply Tuesday–Thursday morning — recruiter inboxes are cleanest then.",
   "Matching roles to your major...",
-  "Tip: Most internships get filled by candidates who applied in the first 72 hours.",
+  "Tip: Many postings close once enough people apply, so earlier is better.",
   "Finding opportunities others overlook...",
-  "Tip: A short follow-up email 5–7 days after applying can triple your callback rate.",
+  "Tip: A short, polite follow-up 5–7 days after applying keeps you on the recruiter's radar.",
   "Factoring in your timing and experience...",
   "Tip: Smaller regional firms often hire faster than the big names — and pay surprisingly well.",
-  "Calculating your honest match scores...",
+  "Estimating your match scores...",
   "Tip: Don't filter by GPA cutoffs — many companies post them but rarely enforce them.",
-  "Checking nearby companies you might not know yet...",
+  "Checking nearby states too...",
   "Tip: Customize your resume for each application. Even small tweaks beat a generic one.",
-  "Cross-referencing local employer databases...",
+  "Reading company job boards...",
   "Tip: Your school's alumni network on LinkedIn is a hidden cheat code — message 1 per week.",
   "Ranking matches by realistic chance...",
   "Tip: Quality > quantity. 10 thoughtful applications beats 100 spray-and-pray every time.",
@@ -709,7 +709,7 @@ function generateReason(c,ans,extPicks){
     "metro":"in your metro area",
     "regional":"within your radius",
     "remote":"fully remote"
-  }[c.locationBand]||"near you";
+  }[c.locationBand]||"hiring right now";
   const pct=c.match||0;
   const lead=exceptionalPicks(extPicks);
   const exp=experienceFromGrad(ans.gradYear);
@@ -2526,7 +2526,6 @@ function App(){
         <button onClick={()=>setShowProModal(false)} aria-label="Close" style={{position:"absolute",top:14,right:14,width:32,height:32,borderRadius:"50%",background:"#F1F5F4",border:"none",color:"#4A5568",fontSize:18,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--font)"}}>×</button>
         <div style={{background:`${G}15`,borderRadius:var_rl,padding:"1.25rem",marginBottom:"1.25rem",border:`1px solid ${GL}`}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
-            <span style={{fontSize:24}}></span>
             <span style={{fontWeight:800,fontSize:22,color:"#0B1220",letterSpacing:"-0.5px"}}>Beat the Pile Pro</span>
             <span style={{marginLeft:"auto",background:GL,color:G,fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:99}}>Beta</span>
           </div>
@@ -2825,7 +2824,7 @@ function App(){
   const NudgeToast=()=>{
     if(!proNudge)return null;
     const msg={
-      welcome_back:"Welcome back Want reminders when each follow-up is due, with the email drafted for you?",
+      welcome_back:"Welcome back. Want reminders when each follow-up is due, with the email drafted for you?",
       followups:`You're tracking ${tracked.length} applications — Beat the Pile can remind you when each is due for a follow-up and draft it for you.`
     }[proNudge.reason]||"Unlock more with Pro.";
     return(
@@ -3405,17 +3404,11 @@ function App(){
                 const strong=results.filter(r=>r.match>=70).length;
                 const decent=results.filter(r=>r.match>=50&&r.match<70).length;
                 return(
-                  <div style={{background:`${G}`,borderRadius:var_rxl,padding:"1.5rem 1.75rem",marginBottom:16,color:"#fff",boxShadow:"0 1px 2px rgba(11,18,32,.06)",position:"relative",overflow:"hidden"}}>
-                    <div style={{position:"absolute",top:-30,right:-20,width:140,height:140,background:"rgba(255,255,255,0.08)",borderRadius:"50%"}}/>
-                    <div style={{position:"absolute",bottom:-40,left:30,width:90,height:90,background:"rgba(255,255,255,0.06)",borderRadius:"50%"}}/>
-                    <p style={{fontSize:13,fontWeight:600,opacity:0.9,marginBottom:4,position:"relative"}}>We found</p>
-                    <p style={{fontSize:34,fontWeight:800,letterSpacing:"-1.5px",lineHeight:1,marginBottom:6,position:"relative"}}>{results.length} internships for you</p>
-                    {metaRef.current?.dbCount>0&&<p style={{fontSize:12,color:"rgba(255,255,255,0.8)",marginBottom:6}}>✓ {metaRef.current.dbCount} verified from real postings</p>}
-                    <div style={{display:"flex",gap:18,flexWrap:"wrap",position:"relative"}}>
-                      <div><span style={{fontSize:22,fontWeight:800}}>{top}%</span><span style={{fontSize:12,opacity:0.9,marginLeft:5}}>top match</span></div>
-                      {strong>0&&<div><span style={{fontSize:22,fontWeight:800}}>{strong}</span><span style={{fontSize:12,opacity:0.9,marginLeft:5}}>strong {strong===1?"match":"matches"}</span></div>}
-                      {decent>0&&<div><span style={{fontSize:22,fontWeight:800}}>{decent}</span><span style={{fontSize:12,opacity:0.9,marginLeft:5}}>decent {decent===1?"shot":"shots"}</span></div>}
-                    </div>
+                  <div style={{background:"#fff",border:"1px solid #E3E7ED",borderRadius:var_rl,padding:"14px 18px",marginBottom:16,display:"flex",alignItems:"baseline",gap:22,flexWrap:"wrap"}}>
+                    <div><span style={{fontSize:26,fontWeight:700,letterSpacing:"-0.03em",color:"#0B1220"}}>{results.length}</span><span style={{fontSize:13,color:"#5B6675",marginLeft:6}}>open {results.length===1?"internship":"internships"} for you</span></div>
+                    <div><span style={{fontSize:18,fontWeight:650,color:"#0B1220"}}>{top}%</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>top match (estimate)</span></div>
+                    {strong>0&&<div><span style={{fontSize:18,fontWeight:650,color:"#0B1220"}}>{strong}</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>strong {strong===1?"match":"matches"}</span></div>}
+                    {decent>0&&<div><span style={{fontSize:18,fontWeight:650,color:"#0B1220"}}>{decent}</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>worth a shot</span></div>}
                   </div>
                 );
               })()}
@@ -3477,14 +3470,13 @@ function App(){
 
               {/* First-visit hint — animated arrow + label teaching new users how to apply/track */}
               {showResultsHint&&topPicks.length>0&&(
-                <div style={{position:"relative",marginBottom:14,animation:"hintPulse 2.4s ease-in-out infinite"}}>
-                  <div style={{background:`${AM}`,color:"#fff",borderRadius:var_rl,padding:"12px 16px",display:"flex",alignItems:"center",gap:12,boxShadow:"0 4px 18px rgba(245,158,11,0.35)"}}>
-                    <span style={{fontSize:22,flexShrink:0,animation:"nudgeRight 1s ease-in-out infinite"}}></span>
-                    <div style={{flex:1,minWidth:0}}>
-                      <p style={{fontSize:13.5,fontWeight:800,marginBottom:2,lineHeight:1.3}}>Tap any company below to start applying</p>
-                      <p style={{fontSize:11.5,opacity:0.92,lineHeight:1.4}}>You'll get a tailored cover letter, the real apply links, and we'll auto-track it on your Dashboard.</p>
+                <div style={{position:"relative",marginBottom:14}}>
+                  <div style={{background:"#F2F4F7",color:"#0B1220",borderRadius:var_rl,padding:"10px 14px",display:"flex",alignItems:"center",gap:12}}>
+                                        <div style={{flex:1,minWidth:0}}>
+                      <p style={{fontSize:13.5,fontWeight:650,marginBottom:2,lineHeight:1.3}}>Open any card to apply</p>
+                      <p style={{fontSize:12,color:"#5B6675",lineHeight:1.4}}>Each card links to the company's own posting. Mark it applied and it's tracked for follow-ups.</p>
                     </div>
-                    <button onClick={dismissResultsHint} aria-label="Dismiss" style={{background:"rgba(255,255,255,0.25)",border:"none",color:"#fff",width:28,height:28,borderRadius:"50%",cursor:"pointer",fontSize:14,fontWeight:700,lineHeight:1,flexShrink:0}}>×</button>
+                    <button onClick={dismissResultsHint} aria-label="Dismiss" style={{background:"transparent",border:"none",color:"#5B6675",width:28,height:28,borderRadius:"50%",cursor:"pointer",fontSize:14,fontWeight:700,lineHeight:1,flexShrink:0}}>×</button>
                   </div>
                 </div>
               )}
@@ -3591,7 +3583,7 @@ function App(){
                       <div style={cardStyle}>
 
                         {/* ── FRONT — original full card ── */}
-                        <div onClick={()=>{setExpandedCard(i);fetchCardIntel(c);}} style={{...faceBase,background:"#fff",border:`1.5px solid ${GL}`,borderTop:`3px solid ${accent}`,padding:"1.5rem",display:"flex",flexDirection:"column",gap:"0.75rem",boxShadow:"0 1px 2px rgba(11,18,32,.06)",cursor:"pointer",overflowY:"auto"}}>
+                        <div onClick={()=>{setExpandedCard(i);fetchCardIntel(c);}} style={{...faceBase,background:"#fff",border:"1px solid #E3E7ED",padding:"1.5rem",display:"flex",flexDirection:"column",gap:"0.75rem",boxShadow:"0 1px 2px rgba(11,18,32,.06)",cursor:"pointer",overflowY:"auto"}}>
                           {/* Header */}
                           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
                             <div style={{flex:1,minWidth:0,paddingRight:12}}>
@@ -3603,7 +3595,7 @@ function App(){
                               </div>
                               <p style={{color:"#4A5568",fontSize:13,marginTop:3}}>{c.role}</p>
                               <div style={{display:"flex",alignItems:"center",gap:6,marginTop:2,flexWrap:"wrap"}}>
-                                <p style={{color:"#6B7280",fontSize:12}}>{hasRealLocation?displayLocation:c.location} · {c.industry}</p>
+                                <p style={{color:"#6B7280",fontSize:12}}>{[hasRealLocation?displayLocation:c.location,c.industry].filter(Boolean).join(" · ")}</p>
                                 {typeof c.distanceMiles==="number"&&c.distanceMiles>0
                                   ?<span style={{fontSize:10.5,color:"#94A3B8",background:"#F1F5F9",padding:"1px 7px",borderRadius:99,fontWeight:600,whiteSpace:"nowrap"}}>{c.distanceMiles} mi</span>
                                   :c.source==="ai"
@@ -3641,7 +3633,7 @@ function App(){
                               <p style={{fontSize:13,color:"#4A5568",lineHeight:1.6,fontStyle:"italic"}}>{c.reason}</p>
                             </div>
                           )}
-                          {isVerified&&<span style={{fontSize:10,fontWeight:800,color:GD,background:GL,padding:"3px 9px",borderRadius:99,alignSelf:"flex-start"}}>✓ Live posting on Adzuna</span>}
+                          {isVerified&&<span style={{fontSize:10,fontWeight:800,color:GD,background:GL,padding:"3px 9px",borderRadius:99,alignSelf:"flex-start"}}>Open on the company's job board</span>}
                           {/* Flip hint */}
                           <p style={{fontSize:10.5,color:"#C3D1D8",textAlign:"center",marginTop:"auto",letterSpacing:"0.3px"}}>tap anywhere to see company info →</p>
                           {/* Actions — stopPropagation so clicks on buttons don't flip */}
@@ -4419,13 +4411,11 @@ Thank you for your time,
           if(noApps&&!hasSaved){
             card={icon:"",color:G,bg:GL,title:"Start by finding your matches",body:"You haven't tracked any applications yet. Take the quiz to get your personalized company list — then come back here to track everything in one place.",cta:"Find my matches →",action:()=>{setStep(0);setPage("quiz");}};
           } else if(noApps&&hasSaved){
-            card={icon:"",color:"#2563EB",bg:"#EFF6FF",title:`You have ${savedJobs.length} saved job${savedJobs.length>1?"s":""} — ready to apply?`,body:"You've bookmarked companies from your results. The best time to apply is now — openings fill fast.",cta:"See saved jobs ↓",action:()=>{document.getElementById("saved-jobs-section")?.scrollIntoView({behavior:"smooth"});}};
-          } else if(dueFollowUps.length>0){
-            card={icon:"",color:CR,bg:"#FFF5F5",title:`${dueFollowUps.length} follow-up${dueFollowUps.length>1?"s":""} overdue`,body:`${dueFollowUps.map(a=>a.company).join(", ")} ${dueFollowUps.length>1?"are":"is"} past the 5-day mark. A quick email can triple your callback rate.`,cta:"Draft follow-up ↓",action:()=>{const el=document.getElementById("tracker-section");if(el)el.scrollIntoView({behavior:"smooth"});}};
+            card={icon:"",color:G,bg:GL,title:`You have ${savedJobs.length} saved job${savedJobs.length>1?"s":""} — ready to apply?`,body:"You've bookmarked companies from your results. The best time to apply is now — openings fill fast.",cta:"See saved jobs ↓",action:()=>{document.getElementById("saved-jobs-section")?.scrollIntoView({behavior:"smooth"});}};
           } else if(interviews.length>0){
-            card={icon:"",color:AM,bg:AL,title:`You have ${interviews.length} interview${interviews.length>1?"s":""} coming up`,body:"Prep makes a measurable difference. Use the Prep button on your interview entry to get tailored questions and coaching.",cta:"Go to tracker ↓",action:()=>{document.getElementById("tracker-section")?.scrollIntoView({behavior:"smooth"});}};
+            card={icon:"",color:AM,bg:AL,title:`You have ${interviews.length} interview${interviews.length>1?"s":""} coming up`,body:"Use the Prep button on your interview entry to get tailored questions and coaching.",cta:"Go to tracker ↓",action:()=>{document.getElementById("tracker-section")?.scrollIntoView({behavior:"smooth"});}};
           } else if(tracked.length>0&&tracked.length<5){
-            card={icon:"",color:"#7C3AED",bg:"#F5F3FF",title:"Apply to more — volume matters",body:"Students who apply to 10+ companies see 3× better results than those who apply to fewer than 5. Your results page has more matches waiting.",cta:"See all my matches →",action:()=>setPage("results")};
+            card={icon:"",color:G,bg:GL,title:"Apply to more — volume matters",body:"Internship searches are a numbers game — most students need many applications to land a few interviews. Your results page has more matches waiting.",cta:"See all my matches →",action:()=>setPage("results")};
           }
           if(!card)return null;
           return(
@@ -4573,16 +4563,15 @@ Thank you for your time,
         </div>
         <div style={{background:`${GL}`,border:`1.5px solid ${G}25`,borderRadius:var_rl,padding:"1.5rem 1.75rem"}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
-            <span style={{fontSize:24}}></span>
             <h3 style={{fontWeight:800,fontSize:17,letterSpacing:"-0.4px",color:"#0B1220"}}>Smart follow-ups</h3>
           </div>
-          <p style={{color:"#4A5568",fontSize:14,lineHeight:1.6,marginBottom:14}}>Most students never follow up — and a good one can triple your callback odds. Beat the Pile tracks the timing for you and, when an application hits the 5-day mark, drafts a tailored follow-up email you send from your own inbox. You stay the sender; we handle the reminder and the words.</p>
+          <p style={{color:"#4A5568",fontSize:14,lineHeight:1.6,marginBottom:14}}>Most students never follow up — and a short, polite one keeps you on the recruiter's radar. Beat the Pile tracks the timing for you and, when an application hits the 5-day mark, drafts a tailored follow-up email you send from your own inbox. You stay the sender; we handle the reminder and the words.</p>
           <div style={{display:"flex",gap:14,flexWrap:"wrap",fontSize:12.5,color:GD,fontWeight:700}}>
             <span>✓ Timed automatically</span><span>✓ Drafted for each role</span><span>✓ Sent by you, as you</span>
           </div>
           <div style={{background:"#fff",border:`1px solid ${GM}`,borderRadius:var_r,padding:"10px 12px",marginTop:14}}>
             <p style={{fontSize:12,fontWeight:800,color:GD,letterSpacing:"0.6px",marginBottom:5}}>HOW REMINDERS WORK</p>
-            <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.55}}>Reminders show <strong>inside Beat the Pile</strong> (the amber banner on your Dashboard and Results page + red badges on each due application). We also <strong>email you</strong> when you open Beat the Pile if a follow-up is due — but only on open, not as scheduled background sends. So opening the app every few days is how reminders actually reach you. <span style={{color:"#6B7280"}}>True scheduled email/text reminders are on the roadmap.</span></p>
+            <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.55}}>Reminders show <strong>inside Beat the Pile</strong> (the amber banner on your Dashboard and Results page + red badges on each due application). We don't send reminder emails yet, so check back every few days — or add each follow-up to your calendar from <a href="/season/" style={{color:GD}}>My Season</a>. <span style={{color:"#6B7280"}}>Email reminders are on the roadmap.</span></p>
           </div>
           {!isPro&&<p style={{fontSize:12,color:"#6B7280",marginTop:12,lineHeight:1.5}}>Free includes follow-up timing + drafts. Pro will add real email/text reminders so you don't have to check back manually.</p>}
         </div>
@@ -4656,7 +4645,7 @@ Thank you for your time,
           </div>
         )}
         {/* FOUNDER ANALYTICS — instrument the funnel. Device-local only (see note). */}
-        <details style={{marginTop:14,background:"#0B1220",borderRadius:var_rl,padding:"0.5rem 1rem",color:"#fff"}}>
+        {/[?&]dev=1/.test(location.search)&&<details style={{marginTop:14,background:"#0B1220",borderRadius:var_rl,padding:"0.5rem 1rem",color:"#fff"}}>
           <summary style={{cursor:"pointer",fontSize:13,fontWeight:700,padding:"8px 0",listStyle:"none"}}>Founder stats (this device only)</summary>
           <div style={{paddingBottom:12}}>
             {(()=>{const s=analytics.read();const keys=["quiz_completed","return_visit","email_captured","application_started","application_tracked","followup_generated","followup_marked_sent","cover_letter_generated","pro_modal_opened","pro_upgrade_clicked"];return(
@@ -4671,7 +4660,7 @@ Thank you for your time,
             );})()}
             <p style={{fontSize:11,color:"#6B7280",lineHeight:1.5}}>These counts are from <strong>this browser only</strong> — useful for testing that events fire. For real cross-user analytics, add Plausible or PostHog at the marked line in the analytics helper (one line). Remove this panel before public launch.</p>
           </div>
-        </details>
+        </details>}
       </div>
     </div>
   );

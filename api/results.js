@@ -12,7 +12,7 @@ const MAX = 60;
 export function toCard(l) {
   return {
     name: l.company, role: l.title, location: l.location || "", industry: "", website: "",
-    hasLinkedin: false, tier: "regional", locationBand: "metro",
+    hasLinkedin: false, tier: "regional", locationBand: null,
     applyUrl: l.url, listingId: l.id, companyId: l.company_id, firstSeen: l.first_seen, postedOn: l.posted_on || null,
     source: "db", verified: true,
     reason: `Open now on ${l.company}'s own job board — we found it there ourselves.`,

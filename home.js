@@ -1,4 +1,4 @@
-/* built from src/home.jsx f488ada457278ef3 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 0d74a025207e0b6f — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -14,7 +14,7 @@ const AM = "#B45309",
 const CR = "#B42318",
   CL = "#FEF3F2";
 const PALETTE = Array(12).fill("#0B1220");
-const LOAD_MSGS = ["Searching for internships near you...", "Tip: Apply Tuesday–Thursday morning — recruiter inboxes are cleanest then.", "Matching roles to your major...", "Tip: Most internships get filled by candidates who applied in the first 72 hours.", "Finding opportunities others overlook...", "Tip: A short follow-up email 5–7 days after applying can triple your callback rate.", "Factoring in your timing and experience...", "Tip: Smaller regional firms often hire faster than the big names — and pay surprisingly well.", "Calculating your honest match scores...", "Tip: Don't filter by GPA cutoffs — many companies post them but rarely enforce them.", "Checking nearby companies you might not know yet...", "Tip: Customize your resume for each application. Even small tweaks beat a generic one.", "Cross-referencing local employer databases...", "Tip: Your school's alumni network on LinkedIn is a hidden cheat code — message 1 per week.", "Ranking matches by realistic chance...", "Tip: Quality > quantity. 10 thoughtful applications beats 100 spray-and-pray every time.", "Polishing the list...", "Tip: After every rejection, ask for feedback. Most won't reply — the ones who do are gold."];
+const LOAD_MSGS = ["Searching for internships near you...", "Tip: Apply Tuesday–Thursday morning — recruiter inboxes are cleanest then.", "Matching roles to your major...", "Tip: Many postings close once enough people apply, so earlier is better.", "Finding opportunities others overlook...", "Tip: A short, polite follow-up 5–7 days after applying keeps you on the recruiter's radar.", "Factoring in your timing and experience...", "Tip: Smaller regional firms often hire faster than the big names — and pay surprisingly well.", "Estimating your match scores...", "Tip: Don't filter by GPA cutoffs — many companies post them but rarely enforce them.", "Checking nearby states too...", "Tip: Customize your resume for each application. Even small tweaks beat a generic one.", "Reading company job boards...", "Tip: Your school's alumni network on LinkedIn is a hidden cheat code — message 1 per week.", "Ranking matches by realistic chance...", "Tip: Quality > quantity. 10 thoughtful applications beats 100 spray-and-pray every time.", "Polishing the list...", "Tip: After every rejection, ask for feedback. Most won't reply — the ones who do are gold."];
 const SCHOOL_ABBR = {
   "umd": "Maryland",
   "psu": "Penn State",
@@ -2411,7 +2411,7 @@ function generateReason(c, ans, extPicks) {
     "metro": "in your metro area",
     "regional": "within your radius",
     "remote": "fully remote"
-  }[c.locationBand] || "near you";
+  }[c.locationBand] || "hiring right now";
   const pct = c.match || 0;
   const lead = exceptionalPicks(extPicks);
   const exp = experienceFromGrad(ans.gradYear);
@@ -5778,10 +5778,6 @@ function App() {
     }
   }, React.createElement("span", {
     style: {
-      fontSize: 24
-    }
-  }), React.createElement("span", {
-    style: {
       fontWeight: 800,
       fontSize: 22,
       color: "#0B1220",
@@ -6853,7 +6849,7 @@ function App() {
   const NudgeToast = () => {
     if (!proNudge) return null;
     const msg = {
-      welcome_back: "Welcome back Want reminders when each follow-up is due, with the email drafted for you?",
+      welcome_back: "Welcome back. Want reminders when each follow-up is due, with the email drafted for you?",
       followups: `You're tracking ${tracked.length} applications — Beat the Pile can remind you when each is due for a follow-up and draft it for you.`
     }[proNudge.reason] || "Unlock more with Pro.";
     return React.createElement("div", {
@@ -8939,99 +8935,66 @@ function App() {
       const decent = results.filter(r => r.match >= 50 && r.match < 70).length;
       return React.createElement("div", {
         style: {
-          background: `${G}`,
-          borderRadius: var_rxl,
-          padding: "1.5rem 1.75rem",
+          background: "#fff",
+          border: "1px solid #E3E7ED",
+          borderRadius: var_rl,
+          padding: "14px 18px",
           marginBottom: 16,
-          color: "#fff",
-          boxShadow: "0 1px 2px rgba(11,18,32,.06)",
-          position: "relative",
-          overflow: "hidden"
-        }
-      }, React.createElement("div", {
-        style: {
-          position: "absolute",
-          top: -30,
-          right: -20,
-          width: 140,
-          height: 140,
-          background: "rgba(255,255,255,0.08)",
-          borderRadius: "50%"
-        }
-      }), React.createElement("div", {
-        style: {
-          position: "absolute",
-          bottom: -40,
-          left: 30,
-          width: 90,
-          height: 90,
-          background: "rgba(255,255,255,0.06)",
-          borderRadius: "50%"
-        }
-      }), React.createElement("p", {
-        style: {
-          fontSize: 13,
-          fontWeight: 600,
-          opacity: 0.9,
-          marginBottom: 4,
-          position: "relative"
-        }
-      }, "We found"), React.createElement("p", {
-        style: {
-          fontSize: 34,
-          fontWeight: 800,
-          letterSpacing: "-1.5px",
-          lineHeight: 1,
-          marginBottom: 6,
-          position: "relative"
-        }
-      }, results.length, " internships for you"), metaRef.current?.dbCount > 0 && React.createElement("p", {
-        style: {
-          fontSize: 12,
-          color: "rgba(255,255,255,0.8)",
-          marginBottom: 6
-        }
-      }, "\u2713 ", metaRef.current.dbCount, " verified from real postings"), React.createElement("div", {
-        style: {
           display: "flex",
-          gap: 18,
-          flexWrap: "wrap",
-          position: "relative"
+          alignItems: "baseline",
+          gap: 22,
+          flexWrap: "wrap"
         }
       }, React.createElement("div", null, React.createElement("span", {
         style: {
-          fontSize: 22,
-          fontWeight: 800
+          fontSize: 26,
+          fontWeight: 700,
+          letterSpacing: "-0.03em",
+          color: "#0B1220"
+        }
+      }, results.length), React.createElement("span", {
+        style: {
+          fontSize: 13,
+          color: "#5B6675",
+          marginLeft: 6
+        }
+      }, "open ", results.length === 1 ? "internship" : "internships", " for you")), React.createElement("div", null, React.createElement("span", {
+        style: {
+          fontSize: 18,
+          fontWeight: 650,
+          color: "#0B1220"
         }
       }, top, "%"), React.createElement("span", {
         style: {
-          fontSize: 12,
-          opacity: 0.9,
+          fontSize: 12.5,
+          color: "#5B6675",
           marginLeft: 5
         }
-      }, "top match")), strong > 0 && React.createElement("div", null, React.createElement("span", {
+      }, "top match (estimate)")), strong > 0 && React.createElement("div", null, React.createElement("span", {
         style: {
-          fontSize: 22,
-          fontWeight: 800
+          fontSize: 18,
+          fontWeight: 650,
+          color: "#0B1220"
         }
       }, strong), React.createElement("span", {
         style: {
-          fontSize: 12,
-          opacity: 0.9,
+          fontSize: 12.5,
+          color: "#5B6675",
           marginLeft: 5
         }
       }, "strong ", strong === 1 ? "match" : "matches")), decent > 0 && React.createElement("div", null, React.createElement("span", {
         style: {
-          fontSize: 22,
-          fontWeight: 800
+          fontSize: 18,
+          fontWeight: 650,
+          color: "#0B1220"
         }
       }, decent), React.createElement("span", {
         style: {
-          fontSize: 12,
-          opacity: 0.9,
+          fontSize: 12.5,
+          color: "#5B6675",
           marginLeft: 5
         }
-      }, "decent ", decent === 1 ? "shot" : "shots"))));
+      }, "worth a shot")));
     })(), React.createElement(FollowUpsDueBanner, null), (() => {
       const hasResume = (profile.resumes || []).filter(r => r.text).length > 0;
       const isSparse = (ans.type === "In-person" || ans.type === "Hybrid") && results.length < 15 && results.length > 0;
@@ -9169,27 +9132,19 @@ function App() {
     })(), showResultsHint && topPicks.length > 0 && React.createElement("div", {
       style: {
         position: "relative",
-        marginBottom: 14,
-        animation: "hintPulse 2.4s ease-in-out infinite"
+        marginBottom: 14
       }
     }, React.createElement("div", {
       style: {
-        background: `${AM}`,
-        color: "#fff",
+        background: "#F2F4F7",
+        color: "#0B1220",
         borderRadius: var_rl,
-        padding: "12px 16px",
+        padding: "10px 14px",
         display: "flex",
         alignItems: "center",
-        gap: 12,
-        boxShadow: "0 4px 18px rgba(245,158,11,0.35)"
+        gap: 12
       }
-    }, React.createElement("span", {
-      style: {
-        fontSize: 22,
-        flexShrink: 0,
-        animation: "nudgeRight 1s ease-in-out infinite"
-      }
-    }), React.createElement("div", {
+    }, React.createElement("div", {
       style: {
         flex: 1,
         minWidth: 0
@@ -9197,23 +9152,23 @@ function App() {
     }, React.createElement("p", {
       style: {
         fontSize: 13.5,
-        fontWeight: 800,
+        fontWeight: 650,
         marginBottom: 2,
         lineHeight: 1.3
       }
-    }, "Tap any company below to start applying"), React.createElement("p", {
+    }, "Open any card to apply"), React.createElement("p", {
       style: {
-        fontSize: 11.5,
-        opacity: 0.92,
+        fontSize: 12,
+        color: "#5B6675",
         lineHeight: 1.4
       }
-    }, "You'll get a tailored cover letter, the real apply links, and we'll auto-track it on your Dashboard.")), React.createElement("button", {
+    }, "Each card links to the company's own posting. Mark it applied and it's tracked for follow-ups.")), React.createElement("button", {
       onClick: dismissResultsHint,
       "aria-label": "Dismiss",
       style: {
-        background: "rgba(255,255,255,0.25)",
+        background: "transparent",
         border: "none",
-        color: "#fff",
+        color: "#5B6675",
         width: 28,
         height: 28,
         borderRadius: "50%",
@@ -9614,8 +9569,7 @@ function App() {
         style: {
           ...faceBase,
           background: "#fff",
-          border: `1.5px solid ${GL}`,
-          borderTop: `3px solid ${accent}`,
+          border: "1px solid #E3E7ED",
           padding: "1.5rem",
           display: "flex",
           flexDirection: "column",
@@ -9689,7 +9643,7 @@ function App() {
           color: "#6B7280",
           fontSize: 12
         }
-      }, hasRealLocation ? displayLocation : c.location, " \xB7 ", c.industry), typeof c.distanceMiles === "number" && c.distanceMiles > 0 ? React.createElement("span", {
+      }, [hasRealLocation ? displayLocation : c.location, c.industry].filter(Boolean).join(" · ")), typeof c.distanceMiles === "number" && c.distanceMiles > 0 ? React.createElement("span", {
         style: {
           fontSize: 10.5,
           color: "#94A3B8",
@@ -9814,7 +9768,7 @@ function App() {
           borderRadius: 99,
           alignSelf: "flex-start"
         }
-      }, "\u2713 Live posting on Adzuna"), React.createElement("p", {
+      }, "Open on the company's job board"), React.createElement("p", {
         style: {
           fontSize: 10.5,
           color: "#C3D1D8",
@@ -12462,28 +12416,13 @@ Thank you for your time,
     } else if (noApps && hasSaved) {
       card = {
         icon: "",
-        color: "#2563EB",
-        bg: "#EFF6FF",
+        color: G,
+        bg: GL,
         title: `You have ${savedJobs.length} saved job${savedJobs.length > 1 ? "s" : ""} — ready to apply?`,
         body: "You've bookmarked companies from your results. The best time to apply is now — openings fill fast.",
         cta: "See saved jobs ↓",
         action: () => {
           document.getElementById("saved-jobs-section")?.scrollIntoView({
-            behavior: "smooth"
-          });
-        }
-      };
-    } else if (dueFollowUps.length > 0) {
-      card = {
-        icon: "",
-        color: CR,
-        bg: "#FFF5F5",
-        title: `${dueFollowUps.length} follow-up${dueFollowUps.length > 1 ? "s" : ""} overdue`,
-        body: `${dueFollowUps.map(a => a.company).join(", ")} ${dueFollowUps.length > 1 ? "are" : "is"} past the 5-day mark. A quick email can triple your callback rate.`,
-        cta: "Draft follow-up ↓",
-        action: () => {
-          const el = document.getElementById("tracker-section");
-          if (el) el.scrollIntoView({
             behavior: "smooth"
           });
         }
@@ -12494,7 +12433,7 @@ Thank you for your time,
         color: AM,
         bg: AL,
         title: `You have ${interviews.length} interview${interviews.length > 1 ? "s" : ""} coming up`,
-        body: "Prep makes a measurable difference. Use the Prep button on your interview entry to get tailored questions and coaching.",
+        body: "Use the Prep button on your interview entry to get tailored questions and coaching.",
         cta: "Go to tracker ↓",
         action: () => {
           document.getElementById("tracker-section")?.scrollIntoView({
@@ -12505,10 +12444,10 @@ Thank you for your time,
     } else if (tracked.length > 0 && tracked.length < 5) {
       card = {
         icon: "",
-        color: "#7C3AED",
-        bg: "#F5F3FF",
+        color: G,
+        bg: GL,
         title: "Apply to more — volume matters",
-        body: "Students who apply to 10+ companies see 3× better results than those who apply to fewer than 5. Your results page has more matches waiting.",
+        body: "Internship searches are a numbers game — most students need many applications to land a few interviews. Your results page has more matches waiting.",
         cta: "See all my matches →",
         action: () => setPage("results")
       };
@@ -13125,11 +13064,7 @@ Thank you for your time,
       gap: 10,
       marginBottom: 10
     }
-  }, React.createElement("span", {
-    style: {
-      fontSize: 24
-    }
-  }), React.createElement("h3", {
+  }, React.createElement("h3", {
     style: {
       fontWeight: 800,
       fontSize: 17,
@@ -13143,7 +13078,7 @@ Thank you for your time,
       lineHeight: 1.6,
       marginBottom: 14
     }
-  }, "Most students never follow up \u2014 and a good one can triple your callback odds. Beat the Pile tracks the timing for you and, when an application hits the 5-day mark, drafts a tailored follow-up email you send from your own inbox. You stay the sender; we handle the reminder and the words."), React.createElement("div", {
+  }, "Most students never follow up \u2014 and a short, polite one keeps you on the recruiter's radar. Beat the Pile tracks the timing for you and, when an application hits the 5-day mark, drafts a tailored follow-up email you send from your own inbox. You stay the sender; we handle the reminder and the words."), React.createElement("div", {
     style: {
       display: "flex",
       gap: 14,
@@ -13174,11 +13109,16 @@ Thank you for your time,
       color: "#4A5568",
       lineHeight: 1.55
     }
-  }, "Reminders show ", React.createElement("strong", null, "inside Beat the Pile"), " (the amber banner on your Dashboard and Results page + red badges on each due application). We also ", React.createElement("strong", null, "email you"), " when you open Beat the Pile if a follow-up is due \u2014 but only on open, not as scheduled background sends. So opening the app every few days is how reminders actually reach you. ", React.createElement("span", {
+  }, "Reminders show ", React.createElement("strong", null, "inside Beat the Pile"), " (the amber banner on your Dashboard and Results page + red badges on each due application). We don't send reminder emails yet, so check back every few days \u2014 or add each follow-up to your calendar from ", React.createElement("a", {
+    href: "/season/",
+    style: {
+      color: GD
+    }
+  }, "My Season"), ". ", React.createElement("span", {
     style: {
       color: "#6B7280"
     }
-  }, "True scheduled email/text reminders are on the roadmap."))), !isPro && React.createElement("p", {
+  }, "Email reminders are on the roadmap."))), !isPro && React.createElement("p", {
     style: {
       fontSize: 12,
       color: "#6B7280",
@@ -13544,7 +13484,7 @@ Thank you for your time,
       fontSize: 14,
       fontWeight: 700
     }
-  }, "Add")))), React.createElement("details", {
+  }, "Add")))), /[?&]dev=1/.test(location.search) && React.createElement("details", {
     style: {
       marginTop: 14,
       background: "#0B1220",
