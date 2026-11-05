@@ -59,7 +59,14 @@
   .tabs{display:flex;gap:6px;margin-bottom:14px}
   .tabs button{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;color:var(--muted)}
   .tabs button[aria-pressed=true]{background:var(--navy);border-color:var(--navy);color:#fff}
+  img.avatar{object-fit:cover;background:#fff;display:block}
+  .band{background:#070F1E;border-bottom:3px solid #2FD39A}
+  .photo{display:flex;gap:16px;align-items:center;padding:4px 0 8px;margin-bottom:4px;border-bottom:1px solid var(--line)}
+  .photo img,.photo .ph{width:84px;height:84px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--line)}
+  .photo .ph{background:var(--green);color:#fff;display:grid;place-items:center;font-size:28px;font-weight:600}
+  .btn{border-radius:999px}
 </style>
+<link rel="stylesheet" href="/d.css">
 </head>
 <body>
 <script src="/nav.js"></script>
@@ -86,7 +93,7 @@
       ${x.desc ? `<p>${esc(x.desc)}</p>` : ""}</div></div>`).join("");
     return `
       <section class="card hero"><div class="band"></div><div class="body">
-        <div class="avatar" aria-hidden="true">${esc(initials(p.name))}</div>
+        ${p.photo && /^data:image\/(jpeg|png|webp);base64,/.test(p.photo) ? `<img class="avatar" src="${esc(p.photo)}" alt="${esc(p.name || "Profile photo")}">` : `<div class="avatar" aria-hidden="true">${esc(initials(p.name))}</div>`}
         <h1>${esc(p.name || "Your name")}</h1>
         ${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
         <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}</div>
@@ -116,7 +123,7 @@
     const r = await fetch("/api/me", { method, headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) }, body: body ? JSON.stringify(body) : undefined });
     const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Something went wrong"); return j;
   }
-  const blank = () => ({ name: "", headline: "", school: "", major: "", gradYear: "", location: "", lookingFor: "", about: "", skills: [], experience: [], projects: [], links: {}, showResume: false });
+  const blank = () => ({ photo: null, name: "", headline: "", school: "", major: "", gradYear: "", location: "", lookingFor: "", about: "", skills: [], experience: [], projects: [], links: {}, showResume: false });
   function editor(){
     const d = S.draft, me = S.me;
     const field = (k, label, ph, attrs = "") => `<div><label for="f_${k}">${label}</label><input id="f_${k}" data-k="${k}" value="${esc(d.p[k] ?? "")}" placeholder="${esc(ph)}" ${attrs}></div>`;
@@ -132,6 +139,12 @@
         ${me.handle && me.profilePublic ? `<p class="small" style="margin:10px 0 0">Live at <a href="/u/${esc(me.handle)}" style="color:var(--green-dark)">beatthepile.com/u/${esc(me.handle)}</a></p>` : ""}
       </section>
       <section class="card"><h2>Basics</h2>
+        <div class="photo">
+          ${d.p.photo ? `<img src="${esc(d.p.photo)}" alt="Your profile photo">` : `<div class="ph" aria-hidden="true">${esc(initials(d.p.name))}</div>`}
+          <div><b style="display:block;font-size:14px">Profile photo</b><span class="muted small">A clear photo of your face works best. We shrink it to a small square.</span>
+            <div class="btns" style="margin-top:8px"><label class="btn" for="f_photo" style="margin:0;cursor:pointer">${d.p.photo ? "Change photo" : "Upload photo"}</label>${d.p.photo ? `<button class="btn" id="rmPhoto" type="button">Remove</button>` : ""}</div>
+            <input type="file" id="f_photo" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="position:absolute;left:-9999px"></div>
+        </div>
         <div class="row">${field("name", "Name", "Jordan Lee")}${field("headline", "Headline", "Finance student · investment club treasurer")}</div>
         <div class="row">${field("school", "School", "Virginia Tech")}${field("major", "Major", "Finance")}</div>
         <div class="row">${field("gradYear", "Graduation year", "2029", 'inputmode="numeric" maxlength="4"')}${field("location", "Location", "Richmond, VA")}</div>
@@ -181,8 +194,32 @@
     const h = $("#f_handle"); if (h) h.oninput = () => { h.value = h.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").slice(0, 30); d.handle = h.value; };
     const pub = $("#f_public"); if (pub) pub.onchange = () => { d.pub = pub.checked; };
     const rs = $("#f_resume"); if (rs) rs.onchange = () => { d.p.showResume = rs.checked; };
+    const ph = $("#f_photo"); if (ph) ph.onchange = async () => { const f = ph.files && ph.files[0]; if (!f) return;
+      const msg = $("#msg"); try { d.p.photo = await shrink(f); editor(); const m = $("#msg"); m.className = "msg"; m.textContent = "Photo ready — tap Save profile."; }
+      catch (e) { msg.className = "msg err"; msg.textContent = e.message; } };
+    const rp = $("#rmPhoto"); if (rp) rp.onclick = () => { d.p.photo = null; editor(); const m = $("#msg"); m.className = "msg"; m.textContent = "Photo removed — tap Save profile."; };
     $("#save").onclick = save;
   }
+  // Photo → centered square, 320px, JPEG; quality steps down until it's small (server limit ~65 KB).
+  function shrink(file){
+    return new Promise((ok, bad) => {
+      if (!/^image\//.test(file.type || "image/")) return bad(new Error("That isn't an image — pick a JPG or PNG."));
+      if (file.size > 15e6) return bad(new Error("That photo is over 15 MB — pick a smaller one."));
+      const url = URL.createObjectURL(file), img = new Image();
+      img.onload = () => { try {
+        const side = Math.min(img.naturalWidth, img.naturalHeight), N = 320, c = document.createElement("canvas"); c.width = c.height = N;
+        const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, N, N);
+        x.drawImage(img, (img.naturalWidth - side) / 2, (img.naturalHeight - side) / 2, side, side, 0, 0, N, N);
+        let q = 0.86, out = c.toDataURL("image/jpeg", q); while (out.length > 88000 && q > 0.4) { q -= 0.08; out = c.toDataURL("image/jpeg", q); }
+        URL.revokeObjectURL(url); out.length > 88000 ? bad(new Error("Couldn't make that photo small enough — try another.")) : ok(out);
+      } catch (e) { bad(new Error("Couldn't read that photo — try a JPG or PNG.")); } };
+      img.onerror = () => { URL.revokeObjectURL(url); bad(new Error("Couldn't read that photo — try a JPG or PNG (iPhone HEIC photos may need converting).")); };
+      img.src = url;
+    });
+  }
+  // the top bar shows your photo/initials and links here
+  function remember(){ try { const p = S.me?.profile || {}; const n = p.name || [S.user?.firstName, S.user?.lastName].filter(Boolean).join(" ");
+    localStorage.setItem("btp_me", JSON.stringify({ i: initials(n), photo: p.photo || null })); window.btpNavMe && window.btpNavMe(); } catch {} }
   async function save(){
     const btn = $("#save"), msg = $("#msg"); btn.disabled = true; msg.className = "msg"; msg.textContent = "Saving…";
     const bad = [...Object.values(S.draft.p.links), ...S.draft.p.projects.map((x) => x.link)].filter((u) => u && !/^https:\/\/[^\s]+\.[^\s]+/i.test(u));
@@ -190,7 +227,7 @@
     try {
       const p = { ...S.draft.p, gradYear: S.draft.p.gradYear ? Number(S.draft.p.gradYear) : null };
       S.me = await api("POST", { action: "profile", profile: p, handle: S.draft.handle.replace(/^-+|-+$/g, "") || null, public: S.draft.pub });
-      load(); editor(); const m = $("#msg"); m.className = "msg ok"; m.textContent = S.me.profilePublic ? "Saved — your page is live." : "Saved (private).";
+      load(); remember(); editor(); const m = $("#msg"); m.className = "msg ok"; m.textContent = S.me.profilePublic ? "Saved — your page is live." : "Saved (private).";
     } catch (e) { msg.className = "msg err"; msg.textContent = e.message; btn.disabled = false; }
   }
   function load(){
@@ -204,12 +241,13 @@
   async function onUser(u){
     S.user = u || null;
     if (!S.user) {
+      try { localStorage.removeItem("btp_me"); window.btpNavMe && window.btpNavMe(); } catch {}
       document.querySelector("main").innerHTML = `<div class="card center"><h1 style="font-size:24px">Your internship profile</h1>
         <p class="muted" style="max-width:46ch;margin:6px auto 16px">One clean page with your experience, projects, skills and resume — share the link with recruiters. It stays private until you turn it on.</p>
         <button class="btn pri" id="si">Sign in to build yours</button></div>`;
       $("#si").onclick = () => S.clerk.openSignIn({}); return;
     }
-    try { S.me = await api("GET"); load(); editor(); }
+    try { S.me = await api("GET"); load(); remember(); editor(); }
     catch { document.querySelector("main").innerHTML = '<div class="card center">Couldn’t load your profile right now. Refresh in a minute.</div>'; }
   }
   async function loadClerk(){

@@ -166,6 +166,17 @@ const HANDLE_OK = /^[a-z0-9](?:[a-z0-9-]{1,28})[a-z0-9]$/;
 const RESERVED = new Set(["admin", "api", "bots", "discovery", "jobs", "fair", "season", "radar", "demo", "privacy", "edit", "me", "new", "settings", "help", "support", "beatthepile", "beat-the-pile", "staff", "team", "official", "recruiter", "employer"]);
 const httpsUrl = (v) => { try { const u = new URL(String(v || "").trim()); return u.protocol === "https:" && u.hostname.includes(".") ? u.toString().slice(0, 300) : ""; } catch { return ""; } };
 const txt = (v, n) => clean(v, n);
+// Profile photo: a small image the browser already resized (≤ ~65 KB), stored with the profile.
+// Only real JPEG/PNG/WebP bytes pass (checked by magic number, not just the label) — never SVG or anything scriptable.
+const PHOTO_MAX = 90000;   // characters of base64 (~65 KB)
+export function cleanPhoto(v) {
+  const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/.exec(typeof v === "string" ? v : "");
+  if (!m || v.length > PHOTO_MAX) return null;
+  let b; try { b = Buffer.from(m[2], "base64"); } catch { return null; }
+  const magic = { jpeg: b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff, png: b.slice(0, 8).toString("hex") === "89504e470d0a1a0a",
+    webp: b.slice(0, 4).toString("ascii") === "RIFF" && b.slice(8, 12).toString("ascii") === "WEBP" };
+  return magic[m[1]] ? v : null;
+}
 function cleanProfile(p) {
   p = p && typeof p === "object" ? p : {};
   const arr = (a, n) => (Array.isArray(a) ? a : []).slice(0, n);
@@ -179,6 +190,7 @@ function cleanProfile(p) {
     projects: arr(p.projects, 8).map((x) => ({ name: txt(x?.name, 100), desc: txt(x?.desc, 600), link: httpsUrl(x?.link) })).filter((x) => x.name),
     links: { linkedin: httpsUrl(p.links?.linkedin), github: httpsUrl(p.links?.github), portfolio: httpsUrl(p.links?.portfolio) },
     showResume: p.showResume === true,
+    photo: cleanPhoto(p.photo),
   };
 }
 async function publicProfile(req, res) {

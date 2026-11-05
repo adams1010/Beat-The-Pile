@@ -51,3 +51,21 @@ const unsub = f.T("user_jobs").find((x) => x.clerk_user_id === "pa").remind_unsu
 r = await call("GET", null, null, { unsub }); assert.equal(r.code, 200);
 assert.equal(f.T("user_jobs").find((x) => x.clerk_user_id === "pa").remind_email, false, "one-click unsubscribe works without sign-in");
 console.log("PROFILE TESTS PASSED");
+
+// profile photo: only real, small JPEG/PNG/WebP bytes are kept (never SVG, never a mislabeled file, never huge)
+{
+  const { cleanPhoto } = await import("../api/me.js");
+  const jpeg = "data:image/jpeg;base64," + Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 4]).toString("base64");
+  const png = "data:image/png;base64," + Buffer.from("89504e470d0a1a0a0000", "hex").toString("base64");
+  assert.equal(cleanPhoto(jpeg), jpeg); assert.equal(cleanPhoto(png), png);
+  assert.equal(cleanPhoto("data:image/svg+xml;base64," + Buffer.from("<svg onload=alert(1)>").toString("base64")), null, "no SVG");
+  assert.equal(cleanPhoto("data:image/jpeg;base64," + Buffer.from("<script>alert(1)</script>").toString("base64")), null, "label must match the bytes");
+  assert.equal(cleanPhoto("javascript:alert(1)"), null); assert.equal(cleanPhoto("https://evil.example/x.jpg"), null, "no outside links (tracking)");
+  assert.equal(cleanPhoto("data:image/jpeg;base64," + Buffer.alloc(80000, 0xff).toString("base64")), null, "too big");
+  let r = await call("POST", "pa", { action: "profile", handle: "adam-s", public: true, profile: { name: "Adam S", photo: jpeg } });
+  assert.equal(r.code, 200); assert.equal(r.body.profile.photo, jpeg);
+  r = await call("GET", null, null, { u: "adam-s" }); assert.equal(r.body.profile.photo, jpeg, "public page shows it");
+  r = await call("POST", "pa", { action: "profile", handle: "adam-s", public: true, profile: { name: "Adam S", photo: null } });
+  assert.equal(r.body.profile.photo, null, "removable");
+  console.log("✓ profile photo: real JPEG/PNG/WebP only, size-capped, shows publicly, removable");
+}

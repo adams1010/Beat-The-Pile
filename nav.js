@@ -4,9 +4,8 @@
 // If the page has an #acct element (its sign-in / sign-out widget), it is moved into the bar's right side.
 (function () {
   if (window.__btpNav) return; window.__btpNav = true;
-  const MAIN = [["/jobs/", "Jobs"], ["/fair/", "Career Fair"], ["/season/", "My Season"], ["/radar/", "Radar"]];
+  const MAIN = [["/jobs/", "Jobs"], ["/fair/", "Career Fair"], ["/season/", "My Season"], ["/radar/", "Radar"], ["/u/", "Profile"]];
   const TOOLS = [
-    ["/u/", "My profile", "A shareable page for recruiters"],
     ["/#quiz", "Match quiz", "Real openings matched to your major"],
     ["/#interview", "Interview practice", "Talk it out against a timer, get graded"],
     ["/#resumebuilder", "Resume builder", "Starter resume from your answers"],
@@ -44,6 +43,9 @@
 .btpnav .menu b{display:block;font-weight:600;font-size:14px}
 .btpnav .menu small{display:block;color:#5B6675;font-size:12.5px;margin-top:2px;font-weight:400}
 .btpnav .right{display:flex;align-items:center;gap:8px;flex-shrink:0;margin-left:6px}
+.btpnav .me{width:32px;height:32px;border-radius:50%;background:#0B7A55;color:#fff;display:grid;place-items:center;font:600 12px "Geist",sans-serif;text-decoration:none;overflow:hidden;flex-shrink:0;border:2px solid #1A2640}
+.btpnav .me[hidden]{display:none}.btpnav .me img{width:100%;height:100%;object-fit:cover}
+.btpnav .me:hover,.btpnav .me[aria-current=page]{border-color:var(--n-acc)}
 .btpnav #acct{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--n-dim)}
 .btpnav #acct span,.btpnav #acct .who{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--n-dim)}
 .btpnav #acct button{font:inherit;font-size:13px;font-weight:600;border-radius:7px;padding:6px 12px;cursor:pointer;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.18)}
@@ -70,8 +72,14 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     <div class="links">${MAIN.map(([h, t]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${t}</a>`).join("")}
       <details><summary>Tools</summary><div class="menu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}</div></details></div>
     <details class="mob"><summary>Menu</summary><div class="menu" role="menu">${MAIN.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div>${TOOLS.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}</div></details>
-    <div class="right" id="btpRight"></div></div>`;
+    <div class="right" id="btpRight"><a class="me" id="btpMe" href="/u/" hidden></a></div></div>`;
   addEventListener("keydown", (e) => { const t = e.target.tagName; if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(t) && !e.target.isContentEditable) { const i = nav.querySelector(".q input"); if (i && i.offsetParent) { e.preventDefault(); i.focus(); } } });
+  // your photo/initials (saved by the profile page or the homepage after sign-in) → links to your profile
+  window.btpNavMe = () => { const a = nav.querySelector("#btpMe"); if (!a) return; let me = null; try { me = JSON.parse(localStorage.getItem("btp_me") || "null"); } catch {}
+    if (!me) { a.hidden = true; return; }
+    a.hidden = false; a.title = "Your profile"; a.setAttribute("aria-label", "Your profile"); if (path.startsWith("/u/")) a.setAttribute("aria-current", "page");
+    a.innerHTML = me.photo && /^data:image\/(jpeg|png|webp);base64,/.test(me.photo) ? `<img alt="" src="${me.photo.replace(/"/g, "")}">` : String(me.i || "").replace(/[^A-Z0-9]/gi, "").slice(0, 2) || "Me"; };
+  window.btpNavMe();
   const later = () => {     // the rest of the page exists now
     const main = document.querySelector("main"); if (main && !main.id) main.id = "main";
     const acct = document.getElementById("acct"); if (acct && !nav.contains(acct)) nav.querySelector("#btpRight").appendChild(acct);

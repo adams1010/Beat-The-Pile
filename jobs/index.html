@@ -61,7 +61,7 @@
   .panel h3{font:500 11px var(--mono);letter-spacing:.08em;color:var(--muted);margin:0 0 12px;text-transform:uppercase}
   .panel .est{font-size:12px;color:var(--faint);margin:-8px 0 8px}
   .prof{padding:0;overflow:hidden}.prof .ban{height:52px;background:#0A1426;border-bottom:3px solid #2FD39A}
-  .prof .body{padding:0 16px 16px}.prof .av{width:52px;height:52px;border-radius:50%;background:var(--green);border:3px solid #fff;margin-top:-26px;color:#fff;display:grid;place-items:center;font-weight:600;font-size:17px}
+  .prof .body{padding:0 16px 16px}.prof .av{object-fit:cover;width:52px;height:52px;border-radius:50%;background:var(--green);border:3px solid #fff;margin-top:-26px;color:#fff;display:grid;place-items:center;font-weight:600;font-size:17px}
   .prof .nm{font-weight:600;font-size:15px;margin:8px 0 2px;overflow:hidden;text-overflow:ellipsis}.prof .sb{font-size:13px;color:var(--muted);margin:0 0 12px;line-height:1.4}
   .prof a,.prof button.lnk{font:inherit;font-size:13px;font-weight:500;color:var(--green);text-decoration:none;background:none;border:0;padding:0;cursor:pointer}
   .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;text-align:center}.stats b{display:block;font:500 22px var(--mono)}.stats span{font-size:11px;color:var(--muted)}
@@ -293,8 +293,9 @@
     $("stSaved").textContent = state.mine.saved.size; $("stApplied").textContent = state.mine.applied.size; $("stFollow").textContent = state.mine.starred.size;
     const u = state.user;
     const nm = u ? ([u.firstName, u.lastName].filter(Boolean).join(" ") || u.primaryEmailAddress?.emailAddress || "You") : "";
-    $("prof").innerHTML = `<div class="ban"></div><div class="body"><div class="av">${u ? esc(initials(nm)) : "?"}</div>`
-      + (u ? `<p class="nm">${esc(nm)}</p><p class="sb">Looking at ${esc(MAJOR_LABEL())}</p><a href="/u/">Edit profile</a>`
+    const photo = state.profile?.photo && /^data:image\/(jpeg|png|webp);base64,/.test(state.profile.photo) ? state.profile.photo : null;
+    $("prof").innerHTML = `<div class="ban"></div><div class="body">${photo ? `<img class="av" src="${esc(photo)}" alt="">` : `<div class="av">${u ? esc(initials(nm)) : "?"}</div>`}`
+      + (u ? `<p class="nm">${esc(nm)}</p><p class="sb">Looking at ${esc(MAJOR_LABEL())}</p><a href="/u/">${photo ? "View &amp; edit profile" : "Add a photo &amp; build your profile →"}</a>`
            : `<p class="nm">Save, follow &amp; track</p><p class="sb">Sign in to keep a list, follow companies and get follow-up nudges.</p>${state.clerk ? `<button class="lnk" id="profSignIn">Sign in →</button>` : ""}`) + `</div>`;
     const b = $("profSignIn"); if (b) b.onclick = () => state.clerk.openSignIn();
     // who's hiring the most in what you're looking at
@@ -493,8 +494,11 @@
   }
   async function onUser(user){
     state.user = user || null;
-    if (state.user) { try { setMine(await api("GET")); markSeenSoon(); loadSaved(); loadFollowed(); } catch { toast("Couldn't load your saved list"); } }
-    else { state.mine = { saved: new Set(), applied: new Set(), starred: new Set(), seenAt: null }; state.savedRows = []; state.followRows = []; }
+    if (state.user) { try { const d = await api("GET"); setMine(d); state.profile = d.profile || null;
+        try { const n = d.profile?.name || [user.firstName, user.lastName].filter(Boolean).join(" ") || user.primaryEmailAddress?.emailAddress || "";
+          localStorage.setItem("btp_me", JSON.stringify({ i: initials(n), photo: d.profile?.photo || null })); window.btpNavMe && window.btpNavMe(); } catch {}
+        markSeenSoon(); loadSaved(); loadFollowed(); } catch { toast("Couldn't load your saved list"); } }
+    else { try { localStorage.removeItem("btp_me"); window.btpNavMe && window.btpNavMe(); } catch {} state.profile = null; state.mine = { saved: new Set(), applied: new Set(), starred: new Set(), seenAt: null }; state.savedRows = []; state.followRows = []; }
     renderAcct(); render();
   }
   async function loadClerk(){
