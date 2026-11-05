@@ -106,7 +106,11 @@ real reason (`board_error` / `identity_failed`); `unsupported` means only "no bo
 ## Job systems we read (`lib/fetchers/`)
 workday · successfactors · greenhouse · lever · icims (classic) · **jibe** (iCIMS's newer career site on the company's
 own domain, `/api/jobs`) · ashby · smartrecruiters · oracle · **eightfold** (newer `/api/pcsx/search` feed, falls back to
-`/api/apply/v2`) · paylocity · adp. Not yet: Avature, UKG, Dayforce, Taleo, BambooHR, BrassRing.
+`/api/apply/v2`) · paylocity · adp · **taleo** (Enterprise: `{tenant}.taleo.net/careersection/{section}`, portal id read
+from the search page and saved in config; keyword search "intern"/"co-op"; proof = tenant name or own-site link) ·
+**ukg** (UltiPro `recruiting{,2}.ultipro.com/{TENANT}/JobBoard/{guid}`; keyword search is broken so it reads every job;
+proof = own-site link only; every detail URL answers 200 → link checker skips it). Not yet: Avature, Dayforce,
+Taleo Business Edition (`*.tbe.taleo.net`), BambooHR, BrassRing. (Board Scout can't use Taleo: pages never name the employer.)
 **Adding a reader:** fetcher in `lib/fetchers/` returning `[{sourceId,title,location,url,postedOn}]` → register in
 `fetchers/index.js` → `boardKey` in `lib/companies.js` → detection in `scanHtml` + a `verify…` proof in
 `lib/discover.js` → add the system to `NOW_READABLE` and bump `READERS_UPDATED_AT` in `api/discover.js` (re-tests
