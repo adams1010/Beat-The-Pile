@@ -60,7 +60,7 @@ const LiveStats=()=>{
   },[]);
   const fmt=(n)=>n==null?"—":n.toLocaleString();
   const ago=(t)=>{if(!t)return null;const m=Math.round((Date.now()-new Date(t))/6e4);return m<60?`${Math.max(1,m)} min ago`:m<1440?`${Math.round(m/60)} hr ago`:`${Math.round(m/1440)} days ago`;};
-  const items=[{v:d?.allMajors,l:"open internships right now, every major",c:"#0B1220"},{v:d?.engineering,l:"of them in engineering",c:"#0B1220"},{v:d?.companies,l:"company job boards we read directly",c:G}];
+  const items=[{v:d?.allMajors,l:"open internships right now, every major",c:"#0B1220"},{v:d?.hiringNow,l:"companies hiring interns right now",c:"#0B1220"},{v:d?.companies,l:"company job boards we read directly",c:G}];
   return (<div style={{maxWidth:760,margin:"0 auto"}}>
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:"1rem"}}>
     {items.map((s,i)=>(<div key={i} style={{background:"#fff",border:"1px solid #EEF6F2",borderRadius:14,padding:"1.75rem 1.25rem",textAlign:"center",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
@@ -2758,7 +2758,7 @@ function App(){
           Apply early.<br/><span style={{color:G}}>Beat the pile.</span>
         </h1>
         <p style={{fontSize:18,color:"#4A5568",lineHeight:1.7,maxWidth:500,margin:"0 auto 2rem"}}>
-          Real internships for every major, pulled straight from each company's own job board — no reposts, no recruiters. Save them, track your applications, and walk into career fairs with a plan.
+          Everything you need to land an internship, in any major: real openings straight from company job boards, a tracker that reminds you to follow up, interview practice, and a plan for every career fair.
         </p>
         <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
           <a href="/jobs/" style={{background:`${G}`,color:"#fff",padding:"15px 32px",borderRadius:var_rl,fontSize:16,fontWeight:700,textDecoration:"none",fontFamily:"var(--font)",boxShadow:"0 1px 2px rgba(11,18,32,.06)",letterSpacing:"-0.3px"}}>Browse internships →</a>

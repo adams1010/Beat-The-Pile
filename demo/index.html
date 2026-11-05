@@ -178,7 +178,7 @@
     <div class="counters rise d2">
       <div class="counter"><span class="n g" data-live="boards">—</span><span class="l">company job boards we read <b>directly</b> — each re-read at least twice a day</span></div>
       <div class="counter"><span class="n" data-live="n">—</span><span class="l">real internships open <b>right now</b>, every major</span></div>
-      <div class="counter"><span class="n a" data-live="me">—</span><span class="l">of them in <b>engineering</b></span></div>
+      <div class="counter"><span class="n a" data-live="me">—</span><span class="l">companies hiring interns <b>right now</b></span></div>
     </div>
     <p class="mid rise d4">All in one list. Free.</p>
   </section>
@@ -353,7 +353,7 @@
   const ok = (r) => { if (!r.ok) throw new Error(r.status); return r.json(); };
   const fail = () => { document.getElementById("feedNote").hidden = false; };
   fetch("/api/listings?summary=1").then(ok).then((d) => {
-    live.n = d.allMajors; live.me = d.engineering; live.boards = d.companies;
+    live.n = d.allMajors; live.me = d.hiringNow; live.boards = d.companies;
     if (slides[i].querySelector("[data-live]")) enter(i);
   }).catch(() => {});
   const SHORT = { mechanical: "Mech", electrical: "EE", civil: "Civil", chemical: "ChemE", industrial: "Mfg", software: "CS", data: "Data", cyber_it: "IT", product_design: "Design",

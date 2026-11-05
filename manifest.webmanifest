@@ -1,7 +1,7 @@
 {
   "name": "Beat the Pile",
   "short_name": "Beat the Pile",
-  "description": "Real internships straight from company job boards, plus Career Fair Mode.",
+  "description": "Land an internship in any major: real openings from company job boards, application tracking, follow-up reminders, interview practice and Career Fair Mode.",
   "start_url": "/jobs/",
   "scope": "/",
   "display": "standalone",

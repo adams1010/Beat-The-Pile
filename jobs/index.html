@@ -319,7 +319,7 @@
       <article class="card${has("applied", j) ? " applied" : ""}${j.closed ? " closed" : ""}">
         <div>
           <div class="co">${esc(j.company)}${j.company_id ? `<button class="follow" data-co="${esc(j.company_id)}" aria-pressed="${followed(j)}">${followed(j) ? "★ Following" : "☆ Follow"}</button>` : ""}</div>
-          <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">NEW</span>' : ""}${j.match === "me" ? '<span class="tag me">ME</span>' : ""}${j.sites.length > 1 ? `<span class="tag multi">${j.sites.length} locations</span>` : j.count > 1 ? `<span class="tag multi">${j.count} openings</span>` : ""}${j.closed ? '<span class="tag closed">Closed — taken down by the company</span>' : ""}</div>
+          <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">NEW</span>' : ""}${j.match === "me" && STRICT_OK() ? '<span class="tag me">Mechanical</span>' : ""}${j.sites.length > 1 ? `<span class="tag multi">${j.sites.length} locations</span>` : j.count > 1 ? `<span class="tag multi">${j.count} openings</span>` : ""}${j.closed ? '<span class="tag closed">Closed — taken down by the company</span>' : ""}</div>
           <div class="meta"><span>${esc(j.sites[0].loc)}${j.sites.length > 1 ? ` +${j.sites.length - 1} more` : ""}</span>${seasonOf(j.title) ? `<span>${esc(seasonOf(j.title))}</span>` : ""}${needsClearance(j.title) ? `<span>US citizens / clearance</span>` : ""}<span>${esc(postedText(j))}</span></div>
           ${j.sites.length > 1 ? `<details class="sites"><summary>All ${j.sites.length} locations</summary><ul>${j.sites.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.loc)}</a></li>`).join("")}</ul></details>` : ""}
         </div>

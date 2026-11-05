@@ -1,4 +1,4 @@
-/* built from src/home.jsx 2926fe34338d6c7f — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx e2011e5b9de0d3ad — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -157,8 +157,8 @@ const LiveStats = () => {
     l: "open internships right now, every major",
     c: "#0B1220"
   }, {
-    v: d?.engineering,
-    l: "of them in engineering",
+    v: d?.hiringNow,
+    l: "companies hiring interns right now",
     c: "#0B1220"
   }, {
     v: d?.companies,
@@ -6081,7 +6081,7 @@ function App() {
       maxWidth: 500,
       margin: "0 auto 2rem"
     }
-  }, "Real internships for every major, pulled straight from each company's own job board \u2014 no reposts, no recruiters. Save them, track your applications, and walk into career fairs with a plan."), React.createElement("div", {
+  }, "Everything you need to land an internship, in any major: real openings straight from company job boards, a tracker that reminds you to follow up, interview practice, and a plan for every career fair."), React.createElement("div", {
     style: {
       display: "flex",
       gap: 12,

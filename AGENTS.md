@@ -1,9 +1,9 @@
 <!-- Same project guide as CLAUDE.md, for ChatGPT/Codex and other AI tools. If you change one, change both. -->
 # Beat the Pile (formerly InternIQ) — read this first
 
-**Beat the Pile** (www.beatthepile.com — the bare domain redirects there; still also served at intern-iq-psi.vercel.app) shows students **real internships
-pulled straight from each company's own job board**, plus Career Fair Mode, My Season, and the Opening Radar.
-Owner: Adam Shiloni (VT mechanical engineering). The repo/Vercel project/database keep the old "InternIQ" names — only
+**Beat the Pile** (www.beatthepile.com — the bare domain redirects there; still also served at intern-iq-psi.vercel.app) helps **every student, any major,
+land an internship**: real internships **pulled straight from each company's own job board**, plus Career Fair Mode, My Season, and the Opening Radar.
+Owner: Adam Shiloni (VT mechanical engineering). **Positioning (Nov 2026): for every major — never write copy that implies it's only for engineers.** The repo/Vercel project/database keep the old "InternIQ" names — only
 the brand changed. All student-facing copy says "Beat the Pile".
 Admins (can flip bot switches, paste links): `ADMIN_EMAILS` env, default shiloniadam10@gmail.com, mdxp21@gmail.com.
 
@@ -42,7 +42,7 @@ in-browser Babel). After editing `src/home.jsx`: `npm install && node scripts/bu
 Homepage screens have hash URLs (`/#quiz`, `/#dashboard`, `/#score`, …) so Back/refresh/sharing work.
 
 ## Pages
-`/jobs` internships (engineering view; filters live in the URL: `?state=all|VA,PA&me=1&q=&view=saved|following`) ·
+`/jobs` internships (every major via the Major picker; filters live in the URL: `?state=all|VA,PA&major=&me=1&q=&view=saved|following&company=`) ·
 `/fair` Career Fair Mode (QR resume, route, briefs, notes, follow-ups) · `/season` My Season (pipeline, weekly goal,
 apply speed, **Delete all my data**) · `/radar` Opening Radar · `/privacy` plain-words privacy page · `/bots` **Bot
 Control Room** (owner sign-in required to see numbers) · `/discovery` robot's company list + "Needs a link" sheet ·
