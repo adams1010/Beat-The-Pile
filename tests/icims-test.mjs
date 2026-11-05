@@ -22,4 +22,9 @@ const out = await fetchCompany({ id: "x-dewberry", company: "Dewberry", ats: "ic
 console.log(out.raw, out.listings.map(l => `${l.title} ${l.state} ${l.match}`));
 assert.equal(out.listings.filter((l) => l.match).length, 1); // engineering view unchanged; other majors now kept + tagged
 assert.ok(out.listings.every((l) => l.field)); // Toronto dropped, CAD not ME-or-general? see output
+// keyword search broken (0 for every keyword) → falls back to browsing the unfiltered list
+const { fetchIcims } = await import("../lib/fetchers/icims.js");
+globalThis.fetch = async (u) => ({ ok: true, status: 200, url: String(u), text: async () => (/searchKeyword=&/.test(String(u)) && String(u).includes("pr=0")) ? html : "<html></html>", json: async () => ({}), headers: new Map() });
+const fb = await fetchIcims({ id: "x-dewberry", base: "https://careers-dewberry.icims.com" });
+assert.ok(fb.length >= 1 && fb.every((j) => /intern|co-?op/i.test(j.title)), "fallback browse keeps intern titles");
 console.log("icims ok");
