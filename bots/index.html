@@ -132,7 +132,7 @@
   const S = { d: null, clerk: null, user: null, busy: {} };
   const ago = (t) => { if (!t) return "never"; const m = Math.round((Date.now() - Date.parse(t)) / 6e4); return m < 1 ? "just now" : m < 60 ? m + " min ago" : m < 1440 ? Math.round(m / 60) + " hr ago" : Math.round(m / 1440) + " d ago"; };
   // How long without a run before a bot looks stuck
-  const STALE_MIN = { scout: 8 * 1440, finder: 120, import: 26 * 60, browser: 26 * 60, sync: 120, links: 14 * 60, radar: 26 * 60 };
+  const STALE_MIN = { scout: 8 * 1440, finder: 120, import: 26 * 60, browser: 26 * 60, sync: 120, links: 14 * 60, radar: 26 * 60, remind: 26 * 60 };
   function toast(m){ const t = document.createElement("div"); t.className = "toast"; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); }
 
   function status(b){

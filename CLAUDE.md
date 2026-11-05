@@ -45,7 +45,7 @@ Homepage screens have hash URLs (`/#quiz`, `/#dashboard`, `/#score`, …) so Bac
 `/fair` Career Fair Mode (QR resume, route, briefs, notes, follow-ups) · `/season` My Season (pipeline, weekly goal,
 apply speed, **Delete all my data**) · `/radar` Opening Radar · `/privacy` plain-words privacy page · `/bots` **Bot
 Control Room** (owner sign-in required to see numbers) · `/discovery` robot's company list + "Needs a link" sheet ·
-`/demo` story-style demo · `/` homepage (built from `src/home.jsx`).
+`/demo` story-style demo · `/u/` profile editor and `/u/<handle>` public profile (private until the student turns it on; noindex; https-only links; resume button only when the QR link is on; API `action:"profile"` + `GET /api/me?u=`) · `/` homepage (built from `src/home.jsx`).
 Every page (homepage too) includes **`/nav.js`** (one shared top bar: Jobs · Career Fair · My Season · Radar · Tools ▾, phones get a Menu; it moves the page's `#acct` sign-in widget into the bar) and
 `/feedback.js` (Report a problem). Owner tools are not in the student nav.
 
@@ -79,6 +79,7 @@ Every page (homepage too) includes **`/nav.js`** (one shared top bar: Jobs · Ca
 | 🔄 Internship Sync | Vercel cron 24×/day + GitHub `sync.yml` (3 passes per fire) | Vercel `api/sync.js` | `lib/fetchers/*`; 14 boards at once |
 | 🔗 Link Checker | after each GitHub sync pass + 09:45/21:45 UTC (Vercel); 700/run | Vercel `api/check-links.js` | hides only after 2 dead checks in a row; skips script-only ATS pages |
 | 📡 Opening Radar | daily 10:40 UTC | GitHub `radar.yml` | `scripts/build-radar.mjs` |
+| ✉️ Follow-up Emails | daily 13:20 UTC (Vercel cron `/api/remind` → `api/me.js?cron=remind`) | Vercel | `lib/remind.js`, rule in `lib/followups.js` (applied 5–45 days, not followed up). Opt-in, ≤1 email/3 days, one-click unsubscribe. Off without `RESEND_API_KEY`; sender `REMIND_FROM` (default reminders@beatthepile.com, domain verified in Resend). |
 
 Every bot calls `botOn(id)` before working and `logRun(id, ok, summary, stats)` after (`lib/bots.js`).
 GitHub-run bots read their switch from `GET /api/discovery?bots=1` and report via `POST /api/discovery {action:"botlog"}`

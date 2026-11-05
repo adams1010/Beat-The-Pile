@@ -1,16 +1,16 @@
 // /nav.js — the one top bar for every page. Include with <script src="/nav.js"></script> right after <body>.
-//   Jobs · Career Fair · My Season · Radar · Tools ▾ · [account]
+//   Jobs · Career Fair · My Season · Radar · Tools ▾ · [account]   (follow-ups live in My Season)
 // "Saved" lives inside My Season (and the ♡ Saved filter on Jobs). Owner tools (/bots, /discovery) are not listed.
 // If the page has an #acct element (its sign-in / sign-out widget), it is moved into the bar's right side.
 (function () {
   if (window.__btpNav) return; window.__btpNav = true;
   const MAIN = [["/jobs/", "Jobs"], ["/fair/", "Career Fair"], ["/season/", "My Season"], ["/radar/", "Radar"]];
   const TOOLS = [
+    ["/u/", "My profile", "A shareable page for recruiters"],
     ["/#quiz", "Match quiz", "Real openings matched to your major"],
     ["/#interview", "Interview practice", "Mock interview with follow-up questions"],
     ["/#resumebuilder", "Resume builder", "Starter resume from your answers"],
     ["/#score", "Resume check", "How a resume reads against a posting"],
-    ["/#dashboard", "Follow-ups", "Who to follow up with, drafts included"],
     ["/#wall", "Community", "Tips from other students"],
     ["/demo/", "How it works", "90-second walkthrough"],
   ];

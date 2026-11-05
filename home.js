@@ -1,4 +1,4 @@
-/* built from src/home.jsx 0d74a025207e0b6f — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 5ea8659bec7152ad — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -12344,7 +12344,38 @@ Thank you for your time,
       fontWeight: 700,
       boxShadow: "0 1px 2px rgba(11,18,32,.06)"
     }
-  }, "Upgrade to Pro")), React.createElement(FollowUpsDueBanner, null), !clerkUser && (tracked.length > 0 || (profile.resumes || []).length > 0) && React.createElement("div", {
+  }, "Upgrade to Pro")), clerkUser ? React.createElement("a", {
+    href: "/season/",
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: 10,
+      background: "#fff",
+      border: "1px solid #E3E7ED",
+      borderRadius: var_rl,
+      padding: "12px 16px",
+      marginBottom: 14,
+      textDecoration: "none",
+      color: "#0B1220"
+    }
+  }, React.createElement("span", {
+    style: {
+      fontSize: 13.5,
+      lineHeight: 1.45
+    }
+  }, React.createElement("strong", null, "This tracker is part of My Season."), " ", React.createElement("span", {
+    style: {
+      color: "#5B6675"
+    }
+  }, "Everything here also shows there, with jobs you marked applied, follow-ups due and email reminders.")), React.createElement("span", {
+    style: {
+      fontSize: 13.5,
+      fontWeight: 650,
+      color: GD,
+      whiteSpace: "nowrap"
+    }
+  }, "Open My Season \u2192")) : null, React.createElement(FollowUpsDueBanner, null), !clerkUser && (tracked.length > 0 || (profile.resumes || []).length > 0) && React.createElement("div", {
     style: {
       background: "#FFFBEB",
       border: "1px solid #FCD34D",

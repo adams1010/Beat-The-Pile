@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Profile — Beat the Pile</title>
+<meta name="description" content="A student's internship profile on Beat the Pile.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<meta name="theme-color" content="#0B1220">
+<style>
+  :root{--green:#0E8A5F;--green-dark:#0B6E4B;--green-light:#EEF6F2;--navy:#0B1220;--ink:#1A2230;--muted:#5B6675;--faint:#9AA4B2;
+        --bg:#F6F7F9;--card:#fff;--line:#E3E7ED;--red:#B42318;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  main{max-width:780px;margin:0 auto;padding:24px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:14px}
+  .hero{padding:0;overflow:hidden}
+  .band{height:84px;background:var(--navy)}
+  .hero .body{padding:0 24px 22px}
+  .avatar{width:88px;height:88px;border-radius:50%;background:var(--green);color:#fff;display:grid;place-items:center;font-size:32px;font-weight:650;
+          border:4px solid #fff;margin-top:-44px;letter-spacing:-.02em}
+  h1{font-size:26px;line-height:1.2;margin:12px 0 2px;color:var(--navy);letter-spacing:-.02em}
+  .headline{font-size:16px;color:var(--ink);margin:0 0 6px}
+  .meta{color:var(--muted);font-size:14px;display:flex;flex-wrap:wrap;gap:4px 14px}
+  .looking{display:inline-block;margin-top:12px;background:var(--green-light);color:var(--green-dark);border-radius:8px;padding:6px 10px;font-size:13.5px;font-weight:550}
+  .btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .btn{font:inherit;font-size:14px;font-weight:600;border-radius:8px;padding:8px 14px;cursor:pointer;text-decoration:none;border:1px solid var(--line);background:#fff;color:var(--navy);display:inline-flex;align-items:center;gap:6px}
+  .btn.pri{background:var(--green);border-color:var(--green);color:#fff}
+  .btn:disabled{opacity:.55;cursor:default}
+  h2{font-size:17px;margin:0 0 10px;color:var(--navy)}
+  .about{white-space:pre-wrap;margin:0}
+  .item{display:flex;gap:14px;padding:12px 0;border-top:1px solid var(--line)}
+  .item:first-of-type{border-top:0;padding-top:2px}
+  .dot{width:40px;height:40px;border-radius:8px;background:#F2F4F7;color:var(--muted);display:grid;place-items:center;font-weight:650;flex-shrink:0;font-size:14px}
+  .item b{display:block;color:var(--navy)} .item .sm{color:var(--muted);font-size:14px} .item p{margin:4px 0 0;white-space:pre-wrap;font-size:15px}
+  .item b a{color:var(--navy);text-decoration:none}.item b a:hover{text-decoration:underline}
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{border:1px solid var(--line);border-radius:999px;padding:4px 11px;font-size:13.5px;background:#fff}
+  .muted{color:var(--muted)} .small{font-size:13.5px}
+  .center{text-align:center;padding:48px 20px}
+  /* editor */
+  label{display:block;font-size:13px;font-weight:600;color:var(--navy);margin:12px 0 4px}
+  input,textarea,select{font:inherit;font-size:15px;width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 11px;background:#fff;color:var(--ink)}
+  input:focus,textarea:focus{outline:2px solid var(--green);outline-offset:0;border-color:var(--green)}
+  textarea{min-height:90px;resize:vertical}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+  @media(max-width:600px){.row{grid-template-columns:1fr}.card{padding:18px}.hero .body{padding:0 18px 18px}}
+  .rep{border:1px solid var(--line);border-radius:10px;padding:4px 12px 12px;margin-top:10px;position:relative}
+  .rm{position:absolute;top:8px;right:8px;background:none;border:0;color:var(--muted);cursor:pointer;font:inherit;font-size:13px}
+  .handle{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden}
+  .handle span{padding:9px 0 9px 11px;color:var(--muted);font-size:15px;white-space:nowrap}
+  .handle input{border:0;padding-left:2px}
+  .switch{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:14.5px}
+  .switch input{width:18px;height:18px;margin-top:2px;accent-color:var(--green)}
+  .bar{position:sticky;bottom:0;background:rgba(246,247,249,.96);border-top:1px solid var(--line);padding:12px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .msg{font-size:14px} .msg.err{color:var(--red)} .msg.ok{color:var(--green-dark)}
+  .tabs{display:flex;gap:6px;margin-bottom:14px}
+  .tabs button{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;color:var(--muted)}
+  .tabs button[aria-pressed=true]{background:var(--navy);border-color:var(--navy);color:#fff}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main"><div class="card center muted" id="app">Loading…</div></main>
+<script>
+(function(){
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const safeUrl = (u) => /^https:\/\//i.test(String(u || "")) ? u : "";
+  const initials = (n) => String(n || "?").trim().split(/\s+/).slice(0, 2).map((w) => w[0] || "").join("").toUpperCase() || "?";
+  const handleFromPath = () => { const m = location.pathname.match(/^\/u\/([a-z0-9-]{3,30})\/?$/i); return m && m[1].toLowerCase() !== "edit" ? m[1].toLowerCase() : null; };
+  const SKILLS = ["SolidWorks","AutoCAD","CATIA","Creo","Fusion 360","Inventor","NX","ANSYS","Abaqus","COMSOL","MATLAB","Simulink","Python","C++","Java","JavaScript","SQL","Excel","LabVIEW","Arduino","Raspberry Pi","3D printing","CNC machining","GD&T","FEA","CFD","Thermodynamics","Heat transfer","Fluid mechanics","Statics","Dynamics","Materials","Manufacturing processes","Lean / Six Sigma","Soldering","PCB design","Revit","Civil 3D","Project management","Technical writing","Public speaking","Leadership","Spanish"];
+  const S = { clerk: null, user: null, me: null, draft: null, tab: "edit" };
+  const app = $("#app");
+
+  // ── Public view (anyone, no sign-in) ──
+  function profileHtml(p, resume, isPreview){
+    const where = [p.school, p.major, p.gradYear ? "Class of " + p.gradYear : ""].filter(Boolean).join(" · ");
+    const links = [["linkedin","LinkedIn"],["github","GitHub"],["portfolio","Portfolio"]].filter(([k]) => safeUrl(p.links?.[k]))
+      .map(([k, t]) => `<a class="btn" href="${esc(p.links[k])}" target="_blank" rel="noopener nofollow ugc">${t} ↗</a>`).join("");
+    const exp = (p.experience || []).map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.org || x.title))}</div><div><b>${esc(x.title)}</b>
+      <div class="sm">${esc([x.org, x.when].filter(Boolean).join(" · "))}</div>${x.desc ? `<p>${esc(x.desc)}</p>` : ""}</div></div>`).join("");
+    const proj = (p.projects || []).map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.name))}</div><div><b>${safeUrl(x.link) ? `<a href="${esc(x.link)}" target="_blank" rel="noopener nofollow ugc">${esc(x.name)} ↗</a>` : esc(x.name)}</b>
+      ${x.desc ? `<p>${esc(x.desc)}</p>` : ""}</div></div>`).join("");
+    return `
+      <section class="card hero"><div class="band"></div><div class="body">
+        <div class="avatar" aria-hidden="true">${esc(initials(p.name))}</div>
+        <h1>${esc(p.name || "Your name")}</h1>
+        ${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
+        <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}</div>
+        ${p.lookingFor ? `<div class="looking">Looking for: ${esc(p.lookingFor)}</div>` : ""}
+        <div class="btns">${resume ? `<a class="btn pri" href="${esc(resume)}" target="_blank" rel="noopener">View resume</a>` : isPreview && p.showResume ? `<span class="btn pri" title="Shows when your resume QR link is on">View resume</span>` : ""}${links}</div>
+      </div></section>
+      ${p.about ? `<section class="card"><h2>About</h2><p class="about">${esc(p.about)}</p></section>` : ""}
+      ${exp ? `<section class="card"><h2>Experience</h2>${exp}</section>` : ""}
+      ${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}
+      ${(p.skills || []).length ? `<section class="card"><h2>Skills</h2><div class="chips">${p.skills.map((s) => `<span class="chip">${esc(s)}</span>`).join("")}</div></section>` : ""}
+      <p class="small muted" style="text-align:center">Profile on <a href="/" style="color:var(--green-dark)">Beat the Pile</a>${isPreview ? "" : ` · <a href="#" id="rep" style="color:var(--muted)">Report this profile</a>`}</p>`;
+  }
+  async function showPublic(h){
+    document.querySelector("main").innerHTML = '<div class="card center muted">Loading…</div>';
+    let r; try { r = await fetch("/api/me?u=" + encodeURIComponent(h)); } catch { r = null; }
+    if (!r || r.status >= 500) { document.querySelector("main").innerHTML = '<div class="card center">Couldn’t load this profile right now. Try again in a minute.</div>'; return; }
+    if (r.status === 404) { document.querySelector("main").innerHTML = `<div class="card center"><h1 style="font-size:22px">No public profile here</h1><p class="muted">This student hasn't made a profile public, or the link changed.</p><a class="btn pri" href="/u/">Make your own profile</a></div>`; return; }
+    const d = await r.json();
+    document.title = (d.profile.name || "Profile") + " — Beat the Pile";
+    document.querySelector("main").innerHTML = profileHtml(d.profile, d.resume, false);
+    $("#rep")?.addEventListener("click", (e) => { e.preventDefault(); window.iqReport ? window.iqReport({ message: "Report profile /u/" + d.handle + "\n" }) : alert("Use the Feedback button to report."); });
+  }
+
+  // ── Editor (signed in) ──
+  async function token(){ try { return await S.clerk?.session?.getToken(); } catch { return null; } }
+  async function api(method, body){
+    const r = await fetch("/api/me", { method, headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) }, body: body ? JSON.stringify(body) : undefined });
+    const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Something went wrong"); return j;
+  }
+  const blank = () => ({ name: "", headline: "", school: "", major: "", gradYear: "", location: "", lookingFor: "", about: "", skills: [], experience: [], projects: [], links: {}, showResume: false });
+  function editor(){
+    const d = S.draft, me = S.me;
+    const field = (k, label, ph, attrs = "") => `<div><label for="f_${k}">${label}</label><input id="f_${k}" data-k="${k}" value="${esc(d.p[k] ?? "")}" placeholder="${esc(ph)}" ${attrs}></div>`;
+    const resumeOn = me.resume && me.resume.share;
+    app.className = "";
+    document.querySelector("main").innerHTML = `
+      <div class="tabs" role="group" aria-label="Profile view"><button data-tab="edit" aria-pressed="${S.tab === "edit"}">Edit</button><button data-tab="preview" aria-pressed="${S.tab === "preview"}">Preview</button></div>
+      ${S.tab === "preview" ? profileHtml(d.p, resumeOn && d.p.showResume ? "/r/" + me.resume.token : null, true) : `
+      <section class="card"><h2>Your link</h2>
+        <label for="f_handle">Profile address</label>
+        <div class="handle"><span>beatthepile.com/u/</span><input id="f_handle" value="${esc(d.handle)}" placeholder="adam-shiloni" autocomplete="off" spellcheck="false"></div>
+        <label class="switch"><input type="checkbox" id="f_public" ${d.pub ? "checked" : ""}><span><b>Public profile</b><br><span class="muted small">Off = only you can see it. On = anyone with the link (recruiters, friends) can view it. It's never listed or searchable.</span></span></label>
+        ${me.handle && me.profilePublic ? `<p class="small" style="margin:10px 0 0">Live at <a href="/u/${esc(me.handle)}" style="color:var(--green-dark)">beatthepile.com/u/${esc(me.handle)}</a></p>` : ""}
+      </section>
+      <section class="card"><h2>Basics</h2>
+        <div class="row">${field("name", "Name", "Adam Shiloni")}${field("headline", "Headline", "Mechanical engineering student · BOLT chassis team")}</div>
+        <div class="row">${field("school", "School", "Virginia Tech")}${field("major", "Major", "Mechanical Engineering")}</div>
+        <div class="row">${field("gradYear", "Graduation year", "2029", 'inputmode="numeric" maxlength="4"')}${field("location", "Location", "Blacksburg, VA")}</div>
+        ${field("lookingFor", "Looking for", "Summer 2027 mechanical engineering internship")}
+        <label for="f_about">About</label><textarea id="f_about" data-k="about" maxlength="1200" placeholder="A few sentences about what you build and what you want to learn.">${esc(d.p.about)}</textarea>
+      </section>
+      <section class="card"><h2>Experience</h2><div id="exp">${d.p.experience.map((x, i) => `
+        <div class="rep"><button class="rm" data-rm="experience" data-i="${i}">Remove</button>
+          <div class="row"><div><label>Role</label><input data-list="experience" data-i="${i}" data-f="title" value="${esc(x.title)}" placeholder="Engineering Intern"></div>
+          <div><label>Company / team</label><input data-list="experience" data-i="${i}" data-f="org" value="${esc(x.org)}" placeholder="Scheerer Bearing"></div></div>
+          <label>When</label><input data-list="experience" data-i="${i}" data-f="when" value="${esc(x.when)}" placeholder="Summer 2026">
+          <label>What you did</label><textarea data-list="experience" data-i="${i}" data-f="desc" maxlength="600">${esc(x.desc)}</textarea></div>`).join("")}</div>
+        ${d.p.experience.length < 10 ? `<button class="btn" data-add="experience" style="margin-top:12px">+ Add experience</button>` : ""}</section>
+      <section class="card"><h2>Projects</h2><div>${d.p.projects.map((x, i) => `
+        <div class="rep"><button class="rm" data-rm="projects" data-i="${i}">Remove</button>
+          <div class="row"><div><label>Project</label><input data-list="projects" data-i="${i}" data-f="name" value="${esc(x.name)}" placeholder="Electric motorcycle chassis"></div>
+          <div><label>Link (https://, optional)</label><input data-list="projects" data-i="${i}" data-f="link" value="${esc(x.link)}" placeholder="https://"></div></div>
+          <label>Description</label><textarea data-list="projects" data-i="${i}" data-f="desc" maxlength="600">${esc(x.desc)}</textarea></div>`).join("")}</div>
+        ${d.p.projects.length < 8 ? `<button class="btn" data-add="projects" style="margin-top:12px">+ Add project</button>` : ""}</section>
+      <section class="card"><h2>Skills</h2>
+        <div class="chips" id="chips">${d.p.skills.map((s, i) => `<span class="chip">${esc(s)} <button data-rmskill="${i}" aria-label="Remove ${esc(s)}" style="border:0;background:none;cursor:pointer;color:var(--muted);padding:0 0 0 4px">×</button></span>`).join("") || '<span class="muted small">None yet</span>'}</div>
+        <label for="f_skill">Add a skill</label><input id="f_skill" list="skilllist" placeholder="Start typing, e.g. SolidWorks, then Enter" ${d.p.skills.length >= 30 ? "disabled" : ""}>
+        <datalist id="skilllist">${SKILLS.filter((s) => !d.p.skills.includes(s)).map((s) => `<option value="${esc(s)}">`).join("")}</datalist>
+      </section>
+      <section class="card"><h2>Links</h2>
+        <div class="row"><div><label for="l_linkedin">LinkedIn</label><input id="l_linkedin" data-link="linkedin" value="${esc(d.p.links.linkedin || "")}" placeholder="https://linkedin.com/in/…"></div>
+        <div><label for="l_github">GitHub</label><input id="l_github" data-link="github" value="${esc(d.p.links.github || "")}" placeholder="https://github.com/…"></div></div>
+        <label for="l_portfolio">Portfolio / website</label><input id="l_portfolio" data-link="portfolio" value="${esc(d.p.links.portfolio || "")}" placeholder="https://">
+        <label class="switch"><input type="checkbox" id="f_resume" ${d.p.showResume ? "checked" : ""}><span><b>Show a "View resume" button</b><br><span class="muted small">${me.resume ? (me.resume.share ? "Uses your Career Fair resume link (on)." : "Your resume link is off — turn it on in <a href='/fair/' style='color:var(--green-dark)'>Career Fair Mode</a> for this to show.") : "Upload a resume in <a href='/fair/' style='color:var(--green-dark)'>Career Fair Mode</a> first."}</span></span></label>
+      </section>`}
+      <div class="bar"><button class="btn pri" id="save">Save profile</button>${me.handle && me.profilePublic ? `<a class="btn" href="/u/${esc(me.handle)}" target="_blank">Open public page ↗</a>` : ""}<span class="msg" id="msg" role="status"></span></div>`;
+    wire();
+  }
+  function wire(){
+    const d = S.draft, main = document.querySelector("main");
+    main.querySelectorAll("[data-tab]").forEach((b) => b.onclick = () => { S.tab = b.dataset.tab; editor(); });
+    main.querySelectorAll("[data-k]").forEach((el) => el.oninput = () => { d.p[el.dataset.k] = el.value; });
+    main.querySelectorAll("[data-list]").forEach((el) => el.oninput = () => { d.p[el.dataset.list][+el.dataset.i][el.dataset.f] = el.value; });
+    main.querySelectorAll("[data-link]").forEach((el) => el.oninput = () => { d.p.links[el.dataset.link] = el.value.trim(); });
+    main.querySelectorAll("[data-add]").forEach((b) => b.onclick = () => { d.p[b.dataset.add].push(b.dataset.add === "experience" ? { title: "", org: "", when: "", desc: "" } : { name: "", link: "", desc: "" }); editor(); });
+    main.querySelectorAll("[data-rm]").forEach((b) => b.onclick = () => { d.p[b.dataset.rm].splice(+b.dataset.i, 1); editor(); });
+    main.querySelectorAll("[data-rmskill]").forEach((b) => b.onclick = () => { d.p.skills.splice(+b.dataset.rmskill, 1); editor(); $("#f_skill")?.focus(); });
+    const sk = $("#f_skill");
+    if (sk) { const add = () => { const v = sk.value.trim().slice(0, 40); if (v && !d.p.skills.some((s) => s.toLowerCase() === v.toLowerCase()) && d.p.skills.length < 30) { d.p.skills.push(v); editor(); $("#f_skill")?.focus(); } };
+      sk.onkeydown = (e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); add(); } };
+      sk.onchange = () => { if (SKILLS.includes(sk.value.trim())) add(); }; }
+    const h = $("#f_handle"); if (h) h.oninput = () => { h.value = h.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").slice(0, 30); d.handle = h.value; };
+    const pub = $("#f_public"); if (pub) pub.onchange = () => { d.pub = pub.checked; };
+    const rs = $("#f_resume"); if (rs) rs.onchange = () => { d.p.showResume = rs.checked; };
+    $("#save").onclick = save;
+  }
+  async function save(){
+    const btn = $("#save"), msg = $("#msg"); btn.disabled = true; msg.className = "msg"; msg.textContent = "Saving…";
+    const bad = [...Object.values(S.draft.p.links), ...S.draft.p.projects.map((x) => x.link)].filter((u) => u && !/^https:\/\/[^\s]+\.[^\s]+/i.test(u));
+    if (bad.length) { msg.className = "msg err"; msg.textContent = "Links must start with https://"; btn.disabled = false; return; }
+    try {
+      const p = { ...S.draft.p, gradYear: S.draft.p.gradYear ? Number(S.draft.p.gradYear) : null };
+      S.me = await api("POST", { action: "profile", profile: p, handle: S.draft.handle.replace(/^-+|-+$/g, "") || null, public: S.draft.pub });
+      load(); editor(); const m = $("#msg"); m.className = "msg ok"; m.textContent = S.me.profilePublic ? "Saved — your page is live." : "Saved (private).";
+    } catch (e) { msg.className = "msg err"; msg.textContent = e.message; btn.disabled = false; }
+  }
+  function load(){
+    const p = { ...blank(), ...(S.me.profile || {}) };
+    p.links = { ...(p.links || {}) }; p.skills = [...(p.skills || [])];
+    p.experience = (p.experience || []).map((x) => ({ ...x })); p.projects = (p.projects || []).map((x) => ({ ...x }));
+    if (!p.name && S.user) p.name = [S.user.firstName, S.user.lastName].filter(Boolean).join(" ");
+    p.gradYear = p.gradYear || "";
+    S.draft = { p, handle: S.me.handle || "", pub: S.me.profilePublic };
+  }
+  async function onUser(u){
+    S.user = u || null;
+    if (!S.user) {
+      document.querySelector("main").innerHTML = `<div class="card center"><h1 style="font-size:24px">Your internship profile</h1>
+        <p class="muted" style="max-width:46ch;margin:6px auto 16px">One clean page with your experience, projects, skills and resume — share the link with recruiters. It stays private until you turn it on.</p>
+        <button class="btn pri" id="si">Sign in to build yours</button></div>`;
+      $("#si").onclick = () => S.clerk.openSignIn({}); return;
+    }
+    try { S.me = await api("GET"); load(); editor(); }
+    catch { document.querySelector("main").innerHTML = '<div class="card center">Couldn’t load your profile right now. Refresh in a minute.</div>'; }
+  }
+  async function loadClerk(){
+    try {
+      const pk = (await fetch("/api/config").then((r) => r.json())).clerkPublishableKey; if (!pk) throw 0;
+      if (!window.Clerk) {
+        const host = atob(pk.replace(/^pk_(test|live)_/, "")).replace(/\$$/, "").trim(); if (!/clerk/.test(host)) throw 0;
+        await new Promise((ok, bad) => { const s = document.createElement("script"); s.src = `https://${host}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`;
+          s.setAttribute("data-clerk-publishable-key", pk); s.async = true; s.crossOrigin = "anonymous"; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
+      }
+      if (typeof window.Clerk.load === "function" && !window.Clerk.loaded) await window.Clerk.load({});
+      S.clerk = window.Clerk;
+      let last = S.clerk.user?.id || null;
+      S.clerk.addListener?.(({ user }) => { const id = user?.id || null; if (id !== last) { last = id; onUser(user); } });
+      await onUser(S.clerk.user);
+    } catch { document.querySelector("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; }
+  }
+  const h = handleFromPath();
+  if (h) showPublic(h); else loadClerk();
+})();
+</script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

@@ -75,6 +75,12 @@
   label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin:12px 0 4px}
   input{width:100%;font:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:14px;font-weight:600;padding:10px 16px;border-radius:10px;z-index:60;max-width:90vw}
+  .fu h2{font-size:16px;margin:0}.fu h2 i{font-style:normal;background:var(--amber-light);color:var(--amber);border-radius:999px;padding:1px 8px;font-size:12.5px;margin-left:4px}
+  .fuhead{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:6px}.fuhead .muted{font-size:13px}
+  .furow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line);font-size:14.5px}
+  .furow .btn{flex-shrink:0}.muted{color:var(--muted)}
+  .remind{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.rbtns{display:flex;gap:8px;align-items:center}
+  .tog{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:600;cursor:pointer}.tog input{width:18px;height:18px;accent-color:var(--green)}
 </style>
 </head>
 <body>
@@ -184,7 +190,9 @@
     const appIds = new Set(st.apps.map((a) => a.id));
     const saved = (S.me.saved || []).filter((id) => !appIds.has(id)).map((id) => S.listings[id]).filter(Boolean);
     const savedLoading = (S.me.saved || []).some((id) => !appIds.has(id) && !S.listings[id]) && !S.listingsTried;
-    const stale = st.apps.filter((a) => a.stage === "applied" && daysAgo(a.appliedAt) >= 14);
+    // Same rule as the reminder emails (lib/followups.js): still "applied", 5–45 days ago, not marked followed-up
+    const stale = st.apps.filter((a) => a.stage === "applied" && !a.followedUpAt && daysAgo(a.appliedAt) >= 5 && daysAgo(a.appliedAt) <= 45)
+      .sort((a, b) => Date.parse(a.appliedAt) - Date.parse(b.appliedAt));
     const counts = { applied: st.apps.filter((a) => a.stage === "applied").length, interview: st.interview, offer: st.offer, rejected: st.rejected, saved: saved.length };
     const list = S.tab === "saved" ? saved : st.apps.filter((a) => a.stage === S.tab).sort((a, b) => Date.parse(b.appliedAt) - Date.parse(a.appliedAt));
     const left = Math.max(0, st.goal - st.week);
@@ -201,8 +209,13 @@
         <div class="stat early"><b>${st.speed == null ? "—" : st.speed < 1 ? "<1d" : st.speed.toFixed(1) + "d"}</b><span>${st.speed == null ? "apply speed (needs 2+ with a posting date)" : `avg. after posting · ${st.speeds} dated`}</span></div>
       </div>
       ${st.speed != null ? (st.speed <= 3 ? `<div class="nudge good"><span><b>Early bird.</b> You apply ${st.speed < 1 ? "the same day" : `about ${st.speed.toFixed(1)} days`} after a job posts, before most of the pile shows up.</span></div>`
-        : `<div class="nudge"><span>You apply about <b>${st.speed.toFixed(1)} days</b> after a job posts. Popular internships get 100+ applicants, so try to get in within 3 days. <a href="/radar/">Opening Radar</a> tells you when companies open.</span></div>`) : ""}
-      ${stale.slice(0, 3).map((a) => `<div class="nudge"><span><b>${esc(a.company)}</b>: applied ${daysAgo(a.appliedAt)} days ago with no update. A short follow-up email to the recruiter is fair game now.</span></div>`).join("")}
+        : `<div class="nudge"><span>You apply about <b>${st.speed.toFixed(1)} days</b> after a job posts. Popular postings fill fast, so try to get in within 3 days. <a href="/radar/">Opening Radar</a> tells you when companies open.</span></div>`) : ""}
+      ${stale.length ? `<section class="card fu"><div class="fuhead"><h2>Follow-ups due <i>${stale.length}</i></h2><span class="muted">Applied 5+ days ago, no update yet</span></div>
+        ${stale.slice(0, 6).map((a) => `<div class="furow" data-fu="${esc(a.id)}"><span><b>${esc(a.company)}</b> <span class="muted">· ${esc(a.title || "Internship")} · ${daysAgo(a.appliedAt)} days ago</span></span><button class="btn" data-fudone>I followed up</button></div>`).join("")}
+        ${stale.length > 6 ? `<p class="muted" style="margin:8px 0 0;font-size:13px">+${stale.length - 6} more in Applied</p>` : ""}
+        <p class="muted" style="margin:10px 0 0;font-size:13px">A short, polite email to the recruiter: thank them, restate the role, one line on why you fit.</p></section>` : ""}
+      <section class="card remind"><div><b>Email me when a follow-up is due</b><br><span class="muted" style="font-size:13.5px">${S.me.emailReady ? `At most one email every 3 days, to ${esc(S.user.primaryEmailAddress?.emailAddress || "your sign-in email")}. Unsubscribe anytime.` : "Coming soon — email reminders aren't switched on yet."}</span></div>
+        <div class="rbtns">${S.me.emailReady && S.me.remindEmail ? `<button class="btn ghost" id="rtest">Send me a test</button>` : ""}<label class="tog"><input type="checkbox" id="rtog" ${S.me.remindEmail ? "checked" : ""} ${S.me.emailReady ? "" : "disabled"}><span>${S.me.remindEmail ? "On" : "Off"}</span></label></div></section>
       <div class="tabs" role="group" aria-label="Pipeline">${[["applied", "Applied"], ["interview", "Interview"], ["offer", "Offer"], ["saved", "♡ Saved"], ["rejected", "Rejected"]]
         .map(([k, l]) => `<button data-tab="${k}" aria-pressed="${S.tab === k}">${l}<i>${counts[k]}</i></button>`).join("")}</div>
       <div id="list">${list.length ? (S.tab === "saved"
@@ -214,6 +227,9 @@
       <p style="font-size:12.5px;color:var(--muted);margin:22px 0 0">Your data: <a href="/privacy/">what we store</a> · <button class="btn ghost" id="delAll" style="font-size:12.5px;padding:4px 8px">Delete all my data</button></p>`;
   }
 
+  $("#app").addEventListener("change", (e) => {
+    if (e.target.id === "rtog") act({ action: "remind", on: e.target.checked }, e.target.checked ? "Reminders on. We'll email you when a follow-up is due" : "Reminder emails off");
+  });
   async function act(body, msg){ try { S.me = await api("POST", body); if (msg) toast(msg); } catch (e) { toast(e.message); } render(); }
   $("#app").addEventListener("click", (e) => {
     const g = e.target.closest("[data-goal]"); if (g) return act({ action: "goal", goal: +g.dataset.goal }, `Goal set: ${g.dataset.goal} a week`);
@@ -224,6 +240,9 @@
       return api("POST", { action: "delete_all", confirm: "DELETE" }).then(() => { toast("All your data is deleted"); S.me = { apps: [], saved: [], applied: [], notes: [], starred: [] }; render(); })
         .catch((err) => toast(err.message));
     }
+    const fu = e.target.closest("[data-fudone]");
+    if (fu) { const a = (S.me.apps || []).find((x) => x.id === fu.closest("[data-fu]").dataset.fu); if (a) return act({ action: "app", app: { ...a, followedUpAt: new Date().toISOString() } }, `Nice. No more reminders for ${a.company}`); }
+    if (e.target.closest("#rtest")) { e.target.disabled = true; return api("POST", { action: "remind_test" }).then((r) => toast(`Test sent to ${r.to}`)).catch((err) => toast(err.message)).finally(() => { e.target.disabled = false; }); }
     const card = e.target.closest(".app"); if (!card) return;
     if (card.dataset.lid && e.target.closest("[data-applied]")) {
       const l = S.listings[card.dataset.lid];

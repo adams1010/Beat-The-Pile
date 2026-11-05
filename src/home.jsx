@@ -4388,6 +4388,12 @@ Thank you for your time,
           {isPro?<span style={{background:GL,color:GD,border:`1px solid ${GM}`,padding:"6px 16px",borderRadius:99,fontSize:13,fontWeight:700}}>Pro Active</span>
           :<button onClick={()=>setShowProModal(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"9px 20px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Upgrade to Pro</button>}
         </div>
+        {clerkUser?(
+          <a href="/season/" style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,background:"#fff",border:"1px solid #E3E7ED",borderRadius:var_rl,padding:"12px 16px",marginBottom:14,textDecoration:"none",color:"#0B1220"}}>
+            <span style={{fontSize:13.5,lineHeight:1.45}}><strong>This tracker is part of My Season.</strong> <span style={{color:"#5B6675"}}>Everything here also shows there, with jobs you marked applied, follow-ups due and email reminders.</span></span>
+            <span style={{fontSize:13.5,fontWeight:650,color:GD,whiteSpace:"nowrap"}}>Open My Season →</span>
+          </a>
+        ):null}
         <FollowUpsDueBanner/>
         {/* Sign-in necessity note — clear without being annoying. Only shows when not signed in AND user has data they'd lose. */}
         {!clerkUser&&(tracked.length>0||(profile.resumes||[]).length>0)&&(

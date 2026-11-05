@@ -17,6 +17,10 @@
 //   POST /api/me { action:"app", app }              → add/update an application on My Season (stage, dates)
 //   POST /api/me { action:"app_delete", id }
 //   POST /api/me { action:"goal", goal }            → weekly application goal
+//   POST /api/me { action:"profile", profile, handle, public } → your profile (public page /u/<handle> only if public:true)
+//   POST /api/me { action:"remind", on }            → email me when a follow-up is due (needs RESEND_API_KEY on the server)
+//   GET  /api/me?u=<handle>  (no sign-in)          → a PUBLIC profile (404 unless the student turned it on)
+//   GET  /api/me?unsub=<token> (no sign-in)        → one-click unsubscribe from reminder emails
 //   GET  /api/me?r=<token>   (no sign-in)          → the QR target: redirects to the resume if sharing is on
 //                                                    (vercel.json maps /r/<token> here)
 // Requires a genuine Clerk session token (signature-checked in lib/auth.js) for everything except ?r=.
@@ -27,6 +31,10 @@ import { db } from "../lib/db.js";
 import { callClaude, rateOk, AIError } from "../lib/aiusage.js";
 import { mutate, loadRow, Conflict } from "../lib/userdata.js";
 import { postedInfo } from "../lib/dates.js";
+import { isAuthorizedCron } from "../lib/db.js";
+import { runReminders, emailFor, sendEmail, buildEmail } from "../lib/remind.js";
+import { dueFollowUps } from "../lib/followups.js";
+import { botOn, logRun } from "../lib/bots.js";
 
 const LISTS = ["saved", "applied"];
 const MAX = 500;
@@ -51,6 +59,7 @@ function cleanApp(a) {
     postedAt: iso(a?.postedAt),                                    // the employer's posting date (null if unknown)
     postedEstimate: a?.postedEstimate === true,                    // true = worked out from "posted N days ago"
     firstSeenAt: iso(a?.firstSeenAt),                              // when our robot first saw it on their board
+    followedUpAt: iso(a?.followedUpAt),                            // student said they followed up (stops reminders)
     updatedAt: new Date().toISOString(),
   };
 }
@@ -152,6 +161,48 @@ function publicResume(row) {
   return { name: row.resume_name || "resume.pdf", token: row.resume_token, share: row.resume_share === true, uploadedAt: row.resume_uploaded_at };
 }
 
+// ── Profiles ──
+const HANDLE_OK = /^[a-z0-9](?:[a-z0-9-]{1,28})[a-z0-9]$/;
+const RESERVED = new Set(["admin", "api", "bots", "discovery", "jobs", "fair", "season", "radar", "demo", "privacy", "edit", "me", "new", "settings", "help", "support", "beatthepile", "beat-the-pile", "staff", "team", "official", "recruiter", "employer"]);
+const httpsUrl = (v) => { try { const u = new URL(String(v || "").trim()); return u.protocol === "https:" && u.hostname.includes(".") ? u.toString().slice(0, 300) : ""; } catch { return ""; } };
+const txt = (v, n) => clean(v, n);
+function cleanProfile(p) {
+  p = p && typeof p === "object" ? p : {};
+  const arr = (a, n) => (Array.isArray(a) ? a : []).slice(0, n);
+  const year = Number(p.gradYear); 
+  return {
+    name: txt(p.name, 80), headline: txt(p.headline, 140), school: txt(p.school, 100), major: txt(p.major, 80),
+    gradYear: Number.isInteger(year) && year >= 2020 && year <= 2040 ? year : null,
+    location: txt(p.location, 80), lookingFor: txt(p.lookingFor, 140), about: txt(p.about, 1200),
+    skills: [...new Set(arr(p.skills, 30).map((x) => txt(x, 40)).filter(Boolean))],
+    experience: arr(p.experience, 10).map((x) => ({ title: txt(x?.title, 100), org: txt(x?.org, 100), when: txt(x?.when, 40), desc: txt(x?.desc, 600) })).filter((x) => x.title || x.org),
+    projects: arr(p.projects, 8).map((x) => ({ name: txt(x?.name, 100), desc: txt(x?.desc, 600), link: httpsUrl(x?.link) })).filter((x) => x.name),
+    links: { linkedin: httpsUrl(p.links?.linkedin), github: httpsUrl(p.links?.github), portfolio: httpsUrl(p.links?.portfolio) },
+    showResume: p.showResume === true,
+  };
+}
+async function publicProfile(req, res) {
+  const h = String(req.query.u || "").toLowerCase();
+  if (!HANDLE_OK.test(h)) return res.status(404).json({ error: "No profile here" });
+  const rows = await db.selectAsAdmin(`user_jobs?select=profile,handle,profile_public,resume_token,resume_share,resume_path&handle=eq.${encodeURIComponent(h)}&limit=1`);
+  const r = rows[0];
+  if (!r || r.profile_public !== true || !r.profile) return res.status(404).json({ error: "No profile here" });
+  const p = cleanProfile(r.profile);          // re-cleaned on the way out, too
+  const resume = p.showResume && r.resume_path && r.resume_share === true && r.resume_token ? `/r/${r.resume_token}` : null;
+  delete p.showResume;
+  res.setHeader("Cache-Control", "public, max-age=60");
+  return res.status(200).json({ handle: r.handle, profile: p, resume });
+}
+async function unsubscribe(req, res) {
+  const t = String(req.query.unsub || "");
+  res.setHeader("Content-Type", "text/html; charset=utf-8");
+  if (TOKEN_OK.test(t)) await db.updateReturning(`user_jobs?remind_unsub=eq.${encodeURIComponent(t)}`, { remind_email: false });
+  return res.status(200).send(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Unsubscribed</title>
+<body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;display:grid;place-items:center;min-height:90vh;margin:0;background:#FBFBFC;color:#0B1220">
+<div style="text-align:center;padding:24px"><div style="color:#0E8A5F;font-weight:700">Beat the Pile</div><h1 style="font-size:22px">You're unsubscribed</h1>
+<p style="color:#5B6675">No more follow-up reminder emails. Turn them back on anytime in <a href="/season/" style="color:#0B6E4B">My Season</a>.</p></div>`);
+}
+
 async function resumeRedirect(req, res) {
   const t = String(req.query?.r || "");
   const notShared = () => {
@@ -176,6 +227,21 @@ export default async function handler(req, res) {
   if (req.method === "GET" && req.query?.r !== undefined) {
     try { return await resumeRedirect(req, res); } catch { return res.status(503).send("Resume temporarily unavailable"); }
   }
+  if (req.method === "GET" && req.query?.u !== undefined) {
+    try { return await publicProfile(req, res); } catch { return res.status(503).json({ error: "Profiles are temporarily unavailable" }); }
+  }
+  if (req.query?.cron === "remind") {             // daily Vercel cron (vercel.json: /api/remind → here)
+    if (!isAuthorizedCron(req)) return res.status(401).json({ error: "cron only" });
+    if (!(await botOn("remind"))) { await logRun("remind", true, "Switched off"); return res.status(200).json({ off: true }); }
+    try {
+      const st = await runReminders();
+      await logRun("remind", !st.failed, st.skipped ? "Waiting for RESEND_API_KEY" : `Sent ${st.sent} reminder email${st.sent === 1 ? "" : "s"} · ${st.optedIn} opted in · ${st.due} with follow-ups due`, st);
+      return res.status(200).json(st);
+    } catch (e) { await logRun("remind", false, "Run failed: " + String(e.message).slice(0, 120)); return res.status(500).json({ error: "reminder run failed" }); }
+  }
+  if ((req.method === "GET" || req.method === "POST") && req.query?.unsub !== undefined) {
+    try { return await unsubscribe(req, res); } catch { return res.status(503).send("Try again in a minute"); }
+  }
 
   let uid;
   try { uid = await verifyClerkJWT(bearer(req)); }
@@ -183,7 +249,9 @@ export default async function handler(req, res) {
   if (!uid) return res.status(401).json({ error: "Not signed in" });
 
   const view = (row) => ({ saved: row?.saved || [], applied: row?.applied || [], resume: publicResume(row), notes: row?.fair_notes || [],
-                            starred: row?.starred || [], seenAt: row?.seen_at || null, apps: row?.apps || [], goal: row?.weekly_goal ?? null });
+                            starred: row?.starred || [], seenAt: row?.seen_at || null, apps: row?.apps || [], goal: row?.weekly_goal ?? null,
+                            profile: row?.profile || null, handle: row?.handle || null, profilePublic: row?.profile_public === true,
+                            remindEmail: row?.remind_email === true, emailReady: !!process.env.RESEND_API_KEY });
   const send = (out) => out.error ? res.status(out.status || 400).json({ error: out.error }) : res.status(200).json(view(out.row));
   const stop = (error, status = 400) => ({ error, status });
 
@@ -234,6 +302,40 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, deleted: true });
     }
 
+    // ── Profile (LinkedIn-style page at /u/<handle>, private until the student turns it on) ──
+    if (action === "profile") {
+      const profile = cleanProfile(body.profile);
+      const pub = body.public === true;
+      const handle = body.handle == null || body.handle === "" ? null : String(body.handle).trim().toLowerCase();
+      if (handle !== null && (!HANDLE_OK.test(handle) || RESERVED.has(handle))) return res.status(400).json({ error: "Pick a link name: 3–30 letters, numbers or dashes" });
+      if (pub && !handle) return res.status(400).json({ error: "Pick a link name before making your profile public" });
+      if (pub && !profile.name) return res.status(400).json({ error: "Add your name before making your profile public" });
+      if (handle) {
+        const taken = await db.selectAsAdmin(`user_jobs?select=clerk_user_id&handle=eq.${encodeURIComponent(handle)}&limit=1`);
+        if (taken[0] && taken[0].clerk_user_id !== uid) return res.status(409).json({ error: "That link name is taken — try another" });
+      }
+      try { return send(await mutate(uid, () => ({ profile, handle, profile_public: pub }))); }
+      catch (e) { if (/23505|duplicate key/i.test(String(e?.message))) return res.status(409).json({ error: "That link name is taken — try another" }); throw e; }
+    }
+    if (action === "remind_test") {            // send yourself one sample reminder (3 a day)
+      if (!process.env.RESEND_API_KEY) return res.status(400).json({ error: "Email reminders aren't switched on yet" });
+      if (!(await rateOk(`remind-test:${uid}`, 86400, 3))) return res.status(429).json({ error: "That's enough test emails for today" });
+      const row = await mutate(uid, (r) => ({ remind_unsub: r.remind_unsub || crypto.randomBytes(18).toString("base64url") }));
+      const to = await emailFor(uid);
+      if (!to) return res.status(400).json({ error: "Your account has no verified email address" });
+      const due = dueFollowUps(row.row.apps);
+      const sample = due.length ? due : [{ company: "Example Company", title: "Example — Mechanical Engineering Intern", appliedAt: new Date(Date.now() - 6 * 864e5).toISOString() }];
+      const mail = buildEmail(sample, row.row.remind_unsub);
+      if (!due.length) mail.subject = "Test: this is what a follow-up reminder looks like";
+      await sendEmail(to, mail);
+      return res.status(200).json({ ok: true, to: to.replace(/^(.).*(@.*)$/, "$1…$2") });
+    }
+    if (action === "remind") {
+      const on = body.on === true;
+      if (on && !process.env.RESEND_API_KEY) return res.status(400).json({ error: "Email reminders aren't switched on yet — check back soon" });
+      return send(await mutate(uid, (row) => ({ remind_email: on, remind_unsub: row.remind_unsub || crypto.randomBytes(18).toString("base64url") })));
+    }
+
     // ── Follow companies (fair game plan + alerts) ──
     if (action === "star") {
       const co = String(body.company || "");
@@ -261,7 +363,8 @@ export default async function handler(req, res) {
           const i = apps.findIndex((x) => x.id === incoming.id);
           if (i >= 0) apps[i] = { ...apps[i], ...incoming, appliedAt: body.app?.appliedAt ? incoming.appliedAt : apps[i].appliedAt,
                                   postedAt: incoming.postedAt || apps[i].postedAt, firstSeenAt: incoming.firstSeenAt || apps[i].firstSeenAt,
-                                  postedEstimate: incoming.postedAt ? incoming.postedEstimate : apps[i].postedEstimate };
+                                  postedEstimate: incoming.postedAt ? incoming.postedEstimate : apps[i].postedEstimate,
+                                  followedUpAt: body.app && "followedUpAt" in body.app ? incoming.followedUpAt : apps[i].followedUpAt || null };
           else apps.unshift(incoming);
           if (apps.length > MAX_APPS) return stop(`Up to ${MAX_APPS} applications`);
         }

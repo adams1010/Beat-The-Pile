@@ -78,6 +78,8 @@ export function installFake({ jwk, anthropic, clerkUsers = {} } = {}) {
     if (u.startsWith("https://api.clerk.com/v1/jwks")) return resp(200, { keys: jwk ? [jwk] : [] });
     if (u.startsWith("https://api.clerk.com/v1/users/")) { const id = decodeURIComponent(u.split("/").pop()); const em = clerkUsers[id];
       return em ? resp(200, { email_addresses: [{ email_address: em, verification: { status: "verified" } }] }) : resp(404, {}); }
+    if (u.startsWith("https://api.resend.com/emails")) { calls.emails = calls.emails || []; const b = JSON.parse(o.body); calls.emails.push(b);
+      return calls.resendFail ? resp(500, {}) : resp(200, { id: "em_" + calls.emails.length }); }
     if (u.includes("api.anthropic.com")) { calls.anthropic++; const body = JSON.parse(o.body); calls.prompts.push(body.messages[0].content);
       const out = anthropic ? await anthropic(body) : { text: "ok" };
       if (out.status && out.status >= 300) return resp(out.status, { error: { message: "nope" } });

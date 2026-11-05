@@ -101,6 +101,9 @@
   .card.closed{opacity:.6}
   .tag.closed{background:#F1F5F9;color:#475569}
   .alert{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#FFF7E6;border:1px solid #FCD9A5;color:#92400E;border-radius:12px;padding:12px 14px;margin:0 0 12px;font-weight:700;font-size:14px;cursor:pointer;width:100%;font-family:inherit;text-align:left}
+  .sites{margin-top:6px;font-size:13px}.sites summary{cursor:pointer;color:var(--green-dark,#0B6E4B);font-weight:600}
+  .sites ul{margin:6px 0 0;padding-left:18px;max-height:220px;overflow:auto;columns:2;column-gap:18px}.sites li{break-inside:avoid;margin:2px 0}
+  @media(max-width:560px){.sites ul{columns:1}}
 </style>
 </head>
 <body>
@@ -253,13 +256,15 @@
     const fresh = state.all.filter(newForMe).length;
     $("followN").textContent = state.mine.starred.size ? `(${state.mine.starred.size})` : "";
     $("alert").innerHTML = fresh && !state.followOnly ? `<button class="alert" id="alertBtn"><span>${fresh} new internship${fresh > 1 ? "s" : ""} from companies you follow</span><span>See →</span></button>` : "";
-    const nationwide = new Set(state.all.filter(matches).map((j) => (j.company + "|" + j.title + "|" + j.location).toLowerCase())).size;
+    const nationwide = new Set(state.all.filter(matches).map((j) => (j.company + "|" + niceTitle(j.title)).toLowerCase().replace(/\s+/g, " "))).size;
 
-    // Merge identical postings (same company + title + place) into one card: "2 openings"
+    // Same company + same title = one card. Different places become "N locations" with a list of each one's own link.
     const groups = new Map();
     for (const j of filtered) {
-      const k = (j.company + "|" + j.title + "|" + cleanLocation(j)).toLowerCase();
-      if (groups.has(k)) { const g = groups.get(k); g.count++; g.ids.push(j.id); } else groups.set(k, { ...j, count: 1, ids: [j.id] });
+      const k = (j.company + "|" + niceTitle(j.title)).toLowerCase().replace(/\s+/g, " ");
+      const site = { id: j.id, loc: cleanLocation(j), url: j.url };
+      if (groups.has(k)) { const g = groups.get(k); g.count++; g.ids.push(j.id); if (!g.sites.some((x) => x.loc === site.loc)) g.sites.push(site); }
+      else groups.set(k, { ...j, count: 1, ids: [j.id], sites: [site] });
     }
     const rows = [...groups.values()];
     const has = (list, j) => j.ids.some((id) => state.mine[list].has(id));
@@ -295,8 +300,9 @@
       <article class="card${has("applied", j) ? " applied" : ""}${j.closed ? " closed" : ""}">
         <div>
           <div class="co">${esc(j.company)}${j.company_id ? `<button class="follow" data-co="${esc(j.company_id)}" aria-pressed="${followed(j)}">${followed(j) ? "★ Following" : "☆ Follow"}</button>` : ""}</div>
-          <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">NEW</span>' : ""}${j.match === "me" ? '<span class="tag me">ME</span>' : ""}${j.count > 1 ? `<span class="tag multi">${j.count} openings</span>` : ""}${j.closed ? '<span class="tag closed">Closed — taken down by the company</span>' : ""}</div>
-          <div class="meta"><span>${esc(cleanLocation(j))}</span>${seasonOf(j.title) ? `<span>${esc(seasonOf(j.title))}</span>` : ""}${needsClearance(j.title) ? `<span>🇺🇸 US citizens / clearance</span>` : ""}<span>${esc(postedText(j))}</span></div>
+          <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">NEW</span>' : ""}${j.match === "me" ? '<span class="tag me">ME</span>' : ""}${j.sites.length > 1 ? `<span class="tag multi">${j.sites.length} locations</span>` : j.count > 1 ? `<span class="tag multi">${j.count} openings</span>` : ""}${j.closed ? '<span class="tag closed">Closed — taken down by the company</span>' : ""}</div>
+          <div class="meta"><span>${esc(j.sites[0].loc)}${j.sites.length > 1 ? ` +${j.sites.length - 1} more` : ""}</span>${seasonOf(j.title) ? `<span>${esc(seasonOf(j.title))}</span>` : ""}${needsClearance(j.title) ? `<span>US citizens / clearance</span>` : ""}<span>${esc(postedText(j))}</span></div>
+          ${j.sites.length > 1 ? `<details class="sites"><summary>All ${j.sites.length} locations</summary><ul>${j.sites.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.loc)}</a></li>`).join("")}</ul></details>` : ""}
         </div>
         <div class="applycol">
           ${j.closed ? "" : `<a class="apply" href="${esc(j.url)}" target="_blank" rel="noopener" data-co="${esc(j.company)}">Apply →</a>`}

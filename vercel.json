@@ -199,12 +199,24 @@
     {
       "path": "/api/check-links",
       "schedule": "45 21 * * *"
+    },
+    {
+      "path": "/api/remind",
+      "schedule": "20 13 * * *"
     }
   ],
   "rewrites": [
     {
       "source": "/r/:token",
       "destination": "/api/me?r=:token"
+    },
+    {
+      "source": "/u/:handle",
+      "destination": "/u/index.html"
+    },
+    {
+      "source": "/api/remind",
+      "destination": "/api/me?cron=remind"
     }
   ]
 }

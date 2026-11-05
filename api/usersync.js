@@ -46,7 +46,7 @@ export function trackerToApps(tracker) {
     const at = new Date(t.appliedAt || t.date || Date.now());
     out.push({ id, company: String(t.company).slice(0, 100), title: String(t.role || "Intern").slice(0, 160), url: null, stage,
                appliedAt: isNaN(at) ? new Date().toISOString() : at.toISOString(), postedAt: null, firstSeenAt: null, postedEstimate: false,
-               source: "home", updatedAt: new Date().toISOString() });
+               source: "home", updatedAt: new Date().toISOString(), ...(t.followedUp ? { _fu: true } : {}) });
   }
   return out;
 }
@@ -55,7 +55,11 @@ async function mirrorToSeason(uid, tracker) {
   await mutate(uid, (row) => {
     const others = (Array.isArray(row.apps) ? row.apps : []).filter((a) => !String(a.id).startsWith("h:"));
     const kept = new Map((row.apps || []).filter((a) => String(a.id).startsWith("h:")).map((a) => [a.id, a]));
-    const apps = [...others, ...fromHome.map((a) => ({ ...kept.get(a.id), ...a }))];
+    const apps = [...others, ...fromHome.map((a) => {
+      const m = { ...kept.get(a.id), ...a };            // keeps My Season-only fields (like followedUpAt) across syncs
+      if (m._fu && !m.followedUpAt) m.followedUpAt = new Date().toISOString();   // "Followed up" on the homepage tracker counts too
+      delete m._fu; return m;
+    })];
     return { apps: apps.slice(0, 500) };
   });
 }
