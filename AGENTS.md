@@ -113,13 +113,17 @@ own domain, `/api/jobs`) · ashby · smartrecruiters · oracle · **eightfold** 
 parked companies) → if links can't be checked like a web page, add it to the skip list in `api/check-links.js` →
 test offline in `tests/` and against real sites with `probe.yml` on a branch.
 
-## All majors (ready, not switched on)
-Every US internship is now stored with `field` (`lib/fields.js`: mechanical, electrical, civil, chemical, software,
-data, cyber_it, industrial, finance, consulting, marketing, sales, product_design, supply_chain, science_health,
-people_hr, legal_policy, engineering, other). `match` stays the engineering view (`me` / `general` / null).
-`GET /api/listings` defaults to engineering (`match` not null); `?field=all` or `?field=finance` etc. returns other
-majors. **To launch all majors:** add a major picker to `/jobs` (and `/fair`) that passes `field`, update copy
-("mechanical engineering internships…"), and extend `/radar` + Board Scout priorities if the focus changes.
+## All majors (LIVE since Nov 5 2026)
+Every US internship is stored with `field` (`lib/fields.js`, first-match-wins rules: software, data, product_design (PM),
+cyber_it, mechanical, electrical, chemical, civil, product_design (design), industrial, finance, legal_policy, people_hr,
+consulting, marketing, sales, supply_chain, science_health, education_social, engineering, other). `match` stays the
+engineering view (`me` / `general` / null). **Any rule change must keep `tests/fields-test.mjs` green** (≈200 real
+hand-labeled titles) — check moves against a live sample before shipping. Quiz majors → fields: `lib/geo.js
+fieldsForMajor` (tested for all 110 quiz majors). `/api/listings` default = engineering view; `field=all|<key>`;
+`names=1` = companies hiring now (Radar). `/jobs` has a Major picker (`?major=`, remembered in localStorage
+`btp_major`, shared with `/fair`) and loads one major + place at a time in pages of 1,000 (all majors in one response
+would hit Vercel's 4.5 MB cap). Bots: finder/scout priority = number of internships (+ small engineering boost);
+nightly SimplifyJobs import takes every major; Radar keeps any company with 5+ postings and 2+ seasons (or tracked).
 
 ## Data model (Supabase)
 `company_candidates` (robot queue + results: status, ats, config, hint, priority, detail) · `listings` (match, field,
