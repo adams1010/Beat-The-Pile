@@ -12,7 +12,7 @@ import BACKLOG from "../data/backlog.json" with { type: "json" };
 
 export const config = { maxDuration: 60 };
 
-const PER_RUN = 36;               // most queued companies now come with a board link, so each check is quick
+const PER_RUN = 60;               // most checks finish in a few seconds (queued companies come with a board link)
 const START_BUDGET_MS = 22000;   // don't start a company after this
 const HARD_STOP_MS = 50000;      // give up on any company still running (Vercel kills the function at 60s)
 const READERS_UPDATED_AT = "2026-11-02T22:00:00Z";   // bump when a new reader ships → re-test companies parked before it
@@ -100,7 +100,7 @@ export default async function handler(req, res) {
   );
 
   if (mark("select")) return res.status(200).json({ marks, rows: rows.length });
-  const results = await mapLimit(rows, 8, async (c) => {
+  const results = await mapLimit(rows, 12, async (c) => {
     if (Date.now() - t0 > START_BUDGET_MS) return { id: c.id, skipped: true };
     let r;
     // Each company gets ~25s of its own (never past the hard stop), so slow careers sites can't sink the whole run
@@ -147,7 +147,7 @@ export default async function handler(req, res) {
 }
 
 // ── Backlog refill ──
-const REFILL_BELOW = PER_RUN * 2, REFILL_SIZE = 30;
+const REFILL_BELOW = PER_RUN * 2, REFILL_SIZE = 60;
 const slug = (s) => String(s).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
 export async function refillFromBacklog() {
   const pending = await db.selectAsAdmin(`company_candidates?select=id&status=eq.pending&limit=${REFILL_BELOW}`);

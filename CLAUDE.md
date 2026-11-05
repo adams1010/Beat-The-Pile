@@ -90,7 +90,7 @@ with the CRON_SECRET. To add a bot: add it to `BOTS` in `lib/bots.js`, check the
    SmartRecruiters, iCIMS) → probes the ones we don't track for US internships → real employer name from the board →
    `POST /api/discovery {action:"scout"}` inserts candidates (`id b-…`, `hint` = board URL, `priority`).
 2. **Backlog** (`data/backlog.json`, 3,000+ companies from 3 years of SimplifyJobs history; rebuild with
-   `scripts/build-backlog.mjs`). The finder pulls 30 more whenever <48 are queued.
+   `scripts/build-backlog.mjs`). The finder pulls 60 more whenever <120 are queued; it checks up to 60 per run, 12 at once.
 3. **Nightly SimplifyJobs import**, **career-fair lists** (`fair/fairs.json`, `lib/candidates.js`), **links pasted on /discovery**.
 4. The **Company Finder** takes the queue by `priority desc` (ME-heavy ~60–95, other engineering ~20–40, other majors
    <20), finds each company's board (or uses the hint), and **proves** it's theirs before enabling it.
