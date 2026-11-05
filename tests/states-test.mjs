@@ -11,6 +11,11 @@ const cases = [
  ["https://jobs.volvogroup.com/job/Macungie-Intern-Ops-PA-18062/1367923755/",["PA"]],
  ["Murrysville, Pennsylvania, United States",["PA"]],["Spring House, Pennsylvania, United States of America",["PA"]],
  ["Indianapolis, IN",["IN"]],["Portland, OR",["OR"]],["Lynchburg, VA, US",["VA"]],
+ ["Milton, Ontario, CA",[]],["Calgary, AB, CA",[]],["Montreal, QC, CA",[]],["Toronto, ON, CA",[]],
+ ["CA | ON | Toronto - 380 Wellington Street West",[]],["CA | BC | Vancouver - 200 Granville Street",[]],
+ ["US | IL | Chicago - 8755 West Higgins Road",["IL"]],["Philly - Ontario, CA",["CA"]],["Ontario, California",["CA"]],
+ ["Los Angeles, CA (On-site)",["CA"]],["Vancouver, WA | Portland, OR",["WA","OR"]],
 ];
 let bad=0; for (const [s,w] of cases){ const g=extractStates(s); try{assert.deepEqual(g,w)}catch{bad++;console.log("✗",s,"→",g,"want",w)} }
+if (bad) process.exitCode = 1;
 console.log(bad?`${bad} bad`:`states: all ${cases.length} formats ✓`);
