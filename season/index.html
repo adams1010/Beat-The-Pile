@@ -10,9 +10,9 @@
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="theme-color" content="#0A1628">
 <style>
-  :root{--green:#00C285;--green-dark:#009E6C;--green-light:#E6FBF4;--navy:#0A1628;--ink:#1E293B;--muted:#64748B;--faint:#94A3B8;
-        --bg:#F8FFFE;--line:#E2EEEA;--amber:#B45309;--amber-light:#FFF4E6;--blue:#1D4ED8;--blue-light:#EFF6FF;--violet:#6D28D9;--violet-light:#F5F3FF;--red:#B91C1C;--red-light:#FEF2F2;
-        --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  :root{--green:#0E8A5F;--green-dark:#0B6E4B;--green-light:#EEF6F2;--navy:#0B1220;--ink:#1A2230;--muted:#64748B;--faint:#94A3B8;
+        --bg:#FBFBFC;--line:#E3E7ED;--amber:#B45309;--amber-light:#FFF4E6;--blue:#1D4ED8;--blue-light:#EFF6FF;--violet:#6D28D9;--violet-light:#F5F3FF;--red:#B91C1C;--red-light:#FEF2F2;
+        --font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
   a{color:inherit}
@@ -82,7 +82,7 @@
 <header>
   <div class="wrap">
     <div class="top"><span class="brand">My Season</span><div class="acct" id="acct"></div></div>
-    <h1>📈 My Season</h1>
+    <h1>My Season</h1>
     <p class="sub">Every application, where it stands, and how you're pacing. Applications you track on the homepage show up here too.</p>
   </div>
 </header>
@@ -151,7 +151,7 @@
 
   function ring(v, goal){
     const p = Math.min(1, v / goal), C = 2 * Math.PI * 50;
-    return `<div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#E2EEEA" stroke-width="12"/><circle cx="60" cy="60" r="50" fill="none" stroke="${p >= 1 ? "#00C285" : "#0A1628"}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - p)}"/></svg>
+    return `<div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#E2EEEA" stroke-width="12"/><circle cx="60" cy="60" r="50" fill="none" stroke="${p >= 1 ? "#0E8A5F" : "#0A1628"}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - p)}"/></svg>
       <div class="c"><div><b>${v}/${goal}</b><small>this week</small></div></div></div>`;
   }
 
@@ -161,14 +161,14 @@
     const speed = p ? Math.max(0, Math.round((Date.parse(a.appliedAt) - Date.parse(p)) / DAY)) : null;
     const found = !p && f ? Math.max(0, Math.round((Date.parse(a.appliedAt) - Date.parse(f)) / DAY)) : null;
     const acts = {
-      applied: `<button class="btn int" data-stage="interview">🎤 Got an interview</button><button class="btn off" data-stage="offer">🎉 Offer</button><button class="btn ghost" data-stage="rejected">Rejected</button>`,
-      interview: `<button class="btn off" data-stage="offer">🎉 Offer</button><button class="btn ghost" data-stage="rejected">Rejected</button><button class="btn ghost" data-stage="applied">Back to applied</button>`,
+      applied: `<button class="btn int" data-stage="interview">Got an interview</button><button class="btn off" data-stage="offer">Offer</button><button class="btn ghost" data-stage="rejected">Rejected</button>`,
+      interview: `<button class="btn off" data-stage="offer">Offer</button><button class="btn ghost" data-stage="rejected">Rejected</button><button class="btn ghost" data-stage="applied">Back to applied</button>`,
       offer: `<button class="btn ghost" data-stage="interview">Back to interview</button>`,
       rejected: `<button class="btn ghost" data-stage="applied">Undo</button>`,
     }[a.stage] || "";
     return `<div class="app ${esc(a.stage)}" data-id="${esc(a.id)}">
       <div class="co">${esc(a.company)}</div><div class="ti">${esc(a.title || "Internship")}</div>
-      <div class="meta"><span>Applied ${esc(fmt(a.appliedAt))} · ${d === 0 ? "today" : d + "d ago"}</span>${speed != null ? `<span title="${est ? "Estimated from the board's “posted N days ago” text" : "From the employer's posting date"}">${speed <= 3 ? "🐦 " : ""}${est ? "~" : ""}${speed === 0 ? "same day it posted" : speed + "d after it posted"}</span>`
+      <div class="meta"><span>Applied ${esc(fmt(a.appliedAt))} · ${d === 0 ? "today" : d + "d ago"}</span>${speed != null ? `<span title="${est ? "Estimated from the board's “posted N days ago” text" : "From the employer's posting date"}">${speed <= 3 ? "" : ""}${est ? "~" : ""}${speed === 0 ? "same day it posted" : speed + "d after it posted"}</span>`
         : found != null ? `<span title="The employer didn't show a posting date, so this is from when our robot first saw it">${found === 0 ? "same day we found it" : found + "d after we found it"}</span>` : ""}</div>
       <div class="acts">${acts}${a.url ? `<a class="btn ghost" href="${esc(a.url)}" target="_blank" rel="noopener">Open ↗</a>` : ""}<button class="btn ghost" data-del>Remove</button></div></div>`;
   }
@@ -190,8 +190,8 @@
     const left = Math.max(0, st.goal - st.week);
     el.innerHTML = `
       <section class="card hero">${ring(st.week, st.goal)}
-        <div><h2>${left ? `${left} more application${left > 1 ? "s" : ""} to hit this week's goal` : "Weekly goal hit 🎯"}</h2>
-          <div class="streak">${st.streak ? `🔥 ${st.streak} week${st.streak > 1 ? "s" : ""} in a row` : "Hit your goal to start a streak"}</div>
+        <div><h2>${left ? `${left} more application${left > 1 ? "s" : ""} to hit this week's goal` : "Weekly goal hit "}</h2>
+          <div class="streak">${st.streak ? `${st.streak} week${st.streak > 1 ? "s" : ""} in a row` : "Hit your goal to start a streak"}</div>
           <div class="goalpick" aria-label="Weekly goal">${[3, 5, 10, 15].map((g) => `<button data-goal="${g}" aria-pressed="${g === st.goal}">${g}/week</button>`).join("")}</div></div>
       </section>
       <div class="stats">
@@ -200,16 +200,16 @@
         <div class="stat"><b>${st.offer}</b><span>offers</span></div>
         <div class="stat early"><b>${st.speed == null ? "—" : st.speed < 1 ? "<1d" : st.speed.toFixed(1) + "d"}</b><span>${st.speed == null ? "apply speed (needs 2+ with a posting date)" : `avg. after posting · ${st.speeds} dated`}</span></div>
       </div>
-      ${st.speed != null ? (st.speed <= 3 ? `<div class="nudge good">🐦 <span><b>Early bird.</b> You apply ${st.speed < 1 ? "the same day" : `about ${st.speed.toFixed(1)} days`} after a job posts, before most of the pile shows up.</span></div>`
-        : `<div class="nudge">⏱ <span>You apply about <b>${st.speed.toFixed(1)} days</b> after a job posts. Popular internships get 100+ applicants, so try to get in within 3 days. <a href="/radar/">Opening Radar</a> tells you when companies open.</span></div>`) : ""}
-      ${stale.slice(0, 3).map((a) => `<div class="nudge">📨 <span><b>${esc(a.company)}</b>: applied ${daysAgo(a.appliedAt)} days ago with no update. A short follow-up email to the recruiter is fair game now.</span></div>`).join("")}
-      <div class="tabs" role="group" aria-label="Pipeline">${[["applied", "📨 Applied"], ["interview", "🎤 Interview"], ["offer", "🎉 Offer"], ["saved", "♡ Saved"], ["rejected", "Rejected"]]
+      ${st.speed != null ? (st.speed <= 3 ? `<div class="nudge good"><span><b>Early bird.</b> You apply ${st.speed < 1 ? "the same day" : `about ${st.speed.toFixed(1)} days`} after a job posts, before most of the pile shows up.</span></div>`
+        : `<div class="nudge"><span>You apply about <b>${st.speed.toFixed(1)} days</b> after a job posts. Popular internships get 100+ applicants, so try to get in within 3 days. <a href="/radar/">Opening Radar</a> tells you when companies open.</span></div>`) : ""}
+      ${stale.slice(0, 3).map((a) => `<div class="nudge"><span><b>${esc(a.company)}</b>: applied ${daysAgo(a.appliedAt)} days ago with no update. A short follow-up email to the recruiter is fair game now.</span></div>`).join("")}
+      <div class="tabs" role="group" aria-label="Pipeline">${[["applied", "Applied"], ["interview", "Interview"], ["offer", "Offer"], ["saved", "♡ Saved"], ["rejected", "Rejected"]]
         .map(([k, l]) => `<button data-tab="${k}" aria-pressed="${S.tab === k}">${l}<i>${counts[k]}</i></button>`).join("")}</div>
       <div id="list">${list.length ? (S.tab === "saved"
-          ? list.map((l) => `<div class="app saved" data-lid="${esc(l.id)}"><div class="co">${esc(l.company)}</div><div class="ti">${esc(l.title)}</div><div class="meta"><span>📍 ${esc(l.location || l.state || "")}</span>${l.open === false ? "<span><b>Closed</b> — the company took this job down</span>" : ""}</div>
+          ? list.map((l) => `<div class="app saved" data-lid="${esc(l.id)}"><div class="co">${esc(l.company)}</div><div class="ti">${esc(l.title)}</div><div class="meta"><span>${esc(l.location || l.state || "")}</span>${l.open === false ? "<span><b>Closed</b> — the company took this job down</span>" : ""}</div>
               <div class="acts">${l.open === false ? "" : `<a class="btn go" href="${esc(l.url)}" target="_blank" rel="noopener">Apply →</a>`}<button class="btn" data-applied>✓ I applied</button></div></div>`).join("")
           : list.map(appCard).join(""))
-        : `<div class="empty">${{ applied: "No applications yet. Tap <b>Mark applied</b> on any internship, or add one you applied to elsewhere.", interview: "No interviews yet. When you get one, tap 🎤 on the application.", offer: "No offers yet. You've got this.", saved: savedLoading ? "Loading your saved jobs…" : S.listingsErr ? "Couldn't load your saved jobs right now — refresh in a minute." : "Nothing saved that you haven't applied to.", rejected: "None. 🙌" }[S.tab]}</div>`}</div>
+        : `<div class="empty">${{ applied: "No applications yet. Tap <b>Mark applied</b> on any internship, or add one you applied to elsewhere.", interview: "No interviews yet. When you get one, tap on the application.", offer: "No offers yet. You've got this.", saved: savedLoading ? "Loading your saved jobs…" : S.listingsErr ? "Couldn't load your saved jobs right now — refresh in a minute." : "Nothing saved that you haven't applied to.", rejected: "None. " }[S.tab]}</div>`}</div>
       <button class="btn add" id="addBtn">＋ Add an application from somewhere else</button>
       <p style="font-size:12.5px;color:var(--muted);margin:22px 0 0">Your data: <a href="/privacy/">what we store</a> · <button class="btn ghost" id="delAll" style="font-size:12.5px;padding:4px 8px">Delete all my data</button></p>`;
   }
@@ -232,7 +232,7 @@
     }
     const a = (S.me.apps || []).find((x) => x.id === card.dataset.id); if (!a) return;
     const s = e.target.closest("[data-stage]");
-    if (s) return act({ action: "app", app: { ...a, stage: s.dataset.stage } }, { interview: "Interview! Nice work 🎤", offer: "Offer! Huge 🎉", rejected: "Moved to rejected. On to the next one", applied: "Moved back" }[s.dataset.stage]);
+    if (s) return act({ action: "app", app: { ...a, stage: s.dataset.stage } }, { interview: "Interview! Nice work ", offer: "Offer! Huge ", rejected: "Moved to rejected. On to the next one", applied: "Moved back" }[s.dataset.stage]);
     if (e.target.closest("[data-del]") && confirm(`Remove ${a.company} from My Season?`)) return act({ action: "app_delete", id: a.id }, "Removed");
   });
 

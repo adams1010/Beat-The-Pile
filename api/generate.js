@@ -3,7 +3,7 @@
 // So nobody can use this endpoint as a free general-purpose Claude.
 //
 //   POST /api/generate { feature, input }   → { text }
-//   features: reasons · resume_builder · cover_letter · followup · score · interview_prep · intel
+//   features: reasons · resume_builder · cover_letter · followup · score · interview_prep · interview_turn · intel
 //
 // Controls (all shared across every server, stored in Postgres):
 //   - Origin/Referer must be our own site. That only stops other websites' browsers — it is NOT authentication.
@@ -157,6 +157,24 @@ Return ONLY valid JSON, no markdown:
   "tips": ["short actionable tip 1", "short actionable tip 2", "short actionable tip 3"]
 }
 Do not state facts about the company unless you are confident they are true.` };
+  },
+
+  // Interview practice: one turn at a time. The student answers; we give short honest feedback and the next question.
+  interview_turn(i) {
+    const company = str(i?.company, 100) || "a company", role = str(i?.role, 120) || "engineering intern", major = str(i?.major, 100);
+    const kind = ["behavioral", "technical", "mixed"].includes(i?.kind) ? i.kind : "mixed";
+    const total = num(i?.total, 3, 8, 5);
+    const hist = (Array.isArray(i?.history) ? i.history : []).slice(-8).map((h) => ({ q: str(h?.q, 400), a: str(h?.a, 1500) })).filter((h) => h.q);
+    const asked = hist.length, done = asked >= total;
+    const transcript = hist.map((h, n) => `Q${n + 1}: ${h.q}\nStudent: ${h.a || "(no answer)"}`).join("\n\n");
+    return { maxTokens: done ? 700 : 450, temperature: 0.5, prompt: `You are a realistic, friendly but honest interviewer running a mock ${kind} interview for a ${role} internship at ${company}.${major ? ` The student studies ${major}.` : ""}
+Ask one question at a time, like a real first-round interview. Technical questions should fit an intern (fundamentals, projects, how they'd approach a problem), not trivia.
+${asked ? `Transcript so far:\n${transcript}\n` : "No questions asked yet."}
+${done ? `That was the last question. Reply with ONLY this JSON:
+{"feedback":"2-3 sentences on the LAST answer","summary":{"strengths":["2-3 specific strengths seen in their answers"],"improve":["2-3 specific, actionable fixes"],"overall":"2 sentences, honest"}}`
+: asked ? `Reply with ONLY this JSON: {"feedback":"2-3 sentences on the LAST answer: what worked, one concrete way to make it stronger (e.g. use STAR, add a number, name the tool)","next":"the next interview question (question ${asked + 1} of ${total})"}`
+: `Reply with ONLY this JSON: {"next":"your opening question (question 1 of ${total})"}`}
+Never invent facts about the student. If an answer is empty or off-topic, say so kindly and move on.` };
   },
 
   intel(i) {

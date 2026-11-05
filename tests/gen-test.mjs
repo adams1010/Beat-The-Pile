@@ -21,7 +21,7 @@ assert.equal(r.code, 200); assert.equal(r.body.text, "hi");
 const p = f.calls.prompts.at(-1); assert.ok(p.includes('Company: "Boeing"') && p.length < 1500, "server-built prompt with capped fields");
 r = await call({ feature: "score", input: { resume: "r".repeat(20000), jd: "need python" } }); assert.equal(r.code, 200);
 assert.ok(f.calls.prompts.at(-1).includes("estimate") && f.calls.prompts.at(-1).length < 12000, "score is framed as an estimate; paste capped");
-for (const feat of ["reasons", "resume_builder", "followup", "interview_prep", "cover_letter"]) {
+for (const feat of ["reasons", "resume_builder", "followup", "interview_prep", "cover_letter", "interview_turn"]) {
   const input = { resume: "Built a go-kart frame in SolidWorks; FEA on the chassis; led a 12-person team; 3.7 GPA mechanical engineering student.", companies: [{ name: "Boeing", role: "Intern" }], company: "Boeing", role: "ME Intern", majors: "Mechanical Engineering" };
   r = await call({ feature: feat, input }); assert.equal(r.code, 200, feat);
 }

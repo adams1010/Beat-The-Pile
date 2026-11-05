@@ -14,10 +14,10 @@
 <meta name="theme-color" content="#0A1628">
 <style>
   :root{
-    --green:#00C285; --green-dark:#009E6C; --green-light:#E6FBF4;
-    --navy:#0A1628; --ink:#1E293B; --muted:#64748B; --faint:#94A3B8;
-    --bg:#F8FFFE; --card:#FFFFFF; --line:#E2EEEA; --amber:#B45309; --amber-light:#FFF4E6; --red:#B91C1C; --red-light:#FEF2F2;
-    --r:14px; --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --green:#0E8A5F; --green-dark:#0B6E4B; --green-light:#EEF6F2;
+    --navy:#0B1220; --ink:#1A2230; --muted:#64748B; --faint:#94A3B8;
+    --bg:#FBFBFC; --card:#FFFFFF; --line:#E3E7ED; --amber:#B45309; --amber-light:#FFF4E6; --red:#B91C1C; --red-light:#FEF2F2;
+    --r:14px; --font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
@@ -180,7 +180,7 @@
   <label for="nSaid">What was said</label>
   <textarea id="nSaid" placeholder="What they're looking for, next steps they mentioned, anything to bring up in your follow-up…"></textarea>
   <label>How did it go?</label>
-  <div class="feel" id="nFeel"><button type="button" data-v="great">🔥 Great</button><button type="button" data-v="good">👍 Good</button><button type="button" data-v="meh">😐 Meh</button></div>
+  <div class="feel" id="nFeel"><button type="button" data-v="great">Great</button><button type="button" data-v="good">Good</button><button type="button" data-v="meh">Meh</button></div>
   <label>Follow up in</label>
   <div class="when" id="nWhen"><button type="button" data-h="24">In 24 hrs</button><button type="button" data-h="48">In 48 hrs</button><button type="button" data-h="168">In 1 week</button></div>
   <div class="row" style="margin-top:16px"><button class="btn go" id="noteSave" style="flex:1">Save notes</button></div>
@@ -360,8 +360,8 @@
           ${jobs || (S.listingsErr && c.id ? `<p class="muted small" style="margin:4px 0 10px">We couldn't load internships just now (our side or your connection) — this doesn't mean they have none. Refresh to try again.</p>`
             : `<p class="muted small" style="margin:4px 0 10px">No open internships on their job board right now. Still worth a conversation — ask what's coming.</p>`)}
           ${c.jobs.length > 12 ? `<p class="muted small">+ ${c.jobs.length - 12} more on the <a href="/jobs/">jobs page</a></p>` : ""}
-          <div class="row" style="margin-top:10px"><button class="btn go note">📝 ${c.talked ? "Add more notes" : "I talked to them"}</button>
-          ${c.id ? `<button class="btn brief">📋 Brief</button>` : ""}
+          <div class="row" style="margin-top:10px"><button class="btn go note">${c.talked ? "Add more notes" : "I talked to them"}</button>
+          ${c.id ? `<button class="btn brief">Brief</button>` : ""}
           ${c.domain ? `<a class="btn" href="https://${esc(c.domain)}" target="_blank" rel="noopener">Website ↗</a>` : ""}</div>
         </div></div>`;
     }).join("") : (S.filter === "plan" ? "" : `<div class="empty">No companies match.</div>`));
@@ -407,7 +407,7 @@
       ${states.length ? `<div class="small"><b>Where:</b> ${esc(states.slice(0, 6).join(", "))}${states.length > 6 ? ` +${states.length - 6} more` : ""}</div>` : ""}
       ${jobs.length ? `<div class="small" style="margin-top:4px"><b>Roles:</b> ${esc([...new Set(jobs.map((j) => j.title))].slice(0, 4).join(" · "))}</div>` : `<div class="small muted">Nothing posted right now. Ask the recruiter when their internships open.</div>`}
       ${others.length ? `<div class="small" style="margin-top:4px"><b>Also at:</b> ${esc(others.join(", "))}</div>` : ""}
-      <div class="ai" id="aiBrief">${S.user ? `<span class="muted">✨ Writing the brief…</span>` : `<b>✨ AI brief</b> — what they do, what engineers work on, and smart questions to ask. <button class="btn go" id="briefSign" style="margin-top:8px">Sign in to see it</button>`}</div>
+      <div class="ai" id="aiBrief">${S.user ? `<span class="muted">Writing the brief…</span>` : `<b>AI brief</b> — what they do, what engineers work on, and smart questions to ask. <button class="btn go" id="briefSign" style="margin-top:8px">Sign in to see it</button>`}</div>
       <div class="row" style="margin-top:14px"><button class="btn go" id="briefStar">${(S.me.starred || []).includes(c.id) ? "★ In my plan" : "☆ Add to my plan"}</button>${c.domain ? `<a class="btn" href="https://${esc(c.domain)}" target="_blank" rel="noopener">Website ↗</a>` : ""}</div>`;
     $("#briefSign")?.addEventListener("click", () => signIn());
     $("#briefStar").onclick = async () => { await toggleStar(c); openBrief(c); };
@@ -419,7 +419,7 @@
     try {
       const b = S.briefs[c.id] || (S.briefs[c.id] = (await api("POST", { action: "brief", companyId: c.id })).brief);
       if (!el()) return;
-      el().innerHTML = `<h4>✨ What they do</h4>${esc(b.about)}${b.engineers ? `<h4>What engineers work on</h4>${esc(b.engineers)}` : ""}
+      el().innerHTML = `<h4>What they do</h4>${esc(b.about)}${b.engineers ? `<h4>What engineers work on</h4>${esc(b.engineers)}` : ""}
         ${b.ask?.length ? `<h4>Good questions to ask</h4><ul>${b.ask.map((q) => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}
         <div class="warn">${b.known === false ? "We couldn't find much on this company — double-check their website. " : ""}AI-written summary. It can be wrong, so confirm on their site.</div>`;
     } catch (e) { if (el()) el().innerHTML = `<span class="muted">${esc(e.message)}</span>`; }
@@ -519,7 +519,7 @@ ${me}${email ? "\n" + email : ""}`;
     const due = S.me.notes.filter((n) => !n.done && new Date(n.followUpAt) - Date.now() <= 24 * 36e5).length;
     const b = $("#dueBadge"); b.textContent = due; b.classList.toggle("hidden", !due);
     if (!S.user) { el.innerHTML = `<div class="card empty"><p><b>Your follow-ups live here.</b><br>After each conversation, tap "I talked to them" — we'll remind you to follow up and draft the email.</p><button class="btn go" id="fs">Sign in</button></div>`; $("#fs").onclick = () => signIn(); return; }
-    if (!S.me.notes.length) { el.innerHTML = `<div class="card empty"><p><b>No conversations yet.</b><br>At the fair, open a company and tap <b>📝 I talked to them</b>. It lands here with a reminder and a ready-to-send email.</p></div>`; return; }
+    if (!S.me.notes.length) { el.innerHTML = `<div class="card empty"><p><b>No conversations yet.</b><br>At the fair, open a company and tap <b>I talked to them</b>. It lands here with a reminder and a ready-to-send email.</p></div>`; return; }
     const rank = { late: 0, due: 1, soon: 2, done: 3 };
     const notes = [...S.me.notes].sort((a, b) => rank[fuState(a)[0]] - rank[fuState(b)[0]] || new Date(a.followUpAt) - new Date(b.followUpAt));
     el.innerHTML = notes.map((n) => {
@@ -527,15 +527,15 @@ ${me}${email ? "\n" + email : ""}`;
       const mail = `mailto:${encodeURIComponent(n.contactEmail || "")}?subject=${encodeURIComponent(d.subject)}&body=${encodeURIComponent(d.body)}`;
       return `<div class="card fu ${k}" data-id="${esc(n.id)}">
         <div class="row" style="justify-content:space-between"><strong style="color:var(--navy);font-size:17px">${esc(n.company)}</strong><span class="status ${k}">${esc(label)}</span></div>
-        <div class="muted small">${esc([n.contact, n.fair, "talked " + when(n.talkedAt), { great: "🔥", good: "👍", meh: "😐" }[n.feel]].filter(Boolean).join(" · "))}</div>
+        <div class="muted small">${esc([n.contact, n.fair, "talked " + when(n.talkedAt), { great: "", good: "", meh: "" }[n.feel]].filter(Boolean).join(" · "))}</div>
         ${n.roles ? `<div class="small" style="margin-top:6px"><b>Roles:</b> ${esc(n.roles)}</div>` : ""}
         ${n.said ? `<div class="small" style="margin-top:4px;white-space:pre-wrap">${esc(n.said)}</div>` : ""}
         <details ${k === "due" || k === "late" ? "open" : ""} style="margin-top:10px"><summary>Follow-up email draft</summary>
           <div class="draft"><b>Subject:</b> ${esc(d.subject)}\n\n${esc(d.body)}</div>
-          <div class="row"><a class="btn go" href="${esc(mail)}">Open in email</a><button class="btn copy">Copy</button><button class="btn polish">✨ ${S.polished[n.id] ? "Rewrite again" : "Write it with AI"}</button></div>
+          <div class="row"><a class="btn go" href="${esc(mail)}">Open in email</a><button class="btn copy">Copy</button><button class="btn polish">${S.polished[n.id] ? "Rewrite again" : "Write it with AI"}</button></div>
           <div class="small muted" style="margin-top:6px">“Write it with AI” sends this company, the recruiter's name, the roles and your notes to our AI provider to draft the email. Their email address isn't sent. Read it over before sending.</div></details>
         ${n.done ? "" : `<div class="small muted" style="margin-top:8px">The due date above is a reminder <b>inside this app</b> (your Follow-ups tab). For a phone notification, add it to your calendar:</div>
-          <div class="row" style="margin-top:4px"><a class="btn ghost" href="${esc(gcal(n))}" target="_blank" rel="noopener">📅 Google Calendar</a><button class="btn ghost ics">📅 iPhone / Outlook</button></div>
+          <div class="row" style="margin-top:4px"><a class="btn ghost" href="${esc(gcal(n))}" target="_blank" rel="noopener">Google Calendar</a><button class="btn ghost ics">iPhone / Outlook</button></div>
           <div class="small muted" style="margin-top:2px">Event: “${esc(reminderText(n).title)}” at ${esc(reminderTimes(n)[0].toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))} — your notes and their email stay out of your calendar.</div>`}
         <div class="row" style="margin-top:10px"><button class="btn done">${n.done ? "Mark not done" : "✓ I followed up"}</button><button class="btn ghost edit">Edit</button><button class="btn ghost del">Delete</button></div>
       </div>`;
@@ -546,7 +546,7 @@ ${me}${email ? "\n" + email : ""}`;
     const n = S.me.notes.find((x) => x.id === card.dataset.id); if (!n) return;
     if (e.target.closest(".ics")) return downloadIcs(n);
     if (e.target.closest(".polish")) {
-      const b = e.target.closest(".polish"); b.disabled = true; b.textContent = "✨ Writing…";
+      const b = e.target.closest(".polish"); b.disabled = true; b.textContent = "Writing…";
       try { S.polished[n.id] = await api("POST", { action: "polish", note: { ...n, contactEmail: "" }, name: S.user?.fullName || "", resumeLink: S.me.resume?.share ? resumeUrl() : "" }); toast("Done — read it over before you send"); }
       catch (err) { toast(err.message); }
       return renderFollow();

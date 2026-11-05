@@ -14,10 +14,10 @@
 <link rel="canonical" href="https://www.beatthepile.com/jobs/">
 <style>
   :root{
-    --green:#00C285; --green-dark:#009E6C; --green-light:#E6FBF4;
-    --navy:#0A1628; --ink:#1E293B; --muted:#64748B; --faint:#94A3B8;
-    --bg:#F8FFFE; --card:#FFFFFF; --line:#E2EEEA; --amber:#B45309; --amber-light:#FFF4E6;
-    --r:12px; --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --green:#0E8A5F; --green-dark:#0B6E4B; --green-light:#EEF6F2;
+    --navy:#0B1220; --ink:#1A2230; --muted:#64748B; --faint:#94A3B8;
+    --bg:#FBFBFC; --card:#FFFFFF; --line:#E3E7ED; --amber:#B45309; --amber-light:#FFF4E6;
+    --r:12px; --font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
@@ -28,12 +28,12 @@
   .brand{font-weight:800;letter-spacing:-.02em;font-size:15px;color:var(--green);text-decoration:none}
   h1{font-size:clamp(24px,5.5vw,32px);line-height:1.15;letter-spacing:-.02em;margin:10px 0 8px;font-weight:800}
   .sub{color:#CBD5E1;margin:0;font-size:15px;max-width:560px}
-  .trust{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:rgba(0,194,133,.14);color:#7DF0C8;
-         border:1px solid rgba(0,194,133,.35);padding:6px 12px;border-radius:999px;font-size:13px;font-weight:600}
+  .trust{display:inline-flex;align-items:center;gap:8px;margin-top:16px;background:rgba(14,138,95,.14);color:#8FD9B8;
+         border:1px solid rgba(14,138,95,.35);padding:6px 12px;border-radius:999px;font-size:13px;font-weight:600}
   .fairlink{display:block;width:fit-content;margin-top:12px;color:#CBD5E1;font-size:14px;text-decoration:none}
-  .fairlink b{color:#7DF0C8}
+  .fairlink b{color:#8FD9B8}
   .fairlink:hover b{text-decoration:underline}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(0,194,133,.25)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(14,138,95,.25)}
 
   .controls{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding:12px 0}
   .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
@@ -125,7 +125,7 @@
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">Pick a state</option></select>
       <label class="toggle" title="Off: mechanical + general engineering roles. On: only roles that say mechanical (or a close match like manufacturing)."><input type="checkbox" id="meOnly"> Mechanical only</label>
       <button class="chip" id="savedOnly" aria-pressed="false" title="Jobs you saved with ♡">♡ Saved <span id="savedN"></span></button>
-      <button class="chip" id="followOnly" aria-pressed="false" title="Companies you follow with ☆ — you get flagged when they post">🔔 Following <span id="followN"></span></button>
+      <button class="chip" id="followOnly" aria-pressed="false" title="Companies you follow with ☆ — you get flagged when they post">Following <span id="followN"></span></button>
       <input class="search" id="q" type="search" placeholder="Search company or role" aria-label="Search company or role">
     </div>
     <div class="count" id="count" aria-live="polite"></div>
@@ -252,7 +252,7 @@
       : state.all.filter((j) => inView(j) && matches(j));
     const fresh = state.all.filter(newForMe).length;
     $("followN").textContent = state.mine.starred.size ? `(${state.mine.starred.size})` : "";
-    $("alert").innerHTML = fresh && !state.followOnly ? `<button class="alert" id="alertBtn"><span>🔔 ${fresh} new internship${fresh > 1 ? "s" : ""} from companies you follow</span><span>See →</span></button>` : "";
+    $("alert").innerHTML = fresh && !state.followOnly ? `<button class="alert" id="alertBtn"><span>${fresh} new internship${fresh > 1 ? "s" : ""} from companies you follow</span><span>See →</span></button>` : "";
     const nationwide = new Set(state.all.filter(matches).map((j) => (j.company + "|" + j.title + "|" + j.location).toLowerCase())).size;
 
     // Merge identical postings (same company + title + place) into one card: "2 openings"
@@ -296,7 +296,7 @@
         <div>
           <div class="co">${esc(j.company)}${j.company_id ? `<button class="follow" data-co="${esc(j.company_id)}" aria-pressed="${followed(j)}">${followed(j) ? "★ Following" : "☆ Follow"}</button>` : ""}</div>
           <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">NEW</span>' : ""}${j.match === "me" ? '<span class="tag me">ME</span>' : ""}${j.count > 1 ? `<span class="tag multi">${j.count} openings</span>` : ""}${j.closed ? '<span class="tag closed">Closed — taken down by the company</span>' : ""}</div>
-          <div class="meta"><span>📍 ${esc(cleanLocation(j))}</span>${seasonOf(j.title) ? `<span>🗓 ${esc(seasonOf(j.title))}</span>` : ""}${needsClearance(j.title) ? `<span>🇺🇸 US citizens / clearance</span>` : ""}<span>${esc(postedText(j))}</span></div>
+          <div class="meta"><span>${esc(cleanLocation(j))}</span>${seasonOf(j.title) ? `<span>${esc(seasonOf(j.title))}</span>` : ""}${needsClearance(j.title) ? `<span>🇺🇸 US citizens / clearance</span>` : ""}<span>${esc(postedText(j))}</span></div>
         </div>
         <div class="applycol">
           ${j.closed ? "" : `<a class="apply" href="${esc(j.url)}" target="_blank" rel="noopener" data-co="${esc(j.company)}">Apply →</a>`}

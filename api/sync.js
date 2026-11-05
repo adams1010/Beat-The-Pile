@@ -1,7 +1,7 @@
 // /api/sync.js — pulls every enabled company's own job board, keeps ME internships in the US,
 // and closes anything that disappeared from the feed.
 // Companies rotate (least-recently-synced first) under a time budget, so as the list grows
-// every company still gets synced — the cron runs twice a day.
+// every company still gets synced. Runs: Vercel cron 24x/day + GitHub sync.yml (3 passes each time GitHub fires it).
 import { loadCompanies } from "../lib/companies.js";
 import { fetchCompany } from "../lib/fetchers/index.js";
 import { db, isAuthorizedCron } from "../lib/db.js";
@@ -10,7 +10,7 @@ import { mapLimit } from "../lib/http.js";
 
 export const config = { maxDuration: 60 };
 
-const START_BUDGET_MS = 35000;   // don't start a new company after this
+const START_BUDGET_MS = 40000;   // don't start a new company after this
 const HARD_STOP_MS = 54000;      // give up on a slow company before Vercel kills the function
 
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(`timed out after ${Math.round(ms / 1000)}s`)), ms))]);
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
   } catch { /* first run */ }
   companies.sort((a, b) => (last[a.id] || "").localeCompare(last[b.id] || ""));   // never-synced first
 
-  const report = await mapLimit(companies, 8, async (cfg) => {
+  const report = await mapLimit(companies, 14, async (cfg) => {   // mostly waiting on company sites, so more at once
     const elapsed = Date.now() - t0;
     if (elapsed > START_BUDGET_MS) return { company_id: cfg.id, skipped: true };
     return syncOne(cfg, runStart, HARD_STOP_MS - elapsed);

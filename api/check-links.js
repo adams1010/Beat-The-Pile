@@ -12,7 +12,7 @@ import { get, mapLimit } from "../lib/http.js";
 
 export const config = { maxDuration: 60 };
 
-const BATCH = 400;          // oldest-checked first
+const BATCH = 700;          // oldest-checked first; whatever doesn't fit the time budget waits for the next run
 const FAILS_TO_HIDE = 2;
 // These job pages are blank shells filled in by script, so a page fetch can't tell open from closed.
 // They're skipped here (and not queued) — the sync closes them when they leave the company's feed.
@@ -63,7 +63,7 @@ export default async function handler(req, res) {
     `listings?select=id,company_id,url,ats,external_path,link_fails&closed_at=is.null&ats=not.in.(${PAGE_UNCHECKABLE.join(",")})&order=link_checked_at.asc.nullsfirst&limit=${BATCH}`
   );
 
-  const results = await mapLimit(rows, 10, async (l) => {
+  const results = await mapLimit(rows, 16, async (l) => {
     if (Date.now() - started > TIME_BUDGET_MS) return { id: l.id, skipped: true };
     // Company was turned off (or removed) → take its listings down
     if (!byId[l.company_id]) {

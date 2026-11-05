@@ -10,9 +10,9 @@
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="theme-color" content="#0A1628">
 <style>
-  :root{--green:#00C285;--green-dark:#009E6C;--green-light:#E6FBF4;--navy:#0A1628;--ink:#1E293B;--muted:#64748B;--faint:#94A3B8;
-        --bg:#F8FFFE;--line:#E2EEEA;--amber:#B45309;--amber-light:#FFF4E6;--violet:#6D28D9;--violet-light:#F5F3FF;
-        --font:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  :root{--green:#0E8A5F;--green-dark:#0B6E4B;--green-light:#EEF6F2;--navy:#0B1220;--ink:#1A2230;--muted:#64748B;--faint:#94A3B8;
+        --bg:#FBFBFC;--line:#E3E7ED;--amber:#B45309;--amber-light:#FFF4E6;--violet:#6D28D9;--violet-light:#F5F3FF;
+        --font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
   a{color:inherit}
@@ -62,7 +62,7 @@
 <header>
   <div class="wrap">
     <div class="top"><span class="brand">Opening Radar</span></div>
-    <h1>📡 Opening Radar</h1>
+    <h1>Opening Radar</h1>
     <p class="sub">Know when companies usually open their summer internships, so you can apply in the first few days instead of after the pile.</p>
     <div class="trend" id="trend" hidden></div>
   </div>
@@ -70,9 +70,9 @@
 <div class="controls">
   <div class="wrap">
     <div class="tabs" role="group" aria-label="View">
-      <button data-v="soon" aria-pressed="true">⏳ Not open yet</button>
-      <button data-v="open" aria-pressed="false">✅ Opened this season</button>
-      <button data-v="next" aria-pressed="false">🗓 Plan for next summer</button>
+      <button data-v="soon" aria-pressed="true">Not open yet</button>
+      <button data-v="open" aria-pressed="false">Opened this season</button>
+      <button data-v="next" aria-pressed="false">Plan for next summer</button>
     </div>
     <input class="search" id="q" type="search" placeholder="Search a company (Boeing, Lockheed, Tesla…)" aria-label="Search a company">
   </div>
@@ -135,14 +135,14 @@
       return `<div class="card"><div class="row1"><div class="name">${esc(c.name)}</div>${n}</div>
         <div class="big">Estimate: Summer ${season + 1} internships around <b>${esc(fmt(c.typicalNext, true))}</b></div>${history(c)}
         <div class="meta">${esc(conf(c))}</div>
-        <div class="acts">${c.openedNext ? (S.onSite.has(c.k) || c.id ? jobsLink(c) : "") : `<button class="btn" data-remind="${esc(c.k)}" data-when="next">📅 Remind me a week before</button>`}</div></div>`;
+        <div class="acts">${c.openedNext ? (S.onSite.has(c.k) || c.id ? jobsLink(c) : "") : `<button class="btn" data-remind="${esc(c.k)}" data-when="next">Remind me a week before</button>`}</div></div>`;
     }
     const days = daysFrom(c.typical);
     const pill = days >= 0 ? `<span class="pill soon">${days === 0 ? "Any day now" : `In ~${days} day${days === 1 ? "" : "s"}`}</span>` : `<span class="pill late">Late this year</span>`;
     const line = days >= 0 ? `Estimate: usually opens around <b>${esc(fmt(c.typical))}</b>` : `Estimate: usually open by <b>${esc(fmt(c.typical))}</b>. Not seen yet this season, so keep checking their careers page.`;
     return `<div class="card"><div class="row1"><div class="name">${esc(c.name)}</div>${pill}</div>
       <div class="big">${line}</div>${history(c)}<div class="meta">${esc(conf(c))}</div>
-      <div class="acts">${days >= 0 ? `<button class="btn" data-remind="${esc(c.k)}" data-when="cur">📅 Remind me a week before</button>` : ""}${S.onSite.has(c.k) || c.id ? jobsLink(c) : ""}</div></div>`;
+      <div class="acts">${days >= 0 ? `<button class="btn" data-remind="${esc(c.k)}" data-when="cur">Remind me a week before</button>` : ""}${S.onSite.has(c.k) || c.id ? jobsLink(c) : ""}</div></div>`;
   }
 
   function render(){

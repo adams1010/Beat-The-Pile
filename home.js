@@ -1,20 +1,20 @@
-/* built from src/home.jsx 8aa979a89d1e114f — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx f488ada457278ef3 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
   useRef,
   useCallback
 } = React;
-const G = "#00C285",
-  GD = "#009E6C",
-  GL = "#E6FBF4",
-  GM = "#B3F0DA";
-const AM = "#FF8C00",
-  AL = "#FFF4E6";
-const CR = "#FF5733",
-  CL = "#FFF0ED";
-const PALETTE = ["#00C285", "#2563EB", "#FF8C00", "#7C3AED", "#FF5733", "#0EA5E9", "#059669", "#D97706", "#DC2626", "#7C3AED", "#0891B2", "#65A30D"];
-const LOAD_MSGS = ["Searching for internships near you...", "💡 Tip: Apply Tuesday–Thursday morning — recruiter inboxes are cleanest then.", "Matching roles to your major...", "💡 Tip: Most internships get filled by candidates who applied in the first 72 hours.", "Finding opportunities others overlook...", "💡 Tip: A short follow-up email 5–7 days after applying can triple your callback rate.", "Factoring in your timing and experience...", "💡 Tip: Smaller regional firms often hire faster than the big names — and pay surprisingly well.", "Calculating your honest match scores...", "💡 Tip: Don't filter by GPA cutoffs — many companies post them but rarely enforce them.", "Checking nearby companies you might not know yet...", "💡 Tip: Customize your resume for each application. Even small tweaks beat a generic one.", "Cross-referencing local employer databases...", "💡 Tip: Your school's alumni network on LinkedIn is a hidden cheat code — message 1 per week.", "Ranking matches by realistic chance...", "💡 Tip: Quality > quantity. 10 thoughtful applications beats 100 spray-and-pray every time.", "Polishing the list...", "💡 Tip: After every rejection, ask for feedback. Most won't reply — the ones who do are gold."];
+const G = "#0E8A5F",
+  GD = "#0B6E4B",
+  GL = "#EEF6F2",
+  GM = "#CFE6DA";
+const AM = "#B45309",
+  AL = "#FFF7ED";
+const CR = "#B42318",
+  CL = "#FEF3F2";
+const PALETTE = Array(12).fill("#0B1220");
+const LOAD_MSGS = ["Searching for internships near you...", "Tip: Apply Tuesday–Thursday morning — recruiter inboxes are cleanest then.", "Matching roles to your major...", "Tip: Most internships get filled by candidates who applied in the first 72 hours.", "Finding opportunities others overlook...", "Tip: A short follow-up email 5–7 days after applying can triple your callback rate.", "Factoring in your timing and experience...", "Tip: Smaller regional firms often hire faster than the big names — and pay surprisingly well.", "Calculating your honest match scores...", "Tip: Don't filter by GPA cutoffs — many companies post them but rarely enforce them.", "Checking nearby companies you might not know yet...", "Tip: Customize your resume for each application. Even small tweaks beat a generic one.", "Cross-referencing local employer databases...", "Tip: Your school's alumni network on LinkedIn is a hidden cheat code — message 1 per week.", "Ranking matches by realistic chance...", "Tip: Quality > quantity. 10 thoughtful applications beats 100 spray-and-pray every time.", "Polishing the list...", "Tip: After every rejection, ask for feedback. Most won't reply — the ones who do are gold."];
 const SCHOOL_ABBR = {
   "umd": "Maryland",
   "psu": "Penn State",
@@ -155,7 +155,7 @@ const LiveStats = () => {
   const items = [{
     v: d?.engineering,
     l: "open engineering internships right now",
-    c: "#00C285"
+    c: "#0E8A5F"
   }, {
     v: d?.me,
     l: "tagged mechanical engineering",
@@ -184,11 +184,11 @@ const LiveStats = () => {
     key: i,
     style: {
       background: "#fff",
-      border: "1px solid #E6FBF4",
+      border: "1px solid #EEF6F2",
       borderRadius: 14,
       padding: "1.75rem 1.25rem",
       textAlign: "center",
-      boxShadow: "0 2px 8px rgba(0,194,133,0.06)"
+      boxShadow: "0 1px 2px rgba(11,18,32,.06)"
     }
   }, React.createElement("div", {
     style: {
@@ -254,7 +254,7 @@ const JobPreview = () => {
   }, "Live preview didn't load. ", React.createElement("a", {
     href: "/jobs/",
     style: {
-      color: "#009E6C",
+      color: "#0B6E4B",
       fontWeight: 700
     }
   }, "See today's internships \u2192"));
@@ -291,17 +291,17 @@ const JobPreview = () => {
     style: {
       display: "block",
       background: "#fff",
-      border: "1px solid #E2F5EE",
+      border: "1px solid #E3E7ED",
       borderRadius: 12,
       padding: "12px 14px",
       textDecoration: "none",
-      color: "#0A1628"
+      color: "#0B1220"
     }
   }, React.createElement("div", {
     style: {
       fontSize: 12,
       fontWeight: 700,
-      color: "#009E6C"
+      color: "#0B6E4B"
     }
   }, j.company), React.createElement("div", {
     style: {
@@ -315,12 +315,12 @@ const JobPreview = () => {
       fontSize: 12,
       color: "#6B7280"
     }
-  }, "\uD83D\uDCCD ", String(j.location || j.state || "").split("|")[0], " \xB7 from ", host(j.url), " \xB7 found ", ago(j.first_seen)))), React.createElement("a", {
+  }, String(j.location || j.state || "").split("|")[0], " \xB7 from ", host(j.url), " \xB7 found ", ago(j.first_seen)))), React.createElement("a", {
     href: "/jobs/",
     style: {
       fontSize: 13,
       fontWeight: 700,
-      color: "#009E6C",
+      color: "#0B6E4B",
       textAlign: "center",
       marginTop: 4
     }
@@ -332,8 +332,8 @@ const MAJORS = ["Accounting", "Actuarial Science", "Advertising", "Aerospace Eng
 const EXT_CATS = [{
   id: "leadership",
   label: "Leadership & Orgs",
-  icon: "🎯",
-  color: "#00C285",
+  icon: "",
+  color: "#0E8A5F",
   why: "Leadership roles are the #1 thing recruiters look for beyond GPA.",
   options: [{
     name: "Student Government",
@@ -361,7 +361,7 @@ const EXT_CATS = [{
 }, {
   id: "competitions",
   label: "Competitions & Challenges",
-  icon: "🏆",
+  icon: "",
   color: "#FF8C00",
   why: "Competitions signal initiative and real-world problem-solving — recruiters love this.",
   options: [{
@@ -390,7 +390,7 @@ const EXT_CATS = [{
 }, {
   id: "research",
   label: "Research & Innovation",
-  icon: "🔬",
+  icon: "",
   color: "#2563EB",
   why: "Research experience proves analytical thinking — critical for technical and finance roles.",
   options: [{
@@ -419,7 +419,7 @@ const EXT_CATS = [{
 }, {
   id: "work",
   label: "Work & Entrepreneurship",
-  icon: "💼",
+  icon: "",
   color: "#7C3AED",
   why: "Paid work experience — especially with real responsibility — is often weighted higher than GPA.",
   options: [{
@@ -448,7 +448,7 @@ const EXT_CATS = [{
 }, {
   id: "athletics",
   label: "Sports & Athletics",
-  icon: "⚽",
+  icon: "",
   color: "#059669",
   why: "Sports show discipline, teamwork, and grit — qualities every employer wants.",
   options: [{
@@ -471,7 +471,7 @@ const EXT_CATS = [{
 }, {
   id: "media",
   label: "Media, Marketing & Events",
-  icon: "📢",
+  icon: "",
   color: "#DC2626",
   why: "Content creation, event management, and communications roles build skills employers pay for.",
   options: [{
@@ -497,7 +497,7 @@ const EXT_CATS = [{
 }, {
   id: "service",
   label: "Community & Volunteering",
-  icon: "❤️",
+  icon: "",
   color: "#0EA5E9",
   why: "Shows character — especially leadership in service roles, not just participation.",
   options: [{
@@ -642,92 +642,92 @@ const STEPS = [{
 }];
 const TIPS = [{
   cat: "Timing",
-  icon: "⏱",
+  icon: "",
   title: "Apply the fall before, not the spring of",
   text: "The single biggest mistake students make: applying in spring for that same summer. Most competitive summer internships open August–October the year before. If you're applying late, apply anyway — but know the strongest roles are usually gone, and target companies with rolling or later deadlines."
 }, {
   cat: "Timing",
-  icon: "📅",
+  icon: "",
   title: "Big tech opens earliest",
   text: "In software, the calendar roughly runs: Google and Microsoft open late summer, Meta in early fall, and Amazon reviews on a rolling basis. Apply to all of them at once rather than waiting to hear back from one before trying the next."
 }, {
   cat: "Resume",
-  icon: "📄",
+  icon: "",
   title: "A solid application beats a perfect GPA",
   text: "A 3.2 with two relevant projects you can talk about for five minutes will often beat a 3.9 with nothing to show. Recruiters hire for evidence you can do the work — build something, then make it the center of your resume and interviews."
 }, {
   cat: "Resume",
-  icon: "🔑",
+  icon: "",
   title: "Mirror the job description's keywords",
   text: "Many companies screen resumes with software before a human sees them. Pull two or three exact phrases from the posting (tools, skills, responsibilities) and make sure they appear naturally in your resume. It's not gaming the system — it's speaking their language."
 }, {
   cat: "Applications",
-  icon: "⚡",
+  icon: "",
   title: "Apply within 48 hours of a posting going live",
   text: "Early applicants get reviewed first, and many roles fill before the listed deadline. Set up alerts on the job boards and company pages for your target field so you catch postings while they're fresh."
 }, {
   cat: "Applications",
-  icon: "🎯",
+  icon: "",
   title: "Don't just chase the famous names",
   text: "Everyone applies to the same ten brand-name companies, which makes them brutally competitive. The regional firms and mid-size companies most students overlook often have real openings and far less competition. Apply to your full list."
 }, {
   cat: "Follow-up",
-  icon: "📧",
+  icon: "",
   title: "A polite follow-up genuinely works",
   text: "Send a short, courteous follow-up email five to seven business days after applying or interviewing. It's not annoying — it signals genuine interest and puts you back on top of the pile. Keep it to a few sentences and reference the specific role."
 }, {
   cat: "Networking",
-  icon: "🤝",
+  icon: "",
   title: "Referrals beat cold applications",
   text: "A referral can move your application past the first filter entirely. Find one alum or connection at a target company on LinkedIn, send a brief, specific, respectful message, and ask if they'd be open to referring you. A few referrals are worth dozens of cold applies."
 }, {
   cat: "Interviews",
-  icon: "💬",
+  icon: "",
   title: "Have three stories ready",
   text: "Most behavioral interviews come down to a handful of questions about teamwork, challenge, and leadership. Prepare three concrete stories from your experience that you can adapt on the fly, structured as situation → what you did → result. Practice them out loud."
 }, {
   cat: "Mindset",
-  icon: "🧱",
+  icon: "",
   title: "Rejection is the default, not the exception",
   text: "Strong candidates routinely apply to 50+ roles to land a few. A rejection — or silence — usually means timing or volume, not that you're not good enough. Keep your pipeline full so no single 'no' carries too much weight."
 }, {
   cat: "Resume",
-  icon: "📊",
+  icon: "",
   title: "Lead bullet points with results, not duties",
   text: "\"Increased club membership 40% by launching a referral drive\" beats \"Responsible for membership.\" Numbers and outcomes catch a recruiter's eye in the six seconds they spend scanning. Start each bullet with a strong verb and end with an impact."
 }, {
   cat: "Applications",
-  icon: "🗂",
+  icon: "",
   title: "Keep a simple application tracker",
   text: "Once you're applying to dozens of roles, you'll lose track of where you stand. A simple list of company, date applied, status, and follow-up date saves you from missing deadlines or following up twice. Beat the Pile's dashboard does this for you."
 }, {
   cat: "Networking",
-  icon: "☕",
+  icon: "",
   title: "Ask for advice, not a job",
   text: "\"Can you give me a job?\" puts people on the spot. \"Could I ask you two questions about how you got into this field?\" gets a yes far more often — and those conversations are where referrals quietly come from. Be genuinely curious, not transactional."
 }, {
   cat: "Interviews",
-  icon: "❓",
+  icon: "",
   title: "Always have questions to ask them",
   text: "\"Do you have any questions for us?\" is not optional — having none signals low interest. Prepare three: one about the team, one about the work itself, one about growth. Avoid asking things easily found on their website."
 }, {
   cat: "Timing",
-  icon: "🔁",
+  icon: "",
   title: "Reapply — being early last year helps this year",
   text: "If you applied somewhere and didn't get it, applying again the next cycle isn't desperate, it's normal. Recruiters often view returning applicants favorably, especially if you've added skills or experience since. Persistence reads as genuine interest."
 }, {
   cat: "Resume",
-  icon: "📁",
+  icon: "",
   title: "Tailor your resume per role type",
   text: "You don't need 50 versions, but having 2-3 — say one for technical roles and one for business roles — lets you front-load the most relevant experience for each. Beat the Pile lets you save multiple named resumes and pick one per application."
 }, {
   cat: "Mindset",
-  icon: "🎯",
+  icon: "",
   title: "Cast a wide net early, then focus",
   text: "Early on, apply broadly to learn what sticks and get interview reps. As you get callbacks, you'll see which roles fit — then concentrate your energy there. Don't over-optimize your first ten applications; treat them as practice."
 }, {
   cat: "Networking",
-  icon: "🎓",
+  icon: "",
   title: "Your career center is underused gold",
   text: "Campus career centers have employer connections, resume reviews, and often exclusive postings most students ignore. They're already paid for by your tuition. Book one appointment this week — it's the highest-leverage hour you're not using."
 }];
@@ -899,7 +899,7 @@ function BlurCard({
     style: {
       fontWeight: 700,
       fontSize: 16,
-      color: "#0A1628"
+      color: "#0B1220"
     }
   }, company?.name || "Regional Company"), React.createElement("div", {
     style: {
@@ -909,7 +909,7 @@ function BlurCard({
     }
   }, company?.role || "Internship Role"), React.createElement("div", {
     style: {
-      color: "#9CA3AF",
+      color: "#6B7280",
       fontSize: 12,
       marginTop: 2
     }
@@ -956,18 +956,18 @@ function BlurCard({
       background: "white",
       borderRadius: var_rl,
       border: `1.5px solid ${GL}`,
-      boxShadow: "0 4px 20px rgba(0,194,133,0.15)"
+      boxShadow: "0 1px 2px rgba(11,18,32,.06)"
     }
   }, React.createElement("div", {
     style: {
       fontSize: 28,
       marginBottom: 8
     }
-  }, "\uD83D\uDD12"), React.createElement("div", {
+  }), React.createElement("div", {
     style: {
       fontWeight: 700,
       fontSize: 14,
-      color: "#0A1628",
+      color: "#0B1220",
       marginBottom: 4
     }
   }, "Unlock with Pro"), React.createElement("div", {
@@ -982,9 +982,9 @@ function BlurCard({
     }
   }, "7 more companies")))));
 }
-const var_r = "10px",
-  var_rl = "14px",
-  var_rxl = "20px";
+const var_r = "8px",
+  var_rl = "10px",
+  var_rxl = "14px";
 const COMPANY_INTEL = {
   "Lockheed Martin": {
     description: "World's largest defense contractor — builds fighter jets (F-35), missile systems, and satellites for the US military.",
@@ -2825,7 +2825,7 @@ function ScoreExplainerCard({
       padding: '4px 8px',
       border: `1px solid ${G}40`
     }
-  }, '💡 Fix: ', f.fix), f.id === 'skills' && f.missingRequired && f.missingRequired.length > 0 && React.createElement('div', {
+  }, 'Fix: ', f.fix), f.id === 'skills' && f.missingRequired && f.missingRequired.length > 0 && React.createElement('div', {
     style: {
       marginTop: 8,
       marginLeft: 24,
@@ -2937,7 +2937,7 @@ function ScoreExplainerCard({
       fontSize: 20,
       marginBottom: 4
     }
-  }, '🔒'), React.createElement('div', {
+  }, ''), React.createElement('div', {
     style: {
       fontSize: 14,
       fontWeight: 700,
@@ -2970,8 +2970,593 @@ function ScoreExplainerCard({
     }
   }, 'Unlock Breakdown'))))));
 }
+const IV = {
+  ink: "#0B1220",
+  dim: "#5B6675",
+  line: "#E3E7ED",
+  soft: "#F6F7F9",
+  acc: "#0E8A5F",
+  accSoft: "#E8F5EF",
+  font: '"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif'
+};
+function InterviewSim({
+  major,
+  defaultCompany,
+  defaultRole
+}) {
+  const [setup, setSetup] = React.useState({
+    company: defaultCompany || "",
+    role: defaultRole || (major ? `${major.split(",")[0]} Intern` : "Engineering Intern"),
+    kind: "mixed",
+    total: 5
+  });
+  const [turns, setTurns] = React.useState([]);
+  const [draft, setDraft] = React.useState("");
+  const [busy, setBusy] = React.useState(false);
+  const [err, setErr] = React.useState("");
+  const [summary, setSummary] = React.useState(null);
+  const started = turns.length > 0;
+  const endRef = React.useRef(null);
+  React.useEffect(() => {
+    if (endRef.current) endRef.current.scrollIntoView({
+      behavior: "smooth",
+      block: "end"
+    });
+  }, [turns, summary, busy]);
+  async function ask(history) {
+    setBusy(true);
+    setErr("");
+    try {
+      const r = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          feature: "interview_turn",
+          input: {
+            ...setup,
+            major,
+            history: history.map(t => ({
+              q: t.q,
+              a: t.a
+            }))
+          }
+        })
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || "The interviewer couldn't answer — try again.");
+      const m = String(d.text || "").match(/\{[\s\S]*\}/);
+      const j = m ? JSON.parse(m[0]) : null;
+      if (!j) throw new Error("The interviewer gave an unreadable answer — try again.");
+      const next = history.map((t, i) => i === history.length - 1 && j.feedback ? {
+        ...t,
+        feedback: j.feedback
+      } : t);
+      if (j.summary) {
+        setTurns(next);
+        setSummary(j.summary);
+      } else if (j.next) setTurns([...next, {
+        q: String(j.next),
+        a: "",
+        feedback: ""
+      }]);else throw new Error("The interviewer gave an unreadable answer — try again.");
+    } catch (e) {
+      setErr(String(e.message || e));
+    } finally {
+      setBusy(false);
+    }
+  }
+  function start() {
+    setTurns([]);
+    setSummary(null);
+    ask([]);
+  }
+  function send() {
+    const a = draft.trim();
+    if (!a || busy) return;
+    const h = turns.map((t, i) => i === turns.length - 1 ? {
+      ...t,
+      a
+    } : t);
+    setTurns(h);
+    setDraft("");
+    ask(h);
+  }
+  const field = {
+    width: "100%",
+    padding: "10px 12px",
+    border: `1px solid ${IV.line}`,
+    borderRadius: 8,
+    font: `400 15px ${IV.font}`,
+    color: IV.ink,
+    background: "#fff"
+  };
+  const label = {
+    display: "block",
+    font: `600 13px ${IV.font}`,
+    color: IV.ink,
+    margin: "14px 0 6px"
+  };
+  const btn = primary => ({
+    font: `600 14px ${IV.font}`,
+    padding: "10px 16px",
+    borderRadius: 8,
+    cursor: "pointer",
+    border: `1px solid ${primary ? IV.acc : IV.line}`,
+    background: primary ? IV.acc : "#fff",
+    color: primary ? "#fff" : IV.ink
+  });
+  return React.createElement("main", {
+    id: "main",
+    style: {
+      maxWidth: 760,
+      margin: "0 auto",
+      padding: "32px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))",
+      fontFamily: IV.font,
+      color: IV.ink
+    }
+  }, React.createElement("p", {
+    style: {
+      font: `600 12px ${IV.font}`,
+      letterSpacing: ".08em",
+      textTransform: "uppercase",
+      color: IV.acc,
+      margin: 0
+    }
+  }, "Interview practice"), React.createElement("h1", {
+    style: {
+      font: `650 clamp(26px,4vw,34px)/1.15 ${IV.font}`,
+      letterSpacing: "-.02em",
+      margin: "6px 0 8px"
+    }
+  }, "Practice the interview before the real one."), React.createElement("p", {
+    style: {
+      color: IV.dim,
+      fontSize: 15.5,
+      lineHeight: 1.6,
+      margin: "0 0 22px",
+      maxWidth: "62ch"
+    }
+  }, "An AI interviewer asks one question at a time, reacts to your answer, and tells you how to make it stronger. At the end you get what you did well and what to fix. Your answers go to our AI provider to write the feedback; nothing is saved."), !started && !busy ? React.createElement("section", {
+    style: {
+      border: `1px solid ${IV.line}`,
+      borderRadius: 12,
+      padding: "18px 18px 20px",
+      background: "#fff"
+    }
+  }, React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))",
+      gap: "0 14px"
+    }
+  }, React.createElement("div", null, React.createElement("label", {
+    style: label,
+    htmlFor: "ivCo"
+  }, "Company"), React.createElement("input", {
+    id: "ivCo",
+    style: field,
+    value: setup.company,
+    placeholder: "e.g. Lockheed Martin",
+    onChange: e => setSetup(s => ({
+      ...s,
+      company: e.target.value
+    }))
+  })), React.createElement("div", null, React.createElement("label", {
+    style: label,
+    htmlFor: "ivRole"
+  }, "Role"), React.createElement("input", {
+    id: "ivRole",
+    style: field,
+    value: setup.role,
+    onChange: e => setSetup(s => ({
+      ...s,
+      role: e.target.value
+    }))
+  })), React.createElement("div", null, React.createElement("label", {
+    style: label,
+    htmlFor: "ivKind"
+  }, "Interview type"), React.createElement("select", {
+    id: "ivKind",
+    style: field,
+    value: setup.kind,
+    onChange: e => setSetup(s => ({
+      ...s,
+      kind: e.target.value
+    }))
+  }, React.createElement("option", {
+    value: "mixed"
+  }, "Mixed (most first rounds)"), React.createElement("option", {
+    value: "behavioral"
+  }, "Behavioral"), React.createElement("option", {
+    value: "technical"
+  }, "Technical"))), React.createElement("div", null, React.createElement("label", {
+    style: label,
+    htmlFor: "ivN"
+  }, "Length"), React.createElement("select", {
+    id: "ivN",
+    style: field,
+    value: setup.total,
+    onChange: e => setSetup(s => ({
+      ...s,
+      total: +e.target.value
+    }))
+  }, React.createElement("option", {
+    value: 3
+  }, "Quick \u2014 3 questions"), React.createElement("option", {
+    value: 5
+  }, "Standard \u2014 5 questions"), React.createElement("option", {
+    value: 8
+  }, "Full \u2014 8 questions")))), React.createElement("button", {
+    style: {
+      ...btn(true),
+      marginTop: 18
+    },
+    onClick: start
+  }, "Start the interview"), err && React.createElement("p", {
+    role: "alert",
+    style: {
+      color: "#B42318",
+      fontSize: 14,
+      marginTop: 12
+    }
+  }, err)) : React.createElement("section", {
+    "aria-live": "polite",
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 14
+    }
+  }, React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      fontSize: 13,
+      color: IV.dim
+    }
+  }, React.createElement("span", null, setup.role, setup.company ? ` · ${setup.company}` : "", " \xB7 ", setup.kind), React.createElement("span", null, "Question ", Math.min(turns.length, setup.total), " of ", setup.total)), turns.map((t, i) => React.createElement("div", {
+    key: i,
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 8
+    }
+  }, React.createElement("div", {
+    style: {
+      alignSelf: "flex-start",
+      maxWidth: "88%",
+      background: IV.soft,
+      border: `1px solid ${IV.line}`,
+      borderRadius: "12px 12px 12px 4px",
+      padding: "12px 14px",
+      fontSize: 15,
+      lineHeight: 1.55
+    }
+  }, React.createElement("div", {
+    style: {
+      font: `600 12px ${IV.font}`,
+      color: IV.dim,
+      marginBottom: 4
+    }
+  }, "Interviewer"), t.q), t.a && React.createElement("div", {
+    style: {
+      alignSelf: "flex-end",
+      maxWidth: "88%",
+      background: IV.ink,
+      color: "#fff",
+      borderRadius: "12px 12px 4px 12px",
+      padding: "12px 14px",
+      fontSize: 15,
+      lineHeight: 1.55,
+      whiteSpace: "pre-wrap"
+    }
+  }, t.a), t.feedback && React.createElement("div", {
+    style: {
+      borderLeft: `3px solid ${IV.acc}`,
+      background: IV.accSoft,
+      borderRadius: "0 8px 8px 0",
+      padding: "10px 12px",
+      fontSize: 14,
+      lineHeight: 1.55
+    }
+  }, React.createElement("div", {
+    style: {
+      font: `600 12px ${IV.font}`,
+      color: IV.acc,
+      marginBottom: 3
+    }
+  }, "Coach"), t.feedback))), busy && React.createElement("div", {
+    style: {
+      color: IV.dim,
+      fontSize: 14
+    }
+  }, "Interviewer is thinking\u2026"), err && React.createElement("div", {
+    role: "alert",
+    style: {
+      color: "#B42318",
+      fontSize: 14
+    }
+  }, err, " ", React.createElement("button", {
+    style: {
+      ...btn(false),
+      padding: "4px 10px",
+      fontSize: 13
+    },
+    onClick: () => ask(turns)
+  }, "Retry")), summary ? React.createElement("div", {
+    style: {
+      border: `1px solid ${IV.line}`,
+      borderRadius: 12,
+      padding: 18,
+      background: "#fff"
+    }
+  }, React.createElement("h2", {
+    style: {
+      font: `650 20px ${IV.font}`,
+      margin: "0 0 10px"
+    }
+  }, "How it went"), React.createElement("p", {
+    style: {
+      fontSize: 15,
+      lineHeight: 1.6,
+      margin: "0 0 12px"
+    }
+  }, summary.overall), React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit,minmax(240px,1fr))",
+      gap: 14
+    }
+  }, React.createElement("div", null, React.createElement("h3", {
+    style: {
+      font: `600 14px ${IV.font}`,
+      margin: "0 0 6px"
+    }
+  }, "Strengths"), React.createElement("ul", {
+    style: {
+      margin: 0,
+      paddingLeft: 18,
+      fontSize: 14.5,
+      lineHeight: 1.6
+    }
+  }, (summary.strengths || []).map((x, i) => React.createElement("li", {
+    key: i
+  }, x)))), React.createElement("div", null, React.createElement("h3", {
+    style: {
+      font: `600 14px ${IV.font}`,
+      margin: "0 0 6px"
+    }
+  }, "Work on"), React.createElement("ul", {
+    style: {
+      margin: 0,
+      paddingLeft: 18,
+      fontSize: 14.5,
+      lineHeight: 1.6
+    }
+  }, (summary.improve || []).map((x, i) => React.createElement("li", {
+    key: i
+  }, x))))), React.createElement("button", {
+    style: {
+      ...btn(true),
+      marginTop: 16
+    },
+    onClick: () => {
+      setTurns([]);
+      setSummary(null);
+    }
+  }, "Practice again")) : started && !busy && turns[turns.length - 1] && !turns[turns.length - 1].a ? React.createElement("div", {
+    style: {
+      position: "sticky",
+      bottom: 12,
+      background: "#fff",
+      border: `1px solid ${IV.line}`,
+      borderRadius: 12,
+      padding: 10,
+      boxShadow: "0 6px 20px rgba(11,18,32,.08)"
+    }
+  }, React.createElement("label", {
+    htmlFor: "ivA",
+    style: {
+      position: "absolute",
+      left: -9999
+    }
+  }, "Your answer"), React.createElement("textarea", {
+    id: "ivA",
+    value: draft,
+    onChange: e => setDraft(e.target.value),
+    rows: 4,
+    placeholder: "Answer like you would out loud. Tip: situation, what you did, the result.",
+    onKeyDown: e => {
+      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) send();
+    },
+    style: {
+      ...field,
+      border: "none",
+      resize: "vertical",
+      padding: "6px 8px"
+    }
+  }), React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      gap: 10,
+      flexWrap: "wrap"
+    }
+  }, React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: IV.dim
+    }
+  }, "Ctrl/\u2318 + Enter to send"), React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8
+    }
+  }, React.createElement("button", {
+    style: btn(false),
+    onClick: () => {
+      setTurns([]);
+      setSummary(null);
+    }
+  }, "End"), React.createElement("button", {
+    style: btn(true),
+    onClick: send,
+    disabled: !draft.trim()
+  }, "Send answer")))) : null, React.createElement("div", {
+    ref: endRef
+  })));
+}
+function SkillPicker({
+  options,
+  value,
+  onToggle,
+  major
+}) {
+  const [q, setQ] = React.useState(""),
+    [open, setOpen] = React.useState(false),
+    [hi, setHi] = React.useState(0);
+  const all = [...new Set([...options, ...SKILLS])];
+  const ql = q.trim().toLowerCase();
+  const list = all.filter(o => !value.includes(o) && (!ql || o.toLowerCase().includes(ql))).slice(0, 8);
+  const custom = ql && !all.some(o => o.toLowerCase() === ql) && !value.some(v => v.toLowerCase() === ql) ? q.trim().slice(0, 40) : null;
+  const items = custom ? [...list, custom] : list;
+  const pick = o => {
+    onToggle(o);
+    setQ("");
+    setHi(0);
+  };
+  const ink = "#0B1220",
+    line = "#D5DBE3",
+    dim = "#5B6675";
+  return React.createElement("div", {
+    style: {
+      position: "relative"
+    }
+  }, value.length > 0 && React.createElement("div", {
+    style: {
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 6,
+      marginBottom: 10
+    }
+  }, value.map(v => React.createElement("span", {
+    key: v,
+    style: {
+      display: "inline-flex",
+      alignItems: "center",
+      gap: 6,
+      background: "#EEF1F5",
+      color: ink,
+      borderRadius: 6,
+      padding: "5px 6px 5px 10px",
+      fontSize: 13.5,
+      fontWeight: 500
+    }
+  }, v, React.createElement("button", {
+    onClick: () => onToggle(v),
+    "aria-label": `Remove ${v}`,
+    style: {
+      border: "none",
+      background: "transparent",
+      cursor: "pointer",
+      color: dim,
+      fontSize: 15,
+      lineHeight: 1,
+      padding: "0 4px"
+    }
+  }, "\xD7")))), React.createElement("label", {
+    htmlFor: "skillQ",
+    style: {
+      position: "absolute",
+      left: -9999
+    }
+  }, "Add a skill"), React.createElement("input", {
+    id: "skillQ",
+    value: q,
+    autoComplete: "off",
+    role: "combobox",
+    "aria-expanded": open,
+    "aria-controls": "skillList",
+    placeholder: value.length ? "Add another skill…" : "Start typing a skill (e.g. SolidWorks, MATLAB, Python)",
+    onFocus: () => setOpen(true),
+    onBlur: () => setTimeout(() => setOpen(false), 150),
+    onChange: e => {
+      setQ(e.target.value);
+      setOpen(true);
+      setHi(0);
+    },
+    onKeyDown: e => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setHi(h => Math.min(h + 1, items.length - 1));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setHi(h => Math.max(h - 1, 0));
+      } else if (e.key === "Enter" && items[hi]) {
+        e.preventDefault();
+        pick(items[hi]);
+      } else if (e.key === "Backspace" && !q && value.length) onToggle(value[value.length - 1]);
+    },
+    style: {
+      width: "100%",
+      padding: "12px 14px",
+      border: `1px solid ${line}`,
+      borderRadius: 8,
+      fontSize: 15,
+      color: ink,
+      background: "#fff",
+      outline: "none",
+      fontFamily: "inherit"
+    }
+  }), open && items.length > 0 && React.createElement("ul", {
+    id: "skillList",
+    role: "listbox",
+    style: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      top: "100%",
+      marginTop: 4,
+      background: "#fff",
+      border: `1px solid ${line}`,
+      borderRadius: 8,
+      boxShadow: "0 10px 28px rgba(11,18,32,.12)",
+      listStyle: "none",
+      padding: 4,
+      zIndex: 20,
+      maxHeight: 300,
+      overflowY: "auto"
+    }
+  }, items.map((o, i) => React.createElement("li", {
+    key: o,
+    role: "option",
+    "aria-selected": i === hi,
+    onMouseDown: e => {
+      e.preventDefault();
+      pick(o);
+    },
+    onMouseEnter: () => setHi(i),
+    style: {
+      padding: "9px 10px",
+      borderRadius: 6,
+      cursor: "pointer",
+      fontSize: 14.5,
+      color: ink,
+      background: i === hi ? "#F2F4F7" : "transparent"
+    }
+  }, o === custom ? React.createElement(React.Fragment, null, "Add \u201C", o, "\u201D") : o))), React.createElement("p", {
+    style: {
+      fontSize: 13,
+      color: dim,
+      marginTop: 10
+    }
+  }, "Suggestions fit ", major || "your major", ". Only add what you'd be comfortable talking about in an interview."));
+}
 function App() {
-  const ROUTES = ["landing", "quiz", "emailgate", "results", "resumebuilder", "profile", "wall", "community", "score", "dashboard"];
+  const ROUTES = ["landing", "quiz", "emailgate", "results", "resumebuilder", "profile", "wall", "community", "score", "dashboard", "interview"];
   const [page, setPageRaw] = useState(() => {
     try {
       const h = location.hash.slice(1);
@@ -2994,7 +3579,11 @@ function App() {
       window.scrollTo(0, 0);
     };
     window.addEventListener("popstate", onPop);
-    return () => window.removeEventListener("popstate", onPop);
+    window.addEventListener("hashchange", onPop);
+    return () => {
+      window.removeEventListener("popstate", onPop);
+      window.removeEventListener("hashchange", onPop);
+    };
   }, []);
   const [step, setStep] = useState(0);
   const [editStep, setEditStep] = useState(null);
@@ -3798,53 +4387,6 @@ function App() {
   useEffect(() => {
     if (page === "wall") fetchWallPosts();
   }, [page]);
-  useEffect(() => {
-    if (page !== "results" && page !== "dashboard") return;
-    const userEmail = profile && profile.email || email;
-    if (!userEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(userEmail)) return;
-    const dueNow = tracked.filter(a => followUpStatus(a).state === "due");
-    if (dueNow.length === 0) return;
-    let sentLog = {};
-    try {
-      sentLog = JSON.parse(localStorage.getItem("iq_reminder_sent_log") || "{}");
-    } catch {}
-    const now = Date.now();
-    const DAY_MS = 24 * 60 * 60 * 1000;
-    const toEmail = dueNow.filter(a => !sentLog[a.company] || now - sentLog[a.company] > DAY_MS);
-    if (toEmail.length === 0) return;
-    (async () => {
-      for (const a of toEmail) {
-        try {
-          const r = await fetch("/api/mailer-reminder", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-              email: userEmail,
-              name: profile && profile.fullName || "there",
-              company: a.company,
-              role: a.role || "the role",
-              daysSinceApplied: followUpStatus(a).days || 5
-            })
-          });
-          if (r.ok) {
-            sentLog[a.company] = now;
-            try {
-              localStorage.setItem("iq_reminder_sent_log", JSON.stringify(sentLog));
-            } catch {}
-            analytics.track("followup_reminder_emailed", {
-              company: a.company
-            });
-          } else {
-            console.warn("[iq] reminder email failed for", a.company);
-          }
-        } catch (e) {
-          console.warn("[iq] reminder send error:", e.message);
-        }
-      }
-    })();
-  }, [page, tracked, profile, email]);
   async function buildStarterResume() {
     setBuilderState({
       loading: true,
@@ -5221,7 +5763,7 @@ function App() {
     }
   }, "\xD7"), React.createElement("div", {
     style: {
-      background: `linear-gradient(135deg,${G}15,${AM}10)`,
+      background: `${G}15`,
       borderRadius: var_rl,
       padding: "1.25rem",
       marginBottom: "1.25rem",
@@ -5238,43 +5780,36 @@ function App() {
     style: {
       fontSize: 24
     }
-  }, "\u26A1"), React.createElement("span", {
+  }), React.createElement("span", {
     style: {
       fontWeight: 800,
       fontSize: 22,
-      color: "#0A1628",
+      color: "#0B1220",
       letterSpacing: "-0.5px"
     }
   }, "Beat the Pile Pro"), React.createElement("span", {
     style: {
       marginLeft: "auto",
-      background: `${AM}18`,
-      color: AM,
+      background: GL,
+      color: G,
       fontSize: 11,
       fontWeight: 700,
       padding: "3px 10px",
-      borderRadius: 99,
-      border: `1px solid ${AM}30`
+      borderRadius: 99
     }
-  }, "Early Access")), React.createElement("p", {
+  }, "Beta")), React.createElement("p", {
     style: {
       color: "#4A5568",
-      fontSize: 14
+      fontSize: 14,
+      lineHeight: 1.5
     }
   }, React.createElement("strong", {
     style: {
-      color: G,
-      fontSize: 18
+      color: G
     }
-  }, "$9"), React.createElement("span", {
+  }, "Free during the beta."), " No card needed. We'll tell you well before anything costs money.")), React.createElement("div", {
     style: {
-      color: "#9CA3AF",
-      textDecoration: "line-through",
-      marginLeft: 6
-    }
-  }, "$19"), " /month \xB7 Cancel anytime")), React.createElement("div", {
-    style: {
-      background: `linear-gradient(135deg,#0A1628,#1E3A5F)`,
+      background: `#0B1220`,
       borderRadius: var_rl,
       padding: "1.25rem",
       marginBottom: "1.25rem",
@@ -5291,7 +5826,7 @@ function App() {
     style: {
       fontSize: 22
     }
-  }, "\uD83D\uDCC4"), React.createElement("p", {
+  }), React.createElement("p", {
     style: {
       fontWeight: 800,
       fontSize: 15,
@@ -5339,25 +5874,17 @@ function App() {
       marginBottom: "1.5rem"
     }
   }, [{
-    icon: "🚀",
+    icon: "",
     title: "Unlimited applications",
     desc: "Apply to as many companies as you want — auto-fill + cover letter for each"
   }, {
-    icon: "📧",
-    title: "Follow-up email reminders",
-    desc: "We ping you when each application hits the 5-day mark, with a draft ready to send"
+    icon: "",
+    title: "Follow-up reminders",
+    desc: "Your dashboard flags each application at the 5-day mark, with a draft email ready for you to send"
   }, {
-    icon: "🔄",
-    title: "Unlimited result refreshes",
-    desc: "Generate fresh company batches any time — new results, new opportunities"
-  }, {
-    icon: "📊",
+    icon: "",
     title: "Full dashboard tracker",
     desc: "Every app, interview, offer, deadline, and note in one place"
-  }, {
-    icon: "📍",
-    title: "Priority local matching",
-    desc: "First access to newly-added regional employers near your ZIP"
   }].map((f, i) => React.createElement("div", {
     key: i,
     style: {
@@ -5366,22 +5893,26 @@ function App() {
       alignItems: "flex-start"
     }
   }, React.createElement("div", {
+    "aria-hidden": "true",
     style: {
-      width: 34,
-      height: 34,
-      borderRadius: var_r,
+      width: 20,
+      height: 20,
+      borderRadius: 6,
       background: GL,
+      color: G,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
       flexShrink: 0,
-      fontSize: 17
+      fontSize: 12,
+      fontWeight: 700,
+      marginTop: 2
     }
-  }, f.icon), React.createElement("div", null, React.createElement("p", {
+  }, "\u2713"), React.createElement("div", null, React.createElement("p", {
     style: {
       fontWeight: 700,
       fontSize: 13.5,
-      color: "#0A1628"
+      color: "#0B1220"
     }
   }, f.title), React.createElement("p", {
     style: {
@@ -5399,7 +5930,7 @@ function App() {
     },
     style: {
       width: "100%",
-      background: `linear-gradient(135deg,${G},${GD})`,
+      background: `${G}`,
       border: "none",
       color: "#fff",
       padding: "15px",
@@ -5409,16 +5940,16 @@ function App() {
       fontSize: 16,
       fontWeight: 700,
       letterSpacing: "-0.3px",
-      boxShadow: `0 4px 16px ${G}40`
+      boxShadow: "0 1px 2px rgba(11,18,32,.06)"
     }
-  }, "Unlock Pro \u2014 $9/mo \u2192"), React.createElement("p", {
+  }, "Unlock Pro \u2014 free during beta"), React.createElement("p", {
     style: {
       textAlign: "center",
       fontSize: 12,
-      color: "#9CA3AF",
+      color: "#6B7280",
       marginTop: 10
     }
-  }, "\uD83D\uDD12 Secure \xB7 Cancel anytime \xB7 Instant access")));
+  }, "Unlocks on this device right away. Nothing to pay.")));
   const RoleModalCmp = () => {
     if (!roleModal) return null;
     const cat = EXT_CATS.find(c => c.id === roleModal.catId);
@@ -5458,7 +5989,7 @@ function App() {
       style: {
         fontSize: 11,
         fontWeight: 700,
-        color: "#9CA3AF",
+        color: "#6B7280",
         letterSpacing: "2px",
         textTransform: "uppercase",
         marginBottom: 8
@@ -5467,7 +5998,7 @@ function App() {
       style: {
         fontWeight: 800,
         fontSize: 18,
-        color: "#0A1628",
+        color: "#0B1220",
         marginBottom: "0.25rem",
         letterSpacing: "-0.3px"
       }
@@ -5489,8 +6020,8 @@ function App() {
         padding: "11px 13px",
         borderRadius: var_r,
         border: `1.5px solid ${customActText ? G : "#E2E8F0"}`,
-        background: "#F8FFFE",
-        color: "#0A1628",
+        background: "#FBFBFC",
+        color: "#0B1220",
         fontFamily: "var(--font)",
         fontSize: 14,
         outline: "none",
@@ -5533,7 +6064,7 @@ function App() {
         style: {
           fontWeight: isSel ? 700 : 500,
           fontSize: 14,
-          color: isSel ? GD : "#0A1628"
+          color: isSel ? GD : "#0B1220"
         }
       }, role)), isSel && React.createElement("span", {
         style: {
@@ -5544,7 +6075,7 @@ function App() {
     })), isCustom && !canConfirmCustom && React.createElement("p", {
       style: {
         fontSize: 11.5,
-        color: "#9CA3AF",
+        color: "#6B7280",
         marginTop: 8,
         textAlign: "center"
       }
@@ -5620,7 +6151,7 @@ function App() {
       style: {
         fontSize: 10,
         fontWeight: 700,
-        color: "#9CA3AF",
+        color: "#6B7280",
         letterSpacing: "2px",
         textTransform: "uppercase"
       }
@@ -5628,7 +6159,7 @@ function App() {
       style: {
         fontWeight: 800,
         fontSize: 20,
-        color: "#0A1628",
+        color: "#0B1220",
         letterSpacing: "-0.4px"
       }
     }, c.name), React.createElement("p", {
@@ -5642,13 +6173,13 @@ function App() {
         background: "none",
         border: "none",
         fontSize: 22,
-        color: "#9CA3AF",
+        color: "#6B7280",
         cursor: "pointer",
         lineHeight: 1
       }
     }, "\xD7")), gated ? React.createElement("div", {
       style: {
-        background: `linear-gradient(135deg,${GL},${AL})`,
+        background: `${GL}`,
         border: `1px solid ${G}25`,
         borderRadius: var_rl,
         padding: "1.75rem 1.5rem",
@@ -5660,11 +6191,11 @@ function App() {
         fontSize: 30,
         marginBottom: 8
       }
-    }, "\uD83D\uDE80"), React.createElement("p", {
+    }), React.createElement("p", {
       style: {
         fontWeight: 800,
         fontSize: 18,
-        color: "#0A1628",
+        color: "#0B1220",
         marginBottom: 6,
         letterSpacing: "-0.3px"
       }
@@ -5683,7 +6214,7 @@ function App() {
         setShowProModal(true);
       },
       style: {
-        background: `linear-gradient(135deg,${G},${GD})`,
+        background: `${G}`,
         border: "none",
         color: "#fff",
         padding: "13px 30px",
@@ -5692,12 +6223,12 @@ function App() {
         fontFamily: "var(--font)",
         fontSize: 15,
         fontWeight: 700,
-        boxShadow: `0 4px 16px ${G}40`
+        boxShadow: "0 1px 2px rgba(11,18,32,.06)"
       }
     }, "Go Pro \u2014 unlimited applications"), React.createElement("p", {
       style: {
         fontSize: 11.5,
-        color: "#9CA3AF",
+        color: "#6B7280",
         marginTop: 12
       }
     }, "You can still open ", c.name, "'s site directly from your matches anytime.")) : React.createElement(React.Fragment, null, safeHttpUrl(c.applyUrl) ? React.createElement(React.Fragment, null, React.createElement("a", {
@@ -5708,14 +6239,14 @@ function App() {
       style: {
         display: "block",
         textAlign: "center",
-        background: `linear-gradient(135deg,${G},${GD})`,
+        background: `${G}`,
         color: "#fff",
         padding: "13px",
         borderRadius: var_rl,
         fontWeight: 800,
         fontSize: 15,
         textDecoration: "none",
-        boxShadow: `0 4px 16px ${G}40`,
+        boxShadow: "0 1px 2px rgba(11,18,32,.06)",
         margin: "10px 0 4px"
       }
     }, "\u2713 Apply to ", c.role || "this role", " at ", c.name, " \u2197"), React.createElement("p", {
@@ -5734,14 +6265,14 @@ function App() {
       style: {
         display: "block",
         textAlign: "center",
-        background: `linear-gradient(135deg,${G},${GD})`,
+        background: `${G}`,
         color: "#fff",
         padding: "13px",
         borderRadius: var_rl,
         fontWeight: 800,
         fontSize: 15,
         textDecoration: "none",
-        boxShadow: `0 4px 16px ${G}40`,
+        boxShadow: "0 1px 2px rgba(11,18,32,.06)",
         margin: "10px 0 4px"
       }
     }, "\u2713 Apply to ", adzunaLink.title || c.role + " at " + c.name, " \u2197"), React.createElement("p", {
@@ -5769,7 +6300,7 @@ function App() {
       }
     }, "Checking for live postings\u2026")) : null, React.createElement("div", {
       style: {
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1px solid ${GL}`,
         borderRadius: var_rl,
         padding: "12px 14px",
@@ -5801,14 +6332,14 @@ function App() {
       const outline = {
         ...btnStyle,
         background: "#fff",
-        color: "#0A1628",
+        color: "#0B1220",
         border: `1.5px solid #E2E8F0`
       };
       if (isNat) {
         return React.createElement(React.Fragment, null, React.createElement("p", {
           style: {
             fontSize: 11.5,
-            color: "#9CA3AF",
+            color: "#6B7280",
             lineHeight: 1.5,
             marginBottom: 9
           }
@@ -5829,36 +6360,36 @@ function App() {
             color: "#0A66C2",
             border: `1.5px solid #0A66C2`
           }
-        }, "\uD83D\uDCBC LinkedIn"), React.createElement("a", {
+        }, "LinkedIn"), React.createElement("a", {
           href: handshakeUrl(c),
           target: "_blank",
           rel: "noopener noreferrer",
           onClick: () => track(c),
           style: outline
-        }, "\uD83C\uDF93 Handshake"), React.createElement("a", {
+        }, "Handshake"), React.createElement("a", {
           href: indeedCompanyUrl(c),
           target: "_blank",
           rel: "noopener noreferrer",
           onClick: () => track(c),
           style: outline
-        }, "\uD83D\uDD0D Indeed"), siteHref ? React.createElement("a", {
+        }, "Indeed"), siteHref ? React.createElement("a", {
           href: siteHref,
           target: "_blank",
           rel: "noopener noreferrer",
           onClick: () => track(c),
           style: outline
-        }, "\uD83C\uDFE2 Company site") : React.createElement("a", {
+        }, "Company site") : React.createElement("a", {
           href: googleHref,
           target: "_blank",
           rel: "noopener noreferrer",
           onClick: () => track(c),
           style: outline
-        }, "\uD83D\uDD0E Google")));
+        }, "Google")));
       }
       return React.createElement(React.Fragment, null, React.createElement("p", {
         style: {
           fontSize: 11.5,
-          color: "#9CA3AF",
+          color: "#6B7280",
           lineHeight: 1.5,
           marginBottom: 9
         }
@@ -5879,13 +6410,13 @@ function App() {
           color: "#0A66C2",
           border: `1.5px solid #0A66C2`
         }
-      }, "\uD83C\uDFE2 Company Website"), React.createElement("a", {
+      }, "Company Website"), React.createElement("a", {
         href: googleHref,
         target: "_blank",
         rel: "noopener noreferrer",
         onClick: () => track(c),
         style: outline
-      }, "\uD83D\uDD0E Search on Google")));
+      }, "Search on Google")));
     })()), !isPro && React.createElement("p", {
       style: {
         fontSize: 11.5,
@@ -5907,7 +6438,7 @@ function App() {
       style: {
         fontWeight: 700,
         fontSize: 15,
-        color: "#0A1628",
+        color: "#0B1220",
         marginBottom: 6
       }
     }, "Finish your profile to auto-fill"), React.createElement("p", {
@@ -5923,7 +6454,7 @@ function App() {
         setPage("profile");
       },
       style: {
-        background: `linear-gradient(135deg,${G},${GD})`,
+        background: `${G}`,
         border: "none",
         color: "#fff",
         padding: "11px 22px",
@@ -5951,9 +6482,9 @@ function App() {
       style: {
         fontWeight: 700,
         fontSize: 14,
-        color: "#0A1628"
+        color: "#0B1220"
       }
-    }, "\uD83D\uDCCB Your info \u2014 tap any field to copy"), React.createElement("button", {
+    }, "Your info \u2014 tap any field to copy"), React.createElement("button", {
       onClick: () => copyText(allText, "all"),
       style: {
         background: GL,
@@ -5980,7 +6511,7 @@ function App() {
         justifyContent: "space-between",
         alignItems: "center",
         gap: 8,
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1px solid ${GL}`,
         borderRadius: var_r,
         padding: "8px 11px",
@@ -5996,7 +6527,7 @@ function App() {
       style: {
         display: "block",
         fontSize: 10,
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontWeight: 700,
         textTransform: "uppercase",
         letterSpacing: "0.5px"
@@ -6005,7 +6536,7 @@ function App() {
       style: {
         display: "block",
         fontSize: 13,
-        color: "#0A1628",
+        color: "#0B1220",
         fontWeight: 600,
         overflow: "hidden",
         textOverflow: "ellipsis",
@@ -6014,7 +6545,7 @@ function App() {
     }, r[1])), React.createElement("span", {
       style: {
         fontSize: 12,
-        color: copied === "r" + i ? G : "#9CA3AF",
+        color: copied === "r" + i ? G : "#6B7280",
         fontWeight: 700,
         flexShrink: 0
       }
@@ -6035,9 +6566,9 @@ function App() {
       style: {
         fontWeight: 700,
         fontSize: 14,
-        color: "#0A1628"
+        color: "#0B1220"
       }
-    }, "\u270D\uFE0F Application kit"), kit.company === c.name && kit.coverLetter && !kit.loading && React.createElement("button", {
+    }, "Application kit"), kit.company === c.name && kit.coverLetter && !kit.loading && React.createElement("button", {
       onClick: () => generateKit(c),
       style: {
         background: "none",
@@ -6068,8 +6599,8 @@ function App() {
         padding: "9px 11px",
         borderRadius: var_r,
         border: `1.5px solid #E2E8F0`,
-        background: "#F8FFFE",
-        color: "#0A1628",
+        background: "#FBFBFC",
+        color: "#0B1220",
         fontFamily: "var(--font)",
         fontSize: 13.5,
         outline: "none"
@@ -6118,7 +6649,7 @@ function App() {
         margin: "0 0 6px",
         lineHeight: 1.45
       }
-    }, "\u270D\uFE0F ", React.createElement("b", null, "Draft"), " written by AI from your profile", chosenResumeId ? " and the resume you picked" : "", ". Edit it here before you paste it anywhere."), React.createElement("div", {
+    }, React.createElement("b", null, "Draft"), " written by AI from your profile", chosenResumeId ? " and the resume you picked" : "", ". Edit it here before you paste it anywhere."), React.createElement("div", {
       style: {
         position: "relative",
         marginBottom: 10
@@ -6132,14 +6663,14 @@ function App() {
       style: {
         width: "100%",
         minHeight: 160,
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1px solid ${GL}`,
         borderRadius: var_r,
         padding: "11px 12px",
         fontFamily: "var(--font)",
         fontSize: 13,
         lineHeight: 1.6,
-        color: "#0A1628",
+        color: "#0B1220",
         resize: "vertical",
         outline: "none"
       }
@@ -6184,16 +6715,16 @@ function App() {
   const ReviewPanel = () => {
     if (!showReview) return null;
     const icons = {
-      university: "🎓",
-      gradYear: "📅",
-      targetTerm: "🎯",
-      major: "📚",
-      gpa: "📊",
-      extracurriculars: "⭐",
-      skills: "🛠",
-      type: "💼",
-      zip: "📍",
-      radius: "🧭"
+      university: "",
+      gradYear: "",
+      targetTerm: "",
+      major: "",
+      gpa: "",
+      extracurriculars: "",
+      skills: "",
+      type: "",
+      zip: "",
+      radius: ""
     };
     return React.createElement("div", {
       onClick: () => setShowReview(false),
@@ -6232,7 +6763,7 @@ function App() {
       style: {
         fontSize: 10,
         fontWeight: 700,
-        color: "#9CA3AF",
+        color: "#6B7280",
         letterSpacing: "2px",
         textTransform: "uppercase"
       }
@@ -6240,7 +6771,7 @@ function App() {
       style: {
         fontWeight: 800,
         fontSize: 20,
-        color: "#0A1628",
+        color: "#0B1220",
         letterSpacing: "-0.4px"
       }
     }, "Tap any answer to change it"), React.createElement("p", {
@@ -6255,7 +6786,7 @@ function App() {
         background: "none",
         border: "none",
         fontSize: 22,
-        color: "#9CA3AF",
+        color: "#6B7280",
         cursor: "pointer",
         lineHeight: 1
       }
@@ -6274,7 +6805,7 @@ function App() {
         display: "flex",
         alignItems: "center",
         gap: 12,
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1.5px solid ${GL}`,
         borderRadius: var_rl,
         padding: "12px 14px",
@@ -6297,14 +6828,14 @@ function App() {
       style: {
         display: "block",
         fontSize: 11,
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontWeight: 700
       }
     }, s.label), React.createElement("span", {
       style: {
         display: "block",
         fontSize: 14,
-        color: "#0A1628",
+        color: "#0B1220",
         fontWeight: 600,
         overflow: "hidden",
         textOverflow: "ellipsis",
@@ -6322,7 +6853,7 @@ function App() {
   const NudgeToast = () => {
     if (!proNudge) return null;
     const msg = {
-      welcome_back: "Welcome back 👋 Want reminders when each follow-up is due, with the email drafted for you?",
+      welcome_back: "Welcome back Want reminders when each follow-up is due, with the email drafted for you?",
       followups: `You're tracking ${tracked.length} applications — Beat the Pile can remind you when each is due for a follow-up and draft it for you.`
     }[proNudge.reason] || "Unlock more with Pro.";
     return React.createElement("div", {
@@ -6340,7 +6871,7 @@ function App() {
     }, React.createElement("div", {
       style: {
         pointerEvents: "auto",
-        background: "#0A1628",
+        background: "#0B1220",
         color: "#fff",
         borderRadius: var_rl,
         padding: "13px 14px 13px 16px",
@@ -6385,7 +6916,7 @@ function App() {
       style: {
         background: "none",
         border: "none",
-        color: "#9CA3AF",
+        color: "#6B7280",
         cursor: "pointer",
         fontSize: 18,
         lineHeight: 1
@@ -6447,7 +6978,7 @@ function App() {
     }, React.createElement("p", {
       style: {
         fontSize: 10,
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontWeight: 700,
         letterSpacing: "2px"
       }
@@ -6455,7 +6986,7 @@ function App() {
       style: {
         fontSize: 20,
         fontWeight: 800,
-        color: "#0A1628",
+        color: "#0B1220",
         margin: "4px 0 6px"
       }
     }, "Sign in to Beat the Pile"), React.createElement("p", {
@@ -6477,7 +7008,7 @@ function App() {
     return React.createElement("div", {
       onClick: () => setPage("dashboard"),
       style: {
-        background: "linear-gradient(135deg,#FEF3C7,#FDE68A)",
+        background: "#FEF3C7",
         border: "1px solid #F59E0B",
         borderRadius: var_rl,
         padding: "12px 16px",
@@ -6493,7 +7024,7 @@ function App() {
         fontSize: 22,
         flexShrink: 0
       }
-    }, "\u23F0"), React.createElement("div", {
+    }), React.createElement("div", {
       style: {
         flex: 1,
         minWidth: 0
@@ -6560,7 +7091,7 @@ function App() {
       style: {
         fontSize: 10,
         fontWeight: 700,
-        color: "#9CA3AF",
+        color: "#6B7280",
         letterSpacing: "2px",
         textTransform: "uppercase"
       }
@@ -6568,7 +7099,7 @@ function App() {
       style: {
         fontWeight: 800,
         fontSize: 20,
-        color: "#0A1628",
+        color: "#0B1220",
         letterSpacing: "-0.4px"
       }
     }, a.company), React.createElement("p", {
@@ -6582,7 +7113,7 @@ function App() {
         background: "none",
         border: "none",
         fontSize: 22,
-        color: "#9CA3AF",
+        color: "#6B7280",
         cursor: "pointer",
         lineHeight: 1
       }
@@ -6597,7 +7128,7 @@ function App() {
         color: GD,
         lineHeight: 1.5
       }
-    }, "\u270B You send this from your own email, as yourself \u2014 that's what makes a follow-up work. We just handle the timing and the first draft."), kit.loading && kit.company === a.company ? React.createElement("div", {
+    }, "You send this from your own email, as yourself \u2014 that's what makes a follow-up work. We just handle the timing and the first draft."), kit.loading && kit.company === a.company ? React.createElement("div", {
       style: {
         display: "flex",
         alignItems: "center",
@@ -6622,7 +7153,7 @@ function App() {
         margin: "0 0 6px",
         lineHeight: 1.45
       }
-    }, "\u270D\uFE0F ", React.createElement("b", null, "Draft"), " \u2014 edit it before you send. Nothing is sent for you."), React.createElement("div", {
+    }, React.createElement("b", null, "Draft"), " \u2014 edit it before you send. Nothing is sent for you."), React.createElement("div", {
       style: {
         position: "relative",
         marginBottom: 10
@@ -6636,14 +7167,14 @@ function App() {
       style: {
         width: "100%",
         minHeight: 200,
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1px solid ${GL}`,
         borderRadius: var_r,
         padding: "12px",
         fontFamily: "var(--font)",
         fontSize: 13,
         lineHeight: 1.6,
-        color: "#0A1628",
+        color: "#0B1220",
         resize: "vertical",
         outline: "none"
       }
@@ -6684,7 +7215,7 @@ function App() {
           textDecoration: "none",
           marginBottom: 14
         }
-      }, "\uD83D\uDCE7 Open in email app");
+      }, "Open in email app");
     })(), kit.tips && kit.tips.length > 0 && React.createElement("div", {
       style: {
         display: "flex",
@@ -6713,7 +7244,7 @@ function App() {
       },
       style: {
         width: "100%",
-        background: `linear-gradient(135deg,${G},${GD})`,
+        background: `${G}`,
         border: "none",
         color: "#fff",
         padding: "13px",
@@ -6722,206 +7253,75 @@ function App() {
         fontFamily: "var(--font)",
         fontSize: 14.5,
         fontWeight: 700,
-        boxShadow: `0 4px 16px ${G}40`
+        boxShadow: "0 1px 2px rgba(11,18,32,.06)"
       }
     }, "I sent it \u2014 mark as followed up \u2713")) : null));
   };
-  const Nav = () => React.createElement("nav", {
-    className: "nav-pad",
-    style: {
-      background: "rgba(255,255,255,0.95)",
-      borderBottom: `1px solid ${GL}`,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-      padding: "0 1.5rem",
-      height: 58,
-      position: "sticky",
-      top: 0,
-      zIndex: 100,
-      backdropFilter: "blur(8px)"
-    }
-  }, React.createElement("button", {
-    onClick: () => setPage("landing"),
-    "aria-label": "Beat the Pile home",
-    style: {
-      background: "none",
-      border: "none",
-      cursor: "pointer",
-      display: "flex",
-      alignItems: "center",
-      gap: 9,
-      padding: 0
-    }
-  }, React.createElement("div", {
-    style: {
-      width: 32,
-      height: 32,
-      background: `linear-gradient(135deg,${G},${GD})`,
-      borderRadius: 9,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      boxShadow: `0 2px 8px ${G}40`
-    }
-  }, React.createElement("span", {
-    style: {
-      fontSize: 13,
-      fontWeight: 800,
-      color: "#fff",
-      letterSpacing: "-0.5px"
-    }
-  }, "BP")), React.createElement("span", {
-    className: "nav-logo-text",
-    style: {
-      whiteSpace: "nowrap",
-      fontWeight: 800,
-      fontSize: 17,
-      color: "#0A1628",
-      letterSpacing: "-0.5px"
-    }
-  }, "Beat the Pile")), React.createElement("div", {
-    className: "nav-links",
-    style: {
-      display: "flex",
-      gap: 2,
-      alignItems: "center",
-      flex: 1,
-      minWidth: 0,
-      overflowX: "auto",
-      scrollbarWidth: "none",
-      justifyContent: "flex-start",
-      marginLeft: 12
-    }
-  }, [["/jobs/", "Jobs"], ["/jobs/?view=saved", "♡ Saved"], ["/fair/", "Career Fair"], ["/season/", "My Season"], ["/radar/", "Radar"]].map(([href, l]) => React.createElement("a", {
-    key: href,
-    className: "nav-tab",
-    href: href,
-    style: {
-      whiteSpace: "nowrap",
-      color: "#4A5568",
-      padding: "7px 12px",
-      borderRadius: var_r,
-      fontSize: 14,
-      fontWeight: 600,
-      fontFamily: "var(--font)",
-      textDecoration: "none"
-    }
-  }, l)), [["quiz", "Match quiz"], ["dashboard", "Dashboard"], ["resumebuilder", "📄 Resume"], ["profile", "Profile"], ["wall", "Community"], ["community", "Tips"]].map(([p, l]) => React.createElement("button", {
-    key: p,
-    className: "nav-tab",
-    onClick: () => setPage(p),
-    style: {
-      whiteSpace: "nowrap",
-      background: page === p ? GL : "transparent",
-      border: "none",
-      color: page === p ? GD : "#4A5568",
-      padding: "7px 12px",
-      borderRadius: var_r,
-      cursor: "pointer",
-      fontSize: 14,
-      fontWeight: page === p ? 600 : 400,
-      fontFamily: "var(--font)"
-    }
-  }, l)), !isPro && React.createElement("button", {
-    onClick: () => setShowProModal(true),
-    style: {
-      whiteSpace: "nowrap",
-      background: AL,
-      border: `1px solid ${AM}30`,
-      color: AM,
-      padding: "6px 12px",
-      borderRadius: var_r,
-      cursor: "pointer",
-      fontSize: 13,
-      fontWeight: 700,
-      fontFamily: "var(--font)",
-      marginLeft: 2
-    }
-  }, "\u26A1 Pro"), React.createElement("button", {
-    className: "nav-hide-mobile nav-cta",
-    onClick: () => {
-      if (results.length > 0) {
-        setPage("results");
-      } else {
-        setStep(0);
-        setPage("quiz");
+  const Nav = () => {
+    const slot = typeof document !== "undefined" ? document.getElementById("btpRight") : null;
+    const acct = clerkUser ? React.createElement("button", {
+      onClick: () => setPage("profile"),
+      title: clerkUser.primaryEmailAddress?.emailAddress || "Account",
+      "aria-label": "Your profile",
+      style: {
+        background: "#2FBF8A",
+        border: "none",
+        color: "#0B1220",
+        width: 30,
+        height: 30,
+        borderRadius: 8,
+        cursor: "pointer",
+        fontSize: 13,
+        fontWeight: 700,
+        fontFamily: "inherit"
       }
-    },
-    style: {
-      whiteSpace: "nowrap",
-      background: `linear-gradient(135deg,${G},${GD})`,
-      border: "none",
-      color: "#fff",
-      padding: "8px 18px",
-      borderRadius: var_r,
-      cursor: "pointer",
-      fontSize: 14,
-      fontWeight: 700,
-      marginLeft: 4,
-      fontFamily: "var(--font)",
-      boxShadow: `0 2px 8px ${G}40`
-    }
-  }, results.length > 0 ? "See results" : "Get Started")), saveNote && React.createElement("div", {
-    role: "status",
-    style: {
-      position: "fixed",
-      left: "50%",
-      bottom: 22,
-      transform: "translateX(-50%)",
-      background: "#0A1628",
-      color: "#fff",
-      padding: "10px 16px",
-      borderRadius: 10,
-      fontSize: 13.5,
-      fontWeight: 600,
-      zIndex: 2000,
-      maxWidth: "90vw",
-      boxShadow: "0 6px 20px rgba(0,0,0,.25)"
-    }
-  }, saveNote), React.createElement("div", {
-    style: {
-      display: "flex",
-      alignItems: "center",
-      flexShrink: 0,
-      marginLeft: 6
-    }
-  }, clerkUser ? React.createElement("button", {
-    onClick: () => setPage("profile"),
-    title: clerkUser.primaryEmailAddress?.emailAddress || "Account",
-    style: {
-      background: GL,
-      border: `1px solid ${GM}`,
-      color: GD,
-      width: 32,
-      height: 32,
-      borderRadius: "50%",
-      cursor: "pointer",
-      fontSize: 13,
-      fontWeight: 800,
-      fontFamily: "var(--font)",
-      marginLeft: 4,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center"
-    }
-  }, (clerkUser.firstName || clerkUser.primaryEmailAddress?.emailAddress || "U").charAt(0).toUpperCase()) : React.createElement("button", {
-    onClick: openSignIn,
-    style: {
-      background: "transparent",
-      border: "1px solid #C7D2FE",
-      color: "#4F46E5",
-      padding: "6px 12px",
-      borderRadius: var_r,
-      cursor: "pointer",
-      fontSize: 13,
-      fontWeight: 700,
-      fontFamily: "var(--font)",
-      marginLeft: 2,
-      whiteSpace: "nowrap",
-      flexShrink: 0
-    }
-  }, "Sign in")));
+    }, (clerkUser.firstName || clerkUser.primaryEmailAddress?.emailAddress || "U").charAt(0).toUpperCase()) : React.createElement("button", {
+      onClick: openSignIn,
+      style: {
+        background: "#2FBF8A",
+        border: "1px solid #2FBF8A",
+        color: "#0B1220",
+        padding: "6px 12px",
+        borderRadius: 7,
+        cursor: "pointer",
+        fontSize: 13,
+        fontWeight: 600,
+        fontFamily: "inherit",
+        whiteSpace: "nowrap"
+      }
+    }, "Sign in");
+    return React.createElement(React.Fragment, null, slot ? ReactDOM.createPortal(acct, slot) : null, saveNote && React.createElement("div", {
+      role: "status",
+      style: {
+        position: "fixed",
+        left: "50%",
+        bottom: 22,
+        transform: "translateX(-50%)",
+        background: "#0B1220",
+        color: "#fff",
+        padding: "10px 16px",
+        borderRadius: 10,
+        fontSize: 13.5,
+        fontWeight: 500,
+        zIndex: 2000,
+        maxWidth: "90vw",
+        boxShadow: "0 6px 20px rgba(0,0,0,.25)"
+      }
+    }, saveNote));
+  };
+  if (page === "interview") {
+    const lastApp = (tracked || []).slice(-1)[0];
+    return React.createElement("div", {
+      style: {
+        background: "#FBFBFC",
+        minHeight: "100vh"
+      }
+    }, React.createElement(Nav, null), React.createElement(InterviewSim, {
+      major: ans.major || profile.major || "",
+      defaultCompany: lastApp?.company || "",
+      defaultRole: lastApp?.role || ""
+    }));
+  }
   if (page === "landing") return React.createElement("div", {
     style: {
       background: "#fff"
@@ -6948,20 +7348,20 @@ function App() {
       border: `1px solid ${GM}`,
       letterSpacing: "0.3px"
     }
-  }, React.createElement("span", null, "\u2726"), " For engineering students \xB7 straight from company job boards"), React.createElement("h1", {
+  }, React.createElement("span", null), " For engineering students \xB7 straight from company job boards"), React.createElement("h1", {
     style: {
       fontSize: "clamp(2.4rem,6vw,4rem)",
-      fontWeight: 800,
-      lineHeight: 1.05,
-      letterSpacing: "-2.5px",
+      fontWeight: 700,
+      lineHeight: 1.04,
+      letterSpacing: "-0.035em",
       marginBottom: "1.25rem",
-      color: "#0A1628"
+      color: "#0B1220"
     }
-  }, "Stop applying blind.", React.createElement("br", null), React.createElement("span", {
+  }, "Apply early.", React.createElement("br", null), React.createElement("span", {
     style: {
       color: G
     }
-  }, "Start applying smart.")), React.createElement("p", {
+  }, "Beat the pile.")), React.createElement("p", {
     style: {
       fontSize: 18,
       color: "#4A5568",
@@ -6979,7 +7379,7 @@ function App() {
   }, React.createElement("a", {
     href: "/jobs/",
     style: {
-      background: `linear-gradient(135deg,${G},${GD})`,
+      background: `${G}`,
       color: "#fff",
       padding: "15px 32px",
       borderRadius: var_rl,
@@ -6987,14 +7387,14 @@ function App() {
       fontWeight: 700,
       textDecoration: "none",
       fontFamily: "var(--font)",
-      boxShadow: `0 4px 20px ${G}50`,
+      boxShadow: "0 1px 2px rgba(11,18,32,.06)",
       letterSpacing: "-0.3px"
     }
   }, "Browse internships \u2192"), React.createElement("a", {
     href: "/fair/",
     style: {
       background: "#fff",
-      color: "#0A1628",
+      color: "#0B1220",
       border: "1.5px solid #CBD5E0",
       padding: "15px 28px",
       borderRadius: var_rl,
@@ -7003,7 +7403,7 @@ function App() {
       textDecoration: "none",
       fontFamily: "var(--font)"
     }
-  }, "\uD83C\uDFAF Career Fair Mode")), React.createElement("p", {
+  }, "Career Fair Mode")), React.createElement("p", {
     style: {
       fontSize: 13,
       color: "#6B7280",
@@ -7033,7 +7433,7 @@ function App() {
     }
   }, "\u25B6 90-second demo")), React.createElement(JobPreview, null)), React.createElement("div", {
     style: {
-      background: "#F8FFFE",
+      background: "#FBFBFC",
       borderTop: `1px solid ${GL}`,
       borderBottom: `1px solid ${GL}`,
       padding: "3rem 2rem"
@@ -7042,7 +7442,7 @@ function App() {
     style: {
       fontSize: 10,
       fontWeight: 700,
-      color: "#9CA3AF",
+      color: "#6B7280",
       letterSpacing: "3px",
       textTransform: "uppercase",
       textAlign: "center",
@@ -7058,7 +7458,7 @@ function App() {
     style: {
       fontSize: 10,
       fontWeight: 700,
-      color: "#9CA3AF",
+      color: "#6B7280",
       letterSpacing: "3px",
       textTransform: "uppercase",
       textAlign: "center",
@@ -7071,7 +7471,7 @@ function App() {
       letterSpacing: "-0.8px",
       textAlign: "center",
       marginBottom: "2rem",
-      color: "#0A1628"
+      color: "#0B1220"
     }
   }, "Real students. Real results."), React.createElement("div", {
     style: {
@@ -7086,7 +7486,7 @@ function App() {
       border: `1.5px solid ${GL}`,
       borderRadius: var_rl,
       padding: "1.4rem",
-      boxShadow: "0 2px 10px rgba(0,194,133,0.06)",
+      boxShadow: "0 1px 2px rgba(11,18,32,.06)",
       display: "flex",
       flexDirection: "column",
       gap: 10
@@ -7105,7 +7505,7 @@ function App() {
   }, "\u2605"))), React.createElement("p", {
     style: {
       fontSize: 13.5,
-      color: "#0A1628",
+      color: "#0B1220",
       lineHeight: 1.65,
       fontStyle: "italic",
       flex: 1
@@ -7122,7 +7522,7 @@ function App() {
       width: 36,
       height: 36,
       borderRadius: "50%",
-      background: `linear-gradient(135deg,${G},${GD})`,
+      background: `${G}`,
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
@@ -7135,12 +7535,12 @@ function App() {
     style: {
       fontWeight: 700,
       fontSize: 13,
-      color: "#0A1628"
+      color: "#0B1220"
     }
   }, t.name), React.createElement("p", {
     style: {
       fontSize: 11.5,
-      color: "#9CA3AF"
+      color: "#6B7280"
     }
   }, t.detail)))))), React.createElement("div", {
     style: {
@@ -7170,7 +7570,7 @@ function App() {
     style: {
       fontSize: 10,
       fontWeight: 700,
-      color: "#9CA3AF",
+      color: "#6B7280",
       letterSpacing: "3px",
       textTransform: "uppercase",
       textAlign: "center",
@@ -7183,7 +7583,7 @@ function App() {
       letterSpacing: "-1px",
       textAlign: "center",
       marginBottom: "2.5rem",
-      color: "#0A1628"
+      color: "#0B1220"
     }
   }, "One place for the whole search."), React.createElement("div", {
     style: {
@@ -7192,7 +7592,7 @@ function App() {
       gap: "1.25rem"
     }
   }, [{
-    icon: "🔎",
+    icon: "",
     num: "01",
     title: "Browse real internships",
     desc: "Pulled straight from each company's own job board. A robot proves every board is really theirs, re-reads it at least twice a day, and removes jobs the company takes down.",
@@ -7204,7 +7604,7 @@ function App() {
     desc: "Save the ones you like, mark what you've applied to, and filter by state — VA & PA by default, or anywhere in the US.",
     color: AM
   }, {
-    icon: "🎯",
+    icon: "",
     num: "03",
     title: "Crush the career fair",
     desc: "Your resume as a QR code, every company at the fair with booth numbers and open roles, notes after each talk, and follow-up emails drafted for you.",
@@ -7216,7 +7616,7 @@ function App() {
       border: `1px solid ${GL}`,
       borderRadius: var_rl,
       padding: "1.75rem",
-      boxShadow: "0 2px 12px rgba(0,194,133,0.06)"
+      boxShadow: "0 1px 2px rgba(11,18,32,.06)"
     }
   }, React.createElement("div", {
     style: {
@@ -7225,30 +7625,19 @@ function App() {
       alignItems: "flex-start",
       marginBottom: "1rem"
     }
-  }, React.createElement("div", {
+  }, React.createElement("span", {
     style: {
-      width: 44,
-      height: 44,
-      borderRadius: var_r,
-      background: GL,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      fontSize: 22
+      fontSize: 13,
+      fontWeight: 600,
+      color: G,
+      letterSpacing: "0.04em"
     }
-  }, s.icon), React.createElement("span", {
-    style: {
-      fontSize: 28,
-      fontWeight: 800,
-      color: "#E2F5EE",
-      letterSpacing: "-1px"
-    }
-  }, s.num)), React.createElement("h3", {
+  }, "STEP ", s.num)), React.createElement("h3", {
     style: {
       fontSize: 16,
       fontWeight: 700,
       marginBottom: "0.5rem",
-      color: "#0A1628",
+      color: "#0B1220",
       letterSpacing: "-0.3px"
     }
   }, s.title), React.createElement("p", {
@@ -7263,14 +7652,14 @@ function App() {
     }
   }, React.createElement("div", {
     style: {
-      background: `linear-gradient(135deg,${GL},#fff)`,
+      background: `${GL}`,
       border: `1.5px solid ${GM}`,
       borderRadius: var_rxl,
       padding: "3rem 2rem",
       maxWidth: 520,
       margin: "0 auto",
       textAlign: "center",
-      boxShadow: `0 8px 32px ${G}15`
+      boxShadow: "0 1px 2px rgba(11,18,32,.06)"
     }
   }, React.createElement("h2", {
     style: {
@@ -7278,7 +7667,7 @@ function App() {
       fontWeight: 800,
       letterSpacing: "-0.8px",
       marginBottom: "0.75rem",
-      color: "#0A1628"
+      color: "#0B1220"
     }
   }, "Ready to find your real shot?"), React.createElement("p", {
     style: {
@@ -7291,7 +7680,7 @@ function App() {
     href: "/jobs/",
     style: {
       display: "inline-block",
-      background: `linear-gradient(135deg,${G},${GD})`,
+      background: `${G}`,
       color: "#fff",
       padding: "15px 40px",
       borderRadius: var_rl,
@@ -7299,7 +7688,7 @@ function App() {
       fontWeight: 700,
       textDecoration: "none",
       fontFamily: "var(--font)",
-      boxShadow: `0 4px 20px ${G}40`
+      boxShadow: "0 1px 2px rgba(11,18,32,.06)"
     }
   }, "Browse internships \u2192"))), React.createElement("footer", {
     style: {
@@ -7338,7 +7727,7 @@ function App() {
       font: "inherit",
       fontWeight: 700
     }
-  }, "Go Pro \u26A1")));
+  }, "Go Pro ")));
   if (page === "quiz") {
     const answered = Object.entries(ans).filter(([k, v]) => {
       if (k === "extracurriculars") return extPicks.length > 0;
@@ -7358,14 +7747,14 @@ function App() {
     }, React.createElement("div", {
       style: {
         height: "100%",
-        background: `linear-gradient(90deg,${G},${GD})`,
+        background: `${G}`,
         width: `${step / STEPS.length * 100}%`,
         transition: "width 0.5s ease",
         borderRadius: "0 99px 99px 0"
       }
     })), React.createElement("div", {
       style: {
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         borderBottom: `1px solid ${GL}`,
         padding: "0.6rem 1.5rem",
         display: "flex",
@@ -7391,7 +7780,7 @@ function App() {
       style: {
         width: `${profilePct}%`,
         height: "100%",
-        background: `linear-gradient(90deg,${G},${GD})`,
+        background: `${G}`,
         borderRadius: 99,
         transition: "width 0.6s ease"
       }
@@ -7417,10 +7806,10 @@ function App() {
         textTransform: "uppercase",
         marginBottom: "0.4rem"
       }
-    }, "\u270E Editing one answer") : React.createElement("p", {
+    }, "Editing one answer") : React.createElement("p", {
       style: {
         fontSize: 10,
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontWeight: 700,
         letterSpacing: "2.5px",
         textTransform: "uppercase",
@@ -7435,7 +7824,7 @@ function App() {
         letterSpacing: "-0.8px",
         marginBottom: "0.5rem",
         lineHeight: 1.2,
-        color: "#0A1628"
+        color: "#0B1220"
       }
     }, cur.label), STEP_HINTS[cur.key] && React.createElement("p", {
       style: {
@@ -7444,11 +7833,11 @@ function App() {
         marginBottom: "1.75rem",
         lineHeight: 1.5,
         padding: "8px 12px",
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         borderRadius: var_r,
         border: `1px solid ${GL}`
       }
-    }, "\uD83D\uDCA1 ", STEP_HINTS[cur.key]), cur.type === "search" && (() => {
+    }, STEP_HINTS[cur.key]), cur.type === "search" && (() => {
       const picked = cur.multi ? (ans[cur.key] || "").split(",").map(s => s.trim()).filter(Boolean) : [];
       const showList = !cur.multi || picked.length === 0 || addingMore;
       const atMax = cur.multi && cur.maxPicks && picked.length >= cur.maxPicks;
@@ -7549,7 +7938,7 @@ function App() {
           transform: "translateY(-50%)",
           fontSize: 16
         }
-      }, "\uD83D\uDD0D"), React.createElement("input", {
+      }), React.createElement("input", {
         type: "text",
         value: searchQ,
         onChange: e => setSearchQ(e.target.value),
@@ -7560,8 +7949,8 @@ function App() {
           padding: "13px 14px 13px 42px",
           borderRadius: var_rl,
           border: `1.5px solid ${searchQ ? G : "#E2E8F0"}`,
-          background: "#F8FFFE",
-          color: "#0A1628",
+          background: "#FBFBFC",
+          color: "#0B1220",
           fontFamily: "var(--font)",
           fontSize: 15,
           outline: "none",
@@ -7601,7 +7990,7 @@ function App() {
             style: {
               background: isPicked ? GL : "#fff",
               border: `1.5px solid ${isPicked ? G : "#E2E8F0"}`,
-              color: isPicked ? GD : "#0A1628",
+              color: isPicked ? GD : "#0B1220",
               padding: "11px 14px",
               borderRadius: var_r,
               cursor: isPicked || atMax ? "not-allowed" : "pointer",
@@ -7619,7 +8008,7 @@ function App() {
           style: {
             background: ans[cur.key] === o ? GL : "#fff",
             border: `1.5px solid ${ans[cur.key] === o ? G : "#E2E8F0"}`,
-            color: ans[cur.key] === o ? GD : "#0A1628",
+            color: ans[cur.key] === o ? GD : "#0B1220",
             padding: "11px 14px",
             borderRadius: var_r,
             cursor: "pointer",
@@ -7635,7 +8024,7 @@ function App() {
           marginTop: 10,
           background: "none",
           border: "none",
-          color: "#9CA3AF",
+          color: "#6B7280",
           fontSize: 12.5,
           cursor: "pointer",
           fontFamily: "var(--font)",
@@ -7662,14 +8051,14 @@ function App() {
         }
       }, "+ Add another major ", React.createElement("span", {
         style: {
-          color: "#9CA3AF",
+          color: "#6B7280",
           fontWeight: 500,
           marginLeft: 4
         }
       }, "(optional)")), cur.multi && atMax && !addingMore && React.createElement("p", {
         style: {
           fontSize: 11,
-          color: "#9CA3AF",
+          color: "#6B7280",
           textAlign: "center",
           marginTop: 6
         }
@@ -7698,7 +8087,7 @@ function App() {
         style: {
           background: sel ? c : "#fff",
           border: `1.5px solid ${sel ? c : "#E2E8F0"}`,
-          color: sel ? "#fff" : "#0A1628",
+          color: sel ? "#fff" : "#0B1220",
           padding: "10px 20px",
           borderRadius: 99,
           cursor: "pointer",
@@ -7788,7 +8177,7 @@ function App() {
           alignItems: "center",
           justifyContent: "space-between",
           padding: "13px 16px",
-          background: catSelected.length > 0 ? `${cat.color}10` : "#F8FFFE",
+          background: catSelected.length > 0 ? `${cat.color}10` : "#FBFBFC",
           cursor: "pointer",
           fontFamily: "var(--font)",
           border: "none"
@@ -7801,13 +8190,9 @@ function App() {
         }
       }, React.createElement("span", {
         style: {
-          fontSize: 18
-        }
-      }, cat.icon), React.createElement("span", {
-        style: {
           fontWeight: 700,
           fontSize: 14,
-          color: "#0A1628"
+          color: "#0B1220"
         }
       }, cat.label), catSelected.length > 0 && React.createElement("span", {
         style: {
@@ -7820,7 +8205,7 @@ function App() {
         }
       }, catSelected.length)), React.createElement("span", {
         style: {
-          color: "#9CA3AF",
+          color: "#6B7280",
           fontSize: 13,
           fontWeight: 600
         }
@@ -7833,7 +8218,7 @@ function App() {
       }, React.createElement("p", {
         style: {
           fontSize: 11,
-          color: "#9CA3AF",
+          color: "#6B7280",
           fontWeight: 600,
           marginBottom: 8,
           letterSpacing: "0.5px"
@@ -7858,7 +8243,7 @@ function App() {
           style: {
             background: picked ? cat.color : "#fff",
             border: `1.5px solid ${picked ? cat.color : "#E2E8F0"}`,
-            color: picked ? "#fff" : "#0A1628",
+            color: picked ? "#fff" : "#0B1220",
             padding: "8px 14px",
             borderRadius: 99,
             cursor: "pointer",
@@ -7888,39 +8273,12 @@ function App() {
       }
     }, "\u2713 ", extPicks.length, " activit", extPicks.length === 1 ? "y" : "ies", " selected")), cur.type === "multi" && React.createElement("div", {
       className: "fade-up"
-    }, React.createElement("div", {
-      style: {
-        display: "flex",
-        flexWrap: "wrap",
-        gap: 8
-      }
-    }, skillsForMajor(ans.major).map((o, i) => {
-      const c = PALETTE[i % PALETTE.length];
-      const sel = ans.skills.includes(o);
-      return React.createElement("button", {
-        key: o,
-        onClick: () => toggleSkill(o),
-        style: {
-          background: sel ? c : "#fff",
-          border: `1.5px solid ${sel ? c : "#E2E8F0"}`,
-          color: sel ? "#fff" : "#0A1628",
-          padding: "9px 16px",
-          borderRadius: 99,
-          cursor: "pointer",
-          fontFamily: "var(--font)",
-          fontSize: 13,
-          fontWeight: sel ? 700 : 400,
-          transition: "all 0.15s",
-          boxShadow: sel ? `0 2px 8px ${c}35` : "none"
-        }
-      }, sel && "✓ ", o);
-    })), React.createElement("p", {
-      style: {
-        fontSize: 13,
-        color: "#9CA3AF",
-        marginTop: 12
-      }
-    }, "Tailored to ", ans.major || "your major", " \u2014 select all you actually have")), cur.type === "resume" && React.createElement("div", {
+    }, React.createElement(SkillPicker, {
+      options: skillsForMajor(ans.major),
+      value: ans.skills,
+      onToggle: toggleSkill,
+      major: ans.major
+    })), cur.type === "resume" && React.createElement("div", {
       className: "fade-up"
     }, React.createElement("p", {
       style: {
@@ -7939,7 +8297,7 @@ function App() {
     }, React.createElement("label", {
       style: {
         flex: "1 1 auto",
-        background: `linear-gradient(135deg,${G},${GD})`,
+        background: `${G}`,
         color: "#fff",
         padding: "12px 16px",
         borderRadius: var_r,
@@ -7948,9 +8306,9 @@ function App() {
         fontSize: 14,
         fontWeight: 700,
         textAlign: "center",
-        boxShadow: `0 2px 10px ${G}40`
+        boxShadow: "0 1px 2px rgba(11,18,32,.06)"
       }
-    }, "\uD83D\uDCCE Upload file (PDF, DOCX, TXT)", React.createElement("input", {
+    }, "Upload file (PDF, DOCX, TXT)", React.createElement("input", {
       type: "file",
       accept: ".pdf,.txt,.docx",
       onChange: e => {
@@ -7985,16 +8343,16 @@ function App() {
         fontWeight: 600,
         marginBottom: 8
       }
-    }, "\uD83D\uDCC4 Reading file\u2026"), resumeUploadErr && React.createElement("p", {
+    }, "Reading file\u2026"), resumeUploadErr && React.createElement("p", {
       style: {
         fontSize: 12,
         color: CR,
         marginBottom: 8
       }
-    }, "\u26A0 ", resumeUploadErr), React.createElement("p", {
+    }, resumeUploadErr), React.createElement("p", {
       style: {
         fontSize: 12,
-        color: "#9CA3AF",
+        color: "#6B7280",
         margin: "10px 0",
         textAlign: "center"
       }
@@ -8008,8 +8366,8 @@ function App() {
         padding: "12px 14px",
         borderRadius: var_rl,
         border: `1.5px solid ${(ans.resume || "").length > 40 ? G : "#E2E8F0"}`,
-        background: "#F8FFFE",
-        color: "#0A1628",
+        background: "#FBFBFC",
+        color: "#0B1220",
         fontFamily: "var(--font)",
         fontSize: 13.5,
         lineHeight: 1.5,
@@ -8035,7 +8393,7 @@ function App() {
     }, React.createElement("p", {
       style: {
         fontSize: 13,
-        color: "#0A1628",
+        color: "#0B1220",
         fontWeight: 700,
         marginBottom: 4
       }
@@ -8086,8 +8444,8 @@ function App() {
         padding: "18px",
         borderRadius: var_rl,
         border: `2px solid ${/^\d{5}$/.test(ans.zip) ? G : "#E2E8F0"}`,
-        background: "#F8FFFE",
-        color: "#0A1628",
+        background: "#FBFBFC",
+        color: "#0B1220",
         fontFamily: "var(--font)",
         outline: "none",
         letterSpacing: 10,
@@ -8105,7 +8463,7 @@ function App() {
     }, "\u2713 Got it"), !/^\d{5}$/.test(ans.zip) && React.createElement("p", {
       style: {
         fontSize: 13,
-        color: "#9CA3AF",
+        color: "#6B7280",
         marginTop: 10,
         textAlign: "center"
       }
@@ -8148,7 +8506,7 @@ function App() {
         display: "flex",
         justifyContent: "space-between",
         marginTop: 8,
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontSize: 12
       }
     }, React.createElement("span", null, "10 mi"), React.createElement("span", null, "200 mi")), React.createElement("p", {
@@ -8170,7 +8528,7 @@ function App() {
         setPage("results");
       },
       style: {
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1.5px solid #E2E8F0`,
         color: "#4A5568",
         padding: "13px 16px",
@@ -8193,7 +8551,7 @@ function App() {
       style: {
         background: canNext() ? "#fff" : "#F1F5F4",
         border: `1.5px solid ${canNext() ? G : "#E2E8F0"}`,
-        color: canNext() ? GD : "#9CA3AF",
+        color: canNext() ? GD : "#6B7280",
         padding: "13px 16px",
         borderRadius: var_rl,
         cursor: canNext() ? "pointer" : "not-allowed",
@@ -8206,9 +8564,9 @@ function App() {
       disabled: !canNext(),
       style: {
         flex: 1,
-        background: canNext() ? `linear-gradient(135deg,${G},${GD})` : "#E2E8F0",
+        background: canNext() ? `${G}` : "#E2E8F0",
         border: "none",
-        color: canNext() ? "#fff" : "#9CA3AF",
+        color: canNext() ? "#fff" : "#6B7280",
         padding: "14px 20px",
         borderRadius: var_rl,
         cursor: canNext() ? "pointer" : "not-allowed",
@@ -8220,7 +8578,7 @@ function App() {
     }, "Save & see results \u2192")) : React.createElement(React.Fragment, null, step > 0 && React.createElement("button", {
       onClick: () => setStep(s => s - 1),
       style: {
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1.5px solid #E2E8F0`,
         color: "#4A5568",
         padding: "13px 18px",
@@ -8234,9 +8592,9 @@ function App() {
       disabled: !canNext(),
       style: {
         flex: 1,
-        background: canNext() ? `linear-gradient(135deg,${G},${GD})` : "#E2E8F0",
+        background: canNext() ? `${G}` : "#E2E8F0",
         border: "none",
-        color: canNext() ? "#fff" : "#9CA3AF",
+        color: canNext() ? "#fff" : "#6B7280",
         padding: "14px 24px",
         borderRadius: var_rl,
         cursor: canNext() ? "pointer" : "not-allowed",
@@ -8267,20 +8625,20 @@ function App() {
       borderRadius: var_rxl,
       padding: "2.5rem 2rem",
       textAlign: "center",
-      boxShadow: "0 8px 32px rgba(0,194,133,0.1)"
+      boxShadow: "0 1px 2px rgba(11,18,32,.06)"
     }
   }, React.createElement("div", {
     style: {
       fontSize: 34,
       marginBottom: 8
     }
-  }, "\uD83D\uDCEC"), React.createElement("h2", {
+  }), React.createElement("h2", {
     style: {
       fontSize: "clamp(1.5rem,3.5vw,2rem)",
       fontWeight: 800,
       letterSpacing: "-1px",
       marginBottom: 10,
-      color: "#0A1628"
+      color: "#0B1220"
     }
   }, "Want internship updates by email?"), React.createElement("p", {
     style: {
@@ -8306,7 +8664,7 @@ function App() {
       padding: "14px 16px",
       borderRadius: var_rl,
       border: `1.5px solid ${emailErr ? CR : /.+@.+\..+/.test(email) ? G : "#E2E8F0"}`,
-      background: "#F8FFFE",
+      background: "#FBFBFC",
       fontFamily: "var(--font)",
       fontSize: 16,
       textAlign: "center",
@@ -8323,7 +8681,7 @@ function App() {
     onClick: submitEmail,
     style: {
       width: "100%",
-      background: `linear-gradient(135deg,${G},${GD})`,
+      background: `${G}`,
       border: "none",
       color: "#fff",
       padding: "15px",
@@ -8332,7 +8690,7 @@ function App() {
       fontFamily: "var(--font)",
       fontSize: 16,
       fontWeight: 700,
-      boxShadow: `0 4px 16px ${G}40`
+      boxShadow: "0 1px 2px rgba(11,18,32,.06)"
     }
   }, "Save email & show my matches \u2192"), React.createElement("button", {
     onClick: () => {
@@ -8343,7 +8701,7 @@ function App() {
       width: "100%",
       background: "#fff",
       border: "1.5px solid #E2E8F0",
-      color: "#0A1628",
+      color: "#0B1220",
       padding: "13px",
       borderRadius: var_rl,
       cursor: "pointer",
@@ -8372,27 +8730,27 @@ function App() {
     const topNames = topPicks.map(c => c.name);
     const bandLabel = b => ({
       "in-town": {
-        text: "📍 IN TOWN",
+        text: "IN TOWN",
         color: "#0d9488",
         bg: "#0d948815"
       },
       "nearby": {
-        text: "📍 NEARBY",
+        text: "NEARBY",
         color: "#0891b2",
         bg: "#0891b215"
       },
       "metro": {
-        text: "🏙 METRO",
+        text: "METRO",
         color: "#4A5568",
         bg: "#4A556815"
       },
       "regional": {
-        text: "🗺 REGIONAL",
-        color: "#9CA3AF",
-        bg: "#9CA3AF15"
+        text: "REGIONAL",
+        color: "#6B7280",
+        bg: "#6B728015"
       },
       "remote": {
-        text: "🌐 REMOTE",
+        text: "REMOTE",
         color: "#7c3aed",
         bg: "#7c3aed15"
       }
@@ -8457,7 +8815,7 @@ function App() {
         justifyContent: "center",
         fontSize: 24
       }
-    }, "\uD83D\uDD0D")), React.createElement("div", {
+    })), React.createElement("div", {
       style: {
         background: GL,
         borderRadius: var_rxl,
@@ -8479,7 +8837,7 @@ function App() {
         fontWeight: 700,
         fontSize: 17,
         marginBottom: "0.5rem",
-        color: "#0A1628"
+        color: "#0B1220"
       }
     }, loadMsg), React.createElement("p", {
       style: {
@@ -8498,7 +8856,7 @@ function App() {
     }, React.createElement("div", null, React.createElement("p", {
       style: {
         fontSize: 10,
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontWeight: 700,
         letterSpacing: "2.5px",
         textTransform: "uppercase"
@@ -8509,7 +8867,7 @@ function App() {
         fontWeight: 800,
         letterSpacing: "-1.5px",
         marginTop: "0.2rem",
-        color: "#0A1628"
+        color: "#0B1220"
       }
     }, "Here's where you stand."), React.createElement("p", {
       style: {
@@ -8528,7 +8886,7 @@ function App() {
     }, React.createElement("button", {
       onClick: () => setShowReview(true),
       style: {
-        background: `linear-gradient(135deg,${G},${GD})`,
+        background: `${G}`,
         border: "none",
         color: "#fff",
         padding: "10px 18px",
@@ -8538,14 +8896,14 @@ function App() {
         fontSize: 13,
         fontWeight: 700,
         whiteSpace: "nowrap",
-        boxShadow: `0 2px 10px ${G}40`
+        boxShadow: "0 1px 2px rgba(11,18,32,.06)"
       }
-    }, "\u270E Edit answers"), React.createElement("button", {
+    }, "Edit answers"), React.createElement("button", {
       onClick: calcResults,
       style: {
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1.5px solid ${GL}`,
-        color: "#0A1628",
+        color: "#0B1220",
         padding: "10px 18px",
         borderRadius: var_rl,
         cursor: "pointer",
@@ -8581,12 +8939,12 @@ function App() {
       const decent = results.filter(r => r.match >= 50 && r.match < 70).length;
       return React.createElement("div", {
         style: {
-          background: `linear-gradient(135deg,${G},${GD})`,
+          background: `${G}`,
           borderRadius: var_rxl,
           padding: "1.5rem 1.75rem",
           marginBottom: 16,
           color: "#fff",
-          boxShadow: `0 8px 28px ${G}45`,
+          boxShadow: "0 1px 2px rgba(11,18,32,.06)",
           position: "relative",
           overflow: "hidden"
         }
@@ -8683,15 +9041,15 @@ function App() {
       const exc = exceptionalPicks(extPicks);
       const lines = [];
       lines.push({
-        icon: "📍",
+        icon: "",
         text: ans.type === "Remote" ? React.createElement(React.Fragment, null, "Real openings that say ", React.createElement("strong", null, "remote"), ", from companies' own job boards.") : React.createElement(React.Fragment, null, "Real openings from companies' own job boards", metaRef.current?.studentState ? React.createElement(React.Fragment, null, ", starting in ", React.createElement("strong", null, metaRef.current.studentState)) : "", ". Each one was open when our robot last checked.")
       });
       if (metaRef.current?.radiusExpanded) lines.push({
-        icon: "📍",
+        icon: "",
         text: React.createElement(React.Fragment, null, "Not enough openings in ", React.createElement("strong", null, metaRef.current.studentState || "your state"), ", so we widened the search to ", React.createElement("strong", null, metaRef.current.expansionLabel), ". Every listing shown is a real opening \u2014 check the location before applying.")
       });
       if (!hasResume && !hideResumeNudge) lines.push({
-        icon: "📄",
+        icon: "",
         text: React.createElement(React.Fragment, null, React.createElement("strong", null, "Add your resume"), " to auto-fill applications. ", React.createElement("button", {
           onClick: () => setPage("profile"),
           style: {
@@ -8708,15 +9066,15 @@ function App() {
         }, "Add now"))
       });
       if (tt) lines.push({
-        icon: late ? "⚠" : "⏱",
+        icon: late ? "" : "",
         text: timingNote(ans.targetTerm)
       });
       if (exp.label) lines.push({
-        icon: "🎓",
+        icon: "",
         text: exp.label
       });
       if (exc.length > 0) lines.push({
-        icon: "⭐",
+        icon: "",
         text: React.createElement(React.Fragment, null, "Your standout leadership \u2014 ", React.createElement("strong", null, exc.map(e => `${e.role} (${e.activity})`).join(", ")), " \u2014 is exactly what recruiters look for. Make sure it's front and center on your resume.")
       });
       if (lines.length === 0) return null;
@@ -8746,12 +9104,12 @@ function App() {
         style: {
           fontSize: 12.5,
           fontWeight: 800,
-          color: "#0A1628",
+          color: "#0B1220",
           letterSpacing: "0.3px"
         }
-      }, "\uD83D\uDCCB Context for these results ", React.createElement("span", {
+      }, "Context for these results ", React.createElement("span", {
         style: {
-          color: "#9CA3AF",
+          color: "#6B7280",
           fontWeight: 600,
           marginLeft: 6,
           fontSize: 11.5
@@ -8759,7 +9117,7 @@ function App() {
       }, "(", lines.length, " ", lines.length === 1 ? "note" : "notes", ")")), React.createElement("span", {
         style: {
           fontSize: 13,
-          color: "#9CA3AF",
+          color: "#6B7280",
           transform: insightsOpen ? "rotate(180deg)" : "rotate(0deg)",
           transition: "transform 0.2s"
         }
@@ -8785,18 +9143,23 @@ function App() {
           color: "#4A5568"
         }
       }, React.createElement("span", {
+        "aria-hidden": "true",
         style: {
-          fontSize: 13,
-          flexShrink: 0
+          width: 5,
+          height: 5,
+          borderRadius: 3,
+          background: "#9AA4B2",
+          flexShrink: 0,
+          marginTop: 8
         }
-      }, l.icon), React.createElement("span", {
+      }), React.createElement("span", {
         style: {
           flex: 1
         }
       }, l.text))), React.createElement("p", {
         style: {
           fontSize: 11,
-          color: "#9CA3AF",
+          color: "#6B7280",
           lineHeight: 1.55,
           paddingTop: 8,
           borderTop: `1px solid #E2E8F0`,
@@ -8811,7 +9174,7 @@ function App() {
       }
     }, React.createElement("div", {
       style: {
-        background: `linear-gradient(135deg,${AM},#F59E0B)`,
+        background: `${AM}`,
         color: "#fff",
         borderRadius: var_rl,
         padding: "12px 16px",
@@ -8826,7 +9189,7 @@ function App() {
         flexShrink: 0,
         animation: "nudgeRight 1s ease-in-out infinite"
       }
-    }, "\uD83D\uDC47"), React.createElement("div", {
+    }), React.createElement("div", {
       style: {
         flex: 1,
         minWidth: 0
@@ -8908,7 +9271,7 @@ function App() {
       style: {
         fontSize: 13.5,
         fontWeight: 800,
-        color: "#0A1628",
+        color: "#0B1220",
         marginBottom: 4
       }
     }, "No open ", ans.major || "", " internships found", ans.type === "Remote" ? " that are remote" : " in your area or anywhere in the US", " right now"), React.createElement("p", {
@@ -8930,7 +9293,7 @@ function App() {
       if (hasResume) return null;
       return React.createElement("div", {
         style: {
-          background: `linear-gradient(135deg,#0A1628,#1E3A5F)`,
+          background: `#0B1220`,
           borderRadius: var_rxl,
           padding: "1.25rem 1.5rem",
           marginBottom: 18,
@@ -8956,7 +9319,7 @@ function App() {
         style: {
           fontSize: 20
         }
-      }, "\uD83D\uDCC4"), React.createElement("p", {
+      }), React.createElement("p", {
         style: {
           fontWeight: 800,
           fontSize: 15,
@@ -8973,7 +9336,7 @@ function App() {
         onClick: () => setPage("resumebuilder"),
         style: {
           flexShrink: 0,
-          background: `linear-gradient(135deg,${G},${GD})`,
+          background: `${G}`,
           border: "none",
           color: "#fff",
           padding: "12px 20px",
@@ -8983,17 +9346,17 @@ function App() {
           fontSize: 14,
           fontWeight: 700,
           whiteSpace: "nowrap",
-          boxShadow: `0 3px 12px ${G}50`
+          boxShadow: "0 1px 2px rgba(11,18,32,.06)"
         }
       }, "Build my resume \u2197"));
     })(), topPicks.length > 0 && React.createElement("div", {
       style: {
-        background: `linear-gradient(135deg,#fff,${GL})`,
+        background: `#fff`,
         border: `1.5px solid ${G}`,
         borderRadius: var_rxl,
         padding: "1.25rem 1.4rem",
         marginBottom: 18,
-        boxShadow: `0 4px 20px ${G}20`
+        boxShadow: "0 1px 2px rgba(11,18,32,.06)"
       }
     }, React.createElement("div", {
       style: {
@@ -9006,11 +9369,11 @@ function App() {
       style: {
         fontSize: 18
       }
-    }, "\u2B50"), React.createElement("h3", {
+    }), React.createElement("h3", {
       style: {
         fontWeight: 800,
         fontSize: 17,
-        color: "#0A1628",
+        color: "#0B1220",
         letterSpacing: "-0.4px"
       }
     }, "Top picks for you")), React.createElement("p", {
@@ -9059,7 +9422,7 @@ function App() {
       style: {
         fontWeight: 700,
         fontSize: 14,
-        color: "#0A1628",
+        color: "#0B1220",
         overflow: "hidden",
         textOverflow: "ellipsis",
         whiteSpace: "nowrap"
@@ -9086,7 +9449,7 @@ function App() {
         borderRadius: 99,
         letterSpacing: "0.3px"
       }
-    }, "\u2728 PERSONALIZED"), (() => {
+    }, "PERSONALIZED"), (() => {
       const b = bandLabel(c.locationBand);
       return b ? React.createElement("span", {
         style: {
@@ -9111,7 +9474,7 @@ function App() {
     }, c.role, " \xB7 ", c.location)), React.createElement("button", {
       onClick: () => openApply(c),
       style: {
-        background: `linear-gradient(135deg,${G},${GD})`,
+        background: `${G}`,
         border: "none",
         color: "#fff",
         padding: "8px 16px",
@@ -9149,7 +9512,7 @@ function App() {
     }, React.createElement("span", {
       style: {
         fontSize: 12,
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontWeight: 600
       }
     }, "Sort:"), [["chance", "Highest chance"], ["firms", "Big Names"]].map(([v, l]) => React.createElement("button", {
@@ -9172,7 +9535,7 @@ function App() {
     }, l)))), sortBy === "firms" && React.createElement("p", {
       style: {
         fontSize: 11.5,
-        color: "#9CA3AF",
+        color: "#6B7280",
         marginTop: 6,
         textAlign: "right"
       }
@@ -9257,7 +9620,7 @@ function App() {
           display: "flex",
           flexDirection: "column",
           gap: "0.75rem",
-          boxShadow: "0 2px 12px rgba(0,194,133,0.08)",
+          boxShadow: "0 1px 2px rgba(11,18,32,.06)",
           cursor: "pointer",
           overflowY: "auto"
         }
@@ -9285,7 +9648,7 @@ function App() {
           fontWeight: 700,
           fontSize: 16,
           letterSpacing: "-0.3px",
-          color: "#0A1628"
+          color: "#0B1220"
         }
       }, c.name), isLikelyNational(c) && React.createElement("span", {
         style: {
@@ -9307,7 +9670,7 @@ function App() {
           borderRadius: 99,
           letterSpacing: "0.3px"
         }
-      }, "\u2728 PERSONALIZED"), locationBadge), React.createElement("p", {
+      }, "PERSONALIZED"), locationBadge), React.createElement("p", {
         style: {
           color: "#4A5568",
           fontSize: 13,
@@ -9323,7 +9686,7 @@ function App() {
         }
       }, React.createElement("p", {
         style: {
-          color: "#9CA3AF",
+          color: "#6B7280",
           fontSize: 12
         }
       }, hasRealLocation ? displayLocation : c.location, " \xB7 ", c.industry), typeof c.distanceMiles === "number" && c.distanceMiles > 0 ? React.createElement("span", {
@@ -9371,7 +9734,7 @@ function App() {
       }), typeof c.low === "number" && React.createElement("p", {
         style: {
           fontSize: 11,
-          color: "#9CA3AF",
+          color: "#6B7280",
           fontWeight: 600,
           marginTop: -2
         }
@@ -9392,7 +9755,7 @@ function App() {
           gap: 10,
           flexWrap: "wrap",
           fontSize: 11,
-          color: "#9CA3AF",
+          color: "#6B7280",
           fontWeight: 600
         }
       }, React.createElement("span", null, "GPA/Profile ", c._profile, "%"), React.createElement("span", null, "\xB7 Experience ", c._exp, "%"), c._lead > 0 && React.createElement("span", null, "\xB7 Leadership ", c._lead, "%"), React.createElement("span", null, "\xB7 Timing ", c._timing, "%"), React.createElement("span", null, "\xB7 Fit (est.) ", c._fit, "%")), React.createElement("div", {
@@ -9421,7 +9784,7 @@ function App() {
         }
       })), c.reason && React.createElement("div", {
         style: {
-          background: c.personalized ? GL : "#F8FFFE",
+          background: c.personalized ? GL : "#FBFBFC",
           border: `1px solid ${c.personalized ? GM : "#E2E8F0"}`,
           borderRadius: var_r,
           padding: "9px 11px"
@@ -9430,11 +9793,11 @@ function App() {
         style: {
           fontSize: 10,
           fontWeight: 800,
-          color: c.personalized ? GD : "#9CA3AF",
+          color: c.personalized ? GD : "#6B7280",
           letterSpacing: "0.8px",
           marginBottom: 4
         }
-      }, c.personalized ? "✨ WHY THIS FITS YOU" : "WHY THIS IS A REALISTIC SHOT"), React.createElement("p", {
+      }, c.personalized ? "WHY THIS FITS YOU" : "WHY THIS IS A REALISTIC SHOT"), React.createElement("p", {
         style: {
           fontSize: 13,
           color: "#4A5568",
@@ -9469,7 +9832,7 @@ function App() {
       }, React.createElement("button", {
         onClick: () => openApply(c),
         style: {
-          background: `linear-gradient(135deg,${G},${GD})`,
+          background: `${G}`,
           color: "#fff",
           padding: "13px 8px",
           borderRadius: var_r,
@@ -9480,7 +9843,7 @@ function App() {
           fontFamily: "var(--font)",
           textAlign: "center",
           width: "100%",
-          boxShadow: `0 3px 14px ${G}50`
+          boxShadow: "0 1px 2px rgba(11,18,32,.06)"
         }
       }, "Apply now \u2197"), React.createElement("div", {
         style: {
@@ -9498,7 +9861,7 @@ function App() {
           flex: 1,
           background: saved ? "#F5F3FF" : "#fff",
           border: `1.5px solid ${saved ? "#7C3AED" : "#E2E8F0"}`,
-          color: saved ? "#7C3AED" : "#9CA3AF",
+          color: saved ? "#7C3AED" : "#6B7280",
           padding: "9px 13px",
           borderRadius: var_r,
           cursor: "pointer",
@@ -9506,13 +9869,13 @@ function App() {
           fontSize: 13,
           fontWeight: 700
         }
-      }, saved ? "📌 Saved" : "🔖 Save"), React.createElement("button", {
+      }, saved ? "Saved" : "Save"), React.createElement("button", {
         onClick: () => track(c),
         style: {
           flex: 1,
           background: isTracked ? GL : "#fff",
           border: `1.5px solid ${isTracked ? G : "#E2E8F0"}`,
-          color: isTracked ? GD : "#9CA3AF",
+          color: isTracked ? GD : "#6B7280",
           padding: "9px 13px",
           borderRadius: var_r,
           cursor: "pointer",
@@ -9524,7 +9887,7 @@ function App() {
         style: {
           ...faceBase,
           transform: "rotateY(180deg)",
-          background: "linear-gradient(160deg,#0A1628 0%,#0F2240 100%)",
+          background: "#0B1220",
           padding: "1.4rem",
           display: "flex",
           flexDirection: "column",
@@ -9643,7 +10006,7 @@ function App() {
             letterSpacing: "0.8px",
             marginBottom: 4
           }
-        }, "\uD83D\uDC65 COMPANY SIZE"), React.createElement("p", {
+        }, "COMPANY SIZE"), React.createElement("p", {
           style: {
             fontSize: 12.5,
             color: "#CBD5E1"
@@ -9663,7 +10026,7 @@ function App() {
             letterSpacing: "0.8px",
             marginBottom: 4
           }
-        }, "\uD83C\uDF31 CULTURE"), React.createElement("p", {
+        }, "CULTURE"), React.createElement("p", {
           style: {
             fontSize: 12.5,
             color: "#CBD5E1"
@@ -9683,7 +10046,7 @@ function App() {
             letterSpacing: "0.8px",
             marginBottom: 4
           }
-        }, "\uD83D\uDEE0 WHAT YOU'D ACTUALLY DO"), React.createElement("p", {
+        }, "WHAT YOU'D ACTUALLY DO"), React.createElement("p", {
           style: {
             fontSize: 13,
             color: "#CBD5E1",
@@ -9702,7 +10065,7 @@ function App() {
           letterSpacing: "0.8px",
           marginBottom: 6
         }
-      }, "\uD83D\uDCE7 CONTACT DIRECTLY"), React.createElement("p", {
+      }, "CONTACT DIRECTLY"), React.createElement("p", {
         style: {
           fontSize: 11.5,
           color: "#94A3B8",
@@ -9715,7 +10078,7 @@ function App() {
           color: "#CBD5E1",
           marginBottom: 8
         }
-      }, "\uD83D\uDCDE ", c.phone), React.createElement("button", {
+      }, c.phone), React.createElement("button", {
         onClick: () => {
           const subject = encodeURIComponent(`Internship Inquiry — ${c.role || "Internship"}`);
           const body = encodeURIComponent(`Hi,
@@ -9738,7 +10101,7 @@ Thank you for your time,
           alignItems: "center",
           justifyContent: "center",
           gap: 6,
-          background: `linear-gradient(135deg,${G},${GD})`,
+          background: `${G}`,
           color: "#fff",
           padding: "11px",
           borderRadius: var_r,
@@ -9749,7 +10112,7 @@ Thank you for your time,
           fontFamily: "var(--font)",
           marginBottom: 6
         }
-      }, "\uD83D\uDCE7 Open email template"), companyWebsiteUrl(c) && React.createElement("a", {
+      }, "Open email template"), companyWebsiteUrl(c) && React.createElement("a", {
         href: companyWebsiteUrl(c),
         target: "_blank",
         rel: "noopener noreferrer",
@@ -9767,7 +10130,7 @@ Thank you for your time,
           fontSize: 12,
           textDecoration: "none"
         }
-      }, "\uD83C\uDF10 Company Website"), React.createElement("a", {
+      }, "Company Website"), React.createElement("a", {
         href: googleSearchUrl(c),
         target: "_blank",
         rel: "noopener noreferrer",
@@ -9786,7 +10149,7 @@ Thank you for your time,
           textDecoration: "none",
           marginTop: 6
         }
-      }, "\uD83D\uDD0E Search on Google")) : React.createElement("div", null, React.createElement("p", {
+      }, "Search on Google")) : React.createElement("div", null, React.createElement("p", {
         style: {
           fontSize: 9.5,
           fontWeight: 800,
@@ -9811,7 +10174,7 @@ Thank you for your time,
           alignItems: "center",
           justifyContent: "center",
           gap: 5,
-          background: `linear-gradient(135deg,${G},${GD})`,
+          background: `${G}`,
           color: "#fff",
           padding: "11px",
           borderRadius: var_r,
@@ -9842,24 +10205,24 @@ Thank you for your time,
         }, label) : null;
         const siteHref = companyWebsiteUrl(c);
         const googleHref = googleSearchUrl(c);
-        return React.createElement(React.Fragment, null, siteHref && btn(siteHref, "🌐 Company Website", {
+        return React.createElement(React.Fragment, null, siteHref && btn(siteHref, "Company Website", {
           gridColumn: "1/-1",
           background: "rgba(255,255,255,0.1)",
           color: "#E2E8F0",
           border: "1px solid rgba(255,255,255,0.15)",
           marginBottom: 4
-        }), isNat && c.hasLinkedin && btn(liUrl, "💼 LinkedIn", {
+        }), isNat && c.hasLinkedin && btn(liUrl, "LinkedIn", {
           background: "#0A66C2",
           color: "#fff"
-        }), isNat && btn(indUrl, "🔍 Indeed", {
+        }), isNat && btn(indUrl, "Indeed", {
           background: "rgba(255,255,255,0.07)",
           color: "#E2E8F0",
           border: "1px solid rgba(255,255,255,0.1)"
-        }), isNat && btn(hsUrl, "🎓 Handshake", {
+        }), isNat && btn(hsUrl, "Handshake", {
           background: "rgba(255,255,255,0.07)",
           color: "#E2E8F0",
           border: "1px solid rgba(255,255,255,0.1)"
-        }), btn(googleHref, "🔎 Search on Google", {
+        }), btn(googleHref, "Search on Google", {
           gridColumn: isNat ? "auto" : "1/-1",
           background: "rgba(66,133,244,0.12)",
           color: "#93C5FD",
@@ -9886,11 +10249,11 @@ Thank you for your time,
           textDecoration: "none",
           marginTop: 2
         }
-      }, "\uD83D\uDCCD Directions to ", displayLocation)))))));
+      }, "Directions to ", displayLocation)))))));
     })), React.createElement("p", {
       style: {
         fontSize: 12,
-        color: "#9CA3AF",
+        color: "#6B7280",
         lineHeight: 1.55,
         textAlign: "center",
         maxWidth: 560,
@@ -9936,7 +10299,7 @@ Thank you for your time,
         fontSize: 30,
         fontWeight: 800,
         letterSpacing: "-1px",
-        color: "#0A1628",
+        color: "#0B1220",
         marginBottom: 10
       }
     }, "Let's build your starter resume."), React.createElement("p", {
@@ -9968,37 +10331,37 @@ Thank you for your time,
         flexDirection: "column",
         gap: 6,
         fontSize: 13,
-        color: "#0A1628"
+        color: "#0B1220"
       }
     }, React.createElement("p", null, React.createElement("strong", null, "Major:"), " ", ans.major || React.createElement("em", {
       style: {
-        color: "#9CA3AF"
+        color: "#6B7280"
       }
     }, "(not set)")), React.createElement("p", null, React.createElement("strong", null, "University:"), " ", ans.university || React.createElement("em", {
       style: {
-        color: "#9CA3AF"
+        color: "#6B7280"
       }
     }, "(not set)")), React.createElement("p", null, React.createElement("strong", null, "Graduation:"), " ", ans.gradYear || React.createElement("em", {
       style: {
-        color: "#9CA3AF"
+        color: "#6B7280"
       }
     }, "(not set)"), " \xA0 ", React.createElement("strong", null, "GPA:"), " ", ans.gpa || React.createElement("em", {
       style: {
-        color: "#9CA3AF"
+        color: "#6B7280"
       }
     }, "(not set)")), React.createElement("p", null, React.createElement("strong", null, "Skills:"), " ", (ans.skills || []).join(", ") || React.createElement("em", {
       style: {
-        color: "#9CA3AF"
+        color: "#6B7280"
       }
     }, "(none listed)")), React.createElement("p", null, React.createElement("strong", null, "Activities:"), " ", extPicks.length > 0 ? extPicks.map(e => `${e.activity} (${e.role})`).join(", ") : React.createElement("em", {
       style: {
-        color: "#9CA3AF"
+        color: "#6B7280"
       }
     }, "(none listed)")))), !builderState.text && !builderState.loading && React.createElement("button", {
       onClick: buildStarterResume,
       style: {
         width: "100%",
-        background: `linear-gradient(135deg,${G},${GD})`,
+        background: `${G}`,
         border: "none",
         color: "#fff",
         padding: "15px",
@@ -10007,16 +10370,16 @@ Thank you for your time,
         fontFamily: "var(--font)",
         fontSize: 15,
         fontWeight: 700,
-        boxShadow: `0 4px 16px ${G}40`
+        boxShadow: "0 1px 2px rgba(11,18,32,.06)"
       }
-    }, "\u2728 Build my starter resume"), builderState.error && React.createElement("p", {
+    }, "Build my starter resume"), builderState.error && React.createElement("p", {
       style: {
         color: CR,
         fontSize: 13,
         marginTop: 12,
         textAlign: "center"
       }
-    }, "\u26A0 ", builderState.error, " ", React.createElement("button", {
+    }, builderState.error, " ", React.createElement("button", {
       onClick: buildStarterResume,
       style: {
         background: "none",
@@ -10055,7 +10418,7 @@ Thank you for your time,
       style: {
         marginTop: 4,
         fontSize: 12,
-        color: "#9CA3AF"
+        color: "#6B7280"
       }
     }, "This usually takes 5\u201315 seconds.")), builderState.text && !builderState.loading && React.createElement("div", null, React.createElement("div", {
       style: {
@@ -10073,7 +10436,7 @@ Thank you for your time,
         fontSize: 14,
         flexShrink: 0
       }
-    }, "\uD83D\uDCA1"), React.createElement("p", {
+    }), React.createElement("p", {
       style: {
         fontSize: 12.5,
         lineHeight: 1.5,
@@ -10101,7 +10464,7 @@ Thank you for your time,
         borderRadius: var_rl,
         border: `1.5px solid ${GM}`,
         background: "#fff",
-        color: "#0A1628",
+        color: "#0B1220",
         fontFamily: "ui-monospace, 'SF Mono', Menlo, Consolas, monospace",
         fontSize: 13,
         lineHeight: 1.55,
@@ -10133,7 +10496,7 @@ Thank you for your time,
         fontSize: 13.5,
         fontWeight: 700
       }
-    }, "\uD83D\uDCCB Copy text"), React.createElement("button", {
+    }, "Copy text"), React.createElement("button", {
       onClick: () => {
         const blob = new Blob([builderState.text], {
           type: "text/plain"
@@ -10189,14 +10552,14 @@ Thank you for your time,
         fontSize: 10,
         marginLeft: 4
       }
-    }, "\uD83D\uDD12 Pro"))), React.createElement("button", {
+    }, "Pro"))), React.createElement("button", {
       onClick: () => {
         saveBuilderResumeToProfile();
         setPage("results");
       },
       style: {
         flex: "1 1 100%",
-        background: `linear-gradient(135deg,${G},${GD})`,
+        background: `${G}`,
         border: "none",
         color: "#fff",
         padding: "13px 16px",
@@ -10205,12 +10568,12 @@ Thank you for your time,
         fontFamily: "var(--font)",
         fontSize: 14,
         fontWeight: 700,
-        boxShadow: `0 4px 14px ${G}40`
+        boxShadow: "0 1px 2px rgba(11,18,32,.06)"
       }
-    }, "\uD83D\uDCBE Save to my profile & use for matches")), React.createElement("p", {
+    }, "Save to my profile & use for matches")), React.createElement("p", {
       style: {
         fontSize: 11.5,
-        color: "#9CA3AF",
+        color: "#6B7280",
         textAlign: "center",
         marginTop: 10,
         lineHeight: 1.5
@@ -10223,8 +10586,8 @@ Thank you for your time,
       padding: "11px 13px",
       borderRadius: var_r,
       border: "1.5px solid #E2E8F0",
-      background: "#F8FFFE",
-      color: "#0A1628",
+      background: "#FBFBFC",
+      color: "#0B1220",
       fontFamily: "var(--font)",
       fontSize: 14,
       outline: "none",
@@ -10259,7 +10622,7 @@ Thank you for your time,
         flex: 1,
         background: profile[key] === o ? G : "#fff",
         border: `1.5px solid ${profile[key] === o ? G : "#E2E8F0"}`,
-        color: profile[key] === o ? "#fff" : "#0A1628",
+        color: profile[key] === o ? "#fff" : "#0B1220",
         padding: "10px",
         borderRadius: var_r,
         cursor: "pointer",
@@ -10282,7 +10645,7 @@ Thank you for your time,
     }, React.createElement("p", {
       style: {
         fontSize: 10,
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontWeight: 700,
         letterSpacing: "2.5px",
         textTransform: "uppercase"
@@ -10294,7 +10657,7 @@ Thank you for your time,
         letterSpacing: "-1px",
         marginTop: "0.3rem",
         marginBottom: "0.4rem",
-        color: "#0A1628"
+        color: "#0B1220"
       }
     }, "Fill it once. Apply faster everywhere."), React.createElement("p", {
       style: {
@@ -10320,7 +10683,7 @@ Thank you for your time,
         fontSize: 24,
         flexShrink: 0
       }
-    }, clerkUser ? "✓" : "🔐"), React.createElement("div", {
+    }, clerkUser ? "✓" : ""), React.createElement("div", {
       style: {
         flex: 1,
         minWidth: 160
@@ -10338,11 +10701,11 @@ Thank you for your time,
         lineHeight: 1.4,
         marginTop: 2
       }
-    }, syncStatus === "loading" ? "⟳ Loading your data…" : syncStatus === "saving" ? "⟳ Saving changes…" : syncStatus === "synced" ? "✓ All changes synced across your devices" : syncStatus === "error" ? "⚠ Sync had a hiccup — your changes are saved locally; we'll retry" : "Syncing your data…")) : React.createElement(React.Fragment, null, React.createElement("p", {
+    }, syncStatus === "loading" ? "⟳ Loading your data…" : syncStatus === "saving" ? "⟳ Saving changes…" : syncStatus === "synced" ? "✓ All changes synced across your devices" : syncStatus === "error" ? "Sync had a hiccup — your changes are saved locally; we'll retry" : "Syncing your data…")) : React.createElement(React.Fragment, null, React.createElement("p", {
       style: {
         fontSize: 13.5,
         fontWeight: 800,
-        color: "#0A1628"
+        color: "#0B1220"
       }
     }, "Not signed in"), React.createElement("p", {
       style: {
@@ -10356,7 +10719,7 @@ Thank you for your time,
       style: {
         flexShrink: 0,
         background: "#fff",
-        color: "#0A1628",
+        color: "#0B1220",
         border: "1.5px solid #E2E8F0",
         padding: "8px 14px",
         borderRadius: var_r,
@@ -10381,7 +10744,7 @@ Thank you for your time,
       }
     }, "Sign in")), React.createElement("div", {
       style: {
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1px solid ${GL}`,
         borderRadius: var_rl,
         padding: "1.5rem",
@@ -10404,7 +10767,7 @@ Thank you for your time,
       }
     }, field("Full name", "fullName", "Adam Smith"), field("Email", "email", "you@email.com", "email"), field("Phone", "phone", "(555) 123-4567", "tel"), field("LinkedIn URL", "linkedin", "linkedin.com/in/you"), field("Portfolio / website (optional)", "portfolio", "yoursite.com"))), React.createElement("div", {
       style: {
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1px solid ${GL}`,
         borderRadius: var_rl,
         padding: "1.5rem",
@@ -10427,7 +10790,7 @@ Thank you for your time,
       }
     }, field("School", "school", "Virginia Tech"), field("Major", "major", "Computer Science"), field("Expected graduation", "gradDate", "May 2027"), field("GPA", "gpa", "3.6"))), React.createElement("div", {
       style: {
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1px solid ${GL}`,
         borderRadius: var_rl,
         padding: "1.5rem",
@@ -10450,7 +10813,7 @@ Thank you for your time,
       }
     }, yesno("Authorized to work in the U.S.?", "workAuth"), yesno("Willing to relocate?", "relocate"))), React.createElement("div", {
       style: {
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1px solid ${GL}`,
         borderRadius: var_rl,
         padding: "1.5rem",
@@ -10489,7 +10852,7 @@ Thank you for your time,
       }
     }))), React.createElement("div", {
       style: {
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1px solid ${GL}`,
         borderRadius: var_rl,
         padding: "1.5rem",
@@ -10536,7 +10899,7 @@ Thank you for your time,
         padding: "1.25rem",
         border: `1.5px dashed ${GM}`,
         borderRadius: var_rl,
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontSize: 13.5
       }
     }, "No resumes yet. Tap \"+ Add resume\" to paste your first one."), React.createElement("div", {
@@ -10569,8 +10932,8 @@ Thank you for your time,
         padding: "8px 11px",
         borderRadius: var_r,
         border: `1.5px solid #E2E8F0`,
-        background: "#F8FFFE",
-        color: "#0A1628",
+        background: "#FBFBFC",
+        color: "#0B1220",
         fontFamily: "var(--font)",
         fontSize: 14,
         fontWeight: 700,
@@ -10592,7 +10955,7 @@ Thank you for your time,
         alignItems: "center",
         gap: 5
       }
-    }, "\uD83D\uDCCE Upload", React.createElement("input", {
+    }, "Upload", React.createElement("input", {
       type: "file",
       accept: ".pdf,.txt,.docx",
       onChange: e => {
@@ -10616,7 +10979,7 @@ Thank you for your time,
         fontSize: 15,
         flexShrink: 0
       }
-    }, "\uD83D\uDDD1")), React.createElement("textarea", {
+    })), React.createElement("textarea", {
       value: r.text,
       onChange: e => updateResume(r.id, "text", e.target.value),
       placeholder: "Paste this resume's text here \u2014 or use the Upload button above to import a PDF / Word file.",
@@ -10633,13 +10996,13 @@ Thank you for your time,
         fontWeight: 600,
         marginTop: 4
       }
-    }, "\uD83D\uDCC4 Reading file\u2026"), resumeUploadErr && React.createElement("p", {
+    }, "Reading file\u2026"), resumeUploadErr && React.createElement("p", {
       style: {
         fontSize: 12,
         color: CR,
         marginTop: 4
       }
-    }, "\u26A0 ", resumeUploadErr))), React.createElement("div", {
+    }, resumeUploadErr))), React.createElement("div", {
       style: {
         display: "flex",
         gap: 10,
@@ -10649,7 +11012,7 @@ Thank you for your time,
     }, React.createElement("button", {
       onClick: saveProfile,
       style: {
-        background: `linear-gradient(135deg,${G},${GD})`,
+        background: `${G}`,
         border: "none",
         color: "#fff",
         padding: "13px 28px",
@@ -10658,7 +11021,7 @@ Thank you for your time,
         fontFamily: "var(--font)",
         fontSize: 15,
         fontWeight: 700,
-        boxShadow: `0 4px 16px ${G}40`
+        boxShadow: "0 1px 2px rgba(11,18,32,.06)"
       }
     }, profileSaved ? "✓ Saved" : "Save profile"), React.createElement("button", {
       onClick: clearProfile,
@@ -10682,11 +11045,11 @@ Thank you for your time,
     }, "Ready to auto-fill applications \u2713")), React.createElement("p", {
       style: {
         fontSize: 11.5,
-        color: "#9CA3AF",
+        color: "#6B7280",
         marginTop: 16,
         lineHeight: 1.5
       }
-    }, "\uD83D\uDD12 Your profile is saved on this device only \u2014 we don't send it anywhere in this version. You can clear it anytime. (When accounts launch, this same info will sync securely to your account.)")));
+    }, "Your profile is saved on this device only \u2014 we don't send it anywhere in this version. You can clear it anytime. (When accounts launch, this same info will sync securely to your account.)")));
   }
   if (page === "wall") {
     const relTime = iso => {
@@ -10715,7 +11078,7 @@ Thank you for your time,
     }, React.createElement("p", {
       style: {
         fontSize: 10,
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontWeight: 700,
         letterSpacing: "2.5px",
         textTransform: "uppercase",
@@ -10726,7 +11089,7 @@ Thank you for your time,
         fontSize: 30,
         fontWeight: 800,
         letterSpacing: "-0.8px",
-        color: "#0A1628",
+        color: "#0B1220",
         marginBottom: 8
       }
     }, "You're not alone in this."), React.createElement("p", {
@@ -10744,7 +11107,7 @@ Thank you for your time,
       style: {
         fontSize: 11,
         fontWeight: 700,
-        color: "#9CA3AF",
+        color: "#6B7280",
         letterSpacing: "1.5px",
         textTransform: "uppercase",
         marginBottom: 10
@@ -10760,7 +11123,7 @@ Thank you for your time,
     }, TESTIMONIALS.map((t, i) => React.createElement("div", {
       key: i,
       style: {
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1.5px solid ${GL}`,
         borderRadius: var_rl,
         padding: "1rem 1.1rem",
@@ -10785,7 +11148,7 @@ Thank you for your time,
     }, "\u2605"))), React.createElement("p", {
       style: {
         fontSize: 12.5,
-        color: "#0A1628",
+        color: "#0B1220",
         lineHeight: 1.55,
         fontStyle: "italic",
         flex: 1
@@ -10801,7 +11164,7 @@ Thank you for your time,
         width: 28,
         height: 28,
         borderRadius: "50%",
-        background: `linear-gradient(135deg,${G},${GD})`,
+        background: `${G}`,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -10814,16 +11177,16 @@ Thank you for your time,
       style: {
         fontWeight: 700,
         fontSize: 11.5,
-        color: "#0A1628"
+        color: "#0B1220"
       }
     }, t.name), React.createElement("p", {
       style: {
         fontSize: 10.5,
-        color: "#9CA3AF"
+        color: "#6B7280"
       }
     }, t.detail))))))), React.createElement("div", {
       style: {
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         border: `1.5px solid ${GM}`,
         borderRadius: var_rl,
         padding: "16px",
@@ -10858,7 +11221,7 @@ Thank you for your time,
         fontSize: 12.5,
         fontWeight: 700
       }
-    }, "\uD83D\uDC64 Anonymous"), React.createElement("button", {
+    }, "Anonymous"), React.createElement("button", {
       onClick: () => setWallNameMode("named"),
       style: {
         background: wallNameMode === "named" ? G : "transparent",
@@ -10871,7 +11234,7 @@ Thank you for your time,
         fontSize: 12.5,
         fontWeight: 700
       }
-    }, "\u270F\uFE0F Use my name"), wallNameMode === "named" && React.createElement("input", {
+    }, "Use my name"), wallNameMode === "named" && React.createElement("input", {
       type: "text",
       value: wallDisplayName,
       onChange: e => setWallDisplayName(e.target.value),
@@ -10883,7 +11246,7 @@ Thank you for your time,
         borderRadius: var_r,
         border: `1px solid #E2E8F0`,
         background: "#fff",
-        color: "#0A1628",
+        color: "#0B1220",
         fontFamily: "var(--font)",
         fontSize: 13,
         outline: "none"
@@ -10900,7 +11263,7 @@ Thank you for your time,
         borderRadius: var_r,
         border: `1px solid #E2E8F0`,
         background: "#fff",
-        color: "#0A1628",
+        color: "#0B1220",
         fontFamily: "var(--font)",
         fontSize: 14,
         lineHeight: 1.5,
@@ -10923,7 +11286,7 @@ Thank you for your time,
         borderRadius: var_r,
         border: `1px solid #E2E8F0`,
         background: "#fff",
-        color: "#0A1628",
+        color: "#0B1220",
         fontFamily: "var(--font)",
         fontSize: 13,
         cursor: "pointer"
@@ -10932,24 +11295,24 @@ Thank you for your time,
       value: ""
     }, "No category"), React.createElement("option", {
       value: "win"
-    }, "\uD83C\uDF89 Win"), React.createElement("option", {
+    }, "Win"), React.createElement("option", {
       value: "vent"
-    }, "\uD83D\uDE24 Vent"), React.createElement("option", {
+    }, "Vent"), React.createElement("option", {
       value: "question"
-    }, "\u2753 Question"), React.createElement("option", {
+    }, "Question"), React.createElement("option", {
       value: "advice"
-    }, "\uD83D\uDCA1 Advice")), React.createElement("span", {
+    }, "Advice")), React.createElement("span", {
       style: {
         fontSize: 12,
-        color: remaining < 50 ? remaining < 0 ? CR : AM : "#9CA3AF",
+        color: remaining < 50 ? remaining < 0 ? CR : AM : "#6B7280",
         marginLeft: "auto"
       }
     }, remaining, " chars left"), React.createElement("button", {
       onClick: submitWallPost,
       disabled: tooShort || wallSubmitting || remaining < 0,
       style: {
-        background: tooShort || wallSubmitting || remaining < 0 ? "#E2E8F0" : `linear-gradient(135deg,${G},${GD})`,
-        color: tooShort || wallSubmitting || remaining < 0 ? "#9CA3AF" : "#fff",
+        background: tooShort || wallSubmitting || remaining < 0 ? "#E2E8F0" : `${G}`,
+        color: tooShort || wallSubmitting || remaining < 0 ? "#6B7280" : "#fff",
         border: "none",
         padding: "9px 18px",
         borderRadius: var_r,
@@ -10973,7 +11336,7 @@ Thank you for your time,
       style: {
         textAlign: "center",
         padding: "2rem 1rem",
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontSize: 13
       }
     }, "Loading the wall\u2026") : wallPosts.length === 0 ? React.createElement("div", {
@@ -10989,10 +11352,10 @@ Thank you for your time,
         textAlign: "center",
         marginBottom: 8
       }
-    }, "\uD83C\uDF31"), React.createElement("p", {
+    }), React.createElement("p", {
       style: {
         fontSize: 15,
-        color: "#0A1628",
+        color: "#0B1220",
         fontWeight: 700,
         textAlign: "center",
         marginBottom: 6
@@ -11031,7 +11394,7 @@ Thank you for your time,
         letterSpacing: "0.6px",
         marginBottom: 4
       }
-    }, "\uD83C\uDF89 WIN"), React.createElement("p", {
+    }, "WIN"), React.createElement("p", {
       style: {
         fontSize: 13,
         color: "#4A5568",
@@ -11053,7 +11416,7 @@ Thank you for your time,
         letterSpacing: "0.6px",
         marginBottom: 4
       }
-    }, "\uD83D\uDE24 VENT"), React.createElement("p", {
+    }, "VENT"), React.createElement("p", {
       style: {
         fontSize: 13,
         color: "#4A5568",
@@ -11075,7 +11438,7 @@ Thank you for your time,
         letterSpacing: "0.6px",
         marginBottom: 4
       }
-    }, "\u2753 QUESTION"), React.createElement("p", {
+    }, "QUESTION"), React.createElement("p", {
       style: {
         fontSize: 13,
         color: "#4A5568",
@@ -11097,7 +11460,7 @@ Thank you for your time,
         letterSpacing: "0.6px",
         marginBottom: 4
       }
-    }, "\uD83D\uDCA1 ADVICE"), React.createElement("p", {
+    }, "ADVICE"), React.createElement("p", {
       style: {
         fontSize: 13,
         color: "#4A5568",
@@ -11107,7 +11470,7 @@ Thank you for your time,
     }, "\"If you're stressing about the technical interview \u2014 practice OUT LOUD, not just in your head.\""))), React.createElement("p", {
       style: {
         fontSize: 11,
-        color: "#9CA3AF",
+        color: "#6B7280",
         textAlign: "center",
         marginTop: 16,
         fontStyle: "italic"
@@ -11145,11 +11508,11 @@ Thank you for your time,
           marginBottom: 6,
           textTransform: "uppercase"
         }
-      }, p.category === "win" ? "🎉 Win" : p.category === "vent" ? "😤 Vent" : p.category === "question" ? "❓ Question" : p.category === "advice" ? "💡 Advice" : p.category), React.createElement("p", {
+      }, p.category === "win" ? "Win" : p.category === "vent" ? "Vent" : p.category === "question" ? "Question" : p.category === "advice" ? "Advice" : p.category), React.createElement("p", {
         style: {
           fontSize: 14,
           lineHeight: 1.55,
-          color: "#0A1628",
+          color: "#0B1220",
           whiteSpace: "pre-wrap"
         }
       }, p.content), React.createElement("div", {
@@ -11164,7 +11527,7 @@ Thank you for your time,
       }, React.createElement("p", {
         style: {
           fontSize: 11,
-          color: "#9CA3AF"
+          color: "#6B7280"
         }
       }, p.display_name ? React.createElement(React.Fragment, null, React.createElement("strong", {
         style: {
@@ -11188,12 +11551,12 @@ Thank you for your time,
           fontFamily: "var(--font)",
           padding: "2px 4px"
         }
-      }, "\uD83D\uDCAC ", isOpen ? "Hide" : "Replies", replyCount > 0 ? ` (${replyCount})` : ""), !ownsPost(p.id) && React.createElement("button", {
+      }, isOpen ? "Hide" : "Replies", replyCount > 0 ? ` (${replyCount})` : ""), !ownsPost(p.id) && React.createElement("button", {
         onClick: () => reportWallItem("post", p.id),
         style: {
           background: "none",
           border: "none",
-          color: "#9CA3AF",
+          color: "#6B7280",
           cursor: "pointer",
           fontSize: 11,
           fontWeight: 600,
@@ -11202,12 +11565,12 @@ Thank you for your time,
           borderRadius: 4
         },
         title: "Report this post"
-      }, "\u2691 Report"), ownsPost(p.id) && React.createElement("button", {
+      }, "Report"), ownsPost(p.id) && React.createElement("button", {
         onClick: () => deleteOwnPost(p.id),
         style: {
           background: "none",
           border: "none",
-          color: "#9CA3AF",
+          color: "#6B7280",
           cursor: "pointer",
           fontSize: 11,
           fontWeight: 600,
@@ -11216,7 +11579,7 @@ Thank you for your time,
           borderRadius: 4
         },
         title: "Delete your post"
-      }, "\uD83D\uDDD1 Delete"))), isOpen && React.createElement("div", {
+      }, "Delete"))), isOpen && React.createElement("div", {
         style: {
           marginTop: 12,
           paddingTop: 12,
@@ -11243,7 +11606,7 @@ Thank you for your time,
           style: {
             fontSize: 13,
             lineHeight: 1.5,
-            color: "#0A1628",
+            color: "#0B1220",
             whiteSpace: "pre-wrap"
           }
         }, r.content), React.createElement("div", {
@@ -11256,7 +11619,7 @@ Thank you for your time,
         }, React.createElement("p", {
           style: {
             fontSize: 10.5,
-            color: "#9CA3AF"
+            color: "#6B7280"
           }
         }, r.display_name ? React.createElement("strong", {
           style: {
@@ -11267,7 +11630,7 @@ Thank you for your time,
           style: {
             background: "none",
             border: "none",
-            color: "#9CA3AF",
+            color: "#6B7280",
             cursor: "pointer",
             fontSize: 10.5,
             fontWeight: 600,
@@ -11275,11 +11638,11 @@ Thank you for your time,
             padding: 0
           },
           title: "Delete reply"
-        }, "\uD83D\uDDD1")));
+        })));
       })) : React.createElement("p", {
         style: {
           fontSize: 12,
-          color: "#9CA3AF",
+          color: "#6B7280",
           fontStyle: "italic",
           marginBottom: 10
         }
@@ -11298,7 +11661,7 @@ Thank you for your time,
           borderRadius: var_r,
           border: `1px solid #E2E8F0`,
           background: "#fff",
-          color: "#0A1628",
+          color: "#0B1220",
           fontFamily: "var(--font)",
           fontSize: 13,
           lineHeight: 1.5,
@@ -11316,7 +11679,7 @@ Thank you for your time,
       }, React.createElement("span", {
         style: {
           fontSize: 11,
-          color: replyRemaining < 40 ? replyRemaining < 0 ? CR : AM : "#9CA3AF"
+          color: replyRemaining < 40 ? replyRemaining < 0 ? CR : AM : "#6B7280"
         }
       }, replyRemaining, " left"), React.createElement("button", {
         onClick: () => submitReply(p.id),
@@ -11324,7 +11687,7 @@ Thank you for your time,
         style: {
           marginLeft: "auto",
           background: replyTooShort || wallReplySubmitting[p.id] || replyRemaining < 0 ? "#E2E8F0" : G,
-          color: replyTooShort || wallReplySubmitting[p.id] || replyRemaining < 0 ? "#9CA3AF" : "#fff",
+          color: replyTooShort || wallReplySubmitting[p.id] || replyRemaining < 0 ? "#6B7280" : "#fff",
           border: "none",
           padding: "6px 14px",
           borderRadius: var_r,
@@ -11348,7 +11711,7 @@ Thank you for your time,
     })), React.createElement("p", {
       style: {
         fontSize: 11,
-        color: "#9CA3AF",
+        color: "#6B7280",
         textAlign: "center",
         marginTop: 32,
         lineHeight: 1.5
@@ -11371,7 +11734,7 @@ Thank you for your time,
     }, React.createElement("p", {
       style: {
         fontSize: 10,
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontWeight: 700,
         letterSpacing: "2.5px",
         textTransform: "uppercase"
@@ -11383,7 +11746,7 @@ Thank you for your time,
         letterSpacing: "-1px",
         marginTop: "0.3rem",
         marginBottom: "0.5rem",
-        color: "#0A1628"
+        color: "#0B1220"
       }
     }, "How to actually land the internship."), React.createElement("p", {
       style: {
@@ -11403,7 +11766,7 @@ Thank you for your time,
       key: c,
       onClick: () => setTipCat(c),
       style: {
-        background: tipCat === c ? `linear-gradient(135deg,${G},${GD})` : "#F8FFFE",
+        background: tipCat === c ? `${G}` : "#FBFBFC",
         border: `1.5px solid ${tipCat === c ? G : "#E2E8F0"}`,
         color: tipCat === c ? "#fff" : "#4A5568",
         padding: "7px 15px",
@@ -11429,7 +11792,7 @@ Thank you for your time,
         borderLeft: `4px solid ${G}`,
         borderRadius: var_rl,
         padding: "1.25rem 1.4rem",
-        boxShadow: "0 1px 8px rgba(0,194,133,0.05)"
+        boxShadow: "0 1px 2px rgba(11,18,32,.06)"
       }
     }, React.createElement("div", {
       style: {
@@ -11438,11 +11801,7 @@ Thank you for your time,
         gap: 10,
         marginBottom: 8
       }
-    }, React.createElement("span", {
-      style: {
-        fontSize: 20
-      }
-    }, t.icon), React.createElement("div", null, React.createElement("span", {
+    }, React.createElement("div", null, React.createElement("span", {
       style: {
         fontSize: 10,
         fontWeight: 700,
@@ -11454,7 +11813,7 @@ Thank you for your time,
       style: {
         fontSize: 16,
         fontWeight: 800,
-        color: "#0A1628",
+        color: "#0B1220",
         letterSpacing: "-0.3px",
         lineHeight: 1.2
       }
@@ -11466,7 +11825,7 @@ Thank you for your time,
       }
     }, t.text)))), React.createElement("div", {
       style: {
-        background: `linear-gradient(135deg,${GL},${AL})`,
+        background: `${GL}`,
         border: `1px solid ${G}25`,
         borderRadius: var_rl,
         padding: "1.5rem",
@@ -11477,7 +11836,7 @@ Thank you for your time,
       style: {
         fontWeight: 800,
         fontSize: 17,
-        color: "#0A1628",
+        color: "#0B1220",
         marginBottom: 6,
         letterSpacing: "-0.3px"
       }
@@ -11496,7 +11855,7 @@ Thank you for your time,
         window.scrollTo(0, 0);
       },
       style: {
-        background: `linear-gradient(135deg,${G},${GD})`,
+        background: `${G}`,
         border: "none",
         color: "#fff",
         padding: "12px 28px",
@@ -11505,12 +11864,12 @@ Thank you for your time,
         fontFamily: "var(--font)",
         fontSize: 15,
         fontWeight: 700,
-        boxShadow: `0 4px 16px ${G}40`
+        boxShadow: "0 1px 2px rgba(11,18,32,.06)"
       }
     }, "Find my matches \u2192")), React.createElement("p", {
       style: {
         fontSize: 11.5,
-        color: "#9CA3AF",
+        color: "#6B7280",
         lineHeight: 1.5,
         textAlign: "center",
         marginTop: 16
@@ -11540,7 +11899,7 @@ Thank you for your time,
         style: {
           fontSize: 13,
           fontWeight: 700,
-          color: "#0A1628"
+          color: "#0B1220"
         }
       }, label), React.createElement("p", {
         style: {
@@ -11605,7 +11964,7 @@ Thank you for your time,
       style: {
         fontSize: 13,
         fontWeight: 700,
-        color: "#0A1628"
+        color: "#0B1220"
       }
     }, f.label), React.createElement("p", {
       style: {
@@ -11639,7 +11998,7 @@ Thank you for your time,
         fontSize: 32,
         fontWeight: 800,
         letterSpacing: "-1px",
-        color: "#0A1628",
+        color: "#0B1220",
         marginBottom: 10
       }
     }, "See what the screener sees."), React.createElement("p", {
@@ -11660,13 +12019,13 @@ Thank you for your time,
       style: {
         fontSize: 13,
         fontWeight: 700,
-        color: "#0A1628",
+        color: "#0B1220",
         marginBottom: 6,
         display: "block"
       }
     }, "Your resume ", React.createElement("span", {
       style: {
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontWeight: 500
       }
     }, "(paste the text, optional but helps)")), React.createElement("textarea", {
@@ -11679,11 +12038,11 @@ Thank you for your time,
         padding: "12px",
         borderRadius: var_r,
         border: `1.5px solid #E2E8F0`,
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         fontFamily: "var(--font)",
         fontSize: 13.5,
         lineHeight: 1.5,
-        color: "#0A1628",
+        color: "#0B1220",
         resize: "vertical",
         outline: "none"
       }
@@ -11707,13 +12066,13 @@ Thank you for your time,
       style: {
         fontSize: 13,
         fontWeight: 700,
-        color: "#0A1628",
+        color: "#0B1220",
         marginBottom: 6,
         display: "block"
       }
     }, "Job description ", React.createElement("span", {
       style: {
-        color: "#9CA3AF",
+        color: "#6B7280",
         fontWeight: 500
       }
     }, "(paste from the posting, optional but helps)")), React.createElement("textarea", {
@@ -11726,11 +12085,11 @@ Thank you for your time,
         padding: "12px",
         borderRadius: var_r,
         border: `1.5px solid #E2E8F0`,
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         fontFamily: "var(--font)",
         fontSize: 13.5,
         lineHeight: 1.5,
-        color: "#0A1628",
+        color: "#0B1220",
         resize: "vertical",
         outline: "none"
       }
@@ -11739,9 +12098,9 @@ Thank you for your time,
       disabled: scoreLoading || !scoreResume.trim() && !scoreJD.trim(),
       style: {
         width: "100%",
-        background: scoreLoading || !scoreResume.trim() && !scoreJD.trim() ? "#E2E8F0" : `linear-gradient(135deg,${G},${GD})`,
+        background: scoreLoading || !scoreResume.trim() && !scoreJD.trim() ? "#E2E8F0" : `${G}`,
         border: "none",
-        color: scoreLoading || !scoreResume.trim() && !scoreJD.trim() ? "#9CA3AF" : "#fff",
+        color: scoreLoading || !scoreResume.trim() && !scoreJD.trim() ? "#6B7280" : "#fff",
         padding: "15px",
         borderRadius: var_rl,
         cursor: scoreLoading || !scoreResume.trim() && !scoreJD.trim() ? "not-allowed" : "pointer",
@@ -11760,7 +12119,7 @@ Thank you for your time,
     }, scoreError), React.createElement("p", {
       style: {
         fontSize: 11.5,
-        color: "#9CA3AF",
+        color: "#6B7280",
         textAlign: "center",
         marginTop: 12,
         lineHeight: 1.5
@@ -11799,7 +12158,7 @@ Thank you for your time,
         letterSpacing: "1.2px",
         marginBottom: 6
       }
-    }, "\uD83E\uDD16 SCREENER ROUND"), React.createElement("p", {
+    }, "SCREENER ROUND"), React.createElement("p", {
       style: {
         fontSize: 13.5,
         color: "#6B7280",
@@ -11827,10 +12186,10 @@ Thank you for your time,
         letterSpacing: "1.2px",
         marginBottom: 6
       }
-    }, "\uD83D\uDC64 HUMAN ROUND"), React.createElement("p", {
+    }, "HUMAN ROUND"), React.createElement("p", {
       style: {
         fontSize: 13.5,
-        color: "#9CA3AF",
+        color: "#6B7280",
         marginBottom: 14,
         lineHeight: 1.5
       }
@@ -11851,10 +12210,10 @@ Thank you for your time,
       style: {
         fontSize: 13,
         fontWeight: 800,
-        color: "#0A1628",
+        color: "#0B1220",
         marginBottom: 12
       }
-    }, "\uD83D\uDEE0 Top fixes \u2014 do these before you apply"), React.createElement("ol", {
+    }, "Top fixes \u2014 do these before you apply"), React.createElement("ol", {
       style: {
         margin: 0,
         paddingLeft: 18,
@@ -11866,7 +12225,7 @@ Thank you for your time,
       key: i,
       style: {
         fontSize: 13,
-        color: "#0A1628",
+        color: "#0B1220",
         lineHeight: 1.5
       }
     }, f)))), React.createElement("button", {
@@ -11877,7 +12236,7 @@ Thank you for your time,
       style: {
         background: "#fff",
         border: `1.5px solid ${GL}`,
-        color: "#0A1628",
+        color: "#0B1220",
         padding: "13px",
         borderRadius: var_rl,
         cursor: "pointer",
@@ -11994,7 +12353,7 @@ Thank you for your time,
   }, React.createElement("div", null, React.createElement("p", {
     style: {
       fontSize: 10,
-      color: "#9CA3AF",
+      color: "#6B7280",
       fontWeight: 700,
       letterSpacing: "2.5px",
       textTransform: "uppercase"
@@ -12005,7 +12364,7 @@ Thank you for your time,
       fontWeight: 800,
       letterSpacing: "-1px",
       marginTop: "0.3rem",
-      color: "#0A1628"
+      color: "#0B1220"
     }
   }, "Your applications.")), isPro ? React.createElement("span", {
     style: {
@@ -12017,10 +12376,10 @@ Thank you for your time,
       fontSize: 13,
       fontWeight: 700
     }
-  }, "\u26A1 Pro Active") : React.createElement("button", {
+  }, "Pro Active") : React.createElement("button", {
     onClick: () => setShowProModal(true),
     style: {
-      background: `linear-gradient(135deg,${G},${GD})`,
+      background: `${G}`,
       border: "none",
       color: "#fff",
       padding: "9px 20px",
@@ -12029,9 +12388,9 @@ Thank you for your time,
       fontFamily: "var(--font)",
       fontSize: 14,
       fontWeight: 700,
-      boxShadow: `0 2px 10px ${G}40`
+      boxShadow: "0 1px 2px rgba(11,18,32,.06)"
     }
-  }, "\u26A1 Upgrade to Pro")), React.createElement(FollowUpsDueBanner, null), !clerkUser && (tracked.length > 0 || (profile.resumes || []).length > 0) && React.createElement("div", {
+  }, "Upgrade to Pro")), React.createElement(FollowUpsDueBanner, null), !clerkUser && (tracked.length > 0 || (profile.resumes || []).length > 0) && React.createElement("div", {
     style: {
       background: "#FFFBEB",
       border: "1px solid #FCD34D",
@@ -12048,7 +12407,7 @@ Thank you for your time,
       fontSize: 18,
       flexShrink: 0
     }
-  }, "\u26A0\uFE0F"), React.createElement("div", {
+  }), React.createElement("div", {
     style: {
       flex: 1,
       minWidth: 0
@@ -12089,7 +12448,7 @@ Thank you for your time,
     let card = null;
     if (noApps && !hasSaved) {
       card = {
-        icon: "🎯",
+        icon: "",
         color: G,
         bg: GL,
         title: "Start by finding your matches",
@@ -12102,7 +12461,7 @@ Thank you for your time,
       };
     } else if (noApps && hasSaved) {
       card = {
-        icon: "📌",
+        icon: "",
         color: "#2563EB",
         bg: "#EFF6FF",
         title: `You have ${savedJobs.length} saved job${savedJobs.length > 1 ? "s" : ""} — ready to apply?`,
@@ -12116,7 +12475,7 @@ Thank you for your time,
       };
     } else if (dueFollowUps.length > 0) {
       card = {
-        icon: "🔔",
+        icon: "",
         color: CR,
         bg: "#FFF5F5",
         title: `${dueFollowUps.length} follow-up${dueFollowUps.length > 1 ? "s" : ""} overdue`,
@@ -12131,7 +12490,7 @@ Thank you for your time,
       };
     } else if (interviews.length > 0) {
       card = {
-        icon: "🎤",
+        icon: "",
         color: AM,
         bg: AL,
         title: `You have ${interviews.length} interview${interviews.length > 1 ? "s" : ""} coming up`,
@@ -12145,7 +12504,7 @@ Thank you for your time,
       };
     } else if (tracked.length > 0 && tracked.length < 5) {
       card = {
-        icon: "📈",
+        icon: "",
         color: "#7C3AED",
         bg: "#F5F3FF",
         title: "Apply to more — volume matters",
@@ -12167,13 +12526,7 @@ Thank you for your time,
         gap: 12,
         alignItems: "flex-start"
       }
-    }, React.createElement("span", {
-      style: {
-        fontSize: 22,
-        flexShrink: 0,
-        marginTop: 1
-      }
-    }, card.icon), React.createElement("div", {
+    }, React.createElement("div", {
       style: {
         flex: 1,
         minWidth: 0
@@ -12182,7 +12535,7 @@ Thank you for your time,
       style: {
         fontWeight: 800,
         fontSize: 14,
-        color: "#0A1628",
+        color: "#0B1220",
         lineHeight: 1.3
       }
     }, card.title), React.createElement("p", {
@@ -12229,7 +12582,7 @@ Thank you for your time,
   }].map((s, i) => React.createElement("div", {
     key: i,
     style: {
-      background: "#F8FFFE",
+      background: "#FBFBFC",
       border: `1px solid ${GL}`,
       borderRadius: var_rl,
       padding: "1.25rem",
@@ -12272,9 +12625,9 @@ Thank you for your time,
     style: {
       fontWeight: 700,
       fontSize: 15,
-      color: "#0A1628"
+      color: "#0B1220"
     }
-  }, "\uD83D\uDCCC Saved \u2014 haven't applied yet"), React.createElement("p", {
+  }, "Saved \u2014 haven't applied yet"), React.createElement("p", {
     style: {
       fontSize: 12,
       color: "#7C3AED",
@@ -12317,7 +12670,7 @@ Thank you for your time,
     style: {
       fontWeight: 700,
       fontSize: 14,
-      color: "#0A1628",
+      color: "#0B1220",
       overflow: "hidden",
       textOverflow: "ellipsis",
       whiteSpace: "nowrap"
@@ -12370,7 +12723,7 @@ Thank you for your time,
     style: {
       background: "#fff",
       border: "1.5px solid #E9D5FF",
-      color: "#9CA3AF",
+      color: "#6B7280",
       width: 30,
       height: 30,
       borderRadius: var_r,
@@ -12397,7 +12750,7 @@ Thank you for your time,
     style: {
       fontWeight: 700,
       fontSize: 15,
-      color: "#0A1628"
+      color: "#0B1220"
     }
   }, "Application Tracker"), React.createElement("div", {
     style: {
@@ -12420,10 +12773,10 @@ Thank you for your time,
       fontWeight: 700,
       opacity: tracked.length === 0 ? 0.6 : 1
     }
-  }, "\u2913 Export", !isPro && " ⚡"), React.createElement("button", {
+  }, "\u2913 Export", !isPro && " "), React.createElement("button", {
     onClick: () => setAddAppModal(true),
     style: {
-      background: `linear-gradient(135deg,${G},${GD})`,
+      background: `${G}`,
       border: "none",
       color: "#fff",
       padding: "6px 14px",
@@ -12432,7 +12785,7 @@ Thank you for your time,
       fontFamily: "var(--font)",
       fontSize: 13,
       fontWeight: 700,
-      boxShadow: `0 2px 8px ${G}40`
+      boxShadow: "0 1px 2px rgba(11,18,32,.06)"
     }
   }, "+ Add Application"))), React.createElement("div", {
     style: {
@@ -12482,7 +12835,7 @@ Thank you for your time,
       style: {
         flex: "0 0 230px",
         minWidth: 230,
-        background: isOver ? col.tint + "12" : "#F8FFFE",
+        background: isOver ? col.tint + "12" : "#FBFBFC",
         border: `1.5px solid ${isOver ? col.tint : GL}`,
         borderRadius: var_rl,
         padding: 10,
@@ -12508,7 +12861,7 @@ Thank you for your time,
       style: {
         fontSize: 13,
         fontWeight: 700,
-        color: "#0A1628"
+        color: "#0B1220"
       }
     }, col.key), React.createElement("span", {
       style: {
@@ -12524,7 +12877,7 @@ Thank you for your time,
     }, items.length)), items.length === 0 && React.createElement("p", {
       style: {
         fontSize: 12,
-        color: "#9CA3AF",
+        color: "#6B7280",
         textAlign: "center",
         padding: "18px 6px",
         lineHeight: 1.4
@@ -12576,7 +12929,7 @@ Thank you for your time,
         style: {
           fontWeight: 700,
           fontSize: 13.5,
-          color: "#0A1628",
+          color: "#0B1220",
           overflow: "hidden",
           textOverflow: "ellipsis",
           whiteSpace: "nowrap",
@@ -12600,7 +12953,7 @@ Thank you for your time,
           padding: 0,
           lineHeight: 1
         }
-      }, "\u2691"), React.createElement("button", {
+      }), React.createElement("button", {
         onClick: () => {
           if (window.confirm(`Remove ${a.company}?`)) setTracked(p => p.filter((x, j) => j !== i));
         },
@@ -12626,17 +12979,17 @@ Thank you for your time,
       }, a.role), React.createElement("p", {
         style: {
           fontSize: 10.5,
-          color: "#9CA3AF",
+          color: "#6B7280",
           marginTop: 3
         }
       }, col.key === "Saved" ? "Saved" : `Applied ${a.date || ""}`), a.deadline && React.createElement("p", {
         style: {
           fontSize: 10.5,
           fontWeight: 700,
-          color: dl < 0 ? "#9CA3AF" : dl <= 2 ? CR : dl <= 5 ? AM : GD,
+          color: dl < 0 ? "#6B7280" : dl <= 2 ? CR : dl <= 5 ? AM : GD,
           marginTop: 2
         }
-      }, "\uD83D\uDCC5 ", a.deadline, dl !== null && (dl < 0 ? " (passed)" : dl === 0 ? " (today!)" : ` · ${dl}d`)), col.key === "Applied" && fu.state !== "unknown" && React.createElement("button", {
+      }, a.deadline, dl !== null && (dl < 0 ? " (passed)" : dl === 0 ? " (today!)" : ` · ${dl}d`)), col.key === "Applied" && fu.state !== "unknown" && React.createElement("button", {
         onClick: () => {
           setFollowUpModal(a);
           generateFollowUp(a);
@@ -12644,7 +12997,7 @@ Thank you for your time,
         style: {
           marginTop: 7,
           width: "100%",
-          background: fu.state === "due" ? `linear-gradient(135deg,${G},${GD})` : "#fff",
+          background: fu.state === "due" ? `${G}` : "#fff",
           border: fu.state === "due" ? "none" : `1.5px solid ${G}`,
           color: fu.state === "due" ? "#fff" : GD,
           padding: "5px 8px",
@@ -12654,12 +13007,12 @@ Thank you for your time,
           fontSize: 11.5,
           fontWeight: 700
         }
-      }, "\u270D\uFE0F ", fu.state === "due" ? "Follow up — due" : fu.state === "done" ? "Followed up ✓" : "Draft follow-up"), col.key === "Interview" && React.createElement("button", {
+      }, fu.state === "due" ? "Follow up — due" : fu.state === "done" ? "Followed up ✓" : "Draft follow-up"), col.key === "Interview" && React.createElement("button", {
         onClick: () => generateInterviewPrep(a),
         style: {
           marginTop: 7,
           width: "100%",
-          background: `linear-gradient(135deg,${AM},#F59E0B)`,
+          background: `${AM}`,
           border: "none",
           color: "#fff",
           padding: "5px 8px",
@@ -12669,7 +13022,7 @@ Thank you for your time,
           fontSize: 11.5,
           fontWeight: 700
         }
-      }, "\uD83C\uDFA4 Prep"), React.createElement("select", {
+      }, "Prep"), React.createElement("select", {
         value: col.key,
         onChange: e => moveCard(a.company, e.target.value),
         style: {
@@ -12680,7 +13033,7 @@ Thank you for your time,
           color: "#6B7280",
           border: `1px solid ${GL}`,
           borderRadius: var_r,
-          background: "#F8FFFE",
+          background: "#FBFBFC",
           padding: "4px 6px",
           cursor: "pointer"
         }
@@ -12696,14 +13049,14 @@ Thank you for your time,
           marginTop: 6,
           background: "none",
           border: "none",
-          color: noteText ? "#7C3AED" : "#9CA3AF",
+          color: noteText ? "#7C3AED" : "#6B7280",
           padding: 0,
           cursor: "pointer",
           fontFamily: "var(--font)",
           fontSize: 11,
           fontWeight: 600
         }
-      }, isNoteOpen ? "Hide details" : noteText ? `📝 Notes (${noteText.length})` : "+ Notes & deadline"), isNoteOpen && React.createElement("div", {
+      }, isNoteOpen ? "Hide details" : noteText ? `Notes (${noteText.length})` : "+ Notes & deadline"), isNoteOpen && React.createElement("div", {
         style: {
           marginTop: 7
         }
@@ -12717,7 +13070,7 @@ Thank you for your time,
       }, React.createElement("label", {
         style: {
           fontSize: 10.5,
-          color: "#9CA3AF",
+          color: "#6B7280",
           fontWeight: 600
         }
       }, "Deadline"), React.createElement("input", {
@@ -12731,8 +13084,8 @@ Thank you for your time,
           padding: "2px 6px",
           border: "1.5px solid #E2E8F0",
           borderRadius: var_r,
-          color: "#0A1628",
-          background: "#F8FFFE",
+          color: "#0B1220",
+          background: "#FBFBFC",
           fontFamily: "var(--font)",
           cursor: "pointer"
         }
@@ -12750,7 +13103,7 @@ Thank you for your time,
           borderRadius: var_r,
           border: `1.5px solid #7C3AED30`,
           background: "#FAF5FF",
-          color: "#0A1628",
+          color: "#0B1220",
           fontFamily: "var(--font)",
           lineHeight: 1.5,
           outline: "none",
@@ -12760,7 +13113,7 @@ Thank you for your time,
     })));
   }))), React.createElement("div", {
     style: {
-      background: `linear-gradient(135deg,${GL},${AL})`,
+      background: `${GL}`,
       border: `1.5px solid ${G}25`,
       borderRadius: var_rl,
       padding: "1.5rem 1.75rem"
@@ -12776,12 +13129,12 @@ Thank you for your time,
     style: {
       fontSize: 24
     }
-  }, "\uD83D\uDCE7"), React.createElement("h3", {
+  }), React.createElement("h3", {
     style: {
       fontWeight: 800,
       fontSize: 17,
       letterSpacing: "-0.4px",
-      color: "#0A1628"
+      color: "#0B1220"
     }
   }, "Smart follow-ups")), React.createElement("p", {
     style: {
@@ -12815,7 +13168,7 @@ Thank you for your time,
       letterSpacing: "0.6px",
       marginBottom: 5
     }
-  }, "\uD83D\uDCCD HOW REMINDERS WORK"), React.createElement("p", {
+  }, "HOW REMINDERS WORK"), React.createElement("p", {
     style: {
       fontSize: 12.5,
       color: "#4A5568",
@@ -12823,12 +13176,12 @@ Thank you for your time,
     }
   }, "Reminders show ", React.createElement("strong", null, "inside Beat the Pile"), " (the amber banner on your Dashboard and Results page + red badges on each due application). We also ", React.createElement("strong", null, "email you"), " when you open Beat the Pile if a follow-up is due \u2014 but only on open, not as scheduled background sends. So opening the app every few days is how reminders actually reach you. ", React.createElement("span", {
     style: {
-      color: "#9CA3AF"
+      color: "#6B7280"
     }
   }, "True scheduled email/text reminders are on the roadmap."))), !isPro && React.createElement("p", {
     style: {
       fontSize: 12,
-      color: "#9CA3AF",
+      color: "#6B7280",
       marginTop: 12,
       lineHeight: 1.5
     }
@@ -12869,7 +13222,7 @@ Thank you for your time,
     style: {
       fontSize: 10,
       fontWeight: 700,
-      color: "#9CA3AF",
+      color: "#6B7280",
       letterSpacing: "2px",
       textTransform: "uppercase"
     }
@@ -12877,7 +13230,7 @@ Thank you for your time,
     style: {
       fontWeight: 800,
       fontSize: 19,
-      color: "#0A1628",
+      color: "#0B1220",
       letterSpacing: "-0.4px",
       marginTop: 2
     }
@@ -12892,7 +13245,7 @@ Thank you for your time,
       background: "none",
       border: "none",
       fontSize: 22,
-      color: "#9CA3AF",
+      color: "#6B7280",
       cursor: "pointer",
       lineHeight: 1
     }
@@ -12936,7 +13289,7 @@ Thank you for your time,
     key: i,
     style: {
       fontSize: 13,
-      color: "#0A1628",
+      color: "#0B1220",
       lineHeight: 1.5,
       marginBottom: i < prepResult.tips.length - 1 ? 6 : 0
     }
@@ -12949,7 +13302,7 @@ Thank you for your time,
   }, prepResult.questions.map((q, i) => React.createElement("div", {
     key: i,
     style: {
-      background: "#F8FFFE",
+      background: "#FBFBFC",
       border: `1.5px solid ${GL}`,
       borderRadius: var_r,
       padding: "12px 14px"
@@ -12958,7 +13311,7 @@ Thank you for your time,
     style: {
       fontWeight: 700,
       fontSize: 14,
-      color: "#0A1628",
+      color: "#0B1220",
       lineHeight: 1.4,
       marginBottom: 8
     }
@@ -12986,7 +13339,7 @@ Thank you for your time,
       fontSize: 15,
       fontWeight: 700
     }
-  }, "Got it \u2014 I'm ready \uD83C\uDFA4")))), addAppModal && React.createElement("div", {
+  }, "Got it \u2014 I'm ready ")))), addAppModal && React.createElement("div", {
     style: {
       position: "fixed",
       inset: 0,
@@ -13024,7 +13377,7 @@ Thank you for your time,
     style: {
       fontWeight: 800,
       fontSize: 19,
-      color: "#0A1628",
+      color: "#0B1220",
       letterSpacing: "-0.4px"
     }
   }, "Add Application"), React.createElement("button", {
@@ -13034,7 +13387,7 @@ Thank you for your time,
       background: "none",
       border: "none",
       fontSize: 22,
-      color: "#9CA3AF",
+      color: "#6B7280",
       cursor: "pointer",
       lineHeight: 1
     }
@@ -13060,8 +13413,8 @@ Thank you for your time,
       padding: "9px 11px",
       border: `1.5px solid ${GL}`,
       borderRadius: var_r,
-      color: "#0A1628",
-      background: "#F8FFFE",
+      color: "#0B1220",
+      background: "#FBFBFC",
       fontFamily: "var(--font)",
       outline: "none"
     }
@@ -13086,8 +13439,8 @@ Thank you for your time,
       padding: "9px 11px",
       border: `1.5px solid ${GL}`,
       borderRadius: var_r,
-      color: "#0A1628",
-      background: "#F8FFFE",
+      color: "#0B1220",
+      background: "#FBFBFC",
       fontFamily: "var(--font)",
       outline: "none"
     }
@@ -13120,8 +13473,8 @@ Thank you for your time,
       padding: "9px 10px",
       border: `1.5px solid ${GL}`,
       borderRadius: var_r,
-      color: "#0A1628",
-      background: "#F8FFFE",
+      color: "#0B1220",
+      background: "#FBFBFC",
       fontFamily: "var(--font)",
       cursor: "pointer"
     }
@@ -13152,8 +13505,8 @@ Thank you for your time,
       padding: "8px 10px",
       border: `1.5px solid ${GL}`,
       borderRadius: var_r,
-      color: "#0A1628",
-      background: "#F8FFFE",
+      color: "#0B1220",
+      background: "#FBFBFC",
       fontFamily: "var(--font)",
       cursor: "pointer"
     }
@@ -13181,7 +13534,7 @@ Thank you for your time,
     type: "submit",
     disabled: !addForm.company.trim(),
     style: {
-      background: addForm.company.trim() ? `linear-gradient(135deg,${G},${GD})` : "#CBD5E0",
+      background: addForm.company.trim() ? `${G}` : "#CBD5E0",
       border: "none",
       color: "#fff",
       padding: "10px 20px",
@@ -13194,7 +13547,7 @@ Thank you for your time,
   }, "Add")))), React.createElement("details", {
     style: {
       marginTop: 14,
-      background: "#0A1628",
+      background: "#0B1220",
       borderRadius: var_rl,
       padding: "0.5rem 1rem",
       color: "#fff"
@@ -13207,7 +13560,7 @@ Thank you for your time,
       padding: "8px 0",
       listStyle: "none"
     }
-  }, "\uD83D\uDCCA Founder stats (this device only)"), React.createElement("div", {
+  }, "Founder stats (this device only)"), React.createElement("div", {
     style: {
       paddingBottom: 12
     }
@@ -13238,14 +13591,14 @@ Thank you for your time,
     }, s[k] || 0), React.createElement("p", {
       style: {
         fontSize: 10.5,
-        color: "#9CA3AF",
+        color: "#6B7280",
         marginTop: 3
       }
     }, k.replace(/_/g, " ")))));
   })(), React.createElement("p", {
     style: {
       fontSize: 11,
-      color: "#9CA3AF",
+      color: "#6B7280",
       lineHeight: 1.5
     }
   }, "These counts are from ", React.createElement("strong", null, "this browser only"), " \u2014 useful for testing that events fire. For real cross-user analytics, add Plausible or PostHog at the marked line in the analytics helper (one line). Remove this panel before public launch.")))));
@@ -13281,7 +13634,7 @@ class AppErrorBoundary extends React.Component {
     return React.createElement('div', {
       style: {
         minHeight: "100vh",
-        background: "#F8FFFE",
+        background: "#FBFBFC",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -13291,7 +13644,7 @@ class AppErrorBoundary extends React.Component {
     }, React.createElement('div', {
       style: {
         background: "#fff",
-        border: "1px solid #E6FBF4",
+        border: "1px solid #EEF6F2",
         borderRadius: 16,
         boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
         padding: "2rem 1.75rem",
@@ -13304,18 +13657,18 @@ class AppErrorBoundary extends React.Component {
         width: 48,
         height: 48,
         margin: "0 auto 14px",
-        background: "linear-gradient(135deg,#00C285,#009E6C)",
+        background: "#0E8A5F",
         borderRadius: 12,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         fontSize: 24
       }
-    }, "⚠️"), React.createElement('h2', {
+    }, ""), React.createElement('h2', {
       style: {
         fontSize: 20,
         fontWeight: 800,
-        color: "#0A1628",
+        color: "#0B1220",
         margin: "0 0 6px",
         letterSpacing: "-0.4px"
       }
@@ -13339,7 +13692,7 @@ class AppErrorBoundary extends React.Component {
         msg: ""
       }),
       style: {
-        background: "linear-gradient(135deg,#00C285,#009E6C)",
+        background: "#0E8A5F",
         border: "none",
         color: "#fff",
         padding: "11px 22px",
@@ -13348,7 +13701,7 @@ class AppErrorBoundary extends React.Component {
         fontFamily: "inherit",
         fontSize: 14,
         fontWeight: 700,
-        boxShadow: "0 2px 10px rgba(0,194,133,0.3)"
+        boxShadow: "0 1px 2px rgba(11,18,32,.06)"
       }
     }, "Try again"), React.createElement('button', {
       onClick: () => {
@@ -13370,7 +13723,7 @@ class AppErrorBoundary extends React.Component {
     }, "Reload page")), this.state.msg && React.createElement('p', {
       style: {
         fontSize: 11,
-        color: "#9CA3AF",
+        color: "#6B7280",
         marginTop: 16,
         fontFamily: "monospace",
         wordBreak: "break-word"

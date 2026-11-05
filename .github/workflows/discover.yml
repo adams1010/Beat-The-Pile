@@ -1,4 +1,5 @@
-# Runs the company-discovery robot every 15 minutes (on top of Vercel's 2 daily runs).
+# Runs the company-discovery robot. GitHub only actually fires "*/15" schedules a few times a day on busy days,
+# so each run does 3 passes back to back (Vercel's hourly cron is the steady backstop).
 # Needs one repo secret: CRON_SECRET (same value as in Vercel → Environment Variables).
 name: discover
 on:
@@ -18,15 +19,19 @@ concurrency: { group: discover, cancel-in-progress: false }
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 6
     steps:
       - name: Call /api/discover
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           if [ -z "$CRON_SECRET" ]; then echo "Add the CRON_SECRET repo secret first"; exit 1; fi
+          for pass in 1 2 3; do
           code=$(curl -s -o out.json -w '%{http_code}' --max-time 70 \
             -H "Authorization: Bearer $CRON_SECRET" "https://intern-iq-psi.vercel.app/api/discover?x=1${{ inputs.import && '&import=1' || '' }}${{ inputs.query && format('&{0}', inputs.query) || '' }}")
-          cat out.json | head -c 2000; echo
-          echo "HTTP $code"
-          [ "$code" = 200 ]
+          cat out.json | head -c 1500; echo
+          echo "pass $pass: HTTP $code"
+          [ "$code" = 200 ] || exit 1
+          grep -q '"off":true' out.json && break        # switched off on /bots
+          [ -n "${{ inputs.query }}${{ inputs.import && 'x' || '' }}" ] && break   # manual debug/import runs: once
+          done

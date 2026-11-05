@@ -28,6 +28,12 @@ The Claude workspace **can't reach company websites**. To test against real site
 then read `PROBE_RESULT` from the run logs. In the JS, `await import(process.cwd() + "/lib/….js")` works. Use real
 tab/newline escapes (`"\t"`, `"\n"`) — the code is passed through bash single quotes.
 
+## Look & feel (Nov 2026)
+Font **Geist**; ink `#0B1220`, one accent green `#0E8A5F`, cool neutrals. No gradients, glows, rainbow chips or emoji
+in UI. Homepage tokens: `G/GD/GL/GM` at the top of `src/home.jsx`; static pages: CSS vars at the top of each page.
+Homepage `/#interview` = Interview practice (`/api/generate` feature `interview_turn`). Pro is **free during beta**
+(no payment exists — never show prices or "secure checkout" until Stripe is wired).
+
 ## Homepage build step (important)
 The homepage app is **`src/home.jsx`** (edit this). Browsers load the built **`home.js`** with production React (no
 in-browser Babel). After editing `src/home.jsx`: `npm install && node scripts/build-home.mjs`, then commit both.
@@ -40,7 +46,7 @@ Homepage screens have hash URLs (`/#quiz`, `/#dashboard`, `/#score`, …) so Bac
 apply speed, **Delete all my data**) · `/radar` Opening Radar · `/privacy` plain-words privacy page · `/bots` **Bot
 Control Room** (owner sign-in required to see numbers) · `/discovery` robot's company list + "Needs a link" sheet ·
 `/demo` story-style demo · `/` homepage (built from `src/home.jsx`).
-Every student page includes **`/nav.js`** (one shared top bar: Jobs · Career Fair · My Season · Radar) and
+Every page (homepage too) includes **`/nav.js`** (one shared top bar: Jobs · Career Fair · My Season · Radar · Tools ▾, phones get a Menu; it moves the page's `#acct` sign-in widget into the bar) and
 `/feedback.js` (Report a problem). Owner tools are not in the student nav.
 
 ## Privacy, AI and data-integrity rules (from the Nov 2026 audit — keep them)
@@ -66,12 +72,12 @@ Every student page includes **`/nav.js`** (one shared top bar: Jobs · Career Fa
 ## The bots (all visible + switchable on /bots; details in docs/BOTS.md)
 | Bot | Runs | Where | Code |
 |---|---|---|---|
-| 🤖 Company Finder (**main**) | every 15 min (GitHub) + hourly (Vercel) | Vercel `api/discover.js` | `lib/discover.js` |
+| 🤖 Company Finder (**main**) | hourly (Vercel) + GitHub `discover.yml` (3 passes per fire; GitHub only fires it a few times a day) | Vercel `api/discover.js` | `lib/discover.js` |
 | 🛰 Board Scout | weekly Sun 07:00 UTC | GitHub `board-scout.yml` | `lib/scout.js`, `scripts/board-scout.mjs` |
 | 🔭 New-Company Scout (SimplifyJobs import) | daily 07:xx UTC inside the finder | Vercel | `lib/simplify.js` |
 | 🌐 Browser Pass | nightly 08:30 UTC | GitHub `deep-discover.yml` (Playwright) | `scripts/deep-discover.mjs` |
-| 🔄 Internship Sync | hourly | Vercel `api/sync.js` (+ GitHub `sync.yml`) | `lib/fetchers/*` |
-| 🔗 Link Checker | hourly (GitHub `sync.yml` step) + 09:45/21:45 UTC (Vercel) | Vercel `api/check-links.js` | hides only after 2 dead checks in a row; skips script-only ATS pages |
+| 🔄 Internship Sync | Vercel cron 24×/day + GitHub `sync.yml` (3 passes per fire) | Vercel `api/sync.js` | `lib/fetchers/*`; 14 boards at once |
+| 🔗 Link Checker | after each GitHub sync pass + 09:45/21:45 UTC (Vercel); 700/run | Vercel `api/check-links.js` | hides only after 2 dead checks in a row; skips script-only ATS pages |
 | 📡 Opening Radar | daily 10:40 UTC | GitHub `radar.yml` | `scripts/build-radar.mjs` |
 
 Every bot calls `botOn(id)` before working and `logRun(id, ok, summary, stats)` after (`lib/bots.js`).
