@@ -1613,6 +1613,8 @@ function App(){
 
   // Load any saved profile once on mount
   useEffect(()=>{const s=profileStore.load();if(s)setProfile({...EMPTY_PROFILE,...s});},[]);
+  // Load sign-in right away (not only on results) so the nav shows "signed in" everywhere, same as the other pages
+  useEffect(()=>{ensureClerkLoaded();},[]);
   // Restore the full session (answers, picks, results, email, tracker, Pro) so a returning
   // user on the same device sees the exact same state — consistent stats and matches.
   const restoredRef=useRef(false);
@@ -1794,17 +1796,10 @@ function App(){
   // Open Clerk's pre-built sign-in modal — handles email+password, magic link, Google all out of the box.
   async function openSignIn(){
     const Clerk=await ensureClerkLoaded();
-    if(!Clerk){alert("Sign-in is temporarily unavailable. Try again in a moment.");return;}
-    setShowSignInModal(true);
-    // Mount Clerk's SignIn component into a div we control. We render the modal shell in React,
-    // and Clerk fills the inner div with its native UI.
-    setTimeout(()=>{
-      const mount=document.getElementById("clerk-signin-mount");
-      if(mount&&!mount.dataset.mounted){
-        Clerk.mountSignIn(mount,{appearance:{elements:{rootBox:"clerk-root-box"}}});
-        mount.dataset.mounted="1";
-      }
-    },50);
+    if(!Clerk){alert("Sign-in couldn't load. Check your connection and try again.");return;}
+    if(Clerk.user){setClerkUser(Clerk.user);setPage("profile");return;}   // already signed in (e.g. on the jobs page)
+    // Clerk's own pop-up (same one the jobs, fair and season pages use) — it lives outside React, so re-renders can't wipe it.
+    try{Clerk.openSignIn({});}catch(e){alert("Sign-in couldn't open. Refresh and try again.");}
   }
 
   async function signOut(){
@@ -2362,12 +2357,19 @@ function App(){
   }
 
   // Feature 6: Save/unsave a job from results page
+  const [saveNote,setSaveNote]=useState("");
   function toggleSaveJob(company){
+    const on=!savedJobs.some(j=>j.name===company.name);
     setSavedJobs(prev=>{
       const exists=prev.find(j=>j.name===company.name);
       if(exists)return prev.filter(j=>j.name!==company.name);
       return [...prev,{...company,savedAt:new Date().toISOString()}];
     });
+    // Real listings also go to your account's Saved list (the same one as the Jobs page and My Season)
+    if(clerkUser&&company.listingId){
+      (async()=>{try{const t=await getClerkToken();await fetch("/api/me",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+t},body:JSON.stringify({list:"saved",id:company.listingId,on})});}catch(e){}})();
+    }
+    if(on){setSaveNote(clerkUser?"Saved ♥ — find it on your Dashboard here, or in My Season → Saved.":"Saved ♥ on this device — find it on your Dashboard. Sign in to keep it in My Season too.");setTimeout(()=>setSaveNote(""),4500);}
   }
   function isJobSaved(name){return savedJobs.some(j=>j.name===name);}
 
@@ -2835,7 +2837,7 @@ function App(){
         <span className="nav-logo-text" style={{fontWeight:800,fontSize:17,color:"#0A1628",letterSpacing:"-0.5px"}}>Beat the Pile</span>
       </button>
       <div className="nav-links" style={{display:"flex",gap:2,alignItems:"center"}}>
-        {[["/jobs/","Jobs"],["/fair/","Career Fair"],["/season/","My Season"],["/radar/","Radar"]].map(([href,l])=>(
+        {[["/jobs/","Jobs"],["/jobs/?view=saved","♡ Saved"],["/fair/","Career Fair"],["/season/","My Season"],["/radar/","Radar"]].map(([href,l])=>(
           <a key={href} className="nav-tab" href={href} style={{color:"#4A5568",padding:"7px 12px",borderRadius:var_r,fontSize:14,fontWeight:600,fontFamily:"var(--font)",textDecoration:"none"}}>{l}</a>
         ))}
         {[["quiz","Match quiz"],["dashboard","Dashboard"],["resumebuilder","📄 Resume"],["profile","Profile"],["wall","Community"],["community","Tips"]].map(([p,l])=>(
@@ -2844,6 +2846,7 @@ function App(){
         {!isPro&&<button onClick={()=>setShowProModal(true)} style={{background:AL,border:`1px solid ${AM}30`,color:AM,padding:"6px 12px",borderRadius:var_r,cursor:"pointer",fontSize:13,fontWeight:700,fontFamily:"var(--font)",marginLeft:2}}>⚡ Pro</button>}
         <button className="nav-hide-mobile nav-cta" onClick={()=>{if(results.length>0){setPage("results");}else{setStep(0);setPage("quiz");}}} style={{background:`linear-gradient(135deg,${G},${GD})`,border:"none",color:"#fff",padding:"8px 18px",borderRadius:var_r,cursor:"pointer",fontSize:14,fontWeight:700,marginLeft:4,fontFamily:"var(--font)",boxShadow:`0 2px 8px ${G}40`}}>{results.length>0?"See results":"Get Started"}</button>
       </div>
+      {saveNote&&<div role="status" style={{position:"fixed",left:"50%",bottom:22,transform:"translateX(-50%)",background:"#0A1628",color:"#fff",padding:"10px 16px",borderRadius:10,fontSize:13.5,fontWeight:600,zIndex:2000,maxWidth:"90vw",boxShadow:"0 6px 20px rgba(0,0,0,.25)"}}>{saveNote}</div>}
       {/* Sign-in stays visible on phones (outside the scrolling links) */}
       <div style={{display:"flex",alignItems:"center",flexShrink:0,marginLeft:6}}>
         {/* Compact auth indicator — sign-in link OR user initial badge. Replaces the heavy banner on results. */}
@@ -4369,7 +4372,7 @@ Thank you for your time,
             <div style={{padding:"1rem 1.25rem",borderBottom:"1px solid #E9D5FF",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <div>
                 <h3 style={{fontWeight:700,fontSize:15,color:"#0A1628"}}>📌 Saved — haven't applied yet</h3>
-                <p style={{fontSize:12,color:"#7C3AED",marginTop:2}}>{savedJobs.length} job{savedJobs.length>1?"s":""} bookmarked from your results</p>
+                <p style={{fontSize:12,color:"#7C3AED",marginTop:2}}>{savedJobs.length} job{savedJobs.length>1?"s":""} saved from your matches{clerkUser?" · also in My Season → Saved":" on this device"} · <a href="/jobs/?view=saved" style={{color:"#7C3AED",fontWeight:700}}>Jobs-page saves →</a></p>
               </div>
               <button onClick={()=>setPage("results")} style={{background:"#7C3AED",color:"#fff",border:"none",padding:"6px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>View results →</button>
             </div>

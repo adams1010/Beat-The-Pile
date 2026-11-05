@@ -3,8 +3,9 @@
 // Owner tools (/bots, /discovery) are NOT in this bar; they have their own small link in the footer of those pages.
 (function () {
   if (window.__btpNav) return; window.__btpNav = true;
-  const LINKS = [["/jobs/", "Jobs"], ["/fair/", "Career Fair"], ["/season/", "My Season"], ["/radar/", "Radar"]];
-  const here = location.pathname.replace(/index\.html$/, "");
+  // "Saved" = every internship you've saved (Jobs page + homepage matches), shown on the Jobs page's Saved view.
+  const LINKS = [["/jobs/", "Jobs"], ["/jobs/?view=saved", "♡ Saved"], ["/fair/", "Career Fair"], ["/season/", "My Season"], ["/radar/", "Radar"]];
+  const here = location.pathname.replace(/index\.html$/, "") + (new URLSearchParams(location.search).get("view") === "saved" ? "?view=saved" : "");
   const css = `.btpnav{background:#06101F;color:#fff;font:600 14px -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;position:relative;z-index:30}
 .btpnav .in{max-width:960px;margin:0 auto;display:flex;align-items:center;gap:4px;padding:0 max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px));min-height:48px}
 .btpnav .logo{color:#00C285;font-weight:800;text-decoration:none;margin-right:10px;white-space:nowrap;letter-spacing:-.01em}

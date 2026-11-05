@@ -1,4 +1,4 @@
-/* built from src/home.jsx fc6146500e43e6a5 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx b1048338b61a7d68 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -3926,6 +3926,9 @@ function App() {
       ...s
     });
   }, []);
+  useEffect(() => {
+    ensureClerkLoaded();
+  }, []);
   const restoredRef = useRef(false);
   const metaRef = useRef(null);
   useEffect(() => {
@@ -4174,23 +4177,19 @@ function App() {
   async function openSignIn() {
     const Clerk = await ensureClerkLoaded();
     if (!Clerk) {
-      alert("Sign-in is temporarily unavailable. Try again in a moment.");
+      alert("Sign-in couldn't load. Check your connection and try again.");
       return;
     }
-    setShowSignInModal(true);
-    setTimeout(() => {
-      const mount = document.getElementById("clerk-signin-mount");
-      if (mount && !mount.dataset.mounted) {
-        Clerk.mountSignIn(mount, {
-          appearance: {
-            elements: {
-              rootBox: "clerk-root-box"
-            }
-          }
-        });
-        mount.dataset.mounted = "1";
-      }
-    }, 50);
+    if (Clerk.user) {
+      setClerkUser(Clerk.user);
+      setPage("profile");
+      return;
+    }
+    try {
+      Clerk.openSignIn({});
+    } catch (e) {
+      alert("Sign-in couldn't open. Refresh and try again.");
+    }
   }
   async function signOut() {
     if (!clerkInstance) return;
@@ -5054,7 +5053,9 @@ function App() {
       setPrepLoading(false);
     }
   }
+  const [saveNote, setSaveNote] = useState("");
   function toggleSaveJob(company) {
+    const on = !savedJobs.some(j => j.name === company.name);
     setSavedJobs(prev => {
       const exists = prev.find(j => j.name === company.name);
       if (exists) return prev.filter(j => j.name !== company.name);
@@ -5063,6 +5064,29 @@ function App() {
         savedAt: new Date().toISOString()
       }];
     });
+    if (clerkUser && company.listingId) {
+      (async () => {
+        try {
+          const t = await getClerkToken();
+          await fetch("/api/me", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + t
+            },
+            body: JSON.stringify({
+              list: "saved",
+              id: company.listingId,
+              on
+            })
+          });
+        } catch (e) {}
+      })();
+    }
+    if (on) {
+      setSaveNote(clerkUser ? "Saved ♥ — find it on your Dashboard here, or in My Season → Saved." : "Saved ♥ on this device — find it on your Dashboard. Sign in to keep it in My Season too.");
+      setTimeout(() => setSaveNote(""), 4500);
+    }
   }
   function isJobSaved(name) {
     return savedJobs.some(j => j.name === name);
@@ -6762,7 +6786,7 @@ function App() {
       gap: 2,
       alignItems: "center"
     }
-  }, [["/jobs/", "Jobs"], ["/fair/", "Career Fair"], ["/season/", "My Season"], ["/radar/", "Radar"]].map(([href, l]) => React.createElement("a", {
+  }, [["/jobs/", "Jobs"], ["/jobs/?view=saved", "♡ Saved"], ["/fair/", "Career Fair"], ["/season/", "My Season"], ["/radar/", "Radar"]].map(([href, l]) => React.createElement("a", {
     key: href,
     className: "nav-tab",
     href: href,
@@ -6827,7 +6851,24 @@ function App() {
       fontFamily: "var(--font)",
       boxShadow: `0 2px 8px ${G}40`
     }
-  }, results.length > 0 ? "See results" : "Get Started")), React.createElement("div", {
+  }, results.length > 0 ? "See results" : "Get Started")), saveNote && React.createElement("div", {
+    role: "status",
+    style: {
+      position: "fixed",
+      left: "50%",
+      bottom: 22,
+      transform: "translateX(-50%)",
+      background: "#0A1628",
+      color: "#fff",
+      padding: "10px 16px",
+      borderRadius: 10,
+      fontSize: 13.5,
+      fontWeight: 600,
+      zIndex: 2000,
+      maxWidth: "90vw",
+      boxShadow: "0 6px 20px rgba(0,0,0,.25)"
+    }
+  }, saveNote), React.createElement("div", {
     style: {
       display: "flex",
       alignItems: "center",
@@ -12228,7 +12269,13 @@ Thank you for your time,
       color: "#7C3AED",
       marginTop: 2
     }
-  }, savedJobs.length, " job", savedJobs.length > 1 ? "s" : "", " bookmarked from your results")), React.createElement("button", {
+  }, savedJobs.length, " job", savedJobs.length > 1 ? "s" : "", " saved from your matches", clerkUser ? " · also in My Season → Saved" : " on this device", " \xB7 ", React.createElement("a", {
+    href: "/jobs/?view=saved",
+    style: {
+      color: "#7C3AED",
+      fontWeight: 700
+    }
+  }, "Jobs-page saves \u2192"))), React.createElement("button", {
     onClick: () => setPage("results"),
     style: {
       background: "#7C3AED",

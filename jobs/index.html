@@ -435,7 +435,8 @@
     const on = !state.mine[list].has(id);
     on ? state.mine[list].add(id) : state.mine[list].delete(id);   // instant, then confirm with server
     render();
-    try { setMine(await api("POST", { list, id, on })); render(); }
+    try { setMine(await api("POST", { list, id, on })); render();
+          if (on) toast(list === "saved" ? "Saved ♥ — find it anytime under “♡ Saved” (top of this page) or in My Season → Saved" : "Marked applied ✓ — it's in My Season → Applied"); }
     catch { on ? state.mine[list].delete(id) : state.mine[list].add(id); render(); toast("Couldn't save that — try again"); }
   }
   $("list").addEventListener("click", (e) => {

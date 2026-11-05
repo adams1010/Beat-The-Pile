@@ -104,7 +104,9 @@
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const DAY = 864e5;
-  const S = { clerk: null, user: null, me: null, listings: {}, tab: "applied", loading: true };
+  const TABS = ["applied", "interview", "offer", "saved", "rejected"];
+  const tab0 = new URLSearchParams(location.search).get("tab");
+  const S = { clerk: null, user: null, me: null, listings: {}, tab: TABS.includes(tab0) ? tab0 : "applied", loading: true };
   const toast = (m) => { const t = document.createElement("div"); t.className = "toast"; t.textContent = m; document.body.appendChild(t); setTimeout(() => t.remove(), 2600); };
   const fmt = (t) => new Date(t).toLocaleDateString(undefined, { month: "short", day: "numeric" });
   const daysAgo = (t) => Math.floor((Date.now() - Date.parse(t)) / DAY);
