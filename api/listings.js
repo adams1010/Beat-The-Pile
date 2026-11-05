@@ -8,6 +8,7 @@
 //   GET /api/listings?limit=200&offset=400       → one page (default: everything, up to 20,000)
 //   GET /api/listings?ids=a:1,b:2                → these exact listings INCLUDING closed ones (your saved/applied history)
 //   GET /api/listings?summary=1                  → just counts + last update time (homepage/demo stats; tiny + cached)
+//   GET /api/listings?names=1                    → just the companies with an open internship right now (any major; Radar)
 // Bad parameters → 400 with what's wrong. A database problem → 503 (never an empty list that looks like "no jobs").
 import { db } from "../lib/db.js";
 import { FIELDS } from "../lib/fields.js";
@@ -34,7 +35,7 @@ export function parse(q) {
   const limit = raw("limit") ? Number(raw("limit")) : null, offset = raw("offset") ? Number(raw("offset")) : 0;
   if (limit != null && !(Number.isInteger(limit) && limit >= 1 && limit <= 1000)) errs.push("limit must be 1–1000");
   if (!(Number.isInteger(offset) && offset >= 0 && offset <= 20000)) errs.push("offset must be 0–20000");
-  return { errs, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, summary: raw("summary") === "1" };
+  return { errs, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, summary: raw("summary") === "1", names: raw("names") === "1" };
 }
 
 export default async function handler(req, res) {
@@ -53,6 +54,18 @@ export default async function handler(req, res) {
       ]);
       // companies = boards the robot proved + the hand-checked starter list
       return res.status(200).json({ engineering, me, allMajors, companies: companies + COMPANIES.length, lastSync: lastRun?.[0]?.ran_at || null, at: new Date().toISOString() });
+    }
+
+    if (p.names) {                                            // every company hiring right now, any major — small enough for a phone
+      res.setHeader("Cache-Control", "s-maxage=900, stale-while-revalidate=3600");
+      const seen = new Map();
+      for (let off = 0; off < 40000; off += 1000) {
+        const page = await db.select(`listings?select=company_id,company&${LIVE}&order=id.asc&limit=1000&offset=${off}`);
+        for (const r of page) if (!seen.has(r.company_id)) seen.set(r.company_id, r.company);
+        if (page.length < 1000) break;
+      }
+      const lastRun = await db.select("feed_runs?select=ran_at&order=ran_at.desc&limit=1");
+      return res.status(200).json({ companies: [...seen].map(([id, company]) => ({ id, company })), meta: { count: seen.size, lastSync: lastRun?.[0]?.ran_at || null } });
     }
 
     if (p.ids.length) {                                        // personal history: include closed listings, say which are closed

@@ -36,7 +36,7 @@ export default async function handler(req, res) {
       const names = new Set([...rows, ...COMPANIES].map((c) => normName(c.company)));
       const boards = new Set(COMPANIES.map(boardKey));
       for (const x of rows) if (x.ats && x.config) boards.add(boardKey({ ats: x.ats, ...x.config }));
-      const fresh = pickCompanies(listings, names, boards);
+      const fresh = pickCompanies(listings, names, boards, { anyMajor: true });   // all majors (Nov 2026)
       for (let i = 0; i < fresh.length; i += 200) await db.insertIgnore("company_candidates", fresh.slice(i, i + 200));
       await logRun("import", true, fresh.length ? `Found ${fresh.length} new companies: ${fresh.slice(0, 5).map((f) => f.company).join(", ")}${fresh.length > 5 ? "…" : ""}` : "No new companies today", { imported: fresh.length });
       return res.status(200).json({ imported: fresh.length, companies: fresh.slice(0, 50).map((f) => f.company) });

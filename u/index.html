@@ -127,27 +127,27 @@
       ${S.tab === "preview" ? profileHtml(d.p, resumeOn && d.p.showResume ? "/r/" + me.resume.token : null, true) : `
       <section class="card"><h2>Your link</h2>
         <label for="f_handle">Profile address</label>
-        <div class="handle"><span>beatthepile.com/u/</span><input id="f_handle" value="${esc(d.handle)}" placeholder="adam-shiloni" autocomplete="off" spellcheck="false"></div>
+        <div class="handle"><span>beatthepile.com/u/</span><input id="f_handle" value="${esc(d.handle)}" placeholder="jordan-lee" autocomplete="off" spellcheck="false"></div>
         <label class="switch"><input type="checkbox" id="f_public" ${d.pub ? "checked" : ""}><span><b>Public profile</b><br><span class="muted small">Off = only you can see it. On = anyone with the link (recruiters, friends) can view it. It's never listed or searchable.</span></span></label>
         ${me.handle && me.profilePublic ? `<p class="small" style="margin:10px 0 0">Live at <a href="/u/${esc(me.handle)}" style="color:var(--green-dark)">beatthepile.com/u/${esc(me.handle)}</a></p>` : ""}
       </section>
       <section class="card"><h2>Basics</h2>
-        <div class="row">${field("name", "Name", "Adam Shiloni")}${field("headline", "Headline", "Mechanical engineering student · BOLT chassis team")}</div>
-        <div class="row">${field("school", "School", "Virginia Tech")}${field("major", "Major", "Mechanical Engineering")}</div>
-        <div class="row">${field("gradYear", "Graduation year", "2029", 'inputmode="numeric" maxlength="4"')}${field("location", "Location", "Blacksburg, VA")}</div>
-        ${field("lookingFor", "Looking for", "Summer 2027 mechanical engineering internship")}
+        <div class="row">${field("name", "Name", "Jordan Lee")}${field("headline", "Headline", "Finance student · investment club treasurer")}</div>
+        <div class="row">${field("school", "School", "Virginia Tech")}${field("major", "Major", "Finance")}</div>
+        <div class="row">${field("gradYear", "Graduation year", "2029", 'inputmode="numeric" maxlength="4"')}${field("location", "Location", "Richmond, VA")}</div>
+        ${field("lookingFor", "Looking for", "Summer 2027 internship")}
         <label for="f_about">About</label><textarea id="f_about" data-k="about" maxlength="1200" placeholder="A few sentences about what you build and what you want to learn.">${esc(d.p.about)}</textarea>
       </section>
       <section class="card"><h2>Experience</h2><div id="exp">${d.p.experience.map((x, i) => `
         <div class="rep"><button class="rm" data-rm="experience" data-i="${i}">Remove</button>
-          <div class="row"><div><label>Role</label><input data-list="experience" data-i="${i}" data-f="title" value="${esc(x.title)}" placeholder="Engineering Intern"></div>
-          <div><label>Company / team</label><input data-list="experience" data-i="${i}" data-f="org" value="${esc(x.org)}" placeholder="Scheerer Bearing"></div></div>
+          <div class="row"><div><label>Role</label><input data-list="experience" data-i="${i}" data-f="title" value="${esc(x.title)}" placeholder="Marketing Intern"></div>
+          <div><label>Company / team</label><input data-list="experience" data-i="${i}" data-f="org" value="${esc(x.org)}" placeholder="Acme Corp"></div></div>
           <label>When</label><input data-list="experience" data-i="${i}" data-f="when" value="${esc(x.when)}" placeholder="Summer 2026">
           <label>What you did</label><textarea data-list="experience" data-i="${i}" data-f="desc" maxlength="600">${esc(x.desc)}</textarea></div>`).join("")}</div>
         ${d.p.experience.length < 10 ? `<button class="btn" data-add="experience" style="margin-top:12px">+ Add experience</button>` : ""}</section>
       <section class="card"><h2>Projects</h2><div>${d.p.projects.map((x, i) => `
         <div class="rep"><button class="rm" data-rm="projects" data-i="${i}">Remove</button>
-          <div class="row"><div><label>Project</label><input data-list="projects" data-i="${i}" data-f="name" value="${esc(x.name)}" placeholder="Electric motorcycle chassis"></div>
+          <div class="row"><div><label>Project</label><input data-list="projects" data-i="${i}" data-f="name" value="${esc(x.name)}" placeholder="Stock pitch competition"></div>
           <div><label>Link (https://, optional)</label><input data-list="projects" data-i="${i}" data-f="link" value="${esc(x.link)}" placeholder="https://"></div></div>
           <label>Description</label><textarea data-list="projects" data-i="${i}" data-f="desc" maxlength="600">${esc(x.desc)}</textarea></div>`).join("")}</div>
         ${d.p.projects.length < 8 ? `<button class="btn" data-add="projects" style="margin-top:12px">+ Add project</button>` : ""}</section>

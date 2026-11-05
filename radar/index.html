@@ -74,7 +74,7 @@
       <button data-v="open" aria-pressed="false">Opened this season</button>
       <button data-v="next" aria-pressed="false">Plan for next summer</button>
     </div>
-    <input class="search" id="q" type="search" placeholder="Search a company (Boeing, Lockheed, Tesla…)" aria-label="Search a company">
+    <input class="search" id="q" type="search" placeholder="Search a company (Boeing, Deloitte, Capital One…)" aria-label="Search a company">
   </div>
 </div>
 <main class="wrap">
@@ -88,7 +88,7 @@
 (function(){
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-  const S = { d: null, view: new URLSearchParams(location.search).get("view") || "soon", q: "", onSite: new Set() };
+  const S = { d: null, view: new URLSearchParams(location.search).get("view") || "soon", q: "", onSite: new Set(), onSiteId: new Map() };
   const DAY = 864e5;
   const fmt = (iso, y) => new Date(iso + "T12:00:00Z").toLocaleDateString(undefined, { month: "short", day: "numeric", ...(y ? { year: "numeric" } : {}), timeZone: "UTC" });
   const daysFrom = (iso) => Math.round((Date.parse(iso + "T12:00:00Z") - Date.now()) / DAY);
@@ -120,7 +120,8 @@
     return `<div class="hist"><span style="font-weight:700">Past seasons:</span>${Object.entries(c.history).map(([S, d]) => `<span>Summer ${esc(S)}: <b>${esc(fmt(d, true))}</b></span>`).join("")}</div>`;
   }
   const conf = (c) => c.confidence === "high" ? "Very consistent year to year" : c.seasons >= 2 ? `Based on ${c.seasons} seasons` : "Based on 1 season, a rough guide";
-  function jobsLink(c){ return `<a class="btn go" href="/jobs/?q=${encodeURIComponent(c.name)}">See internships →</a>`; }
+  // One company's internships, every major (the jobs page loads just that company — fast on a phone)
+  function jobsLink(c){ const id = c.id || S.onSiteId.get(c.k); return `<a class="btn go" href="/jobs/?${id ? `company=${encodeURIComponent(id)}&` : ""}major=all&q=${encodeURIComponent(c.name.trim())}">See internships →</a>`; }
 
   function card(c){
     const season = S.d.season;
@@ -178,10 +179,10 @@
   });
 
   Promise.all([fetch("/radar/radar.json").then((r) => r.json()),
-               fetch("/api/listings").then((r) => { if (!r.ok) throw 0; return r.json(); }).catch(() => null)]).then(([d, l]) => {
+               fetch("/api/listings?names=1").then((r) => { if (!r.ok) throw 0; return r.json(); }).catch(() => null)]).then(([d, l]) => {
     S.d = d;
     if (!l) S.liveErr = true; else S.lastSync = l.meta?.lastSync || null;
-    for (const j of l?.listings || []) { S.onSite.add(normName(j.company)); }
+    for (const j of l?.companies || []) { const k = normName(j.company); S.onSite.add(k); if (!S.onSiteId.has(k)) S.onSiteId.set(k, j.id); }
     if (d.trend && d.trend.companies >= 10) {
       const t = d.trend, pct = Math.round(t.earlier / t.companies * 100);
       $("#trend").innerHTML = `<div class="n">${pct}%</div><div class="t">of companies opened Summer ${d.season} internships <b>earlier than last year</b>. Only ${Math.round(t.later / t.companies * 100)}% opened later (${t.companies} companies compared, from the opening history below).</div>`;

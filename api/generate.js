@@ -161,7 +161,7 @@ Do not state facts about the company unless you are confident they are true.` };
 
   // Interview practice: one turn at a time. The student answers; we give short honest feedback and the next question.
   interview_turn(i) {
-    const company = str(i?.company, 100) || "a company", role = str(i?.role, 120) || "engineering intern", major = str(i?.major, 100);
+    const company = str(i?.company, 100) || "a company", role = str(i?.role, 120) || "intern", major = str(i?.major, 100);
     const kind = ["behavioral", "technical", "mixed"].includes(i?.kind) ? i.kind : "mixed";
     const total = num(i?.total, 3, 8, 5);
     const hist = (Array.isArray(i?.history) ? i.history : []).slice(-8).map((h) => ({ q: str(h?.q, 400), a: str(h?.a, 1500) })).filter((h) => h.q);
