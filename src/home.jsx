@@ -916,36 +916,36 @@ function InterviewSim({major,defaultCompany,defaultRole}){
 
 
 // ── Skills: a searchable dropdown instead of a wall of chips. Suggestions fit the major; you can add your own. ──
+// Skills step: one big bank of tappable chips — no typing needed (people quit quizzes that feel like work).
+// Your major's skills first, then ones that fit any major; a small box at the end adds anything missing.
 function SkillPicker({options,value,onToggle,major}){
-  const [q,setQ]=React.useState(""),[open,setOpen]=React.useState(false),[hi,setHi]=React.useState(0);
-  const all=[...new Set([...options,...SKILLS])];
-  const ql=q.trim().toLowerCase();
-  const list=all.filter(o=>!value.includes(o)&&(!ql||o.toLowerCase().includes(ql))).slice(0,8);
-  const custom=ql&&!all.some(o=>o.toLowerCase()===ql)&&!value.some(v=>v.toLowerCase()===ql)?q.trim().slice(0,40):null;
-  const items=custom?[...list,custom]:list;
-  const pick=(o)=>{onToggle(o);setQ("");setHi(0);};
+  const [q,setQ]=React.useState("");
+  const general=SKILLS_BY_FIELD.default.filter(o=>!options.includes(o));
+  const custom=value.filter(v=>!options.includes(v)&&!general.includes(v));
   const ink="#0B1220",line="#D5DBE3",dim="#5B6675";
-  return (<div style={{position:"relative"}}>
-    {value.length>0&&<div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:10}}>
-      {value.map(v=>(<span key={v} style={{display:"inline-flex",alignItems:"center",gap:6,background:"#EEF1F5",color:ink,borderRadius:6,padding:"5px 6px 5px 10px",fontSize:13.5,fontWeight:500}}>
-        {v}<button onClick={()=>onToggle(v)} aria-label={`Remove ${v}`} style={{border:"none",background:"transparent",cursor:"pointer",color:dim,fontSize:15,lineHeight:1,padding:"0 4px"}}>×</button></span>))}
-    </div>}
-    <label htmlFor="skillQ" style={{position:"absolute",left:-9999}}>Add a skill</label>
-    <input id="skillQ" value={q} autoComplete="off" role="combobox" aria-expanded={open} aria-controls="skillList"
-      placeholder={value.length?"Add another skill…":"Start typing a skill (e.g. SolidWorks, MATLAB, Python)"}
-      onFocus={()=>setOpen(true)} onBlur={()=>setTimeout(()=>setOpen(false),150)}
-      onChange={e=>{setQ(e.target.value);setOpen(true);setHi(0);}}
-      onKeyDown={e=>{if(e.key==="ArrowDown"){e.preventDefault();setHi(h=>Math.min(h+1,items.length-1));}
-        else if(e.key==="ArrowUp"){e.preventDefault();setHi(h=>Math.max(h-1,0));}
-        else if(e.key==="Enter"&&items[hi]){e.preventDefault();pick(items[hi]);}
-        else if(e.key==="Backspace"&&!q&&value.length)onToggle(value[value.length-1]);}}
-      style={{width:"100%",padding:"12px 14px",border:`1px solid ${line}`,borderRadius:8,fontSize:15,color:ink,background:"#fff",outline:"none",fontFamily:"inherit"}}/>
-    {open&&items.length>0&&<ul id="skillList" role="listbox" style={{position:"absolute",left:0,right:0,top:"100%",marginTop:4,background:"#fff",border:`1px solid ${line}`,borderRadius:8,boxShadow:"0 10px 28px rgba(11,18,32,.12)",listStyle:"none",padding:4,zIndex:20,maxHeight:300,overflowY:"auto"}}>
-      {items.map((o,i)=>(<li key={o} role="option" aria-selected={i===hi} onMouseDown={e=>{e.preventDefault();pick(o);}} onMouseEnter={()=>setHi(i)}
-        style={{padding:"9px 10px",borderRadius:6,cursor:"pointer",fontSize:14.5,color:ink,background:i===hi?"#F2F4F7":"transparent"}}>
-        {o===custom?<>Add “{o}”</>:o}</li>))}
-    </ul>}
-    <p style={{fontSize:13,color:dim,marginTop:10}}>Suggestions fit {major||"your major"}. Only add what you'd be comfortable talking about in an interview.</p>
+  const chip=(o)=>{const on=value.includes(o);return(
+    <button key={o} type="button" aria-pressed={on} onClick={()=>onToggle(o)}
+      style={{display:"inline-flex",alignItems:"center",gap:6,minHeight:40,padding:"8px 14px",borderRadius:999,fontSize:14.5,fontWeight:500,cursor:"pointer",fontFamily:"inherit",
+        border:`1px solid ${on?ink:line}`,background:on?ink:"#fff",color:on?"#fff":ink,transition:"background .12s, color .12s"}}>
+      {on&&<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>}{o}
+    </button>);};
+  const add=()=>{const v=q.trim().slice(0,40);if(v&&!value.some(x=>x.toLowerCase()===v.toLowerCase()))onToggle(v);setQ("");};
+  return (<div>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:12,marginBottom:10}}>
+      <p style={{fontSize:13,fontWeight:600,color:ink,margin:0}}>For {major||"your major"}</p>
+      <p aria-live="polite" style={{fontSize:13,color:value.length?"#0E8A5F":dim,margin:0,fontWeight:value.length?600:400}}>{value.length?`${value.length} picked`:"Tap any that fit — skip the rest"}</p>
+    </div>
+    <div style={{display:"flex",flexWrap:"wrap",gap:8}}>{options.map(chip)}</div>
+    <p style={{fontSize:13,fontWeight:600,color:ink,margin:"20px 0 10px"}}>Good for any major</p>
+    <div style={{display:"flex",flexWrap:"wrap",gap:8}}>{general.map(chip)}{custom.map(chip)}</div>
+    <div style={{display:"flex",gap:8,marginTop:18}}>
+      <label htmlFor="skillQ" style={{position:"absolute",left:-9999}}>Add a skill that isn't listed</label>
+      <input id="skillQ" value={q} autoComplete="off" placeholder="Something missing? Type it and press Enter"
+        onChange={e=>setQ(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();add();}}}
+        style={{flex:1,minWidth:0,padding:"11px 14px",border:`1px solid ${line}`,borderRadius:8,fontSize:14.5,color:ink,background:"#fff",outline:"none",fontFamily:"inherit"}}/>
+      <button type="button" onClick={add} disabled={!q.trim()} style={{padding:"0 16px",borderRadius:8,border:`1px solid ${line}`,background:"#fff",color:ink,fontWeight:600,fontSize:14,cursor:q.trim()?"pointer":"default",opacity:q.trim()?1:.5,fontFamily:"inherit"}}>Add</button>
+    </div>
+    <p style={{fontSize:13,color:dim,marginTop:10}}>Only pick what you'd be comfortable talking about in an interview. You can change these later.</p>
   </div>);
 }
 
@@ -1114,7 +1114,7 @@ function App(){
   function toggleSkill(v){setAns(p=>{const a=p.skills;return{...p,skills:a.includes(v)?a.filter(x=>x!==v):[...a,v]};});}
 
   function canNext(){
-    if(cur?.type==="multi")return ans.skills.length>0;
+    if(cur?.type==="multi")return true;   // skills are optional — a required step here made people quit
     if(cur?.type==="slider")return true;
     if(cur?.type==="resume")return true; // resume is optional — always can proceed
     if(cur?.type==="zip")return /^\d{5}$/.test(ans.zip);
@@ -1146,6 +1146,7 @@ function App(){
       if(e.key!=="Enter")return;
       const tag=(e.target&&e.target.tagName)||"";
       if(tag==="TEXTAREA")return; // allow newlines in text areas
+      if(e.defaultPrevented||tag==="BUTTON")return; // a field already used this Enter (e.g. "add a skill"), or a focused button gets pressed
       e.preventDefault();
       advanceQuiz();
     };
@@ -3077,7 +3078,7 @@ function App(){
               {(cur.type==="multi"||cur.type==="zip"||cur.type==="slider"||cur.type==="extracurricular")&&(
                 <button onClick={advanceQuiz} disabled={!canNext()}
                   style={{flex:1,background:canNext()?`${G}`:"#E2E8F0",border:"none",color:canNext()?"#fff":"#6B7280",padding:"14px 24px",borderRadius:var_rl,cursor:canNext()?"pointer":"not-allowed",fontFamily:"var(--font)",fontSize:15,fontWeight:700,transition:"all 0.2s",boxShadow:canNext()?`0 4px 16px ${G}40`:"none"}}>
-                  {step===STEPS.length-1?"Find My Matches →":"Continue →"}
+                  {step===STEPS.length-1?"Find My Matches →":cur.type==="multi"&&!ans.skills.length?"Skip for now →":"Continue →"}
                 </button>
               )}
             </>)}
