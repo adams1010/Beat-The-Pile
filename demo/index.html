@@ -29,7 +29,7 @@
   .brand b{width:26px;height:26px;border-radius:8px;background:var(--green);display:grid;place-items:center;font-size:11px}
   .ctrl{display:flex;gap:6px}
   .ctrl button,.ctrl a{font:700 12px var(--font);color:#fff;background:rgba(255,255,255,.12);border:0;border-radius:999px;padding:7px 11px;cursor:pointer;text-decoration:none}
-  .tapL,.tapR{position:absolute;top:70px;bottom:90px;z-index:10}
+  .tapL,.tapR{position:absolute;top:70px;bottom:90px;z-index:10;pointer-events:none}
   .tapL{left:0;width:30%}.tapR{right:0;width:70%}
   .slide{position:absolute;inset:0;padding:96px 26px 110px;display:flex;flex-direction:column;justify-content:center;opacity:0;visibility:hidden;transition:opacity .35s}
   .slide.on{opacity:1;visibility:visible}
@@ -315,7 +315,14 @@
   }
   const next = () => show(i === slides.length - 1 ? 0 : i + 1), back = () => show(Math.max(0, i - 1));
   document.getElementById("next").onclick = next; document.getElementById("back").onclick = back;
-  document.getElementById("tapR").onclick = next; document.getElementById("tapL").onclick = back;
+  // Tap left 30% = back, rest = next — but never steal a tap meant for a link or button on the slide
+  document.getElementById("frame").addEventListener("click", (e) => {
+    if (e.target.closest("a,button,input,select,textarea,summary,details,.head,.hint,.bars")) return;
+    if (window.getSelection && String(getSelection()).length) return;
+    const r = e.currentTarget.getBoundingClientRect(), y = e.clientY - r.top;
+    if (y < 70 || y > r.height - 90) return;
+    (e.clientX - r.left < r.width * 0.3 ? back : next)();
+  });
   const pp = document.getElementById("pp");
   const setPaused = (v) => { paused = v; pp.textContent = v ? "▶" : "❚❚"; pp.setAttribute("aria-label", v ? "Play" : "Pause"); };
   pp.onclick = () => setPaused(!paused);
