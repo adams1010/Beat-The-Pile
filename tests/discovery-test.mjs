@@ -73,10 +73,10 @@ r = await discoverOne({ company: "Bahnson", domain: "bahnson.com", key: "bahnson
 assert.equal(r.status, "identity_failed");
 console.log("4c parent portal held ✓  ", r.detail);
 
-// 4b) Careers page uses Taleo → unsupported (logged by system)
-sites["https://www.oldco.com/careers"] = html(200, `<a href="https://oldco.taleo.net/careersection/2/jobsearch.ftl">Open roles</a>`, "https://www.oldco.com/careers");
+// 4b) Careers page uses a system we can't read yet (Avature) → unsupported (logged by system). (Taleo + UKG: readable since Nov 2026)
+sites["https://www.oldco.com/careers"] = html(200, `<a href="https://oldco.avature.net/careers">Open roles</a>`, "https://www.oldco.com/careers");
 r = await discoverOne({ company: "OldCo", domain: "oldco.com", key: "oldco" });
-assert.equal(r.status, "unsupported"); assert.match(r.detail, /Taleo/);
+assert.equal(r.status, "unsupported"); assert.match(r.detail, /Avature/);
 console.log("4b unsupported ✓         ", r.detail);
 
 // 5) Bot wall everywhere → blocked
