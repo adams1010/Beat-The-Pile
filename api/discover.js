@@ -125,6 +125,8 @@ export default async function handler(req, res) {
       enabled: r.status === "live",
       detail: r.detail || null,
       intern_count: r.intern_count ?? null,
+      ...(r.domain && !c.domain ? { domain: r.domain } : {}),
+      ...(r.status === "live" && r.company ? { company: r.company } : {}),     // board is the whole organization → list under its name                // website we found for a company known only by a dead link
       attempts: (c.attempts || 0) + 1,
       checked_at: now,
       ...(r.status === "live" ? { verified_at: now } : {}),
