@@ -94,6 +94,105 @@ const JobPreview=()=>{
     <a href="/jobs/" style={{fontSize:13,fontWeight:700,color:"#0B6E4B",textAlign:"center",marginTop:4}}>See all of them →</a>
   </div>);
 };
+
+// ── Homepage (Direction D) ─────────────────────────────────────────────
+const D_FIELD={software:"Software & CS",data:"Data & AI",cyber_it:"Cybersecurity & IT",mechanical:"Mechanical & Aerospace",electrical:"Electrical & Computer",chemical:"Chemical & Materials",civil:"Civil & Construction",product_design:"Product & Design",industrial:"Industrial & Manufacturing",finance:"Finance & Accounting",legal_policy:"Legal & Policy",people_hr:"People & HR",consulting:"Consulting & Strategy",marketing:"Marketing & Media",sales:"Sales",supply_chain:"Supply Chain & Ops",science_health:"Science & Health",education_social:"Education & Social Impact"};
+const D_STATES={alabama:"AL",alaska:"AK",arizona:"AZ",arkansas:"AR",california:"CA",colorado:"CO",connecticut:"CT",delaware:"DE",florida:"FL",georgia:"GA",hawaii:"HI",idaho:"ID",illinois:"IL",indiana:"IN",iowa:"IA",kansas:"KS",kentucky:"KY",louisiana:"LA",maine:"ME",maryland:"MD",massachusetts:"MA",michigan:"MI",minnesota:"MN",mississippi:"MS",missouri:"MO",montana:"MT",nebraska:"NE",nevada:"NV","new hampshire":"NH","new jersey":"NJ","new mexico":"NM","new york":"NY","north carolina":"NC","north dakota":"ND",ohio:"OH",oklahoma:"OK",oregon:"OR",pennsylvania:"PA","rhode island":"RI","south carolina":"SC","south dakota":"SD",tennessee:"TN",texas:"TX",utah:"UT",vermont:"VT",virginia:"VA",washington:"WA","west virginia":"WV",wisconsin:"WI",wyoming:"WY","district of columbia":"DC"};
+function dAgo(t){const m=Math.max(0,Math.round((Date.now()-new Date(t))/6e4));return m<60?`${m||1}m`:m<1440?`${Math.round(m/60)}h`:`${Math.round(m/1440)}d`;}
+function dAgoLong(t){const m=Math.max(0,Math.round((Date.now()-new Date(t))/6e4));return m<60?`${m||1} min ago`:m<1440?`${Math.round(m/60)} h ago`:`${Math.round(m/1440)} days ago`;}
+const DM={fontFamily:'"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace'};
+function LandingD({onQuiz,onPage}){
+  const [sum,setSum]=React.useState(null),[sumErr,setSumErr]=React.useState(false),[fresh,setFresh]=React.useState(null);
+  const [q,setQ]=React.useState(""),[where,setWhere]=React.useState("");
+  React.useEffect(()=>{
+    fetch("/api/listings?summary=1").then(r=>{if(!r.ok)throw 0;return r.json();}).then(setSum).catch(()=>setSumErr(true));
+    fetch("/api/listings?field=all&limit=80").then(r=>{if(!r.ok)throw 0;return r.json();}).then(d=>{const co=new Set(),out=[];for(const l of d.listings||[]){if(co.has(l.company))continue;co.add(l.company);out.push(l);if(out.length===5)break;}setFresh(out);}).catch(()=>setFresh([]));
+  },[]);
+  const go=(e)=>{e.preventDefault();const p=new URLSearchParams();if(q.trim())p.set("q",q.trim());
+    const w=where.trim().toLowerCase();const code=/^[a-z]{2}$/.test(w)?w.toUpperCase():(D_STATES[w]||null);
+    p.set("state",code&&Object.values(D_STATES).includes(code)?code:"all");if(w==="remote"&&!q.trim())p.set("q","remote");
+    location.href="/jobs/?"+p.toString();};
+  const fmt=(n)=>n==null?"—":Number(n).toLocaleString();
+  const fields=sum?.byField?Object.entries(sum.byField).filter(([k])=>D_FIELD[k]).sort((a,b)=>b[1]-a[1]).slice(0,8):null;
+  const pills=["finance","software","mechanical","marketing","civil","science_health"];
+  const card={background:"#fff",border:"1px solid #DCE2EC",borderRadius:14};
+  const wrap={maxWidth:1240,margin:"0 auto",padding:"0 24px"};
+  return(<>
+    <section style={{position:"relative",overflow:"hidden",background:"#070F1E",color:"#E8EDF5",backgroundImage:"linear-gradient(#111C33 1px,transparent 1px),linear-gradient(90deg,#111C33 1px,transparent 1px)",backgroundSize:"32px 32px"}}>
+      <div aria-hidden="true" className="d-scan" style={{position:"absolute",left:0,right:0,top:0,height:120,background:"linear-gradient(transparent,rgba(47,211,154,.07),transparent)"}}/>
+      <div style={{...wrap,position:"relative",paddingTop:64,paddingBottom:48,display:"flex",gap:48,flexWrap:"wrap",alignItems:"center"}}>
+        <div style={{flex:"999 1 520px",minWidth:0}}>
+          <p style={{...DM,fontSize:12,letterSpacing:".12em",color:"#2FD39A",margin:"0 0 18px",textTransform:"uppercase"}}><span className="d-blink" style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#2FD39A",marginRight:8}}/>
+            {sum?`Live · ${fmt(sum.companies)} company job boards${sum.lastSync?` · re-read ${dAgoLong(sum.lastSync)}`:""}`:sumErr?"Live numbers unavailable right now":"Connecting…"}</p>
+          <h1 style={{fontSize:"clamp(2.3rem,5.6vw,4rem)",lineHeight:1.03,letterSpacing:"-0.035em",fontWeight:600,margin:"0 0 16px",color:"#fff"}}>Find your internship<br/>before the <span style={{color:"#2FD39A"}}>pile</span> does.</h1>
+          <p style={{fontSize:18,lineHeight:1.5,color:"#9FAAC0",margin:"0 0 28px",maxWidth:560}}>Every major. Pulled straight from each company's own job board — no reposts, and jobs drop off when the company takes them down.</p>
+          <form onSubmit={go} role="search" className="d-search" style={{display:"flex",alignItems:"stretch",background:"#fff",borderRadius:14,padding:6,boxShadow:"0 0 0 1px #2FD39A33, 0 20px 50px rgba(0,0,0,.35)",maxWidth:760}}>
+            <label style={{flex:"3 1 0",display:"flex",alignItems:"center",gap:10,padding:"0 14px",minWidth:0}}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55627A" strokeWidth="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+              <input value={q} onChange={e=>setQ(e.target.value)} aria-label="Role, company or major" placeholder="Role, company or major" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#0A1426",height:48,background:"transparent",outline:"none"}}/></label>
+            <span className="d-sep" style={{width:1,background:"#DCE2EC",margin:"10px 0"}}/>
+            <label style={{flex:"2 1 0",display:"flex",alignItems:"center",gap:10,padding:"0 14px",minWidth:0}}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55627A" strokeWidth="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+              <input value={where} onChange={e=>setWhere(e.target.value)} aria-label="State" placeholder="State (e.g. Virginia or VA)" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#0A1426",height:48,background:"transparent",outline:"none"}}/></label>
+            <button type="submit" style={{font:"inherit",fontSize:16,fontWeight:600,background:"#0B7A55",color:"#fff",border:0,padding:"0 28px",borderRadius:10,cursor:"pointer",minHeight:48}}>Search</button>
+          </form>
+          <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:16,alignItems:"center"}}>
+            <span style={{fontSize:13,color:"#8D9AB3",marginRight:4}}>Popular:</span>
+            {pills.map(k=><a key={k} href={`/jobs/?major=${k}&state=all`} style={{fontSize:13,color:"#CFD7E6",textDecoration:"none",border:"1px solid #22304D",padding:"6px 12px",borderRadius:999}}>{D_FIELD[k].split(" & ")[0]}</a>)}
+          </div>
+          <p style={{fontSize:13,color:"#8D9AB3",marginTop:18}}>Free · no account needed to browse · <button onClick={onQuiz} style={{background:"none",border:0,padding:0,color:"#2FD39A",cursor:"pointer",font:"inherit",fontWeight:600}}>2-minute match quiz</button> · <a href="/demo/" style={{color:"#2FD39A",fontWeight:600,textDecoration:"none"}}>90-second demo</a></p>
+        </div>
+        <aside style={{flex:"1 1 300px",maxWidth:420,minWidth:0,boxSizing:"border-box",width:"100%",background:"rgba(13,22,40,.85)",border:"1px solid #22304D",borderRadius:16,padding:20,...DM}}>
+          <div style={{display:"flex",justifyContent:"space-between",fontSize:11,letterSpacing:".1em",color:"#8D9AB3",marginBottom:10}}><span>JUST FOUND</span><span style={{color:"#2FD39A"}}>● LIVE</span></div>
+          {fresh===null?<div style={{height:200}} aria-hidden="true"/>:fresh.length===0?<p style={{fontSize:13,color:"#8D9AB3",fontFamily:"Geist,sans-serif"}}>Live list didn't load. <a href="/jobs/" style={{color:"#2FD39A"}}>Open the jobs page →</a></p>:
+            fresh.map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"flex",justifyContent:"space-between",gap:12,padding:"10px 0",borderTop:"1px solid #1A2640",textDecoration:"none",fontSize:13}}>
+              <span style={{color:"#fff",fontFamily:"Geist,sans-serif",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{j.company} <span style={{color:"#8D9AB3"}}>· {j.title}</span></span><span style={{color:"#2FD39A",flexShrink:0}}>{dAgo(j.first_seen)}</span></a>))}
+          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:12,paddingTop:16,borderTop:"1px solid #22304D"}}>
+            <div><p style={{fontSize:26,color:"#fff",margin:0}}>{fmt(sum?.allMajors)}</p><p style={{fontSize:11,color:"#8D9AB3",margin:"4px 0 0",letterSpacing:".06em"}}>OPEN NOW</p></div>
+            <div><p style={{fontSize:26,color:"#fff",margin:0}}>{fmt(sum?.hiringNow)}</p><p style={{fontSize:11,color:"#8D9AB3",margin:"4px 0 0",letterSpacing:".06em"}}>COMPANIES HIRING</p></div>
+          </div>
+        </aside>
+      </div>
+      {sum?.top?.length>0&&<div style={{position:"relative",borderTop:"1px solid #1A2640",overflow:"hidden",height:44,display:"flex",alignItems:"center"}}>
+        <div className="d-tick" style={{display:"flex",gap:40,whiteSpace:"nowrap",...DM,fontSize:12,color:"#8D9AB3",paddingLeft:24}}>
+          {[...sum.top,...sum.top].map((c,i)=><a key={i} href={`/jobs/?company=${encodeURIComponent(c.id)}&major=all`} style={{color:"#8D9AB3",textDecoration:"none"}} tabIndex={i>=sum.top.length?-1:0}>{c.company.toUpperCase()} <b style={{color:"#2FD39A",fontWeight:500}}>{c.n}</b></a>)}
+        </div></div>}
+    </section>
+
+    <main style={{...wrap,paddingTop:40,paddingBottom:64,display:"flex",flexDirection:"column",gap:40}}>
+      <section>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#0A1426"}}>Explore by major</h2><a href="/jobs/?major=all&state=all" style={{fontSize:14,color:"#0B7A55",textDecoration:"none",fontWeight:500}}>Every major →</a></div>
+        <div className="d-grid4">
+          {(fields||Object.keys(D_FIELD).slice(0,8).map(k=>[k,null])).map(([k,n])=>(
+            <a key={k} href={`/jobs/?major=${k}&state=all`} style={{...card,borderRadius:12,textDecoration:"none",color:"#0A1426",padding:18,display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}><span style={{fontWeight:500}}>{D_FIELD[k]}</span><span style={{...DM,fontSize:13,color:"#55627A"}}>{n==null?"":fmt(n)}</span></a>))}
+        </div>
+      </section>
+
+      {sum?.top?.length>0&&<section>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#0A1426"}}>Hiring the most interns right now</h2><a href="/radar/" style={{fontSize:14,color:"#0B7A55",textDecoration:"none",fontWeight:500}}>When companies open →</a></div>
+        <div className="d-grid4">
+          {sum.top.slice(0,4).map(c=>(
+            <article key={c.id} style={{...card,padding:20,display:"flex",flexDirection:"column",gap:12}}>
+              <div style={{display:"flex",gap:12,alignItems:"center"}}><span style={{width:44,height:44,borderRadius:10,background:"#F1F4F9",border:"1px solid #DCE2EC",display:"grid",placeItems:"center",fontWeight:600,flexShrink:0,color:"#0A1426"}}>{coInitials(c.company)}</span><p style={{fontWeight:600,margin:0,color:"#0A1426"}}>{c.company}</p></div>
+              <div style={{fontSize:13,borderTop:"1px solid #EEF1F6",paddingTop:12,color:"#0A1426"}}><b style={{...DM,fontWeight:500}}>{c.n}</b> open internships</div>
+              <a href={`/jobs/?company=${encodeURIComponent(c.id)}&major=all`} style={{fontSize:13,fontWeight:600,color:"#0B7A55",textDecoration:"none"}}>See internships →</a>
+            </article>))}
+        </div>
+      </section>}
+
+      <section className="d-grid3">
+        {[["OPENING RADAR","Know the week they open.","Estimates from past seasons, with a reminder a week before.","/radar/"],
+          ["CAREER FAIR MODE","Walk in with a route.","Booths, open roles, a QR resume and follow-ups in one place.","/fair/"],
+          ["INTERVIEW PRACTICE","Rehearse before the real one.","A mock interviewer for the company and role you pick, with honest feedback.","/#interview"]].map(([k,t,d,h])=>(
+          <a key={k} href={h} onClick={h==="/#interview"?(e)=>{e.preventDefault();onPage("interview");}:undefined} style={{background:"#070F1E",color:"#E8EDF5",borderRadius:14,padding:24,border:"1px solid #1A2640",textDecoration:"none",display:"block"}}>
+            <p style={{...DM,fontSize:11,letterSpacing:".1em",color:"#2FD39A",margin:"0 0 10px"}}>{k}</p>
+            <p style={{fontSize:18,fontWeight:600,margin:"0 0 8px",color:"#fff"}}>{t}</p>
+            <p style={{fontSize:14,lineHeight:1.5,color:"#9FAAC0",margin:0}}>{d}</p></a>))}
+      </section>
+    </main>
+    <footer style={{textAlign:"center",padding:"1.5rem",color:"#55627A",fontSize:13,borderTop:"1px solid #DCE2EC",background:"#fff"}}>© 2026 Beat the Pile · Built for students · <a href="/privacy/" style={{color:"#55627A"}}>Privacy</a> · <button type="button" onClick={()=>window.iqReport&&window.iqReport()} style={{background:"none",border:"none",color:"#55627A",cursor:"pointer",font:"inherit",textDecoration:"underline",padding:0}}>Report a problem</button></footer>
+  </>);
+}
 // Real student quotes go here once real students give them (with permission). Never invent these.
 const TESTIMONIALS=[];
 const UNIVERSITIES=["American University","Appalachian State University","Arizona State University","Auburn University","Ball State University","Baylor University","Binghamton University","Boise State University","Boston College","Boston University","Bowling Green State University","Brandeis University","Brigham Young University","Brown University","Bucknell University","Butler University","Cal Poly SLO","California State University, Fullerton","California State University, Long Beach","Carnegie Mellon University","Case Western Reserve University","Chapman University","Clemson University","Colgate University","College of Charleston","College of William & Mary","Colorado School of Mines","Colorado State University","Columbia University","Cornell University","Creighton University","Dartmouth College","DePaul University","Drexel University","Duke University","East Carolina University","Elon University","Emory University","Fairfield University","Florida Atlantic University","Florida Gulf Coast University","Florida International University","Florida State University","Fordham University","George Mason University","George Washington University","Georgetown University","Georgia State University","Georgia Tech","Gonzaga University","Harvard University","High Point University","Hofstra University","Howard University","Illinois State University","Indiana University Bloomington","Iowa State University","James Madison University","Johns Hopkins University","Kansas State University","Kennesaw State University","Kent State University","Lafayette College","Lehigh University","Louisiana State University","Loyola Marymount University","Loyola University Chicago","Marquette University","MIT","Miami University (Ohio)","Michigan State University","Mississippi State University","Missouri State University","Montclair State University","NC State University","New York University (NYU)","Northeastern University","Northern Arizona University","Northern Illinois University","Northwestern University","Notre Dame","Oakland University","Ohio State University","Ohio University","Oklahoma State University","Old Dominion University","Oregon State University","Pace University","Penn State University","Pepperdine University","Princeton University","Purdue University","Quinnipiac University","Rensselaer Polytechnic Institute (RPI)","Rice University","RIT","Rowan University","Rutgers University","Saint Joseph's University","Saint Louis University","Salisbury University","San Diego State University","San Jose State University","Santa Clara University","Seton Hall University","Southern Methodist University (SMU)","Stanford University","Stevens Institute of Technology","Stony Brook University","SUNY Albany","Syracuse University","Temple University","Texas A&M University","Texas Christian University (TCU)","Texas State University","Texas Tech University","Towson University","Tufts University","Tulane University","UC Berkeley","UC Davis","UC Irvine","UC Riverside","UC San Diego","UC Santa Barbara","UCLA","University at Buffalo","University of Alabama","University of Arizona","University of Arkansas","University of Central Florida","University of Chicago","University of Cincinnati","University of Colorado Boulder","University of Connecticut","University of Dayton","University of Delaware","University of Denver","University of Florida","University of Georgia","University of Houston","University of Illinois Chicago","University of Illinois Urbana-Champaign","University of Iowa","University of Kansas","University of Kentucky","University of Louisville","University of Maryland","UMass Amherst","University of Miami","University of Michigan","University of Minnesota","University of Mississippi (Ole Miss)","University of Missouri","University of Nebraska-Lincoln","University of Nevada, Las Vegas","University of New Hampshire","UNC Chapel Hill","University of North Carolina at Charlotte","University of North Texas","University of Oklahoma","University of Oregon","University of Pennsylvania","University of Pittsburgh","University of Rhode Island","University of Richmond","University of Rochester","University of San Diego","University of South Carolina","University of South Florida","University of Southern California","University of Tennessee","UT Austin","University of Texas at Dallas","University of Utah","University of Vermont","University of Virginia","University of Washington","UW-Madison","Vanderbilt University","Villanova University","Virginia Commonwealth University","Virginia Tech","Wake Forest University","Washington University in St. Louis","Wayne State University","West Virginia University","Western Michigan University","Yale University","Borough of Manhattan Community College","Broward College","Cuyahoga Community College","Dallas College","De Anza College","Foothill College","Houston Community College","Lone Star College","Miami Dade College","Mt. San Antonio College","Northern Virginia Community College (NOVA)","Pasadena City College","Santa Monica College","Tarrant County College","Valencia College","Wake Tech Community College","Other Community College","Other"].sort();
@@ -353,6 +452,9 @@ function Confetti(){
     </div>
   );
 }
+
+// "Systems Planning and Analysis" → "SP"; "ABB" → "AB"; used for the small company tile next to every role
+function coInitials(n){const w=String(n||"").replace(/[^A-Za-z0-9& ]/g," ").split(/\s+/).filter(x=>x&&!/^(and|of|the|&|inc|llc|corp|co)$/i.test(x));if(!w.length)return"·";return(w.length===1?w[0].slice(0,2):w[0][0]+w[1][0]).toUpperCase();}
 
 function BlurCard({company}){
   const accent=company?.match>=70?G:company?.match>=50?AM:CR;
@@ -2744,91 +2846,13 @@ function App(){
     return(<div style={{background:"#FBFBFC",minHeight:"100vh"}}><Nav/>
       <InterviewSim major={ans.major||profile.major||""} defaultCompany={lastApp?.company||""} defaultRole={lastApp?.role||""}/></div>);
   }
-  // LANDING
+  // LANDING (Direction D: search-first like Glassdoor, live "console" feel; every number is live data)
   if(page==="landing")return(
-    <div style={{background:"#fff"}}>
+    <div style={{background:"#EEF1F6",minHeight:"100vh"}}>
       {showProModal&&<ProModal/>}
-        <SignInModal/>
+      <SignInModal/>
       <Nav/>
-      {/* Hero */}
-      <div style={{padding:"5rem 2rem 4rem",textAlign:"center",maxWidth:680,margin:"0 auto"}}>
-        <div style={{display:"inline-flex",alignItems:"center",gap:6,background:GL,color:GD,padding:"6px 16px",borderRadius:99,fontSize:12,fontWeight:700,marginBottom:"1.5rem",border:`1px solid ${GM}`,letterSpacing:"0.3px"}}>
-          Every major · straight from company job boards
-        </div>
-        <h1 style={{fontSize:"clamp(2.4rem,6vw,4rem)",fontWeight:700,lineHeight:1.04,letterSpacing:"-0.035em",marginBottom:"1.25rem",color:"#0B1220"}}>
-          Apply early.<br/><span style={{color:G}}>Beat the pile.</span>
-        </h1>
-        <p style={{fontSize:18,color:"#4A5568",lineHeight:1.7,maxWidth:500,margin:"0 auto 2rem"}}>
-          Everything you need to land an internship, in any major: real openings straight from company job boards, a tracker that reminds you to follow up, interview practice, and a plan for every career fair.
-        </p>
-        <div style={{display:"flex",gap:12,justifyContent:"center",flexWrap:"wrap"}}>
-          <a href="/jobs/" style={{background:`${G}`,color:"#fff",padding:"15px 32px",borderRadius:var_rl,fontSize:16,fontWeight:700,textDecoration:"none",fontFamily:"var(--font)",boxShadow:"0 1px 2px rgba(11,18,32,.06)",letterSpacing:"-0.3px"}}>Browse internships →</a>
-          <a href="/fair/" style={{background:"#fff",color:"#0B1220",border:"1.5px solid #CBD5E0",padding:"15px 28px",borderRadius:var_rl,fontSize:16,fontWeight:700,textDecoration:"none",fontFamily:"var(--font)"}}>Career Fair Mode</a>
-        </div>
-        <p style={{fontSize:13,color:"#6B7280",marginTop:16}}>Free · No account needed to browse · <button onClick={()=>{setStep(0);setPage("quiz");}} style={{background:"none",border:"none",padding:0,color:GD,fontWeight:700,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,textDecoration:"underline"}}>Take the 2-minute match quiz</button> · <a href="/demo/" style={{color:GD,fontWeight:600}}>▶ 90-second demo</a></p>
-        <JobPreview/>
-      </div>
-
-      {/* Stats */}
-      <div style={{background:"#FBFBFC",borderTop:`1px solid ${GL}`,borderBottom:`1px solid ${GL}`,padding:"3rem 2rem"}}>
-        <p style={{fontSize:10,fontWeight:700,color:"#6B7280",letterSpacing:"3px",textTransform:"uppercase",textAlign:"center",marginBottom:"2rem"}}>Live right now</p>
-        <LiveStats/>
-      </div>
-
-      {/* Student testimonials — only real ones */}
-      {TESTIMONIALS.length>0&&<div style={{padding:"3.5rem 2rem",maxWidth:820,margin:"0 auto"}}>
-        <p style={{fontSize:10,fontWeight:700,color:"#6B7280",letterSpacing:"3px",textTransform:"uppercase",textAlign:"center",marginBottom:"0.5rem"}}>From students like you</p>
-        <h2 style={{fontSize:"clamp(1.4rem,3vw,2rem)",fontWeight:800,letterSpacing:"-0.8px",textAlign:"center",marginBottom:"2rem",color:"#0B1220"}}>Real students. Real results.</h2>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:"1rem"}}>
-          {TESTIMONIALS.map((t,i)=>(
-            <div key={i} style={{background:"#fff",border:`1.5px solid ${GL}`,borderRadius:var_rl,padding:"1.4rem",boxShadow:"0 1px 2px rgba(11,18,32,.06)",display:"flex",flexDirection:"column",gap:10}}>
-              <div style={{display:"flex",gap:2}}>{[...Array(t.stars)].map((_,j)=><span key={j} style={{color:"#F59E0B",fontSize:14}}>★</span>)}</div>
-              <p style={{fontSize:13.5,color:"#0B1220",lineHeight:1.65,fontStyle:"italic",flex:1}}>"{t.quote}"</p>
-              <div style={{display:"flex",alignItems:"center",gap:10,marginTop:4}}>
-                <div style={{width:36,height:36,borderRadius:"50%",background:`${G}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:800,color:"#fff",flexShrink:0}}>{t.avatar}</div>
-                <div>
-                  <p style={{fontWeight:700,fontSize:13,color:"#0B1220"}}>{t.name}</p>
-                  <p style={{fontSize:11.5,color:"#6B7280"}}>{t.detail}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-        <div style={{textAlign:"center",marginTop:"1.75rem"}}>
-          <button onClick={()=>setPage("wall")} style={{background:"none",border:`1.5px solid ${GL}`,color:GD,padding:"10px 24px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:13.5,fontWeight:700}}>See more from the community →</button>
-        </div>
-      </div>}
-
-      {/* How it works */}
-      <div style={{padding:"4rem 2rem",maxWidth:760,margin:"0 auto"}}>
-        <p style={{fontSize:10,fontWeight:700,color:"#6B7280",letterSpacing:"3px",textTransform:"uppercase",textAlign:"center",marginBottom:"0.5rem"}}>How it works</p>
-        <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.4rem)",fontWeight:800,letterSpacing:"-1px",textAlign:"center",marginBottom:"2.5rem",color:"#0B1220"}}>One place for the whole search.</h2>
-        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:"1.25rem"}}>
-          {[
-            {icon:"",num:"01",title:"Browse real internships",desc:"Pulled straight from each company's own job board. A robot proves every board is really theirs, re-reads it at least twice a day, and removes jobs the company takes down.",color:G},
-            {icon:"♡",num:"02",title:"Save and track",desc:"Save the ones you like, mark what you've applied to, and filter by state — VA & PA by default, or anywhere in the US.",color:AM},
-            {icon:"",num:"03",title:"Crush the career fair",desc:"Your resume as a QR code, every company at the fair with booth numbers and open roles, notes after each talk, and follow-up emails drafted for you.",color:"#2563EB"},
-          ].map((s,i)=>(
-            <div key={i} style={{background:"#fff",border:`1px solid ${GL}`,borderRadius:var_rl,padding:"1.75rem",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
-              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"1rem"}}>
-                
-                <span style={{fontSize:13,fontWeight:600,color:G,letterSpacing:"0.04em"}}>STEP {s.num}</span>
-              </div>
-              <h3 style={{fontSize:16,fontWeight:700,marginBottom:"0.5rem",color:"#0B1220",letterSpacing:"-0.3px"}}>{s.title}</h3>
-              <p style={{fontSize:14,color:"#4A5568",lineHeight:1.6}}>{s.desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div style={{padding:"2rem 2rem 5rem"}}>
-        <div style={{background:`${GL}`,border:`1.5px solid ${GM}`,borderRadius:var_rxl,padding:"3rem 2rem",maxWidth:520,margin:"0 auto",textAlign:"center",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
-          <h2 style={{fontSize:"clamp(1.4rem,3vw,2rem)",fontWeight:800,letterSpacing:"-0.8px",marginBottom:"0.75rem",color:"#0B1220"}}>Ready to find your real shot?</h2>
-          <p style={{color:"#4A5568",marginBottom:"1.5rem",fontSize:15,lineHeight:1.6}}>Free. Real openings at real firms, not just the big names.</p>
-          <a href="/jobs/" style={{display:"inline-block",background:`${G}`,color:"#fff",padding:"15px 40px",borderRadius:var_rl,fontSize:16,fontWeight:700,textDecoration:"none",fontFamily:"var(--font)",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Browse internships →</a>
-        </div>
-      </div>
-      <footer style={{textAlign:"center",padding:"1.5rem",color:"#6B7280",fontSize:13,borderTop:`1px solid ${GL}`}}>© 2026 Beat the Pile · Built for students · <a href="/privacy/" style={{color:"#4A5568"}}>Privacy</a> · <button type="button" onClick={()=>window.iqReport&&window.iqReport()} style={{background:"none",border:"none",padding:0,color:"#4A5568",cursor:"pointer",font:"inherit",textDecoration:"underline"}}>Feedback</button> · <button type="button" onClick={()=>setShowProModal(true)} style={{background:"none",border:"none",padding:0,color:GD,cursor:"pointer",font:"inherit",fontWeight:700}}>Go Pro </button></footer>
+      <LandingD onQuiz={()=>{setStep(0);setPage("quiz");}} onPage={setPage}/>
     </div>
   );
 
@@ -3321,12 +3345,12 @@ function App(){
                         <span style={{fontSize:20,fontWeight:800,color:G,minWidth:48}}>{c.match}%</span>
                         <div style={{flex:1,minWidth:0}}>
                           <div style={{display:"flex",alignItems:"center",gap:6}}>
-                            <p style={{fontWeight:700,fontSize:14,color:"#0B1220",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.name}</p>
+                            <p style={{fontWeight:600,fontSize:14,color:"#0B1220",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.role||"Internship"}</p>
                             {isLikelyNational(c)&&<span style={{flexShrink:0,fontSize:9.5,fontWeight:800,color:"#2563EB",background:"#2563EB15",padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>BIG NAME</span>}
                             {c.personalized&&<span style={{flexShrink:0,fontSize:9.5,fontWeight:800,color:GD,background:GL,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>PERSONALIZED</span>}
                             {(()=>{const b=bandLabel(c.locationBand);return b?<span style={{flexShrink:0,fontSize:9.5,fontWeight:800,color:b.color,background:b.bg,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>{b.text}</span>:null;})()}
                           </div>
-                          <p style={{fontSize:12,color:"#4A5568",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.role} · {c.location}</p>
+                          <p style={{fontSize:12,color:"#4A5568",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>at <b style={{fontWeight:600,color:"#0B1220"}}>{c.name}</b>{c.location?` · ${c.location}`:""}</p>
                         </div>
                         <button onClick={()=>openApply(c)} style={{background:`${G}`,border:"none",color:"#fff",padding:"8px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:12.5,fontWeight:700,flexShrink:0}}>Apply ↗</button>
                       </div>
@@ -3381,12 +3405,15 @@ function App(){
                           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
                             <div style={{flex:1,minWidth:0,paddingRight:12}}>
                               <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
-                                <p style={{fontWeight:700,fontSize:16,letterSpacing:"-0.3px",color:"#0B1220"}}>{c.name}</p>
+                                <p style={{fontWeight:600,fontSize:16,letterSpacing:"-0.2px",color:"#0B1220",lineHeight:1.3}}>{c.role||"Internship"}</p>
+                              </div>
+                              <div style={{display:"flex",alignItems:"center",gap:8,marginTop:6,flexWrap:"wrap"}}>
+                                <span aria-hidden="true" style={{width:24,height:24,borderRadius:6,background:"#F1F4F9",border:"1px solid #DCE2EC",display:"grid",placeItems:"center",fontSize:10,fontWeight:600,color:"#0B1220",flexShrink:0}}>{coInitials(c.name)}</span>
+                                <p style={{fontSize:14,fontWeight:500,color:"#0B1220"}}><span style={{position:"absolute",left:-9999}}>Company: </span>{c.name}</p>
                                 {isLikelyNational(c)&&<span style={{fontSize:9.5,fontWeight:800,color:"#2563EB",background:"#2563EB15",padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>BIG NAME</span>}
                                 {c.personalized&&<span style={{fontSize:9.5,fontWeight:800,color:GD,background:GL,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>PERSONALIZED</span>}
                                 {locationBadge}
                               </div>
-                              <p style={{color:"#4A5568",fontSize:13,marginTop:3}}>{c.role}</p>
                               <div style={{display:"flex",alignItems:"center",gap:6,marginTop:2,flexWrap:"wrap"}}>
                                 <p style={{color:"#6B7280",fontSize:12}}>{[hasRealLocation?displayLocation:c.location,c.industry].filter(Boolean).join(" · ")}</p>
                                 {typeof c.distanceMiles==="number"&&c.distanceMiles>0

@@ -6,7 +6,7 @@
 <link rel="manifest" href="/manifest.webmanifest"/>
 <meta name="theme-color" content="#0B1220"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Geist:wght@400;500;600;700;800&display=swap"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-title" content="Beat the Pile"/>
@@ -35,6 +35,14 @@ html{font-family:var(--font);background:var(--bg);color:var(--text1);scroll-beha
 body{min-height:100vh}
 ::-webkit-scrollbar{width:4px}
 ::-webkit-scrollbar-thumb{background:#CBD5E0;border-radius:99px}
+@keyframes dscan{0%{transform:translateY(-120px)}100%{transform:translateY(640px)}}
+@keyframes dblink{50%{opacity:.25}}
+@keyframes dtick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.d-scan{animation:dscan 7s linear infinite}.d-blink{animation:dblink 1.6s infinite}.d-tick{animation:dtick 45s linear infinite}.d-tick:hover{animation-play-state:paused}
+.d-grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.d-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:900px){.d-grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.d-grid3{grid-template-columns:1fr}}
+@media (max-width:560px){.d-search{flex-direction:column}.d-search .d-sep{width:auto!important;height:1px;margin:0 10px!important}.d-grid4{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){.d-scan,.d-blink,.d-tick{animation:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeUp{from{opacity:0.4;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pop{0%{transform:scale(0.92)}60%{transform:scale(1.04)}100%{transform:scale(1)}}

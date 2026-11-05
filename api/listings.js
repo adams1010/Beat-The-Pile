@@ -38,15 +38,23 @@ export function parse(q) {
   return { errs, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, summary: raw("summary") === "1", names: raw("names") === "1" };
 }
 
-/** company_id → name for every company with an open internship right now (any major). */
-async function hiringCompanies() {
-  const seen = new Map();
+/** One pass over every open internship: company_id → {company, n}, plus counts per field (major). */
+async function liveScan() {
+  const seen = new Map(), byField = {};
   for (let off = 0; off < 40000; off += 1000) {
-    const page = await db.select(`listings?select=company_id,company&${LIVE}&order=id.asc&limit=1000&offset=${off}`);
-    for (const r of page) if (!seen.has(r.company_id)) seen.set(r.company_id, r.company);
+    const page = await db.select(`listings?select=company_id,company,field&${LIVE}&order=id.asc&limit=1000&offset=${off}`);
+    for (const r of page) {
+      const e = seen.get(r.company_id); if (e) e.n++; else seen.set(r.company_id, { company: r.company, n: 1 });
+      const f = r.field || "other"; byField[f] = (byField[f] || 0) + 1;
+    }
     if (page.length < 1000) break;
   }
-  return seen;
+  return { seen, byField };
+}
+/** company_id → name for every company with an open internship right now (any major). */
+async function hiringCompanies() {
+  const { seen } = await liveScan();
+  return new Map([...seen].map(([id, v]) => [id, v.company]));
 }
 
 export default async function handler(req, res) {
@@ -58,14 +66,16 @@ export default async function handler(req, res) {
   try {
     if (p.summary) {
       res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=1800");
-      const hiringNow = await hiringCompanies().then((m) => m.size).catch(() => null);
+      const scan = await liveScan().catch(() => null);
+      const hiringNow = scan ? scan.seen.size : null;
+      const top = scan ? [...scan.seen].sort((a, b) => b[1].n - a[1].n).slice(0, 8).map(([id, v]) => ({ id, company: v.company, n: v.n })) : [];
       const [engineering, me, allMajors, companies, lastRun] = await Promise.all([
         db.count(`listings?${LIVE}&match=not.is.null`), db.count(`listings?${LIVE}&match=eq.me`), db.count(`listings?${LIVE}`),
         db.count("company_candidates?status=eq.live"),
         db.select("feed_runs?select=ran_at&order=ran_at.desc&limit=1"),
       ]);
       // companies = boards the robot proved + the hand-checked starter list
-      return res.status(200).json({ engineering, me, allMajors, hiringNow, companies: companies + COMPANIES.length, lastSync: lastRun?.[0]?.ran_at || null, at: new Date().toISOString() });
+      return res.status(200).json({ engineering, me, allMajors, hiringNow, top, byField: scan?.byField || null, companies: companies + COMPANIES.length, lastSync: lastRun?.[0]?.ran_at || null, at: new Date().toISOString() });
     }
 
     if (p.names) {                                            // every company hiring right now, any major — small enough for a phone
