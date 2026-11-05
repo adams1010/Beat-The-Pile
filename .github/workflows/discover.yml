@@ -35,3 +35,4 @@ jobs:
           grep -q '"off":true' out.json && break        # switched off on /bots
           [ -n "${{ inputs.query }}${{ inputs.import && 'x' || '' }}" ] && break   # manual debug/import runs: once
           done
+          exit 0   # the loop's last test is false after pass 3, which would otherwise fail the run
