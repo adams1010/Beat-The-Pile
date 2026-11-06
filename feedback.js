@@ -10,7 +10,7 @@
 .iqfb textarea,.iqfb input{width:100%;box-sizing:border-box;font:16px inherit;padding:10px;border:1px solid #E2EEEA;border-radius:10px;margin-bottom:8px}
 .iqfb textarea{min-height:90px}.iqfb .row{display:flex;gap:8px;justify-content:flex-end}
 .iqfb .row button{font:700 14px inherit;padding:10px 14px;border-radius:10px;border:1px solid #E2EEEA;background:#fff;cursor:pointer}.iqfb .row .go{background:#0E8A5F;border-color:#0E8A5F;color:#fff}
-@media (max-width:560px){.iqfb-btn{padding:6px 10px;font-size:12px}}
+@media (max-width:640px){.iqfb-btn{width:38px;height:38px;padding:0;border-radius:50%;font-size:0;right:10px;bottom:10px;opacity:.9;box-shadow:0 4px 14px rgba(10,22,40,.12)}.iqfb-btn::after{content:"?";font-size:17px;font-weight:600;color:#55627A}}
 @media print{.iqfb-btn{display:none}}`;
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
   const kinds = [["wrong", "Wrong listing"], ["broken", "Broken link"], ["missing", "Missing a company"], ["idea", "Idea"], ["other", "Other"]];
