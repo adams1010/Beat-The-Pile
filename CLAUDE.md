@@ -28,11 +28,12 @@ The Claude workspace **can't reach company websites**. To test against real site
 then read `PROBE_RESULT` from the run logs. In the JS, `await import(process.cwd() + "/lib/….js")` works. Use real
 tab/newline escapes (`"\t"`, `"\n"`) — the code is passed through bash single quotes.
 
-## Look & feel (Nov 2026) — Direction D (Glassdoor × LinkedIn, lightly futuristic), live since Nov 5
-Top bar + homepage hero: deep navy `#070F1E` with a faint 32px grid, mint `#2FD39A` for live/accents, Geist Mono for numbers
-and labels. Content area `#EEF1F6` with white 12px-radius cards, green actions `#0B7A55`, pill buttons. Job cards lead with the
-**role**, then a company line with an initials tile (never company-name-as-headline). /jobs = 3 columns (you · feed · hiring most /
-opening soon). Mockups: Design artifact 6iuFD7mA58DSdeeWUebJCo. Owner says it still looks a bit "AI" — polish pass pending.
+## Look & feel (Nov 2026) — Direction D (Glassdoor × LinkedIn), live since Nov 5; "less AI" pass Nov 5 night
+Top bar + homepage hero: deep navy `#070F1E` (no grid, no scan line, no ticker, no blinking), mint `#2FD39A` accent, solid mint "BP"
+mark. Content area `#EEF1F6`, white 12px-radius cards, green actions `#0B7A55`, pill buttons. **No monospace/"terminal" font and
+no ALL-CAPS letter-spaced labels** — sentence case, Geist with `tabular-nums` for numbers. Job cards lead with the **role**, then a
+company line with an initials tile. /jobs = 3 columns on desktop; on phones the filter box is not sticky and Feedback is a small "?".
+Shared static-page theme: `/d.css`. Mockups: Design artifact 6iuFD7mA58DSdeeWUebJCo.
 Font **Geist**; ink `#0B1220`, one accent green `#0E8A5F`, cool neutrals. No gradients, glows, rainbow chips or emoji
 in UI. Homepage tokens: `G/GD/GL/GM` at the top of `src/home.jsx`; static pages: CSS vars at the top of each page.
 Homepage `/#interview` = Interview practice (`/api/generate` feature `interview_turn`). Pro is **free during beta**
