@@ -1,5 +1,5 @@
 // scripts/board-scout.mjs — the Board Scout bot (GitHub Actions, weekly). See lib/scout.js for how it works.
-//   node scripts/board-scout.mjs [--dry] [--limit=N] [--crawls=2] [--force]
+//   node scripts/board-scout.mjs [--dry] [--limit=N] [--crawls=4] [--force]
 // State (which boards were already probed, and when) lives in data/scout-state.json; boards are re-probed after
 // RECHECK_DAYS because internships are seasonal (a board with none in November may have ten in August).
 import fs from "node:fs";
@@ -9,7 +9,7 @@ const SITE = process.env.SITE || "https://intern-iq-psi.vercel.app";
 const arg = (k, d) => { const a = process.argv.find((x) => x.startsWith(`--${k}=`)); return a ? a.split("=")[1] : d; };
 const DRY = process.argv.includes("--dry");
 const LIMIT = +arg("limit", 20000);
-const CRAWLS = +arg("crawls", 2);
+const CRAWLS = +arg("crawls", 4);   // Nov 6 2026: 4 crawls found 4,008 boards 2 crawls missed
 const RECHECK_DAYS = 30;
 const STATE = "data/scout-state.json";
 const MAX_MINUTES = +arg("minutes", 50);
