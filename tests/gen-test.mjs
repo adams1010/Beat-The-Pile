@@ -21,10 +21,13 @@ assert.equal(r.code, 200); assert.equal(r.body.text, "hi");
 const p = f.calls.prompts.at(-1); assert.ok(p.includes('Company: "Boeing"') && p.length < 1500, "server-built prompt with capped fields");
 r = await call({ feature: "score", input: { resume: "r".repeat(20000), jd: "need python" } }); assert.equal(r.code, 200);
 assert.ok(f.calls.prompts.at(-1).includes("estimate") && f.calls.prompts.at(-1).length < 12000, "score is framed as an estimate; paste capped");
-for (const feat of ["reasons", "resume_builder", "followup", "interview_prep", "cover_letter", "interview_turn"]) {
+for (const feat of ["reasons", "resume_builder", "followup", "interview_prep", "cover_letter", "interview_turn", "tailor"]) {
   const input = { resume: "Built a go-kart frame in SolidWorks; FEA on the chassis; led a 12-person team; 3.7 GPA mechanical engineering student.", companies: [{ name: "Boeing", role: "Intern" }], company: "Boeing", role: "ME Intern", majors: "Mechanical Engineering" };
   r = await call({ feature: feat, input }); assert.equal(r.code, 200, feat);
 }
+r = await call({ feature: "tailor", input: { resume: "short", role: "ME Intern", company: "Boeing" } }); assert.equal(r.code, 400, "tailor needs a real resume");
+r = await call({ feature: "tailor", input: { resume: "x".repeat(200), role: "ME Intern", company: "Boeing", posting: "p".repeat(50000) } }); assert.equal(r.code, 200);
+assert.ok(f.calls.prompts.at(-1).includes("Never invent experience") && f.calls.prompts.at(-1).length < 15000, "tailor: honesty rules + capped paste");
 console.log("✓ feature-only AI: no raw prompts, required fields, capped inputs, server-built prompts");
 // interview practice: timed, spoken answers get a rubric score per answer (the page turns scores into the grade)
 r = await call({ feature: "interview_turn", input: { company: "Boeing", role: "ME Intern", total: 3, limit: 60, spoken: true,

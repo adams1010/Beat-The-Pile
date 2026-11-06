@@ -112,7 +112,25 @@
   .acct .who{color:#CBD5E1;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .chip{font:inherit;font-size:13px;font-weight:500;color:var(--ink);background:#fff;border:1px solid #C9D1DE;border-radius:999px;padding:7px 14px;cursor:pointer}
   .chip[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
-  .mine{display:flex;gap:6px;justify-content:flex-end}
+  .mine{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+  .tbtn{font:inherit;font-size:12px;font-weight:500;border:1px solid #C9D1DE;background:#fff;color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+  .tbtn:hover{border-color:var(--green)}
+  dialog.tl{border:1px solid var(--line);border-radius:14px;padding:0;width:min(640px,calc(100vw - 24px));max-height:calc(100vh - 40px);color:var(--ink);font-family:inherit}
+  dialog.tl::backdrop{background:rgba(7,15,30,.45)}
+  .tl .hd{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 20px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:1}
+  .tl .hd b{display:block;font-size:16px}.tl .hd span{color:var(--muted);font-size:13.5px}
+  .tl .x{border:0;background:none;font-size:22px;line-height:1;color:var(--faint);cursor:pointer;padding:2px 6px}
+  .tl .bd{padding:16px 20px 20px;display:flex;flex-direction:column;gap:12px;overflow:auto}
+  .tl label{font-size:13px;font-weight:600}.tl .hint{font-size:12.5px;color:var(--muted);font-weight:400}
+  .tl textarea{width:100%;box-sizing:border-box;font:14px/1.45 inherit;font-family:inherit;padding:10px;border:1px solid #C9D1DE;border-radius:10px;min-height:110px;resize:vertical}
+  .tl .go{align-self:flex-start;font:600 14px inherit;font-family:inherit;padding:10px 20px;border-radius:999px;border:0;background:var(--green);color:#fff;cursor:pointer}
+  .tl .go[disabled]{opacity:.6;cursor:default}
+  .tl h4{margin:6px 0 4px;font-size:14px}.tl ul{margin:0;padding-left:18px;font-size:14px;line-height:1.5}
+  .tl .rw{border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:14px;line-height:1.45}
+  .tl .rw .b{color:var(--muted);text-decoration:line-through;text-decoration-color:#C9D1DE}.tl .rw .a{margin-top:4px}.tl .rw .w{margin-top:4px;font-size:12.5px;color:var(--muted)}
+  .tl .rw button{margin-top:6px;font:500 12px inherit;font-family:inherit;border:1px solid #C9D1DE;background:#fff;border-radius:999px;padding:4px 10px;cursor:pointer}
+  .tl .kw{display:flex;flex-wrap:wrap;gap:6px}.tl .kw span{background:var(--green-light);color:#0A6647;border-radius:999px;padding:3px 10px;font-size:13px}
+  .tl .est{font-size:12.5px;color:var(--muted);background:#F4F6F9;border-radius:8px;padding:8px 10px}
   .ic{font:inherit;font-size:12px;font-weight:500;border:1px solid #C9D1DE;background:#fff;color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer;white-space:nowrap}
   .ic[aria-pressed="true"].save{background:#FFF1F2;border-color:#FECDD3;color:#BE123C}
   .ic[aria-pressed="true"].done{background:var(--green-light);border-color:#B3F0DA;color:var(--green-dark)}
@@ -187,6 +205,10 @@
   </div>
       <div id="alert"></div>
       <div id="mailme"></div>
+<dialog class="tl" id="tailor" aria-labelledby="tlTitle">
+  <div class="hd"><div><b id="tlTitle">Tailor your resume</b><span id="tlJob"></span></div><button class="x" type="button" id="tlX" aria-label="Close">×</button></div>
+  <div class="bd" id="tlBody"></div>
+</dialog>
       <div class="list" id="list">
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
       </div>
@@ -438,6 +460,7 @@
           <div class="mine">
             <button class="ic save" data-act="saved" data-id="${esc(j.id)}" aria-pressed="${has("saved", j)}">${has("saved", j) ? "♥ Saved" : "♡ Save"}</button>
             <button class="ic done" data-act="applied" data-id="${esc(j.id)}" aria-pressed="${has("applied", j)}">${has("applied", j) ? "✓ Applied" : "Mark applied"}</button>
+            ${j.closed ? "" : `<button class="tbtn" type="button" data-tailor="${esc(j.id)}" data-t="${esc(niceTitle(j.title))}" data-c="${esc(j.company)}" data-l="${esc(j.sites[0].loc)}" data-f="${esc(FIELD_NAME[j.field] || "")}" data-u="${esc(j.url)}">Tailor resume</button>`}
           </div>
         </div>
       </article>`).join("");
@@ -528,6 +551,65 @@
     } catch (err) { toast(err.message || "Couldn't save — try again"); }
     b.disabled = false;
   });
+  // ── "Tailor resume" for one job (AI suggestions, /api/generate feature "tailor"). Resume text stays in this browser. ──
+  const TL = { job: null };
+  function myResume(){
+    try { const r = localStorage.getItem("btp_tailor_resume"); if (r) return r; } catch {}
+    try { const p = JSON.parse(localStorage.getItem("iq_profile") || "{}"); const list = (p.resumes || []).filter((x) => x && x.text && x.text.length > 80);
+      return (list[0] && list[0].text) || p.resumeText || ""; } catch { return ""; }
+  }
+  function tailorForm(){
+    const j = TL.job;
+    $("tlJob").textContent = `${j.t} · ${j.c}`;
+    $("tlBody").innerHTML = `
+      <div><label for="tlRes">Your resume <span class="hint">· paste the text (stays on this device)</span></label>
+        <textarea id="tlRes" placeholder="Paste your resume text here">${esc(myResume())}</textarea></div>
+      <div><label for="tlPost">The job posting <span class="hint">· optional, but much better results. <a href="${esc(j.u)}" target="_blank" rel="noopener">Open it ↗</a> and copy the description</span></label>
+        <textarea id="tlPost" placeholder="Paste the job description (what they want, responsibilities, skills)"></textarea></div>
+      <button class="go" type="button" id="tlGo">Get suggestions</button>
+      <div class="est">AI suggestions, not a guarantee. It only rephrases what's already on your resume. Never add things you didn't do.</div>`;
+    $("tlGo").onclick = runTailor;
+  }
+  async function runTailor(){
+    const resume = $("tlRes").value.trim(), posting = $("tlPost").value.trim(), go = $("tlGo");
+    if (resume.length < 80) { toast("Paste your resume first (at least a few lines)"); $("tlRes").focus(); return; }
+    try { localStorage.setItem("btp_tailor_resume", resume); } catch {}
+    go.disabled = true; go.textContent = "Reading the job…";
+    try {
+      const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ feature: "tailor", input: { resume, posting, role: TL.job.t, company: TL.job.c, location: TL.job.l, field: TL.job.f } }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || "Couldn't get suggestions — try again");
+      const m = String(d.text || "").match(/\{[\s\S]*\}/); const o = m ? JSON.parse(m[0]) : null;
+      if (!o) throw new Error("Couldn't read the suggestions — try again");
+      track("tailor_done", { field: TL.job.f || null, posting: !!posting });
+      showTailor(o, !!posting);
+    } catch (e) { toast(e.message); go.disabled = false; go.textContent = "Get suggestions"; }
+  }
+  function showTailor(o, hadPosting){
+    const li = (a) => (Array.isArray(a) ? a : []).filter(Boolean).map((x) => `<li>${esc(String(x))}</li>`).join("");
+    const rws = (Array.isArray(o.rewrites) ? o.rewrites : []).slice(0, 5).map((r, i) => `<div class="rw"><div class="b">${esc(r.before || "")}</div><div class="a"><b>→</b> ${esc(r.after || "")}</div>${r.why ? `<div class="w">${esc(r.why)}</div>` : ""}<button type="button" data-copy="${i}">Copy new line</button></div>`).join("");
+    const kws = (Array.isArray(o.keywords) ? o.keywords : []).slice(0, 8).map((k) => `<span>${esc(String(k))}</span>`).join("");
+    $("tlBody").innerHTML = `
+      ${o.fit ? `<p style="margin:0;font-size:15px;line-height:1.5"><b>Fit:</b> ${esc(o.fit)}</p>` : ""}
+      ${li(o.lead_with) ? `<div><h4>Move to the top</h4><ul>${li(o.lead_with)}</ul></div>` : ""}
+      ${rws ? `<div><h4>Sharper lines</h4><div class="hint" style="font-size:12.5px;color:var(--muted)">Fill in any [brackets] with real numbers, or leave them out.</div>${rws}</div>` : ""}
+      ${kws ? `<div><h4>Words from the posting you can honestly use</h4><div class="kw">${kws}</div></div>` : ""}
+      ${li(o.gaps) ? `<div><h4>What they want that your resume doesn't show</h4><ul>${li(o.gaps)}</ul></div>` : ""}
+      <div class="est">${hadPosting ? "" : "No posting pasted, so this is based on the job title only. Paste the description for sharper suggestions. "}${o.note ? esc(o.note) + " " : ""}AI suggestions. Check every line is true before you use it.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="go" type="button" id="tlAgain">Try with changes</button><a class="tbtn" href="${esc(TL.job.u)}" target="_blank" rel="noopener" style="text-decoration:none;padding:10px 16px;font-size:14px">Apply →</a></div>`;
+    $("tlBody").querySelectorAll("[data-copy]").forEach((b) => b.onclick = async () => { const r = o.rewrites[+b.dataset.copy]; try { await navigator.clipboard.writeText(r.after || ""); b.textContent = "Copied"; } catch { toast("Couldn't copy — select the text instead"); } });
+    $("tlAgain").onclick = tailorForm;
+    $("tlBody").scrollTop = 0;
+  }
+  $("list").addEventListener("click", (e) => {
+    const b = e.target.closest("[data-tailor]"); if (!b) return;
+    TL.job = { id: b.dataset.tailor, t: b.dataset.t, c: b.dataset.c, l: b.dataset.l, f: b.dataset.f, u: b.dataset.u };
+    track("tailor_open", { field: TL.job.f || null });
+    tailorForm(); const d = $("tailor"); if (d.showModal) d.showModal(); else d.setAttribute("open", "");
+  });
+  $("tlX").onclick = () => $("tailor").close();
+  $("tailor").addEventListener("click", (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
   function toast(msg){
     const t = document.createElement("div"); t.className = "toast"; t.textContent = msg;
     document.body.appendChild(t); setTimeout(() => t.remove(), 3200);

@@ -161,6 +161,39 @@ Do not state facts about the company unless you are confident they are true.` };
 
   // Interview practice: one turn at a time. The student answers (typed or spoken + auto-transcribed, against a timer);
   // we give short honest feedback, a rubric score for that answer, and the next question. The page turns scores into the grade.
+  // "Tailor my resume to this job" (from user interview #1, Nov 2026). Suggestions only — never invents experience.
+  tailor(i) {
+    const resume = str(i?.resume, 6000), posting = str(i?.posting, 6000);
+    const role = str(i?.role, 160), company = str(i?.company, 100), location = str(i?.location, 100), field = str(i?.field, 60);
+    if (resume.length < 80) throw new AIError("Paste your resume first (at least a few lines)", 400);
+    if (!role || !company) throw new AIError("Which job?", 400);
+    return { maxTokens: 1800, temperature: 0, prompt: `A college student wants to tailor their resume to ONE internship. Give honest, specific edits.
+
+RULES (follow all):
+- Never invent experience, numbers, tools, courses or results the resume doesn't show. Rewrites may only rephrase, reorder or sharpen what is already there.
+- If a stronger version needs a number they didn't give, write the rewrite with a bracketed placeholder like [#] or [% faster] for them to fill in truthfully.
+- "before" must be copied EXACTLY from the resume (one line or bullet).
+- Keywords come only from the job title/posting below, and only ones the student can honestly claim from their resume. Put the rest in "gaps".
+- If no posting text is given, say so in "note" and base it on the job title and field only.
+- Plain, direct language. No buzzwords.
+
+JOB: ${role} at ${company}${location ? ` (${location})` : ""}${field ? ` · field: ${field}` : ""}
+POSTING TEXT:
+${posting || "(not provided)"}
+
+STUDENT RESUME:
+${resume}
+
+Return ONLY JSON, no other text:
+{"fit":"one honest sentence on how well this resume fits this job now",
+ "lead_with":["the 1-3 things from their resume to move to the top for THIS job"],
+ "rewrites":[{"before":"exact resume line","after":"sharper version","why":"short reason"}],
+ "keywords":["terms from the posting they can honestly add"],
+ "gaps":["things the job wants that the resume doesn't show — don't fake these; how to address them honestly"],
+ "note":"optional one-line caveat"}
+At most 5 rewrites, 8 keywords, 4 gaps.` };
+  },
+
   interview_turn(i) {
     const company = str(i?.company, 100) || "a company", role = str(i?.role, 120) || "intern", major = str(i?.major, 100);
     const kind = ["behavioral", "technical", "mixed"].includes(i?.kind) ? i.kind : "mixed";
