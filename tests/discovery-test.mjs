@@ -96,7 +96,7 @@ console.log("6 live SuccessFactors ✓  ", r.detail);
 // 7) Follows a "Students & Interns" link one level deep
 sites["https://www.deep.com/careers"] = html(200, `<a href="/careers/early-talent">Students &amp; Interns</a>`, "https://www.deep.com/careers");
 sites["https://www.deep.com/careers/early-talent"] = html(200, `<a href="https://jobs.lever.co/deepco">See openings</a>`, "https://www.deep.com/careers/early-talent");
-sites["https://api.lever.co/v0/postings/deepco?mode=json"] = json(200, [{ text: "Mechanical Engineering Intern" }, { text: "Engineer" }]);
+sites["https://api.lever.co/v0/postings/deepco?mode=json&limit=100"] = json(200, [{ text: "Mechanical Engineering Intern" }, { text: "Engineer" }]);
 r = await discoverOne({ company: "Deep Co", domain: "deep.com", key: "deep" });
 assert.equal(r.status, "live"); assert.equal(r.ats, "lever"); assert.equal(r.intern_count, 1);
 console.log("7 live via 2nd-level link ✓", r.detail);
@@ -180,14 +180,14 @@ console.log("\nALL DISCOVERY TESTS PASSED");
   console.log("14 board-name proof: 7 real matches pass, 13 known-wrong boards still rejected ✓");
 
   // dead old board link + no website on file → find the website (only if its home page carries the full name), start over
-  sites["https://api.lever.co/v0/postings/aprio?mode=json"] = json(404, {});
+  sites["https://api.lever.co/v0/postings/aprio?mode=json&limit=100"] = json(404, {});
   sites["https://www.aprio.com/"] = html(200, `<title>Aprio | CPA, Advisory and Tax</title>`, "https://www.aprio.com/");
   sites["https://www.aprio.com/careers"] = html(200, `<a href="https://aprio.wd1.myworkdayjobs.com/en-US/Aprio_Careers">Jobs</a>`, "https://www.aprio.com/careers");
   sites["https://aprio.wd1.myworkdayjobs.com/wday/cxs/aprio/Aprio_Careers/jobs"] = () => json(200, W(40, [{ title: "Tax Intern", externalPath: "/job/t_1" }]));
   let r = await discoverOne({ company: "Aprio", key: "aprio", hint: "https://jobs.lever.co/aprio" });
   assert.equal(r.status, "live"); assert.equal(r.domain, "aprio.com"); assert.match(r.detail, /old board link was dead/);
   // a parked domain that merely contains the name is NOT accepted
-  sites["https://api.lever.co/v0/postings/zentro?mode=json"] = json(404, {});
+  sites["https://api.lever.co/v0/postings/zentro?mode=json&limit=100"] = json(404, {});
   sites["https://www.zentro.com/"] = html(200, `<title>zentro.com is for sale</title>`, "https://www.zentro.com/");
   r = await discoverOne({ company: "Zentro", key: "zentro", hint: "https://jobs.lever.co/zentro" });
   assert.notEqual(r.status, "live"); assert.ok(!r.domain);
@@ -195,7 +195,7 @@ console.log("\nALL DISCOVERY TESTS PASSED");
 }
 {
   // guessed website that links to SOMEONE ELSE's board (revolution.com → Stord) → held back, not live
-  sites["https://api.lever.co/v0/postings/revolution?mode=json"] = json(404, {});
+  sites["https://api.lever.co/v0/postings/revolution?mode=json&limit=100"] = json(404, {});
   sites["https://www.revolution.com/"] = html(200, `<title>Revolution | Investing in companies</title>`, "https://www.revolution.com/");
   sites["https://www.revolution.com/careers"] = html(200, `<a href="https://stord.wd1.myworkdayjobs.com/en-US/Stord_External_Career">Portfolio jobs</a>`, "https://www.revolution.com/careers");
   sites["https://stord.wd1.myworkdayjobs.com/wday/cxs/stord/Stord_External_Career/jobs"] = () => json(200, W(30, [{ title: "Ops Intern", externalPath: "/job/s_1" }]));

@@ -5,8 +5,8 @@ const web = {
   "https://boards-api.greenhouse.io/v1/boards/geckorobotics": J(200, { name: "Gecko Robotics" }),
   "https://boards-api.greenhouse.io/v1/boards/geckorobotics/jobs": J(200, { jobs: [{ title: "Mechanical Engineering Intern" }, { title: "Engineer" }] }),
   "https://boards-api.greenhouse.io/v1/boards/scout": J(200, { name: "Scout RFP" }),                 // someone else's "scout" board
-  "https://api.lever.co/v0/postings/xenergy?mode=json": J(200, [{ text: "Mechanical Intern", descriptionPlain: "At X-energy we build reactors" }]),
-  "https://api.lever.co/v0/postings/trex?mode=json": J(200, [{ text: "Intern", descriptionPlain: "Join T-Rex Games!" }]),
+  "https://api.lever.co/v0/postings/xenergy?mode=json&limit=100": J(200, [{ text: "Mechanical Intern", descriptionPlain: "At X-energy we build reactors" }]),
+  "https://api.lever.co/v0/postings/trex?mode=json&limit=100": J(200, [{ text: "Intern", descriptionPlain: "Join T-Rex Games!" }]),
 };
 globalThis.fetch = async (u) => web[String(u)] || { ok: false, status: 404, url: String(u), text: async () => "", json: async () => ({}) };
 
