@@ -13,7 +13,7 @@ assert.equal((await call("GET", "fake.token.here")).code, 401);
 // saved / applied
 let r = await call("POST", "user_a", { list: "saved", id: "merck:JR123", on: true }); assert.deepEqual(r.body, { saved: ["merck:JR123"], applied: [] });
 r = await call("POST", "user_a", { list: "applied", id: "x-abbott:31415", on: true }); assert.deepEqual(r.body.applied, ["x-abbott:31415"]); assert.deepEqual(r.body.saved, ["merck:JR123"]);
-r = await call("GET", "user_b"); assert.deepEqual(r.body, { saved: [], applied: [], resume: null, notes: [], starred: [], seenAt: null, apps: [], goal: null, profile: null, handle: null, profilePublic: false, remindEmail: false, emailReady: false });
+r = await call("GET", "user_b"); assert.deepEqual(r.body, { saved: [], applied: [], resume: null, notes: [], starred: [], seenAt: null, apps: [], goal: null, profile: null, handle: null, profilePublic: false, remindEmail: false, alerts: null, emailReady: false });
 assert.equal((await call("POST", "user_a", { list: "admin", id: "x:1", on: true })).code, 400);
 console.log("✓ saved/applied; users isolated");
 

@@ -19,6 +19,8 @@
 //   POST /api/me { action:"goal", goal }            → weekly application goal
 //   POST /api/me { action:"profile", profile, handle, public } → your profile (public page /u/<handle> only if public:true)
 //   POST /api/me { action:"remind", on }            → email me when a follow-up is due (needs RESEND_API_KEY on the server)
+//   POST /api/me { action:"alerts", on, major, states } → weekly email of new internships for that major/places (+ followed companies)
+//   POST /api/me { action:"alerts_test" }          → send yourself this week's alert now (3 a day)
 //   GET  /api/me?u=<handle>  (no sign-in)          → a PUBLIC profile (404 unless the student turned it on)
 //   GET  /api/me?unsub=<token> (no sign-in)        → one-click unsubscribe from reminder emails
 //   GET  /api/me?r=<token>   (no sign-in)          → the QR target: redirects to the resume if sharing is on
@@ -33,6 +35,7 @@ import { mutate, loadRow, Conflict } from "../lib/userdata.js";
 import { postedInfo } from "../lib/dates.js";
 import { isAuthorizedCron } from "../lib/db.js";
 import { runReminders, emailFor, sendEmail, buildEmail } from "../lib/remind.js";
+import { runAlerts, cleanMajor, cleanStates, buildAlert, freshListings, matchesFor } from "../lib/alerts.js";
 import { dueFollowUps } from "../lib/followups.js";
 import { botOn, logRun } from "../lib/bots.js";
 
@@ -208,11 +211,12 @@ async function publicProfile(req, res) {
 async function unsubscribe(req, res) {
   const t = String(req.query.unsub || "");
   res.setHeader("Content-Type", "text/html; charset=utf-8");
-  if (TOKEN_OK.test(t)) await db.updateReturning(`user_jobs?remind_unsub=eq.${encodeURIComponent(t)}`, { remind_email: false });
+  const alerts = req.query.k === "alerts";
+  if (TOKEN_OK.test(t)) await db.updateReturning(`user_jobs?remind_unsub=eq.${encodeURIComponent(t)}`, alerts ? { alert_on: false } : { remind_email: false });
   return res.status(200).send(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Unsubscribed</title>
 <body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;display:grid;place-items:center;min-height:90vh;margin:0;background:#FBFBFC;color:#0B1220">
 <div style="text-align:center;padding:24px"><div style="color:#0E8A5F;font-weight:700">Beat the Pile</div><h1 style="font-size:22px">You're unsubscribed</h1>
-<p style="color:#5B6675">No more follow-up reminder emails. Turn them back on anytime in <a href="/season/" style="color:#0B6E4B">My Season</a>.</p></div>`);
+<p style="color:#5B6675">${alerts ? `No more weekly job alert emails. Turn them back on anytime on <a href="/jobs/" style="color:#0B6E4B">Jobs</a>.` : `No more follow-up reminder emails. Turn them back on anytime in <a href="/season/" style="color:#0B6E4B">My Season</a>.`}</p></div>`);
 }
 
 async function resumeRedirect(req, res) {
@@ -247,8 +251,11 @@ export default async function handler(req, res) {
     if (!(await botOn("remind"))) { await logRun("remind", true, "Switched off"); return res.status(200).json({ off: true }); }
     try {
       const st = await runReminders();
-      await logRun("remind", !st.failed, st.skipped ? "Waiting for RESEND_API_KEY" : `Sent ${st.sent} reminder email${st.sent === 1 ? "" : "s"} · ${st.optedIn} opted in · ${st.due} with follow-ups due`, st);
-      return res.status(200).json(st);
+      let al = { sent: 0, optedIn: 0 };
+      try { al = await runAlerts(); } catch (e) { al = { sent: 0, optedIn: 0, failed: 1, error: String(e.message).slice(0, 80) }; }
+      const ok = !st.failed && !al.failed;
+      await logRun("remind", ok, st.skipped ? "Waiting for RESEND_API_KEY" : `Sent ${st.sent} reminder email${st.sent === 1 ? "" : "s"} · ${st.optedIn} opted in · ${st.due} with follow-ups due · job alerts: ${al.sent} sent, ${al.optedIn} opted in`, { ...st, alerts: al });
+      return res.status(200).json({ ...st, alerts: al });
     } catch (e) { await logRun("remind", false, "Run failed: " + String(e.message).slice(0, 120)); return res.status(500).json({ error: "reminder run failed" }); }
   }
   if ((req.method === "GET" || req.method === "POST") && req.query?.unsub !== undefined) {
@@ -263,7 +270,8 @@ export default async function handler(req, res) {
   const view = (row) => ({ saved: row?.saved || [], applied: row?.applied || [], resume: publicResume(row), notes: row?.fair_notes || [],
                             starred: row?.starred || [], seenAt: row?.seen_at || null, apps: row?.apps || [], goal: row?.weekly_goal ?? null,
                             profile: row?.profile || null, handle: row?.handle || null, profilePublic: row?.profile_public === true,
-                            remindEmail: row?.remind_email === true, emailReady: !!process.env.RESEND_API_KEY });
+                            remindEmail: row?.remind_email === true,
+                            alerts: row?.alert_on === true ? { major: row.alert_major || "all", states: row.alert_states || "" } : null, emailReady: !!process.env.RESEND_API_KEY });
   const send = (out) => out.error ? res.status(out.status || 400).json({ error: out.error }) : res.status(200).json(view(out.row));
   const stop = (error, status = 400) => ({ error, status });
 
@@ -341,6 +349,24 @@ export default async function handler(req, res) {
       if (!due.length) mail.subject = "Test: this is what a follow-up reminder looks like";
       await sendEmail(to, mail);
       return res.status(200).json({ ok: true, to: to.replace(/^(.).*(@.*)$/, "$1…$2") });
+    }
+    if (action === "alerts") {                  // weekly new-internship email for one major + places
+      const on = body.on === true;
+      if (on && !process.env.RESEND_API_KEY) return res.status(400).json({ error: "Email alerts aren't switched on yet — check back soon" });
+      return send(await mutate(uid, (row) => ({ alert_on: on, ...(on ? { alert_major: cleanMajor(body.major), alert_states: cleanStates(body.states) || null } : {}),
+        remind_unsub: row.remind_unsub || crypto.randomBytes(18).toString("base64url") })));
+    }
+    if (action === "alerts_test") {             // this week's alert, now, to yourself (3 a day)
+      if (!process.env.RESEND_API_KEY) return res.status(400).json({ error: "Email alerts aren't switched on yet" });
+      if (!(await rateOk(`alerts-test:${uid}`, 86400, 3))) return res.status(429).json({ error: "That's enough test emails for today" });
+      const row = (await mutate(uid, (r) => ({ remind_unsub: r.remind_unsub || crypto.randomBytes(18).toString("base64url") }))).row;
+      if (!row.alert_on) return res.status(400).json({ error: "Turn on job alerts first" });
+      const to = await emailFor(uid);
+      if (!to) return res.status(400).json({ error: "Your account has no verified email address" });
+      const m = matchesFor({ ...row, alert_last_sent: null }, await freshListings());
+      if (!m.length) return res.status(200).json({ ok: true, none: true });
+      await sendEmail(to, buildAlert(row, m, row.remind_unsub));
+      return res.status(200).json({ ok: true, count: m.length, to: to.replace(/^(.).*(@.*)$/, "$1…$2") });
     }
     if (action === "remind") {
       const on = body.on === true;
