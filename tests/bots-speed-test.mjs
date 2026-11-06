@@ -15,11 +15,11 @@ globalThis.fetch = async (u, o = {}) => {
   if (String(u).includes("/jobs") && first429 && String(u).includes("t0.")) { first429 = false; return { ok: false, status: 429, headers: { get: () => "0" }, json: async () => ({}) }; }
   return { ok: true, status: 200, headers: { get: () => null }, json: async () => ({ total: 1, facets: [], jobPostings: [{ externalPath: "/job/Austin-TX/Mechanical-Engineering-Intern_R1", title: "Mechanical Engineering Intern", locationsText: "Austin, TX" }] }) };
 };
-const cfgs = Array.from({ length: 8 }, (_, i) => ({ id: "w" + i, host: `t${i}.wd5.myworkdayjobs.com`, tenant: "t" + i, site: "Ext" }));
+const cfgs = Array.from({ length: 14 }, (_, i) => ({ id: "w" + i, host: `t${i}.wd5.myworkdayjobs.com`, tenant: "t" + i, site: "Ext" }));
 const results = await Promise.all(cfgs.map((c) => fetchWorkday(c)));
 assert.ok(results.every((r) => r.length === 1), "every company returned its job, including the one that got a 429 first");
 assert.ok(peak <= _wdTest.PER_CLUSTER, `at most ${_wdTest.PER_CLUSTER} at once on wd5 (saw ${peak})`);
-console.log("✓ Workday: 429 waits and retries; max 3 requests at once per cluster");
+console.log("✓ Workday: 429 waits and retries; capped requests per cluster");
 
 // a 429 that never clears still fails the company (after 2 retries), so the sync logs it
 globalThis.fetch = async () => ({ ok: false, status: 429, headers: { get: () => "0" }, json: async () => ({}) });
