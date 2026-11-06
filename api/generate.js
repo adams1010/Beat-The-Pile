@@ -171,6 +171,7 @@ Do not state facts about the company unless you are confident they are true.` };
 
 RULES (follow all):
 - Never invent experience, numbers, tools, courses or results the resume doesn't show. Rewrites may only rephrase, reorder or sharpen what is already there.
+- Do not add new actions, teammates, scope or skills to a line (no "collaborated", "led", "optimized", "structural" etc. unless the resume says so). Stronger verbs are fine only when they describe the same thing.
 - If a stronger version needs a number they didn't give, write the rewrite with a bracketed placeholder like [#] or [% faster] for them to fill in truthfully.
 - "before" must be copied EXACTLY from the resume (one line or bullet).
 - Keywords come only from the job title/posting below, and only ones the student can honestly claim from their resume. Put the rest in "gaps".
