@@ -35,6 +35,17 @@ const lev = await fetchLever({ id: "lv", token: "acme" });
 assert.equal(lev.length, 237); assert.equal(urls.length, 2, "stops when a page comes back short");
 assert.match(urls[0], /limit=200&skip=0/);
 console.log("✓ Lever: read in pages of 200 (no 6 MB single download)");
+{ // at most 4 Lever requests at once, and a stalled (aborted) request is retried once
+  const { _leverTest } = await import("../lib/fetchers/greenhouse-lever.js");
+  let inF = 0, pk = 0, aborts = 0;
+  globalThis.fetch = async (u) => { inF++; pk = Math.max(pk, inF); await new Promise((r) => setTimeout(r, 10)); inF--;
+    if (String(u).includes("/stall?") && aborts++ === 0) { const e = new Error("This operation was aborted"); e.name = "AbortError"; throw e; }
+    return { ok: true, status: 200, json: async () => [{ id: "1", text: "Intern", categories: { location: "Austin, TX" }, hostedUrl: "https://jobs.lever.co/x/1" }] }; };
+  const got = await Promise.all(["a", "b", "c", "d", "e", "f", "g", "stall"].map((t) => fetchLever({ id: t, token: t })));
+  assert.ok(got.every((r) => r.length === 1), "the stalled board succeeded on retry");
+  assert.ok(pk <= _leverTest.LEVER_AT_ONCE, `≤${_leverTest.LEVER_AT_ONCE} at once (saw ${pk})`);
+  console.log("✓ Lever: max 4 at once; a stalled request is retried");
+}
 
 // ── Sync queue: never-synced first, then oldest, with companies posting now pulled forward 3 hours ──
 const now = Date.parse("2026-11-06T20:00:00Z"), h = 3600e3;
