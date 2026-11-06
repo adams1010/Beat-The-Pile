@@ -201,6 +201,7 @@ console.log("\nALL DISCOVERY TESTS PASSED");
   sites["https://stord.wd1.myworkdayjobs.com/wday/cxs/stord/Stord_External_Career/jobs"] = () => json(200, W(30, [{ title: "Ops Intern", externalPath: "/job/s_1" }]));
   const r = await discoverOne({ company: "Revolution", key: "revolution", hint: "https://jobs.lever.co/revolution" });
   assert.equal(r.status, "identity_failed", JSON.stringify(r)); assert.match(r.detail, /held back/);
+  assert.equal(r.domain, undefined, "a guess that failed is NOT saved as their website (else the next check trusts it)");
   // name-proof via the lead word → jobs listed under the organization (config.listAs), company row untouched
   sites["https://centerstone.wd1.myworkdayjobs.com/wday/cxs/centerstone/CenterstoneCareers/jobs"] = () => json(200, W(25, [{ title: "Clinical Intern", externalPath: "/job/c_1" }]));
   const r2 = await discoverOne({ company: "Centerstone of Tennessee", key: "centerstoneoftennessee", hint: "https://centerstone.wd1.myworkdayjobs.com/CenterstoneCareers" });
