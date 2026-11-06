@@ -56,6 +56,13 @@
 
   main{padding:24px 0 48px}
   .layout{display:grid;grid-template-columns:240px minmax(0,1fr) 300px;gap:20px;align-items:start}
+  .welcome{position:relative;margin-bottom:12px;padding:20px 20px 18px;border-color:#B9DDCC;background:linear-gradient(#fff,#fff) padding-box}
+  .welcome h2{margin:0 0 4px;font-size:19px;font-weight:600;letter-spacing:-.01em}.welcome p{margin:0 0 14px;color:var(--muted);font-size:14px}
+  .wchips{display:flex;flex-wrap:wrap;gap:8px}
+  .wchips button{font:inherit;font-size:14px;font-weight:500;padding:9px 14px;border-radius:999px;border:1px solid #C9D1DE;background:#fff;color:var(--ink);cursor:pointer}
+  .wchips button:hover,.wchips button:focus-visible{border-color:var(--green);color:var(--green);outline:none}
+  .wchips button.all{border-style:dashed;color:var(--muted)}
+  .wx{position:absolute;top:10px;right:12px;border:0;background:none;font-size:22px;line-height:1;color:var(--faint);cursor:pointer;padding:4px}
   .rail{display:flex;flex-direction:column;gap:12px;position:sticky;top:84px}
   .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
   .panel h3{font:500 11px var(--mono);letter-spacing:.08em;color:var(--muted);margin:0 0 12px;text-transform:uppercase}
@@ -149,6 +156,12 @@
       </section>
     </aside>
     <div class="feed">
+      <section class="panel welcome" id="welcome" hidden aria-labelledby="welcomeH">
+        <button class="wx" id="welcomeX" aria-label="Show every major instead">×</button>
+        <h2 id="welcomeH">What are you studying?</h2>
+        <p>Pick one and we'll show internships for your major first. You can change it any time.</p>
+        <div class="wchips" id="welcomeChips"></div>
+      </section>
 <div class="controls">
     <div class="row">
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">All US states</option></select>
@@ -635,6 +648,24 @@
   $("majorSel").addEventListener("change", (e) => { state.company = null; state.major = e.target.value; store.set("btp_major", state.major); $("meWrap").hidden = !STRICT_OK(); loadScope(); });
   if (!MAJOR_KEYS.includes(state.major)) state.major = "all";
   $("majorSel").value = state.major; $("meWrap").hidden = !STRICT_OK();
+  // Arriving from a major link (homepage tiles) counts as picking one — remembered unless you already chose
+  { const mj = (new URLSearchParams(location.search).get("major") || "").toLowerCase(); if (mj && mj !== "all" && MAJOR_KEYS.includes(mj) && !store.get("btp_major")) store.set("btp_major", mj); }
+  // First visit: ask for a major once (never blocks the list; dismissing = "every major" and it won't ask again)
+  (function welcome(){
+    const p = new URLSearchParams(location.search);
+    if (store.get("btp_major") || p.has("major") || p.has("company") || p.has("q") || p.has("view") || state.major !== "all") return;
+    const PICKS = ["finance", "software", "mechanical", "marketing", "civil", "science_health", "data", "electrical", "consulting", "supply_chain", "people_hr", "legal_policy"];
+    const SHORT = { finance: "Finance & Accounting", software: "Software & CS", mechanical: "Mechanical & Aerospace", marketing: "Marketing & Media", civil: "Civil & Construction",
+      science_health: "Science & Health", data: "Data & AI", electrical: "Electrical & Computer", consulting: "Business & Consulting", supply_chain: "Supply Chain & Ops", people_hr: "HR & People", legal_policy: "Legal & Policy" };
+    const short = (k) => SHORT[k] || document.querySelector(`#majorSel option[value="${k}"]`)?.textContent || k;
+    $("welcomeChips").innerHTML = PICKS.filter((k) => MAJOR_KEYS.includes(k)).map((k) => `<button data-m="${k}">${esc(short(k))}</button>`).join("")
+      + `<button data-m="all" class="all">Show me everything</button>`;
+    $("welcome").hidden = false;
+    const pick = (m) => { store.set("btp_major", m); $("welcome").hidden = true; if (m !== state.major) { state.company = null; state.major = m; $("majorSel").value = m; $("meWrap").hidden = !STRICT_OK(); loadScope(); } };
+    $("welcomeChips").addEventListener("click", (e) => { const b = e.target.closest("button[data-m]"); if (b) pick(b.dataset.m); });
+    $("welcomeX").onclick = () => pick("all");
+    $("majorSel").addEventListener("change", () => { $("welcome").hidden = true; });
+  })();
   fillStates();
   { const single = state.st !== "ALL" && state.st.length === 1 ? state.st[0] : ""; if (single) { $("stateSel").value = single; $("stateSel").classList.add("on"); } }
   loadScope();
