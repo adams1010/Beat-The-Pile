@@ -21,12 +21,12 @@
 .btpnav .in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:6px;min-height:60px;
   padding:0 max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
 .btpnav .logo{display:flex;align-items:center;gap:8px;color:#fff;font-weight:650;text-decoration:none;margin-right:14px;white-space:nowrap;letter-spacing:-.01em}
-.btpnav .mark{width:26px;height:26px;border-radius:7px;border:1px solid var(--n-acc);display:grid;place-items:center;color:var(--n-acc);font:500 11px "Geist Mono",ui-monospace,monospace}
+.btpnav .mark{width:26px;height:26px;border-radius:7px;background:var(--n-acc);display:grid;place-items:center;color:#070F1E;font:700 11px "Geist",sans-serif;letter-spacing:-.02em}
 .btpnav .q{flex:1 1 220px;max-width:380px;display:flex;align-items:center;gap:8px;height:38px;padding:0 12px;border-radius:8px;background:#16223A;border:1px solid #263452;margin-right:10px}
 .btpnav .q input{flex:1;min-width:0;background:transparent;border:0;color:var(--n-fg);font:inherit;font-size:14px;outline:0}
 .btpnav .q input::placeholder{color:#8D9AB3}
 .btpnav .q:focus-within{border-color:var(--n-acc)}
-.btpnav .q kbd{font:11px "Geist Mono",monospace;color:#8D9AB3;border:1px solid #263452;border-radius:4px;padding:1px 6px}
+.btpnav .q kbd{font:500 11px "Geist",sans-serif;color:#8D9AB3;border:1px solid #263452;border-radius:4px;padding:1px 6px}
 .btpnav .links{display:flex;align-items:center;gap:2px;flex:0 1 auto;margin-left:auto;min-width:0;overflow-x:auto;scrollbar-width:none}
 .btpnav .links::-webkit-scrollbar{display:none}
 .btpnav .links a,.btpnav summary{color:var(--n-dim);text-decoration:none;font-size:13px;padding:8px 12px;border-radius:6px;white-space:nowrap;cursor:pointer}
@@ -63,7 +63,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
   if (!document.querySelector('link[href*="family=Geist"]')) {
     const f = document.createElement("link"); f.rel = "stylesheet";
-    f.href = "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap"; document.head.appendChild(f);
+    f.href = "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap"; document.head.appendChild(f);
   }
   const nav = document.createElement("nav"); nav.className = "btpnav"; nav.setAttribute("aria-label", "Main");
   nav.innerHTML = `<a class="btpskip" href="#main">Skip to content</a><div class="in">

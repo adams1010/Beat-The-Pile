@@ -1,7 +1,7 @@
 const {useState,useEffect,useRef,useCallback}=React;
 
 // Design tokens: one calm green accent on near-black ink and cool neutrals. No gradients, no glows.
-const G="#0E8A5F",GD="#0B6E4B",GL="#EEF6F2",GM="#CFE6DA";
+const G="#0B7A55",GD="#0A6647",GL="#EAF7F1",GM="#C6E8D8";   // Direction D green (matches /jobs + static pages)
 const AM="#B45309",AL="#FFF7ED";
 const CR="#B42318",CL="#FEF3F2";
 const PALETTE=Array(12).fill("#0B1220");   // selected chips: one ink color (was a rainbow)
@@ -64,7 +64,7 @@ const LiveStats=()=>{
   return (<div style={{maxWidth:760,margin:"0 auto"}}>
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:"1rem"}}>
     {items.map((s,i)=>(<div key={i} style={{background:"#fff",border:"1px solid #EEF6F2",borderRadius:14,padding:"1.75rem 1.25rem",textAlign:"center",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
-      <div style={{fontSize:38,fontWeight:800,color:s.c,lineHeight:1,marginBottom:"0.5rem",letterSpacing:"-1.5px"}}>{err?"—":fmt(s.v)}</div>
+      <div style={{fontSize:38,fontWeight:700,color:s.c,lineHeight:1,marginBottom:"0.5rem",letterSpacing:"-1.5px"}}>{err?"—":fmt(s.v)}</div>
       <p style={{fontSize:12,color:"#4A5568",lineHeight:1.5,fontWeight:500}}>{s.l}</p></div>))}
     </div>
     <p style={{textAlign:"center",fontSize:12,color:"#6B7280",marginTop:10}}>{err?"Live numbers are unavailable right now (that's on us, not a sign of zero jobs).":d?.lastSync?`Live from our database · last job-board sync ${ago(d.lastSync)}`:"Loading live numbers…"}</p>
@@ -85,7 +85,7 @@ const JobPreview=()=>{
   if(!jobs)return <div style={{height:150,marginTop:22}} aria-hidden="true"/>;
   if(!jobs.length)return null;
   return (<div style={{marginTop:26,textAlign:"left",display:"flex",flexDirection:"column",gap:8}}>
-    <p style={{fontSize:11,fontWeight:700,color:"#6B7280",letterSpacing:"1.5px",textTransform:"uppercase",margin:"0 0 2px"}}>Open right now · real listings</p>
+    <p style={{fontSize:12,fontWeight:600,color:"#6B7280",margin:"0 0 2px"}}>Open right now · real listings</p>
     {jobs.map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"block",background:"#fff",border:"1px solid #E3E7ED",borderRadius:12,padding:"12px 14px",textDecoration:"none",color:"#0B1220"}}>
       <div style={{fontSize:12,fontWeight:700,color:"#0B6E4B"}}>{j.company}</div>
       <div style={{fontSize:15,fontWeight:700,lineHeight:1.3,margin:"2px 0 3px"}}>{j.title}</div>
@@ -100,7 +100,7 @@ const D_FIELD={software:"Software & CS",data:"Data & AI",cyber_it:"Cybersecurity
 const D_STATES={alabama:"AL",alaska:"AK",arizona:"AZ",arkansas:"AR",california:"CA",colorado:"CO",connecticut:"CT",delaware:"DE",florida:"FL",georgia:"GA",hawaii:"HI",idaho:"ID",illinois:"IL",indiana:"IN",iowa:"IA",kansas:"KS",kentucky:"KY",louisiana:"LA",maine:"ME",maryland:"MD",massachusetts:"MA",michigan:"MI",minnesota:"MN",mississippi:"MS",missouri:"MO",montana:"MT",nebraska:"NE",nevada:"NV","new hampshire":"NH","new jersey":"NJ","new mexico":"NM","new york":"NY","north carolina":"NC","north dakota":"ND",ohio:"OH",oklahoma:"OK",oregon:"OR",pennsylvania:"PA","rhode island":"RI","south carolina":"SC","south dakota":"SD",tennessee:"TN",texas:"TX",utah:"UT",vermont:"VT",virginia:"VA",washington:"WA","west virginia":"WV",wisconsin:"WI",wyoming:"WY","district of columbia":"DC"};
 function dAgo(t){const m=Math.max(0,Math.round((Date.now()-new Date(t))/6e4));return m<60?`${m||1}m`:m<1440?`${Math.round(m/60)}h`:`${Math.round(m/1440)}d`;}
 function dAgoLong(t){const m=Math.max(0,Math.round((Date.now()-new Date(t))/6e4));return m<60?`${m||1} min ago`:m<1440?`${Math.round(m/60)} h ago`:`${Math.round(m/1440)} days ago`;}
-const DM={fontFamily:'"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace'};
+const DM={fontVariantNumeric:"tabular-nums"};   // numbers line up; no "terminal" font
 function LandingD({onQuiz,onPage}){
   const [sum,setSum]=React.useState(null),[sumErr,setSumErr]=React.useState(false),[fresh,setFresh]=React.useState(null);
   const [q,setQ]=React.useState(""),[where,setWhere]=React.useState("");
@@ -121,8 +121,8 @@ function LandingD({onQuiz,onPage}){
     <section style={{position:"relative",overflow:"hidden",background:"#070F1E",color:"#E8EDF5"}}>
       <div style={{...wrap,position:"relative",paddingTop:64,paddingBottom:48,display:"flex",gap:48,flexWrap:"wrap",alignItems:"center"}}>
         <div style={{flex:"999 1 520px",minWidth:0}}>
-          <p style={{...DM,fontSize:12,letterSpacing:".12em",color:"#2FD39A",margin:"0 0 18px",textTransform:"uppercase"}}><span className="d-blink" style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#2FD39A",marginRight:8}}/>
-            {sum?`Live · ${fmt(sum.companies)} company job boards${sum.lastSync?` · re-read ${dAgoLong(sum.lastSync)}`:""}`:sumErr?"Live numbers unavailable right now":"Connecting…"}</p>
+          <p style={{fontSize:14,fontWeight:500,color:"#9FE5C8",margin:"0 0 18px"}}><span style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#2FD39A",marginRight:8,verticalAlign:1}}/>
+            {sum?`${fmt(sum.companies)} company job boards${sum.lastSync?`, last checked ${dAgoLong(sum.lastSync)}`:""}`:sumErr?"Live numbers unavailable right now":"Loading the latest numbers…"}</p>
           <h1 style={{fontSize:"clamp(2.3rem,5.6vw,4rem)",lineHeight:1.03,letterSpacing:"-0.035em",fontWeight:600,margin:"0 0 16px",color:"#fff"}}>Find your internship<br/>before the <span style={{color:"#2FD39A"}}>pile</span> does.</h1>
           <p style={{fontSize:18,lineHeight:1.5,color:"#9FAAC0",margin:"0 0 28px",maxWidth:560}}>Every major. Pulled straight from each company's own job board — no reposts, and jobs drop off when the company takes them down.</p>
           <form onSubmit={go} role="search" className="d-search" style={{display:"flex",alignItems:"stretch",background:"#fff",borderRadius:14,padding:6,boxShadow:"0 0 0 1px #2FD39A33, 0 20px 50px rgba(0,0,0,.35)",maxWidth:760}}>
@@ -146,21 +146,18 @@ function LandingD({onQuiz,onPage}){
         {[["rotate(-9deg) translate(-22px,14px)",.6],["rotate(6deg) translate(18px,8px)",.8],["rotate(-3deg) translate(-6px,-6px)",1]].map(([t,o],i)=>(
           <div key={i} aria-hidden="true" style={{position:"absolute",inset:0,borderRadius:16,background:"#0A1426",border:"1px solid rgba(174,185,204,.24)",transform:t,opacity:o}}/>))}
         <aside style={{position:"relative",boxSizing:"border-box",background:"#0D1A2F",border:"1px solid #2A3B5C",borderRadius:16,padding:20,boxShadow:"0 24px 60px rgba(0,0,0,.45)",...DM}}>
-          <div style={{display:"flex",justifyContent:"space-between",fontSize:11,letterSpacing:".1em",color:"#8D9AB3",marginBottom:10}}><span>JUST FOUND</span><span style={{color:"#2FD39A"}}>● LIVE</span></div>
+          <div style={{display:"flex",justifyContent:"space-between",fontSize:13,fontWeight:600,color:"#E8EDF5",marginBottom:10,fontFamily:"Geist,sans-serif"}}><span>Just found</span><span style={{color:"#8D9AB3",fontWeight:500}}>newest first</span></div>
           {fresh===null?<div style={{height:200}} aria-hidden="true"/>:fresh.length===0?<p style={{fontSize:13,color:"#8D9AB3",fontFamily:"Geist,sans-serif"}}>Live list didn't load. <a href="/jobs/" style={{color:"#2FD39A"}}>Open the jobs page →</a></p>:
             fresh.map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"flex",justifyContent:"space-between",gap:12,padding:"10px 0",borderTop:"1px solid #1A2640",textDecoration:"none",fontSize:13}}>
               <span style={{color:"#fff",fontFamily:"Geist,sans-serif",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{j.company} <span style={{color:"#8D9AB3"}}>· {j.title}</span></span><span style={{color:"#2FD39A",flexShrink:0}}>{dAgo(j.first_seen)}</span></a>))}
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:12,paddingTop:16,borderTop:"1px solid #22304D"}}>
-            <div><p style={{fontSize:26,color:"#fff",margin:0}}>{fmt(sum?.allMajors)}</p><p style={{fontSize:11,color:"#8D9AB3",margin:"4px 0 0",letterSpacing:".06em"}}>OPEN NOW</p></div>
-            <div><p style={{fontSize:26,color:"#fff",margin:0}}>{fmt(sum?.hiringNow)}</p><p style={{fontSize:11,color:"#8D9AB3",margin:"4px 0 0",letterSpacing:".06em"}}>COMPANIES HIRING</p></div>
+            <div><p style={{fontSize:26,color:"#fff",margin:0}}>{fmt(sum?.allMajors)}</p><p style={{fontSize:13,color:"#8D9AB3",margin:"4px 0 0",fontFamily:"Geist,sans-serif"}}>internships open now</p></div>
+            <div><p style={{fontSize:26,color:"#fff",margin:0}}>{fmt(sum?.hiringNow)}</p><p style={{fontSize:13,color:"#8D9AB3",margin:"4px 0 0",fontFamily:"Geist,sans-serif"}}>companies hiring</p></div>
           </div>
         </aside>
         </div>
       </div>
-      {sum?.top?.length>0&&<div style={{position:"relative",borderTop:"1px solid #1A2640",overflow:"hidden",height:44,display:"flex",alignItems:"center"}}>
-        <div className="d-tick" style={{display:"flex",gap:40,whiteSpace:"nowrap",...DM,fontSize:12,color:"#8D9AB3",paddingLeft:24}}>
-          {[...sum.top,...sum.top].map((c,i)=><a key={i} href={`/c/${encodeURIComponent(c.id)}`} style={{color:"#8D9AB3",textDecoration:"none"}} tabIndex={i>=sum.top.length?-1:0}>{c.company.toUpperCase()} <b style={{color:"#2FD39A",fontWeight:500}}>{c.n}</b></a>)}
-        </div></div>}
+
     </section>
 
     <main style={{...wrap,paddingTop:40,paddingBottom:64,display:"flex",flexDirection:"column",gap:40}}>
@@ -185,11 +182,11 @@ function LandingD({onQuiz,onPage}){
       </section>}
 
       <section className="d-grid3">
-        {[["OPENING RADAR","Know the week they open.","Estimates from past seasons, with a reminder a week before.","/radar/"],
-          ["CAREER FAIR MODE","Walk in with a route.","Booths, open roles, a QR resume and follow-ups in one place.","/fair/"],
-          ["INTERVIEW PRACTICE","Talk it out. Get a grade.","Answer out loud against a timer, get scored on every answer and a letter grade at the end.","/#interview"]].map(([k,t,d,h])=>(
+        {[["Opening Radar","Know the week they open.","Estimates from past seasons, with a reminder a week before.","/radar/"],
+          ["Career Fair Mode","Walk in with a route.","Booths, open roles, a QR resume and follow-ups in one place.","/fair/"],
+          ["Interview practice","Talk it out. Get a grade.","Answer out loud against a timer, get scored on every answer and a letter grade at the end.","/#interview"]].map(([k,t,d,h])=>(
           <a key={k} href={h} onClick={h==="/#interview"?(e)=>{e.preventDefault();onPage("interview");}:undefined} style={{background:"#070F1E",color:"#E8EDF5",borderRadius:14,padding:24,border:"1px solid #1A2640",textDecoration:"none",display:"block"}}>
-            <p style={{...DM,fontSize:11,letterSpacing:".1em",color:"#2FD39A",margin:"0 0 10px"}}>{k}</p>
+            <p style={{fontSize:13,fontWeight:600,color:"#2FD39A",margin:"0 0 10px"}}>{k}</p>
             <p style={{fontSize:18,fontWeight:600,margin:"0 0 8px",color:"#fff"}}>{t}</p>
             <p style={{fontSize:14,lineHeight:1.5,color:"#9FAAC0",margin:0}}>{d}</p></a>))}
       </section>
@@ -206,7 +203,7 @@ const MAJORS=["Accounting","Actuarial Science","Advertising","Aerospace Engineer
 // RECRUITER-OPTIMIZED EXTRACURRICULARS
 const EXT_CATS=[
   {
-    id:"leadership",label:"Leadership & Orgs",icon:"",color:"#0E8A5F",
+    id:"leadership",label:"Leadership & Orgs",icon:"",color:"#0B7A55",
     why:"Leadership roles are the #1 thing recruiters look for beyond GPA.",
     options:[
       {name:"Student Government",roles:["Senator/Representative","Committee Chair","VP / Secretary","President"]},
@@ -422,7 +419,7 @@ function AnimatedPct({target,color}){
     const t=setTimeout(()=>requestAnimationFrame(tick),300);
     return()=>clearTimeout(t);
   },[target]);
-  return<span style={{fontWeight:800,fontSize:32,color,lineHeight:1,letterSpacing:"-1.5px"}}>{n}%</span>;
+  return<span style={{fontWeight:700,fontSize:32,color,lineHeight:1,letterSpacing:"-1.5px"}}>{n}%</span>;
 }
 
 function Counter({target,suffix}){
@@ -471,7 +468,7 @@ function BlurCard({company}){
             <div style={{color:"#4A5568",fontSize:13,marginTop:2}}>{company?.role||"Internship Role"}</div>
             <div style={{color:"#6B7280",fontSize:12,marginTop:2}}>{company?.location||"City, ST"}</div>
           </div>
-          <div style={{fontWeight:800,fontSize:32,color:accent}}>{company?.match||74}%</div>
+          <div style={{fontWeight:700,fontSize:32,color:accent}}>{company?.match||74}%</div>
         </div>
         <div style={{background:"#E8F5F0",borderRadius:99,height:6,marginBottom:"0.75rem"}}>
           <div style={{width:`${company?.match||74}%`,height:"100%",background:accent,borderRadius:99}}/>
@@ -1042,12 +1039,12 @@ function InterviewSim({major,defaultCompany,defaultRole}){
   const label={display:"block",font:`600 13px ${IV.font}`,color:IV.ink,margin:"14px 0 6px"};
   const btn=(primary)=>({font:`600 14px ${IV.font}`,padding:"10px 16px",borderRadius:999,cursor:"pointer",border:`1px solid ${primary?IV.acc:IV.line}`,background:primary?IV.acc:"#fff",color:primary?"#fff":IV.ink});
   const seg=(on)=>({font:`500 14px ${IV.font}`,padding:"9px 14px",borderRadius:999,cursor:"pointer",border:`1px solid ${on?IV.ink:IV.line}`,background:on?IV.ink:"#fff",color:on?"#fff":IV.ink});
-  const mono={fontFamily:'"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace'};
+  const mono={fontVariantNumeric:"tabular-nums"};
   const pctColor=(p)=>p>=64?IV.acc:p>=46?"#B45309":"#B42318";
   const lowTime=phase==="answer"&&left<=15;
   return (
     <main id="main" style={{maxWidth:780,margin:"0 auto",padding:"32px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))",fontFamily:IV.font,color:IV.ink}}>
-      <p style={{...mono,fontSize:12,letterSpacing:".1em",textTransform:"uppercase",color:IV.acc,margin:0}}>Interview practice</p>
+      <p style={{fontSize:14,fontWeight:600,color:IV.acc,margin:0}}>Interview practice</p>
       <h1 style={{font:`600 clamp(26px,4vw,34px)/1.15 ${IV.font}`,letterSpacing:"-.02em",margin:"6px 0 8px"}}>Say it out loud. Beat the clock. Get a grade.</h1>
       <p style={{color:IV.dim,fontSize:15.5,lineHeight:1.6,margin:"0 0 22px",maxWidth:"64ch"}}>An AI interviewer asks one question at a time. You get {IV_THINK} seconds to think, then the clock runs — talk (or type) your answer, and it sends itself when time's up. Every answer is scored, and you get a letter grade at the end. Grades are an AI estimate, not a hiring decision. Your answers go to our AI provider to write the feedback; nothing is saved{canTalk?" (speech is turned into text by your browser)":""}.</p>
       {!started&&!busy?(
@@ -1189,7 +1186,7 @@ function SkillPicker({options,value,onToggle,major}){
   return (<div>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:12,marginBottom:10}}>
       <p style={{fontSize:13,fontWeight:600,color:ink,margin:0}}>For {major||"your major"}</p>
-      <p aria-live="polite" style={{fontSize:13,color:value.length?"#0E8A5F":dim,margin:0,fontWeight:value.length?600:400}}>{value.length?`${value.length} picked`:"Tap any that fit — skip the rest"}</p>
+      <p aria-live="polite" style={{fontSize:13,color:value.length?"#0B7A55":dim,margin:0,fontWeight:value.length?600:400}}>{value.length?`${value.length} picked`:"Tap any that fit — skip the rest"}</p>
     </div>
     <div style={{display:"flex",flexWrap:"wrap",gap:8}}>{options.map(chip)}</div>
     <p style={{fontSize:13,fontWeight:600,color:ink,margin:"20px 0 10px"}}>Good for any major</p>
@@ -2575,7 +2572,7 @@ function App(){
         <button onClick={()=>setShowProModal(false)} aria-label="Close" style={{position:"absolute",top:14,right:14,width:32,height:32,borderRadius:"50%",background:"#F1F5F4",border:"none",color:"#4A5568",fontSize:18,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--font)"}}>×</button>
         <div style={{background:`${G}15`,borderRadius:var_rl,padding:"1.25rem",marginBottom:"1.25rem",border:`1px solid ${GL}`}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
-            <span style={{fontWeight:800,fontSize:22,color:"#0B1220",letterSpacing:"-0.5px"}}>Beat the Pile Pro</span>
+            <span style={{fontWeight:700,fontSize:22,color:"#0B1220",letterSpacing:"-0.5px"}}>Beat the Pile Pro</span>
             <span style={{marginLeft:"auto",background:GL,color:G,fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:99}}>Beta</span>
           </div>
           <p style={{color:"#4A5568",fontSize:14,lineHeight:1.5}}><strong style={{color:G}}>Free during the beta.</strong> No card needed. We'll tell you well before anything costs money.</p>
@@ -2583,7 +2580,7 @@ function App(){
         <div style={{background:`#0B1220`,borderRadius:var_rl,padding:"1.25rem",marginBottom:"1.25rem",border:`1px solid #2563EB30`}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
             <span style={{fontSize:22}}></span>
-            <p style={{fontWeight:800,fontSize:15,color:"#fff",letterSpacing:"-0.3px"}}>AI Resume Builder</p>
+            <p style={{fontWeight:700,fontSize:15,color:"#fff",letterSpacing:"-0.3px"}}>AI Resume Builder</p>
             <span style={{marginLeft:"auto",background:"#2563EB",color:"#fff",fontSize:10,fontWeight:700,padding:"2px 9px",borderRadius:99}}>PRO</span>
           </div>
           <p style={{fontSize:13,color:"#94A3B8",lineHeight:1.55,marginBottom:10}}>Most students applying for internships don't have a resume yet. Pro builds yours from your quiz answers in seconds — tailored to your major, activities, and skills. Edit it, download it as a PDF, and use it across every application.</p>
@@ -2626,8 +2623,8 @@ function App(){
     return(
       <div style={{position:"fixed",inset:0,background:"rgba(10,22,40,0.5)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem",backdropFilter:"blur(3px)"}} onClick={()=>{setRoleModal(null);setCustomActText("");}}>
         <div style={{background:"#fff",borderRadius:var_rxl,padding:"2rem",maxWidth:380,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.15)",animation:"pop 0.25s ease"}} onClick={e=>e.stopPropagation()}>
-          <p style={{fontSize:11,fontWeight:700,color:"#6B7280",letterSpacing:"2px",textTransform:"uppercase",marginBottom:8}}>Your Role</p>
-          <h3 style={{fontWeight:800,fontSize:18,color:"#0B1220",marginBottom:"0.25rem",letterSpacing:"-0.3px"}}>{act.name}</h3>
+          <p style={{fontSize:12,fontWeight:600,color:"#6B7280",marginBottom:8}}>Your Role</p>
+          <h3 style={{fontWeight:700,fontSize:18,color:"#0B1220",marginBottom:"0.25rem",letterSpacing:"-0.3px"}}>{act.name}</h3>
           {isCustom?(
             <>
               <p style={{color:"#4A5568",fontSize:13,marginBottom:10}}>Type the actual name of your activity or organization.</p>
@@ -2692,8 +2689,8 @@ function App(){
         <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:var_rxl,padding:"1.75rem",maxWidth:560,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.25)",animation:"pop 0.25s ease",margin:"auto 0"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
             <div>
-              <p style={{fontSize:10,fontWeight:700,color:"#6B7280",letterSpacing:"2px",textTransform:"uppercase"}}>Assisted Apply</p>
-              <h3 style={{fontWeight:800,fontSize:20,color:"#0B1220",letterSpacing:"-0.4px"}}>{c.name}</h3>
+              <p style={{fontSize:12,fontWeight:600,color:"#6B7280"}}>Assisted Apply</p>
+              <h3 style={{fontWeight:700,fontSize:20,color:"#0B1220",letterSpacing:"-0.4px"}}>{c.name}</h3>
               <p style={{color:"#4A5568",fontSize:13}}>{c.role}</p>
             </div>
             <button onClick={()=>setApplyModal(null)} style={{background:"none",border:"none",fontSize:22,color:"#6B7280",cursor:"pointer",lineHeight:1}}>×</button>
@@ -2703,7 +2700,7 @@ function App(){
             /* Application limit reached — value-first Pro wall */
             <div style={{background:`${GL}`,border:`1px solid ${G}25`,borderRadius:var_rl,padding:"1.75rem 1.5rem",textAlign:"center",marginTop:10}}>
               <p style={{fontSize:30,marginBottom:8}}></p>
-              <p style={{fontWeight:800,fontSize:18,color:"#0B1220",marginBottom:6,letterSpacing:"-0.3px"}}>You've used your {FREE_APPLICATIONS} free applications</p>
+              <p style={{fontWeight:700,fontSize:18,color:"#0B1220",marginBottom:6,letterSpacing:"-0.3px"}}>You've used your {FREE_APPLICATIONS} free applications</p>
               <p style={{fontSize:13.5,color:"#4A5568",lineHeight:1.55,marginBottom:16,maxWidth:380,margin:"0 auto 16px"}}>You applied to {appliedCos.slice(0,FREE_APPLICATIONS).join(", ")} with Beat the Pile's help. Go Pro for <strong>unlimited applications</strong> — auto-fill and a tailored cover letter for every job, plus follow-up reminders.</p>
               <button onClick={()=>{setApplyModal(null);setShowProModal(true);}} style={{background:`${G}`,border:"none",color:"#fff",padding:"13px 30px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Go Pro — unlimited applications</button>
               <p style={{fontSize:11.5,color:"#6B7280",marginTop:12}}>You can still open {c.name}'s site directly from your matches anytime.</p>
@@ -2713,7 +2710,7 @@ function App(){
             // Real Adzuna posting from the main search — direct apply link, always works
             <>
               <a href={safeHttpUrl(c.applyUrl)} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)}
-                style={{display:"block",textAlign:"center",background:`${G}`,color:"#fff",padding:"13px",borderRadius:var_rl,fontWeight:800,fontSize:15,textDecoration:"none",boxShadow:"0 1px 2px rgba(11,18,32,.06)",margin:"10px 0 4px"}}>
+                style={{display:"block",textAlign:"center",background:`${G}`,color:"#fff",padding:"13px",borderRadius:var_rl,fontWeight:700,fontSize:15,textDecoration:"none",boxShadow:"0 1px 2px rgba(11,18,32,.06)",margin:"10px 0 4px"}}>
                 ✓ Apply to {c.role||"this role"} at {c.name} ↗
               </a>
               <p style={{fontSize:11,color:GD,textAlign:"center",fontWeight:700,marginBottom:10}}>Live posting{c.location?` · ${c.location}`:""}{c.created?` · posted ${(new Date(c.created)).toLocaleDateString()}`:""}</p>
@@ -2721,7 +2718,7 @@ function App(){
           ):safeHttpUrl(adzunaLink&&adzunaLink.applyUrl)?(
             <>
               <a href={safeHttpUrl(adzunaLink.applyUrl)} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)}
-                style={{display:"block",textAlign:"center",background:`${G}`,color:"#fff",padding:"13px",borderRadius:var_rl,fontWeight:800,fontSize:15,textDecoration:"none",boxShadow:"0 1px 2px rgba(11,18,32,.06)",margin:"10px 0 4px"}}>
+                style={{display:"block",textAlign:"center",background:`${G}`,color:"#fff",padding:"13px",borderRadius:var_rl,fontWeight:700,fontSize:15,textDecoration:"none",boxShadow:"0 1px 2px rgba(11,18,32,.06)",margin:"10px 0 4px"}}>
                 ✓ Apply to {adzunaLink.title||(c.role+" at "+c.name)} ↗
               </a>
               <p style={{fontSize:11,color:GD,textAlign:"center",fontWeight:700,marginBottom:10}}>Live posting{adzunaLink.location?` · ${adzunaLink.location}`:""}</p>
@@ -2734,7 +2731,7 @@ function App(){
 
           {/* Real apply paths — only show links that actually go to THIS company. */}
           <div style={{background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_rl,padding:"12px 14px",marginBottom:14}}>
-            <p style={{fontSize:11,fontWeight:800,color:"#4A5568",letterSpacing:"1px",marginBottom:4}}>FIND THIS ROLE ON</p>
+            <p style={{fontSize:12,fontWeight:600,color:"#4A5568",marginBottom:4}}>Find this role on</p>
             {(()=>{
               const isNat=c.tier==="national"||isLikelyNational(c);
               const siteHref=companyWebsiteUrl(c);
@@ -2782,7 +2779,7 @@ function App(){
               <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:6}}>
                 {rows.map((r,i)=>(
                   <button key={i} onClick={()=>copyText(r[1],"r"+i)} style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8,background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_r,padding:"8px 11px",cursor:"pointer",fontFamily:"var(--font)",textAlign:"left"}}>
-                    <span style={{minWidth:0}}><span style={{display:"block",fontSize:10,color:"#6B7280",fontWeight:700,textTransform:"uppercase",letterSpacing:"0.5px"}}>{r[0]}</span><span style={{display:"block",fontSize:13,color:"#0B1220",fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r[1]}</span></span>
+                    <span style={{minWidth:0}}><span style={{display:"block",fontSize:12,color:"#6B7280",fontWeight:600}}>{r[0]}</span><span style={{display:"block",fontSize:13,color:"#0B1220",fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r[1]}</span></span>
                     <span style={{fontSize:12,color:copied==="r"+i?G:"#6B7280",fontWeight:700,flexShrink:0}}>{copied==="r"+i?"✓":"copy"}</span>
                   </button>
                 ))}
@@ -2823,7 +2820,7 @@ function App(){
                 {kit.tips&&kit.tips.length>0&&(
                   <div style={{display:"flex",flexDirection:"column",gap:6}}>
                     {kit.tips.map((t,i)=>(
-                      <div key={i} style={{display:"flex",gap:8,fontSize:12.5,color:"#4A5568",lineHeight:1.5}}><span style={{color:G,fontWeight:800}}>›</span><span>{t}</span></div>
+                      <div key={i} style={{display:"flex",gap:8,fontSize:12.5,color:"#4A5568",lineHeight:1.5}}><span style={{color:G,fontWeight:700}}>›</span><span>{t}</span></div>
                     ))}
                   </div>
                 )}
@@ -2845,8 +2842,8 @@ function App(){
         <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:var_rxl,padding:"1.75rem",maxWidth:540,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.25)",animation:"pop 0.25s ease",margin:"auto 0"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
             <div>
-              <p style={{fontSize:10,fontWeight:700,color:"#6B7280",letterSpacing:"2px",textTransform:"uppercase"}}>Your Answers</p>
-              <h3 style={{fontWeight:800,fontSize:20,color:"#0B1220",letterSpacing:"-0.4px"}}>Tap any answer to change it</h3>
+              <p style={{fontSize:12,fontWeight:600,color:"#6B7280"}}>Your Answers</p>
+              <h3 style={{fontWeight:700,fontSize:20,color:"#0B1220",letterSpacing:"-0.4px"}}>Tap any answer to change it</h3>
               <p style={{color:"#4A5568",fontSize:13,marginTop:2}}>Update one thing and we'll instantly recalculate — no need to redo the quiz.</p>
             </div>
             <button onClick={()=>setShowReview(false)} style={{background:"none",border:"none",fontSize:22,color:"#6B7280",cursor:"pointer",lineHeight:1}}>×</button>
@@ -2899,8 +2896,8 @@ function App(){
         <div style={{background:"#fff",borderRadius:var_rl,padding:"1.5rem 1.25rem",maxWidth:440,width:"100%",maxHeight:"92vh",overflow:"auto",position:"relative"}}>
           <button onClick={()=>setShowSignInModal(false)} style={{position:"absolute",top:10,right:10,background:"#F1F5F9",border:"none",width:32,height:32,borderRadius:"50%",cursor:"pointer",fontSize:16,fontWeight:700,color:"#4A5568",lineHeight:1}}>×</button>
           <div style={{textAlign:"center",marginBottom:12}}>
-            <p style={{fontSize:10,color:"#6B7280",fontWeight:700,letterSpacing:"2px"}}>SAVE YOUR PROGRESS</p>
-            <h3 style={{fontSize:20,fontWeight:800,color:"#0B1220",margin:"4px 0 6px"}}>Sign in to Beat the Pile</h3>
+            <p style={{fontSize:12,color:"#6B7280",fontWeight:600}}>Save your progress</p>
+            <h3 style={{fontSize:20,fontWeight:700,color:"#0B1220",margin:"4px 0 6px"}}>Sign in to Beat the Pile</h3>
             <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.5}}>Your tracker, profile, and resumes sync across all your devices. Sign in once — pick up where you left off anywhere.</p>
           </div>
           {/* Clerk's prebuilt sign-in UI mounts here */}
@@ -2917,7 +2914,7 @@ function App(){
       <div onClick={()=>setPage("dashboard")} style={{background:"#FEF3C7",border:"1px solid #F59E0B",borderRadius:var_rl,padding:"12px 16px",marginBottom:18,cursor:"pointer",display:"flex",alignItems:"center",gap:12,boxShadow:"0 2px 8px rgba(245,158,11,0.15)"}}>
         <div style={{fontSize:22,flexShrink:0}}></div>
         <div style={{flex:1,minWidth:0}}>
-          <p style={{fontSize:13.5,fontWeight:800,color:"#92400E",marginBottom:2}}>{dueApps.length} follow-up{dueApps.length===1?"":"s"} due</p>
+          <p style={{fontSize:13.5,fontWeight:700,color:"#92400E",marginBottom:2}}>{dueApps.length} follow-up{dueApps.length===1?"":"s"} due</p>
           <p style={{fontSize:12,color:"#78350F",lineHeight:1.4}}>{dueApps.slice(0,3).map(a=>a.company).join(", ")}{dueApps.length>3?` +${dueApps.length-3} more`:""} — tap to draft them.</p>
         </div>
         <div style={{fontSize:14,color:"#92400E",fontWeight:700,flexShrink:0}}>→</div>
@@ -2934,8 +2931,8 @@ function App(){
         <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:var_rxl,padding:"1.75rem",maxWidth:560,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.25)",animation:"pop 0.25s ease",margin:"auto 0"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
             <div>
-              <p style={{fontSize:10,fontWeight:700,color:"#6B7280",letterSpacing:"2px",textTransform:"uppercase"}}>Follow-up email</p>
-              <h3 style={{fontWeight:800,fontSize:20,color:"#0B1220",letterSpacing:"-0.4px"}}>{a.company}</h3>
+              <p style={{fontSize:12,fontWeight:600,color:"#6B7280"}}>Follow-up email</p>
+              <h3 style={{fontWeight:700,fontSize:20,color:"#0B1220",letterSpacing:"-0.4px"}}>{a.company}</h3>
               <p style={{color:"#4A5568",fontSize:13}}>{a.role}</p>
             </div>
             <button onClick={()=>setFollowUpModal(null)} style={{background:"none",border:"none",fontSize:22,color:"#6B7280",cursor:"pointer",lineHeight:1}}>×</button>
@@ -2965,7 +2962,7 @@ function App(){
             })()}
             {kit.tips&&kit.tips.length>0&&(
               <div style={{display:"flex",flexDirection:"column",gap:6,marginBottom:14}}>
-                {kit.tips.map((t,i)=>(<div key={i} style={{display:"flex",gap:8,fontSize:12.5,color:"#4A5568",lineHeight:1.5}}><span style={{color:G,fontWeight:800}}>›</span><span>{t}</span></div>))}
+                {kit.tips.map((t,i)=>(<div key={i} style={{display:"flex",gap:8,fontSize:12.5,color:"#4A5568",lineHeight:1.5}}><span style={{color:G,fontWeight:700}}>›</span><span>{t}</span></div>))}
               </div>
             )}
             <button onClick={()=>{markFollowedUp(a.company);setFollowUpModal(null);}} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"13px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14.5,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>I sent it — mark as followed up ✓</button>
@@ -3039,9 +3036,9 @@ function App(){
 
         <div style={{maxWidth:540,margin:"0 auto",padding:"2.5rem 1.5rem"}}>
           {editStep!==null
-            ? <p style={{fontSize:11,color:GD,fontWeight:800,letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:"0.4rem"}}>Editing one answer</p>
-            : <p style={{fontSize:10,color:"#6B7280",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",marginBottom:"0.4rem"}}>Step {step+1} of {STEPS.length}</p>}
-          <h2 className="fade-up" key={step} style={{fontSize:"clamp(1.4rem,3vw,2rem)",fontWeight:800,letterSpacing:"-0.8px",marginBottom:"0.5rem",lineHeight:1.2,color:"#0B1220"}}>{cur.label}</h2>
+            ? <p style={{fontSize:12,color:GD,fontWeight:600,marginBottom:"0.4rem"}}>Editing one answer</p>
+            : <p style={{fontSize:12,color:"#6B7280",fontWeight:600,marginBottom:"0.4rem"}}>Step {step+1} of {STEPS.length}</p>}
+          <h2 className="fade-up" key={step} style={{fontSize:"clamp(1.4rem,3vw,2rem)",fontWeight:700,letterSpacing:"-0.8px",marginBottom:"0.5rem",lineHeight:1.2,color:"#0B1220"}}>{cur.label}</h2>
           {STEP_HINTS[cur.key]&&<p style={{fontSize:13,color:"#4A5568",marginBottom:"1.75rem",lineHeight:1.5,padding:"8px 12px",background:"#FBFBFC",borderRadius:var_r,border:`1px solid ${GL}`}}>{STEP_HINTS[cur.key]}</p>}
 
           {/* SEARCH */}
@@ -3154,7 +3151,7 @@ function App(){
                   </button>
                   {isExp&&(
                     <div style={{padding:"0.75rem",background:"#fff",borderTop:`1px solid ${cat.color}20`}}>
-                      <p style={{fontSize:11,color:"#6B7280",fontWeight:600,marginBottom:8,letterSpacing:"0.5px"}}>TAP TO SELECT ROLE →</p>
+                      <p style={{fontSize:12,color:"#6B7280",fontWeight:600,marginBottom:8}}>Tap to select role →</p>
                       <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
                         {cat.options.map(opt=>{
                           const picked=extPicks.find(x=>x.activity===opt.name);
@@ -3221,7 +3218,7 @@ function App(){
           {/* ZIP */}
           {cur.type==="zip"&&(<div className="fade-up">
             <input type="text" inputMode="numeric" maxLength={5} value={ans.zip} onChange={e=>setA("zip",e.target.value.replace(/\D/g,""))} placeholder="19006" autoFocus
-              style={{width:"100%",fontSize:36,fontWeight:800,padding:"18px",borderRadius:var_rl,border:`2px solid ${/^\d{5}$/.test(ans.zip)?G:"#E2E8F0"}`,background:"#FBFBFC",color:"#0B1220",fontFamily:"var(--font)",outline:"none",letterSpacing:10,textAlign:"center",transition:"border-color 0.2s"}}/>
+              style={{width:"100%",fontSize:36,fontWeight:700,padding:"18px",borderRadius:var_rl,border:`2px solid ${/^\d{5}$/.test(ans.zip)?G:"#E2E8F0"}`,background:"#FBFBFC",color:"#0B1220",fontFamily:"var(--font)",outline:"none",letterSpacing:10,textAlign:"center",transition:"border-color 0.2s"}}/>
             {/^\d{5}$/.test(ans.zip)&&<p style={{fontSize:14,color:GD,fontWeight:700,marginTop:10,textAlign:"center"}}>✓ Got it</p>}
             {!/^\d{5}$/.test(ans.zip)&&<p style={{fontSize:13,color:"#6B7280",marginTop:10,textAlign:"center"}}>We use this to factor location into your matches</p>}
           </div>)}
@@ -3230,7 +3227,7 @@ function App(){
           {cur.type==="slider"&&(<div className="fade-up">
             <div style={{display:"flex",justifyContent:"space-between",marginBottom:"1rem"}}>
               <span style={{color:"#4A5568",fontSize:15,fontWeight:600}}>Search radius</span>
-              <span style={{fontWeight:800,color:G,fontSize:20,letterSpacing:"-0.5px"}}>{ans.radius} mi</span>
+              <span style={{fontWeight:700,color:G,fontSize:20,letterSpacing:"-0.5px"}}>{ans.radius} mi</span>
             </div>
             <input type="range" min={10} max={200} step={5} value={ans.radius} onChange={e=>setA("radius",+e.target.value)} style={{width:"100%",accentColor:G,height:6,cursor:"pointer"}}/>
             <div style={{display:"flex",justifyContent:"space-between",marginTop:8,color:"#6B7280",fontSize:12}}><span>10 mi</span><span>200 mi</span></div>
@@ -3275,7 +3272,7 @@ function App(){
       <div style={{maxWidth:480,margin:"0 auto",padding:"3rem 1.5rem"}}>
         <div className="fade-up" style={{background:"#fff",border:`1.5px solid ${GL}`,borderRadius:var_rxl,padding:"2.5rem 2rem",textAlign:"center",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
           <div style={{fontSize:34,marginBottom:8}}></div>
-          <h2 style={{fontSize:"clamp(1.5rem,3.5vw,2rem)",fontWeight:800,letterSpacing:"-1px",marginBottom:10,color:"#0B1220"}}>Want internship updates by email?</h2>
+          <h2 style={{fontSize:"clamp(1.5rem,3.5vw,2rem)",fontWeight:700,letterSpacing:"-1px",marginBottom:10,color:"#0B1220"}}>Want internship updates by email?</h2>
           <p style={{color:"#4A5568",fontSize:15,lineHeight:1.6,marginBottom:"1.5rem"}}><b>Optional.</b> Your matches show up either way. Leave your email if you'd like occasional internship tips and updates from Beat the Pile.</p>
           <input type="email" value={email} autoFocus placeholder="you@email.com"
             onChange={e=>{setEmail(e.target.value);setEmailErr("");}}
@@ -3358,8 +3355,8 @@ function App(){
               {/* Header */}
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"2rem",flexWrap:"wrap",gap:12}}>
                 <div>
-                  <p style={{fontSize:10,color:"#6B7280",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase"}}>Your Matches</p>
-                  <h2 style={{fontSize:"clamp(1.8rem,4vw,2.6rem)",fontWeight:800,letterSpacing:"-1.5px",marginTop:"0.2rem",color:"#0B1220"}}>Here's where you stand.</h2>
+                  <p style={{fontSize:12,color:"#6B7280",fontWeight:600}}>Your Matches</p>
+                  <h2 style={{fontSize:"clamp(1.8rem,4vw,2.6rem)",fontWeight:700,letterSpacing:"-1.5px",marginTop:"0.2rem",color:"#0B1220"}}>Here's where you stand.</h2>
                   <p style={{color:"#4A5568",fontSize:13,marginTop:4}}>{ans.major} · {ans.gpa} GPA · {ans.gradYear}{ans.type&&ans.type!=="Any"?` · ${ans.type}`:""}</p>
                 </div>
                 <div style={{display:"flex",gap:8,flexShrink:0,flexWrap:"wrap",justifyContent:"flex-end"}}>
@@ -3419,7 +3416,7 @@ function App(){
                 return (
                   <div style={{background:"#F8FAFC",border:`1px solid #E2E8F0`,borderRadius:var_rl,marginBottom:16,overflow:"hidden"}}>
                     <button onClick={()=>setInsightsOpen(o=>!o)} style={{width:"100%",background:"transparent",border:"none",padding:"11px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",fontFamily:"var(--font)",textAlign:"left"}}>
-                      <span style={{fontSize:12.5,fontWeight:800,color:"#0B1220",letterSpacing:"0.3px"}}>Context for these results <span style={{color:"#6B7280",fontWeight:600,marginLeft:6,fontSize:11.5}}>({lines.length} {lines.length===1?"note":"notes"})</span></span>
+                      <span style={{fontSize:12.5,fontWeight:700,color:"#0B1220",letterSpacing:"0.3px"}}>Context for these results <span style={{color:"#6B7280",fontWeight:600,marginLeft:6,fontSize:11.5}}>({lines.length} {lines.length===1?"note":"notes"})</span></span>
                       <span style={{fontSize:13,color:"#6B7280",transform:insightsOpen?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.2s"}}>▼</span>
                     </button>
                     {insightsOpen&&(
@@ -3455,13 +3452,13 @@ function App(){
               {/* Couldn't load vs. genuinely nothing found — two different messages */}
               {resultsError?(
                 <div role="alert" style={{background:"#FFF5F5",border:"1.5px solid #FED7D7",borderLeft:"4px solid #E53E3E",borderRadius:var_rl,padding:"12px 16px",marginBottom:14}}>
-                  <p style={{fontSize:13,fontWeight:800,color:"#C53030",marginBottom:4}}>We couldn't load internships</p>
+                  <p style={{fontSize:13,fontWeight:700,color:"#C53030",marginBottom:4}}>We couldn't load internships</p>
                   <p style={{fontSize:12.5,color:"#742A2A",lineHeight:1.5,marginBottom:8}}>{resultsError} This is a problem on our side or your connection, not a sign there are no openings.</p>
                   <button onClick={calcResults} style={{background:"#C53030",color:"#fff",border:"none",borderRadius:var_r,padding:"8px 14px",fontWeight:700,cursor:"pointer",fontFamily:"var(--font)"}}>Try again</button>
                 </div>
               ):results.length===0?(
                 <div style={{background:"#F8FAFC",border:"1.5px solid #E2E8F0",borderRadius:var_rl,padding:"14px 16px",marginBottom:14}}>
-                  <p style={{fontSize:13.5,fontWeight:800,color:"#0B1220",marginBottom:4}}>No open {ans.major||""} internships found{ans.type==="Remote"?" that are remote":" in your area or anywhere in the US"} right now</p>
+                  <p style={{fontSize:13.5,fontWeight:700,color:"#0B1220",marginBottom:4}}>No open {ans.major||""} internships found{ans.type==="Remote"?" that are remote":" in your area or anywhere in the US"} right now</p>
                   <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.5,marginBottom:8}}>We only show real openings we found on companies' own job boards, so this list can be empty for some majors. New companies are added every day.</p>
                   <a href="/jobs/?state=all" style={{color:GD,fontWeight:700,fontSize:13}}>Browse every internship →</a>
                 </div>
@@ -3476,7 +3473,7 @@ function App(){
                     <div style={{flex:1,minWidth:220}}>
                       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:5}}>
                         <span style={{fontSize:20}}></span>
-                        <p style={{fontWeight:800,fontSize:15,color:"#fff",letterSpacing:"-0.3px"}}>No resume yet? Build one in 30 seconds.</p>
+                        <p style={{fontWeight:700,fontSize:15,color:"#fff",letterSpacing:"-0.3px"}}>No resume yet? Build one in 30 seconds.</p>
                       </div>
                       <p style={{fontSize:13,color:"#94A3B8",lineHeight:1.5}}>Beat the Pile generates a starter resume from your quiz answers — your major, activities, skills, all filled in. Edit it, then use it on every application.</p>
                     </div>
@@ -3490,19 +3487,19 @@ function App(){
                 <div style={{background:`#fff`,border:`1.5px solid ${G}`,borderRadius:var_rxl,padding:"1.25rem 1.4rem",marginBottom:18,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
                   <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
                     <span style={{fontSize:18}}></span>
-                    <h3 style={{fontWeight:800,fontSize:17,color:"#0B1220",letterSpacing:"-0.4px"}}>Top picks for you</h3>
+                    <h3 style={{fontWeight:700,fontSize:17,color:"#0B1220",letterSpacing:"-0.4px"}}>Top picks for you</h3>
                   </div>
                   <p style={{fontSize:12.5,color:"#4A5568",marginBottom:12,lineHeight:1.5}}>Of all your matches, these are the strongest realistic shots — where your time is best spent first.</p>
                   <div style={{display:"flex",flexDirection:"column",gap:8}}>
                     {topPicks.map((c,i)=>(
                       <div key={i} style={{display:"flex",alignItems:"center",gap:12,background:"#fff",border:`1px solid ${GM}`,borderRadius:var_rl,padding:"10px 14px"}}>
-                        <span style={{fontSize:20,fontWeight:800,color:G,minWidth:48}}>{c.match}%</span>
+                        <span style={{fontSize:20,fontWeight:700,color:G,minWidth:48}}>{c.match}%</span>
                         <div style={{flex:1,minWidth:0}}>
                           <div style={{display:"flex",alignItems:"center",gap:6}}>
                             <p style={{fontWeight:600,fontSize:14,color:"#0B1220",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.role||"Internship"}</p>
-                            {isLikelyNational(c)&&<span style={{flexShrink:0,fontSize:9.5,fontWeight:800,color:"#2563EB",background:"#2563EB15",padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>BIG NAME</span>}
-                            {c.personalized&&<span style={{flexShrink:0,fontSize:9.5,fontWeight:800,color:GD,background:GL,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>PERSONALIZED</span>}
-                            {(()=>{const b=bandLabel(c.locationBand);return b?<span style={{flexShrink:0,fontSize:9.5,fontWeight:800,color:b.color,background:b.bg,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>{b.text}</span>:null;})()}
+                            {isLikelyNational(c)&&<span style={{flexShrink:0,fontSize:9.5,fontWeight:700,color:"#2563EB",background:"#2563EB15",padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>Big name</span>}
+                            {c.personalized&&<span style={{flexShrink:0,fontSize:9.5,fontWeight:700,color:GD,background:GL,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>Personalized</span>}
+                            {(()=>{const b=bandLabel(c.locationBand);return b?<span style={{flexShrink:0,fontSize:9.5,fontWeight:700,color:b.color,background:b.bg,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>{b.text}</span>:null;})()}
                           </div>
                           <p style={{fontSize:12,color:"#4A5568",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>at <b style={{fontWeight:600,color:"#0B1220"}}>{c.name}</b>{c.location?` · ${c.location}`:""}</p>
                         </div>
@@ -3536,7 +3533,7 @@ function App(){
                   const isTracked=trackedNames.includes(c.name);
                   const saved=isJobSaved(c.name);
                   const isFlipped=expandedCard===i;
-                  const locationBadge=(()=>{const b=bandLabel(c.locationBand);return b?<span style={{fontSize:9.5,fontWeight:800,color:b.color,background:b.bg,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>{b.text}</span>:null;})();
+                  const locationBadge=(()=>{const b=bandLabel(c.locationBand);return b?<span style={{fontSize:9.5,fontWeight:700,color:b.color,background:b.bg,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>{b.text}</span>:null;})();
                   const verified=(c.source==="db"&&c.applyUrl)?{verified:true,applyUrl:c.applyUrl,realLocation:c.location}:(adzunaVerified[c.name]||null);
                   const isVerified=verified&&verified.verified&&verified.applyUrl;
                   const displayLocation=isVerified&&verified.realLocation?verified.realLocation:c.location;
@@ -3564,8 +3561,8 @@ function App(){
                               <div style={{display:"flex",alignItems:"center",gap:8,marginTop:6,flexWrap:"wrap"}}>
                                 <span aria-hidden="true" style={{width:24,height:24,borderRadius:6,background:"#F1F4F9",border:"1px solid #DCE2EC",display:"grid",placeItems:"center",fontSize:10,fontWeight:600,color:"#0B1220",flexShrink:0}}>{coInitials(c.name)}</span>
                                 <p style={{fontSize:14,fontWeight:500,color:"#0B1220"}}><span style={{position:"absolute",left:-9999}}>Company: </span>{c.name}</p>
-                                {isLikelyNational(c)&&<span style={{fontSize:9.5,fontWeight:800,color:"#2563EB",background:"#2563EB15",padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>BIG NAME</span>}
-                                {c.personalized&&<span style={{fontSize:9.5,fontWeight:800,color:GD,background:GL,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>PERSONALIZED</span>}
+                                {isLikelyNational(c)&&<span style={{fontSize:9.5,fontWeight:700,color:"#2563EB",background:"#2563EB15",padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>Big name</span>}
+                                {c.personalized&&<span style={{fontSize:9.5,fontWeight:700,color:GD,background:GL,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>Personalized</span>}
                                 {locationBadge}
                               </div>
                               <div style={{display:"flex",alignItems:"center",gap:6,marginTop:2,flexWrap:"wrap"}}>
@@ -3603,16 +3600,16 @@ function App(){
                           {/* Reason */}
                           {c.reason&&(
                             <div style={{background:c.personalized?GL:"#FBFBFC",border:`1px solid ${c.personalized?GM:"#E2E8F0"}`,borderRadius:var_r,padding:"9px 11px"}}>
-                              <p style={{fontSize:10,fontWeight:800,color:c.personalized?GD:"#6B7280",letterSpacing:"0.8px",marginBottom:4}}>{c.personalized?"WHY THIS FITS YOU":"WHY THIS IS A REALISTIC SHOT"}</p>
+                              <p style={{fontSize:12,fontWeight:600,color:c.personalized?GD:"#6B7280",marginBottom:4}}>{c.personalized?"Why this fits you":"Why this is a realistic shot"}</p>
                               <p style={{fontSize:13,color:"#4A5568",lineHeight:1.6,fontStyle:"italic"}}>{c.reason}</p>
                             </div>
                           )}
-                          {isVerified&&<span style={{fontSize:10,fontWeight:800,color:GD,background:GL,padding:"3px 9px",borderRadius:99,alignSelf:"flex-start"}}>Open on the company's job board</span>}
+                          {isVerified&&<span style={{fontSize:10,fontWeight:700,color:GD,background:GL,padding:"3px 9px",borderRadius:99,alignSelf:"flex-start"}}>Open on the company's job board</span>}
                           {/* Flip hint */}
                           <p style={{fontSize:10.5,color:"#C3D1D8",textAlign:"center",marginTop:"auto",letterSpacing:"0.3px"}}>tap anywhere to see company info →</p>
                           {/* Actions — stopPropagation so clicks on buttons don't flip */}
                           <div style={{display:"flex",flexDirection:"column",gap:6}} onClick={e=>e.stopPropagation()}>
-                            <button onClick={()=>openApply(c)} style={{background:`${G}`,color:"#fff",padding:"13px 8px",borderRadius:var_r,fontSize:14.5,fontWeight:800,border:"none",cursor:"pointer",fontFamily:"var(--font)",textAlign:"center",width:"100%",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Apply now ↗</button>
+                            <button onClick={()=>openApply(c)} style={{background:`${G}`,color:"#fff",padding:"13px 8px",borderRadius:var_r,fontSize:14.5,fontWeight:700,border:"none",cursor:"pointer",fontFamily:"var(--font)",textAlign:"center",width:"100%",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Apply now ↗</button>
                             <div style={{display:"flex",gap:6}}>
                               <button onClick={()=>{toggleSaveJob(c);analytics.track(saved?"job_unsaved":"job_saved",{company:c.name});}} style={{flex:1,background:saved?"#F5F3FF":"#fff",border:`1.5px solid ${saved?"#7C3AED":"#E2E8F0"}`,color:saved?"#7C3AED":"#6B7280",padding:"9px 13px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>{saved?"Saved":"Save"}</button>
                               <button onClick={()=>track(c)} style={{flex:1,background:isTracked?GL:"#fff",border:`1.5px solid ${isTracked?G:"#E2E8F0"}`,color:isTracked?GD:"#6B7280",padding:"9px 13px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>{isTracked?"✓ Tracked":"+ Track"}</button>
@@ -3625,8 +3622,8 @@ function App(){
                           {/* Back header */}
                           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:2}}>
                             <div>
-                              <p style={{fontSize:9.5,fontWeight:800,color:G,letterSpacing:"1.5px",marginBottom:3}}>COMPANY INTEL</p>
-                              <p style={{fontWeight:800,fontSize:17,color:"#fff",letterSpacing:"-0.3px",lineHeight:1.2}}>{c.name}</p>
+                              <p style={{fontSize:12,fontWeight:600,color:G,marginBottom:3}}>Company intel</p>
+                              <p style={{fontWeight:700,fontSize:17,color:"#fff",letterSpacing:"-0.3px",lineHeight:1.2}}>{c.name}</p>
                               <p style={{fontSize:12,color:"#64748B",marginTop:3}}>{c.role} · {hasRealLocation?displayLocation:c.industry}</p>
                             </div>
                             <button onClick={()=>setExpandedCard(null)} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.12)",color:"#94A3B8",width:32,height:32,borderRadius:"50%",cursor:"pointer",fontSize:16,fontFamily:"var(--font)",lineHeight:1,flexShrink:0}}>×</button>
@@ -3643,25 +3640,25 @@ function App(){
                             return(<>
                               {intel.description&&(
                                 <div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:var_r,padding:"10px 12px"}}>
-                                  <p style={{fontSize:9.5,fontWeight:800,color:"#475569",letterSpacing:"0.8px",marginBottom:4}}>WHAT THEY DO</p>
+                                  <p style={{fontSize:12,fontWeight:600,color:"#475569",marginBottom:4}}>What they do</p>
                                   <p style={{fontSize:13,color:"#CBD5E1",lineHeight:1.6}}>{intel.description}</p>
                                 </div>
                               )}
                               {(intel.size||intel.culture)&&(
                                 <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7}}>
                                   {intel.size&&<div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:var_r,padding:"9px 10px"}}>
-                                    <p style={{fontSize:9.5,fontWeight:800,color:"#475569",letterSpacing:"0.8px",marginBottom:4}}>COMPANY SIZE</p>
+                                    <p style={{fontSize:12,fontWeight:600,color:"#475569",marginBottom:4}}>Company size</p>
                                     <p style={{fontSize:12.5,color:"#CBD5E1"}}>{intel.size}</p>
                                   </div>}
                                   {intel.culture&&<div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:var_r,padding:"9px 10px"}}>
-                                    <p style={{fontSize:9.5,fontWeight:800,color:"#475569",letterSpacing:"0.8px",marginBottom:4}}>CULTURE</p>
+                                    <p style={{fontSize:12,fontWeight:600,color:"#475569",marginBottom:4}}>Culture</p>
                                     <p style={{fontSize:12.5,color:"#CBD5E1"}}>{intel.culture}</p>
                                   </div>}
                                 </div>
                               )}
                               {intel.internTasks&&(
                                 <div style={{background:"rgba(0,194,133,0.08)",border:`1px solid ${G}25`,borderRadius:var_r,padding:"10px 12px"}}>
-                                  <p style={{fontSize:9.5,fontWeight:800,color:G,letterSpacing:"0.8px",marginBottom:4}}>WHAT YOU'D ACTUALLY DO</p>
+                                  <p style={{fontSize:12,fontWeight:600,color:G,marginBottom:4}}>What you'd actually do</p>
                                   <p style={{fontSize:13,color:"#CBD5E1",lineHeight:1.55}}>{intel.internTasks}</p>
                                 </div>
                               )}
@@ -3673,7 +3670,7 @@ function App(){
                             {c.contactType==="cold_outreach"?(
                               /* Small company — no job posting, contact directly */
                               <div>
-                                <p style={{fontSize:9.5,fontWeight:800,color:G,letterSpacing:"0.8px",marginBottom:6}}>CONTACT DIRECTLY</p>
+                                <p style={{fontSize:12,fontWeight:600,color:G,marginBottom:6}}>Contact directly</p>
                                 <p style={{fontSize:11.5,color:"#94A3B8",marginBottom:8,lineHeight:1.5}}>This company doesn't post on job boards — reach out directly. Small companies hire this way all the time.</p>
                                 {c.phone&&<p style={{fontSize:12,color:"#CBD5E1",marginBottom:8}}>{c.phone}</p>}
                                 <button onClick={()=>{
@@ -3691,7 +3688,7 @@ Thank you for your time,
 [Your Phone]
 [Your LinkedIn]`);
                                   window.open(`mailto:?subject=${subject}&body=${body}`);
-                                }} style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:6,background:`${G}`,color:"#fff",padding:"11px",borderRadius:var_r,fontWeight:800,fontSize:13,border:"none",cursor:"pointer",fontFamily:"var(--font)",marginBottom:6}}>
+                                }} style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"center",gap:6,background:`${G}`,color:"#fff",padding:"11px",borderRadius:var_r,fontWeight:700,fontSize:13,border:"none",cursor:"pointer",fontFamily:"var(--font)",marginBottom:6}}>
                                   Open email template
                                 </button>
                                 {companyWebsiteUrl(c)&&<a href={companyWebsiteUrl(c)} target="_blank" rel="noopener noreferrer" style={{display:"flex",alignItems:"center",justifyContent:"center",gap:5,background:"rgba(255,255,255,0.07)",color:"#E2E8F0",border:"1px solid rgba(255,255,255,0.1)",padding:"9px",borderRadius:var_r,fontWeight:700,fontSize:12,textDecoration:"none"}}>Company Website</a>}
@@ -3699,9 +3696,9 @@ Thank you for your time,
                               </div>
                             ):(
                             <div>
-                            <p style={{fontSize:9.5,fontWeight:800,color:"#475569",letterSpacing:"0.8px",marginBottom:6}}>FIND THIS ROLE ON</p>
+                            <p style={{fontSize:12,fontWeight:600,color:"#475569",marginBottom:6}}>Find this role on</p>
                             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:5}}>
-                              {isVerified&&<a href={verified.applyUrl} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)} style={{gridColumn:"1/-1",display:"flex",alignItems:"center",justifyContent:"center",gap:5,background:`${G}`,color:"#fff",padding:"11px",borderRadius:var_r,fontWeight:800,fontSize:13.5,textDecoration:"none",marginBottom:2}}>✓ Direct apply — live posting ↗</a>}
+                              {isVerified&&<a href={verified.applyUrl} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)} style={{gridColumn:"1/-1",display:"flex",alignItems:"center",justifyContent:"center",gap:5,background:`${G}`,color:"#fff",padding:"11px",borderRadius:var_r,fontWeight:700,fontSize:13.5,textDecoration:"none",marginBottom:2}}>✓ Direct apply — live posting ↗</a>}
                               {(()=>{
                               const isNat=c.tier==="national"||isLikelyNational(c);
                               const btn=(href,label,style)=>href?<a href={href} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:5,padding:"9px 8px",borderRadius:var_r,fontWeight:700,fontSize:12,textDecoration:"none",...style}}>{label}</a>:null;
@@ -3756,14 +3753,14 @@ Thank you for your time,
         <Nav/>
         <div style={{maxWidth:760,margin:"0 auto",padding:"1.5rem 1rem 4rem"}}>
           <button onClick={()=>setPage(results.length>0?"results":"landing")} style={{background:"transparent",border:"none",color:GD,padding:0,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:600,marginBottom:14}}>← {results.length>0?"Back to results":"Back to home"}</button>
-          <p style={{fontSize:12,fontWeight:700,color:G,letterSpacing:"1.5px",marginBottom:6}}>RESUME BUILDER</p>
-          <h1 style={{fontSize:30,fontWeight:800,letterSpacing:"-1px",color:"#0B1220",marginBottom:10}}>Let's build your starter resume.</h1>
+          <p style={{fontSize:12,fontWeight:600,color:G,marginBottom:6}}>Resume builder</p>
+          <h1 style={{fontSize:30,fontWeight:700,letterSpacing:"-1px",color:"#0B1220",marginBottom:10}}>Let's build your starter resume.</h1>
           <p style={{color:"#4A5568",fontSize:14.5,lineHeight:1.55,marginBottom:22}}>We'll use your quiz answers to build the structure with your real info filled in. There'll be <strong>[bracketed placeholders]</strong> where you need to add specifics yourself — like bullets describing what you did in each activity. Honest start, not a finished resume.</p>
 
           {/* Initial state — show preview of what we'll use, then a Generate button */}
           {!builderState.text&&!builderState.loading&&(
             <div style={{background:GL,border:`1px solid ${GM}`,borderRadius:var_rl,padding:"16px 18px",marginBottom:16}}>
-              <p style={{fontSize:12,fontWeight:700,color:GD,letterSpacing:"0.8px",marginBottom:10}}>WHAT WE'LL USE</p>
+              <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:10}}>What we'll use</p>
               <div style={{display:"flex",flexDirection:"column",gap:6,fontSize:13,color:"#0B1220"}}>
                 <p><strong>Major:</strong> {ans.major||<em style={{color:"#6B7280"}}>(not set)</em>}</p>
                 <p><strong>University:</strong> {ans.university||<em style={{color:"#6B7280"}}>(not set)</em>}</p>
@@ -3847,8 +3844,8 @@ Thank you for your time,
         <SignInModal/>
         <Nav/>
         <div style={{maxWidth:640,margin:"0 auto",padding:"2.5rem 1.5rem"}}>
-          <p style={{fontSize:10,color:"#6B7280",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase"}}>Your Profile</p>
-          <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:800,letterSpacing:"-1px",marginTop:"0.3rem",marginBottom:"0.4rem",color:"#0B1220"}}>Fill it once. Apply faster everywhere.</h2>
+          <p style={{fontSize:12,color:"#6B7280",fontWeight:600}}>Your Profile</p>
+          <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:700,letterSpacing:"-1px",marginTop:"0.3rem",marginBottom:"0.4rem",color:"#0B1220"}}>Fill it once. Apply faster everywhere.</h2>
           <p style={{color:"#4A5568",fontSize:14,lineHeight:1.6,marginBottom:"1.5rem"}}>Save your info and Beat the Pile auto-fills a copy-paste card and a tailored cover letter on every application — so you stop retyping the same fields on fifty different sites.</p>
 
           {/* Account section — sign in / sign out + cross-device sync status */}
@@ -3856,7 +3853,7 @@ Thank you for your time,
             <div style={{fontSize:24,flexShrink:0}}>{clerkUser?"✓":""}</div>
             <div style={{flex:1,minWidth:160}}>
               {clerkUser?(<>
-                <p style={{fontSize:13.5,fontWeight:800,color:"#166534"}}>Signed in as {clerkUser.primaryEmailAddress?.emailAddress||clerkUser.firstName||"you"}</p>
+                <p style={{fontSize:13.5,fontWeight:700,color:"#166534"}}>Signed in as {clerkUser.primaryEmailAddress?.emailAddress||clerkUser.firstName||"you"}</p>
                 <p style={{fontSize:12,color:"#15803D",lineHeight:1.4,marginTop:2}}>
                   {syncStatus==="loading"?"⟳ Loading your data…":
                    syncStatus==="saving"?"⟳ Saving changes…":
@@ -3865,7 +3862,7 @@ Thank you for your time,
                    "Syncing your data…"}
                 </p>
               </>):(<>
-                <p style={{fontSize:13.5,fontWeight:800,color:"#0B1220"}}>Not signed in</p>
+                <p style={{fontSize:13.5,fontWeight:700,color:"#0B1220"}}>Not signed in</p>
                 <p style={{fontSize:12,color:"#4A5568",lineHeight:1.4,marginTop:2}}>Sign in to sync your tracker, profile, and resumes across all your devices.</p>
               </>)}
             </div>
@@ -3877,7 +3874,7 @@ Thank you for your time,
           </div>
 
           <div style={{background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_rl,padding:"1.5rem",marginBottom:14}}>
-            <p style={{fontSize:11,fontWeight:700,color:GD,letterSpacing:"1px",textTransform:"uppercase",marginBottom:14}}>Contact</p>
+            <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:14}}>Contact</p>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:12}}>
               {field("Full name","fullName","Adam Smith")}
               {field("Email","email","you@email.com","email")}
@@ -3888,7 +3885,7 @@ Thank you for your time,
           </div>
 
           <div style={{background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_rl,padding:"1.5rem",marginBottom:14}}>
-            <p style={{fontSize:11,fontWeight:700,color:GD,letterSpacing:"1px",textTransform:"uppercase",marginBottom:14}}>Academics</p>
+            <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:14}}>Academics</p>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:12}}>
               {field("School","school","Virginia Tech")}
               {field("Major","major","Computer Science")}
@@ -3898,7 +3895,7 @@ Thank you for your time,
           </div>
 
           <div style={{background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_rl,padding:"1.5rem",marginBottom:14}}>
-            <p style={{fontSize:11,fontWeight:700,color:GD,letterSpacing:"1px",textTransform:"uppercase",marginBottom:14}}>Common application answers</p>
+            <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:14}}>Common application answers</p>
             <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:12}}>
               {yesno("Authorized to work in the U.S.?","workAuth")}
               {yesno("Willing to relocate?","relocate")}
@@ -3906,7 +3903,7 @@ Thank you for your time,
           </div>
 
           <div style={{background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_rl,padding:"1.5rem",marginBottom:14}}>
-            <p style={{fontSize:11,fontWeight:700,color:GD,letterSpacing:"1px",textTransform:"uppercase",marginBottom:14}}>Make your applications stronger</p>
+            <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:14}}>Make your applications stronger</p>
             <div style={{marginBottom:12}}><label style={lbl}>Top skills (comma separated)</label><input value={profile.topSkills||""} placeholder="Python, SQL, Excel" onChange={e=>setP("topSkills",e.target.value)} style={inp}/></div>
             <div><label style={lbl}>What makes you stand out? (used in cover letters)</label><textarea value={profile.whyMe||""} placeholder="A sentence or two about your standout experience, project, or drive." onChange={e=>setP("whyMe",e.target.value)} style={{...inp,minHeight:70,resize:"vertical"}}/></div>
           </div>
@@ -3914,7 +3911,7 @@ Thank you for your time,
           {/* RESUMES — save multiple, named, pick per application */}
           <div style={{background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_rl,padding:"1.5rem",marginBottom:14}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
-              <p style={{fontSize:11,fontWeight:700,color:GD,letterSpacing:"1px",textTransform:"uppercase"}}>Your resumes</p>
+              <p style={{fontSize:12,fontWeight:600,color:GD}}>Your resumes</p>
               <button onClick={addResume} style={{background:GL,border:`1px solid ${GM}`,color:GD,padding:"6px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>+ Add resume</button>
             </div>
             <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.5,marginBottom:14}}>Save multiple resumes for different kinds of roles (e.g. "Software" and "Finance"). When you apply, you'll pick which one to tailor the cover letter from.</p>
@@ -3973,20 +3970,20 @@ Thank you for your time,
         <SignInModal/>
         <Nav/>
         <div style={{maxWidth:680,margin:"0 auto",padding:"2rem 1.25rem 4rem"}}>
-          <p style={{fontSize:10,color:"#6B7280",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase",marginBottom:6}}>Community Wall</p>
-          <h1 style={{fontSize:30,fontWeight:800,letterSpacing:"-0.8px",color:"#0B1220",marginBottom:8}}>You're not alone in this.</h1>
+          <p style={{fontSize:12,color:"#6B7280",fontWeight:600,marginBottom:6}}>Community Wall</p>
+          <h1 style={{fontSize:30,fontWeight:700,letterSpacing:"-0.8px",color:"#0B1220",marginBottom:8}}>You're not alone in this.</h1>
           <p style={{color:"#4A5568",fontSize:14.5,lineHeight:1.55,marginBottom:22}}>A space for the wins, the frustrations, and the questions. Posts are checked by AI moderation, so keep it real but keep it kind. Post anonymously or with your name — your choice on every post.</p>
 
           {/* Testimonials carousel — same data as the landing page, compact horizontal scroll here */}
           <div style={{marginBottom:26}}>
-            {TESTIMONIALS.length>0&&<p style={{fontSize:11,fontWeight:700,color:"#6B7280",letterSpacing:"1.5px",textTransform:"uppercase",marginBottom:10}}>What students are saying</p>}
+            {TESTIMONIALS.length>0&&<p style={{fontSize:12,fontWeight:600,color:"#6B7280",marginBottom:10}}>What students are saying</p>}
             <div style={{display:"flex",gap:10,overflowX:"auto",paddingBottom:6,scrollbarWidth:"thin"}}>
               {TESTIMONIALS.map((t,i)=>(
                 <div key={i} style={{background:"#FBFBFC",border:`1.5px solid ${GL}`,borderRadius:var_rl,padding:"1rem 1.1rem",display:"flex",flexDirection:"column",gap:8,minWidth:230,maxWidth:230,flexShrink:0}}>
                   <div style={{display:"flex",gap:2}}>{[...Array(t.stars)].map((_,j)=><span key={j} style={{color:"#F59E0B",fontSize:12}}>★</span>)}</div>
                   <p style={{fontSize:12.5,color:"#0B1220",lineHeight:1.55,fontStyle:"italic",flex:1}}>"{t.quote}"</p>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
-                    <div style={{width:28,height:28,borderRadius:"50%",background:`${G}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10.5,fontWeight:800,color:"#fff",flexShrink:0}}>{t.avatar}</div>
+                    <div style={{width:28,height:28,borderRadius:"50%",background:`${G}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10.5,fontWeight:700,color:"#fff",flexShrink:0}}>{t.avatar}</div>
                     <div>
                       <p style={{fontWeight:700,fontSize:11.5,color:"#0B1220"}}>{t.name}</p>
                       <p style={{fontSize:10.5,color:"#6B7280"}}>{t.detail}</p>
@@ -3999,7 +3996,7 @@ Thank you for your time,
 
           {/* Submit box */}
           <div style={{background:"#FBFBFC",border:`1.5px solid ${GM}`,borderRadius:var_rl,padding:"16px",marginBottom:24}}>
-            <p style={{fontSize:12,fontWeight:700,color:GD,letterSpacing:"0.8px",marginBottom:8}}>SHARE SOMETHING</p>
+            <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:8}}>Share something</p>
 
             {/* Name mode toggle */}
             <div style={{display:"flex",gap:6,marginBottom:10,alignItems:"center",flexWrap:"wrap"}}>
@@ -4044,19 +4041,19 @@ Thank you for your time,
               <p style={{fontSize:13,color:"#4A5568",lineHeight:1.55,textAlign:"center",marginBottom:18,maxWidth:380,marginLeft:"auto",marginRight:"auto"}}>The first real story always feels weird to post, but it's what makes this a place. Try something like:</p>
               <div style={{display:"flex",flexDirection:"column",gap:8,maxWidth:420,margin:"0 auto"}}>
                 <div style={{background:"#fff",border:`1px solid #E2E8F0`,borderRadius:var_r,padding:"10px 13px"}}>
-                  <p style={{fontSize:11,fontWeight:700,color:GD,letterSpacing:"0.6px",marginBottom:4}}>WIN</p>
+                  <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:4}}>WIN</p>
                   <p style={{fontSize:13,color:"#4A5568",fontStyle:"italic",lineHeight:1.5}}>"Just landed my first interview and I have no idea what I'm doing but I'm so hyped."</p>
                 </div>
                 <div style={{background:"#fff",border:`1px solid #E2E8F0`,borderRadius:var_r,padding:"10px 13px"}}>
-                  <p style={{fontSize:11,fontWeight:700,color:GD,letterSpacing:"0.6px",marginBottom:4}}>VENT</p>
+                  <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:4}}>VENT</p>
                   <p style={{fontSize:13,color:"#4A5568",fontStyle:"italic",lineHeight:1.5}}>"Applied to 47 places. Heard back from 2. Both rejections. Why is this so hard."</p>
                 </div>
                 <div style={{background:"#fff",border:`1px solid #E2E8F0`,borderRadius:var_r,padding:"10px 13px"}}>
-                  <p style={{fontSize:11,fontWeight:700,color:GD,letterSpacing:"0.6px",marginBottom:4}}>QUESTION</p>
+                  <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:4}}>Question</p>
                   <p style={{fontSize:13,color:"#4A5568",fontStyle:"italic",lineHeight:1.5}}>"Does anyone actually get internships from cold-emailing or is that just LinkedIn theater?"</p>
                 </div>
                 <div style={{background:"#fff",border:`1px solid #E2E8F0`,borderRadius:var_r,padding:"10px 13px"}}>
-                  <p style={{fontSize:11,fontWeight:700,color:GD,letterSpacing:"0.6px",marginBottom:4}}>ADVICE</p>
+                  <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:4}}>Advice</p>
                   <p style={{fontSize:13,color:"#4A5568",fontStyle:"italic",lineHeight:1.5}}>"If you're stressing about the technical interview — practice OUT LOUD, not just in your head."</p>
                 </div>
               </div>
@@ -4075,7 +4072,7 @@ Thank you for your time,
                 const replyRemaining=400-replyDraft.length;
                 return (
                   <div key={p.id} style={{background:"#fff",border:`1px solid #E2E8F0`,borderRadius:var_rl,padding:"14px 16px",position:"relative"}}>
-                    {p.category&&<p style={{fontSize:11,fontWeight:700,color:GD,letterSpacing:"0.6px",marginBottom:6,textTransform:"uppercase"}}>{p.category==="win"?"Win":p.category==="vent"?"Vent":p.category==="question"?"Question":p.category==="advice"?"Advice":p.category}</p>}
+                    {p.category&&<p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:6}}>{p.category==="win"?"Win":p.category==="vent"?"Vent":p.category==="question"?"Question":p.category==="advice"?"Advice":p.category}</p>}
                     <p style={{fontSize:14,lineHeight:1.55,color:"#0B1220",whiteSpace:"pre-wrap"}}>{p.content}</p>
                     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:8,gap:8,flexWrap:"wrap"}}>
                       <p style={{fontSize:11,color:"#6B7280"}}>
@@ -4157,8 +4154,8 @@ Thank you for your time,
         <SignInModal/>
         <Nav/>
         <div style={{maxWidth:680,margin:"0 auto",padding:"2.5rem 1.5rem"}}>
-          <p style={{fontSize:10,color:"#6B7280",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase"}}>Tips & Resources</p>
-          <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:800,letterSpacing:"-1px",marginTop:"0.3rem",marginBottom:"0.5rem",color:"#0B1220"}}>How to actually land the internship.</h2>
+          <p style={{fontSize:12,color:"#6B7280",fontWeight:600}}>Tips & Resources</p>
+          <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:700,letterSpacing:"-1px",marginTop:"0.3rem",marginBottom:"0.5rem",color:"#0B1220"}}>How to actually land the internship.</h2>
           <p style={{color:"#4A5568",fontSize:14.5,lineHeight:1.6,marginBottom:"1.5rem"}}>Honest, no-fluff advice on timing, applications, and standing out — the stuff that actually moves the needle, in one place.</p>
 
           {/* Category filter */}
@@ -4175,8 +4172,8 @@ Thank you for your time,
                 <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
                   
                   <div>
-                    <span style={{fontSize:10,fontWeight:700,color:GD,letterSpacing:"1px",textTransform:"uppercase"}}>{t.cat}</span>
-                    <h3 style={{fontSize:16,fontWeight:800,color:"#0B1220",letterSpacing:"-0.3px",lineHeight:1.2}}>{t.title}</h3>
+                    <span style={{fontSize:12,fontWeight:600,color:GD}}>{t.cat}</span>
+                    <h3 style={{fontSize:16,fontWeight:700,color:"#0B1220",letterSpacing:"-0.3px",lineHeight:1.2}}>{t.title}</h3>
                   </div>
                 </div>
                 <p style={{fontSize:14,color:"#4A5568",lineHeight:1.65}}>{t.text}</p>
@@ -4186,7 +4183,7 @@ Thank you for your time,
 
           {/* Honest CTA back to the tool */}
           <div style={{background:`${GL}`,border:`1px solid ${G}25`,borderRadius:var_rl,padding:"1.5rem",marginTop:18,textAlign:"center"}}>
-            <p style={{fontWeight:800,fontSize:17,color:"#0B1220",marginBottom:6,letterSpacing:"-0.3px"}}>Ready to put this into action?</p>
+            <p style={{fontWeight:700,fontSize:17,color:"#0B1220",marginBottom:6,letterSpacing:"-0.3px"}}>Ready to put this into action?</p>
             <p style={{fontSize:13.5,color:"#4A5568",lineHeight:1.55,marginBottom:14}}>Get your honest odds and a tailored list of internships to apply to.</p>
             <button onClick={()=>{setStep(0);setEditStep(null);setPage("quiz");window.scrollTo(0,0);}} style={{background:`${G}`,border:"none",color:"#fff",padding:"12px 28px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Find my matches →</button>
           </div>
@@ -4206,7 +4203,7 @@ Thank you for your time,
         <div style={{marginBottom:18}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:6}}>
             <p style={{fontSize:13,fontWeight:700,color:"#0B1220"}}>{label}</p>
-            <p style={{fontSize:24,fontWeight:800,color:color,fontFamily:"var(--font)"}}>{pct}%</p>
+            <p style={{fontSize:24,fontWeight:700,color:color,fontFamily:"var(--font)"}}>{pct}%</p>
           </div>
           <div style={{height:8,background:"#F1F5F4",borderRadius:99,overflow:"hidden"}}>
             <div style={{width:pct+"%",height:"100%",background:color,transition:"width 0.6s"}}/>
@@ -4234,8 +4231,8 @@ Thank you for your time,
         <SignInModal/>
         <Nav/>
         <div style={{maxWidth:760,margin:"0 auto",padding:"1.5rem 1rem 4rem"}}>
-          <p style={{fontSize:12,fontWeight:700,color:G,letterSpacing:"1.5px",marginBottom:6}}>SCORE A JOB</p>
-          <h1 style={{fontSize:32,fontWeight:800,letterSpacing:"-1px",color:"#0B1220",marginBottom:10}}>See what the screener sees.</h1>
+          <p style={{fontSize:12,fontWeight:600,color:G,marginBottom:6}}>Score a job</p>
+          <h1 style={{fontSize:32,fontWeight:700,letterSpacing:"-1px",color:"#0B1220",marginBottom:10}}>See what the screener sees.</h1>
           <p style={{color:"#4A5568",fontSize:15,lineHeight:1.55,marginBottom:24}}>Before a recruiter ever looks at you, software often does. Paste your resume, the job description, or both and our AI gives you an honest breakdown and real fixes. <strong>This is coaching: the scores are our AI's estimate, not a number from Workday, Greenhouse or any employer.</strong> What you paste is sent to our AI provider (Anthropic) to write the breakdown.</p>
 
           {!scoreResult&&(
@@ -4269,14 +4266,14 @@ Thank you for your time,
               </div>
 
               <div style={{padding:"20px",background:"#fff",border:`1px solid #E2E8F0`,borderRadius:var_rl}}>
-                <p style={{fontSize:11,fontWeight:700,color:"#4A5568",letterSpacing:"1.2px",marginBottom:6}}>SCREENER ROUND</p>
+                <p style={{fontSize:12,fontWeight:600,color:"#4A5568",marginBottom:6}}>Screener round</p>
                 <p style={{fontSize:13.5,color:"#6B7280",marginBottom:14,lineHeight:1.5}}>Many employers' application software filters before a person looks. This is our AI's estimate of how your application might do — not the employer's real score.</p>
                 <ScoreBar label="Score" value={scoreResult.screenerScore} verdict={scoreResult.screenerVerdict}/>
                 <FactorList factors={scoreResult.screenerFactors}/>
               </div>
 
               <div style={{padding:"20px",background:"#fff",border:`1px solid #E2E8F0`,borderRadius:var_rl}}>
-                <p style={{fontSize:11,fontWeight:700,color:"#4A5568",letterSpacing:"1.2px",marginBottom:6}}>HUMAN ROUND</p>
+                <p style={{fontSize:12,fontWeight:600,color:"#4A5568",marginBottom:6}}>Human round</p>
                 <p style={{fontSize:13.5,color:"#6B7280",marginBottom:14,lineHeight:1.5}}>If you pass the screener, this is how strong you look to a recruiter.</p>
                 <ScoreBar label="Score" value={scoreResult.humanScore} verdict={scoreResult.humanVerdict}/>
                 <FactorList factors={scoreResult.humanFactors}/>
@@ -4284,7 +4281,7 @@ Thank you for your time,
 
               {scoreResult.fixes&&scoreResult.fixes.length>0&&(
                 <div style={{padding:"20px",background:"#FEF7E6",border:`1px solid #F4D77E`,borderRadius:var_rl}}>
-                  <p style={{fontSize:13,fontWeight:800,color:"#0B1220",marginBottom:12}}>Top fixes — do these before you apply</p>
+                  <p style={{fontSize:13,fontWeight:700,color:"#0B1220",marginBottom:12}}>Top fixes — do these before you apply</p>
                   <ol style={{margin:0,paddingLeft:18,display:"flex",flexDirection:"column",gap:8}}>
                     {scoreResult.fixes.map((f,i)=>(
                       <li key={i} style={{fontSize:13,color:"#0B1220",lineHeight:1.5}}>{f}</li>
@@ -4357,8 +4354,8 @@ Thank you for your time,
       <div style={{maxWidth:720,margin:"0 auto",padding:"2.5rem 1.5rem"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"2rem"}}>
           <div>
-            <p style={{fontSize:10,color:"#6B7280",fontWeight:700,letterSpacing:"2.5px",textTransform:"uppercase"}}>Dashboard</p>
-            <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:800,letterSpacing:"-1px",marginTop:"0.3rem",color:"#0B1220"}}>Your applications.</h2>
+            <p style={{fontSize:12,color:"#6B7280",fontWeight:600}}>Dashboard</p>
+            <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:700,letterSpacing:"-1px",marginTop:"0.3rem",color:"#0B1220"}}>Your applications.</h2>
           </div>
           {isPro?<span style={{background:GL,color:GD,border:`1px solid ${GM}`,padding:"6px 16px",borderRadius:99,fontSize:13,fontWeight:700}}>Pro Active</span>
           :<button onClick={()=>setShowProModal(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"9px 20px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Upgrade to Pro</button>}
@@ -4375,7 +4372,7 @@ Thank you for your time,
           <div style={{background:"#FFFBEB",border:"1px solid #FCD34D",borderLeft:`4px solid ${AM}`,borderRadius:var_rl,padding:"12px 14px",marginBottom:14,display:"flex",alignItems:"center",gap:10}}>
             <span style={{fontSize:18,flexShrink:0}}></span>
             <div style={{flex:1,minWidth:0}}>
-              <p style={{fontSize:13,fontWeight:800,color:"#92400E",lineHeight:1.4}}>Your data is only on this device.</p>
+              <p style={{fontSize:13,fontWeight:700,color:"#92400E",lineHeight:1.4}}>Your data is only on this device.</p>
               <p style={{fontSize:11.5,color:"#78350F",lineHeight:1.4,marginTop:2}}>If you clear your browser or switch devices, your tracker and saved resumes disappear. <strong>Sign in to save them.</strong></p>
             </div>
             <button onClick={openSignIn} style={{flexShrink:0,background:AM,color:"#fff",border:"none",padding:"8px 14px",borderRadius:var_r,fontFamily:"var(--font)",fontSize:12.5,fontWeight:700,cursor:"pointer"}}>Sign in</button>
@@ -4403,7 +4400,7 @@ Thank you for your time,
             <div style={{background:card.bg,border:`1.5px solid ${card.color}25`,borderLeft:`4px solid ${card.color}`,borderRadius:var_rl,padding:"14px 16px",marginBottom:"1.25rem",display:"flex",gap:12,alignItems:"flex-start"}}>
               
               <div style={{flex:1,minWidth:0}}>
-                <p style={{fontWeight:800,fontSize:14,color:"#0B1220",lineHeight:1.3}}>{card.title}</p>
+                <p style={{fontWeight:700,fontSize:14,color:"#0B1220",lineHeight:1.3}}>{card.title}</p>
                 <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.5,marginTop:3}}>{card.body}</p>
                 <button onClick={card.action} style={{marginTop:9,background:"none",border:`1.5px solid ${card.color}`,color:card.color,padding:"6px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>{card.cta}</button>
               </div>
@@ -4414,7 +4411,7 @@ Thank you for your time,
         <div style={{display:"grid",gridTemplateColumns:"repeat(3,minmax(0,1fr))",gap:"0.75rem",marginBottom:"1.5rem"}}>
           {[{l:"Applied",v:tracked.length,c:G},{l:"Interviews",v:tracked.filter(a=>a.status==="Interview").length,c:AM},{l:"Follow-ups Due",v:tracked.filter(a=>followUpStatus(a).state==="due").length,c:CR}].map((s,i)=>(
             <div key={i} style={{background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_rl,padding:"1.25rem",position:"relative",overflow:"hidden"}}>
-              <p style={{fontSize:32,fontWeight:800,color:s.c,lineHeight:1,letterSpacing:"-1.5px"}}>{s.v}</p>
+              <p style={{fontSize:32,fontWeight:700,color:s.c,lineHeight:1,letterSpacing:"-1.5px"}}>{s.v}</p>
               <p style={{fontSize:12,color:"#4A5568",marginTop:6,fontWeight:500}}>{s.l}</p>
             </div>
           ))}
@@ -4544,14 +4541,14 @@ Thank you for your time,
         </div>
         <div style={{background:`${GL}`,border:`1.5px solid ${G}25`,borderRadius:var_rl,padding:"1.5rem 1.75rem"}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
-            <h3 style={{fontWeight:800,fontSize:17,letterSpacing:"-0.4px",color:"#0B1220"}}>Smart follow-ups</h3>
+            <h3 style={{fontWeight:700,fontSize:17,letterSpacing:"-0.4px",color:"#0B1220"}}>Smart follow-ups</h3>
           </div>
           <p style={{color:"#4A5568",fontSize:14,lineHeight:1.6,marginBottom:14}}>Most students never follow up — and a short, polite one keeps you on the recruiter's radar. Beat the Pile tracks the timing for you and, when an application hits the 5-day mark, drafts a tailored follow-up email you send from your own inbox. You stay the sender; we handle the reminder and the words.</p>
           <div style={{display:"flex",gap:14,flexWrap:"wrap",fontSize:12.5,color:GD,fontWeight:700}}>
             <span>✓ Timed automatically</span><span>✓ Drafted for each role</span><span>✓ Sent by you, as you</span>
           </div>
           <div style={{background:"#fff",border:`1px solid ${GM}`,borderRadius:var_r,padding:"10px 12px",marginTop:14}}>
-            <p style={{fontSize:12,fontWeight:800,color:GD,letterSpacing:"0.6px",marginBottom:5}}>HOW REMINDERS WORK</p>
+            <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:5}}>How reminders work</p>
             <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.55}}>Reminders show <strong>inside Beat the Pile</strong> (the amber banner on your Dashboard and Results page + red badges on each due application). We don't send reminder emails yet, so check back every few days — or add each follow-up to your calendar from <a href="/season/" style={{color:GD}}>My Season</a>. <span style={{color:"#6B7280"}}>Email reminders are on the roadmap.</span></p>
           </div>
           {!isPro&&<p style={{fontSize:12,color:"#6B7280",marginTop:12,lineHeight:1.5}}>Free includes follow-up timing + drafts. Pro will add real email/text reminders so you don't have to check back manually.</p>}
@@ -4562,8 +4559,8 @@ Thank you for your time,
             <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:var_rxl,padding:"2rem",maxWidth:580,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.25)",animation:"pop 0.25s ease",margin:"auto 0"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
                 <div>
-                  <p style={{fontSize:10,fontWeight:700,color:"#6B7280",letterSpacing:"2px",textTransform:"uppercase"}}>Interview Prep</p>
-                  <h3 style={{fontWeight:800,fontSize:19,color:"#0B1220",letterSpacing:"-0.4px",marginTop:2}}>{prepModal.company}</h3>
+                  <p style={{fontSize:12,fontWeight:600,color:"#6B7280"}}>Interview Prep</p>
+                  <h3 style={{fontWeight:700,fontSize:19,color:"#0B1220",letterSpacing:"-0.4px",marginTop:2}}>{prepModal.company}</h3>
                   <p style={{fontSize:13,color:"#4A5568"}}>{prepModal.role}</p>
                 </div>
                 <button onClick={()=>setPrepModal(null)} style={{background:"none",border:"none",fontSize:22,color:"#6B7280",cursor:"pointer",lineHeight:1}}>×</button>
@@ -4577,7 +4574,7 @@ Thank you for your time,
               {prepResult&&!prepLoading&&(<>
                 {prepResult.tips&&prepResult.tips.length>0&&(
                   <div style={{background:AL,border:`1px solid ${AM}25`,borderRadius:var_r,padding:"12px 14px",marginBottom:16}}>
-                    <p style={{fontSize:11,fontWeight:800,color:AM,letterSpacing:"1px",marginBottom:8}}>BEFORE YOU GO IN</p>
+                    <p style={{fontSize:12,fontWeight:600,color:AM,marginBottom:8}}>Before you go in</p>
                     {prepResult.tips.map((t,i)=><p key={i} style={{fontSize:13,color:"#0B1220",lineHeight:1.5,marginBottom:i<prepResult.tips.length-1?6:0}}>→ {t}</p>)}
                   </div>
                 )}
@@ -4599,7 +4596,7 @@ Thank you for your time,
           <div style={{position:"fixed",inset:0,background:"rgba(10,22,40,0.65)",zIndex:500,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"1.5rem 1rem",backdropFilter:"blur(4px)",overflowY:"auto"}} onClick={()=>setAddAppModal(false)}>
             <form onClick={e=>e.stopPropagation()} onSubmit={submitAddApp} style={{background:"#fff",borderRadius:var_rxl,padding:"1.75rem",maxWidth:420,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.25)",animation:"pop 0.25s ease",margin:"auto 0"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
-                <h3 style={{fontWeight:800,fontSize:19,color:"#0B1220",letterSpacing:"-0.4px"}}>Add Application</h3>
+                <h3 style={{fontWeight:700,fontSize:19,color:"#0B1220",letterSpacing:"-0.4px"}}>Add Application</h3>
                 <button type="button" onClick={()=>setAddAppModal(false)} style={{background:"none",border:"none",fontSize:22,color:"#6B7280",cursor:"pointer",lineHeight:1}}>×</button>
               </div>
               <label style={{display:"block",fontSize:12,fontWeight:600,color:"#4A5568",marginBottom:4}}>Company *</label>
@@ -4633,7 +4630,7 @@ Thank you for your time,
               <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:8,marginBottom:10}}>
                 {keys.map(k=>(
                   <div key={k} style={{background:"rgba(255,255,255,0.06)",borderRadius:var_r,padding:"8px 10px"}}>
-                    <p style={{fontSize:20,fontWeight:800,color:"#fff",lineHeight:1}}>{s[k]||0}</p>
+                    <p style={{fontSize:20,fontWeight:700,color:"#fff",lineHeight:1}}>{s[k]||0}</p>
                     <p style={{fontSize:10.5,color:"#6B7280",marginTop:3}}>{k.replace(/_/g," ")}</p>
                   </div>
                 ))}
@@ -4669,11 +4666,11 @@ class AppErrorBoundary extends React.Component {
     if(!this.state.hasError) return this.props.children;
     return React.createElement('div',{style:{minHeight:"100vh",background:"#FBFBFC",display:"flex",alignItems:"center",justifyContent:"center",padding:"1.5rem",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif"}},
       React.createElement('div',{style:{background:"#fff",border:"1px solid #EEF6F2",borderRadius:16,boxShadow:"0 8px 32px rgba(0,0,0,0.1)",padding:"2rem 1.75rem",maxWidth:440,width:"100%",textAlign:"center"}},
-        React.createElement('div',{style:{width:48,height:48,margin:"0 auto 14px",background:"#0E8A5F",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}},""),
-        React.createElement('h2',{style:{fontSize:20,fontWeight:800,color:"#0B1220",margin:"0 0 6px",letterSpacing:"-0.4px"}},"Something went wrong"),
+        React.createElement('div',{style:{width:48,height:48,margin:"0 auto 14px",background:"#0B7A55",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}},""),
+        React.createElement('h2',{style:{fontSize:20,fontWeight:700,color:"#0B1220",margin:"0 0 6px",letterSpacing:"-0.4px"}},"Something went wrong"),
         React.createElement('p',{style:{fontSize:13.5,color:"#4A5568",lineHeight:1.55,margin:"0 0 18px"}},"The app hit an unexpected error. Your saved progress is safe — try again, or reload the page."),
         React.createElement('div',{style:{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}},
-          React.createElement('button',{onClick:()=>this.setState({hasError:false,msg:""}),style:{background:"#0E8A5F",border:"none",color:"#fff",padding:"11px 22px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",fontSize:14,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}},"Try again"),
+          React.createElement('button',{onClick:()=>this.setState({hasError:false,msg:""}),style:{background:"#0B7A55",border:"none",color:"#fff",padding:"11px 22px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",fontSize:14,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}},"Try again"),
           React.createElement('button',{onClick:()=>{try{location.reload();}catch(e){}},style:{background:"#fff",border:"1.5px solid #E2E8F0",color:"#4A5568",padding:"11px 22px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",fontSize:14,fontWeight:700}},"Reload page")
         ),
         this.state.msg&&React.createElement('p',{style:{fontSize:11,color:"#6B7280",marginTop:16,fontFamily:"monospace",wordBreak:"break-word"}},this.state.msg)

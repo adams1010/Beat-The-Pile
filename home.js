@@ -1,14 +1,14 @@
-/* built from src/home.jsx 4b414bb1090b1d3e — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 5da1d3738a20f700 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
   useRef,
   useCallback
 } = React;
-const G = "#0E8A5F",
-  GD = "#0B6E4B",
-  GL = "#EEF6F2",
-  GM = "#CFE6DA";
+const G = "#0B7A55",
+  GD = "#0A6647",
+  GL = "#EAF7F1",
+  GM = "#C6E8D8";
 const AM = "#B45309",
   AL = "#FFF7ED";
 const CR = "#B42318",
@@ -189,7 +189,7 @@ const LiveStats = () => {
   }, React.createElement("div", {
     style: {
       fontSize: 38,
-      fontWeight: 800,
+      fontWeight: 700,
       color: s.c,
       lineHeight: 1,
       marginBottom: "0.5rem",
@@ -274,11 +274,9 @@ const JobPreview = () => {
     }
   }, React.createElement("p", {
     style: {
-      fontSize: 11,
-      fontWeight: 700,
+      fontSize: 12,
+      fontWeight: 600,
       color: "#6B7280",
-      letterSpacing: "1.5px",
-      textTransform: "uppercase",
       margin: "0 0 2px"
     }
   }, "Open right now \xB7 real listings"), jobs.map(j => React.createElement("a", {
@@ -406,7 +404,7 @@ function dAgoLong(t) {
   return m < 60 ? `${m || 1} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} days ago`;
 }
 const DM = {
-  fontFamily: '"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace'
+  fontVariantNumeric: "tabular-nums"
 };
 function LandingD({
   onQuiz,
@@ -485,24 +483,22 @@ function LandingD({
     }
   }, React.createElement("p", {
     style: {
-      ...DM,
-      fontSize: 12,
-      letterSpacing: ".12em",
-      color: "#2FD39A",
-      margin: "0 0 18px",
-      textTransform: "uppercase"
+      fontSize: 14,
+      fontWeight: 500,
+      color: "#9FE5C8",
+      margin: "0 0 18px"
     }
   }, React.createElement("span", {
-    className: "d-blink",
     style: {
       display: "inline-block",
       width: 7,
       height: 7,
       borderRadius: "50%",
       background: "#2FD39A",
-      marginRight: 8
+      marginRight: 8,
+      verticalAlign: 1
     }
-  }), sum ? `Live · ${fmt(sum.companies)} company job boards${sum.lastSync ? ` · re-read ${dAgoLong(sum.lastSync)}` : ""}` : sumErr ? "Live numbers unavailable right now" : "Connecting…"), React.createElement("h1", {
+  }), sum ? `${fmt(sum.companies)} company job boards${sum.lastSync ? `, last checked ${dAgoLong(sum.lastSync)}` : ""}` : sumErr ? "Live numbers unavailable right now" : "Loading the latest numbers…"), React.createElement("h1", {
     style: {
       fontSize: "clamp(2.3rem,5.6vw,4rem)",
       lineHeight: 1.03,
@@ -719,16 +715,18 @@ function LandingD({
     style: {
       display: "flex",
       justifyContent: "space-between",
-      fontSize: 11,
-      letterSpacing: ".1em",
-      color: "#8D9AB3",
-      marginBottom: 10
+      fontSize: 13,
+      fontWeight: 600,
+      color: "#E8EDF5",
+      marginBottom: 10,
+      fontFamily: "Geist,sans-serif"
     }
-  }, React.createElement("span", null, "JUST FOUND"), React.createElement("span", {
+  }, React.createElement("span", null, "Just found"), React.createElement("span", {
     style: {
-      color: "#2FD39A"
+      color: "#8D9AB3",
+      fontWeight: 500
     }
-  }, "\u25CF LIVE")), fresh === null ? React.createElement("div", {
+  }, "newest first")), fresh === null ? React.createElement("div", {
     style: {
       height: 200
     },
@@ -793,12 +791,12 @@ function LandingD({
     }
   }, fmt(sum?.allMajors)), React.createElement("p", {
     style: {
-      fontSize: 11,
+      fontSize: 13,
       color: "#8D9AB3",
       margin: "4px 0 0",
-      letterSpacing: ".06em"
+      fontFamily: "Geist,sans-serif"
     }
-  }, "OPEN NOW")), React.createElement("div", null, React.createElement("p", {
+  }, "internships open now")), React.createElement("div", null, React.createElement("p", {
     style: {
       fontSize: 26,
       color: "#fff",
@@ -806,45 +804,12 @@ function LandingD({
     }
   }, fmt(sum?.hiringNow)), React.createElement("p", {
     style: {
-      fontSize: 11,
+      fontSize: 13,
       color: "#8D9AB3",
       margin: "4px 0 0",
-      letterSpacing: ".06em"
+      fontFamily: "Geist,sans-serif"
     }
-  }, "COMPANIES HIRING")))))), sum?.top?.length > 0 && React.createElement("div", {
-    style: {
-      position: "relative",
-      borderTop: "1px solid #1A2640",
-      overflow: "hidden",
-      height: 44,
-      display: "flex",
-      alignItems: "center"
-    }
-  }, React.createElement("div", {
-    className: "d-tick",
-    style: {
-      display: "flex",
-      gap: 40,
-      whiteSpace: "nowrap",
-      ...DM,
-      fontSize: 12,
-      color: "#8D9AB3",
-      paddingLeft: 24
-    }
-  }, [...sum.top, ...sum.top].map((c, i) => React.createElement("a", {
-    key: i,
-    href: `/c/${encodeURIComponent(c.id)}`,
-    style: {
-      color: "#8D9AB3",
-      textDecoration: "none"
-    },
-    tabIndex: i >= sum.top.length ? -1 : 0
-  }, c.company.toUpperCase(), " ", React.createElement("b", {
-    style: {
-      color: "#2FD39A",
-      fontWeight: 500
-    }
-  }, c.n)))))), React.createElement("main", {
+  }, "companies hiring"))))))), React.createElement("main", {
     style: {
       ...wrap,
       paddingTop: 40,
@@ -985,7 +950,7 @@ function LandingD({
     }
   }, "See internships \u2192"))))), React.createElement("section", {
     className: "d-grid3"
-  }, [["OPENING RADAR", "Know the week they open.", "Estimates from past seasons, with a reminder a week before.", "/radar/"], ["CAREER FAIR MODE", "Walk in with a route.", "Booths, open roles, a QR resume and follow-ups in one place.", "/fair/"], ["INTERVIEW PRACTICE", "Talk it out. Get a grade.", "Answer out loud against a timer, get scored on every answer and a letter grade at the end.", "/#interview"]].map(([k, t, d, h]) => React.createElement("a", {
+  }, [["Opening Radar", "Know the week they open.", "Estimates from past seasons, with a reminder a week before.", "/radar/"], ["Career Fair Mode", "Walk in with a route.", "Booths, open roles, a QR resume and follow-ups in one place.", "/fair/"], ["Interview practice", "Talk it out. Get a grade.", "Answer out loud against a timer, get scored on every answer and a letter grade at the end.", "/#interview"]].map(([k, t, d, h]) => React.createElement("a", {
     key: k,
     href: h,
     onClick: h === "/#interview" ? e => {
@@ -1003,9 +968,8 @@ function LandingD({
     }
   }, React.createElement("p", {
     style: {
-      ...DM,
-      fontSize: 11,
-      letterSpacing: ".1em",
+      fontSize: 13,
+      fontWeight: 600,
       color: "#2FD39A",
       margin: "0 0 10px"
     }
@@ -1058,7 +1022,7 @@ const EXT_CATS = [{
   id: "leadership",
   label: "Leadership & Orgs",
   icon: "",
-  color: "#0E8A5F",
+  color: "#0B7A55",
   why: "Leadership roles are the #1 thing recruiters look for beyond GPA.",
   options: [{
     name: "Student Government",
@@ -1503,7 +1467,7 @@ function AnimatedPct({
   }, [target]);
   return React.createElement("span", {
     style: {
-      fontWeight: 800,
+      fontWeight: 700,
       fontSize: 32,
       color,
       lineHeight: 1,
@@ -1645,7 +1609,7 @@ function BlurCard({
     }
   }, company?.location || "City, ST")), React.createElement("div", {
     style: {
-      fontWeight: 800,
+      fontWeight: 700,
       fontSize: 32,
       color: accent
     }
@@ -2822,7 +2786,7 @@ function InterviewSim({
     color: on ? "#fff" : IV.ink
   });
   const mono = {
-    fontFamily: '"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace'
+    fontVariantNumeric: "tabular-nums"
   };
   const pctColor = p => p >= 64 ? IV.acc : p >= 46 ? "#B45309" : "#B42318";
   const lowTime = phase === "answer" && left <= 15;
@@ -2837,10 +2801,8 @@ function InterviewSim({
     }
   }, React.createElement("p", {
     style: {
-      ...mono,
-      fontSize: 12,
-      letterSpacing: ".1em",
-      textTransform: "uppercase",
+      fontSize: 14,
+      fontWeight: 600,
       color: IV.acc,
       margin: 0
     }
@@ -3568,7 +3530,7 @@ function SkillPicker({
     "aria-live": "polite",
     style: {
       fontSize: 13,
-      color: value.length ? "#0E8A5F" : dim,
+      color: value.length ? "#0B7A55" : dim,
       margin: 0,
       fontWeight: value.length ? 600 : 400
     }
@@ -5865,7 +5827,7 @@ function App() {
     }
   }, React.createElement("span", {
     style: {
-      fontWeight: 800,
+      fontWeight: 700,
       fontSize: 22,
       color: "#0B1220",
       letterSpacing: "-0.5px"
@@ -5911,7 +5873,7 @@ function App() {
     }
   }), React.createElement("p", {
     style: {
-      fontWeight: 800,
+      fontWeight: 700,
       fontSize: 15,
       color: "#fff",
       letterSpacing: "-0.3px"
@@ -6070,16 +6032,14 @@ function App() {
       onClick: e => e.stopPropagation()
     }, React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 700,
+        fontSize: 12,
+        fontWeight: 600,
         color: "#6B7280",
-        letterSpacing: "2px",
-        textTransform: "uppercase",
         marginBottom: 8
       }
     }, "Your Role"), React.createElement("h3", {
       style: {
-        fontWeight: 800,
+        fontWeight: 700,
         fontSize: 18,
         color: "#0B1220",
         marginBottom: "0.25rem",
@@ -6232,15 +6192,13 @@ function App() {
       }
     }, React.createElement("div", null, React.createElement("p", {
       style: {
-        fontSize: 10,
-        fontWeight: 700,
-        color: "#6B7280",
-        letterSpacing: "2px",
-        textTransform: "uppercase"
+        fontSize: 12,
+        fontWeight: 600,
+        color: "#6B7280"
       }
     }, "Assisted Apply"), React.createElement("h3", {
       style: {
-        fontWeight: 800,
+        fontWeight: 700,
         fontSize: 20,
         color: "#0B1220",
         letterSpacing: "-0.4px"
@@ -6276,7 +6234,7 @@ function App() {
       }
     }), React.createElement("p", {
       style: {
-        fontWeight: 800,
+        fontWeight: 700,
         fontSize: 18,
         color: "#0B1220",
         marginBottom: 6,
@@ -6326,7 +6284,7 @@ function App() {
         color: "#fff",
         padding: "13px",
         borderRadius: var_rl,
-        fontWeight: 800,
+        fontWeight: 700,
         fontSize: 15,
         textDecoration: "none",
         boxShadow: "0 1px 2px rgba(11,18,32,.06)",
@@ -6352,7 +6310,7 @@ function App() {
         color: "#fff",
         padding: "13px",
         borderRadius: var_rl,
-        fontWeight: 800,
+        fontWeight: 700,
         fontSize: 15,
         textDecoration: "none",
         boxShadow: "0 1px 2px rgba(11,18,32,.06)",
@@ -6391,13 +6349,12 @@ function App() {
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 800,
+        fontSize: 12,
+        fontWeight: 600,
         color: "#4A5568",
-        letterSpacing: "1px",
         marginBottom: 4
       }
-    }, "FIND THIS ROLE ON"), (() => {
+    }, "Find this role on"), (() => {
       const isNat = c.tier === "national" || isLikelyNational(c);
       const siteHref = companyWebsiteUrl(c);
       const googleHref = googleSearchUrl(c);
@@ -6609,11 +6566,9 @@ function App() {
     }, React.createElement("span", {
       style: {
         display: "block",
-        fontSize: 10,
+        fontSize: 12,
         color: "#6B7280",
-        fontWeight: 700,
-        textTransform: "uppercase",
-        letterSpacing: "0.5px"
+        fontWeight: 600
       }
     }, r[0]), React.createElement("span", {
       style: {
@@ -6791,7 +6746,7 @@ function App() {
     }, React.createElement("span", {
       style: {
         color: G,
-        fontWeight: 800
+        fontWeight: 700
       }
     }, "\u203A"), React.createElement("span", null, t))))))))));
   };
@@ -6844,15 +6799,13 @@ function App() {
       }
     }, React.createElement("div", null, React.createElement("p", {
       style: {
-        fontSize: 10,
-        fontWeight: 700,
-        color: "#6B7280",
-        letterSpacing: "2px",
-        textTransform: "uppercase"
+        fontSize: 12,
+        fontWeight: 600,
+        color: "#6B7280"
       }
     }, "Your Answers"), React.createElement("h3", {
       style: {
-        fontWeight: 800,
+        fontWeight: 700,
         fontSize: 20,
         color: "#0B1220",
         letterSpacing: "-0.4px"
@@ -7060,15 +7013,14 @@ function App() {
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 10,
+        fontSize: 12,
         color: "#6B7280",
-        fontWeight: 700,
-        letterSpacing: "2px"
+        fontWeight: 600
       }
-    }, "SAVE YOUR PROGRESS"), React.createElement("h3", {
+    }, "Save your progress"), React.createElement("h3", {
       style: {
         fontSize: 20,
-        fontWeight: 800,
+        fontWeight: 700,
         color: "#0B1220",
         margin: "4px 0 6px"
       }
@@ -7115,7 +7067,7 @@ function App() {
     }, React.createElement("p", {
       style: {
         fontSize: 13.5,
-        fontWeight: 800,
+        fontWeight: 700,
         color: "#92400E",
         marginBottom: 2
       }
@@ -7172,15 +7124,13 @@ function App() {
       }
     }, React.createElement("div", null, React.createElement("p", {
       style: {
-        fontSize: 10,
-        fontWeight: 700,
-        color: "#6B7280",
-        letterSpacing: "2px",
-        textTransform: "uppercase"
+        fontSize: 12,
+        fontWeight: 600,
+        color: "#6B7280"
       }
     }, "Follow-up email"), React.createElement("h3", {
       style: {
-        fontWeight: 800,
+        fontWeight: 700,
         fontSize: 20,
         color: "#0B1220",
         letterSpacing: "-0.4px"
@@ -7318,7 +7268,7 @@ function App() {
     }, React.createElement("span", {
       style: {
         color: G,
-        fontWeight: 800
+        fontWeight: 700
       }
     }, "\u203A"), React.createElement("span", null, t)))), React.createElement("button", {
       onClick: () => {
@@ -7494,20 +7444,16 @@ function App() {
       }
     }, editStep !== null ? React.createElement("p", {
       style: {
-        fontSize: 11,
+        fontSize: 12,
         color: GD,
-        fontWeight: 800,
-        letterSpacing: "1.5px",
-        textTransform: "uppercase",
+        fontWeight: 600,
         marginBottom: "0.4rem"
       }
     }, "Editing one answer") : React.createElement("p", {
       style: {
-        fontSize: 10,
+        fontSize: 12,
         color: "#6B7280",
-        fontWeight: 700,
-        letterSpacing: "2.5px",
-        textTransform: "uppercase",
+        fontWeight: 600,
         marginBottom: "0.4rem"
       }
     }, "Step ", step + 1, " of ", STEPS.length), React.createElement("h2", {
@@ -7515,7 +7461,7 @@ function App() {
       key: step,
       style: {
         fontSize: "clamp(1.4rem,3vw,2rem)",
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: "-0.8px",
         marginBottom: "0.5rem",
         lineHeight: 1.2,
@@ -7912,13 +7858,12 @@ function App() {
         }
       }, React.createElement("p", {
         style: {
-          fontSize: 11,
+          fontSize: 12,
           color: "#6B7280",
           fontWeight: 600,
-          marginBottom: 8,
-          letterSpacing: "0.5px"
+          marginBottom: 8
         }
-      }, "TAP TO SELECT ROLE \u2192"), React.createElement("div", {
+      }, "Tap to select role \u2192"), React.createElement("div", {
         style: {
           display: "flex",
           flexWrap: "wrap",
@@ -8135,7 +8080,7 @@ function App() {
       style: {
         width: "100%",
         fontSize: 36,
-        fontWeight: 800,
+        fontWeight: 700,
         padding: "18px",
         borderRadius: var_rl,
         border: `2px solid ${/^\d{5}$/.test(ans.zip) ? G : "#E2E8F0"}`,
@@ -8178,7 +8123,7 @@ function App() {
       }
     }, "Search radius"), React.createElement("span", {
       style: {
-        fontWeight: 800,
+        fontWeight: 700,
         color: G,
         fontSize: 20,
         letterSpacing: "-0.5px"
@@ -8330,7 +8275,7 @@ function App() {
   }), React.createElement("h2", {
     style: {
       fontSize: "clamp(1.5rem,3.5vw,2rem)",
-      fontWeight: 800,
+      fontWeight: 700,
       letterSpacing: "-1px",
       marginBottom: 10,
       color: "#0B1220"
@@ -8550,16 +8495,14 @@ function App() {
       }
     }, React.createElement("div", null, React.createElement("p", {
       style: {
-        fontSize: 10,
+        fontSize: 12,
         color: "#6B7280",
-        fontWeight: 700,
-        letterSpacing: "2.5px",
-        textTransform: "uppercase"
+        fontWeight: 600
       }
     }, "Your Matches"), React.createElement("h2", {
       style: {
         fontSize: "clamp(1.8rem,4vw,2.6rem)",
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: "-1.5px",
         marginTop: "0.2rem",
         color: "#0B1220"
@@ -8765,7 +8708,7 @@ function App() {
       }, React.createElement("span", {
         style: {
           fontSize: 12.5,
-          fontWeight: 800,
+          fontWeight: 700,
           color: "#0B1220",
           letterSpacing: "0.3px"
         }
@@ -8890,7 +8833,7 @@ function App() {
     }, React.createElement("p", {
       style: {
         fontSize: 13,
-        fontWeight: 800,
+        fontWeight: 700,
         color: "#C53030",
         marginBottom: 4
       }
@@ -8924,7 +8867,7 @@ function App() {
     }, React.createElement("p", {
       style: {
         fontSize: 13.5,
-        fontWeight: 800,
+        fontWeight: 700,
         color: "#0B1220",
         marginBottom: 4
       }
@@ -8975,7 +8918,7 @@ function App() {
         }
       }), React.createElement("p", {
         style: {
-          fontWeight: 800,
+          fontWeight: 700,
           fontSize: 15,
           color: "#fff",
           letterSpacing: "-0.3px"
@@ -9025,7 +8968,7 @@ function App() {
       }
     }), React.createElement("h3", {
       style: {
-        fontWeight: 800,
+        fontWeight: 700,
         fontSize: 17,
         color: "#0B1220",
         letterSpacing: "-0.4px"
@@ -9057,7 +9000,7 @@ function App() {
     }, React.createElement("span", {
       style: {
         fontSize: 20,
-        fontWeight: 800,
+        fontWeight: 700,
         color: G,
         minWidth: 48
       }
@@ -9085,31 +9028,31 @@ function App() {
       style: {
         flexShrink: 0,
         fontSize: 9.5,
-        fontWeight: 800,
+        fontWeight: 700,
         color: "#2563EB",
         background: "#2563EB15",
         padding: "2px 7px",
         borderRadius: 99,
         letterSpacing: "0.3px"
       }
-    }, "BIG NAME"), c.personalized && React.createElement("span", {
+    }, "Big name"), c.personalized && React.createElement("span", {
       style: {
         flexShrink: 0,
         fontSize: 9.5,
-        fontWeight: 800,
+        fontWeight: 700,
         color: GD,
         background: GL,
         padding: "2px 7px",
         borderRadius: 99,
         letterSpacing: "0.3px"
       }
-    }, "PERSONALIZED"), (() => {
+    }, "Personalized"), (() => {
       const b = bandLabel(c.locationBand);
       return b ? React.createElement("span", {
         style: {
           flexShrink: 0,
           fontSize: 9.5,
-          fontWeight: 800,
+          fontWeight: 700,
           color: b.color,
           background: b.bg,
           padding: "2px 7px",
@@ -9218,7 +9161,7 @@ function App() {
         return b ? React.createElement("span", {
           style: {
             fontSize: 9.5,
-            fontWeight: 800,
+            fontWeight: 700,
             color: b.color,
             background: b.bg,
             padding: "2px 7px",
@@ -9346,24 +9289,24 @@ function App() {
       }, "Company: "), c.name), isLikelyNational(c) && React.createElement("span", {
         style: {
           fontSize: 9.5,
-          fontWeight: 800,
+          fontWeight: 700,
           color: "#2563EB",
           background: "#2563EB15",
           padding: "2px 7px",
           borderRadius: 99,
           letterSpacing: "0.3px"
         }
-      }, "BIG NAME"), c.personalized && React.createElement("span", {
+      }, "Big name"), c.personalized && React.createElement("span", {
         style: {
           fontSize: 9.5,
-          fontWeight: 800,
+          fontWeight: 700,
           color: GD,
           background: GL,
           padding: "2px 7px",
           borderRadius: 99,
           letterSpacing: "0.3px"
         }
-      }, "PERSONALIZED"), locationBadge), React.createElement("div", {
+      }, "Personalized"), locationBadge), React.createElement("div", {
         style: {
           display: "flex",
           alignItems: "center",
@@ -9478,13 +9421,12 @@ function App() {
         }
       }, React.createElement("p", {
         style: {
-          fontSize: 10,
-          fontWeight: 800,
+          fontSize: 12,
+          fontWeight: 600,
           color: c.personalized ? GD : "#6B7280",
-          letterSpacing: "0.8px",
           marginBottom: 4
         }
-      }, c.personalized ? "WHY THIS FITS YOU" : "WHY THIS IS A REALISTIC SHOT"), React.createElement("p", {
+      }, c.personalized ? "Why this fits you" : "Why this is a realistic shot"), React.createElement("p", {
         style: {
           fontSize: 13,
           color: "#4A5568",
@@ -9494,7 +9436,7 @@ function App() {
       }, c.reason)), isVerified && React.createElement("span", {
         style: {
           fontSize: 10,
-          fontWeight: 800,
+          fontWeight: 700,
           color: GD,
           background: GL,
           padding: "3px 9px",
@@ -9524,7 +9466,7 @@ function App() {
           padding: "13px 8px",
           borderRadius: var_r,
           fontSize: 14.5,
-          fontWeight: 800,
+          fontWeight: 700,
           border: "none",
           cursor: "pointer",
           fontFamily: "var(--font)",
@@ -9590,15 +9532,14 @@ function App() {
         }
       }, React.createElement("div", null, React.createElement("p", {
         style: {
-          fontSize: 9.5,
-          fontWeight: 800,
+          fontSize: 12,
+          fontWeight: 600,
           color: G,
-          letterSpacing: "1.5px",
           marginBottom: 3
         }
-      }, "COMPANY INTEL"), React.createElement("p", {
+      }, "Company intel"), React.createElement("p", {
         style: {
-          fontWeight: 800,
+          fontWeight: 700,
           fontSize: 17,
           color: "#fff",
           letterSpacing: "-0.3px",
@@ -9660,13 +9601,12 @@ function App() {
           }
         }, React.createElement("p", {
           style: {
-            fontSize: 9.5,
-            fontWeight: 800,
+            fontSize: 12,
+            fontWeight: 600,
             color: "#475569",
-            letterSpacing: "0.8px",
             marginBottom: 4
           }
-        }, "WHAT THEY DO"), React.createElement("p", {
+        }, "What they do"), React.createElement("p", {
           style: {
             fontSize: 13,
             color: "#CBD5E1",
@@ -9687,13 +9627,12 @@ function App() {
           }
         }, React.createElement("p", {
           style: {
-            fontSize: 9.5,
-            fontWeight: 800,
+            fontSize: 12,
+            fontWeight: 600,
             color: "#475569",
-            letterSpacing: "0.8px",
             marginBottom: 4
           }
-        }, "COMPANY SIZE"), React.createElement("p", {
+        }, "Company size"), React.createElement("p", {
           style: {
             fontSize: 12.5,
             color: "#CBD5E1"
@@ -9707,13 +9646,12 @@ function App() {
           }
         }, React.createElement("p", {
           style: {
-            fontSize: 9.5,
-            fontWeight: 800,
+            fontSize: 12,
+            fontWeight: 600,
             color: "#475569",
-            letterSpacing: "0.8px",
             marginBottom: 4
           }
-        }, "CULTURE"), React.createElement("p", {
+        }, "Culture"), React.createElement("p", {
           style: {
             fontSize: 12.5,
             color: "#CBD5E1"
@@ -9727,13 +9665,12 @@ function App() {
           }
         }, React.createElement("p", {
           style: {
-            fontSize: 9.5,
-            fontWeight: 800,
+            fontSize: 12,
+            fontWeight: 600,
             color: G,
-            letterSpacing: "0.8px",
             marginBottom: 4
           }
-        }, "WHAT YOU'D ACTUALLY DO"), React.createElement("p", {
+        }, "What you'd actually do"), React.createElement("p", {
           style: {
             fontSize: 13,
             color: "#CBD5E1",
@@ -9752,13 +9689,12 @@ function App() {
         }
       }, c.contactType === "cold_outreach" ? React.createElement("div", null, React.createElement("p", {
         style: {
-          fontSize: 9.5,
-          fontWeight: 800,
+          fontSize: 12,
+          fontWeight: 600,
           color: G,
-          letterSpacing: "0.8px",
           marginBottom: 6
         }
-      }, "CONTACT DIRECTLY"), React.createElement("p", {
+      }, "Contact directly"), React.createElement("p", {
         style: {
           fontSize: 11.5,
           color: "#94A3B8",
@@ -9798,7 +9734,7 @@ Thank you for your time,
           color: "#fff",
           padding: "11px",
           borderRadius: var_r,
-          fontWeight: 800,
+          fontWeight: 700,
           fontSize: 13,
           border: "none",
           cursor: "pointer",
@@ -9844,13 +9780,12 @@ Thank you for your time,
         }
       }, "Search on Google")) : React.createElement("div", null, React.createElement("p", {
         style: {
-          fontSize: 9.5,
-          fontWeight: 800,
+          fontSize: 12,
+          fontWeight: 600,
           color: "#475569",
-          letterSpacing: "0.8px",
           marginBottom: 6
         }
-      }, "FIND THIS ROLE ON"), React.createElement("div", {
+      }, "Find this role on"), React.createElement("div", {
         style: {
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
@@ -9871,7 +9806,7 @@ Thank you for your time,
           color: "#fff",
           padding: "11px",
           borderRadius: var_r,
-          fontWeight: 800,
+          fontWeight: 700,
           fontSize: 13.5,
           textDecoration: "none",
           marginBottom: 2
@@ -9982,15 +9917,14 @@ Thank you for your time,
     }, "\u2190 ", results.length > 0 ? "Back to results" : "Back to home"), React.createElement("p", {
       style: {
         fontSize: 12,
-        fontWeight: 700,
+        fontWeight: 600,
         color: G,
-        letterSpacing: "1.5px",
         marginBottom: 6
       }
-    }, "RESUME BUILDER"), React.createElement("h1", {
+    }, "Resume builder"), React.createElement("h1", {
       style: {
         fontSize: 30,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: "-1px",
         color: "#0B1220",
         marginBottom: 10
@@ -10013,12 +9947,11 @@ Thank you for your time,
     }, React.createElement("p", {
       style: {
         fontSize: 12,
-        fontWeight: 700,
+        fontWeight: 600,
         color: GD,
-        letterSpacing: "0.8px",
         marginBottom: 10
       }
-    }, "WHAT WE'LL USE"), React.createElement("div", {
+    }, "What we'll use"), React.createElement("div", {
       style: {
         display: "flex",
         flexDirection: "column",
@@ -10337,16 +10270,14 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 10,
+        fontSize: 12,
         color: "#6B7280",
-        fontWeight: 700,
-        letterSpacing: "2.5px",
-        textTransform: "uppercase"
+        fontWeight: 600
       }
     }, "Your Profile"), React.createElement("h2", {
       style: {
         fontSize: "clamp(1.6rem,3.5vw,2.3rem)",
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: "-1px",
         marginTop: "0.3rem",
         marginBottom: "0.4rem",
@@ -10384,7 +10315,7 @@ Thank you for your time,
     }, clerkUser ? React.createElement(React.Fragment, null, React.createElement("p", {
       style: {
         fontSize: 13.5,
-        fontWeight: 800,
+        fontWeight: 700,
         color: "#166534"
       }
     }, "Signed in as ", clerkUser.primaryEmailAddress?.emailAddress || clerkUser.firstName || "you"), React.createElement("p", {
@@ -10397,7 +10328,7 @@ Thank you for your time,
     }, syncStatus === "loading" ? "⟳ Loading your data…" : syncStatus === "saving" ? "⟳ Saving changes…" : syncStatus === "synced" ? "✓ All changes synced across your devices" : syncStatus === "error" ? "Sync had a hiccup — your changes are saved locally; we'll retry" : "Syncing your data…")) : React.createElement(React.Fragment, null, React.createElement("p", {
       style: {
         fontSize: 13.5,
-        fontWeight: 800,
+        fontWeight: 700,
         color: "#0B1220"
       }
     }, "Not signed in"), React.createElement("p", {
@@ -10445,11 +10376,9 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 700,
+        fontSize: 12,
+        fontWeight: 600,
         color: GD,
-        letterSpacing: "1px",
-        textTransform: "uppercase",
         marginBottom: 14
       }
     }, "Contact"), React.createElement("div", {
@@ -10468,11 +10397,9 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 700,
+        fontSize: 12,
+        fontWeight: 600,
         color: GD,
-        letterSpacing: "1px",
-        textTransform: "uppercase",
         marginBottom: 14
       }
     }, "Academics"), React.createElement("div", {
@@ -10491,11 +10418,9 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 700,
+        fontSize: 12,
+        fontWeight: 600,
         color: GD,
-        letterSpacing: "1px",
-        textTransform: "uppercase",
         marginBottom: 14
       }
     }, "Common application answers"), React.createElement("div", {
@@ -10514,11 +10439,9 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 700,
+        fontSize: 12,
+        fontWeight: 600,
         color: GD,
-        letterSpacing: "1px",
-        textTransform: "uppercase",
         marginBottom: 14
       }
     }, "Make your applications stronger"), React.createElement("div", {
@@ -10560,11 +10483,9 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 700,
-        color: GD,
-        letterSpacing: "1px",
-        textTransform: "uppercase"
+        fontSize: 12,
+        fontWeight: 600,
+        color: GD
       }
     }, "Your resumes"), React.createElement("button", {
       onClick: addResume,
@@ -10770,17 +10691,15 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 10,
+        fontSize: 12,
         color: "#6B7280",
-        fontWeight: 700,
-        letterSpacing: "2.5px",
-        textTransform: "uppercase",
+        fontWeight: 600,
         marginBottom: 6
       }
     }, "Community Wall"), React.createElement("h1", {
       style: {
         fontSize: 30,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: "-0.8px",
         color: "#0B1220",
         marginBottom: 8
@@ -10798,11 +10717,9 @@ Thank you for your time,
       }
     }, TESTIMONIALS.length > 0 && React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 700,
+        fontSize: 12,
+        fontWeight: 600,
         color: "#6B7280",
-        letterSpacing: "1.5px",
-        textTransform: "uppercase",
         marginBottom: 10
       }
     }, "What students are saying"), React.createElement("div", {
@@ -10862,7 +10779,7 @@ Thank you for your time,
         alignItems: "center",
         justifyContent: "center",
         fontSize: 10.5,
-        fontWeight: 800,
+        fontWeight: 700,
         color: "#fff",
         flexShrink: 0
       }
@@ -10888,12 +10805,11 @@ Thank you for your time,
     }, React.createElement("p", {
       style: {
         fontSize: 12,
-        fontWeight: 700,
+        fontWeight: 600,
         color: GD,
-        letterSpacing: "0.8px",
         marginBottom: 8
       }
-    }, "SHARE SOMETHING"), React.createElement("div", {
+    }, "Share something"), React.createElement("div", {
       style: {
         display: "flex",
         gap: 6,
@@ -11081,10 +10997,9 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 700,
+        fontSize: 12,
+        fontWeight: 600,
         color: GD,
-        letterSpacing: "0.6px",
         marginBottom: 4
       }
     }, "WIN"), React.createElement("p", {
@@ -11103,10 +11018,9 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 700,
+        fontSize: 12,
+        fontWeight: 600,
         color: GD,
-        letterSpacing: "0.6px",
         marginBottom: 4
       }
     }, "VENT"), React.createElement("p", {
@@ -11125,13 +11039,12 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 700,
+        fontSize: 12,
+        fontWeight: 600,
         color: GD,
-        letterSpacing: "0.6px",
         marginBottom: 4
       }
-    }, "QUESTION"), React.createElement("p", {
+    }, "Question"), React.createElement("p", {
       style: {
         fontSize: 13,
         color: "#4A5568",
@@ -11147,13 +11060,12 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 700,
+        fontSize: 12,
+        fontWeight: 600,
         color: GD,
-        letterSpacing: "0.6px",
         marginBottom: 4
       }
-    }, "ADVICE"), React.createElement("p", {
+    }, "Advice"), React.createElement("p", {
       style: {
         fontSize: 13,
         color: "#4A5568",
@@ -11194,12 +11106,10 @@ Thank you for your time,
         }
       }, p.category && React.createElement("p", {
         style: {
-          fontSize: 11,
-          fontWeight: 700,
+          fontSize: 12,
+          fontWeight: 600,
           color: GD,
-          letterSpacing: "0.6px",
-          marginBottom: 6,
-          textTransform: "uppercase"
+          marginBottom: 6
         }
       }, p.category === "win" ? "Win" : p.category === "vent" ? "Vent" : p.category === "question" ? "Question" : p.category === "advice" ? "Advice" : p.category), React.createElement("p", {
         style: {
@@ -11426,16 +11336,14 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 10,
+        fontSize: 12,
         color: "#6B7280",
-        fontWeight: 700,
-        letterSpacing: "2.5px",
-        textTransform: "uppercase"
+        fontWeight: 600
       }
     }, "Tips & Resources"), React.createElement("h2", {
       style: {
         fontSize: "clamp(1.6rem,3.5vw,2.3rem)",
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: "-1px",
         marginTop: "0.3rem",
         marginBottom: "0.5rem",
@@ -11496,16 +11404,14 @@ Thank you for your time,
       }
     }, React.createElement("div", null, React.createElement("span", {
       style: {
-        fontSize: 10,
-        fontWeight: 700,
-        color: GD,
-        letterSpacing: "1px",
-        textTransform: "uppercase"
+        fontSize: 12,
+        fontWeight: 600,
+        color: GD
       }
     }, t.cat), React.createElement("h3", {
       style: {
         fontSize: 16,
-        fontWeight: 800,
+        fontWeight: 700,
         color: "#0B1220",
         letterSpacing: "-0.3px",
         lineHeight: 1.2
@@ -11527,7 +11433,7 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontWeight: 800,
+        fontWeight: 700,
         fontSize: 17,
         color: "#0B1220",
         marginBottom: 6,
@@ -11597,7 +11503,7 @@ Thank you for your time,
       }, label), React.createElement("p", {
         style: {
           fontSize: 24,
-          fontWeight: 800,
+          fontWeight: 700,
           color: color,
           fontFamily: "var(--font)"
         }
@@ -11681,15 +11587,14 @@ Thank you for your time,
     }, React.createElement("p", {
       style: {
         fontSize: 12,
-        fontWeight: 700,
+        fontWeight: 600,
         color: G,
-        letterSpacing: "1.5px",
         marginBottom: 6
       }
-    }, "SCORE A JOB"), React.createElement("h1", {
+    }, "Score a job"), React.createElement("h1", {
       style: {
         fontSize: 32,
-        fontWeight: 800,
+        fontWeight: 700,
         letterSpacing: "-1px",
         color: "#0B1220",
         marginBottom: 10
@@ -11845,13 +11750,12 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 700,
+        fontSize: 12,
+        fontWeight: 600,
         color: "#4A5568",
-        letterSpacing: "1.2px",
         marginBottom: 6
       }
-    }, "SCREENER ROUND"), React.createElement("p", {
+    }, "Screener round"), React.createElement("p", {
       style: {
         fontSize: 13.5,
         color: "#6B7280",
@@ -11873,13 +11777,12 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontSize: 11,
-        fontWeight: 700,
+        fontSize: 12,
+        fontWeight: 600,
         color: "#4A5568",
-        letterSpacing: "1.2px",
         marginBottom: 6
       }
-    }, "HUMAN ROUND"), React.createElement("p", {
+    }, "Human round"), React.createElement("p", {
       style: {
         fontSize: 13.5,
         color: "#6B7280",
@@ -11902,7 +11805,7 @@ Thank you for your time,
     }, React.createElement("p", {
       style: {
         fontSize: 13,
-        fontWeight: 800,
+        fontWeight: 700,
         color: "#0B1220",
         marginBottom: 12
       }
@@ -12045,16 +11948,14 @@ Thank you for your time,
     }
   }, React.createElement("div", null, React.createElement("p", {
     style: {
-      fontSize: 10,
+      fontSize: 12,
       color: "#6B7280",
-      fontWeight: 700,
-      letterSpacing: "2.5px",
-      textTransform: "uppercase"
+      fontWeight: 600
     }
   }, "Dashboard"), React.createElement("h2", {
     style: {
       fontSize: "clamp(1.6rem,3.5vw,2.3rem)",
-      fontWeight: 800,
+      fontWeight: 700,
       letterSpacing: "-1px",
       marginTop: "0.3rem",
       color: "#0B1220"
@@ -12139,7 +12040,7 @@ Thank you for your time,
   }, React.createElement("p", {
     style: {
       fontSize: 13,
-      fontWeight: 800,
+      fontWeight: 700,
       color: "#92400E",
       lineHeight: 1.4
     }
@@ -12242,7 +12143,7 @@ Thank you for your time,
       }
     }, React.createElement("p", {
       style: {
-        fontWeight: 800,
+        fontWeight: 700,
         fontSize: 14,
         color: "#0B1220",
         lineHeight: 1.3
@@ -12301,7 +12202,7 @@ Thank you for your time,
   }, React.createElement("p", {
     style: {
       fontSize: 32,
-      fontWeight: 800,
+      fontWeight: 700,
       color: s.c,
       lineHeight: 1,
       letterSpacing: "-1.5px"
@@ -12836,7 +12737,7 @@ Thank you for your time,
     }
   }, React.createElement("h3", {
     style: {
-      fontWeight: 800,
+      fontWeight: 700,
       fontSize: 17,
       letterSpacing: "-0.4px",
       color: "#0B1220"
@@ -12868,12 +12769,11 @@ Thank you for your time,
   }, React.createElement("p", {
     style: {
       fontSize: 12,
-      fontWeight: 800,
+      fontWeight: 600,
       color: GD,
-      letterSpacing: "0.6px",
       marginBottom: 5
     }
-  }, "HOW REMINDERS WORK"), React.createElement("p", {
+  }, "How reminders work"), React.createElement("p", {
     style: {
       fontSize: 12.5,
       color: "#4A5568",
@@ -12930,15 +12830,13 @@ Thank you for your time,
     }
   }, React.createElement("div", null, React.createElement("p", {
     style: {
-      fontSize: 10,
-      fontWeight: 700,
-      color: "#6B7280",
-      letterSpacing: "2px",
-      textTransform: "uppercase"
+      fontSize: 12,
+      fontWeight: 600,
+      color: "#6B7280"
     }
   }, "Interview Prep"), React.createElement("h3", {
     style: {
-      fontWeight: 800,
+      fontWeight: 700,
       fontSize: 19,
       color: "#0B1220",
       letterSpacing: "-0.4px",
@@ -12989,13 +12887,12 @@ Thank you for your time,
     }
   }, React.createElement("p", {
     style: {
-      fontSize: 11,
-      fontWeight: 800,
+      fontSize: 12,
+      fontWeight: 600,
       color: AM,
-      letterSpacing: "1px",
       marginBottom: 8
     }
-  }, "BEFORE YOU GO IN"), prepResult.tips.map((t, i) => React.createElement("p", {
+  }, "Before you go in"), prepResult.tips.map((t, i) => React.createElement("p", {
     key: i,
     style: {
       fontSize: 13,
@@ -13085,7 +12982,7 @@ Thank you for your time,
     }
   }, React.createElement("h3", {
     style: {
-      fontWeight: 800,
+      fontWeight: 700,
       fontSize: 19,
       color: "#0B1220",
       letterSpacing: "-0.4px"
@@ -13294,7 +13191,7 @@ Thank you for your time,
     }, React.createElement("p", {
       style: {
         fontSize: 20,
-        fontWeight: 800,
+        fontWeight: 700,
         color: "#fff",
         lineHeight: 1
       }
@@ -13367,7 +13264,7 @@ class AppErrorBoundary extends React.Component {
         width: 48,
         height: 48,
         margin: "0 auto 14px",
-        background: "#0E8A5F",
+        background: "#0B7A55",
         borderRadius: 12,
         display: "flex",
         alignItems: "center",
@@ -13377,7 +13274,7 @@ class AppErrorBoundary extends React.Component {
     }, ""), React.createElement('h2', {
       style: {
         fontSize: 20,
-        fontWeight: 800,
+        fontWeight: 700,
         color: "#0B1220",
         margin: "0 0 6px",
         letterSpacing: "-0.4px"
@@ -13402,7 +13299,7 @@ class AppErrorBoundary extends React.Component {
         msg: ""
       }),
       style: {
-        background: "#0E8A5F",
+        background: "#0B7A55",
         border: "none",
         color: "#fff",
         padding: "11px 22px",

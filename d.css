@@ -1,13 +1,12 @@
 /* /d.css — Direction D look for the static pages (Career Fair, My Season, Radar).
    Load it AFTER the page's own <style> so these win. Same tokens as /jobs and the homepage. */
-@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap");
 :root{
   --green:#0B7A55; --green-dark:#0B6E4B; --green-light:#EAF7F1; --mint:#2FD39A;
   --navy:#0A1426; --ink:#0A1426; --muted:#55627A; --faint:#8590A6;
   --bg:#EEF1F6; --card:#FFFFFF; --line:#DCE2EC; --amber:#8A4B08; --amber-light:#FEF3E2;
-  --mono:"Geist Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --mono:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
-body{background:var(--bg)}
+body{background:var(--bg);font-variant-numeric:tabular-nums}
 .controls{background:rgba(238,241,246,.96);border-color:var(--line);top:60px}
 @media (max-width:640px){.controls{top:52px}}
 
@@ -32,7 +31,7 @@ header .trend .n,header .big{color:var(--mint);font-family:var(--mono);font-weig
 .chip,.pill{border-radius:999px}
 .chip{font-weight:500;border-color:#C9D1DE}
 .chip[aria-pressed="true"],.chip.on{background:var(--navy);border-color:var(--navy)}
-.tag,.booth,.badge{font-family:var(--mono);font-weight:500;letter-spacing:.02em;border-radius:6px}
+.tag,.booth,.badge{font-weight:600;border-radius:6px}
 
 /* inputs */
 .search,.fairsel,.majorsel,select,input[type=search],input[type=text],input[type=email],input[type=url],input[type=date],textarea{border-color:#C9D1DE}
