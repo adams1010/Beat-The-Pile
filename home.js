@@ -1,4 +1,4 @@
-/* built from src/home.jsx 5da1d3738a20f700 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx e1e864ba635ef756 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -416,14 +416,14 @@ function LandingD({
   const [q, setQ] = React.useState(""),
     [where, setWhere] = React.useState("");
   React.useEffect(() => {
-    fetch("/api/listings?summary=1").then(r => {
+    const pre = window.__btpPre || {};
+    window.__btpPre = null;
+    const get = u => fetch(u).then(r => {
       if (!r.ok) throw 0;
       return r.json();
-    }).then(setSum).catch(() => setSumErr(true));
-    fetch("/api/listings?field=all&limit=80").then(r => {
-      if (!r.ok) throw 0;
-      return r.json();
-    }).then(d => {
+    });
+    (pre.sum || get("/api/listings?summary=1")).then(setSum).catch(() => setSumErr(true));
+    (pre.fresh || get("/api/listings?field=all&limit=80")).then(d => {
       const co = new Set(),
         out = [];
       for (const l of d.listings || []) {
@@ -437,6 +437,10 @@ function LandingD({
   }, []);
   const go = e => {
     e.preventDefault();
+    analytics.track("home_search", {
+      has_query: !!q.trim(),
+      has_state: !!where.trim()
+    });
     const p = new URLSearchParams();
     if (q.trim()) p.set("q", q.trim());
     const w = where.trim().toLowerCase();
@@ -1991,7 +1995,9 @@ const analytics = {
       memStats[event] = (memStats[event] || 0) + 1;
     }
     try {
-      if (typeof window !== "undefined" && window.posthog) window.posthog.capture(event, props || {});
+      if (typeof window !== "undefined") {
+        if (window.btpTrack) window.btpTrack(event, props || {});else if (window.posthog) window.posthog.capture(event, props || {});
+      }
     } catch (e) {}
     if (typeof console !== "undefined") console.log("[iq]", event, props || "");
   },
@@ -2702,6 +2708,15 @@ function InterviewSim({
       if (j.summary) {
         setTurns(next);
         setSummary(j.summary);
+        const g = ivGrade(next);
+        analytics.track("interview_finished", {
+          mode: setup.mode,
+          kind: setup.kind,
+          questions: setup.total,
+          grade: g ? g.letter : null,
+          overall: g ? g.overall : null,
+          timed_out: next.filter(t => t.timedOut).length
+        });
       } else if (j.next) setTurns([...next, {
         q: String(j.next),
         a: "",
@@ -2719,6 +2734,13 @@ function InterviewSim({
     setTurns([]);
     setSummary(null);
     setPhase(null);
+    analytics.track("interview_started", {
+      mode: setup.mode,
+      kind: setup.kind,
+      questions: setup.total,
+      seconds: setup.limit,
+      read_aloud: !!setup.readAloud
+    });
     ask([]);
   }
   function submit(timedOut) {
@@ -4763,9 +4785,11 @@ function App() {
           user
         }) => {
           setClerkUser(user || null);
+          if (user && window.btpIdentify) window.btpIdentify(user.id);
         });
       }
       setClerkUser(Clerk.user || null);
+      if (Clerk.user && window.btpIdentify) window.btpIdentify(Clerk.user.id);
       setClerkInstance(Clerk);
       return Clerk;
     } catch (e) {
@@ -13228,8 +13252,8 @@ class AppErrorBoundary extends React.Component {
   componentDidCatch(error, info) {
     try {
       console.error("[iq] render error caught by boundary:", error, info && info.componentStack);
-      if (typeof window !== "undefined" && window.posthog && window.posthog.capture) {
-        window.posthog.capture("app_error", {
+      if (typeof window !== "undefined" && window.btpTrack) {
+        window.btpTrack("app_error", {
           message: error && error.message || "",
           stack: (error && error.stack || "").slice(0, 600)
         });

@@ -244,6 +244,7 @@
     } catch { renderAcct(); }
   }
   async function onUser(u){
+    try { if (u && window.btpIdentify) window.btpIdentify(u.id); } catch {}   // counted by account id only — never name/email
     S.user = u || null; S.me = { resume: null, notes: [], starred: [] }; S.loaded = false;
     renderAcct();
     if (S.user) { try { S.me = await api("GET"); S.loaded = true; } catch (e) { toast(e.message); } }
@@ -627,6 +628,7 @@ ${me}${email ? "\n" + email : ""}`;
   loadClerk();
 })();
 </script>
+<script src="/ph.js" defer></script>
 <script src="/feedback.js" defer></script>
 </body>
 </html>

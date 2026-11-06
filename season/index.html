@@ -276,6 +276,7 @@
   };
 
   async function onUser(u){
+    try { if (u && window.btpIdentify) window.btpIdentify(u.id); } catch {}   // counted by account id only — never name/email
     S.user = u || null; S.me = null; acct(); render();
     if (!S.user) return;
     try { S.me = await api("GET"); } catch (e) { toast(e.message); }
@@ -311,6 +312,7 @@
   render(); loadClerk();
 })();
 </script>
+<script src="/ph.js" defer></script>
 <script src="/feedback.js" defer></script>
 </body>
 </html>

@@ -348,6 +348,16 @@
       ${bars.length > 1 ? `<h3 style="font-size:14px;font-weight:600;margin:18px 0 10px">Who they're hiring</h3>` + bars.map(([k, v]) => `<div style="display:grid;grid-template-columns:140px 1fr 36px;gap:10px;align-items:center;font-size:13px;margin:6px 0"><span>${esc(k)}</span><div style="height:7px;background:#EEF1F6;border-radius:4px"><div style="width:${Math.round(v / max * 100)}%;height:7px;background:var(--navy);border-radius:4px"></div></div><span style="font-family:var(--mono);text-align:right">${v}</span></div>`).join("") : ""}
     </section>`;
   }
+  // analytics (PostHog via /ph.js): what students actually do — no names, emails or resume text
+  const track = (e, p) => { try { window.btpTrack && window.btpTrack(e, p); } catch {} };
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("#list a.apply"); if (!a) return;
+    const j = state.all.find((x) => x.url === a.getAttribute("href"));
+    track("apply_click", { company_id: j?.company_id || null, field: j?.field || null, major_view: state.major, page: "jobs" });
+  }, true);
+  let searchTimer = 0;
+  document.addEventListener("input", (e) => { if (e.target.id !== "q") return; clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { const v = e.target.value.trim(); if (v.length >= 3) track("jobs_search", { length: v.length, major_view: state.major, results: $("count")?.textContent?.match(/^[\d,]+/)?.[0] || null }); }, 1500); });
   function render(){
     try { renderRails(); } catch (e) { console.error("[jobs] rails", e); }
     if (!state.loaded) return;
@@ -510,6 +520,7 @@
     }
   }
   async function onUser(user){
+    try { if (user && window.btpIdentify) window.btpIdentify(user.id); } catch {}   // counted by account id only — never name/email
     state.user = user || null;
     if (state.user) { try { const d = await api("GET"); setMine(d); state.profile = d.profile || null;
         try { const n = d.profile?.name || [user.firstName, user.lastName].filter(Boolean).join(" ") || user.primaryEmailAddress?.emailAddress || "";
@@ -646,7 +657,7 @@
     const cos = [...state.mine.starred]; if (!cos.length) { state.followRows = []; return render(); }
     try { state.followRows = await getAll(`field=all&companies=${cos.slice(0, 400).join(",")}`); render(); } catch {}
   }
-  $("majorSel").addEventListener("change", (e) => { state.company = null; state.major = e.target.value; store.set("btp_major", state.major); $("meWrap").hidden = !STRICT_OK(); loadScope(); });
+  $("majorSel").addEventListener("change", (e) => { state.company = null; state.major = e.target.value; store.set("btp_major", state.major); track("major_picked", { major: state.major, from: "picker" }); $("meWrap").hidden = !STRICT_OK(); loadScope(); });
   if (!MAJOR_KEYS.includes(state.major)) state.major = "all";
   $("majorSel").value = state.major; $("meWrap").hidden = !STRICT_OK();
   // Arriving from a major link (homepage tiles) counts as picking one — remembered unless you already chose
@@ -662,7 +673,7 @@
     $("welcomeChips").innerHTML = PICKS.filter((k) => MAJOR_KEYS.includes(k)).map((k) => `<button data-m="${k}">${esc(short(k))}</button>`).join("")
       + `<button data-m="all" class="all">Show me everything</button>`;
     $("welcome").hidden = false;
-    const pick = (m) => { store.set("btp_major", m); $("welcome").hidden = true; if (m !== state.major) { state.company = null; state.major = m; $("majorSel").value = m; $("meWrap").hidden = !STRICT_OK(); loadScope(); } };
+    const pick = (m) => { track("major_picked", { major: m, from: "welcome" }); store.set("btp_major", m); $("welcome").hidden = true; if (m !== state.major) { state.company = null; state.major = m; $("majorSel").value = m; $("meWrap").hidden = !STRICT_OK(); loadScope(); } };
     $("welcomeChips").addEventListener("click", (e) => { const b = e.target.closest("button[data-m]"); if (b) pick(b.dataset.m); });
     $("welcomeX").onclick = () => pick("all");
     $("majorSel").addEventListener("change", () => { $("welcome").hidden = true; });
@@ -672,6 +683,7 @@
   loadScope();
 })();
 </script>
+<script src="/ph.js" defer></script>
 <script src="/feedback.js" defer></script>
 </body>
 </html>

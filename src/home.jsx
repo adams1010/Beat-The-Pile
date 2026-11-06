@@ -105,10 +105,12 @@ function LandingD({onQuiz,onPage}){
   const [sum,setSum]=React.useState(null),[sumErr,setSumErr]=React.useState(false),[fresh,setFresh]=React.useState(null);
   const [q,setQ]=React.useState(""),[where,setWhere]=React.useState("");
   React.useEffect(()=>{
-    fetch("/api/listings?summary=1").then(r=>{if(!r.ok)throw 0;return r.json();}).then(setSum).catch(()=>setSumErr(true));
-    fetch("/api/listings?field=all&limit=80").then(r=>{if(!r.ok)throw 0;return r.json();}).then(d=>{const co=new Set(),out=[];for(const l of d.listings||[]){if(co.has(l.company))continue;co.add(l.company);out.push(l);if(out.length===5)break;}setFresh(out);}).catch(()=>setFresh([]));
+    const pre=window.__btpPre||{};window.__btpPre=null;   // started in index.html's <head>; used once
+    const get=(u)=>fetch(u).then(r=>{if(!r.ok)throw 0;return r.json();});
+    (pre.sum||get("/api/listings?summary=1")).then(setSum).catch(()=>setSumErr(true));
+    (pre.fresh||get("/api/listings?field=all&limit=80")).then(d=>{const co=new Set(),out=[];for(const l of d.listings||[]){if(co.has(l.company))continue;co.add(l.company);out.push(l);if(out.length===5)break;}setFresh(out);}).catch(()=>setFresh([]));
   },[]);
-  const go=(e)=>{e.preventDefault();const p=new URLSearchParams();if(q.trim())p.set("q",q.trim());
+  const go=(e)=>{e.preventDefault();analytics.track("home_search",{has_query:!!q.trim(),has_state:!!where.trim()});const p=new URLSearchParams();if(q.trim())p.set("q",q.trim());
     const w=where.trim().toLowerCase();const code=/^[a-z]{2}$/.test(w)?w.toUpperCase():(D_STATES[w]||null);
     p.set("state",code&&Object.values(D_STATES).includes(code)?code:"all");if(w==="remote"&&!q.trim())p.set("q","remote");
     location.href="/jobs/?"+p.toString();};
@@ -719,7 +721,7 @@ const analytics={
     try{const s=JSON.parse(localStorage.getItem("iq_stats")||"{}");s[event]=(s[event]||0)+1;localStorage.setItem("iq_stats",JSON.stringify(s));memStats=s;}
     catch(e){memStats[event]=(memStats[event]||0)+1;}
     // Real cross-user analytics → PostHog. Fires for every user; owner views funnels in PostHog dashboard.
-    try{if(typeof window!=="undefined"&&window.posthog)window.posthog.capture(event,props||{});}catch(e){}
+    try{if(typeof window!=="undefined"){if(window.btpTrack)window.btpTrack(event,props||{});else if(window.posthog)window.posthog.capture(event,props||{});}}catch(e){}   // /ph.js queues until PostHog loads
     if(typeof console!=="undefined")console.log("[iq]",event,props||"");
   },
   read(){try{return JSON.parse(localStorage.getItem("iq_stats")||"{}");}catch(e){return memStats;}}
@@ -1016,13 +1018,13 @@ function InterviewSim({major,defaultCompany,defaultRole}){
       const m=String(d.text||"").match(/\{[\s\S]*\}/);let j=null;try{j=m?JSON.parse(m[0]):null;}catch(x){}
       if(!j)throw new Error("The interviewer gave an unreadable answer — try again.");
       const next=history.map((t,i)=>i===history.length-1&&t.answered?{...t,feedback:j.feedback||"",scores:j.scores&&typeof j.scores==="object"?j.scores:null}:t);
-      if(j.summary){setTurns(next);setSummary(j.summary);}
+      if(j.summary){setTurns(next);setSummary(j.summary);const g=ivGrade(next);analytics.track("interview_finished",{mode:setup.mode,kind:setup.kind,questions:setup.total,grade:g?g.letter:null,overall:g?g.overall:null,timed_out:next.filter(t=>t.timedOut).length});}
       else if(j.next)setTurns([...next,{q:String(j.next),a:"",feedback:"",answered:false}]);
       else throw new Error("The interviewer gave an unreadable answer — try again.");
     }catch(e){setErr(String(e.message||e));}
     finally{setBusy(false);}
   }
-  function start(){hush();setTurns([]);setSummary(null);setPhase(null);ask([]);}
+  function start(){hush();setTurns([]);setSummary(null);setPhase(null);analytics.track("interview_started",{mode:setup.mode,kind:setup.kind,questions:setup.total,seconds:setup.limit,read_aloud:!!setup.readAloud});ask([]);}
   function submit(timedOut){
     if(sentRef.current||busy||!waiting)return;
     const a=(draftRef.current+" "+interimRef.current).replace(/\s+/g," ").trim();
@@ -1931,9 +1933,9 @@ function App(){
       const Clerk=window.Clerk;
       // Subscribe to user changes so signing in/out updates our state
       if(typeof Clerk.addListener==="function"){
-        Clerk.addListener(({user})=>{setClerkUser(user||null);});
+        Clerk.addListener(({user})=>{setClerkUser(user||null);if(user&&window.btpIdentify)window.btpIdentify(user.id);});
       }
-      setClerkUser(Clerk.user||null);
+      setClerkUser(Clerk.user||null);if(Clerk.user&&window.btpIdentify)window.btpIdentify(Clerk.user.id);   // account id only, never name/email
       setClerkInstance(Clerk);
       return Clerk;
     }catch(e){
@@ -4657,8 +4659,8 @@ class AppErrorBoundary extends React.Component {
   componentDidCatch(error,info){
     try{
       console.error("[iq] render error caught by boundary:",error,info&&info.componentStack);
-      if(typeof window!=="undefined"&&window.posthog&&window.posthog.capture){
-        window.posthog.capture("app_error",{message:(error&&error.message)||"",stack:((error&&error.stack)||"").slice(0,600)});
+      if(typeof window!=="undefined"&&window.btpTrack){
+        window.btpTrack("app_error",{message:(error&&error.message)||"",stack:((error&&error.stack)||"").slice(0,600)});
       }
     }catch(e){}
   }
