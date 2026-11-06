@@ -379,9 +379,12 @@
     const where = state.savedOnly ? "saved" : state.followOnly ? "you follow" : state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
     $("count").textContent = rows.length
       ? `${rows.length} internship${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"} ${where}` +
-        (state.savedOnly || state.followOnly ? "" : ` · ${MAJOR_LABEL()}`)
+        (state.savedOnly || state.followOnly ? "" : ` · ${MAJOR_LABEL()}`) + (state.partial && !state.savedOnly && !state.followOnly ? " so far · loading the rest…" : "")
       : "";
 
+    if (!rows.length && state.partial && !state.savedOnly && !state.followOnly){   // don't say "nothing found" until every page is in
+      $("list").innerHTML = '<div class="skel"></div><div class="skel"></div>'; $("count").textContent = "Searching every listing…"; syncUrl(); return;
+    }
     if (!rows.length){
       $("list").innerHTML = state.followOnly
         ? `<div class="empty">${state.user ? "Follow companies with ☆ on any internship (or in Career Fair Mode). New postings from them show up here first." : "Sign in to follow companies and get alerted when they post."}</div>`
@@ -566,14 +569,21 @@
   // ── Loading: one major + one place at a time, in pages of 1,000 (the full all-majors list is too big for one response) ──
   const cache = new Map();
   let loadSeq = 0;
-  async function getAll(qs){
-    const rows = [];
-    for (let off = 0; off <= 20000; off += 1000) {
+  // Pages of 1,000, newest first. The first page comes back on its own (onFirst → render right away);
+  // the rest are fetched 4 at a time in parallel instead of one after another.
+  async function getAll(qs, onFirst){
+    const page = async (off) => {
       const r = await fetch(`/api/listings?${qs}${qs ? "&" : ""}limit=1000&offset=${off}`);
       if (!r.ok) throw new Error(r.status);
-      const d = await r.json(); rows.push(...(d.listings || []));
-      if (d.meta?.lastSync) state.lastSync = d.meta.lastSync;
-      if (!d.meta?.more) break;
+      const d = await r.json(); if (d.meta?.lastSync) state.lastSync = d.meta.lastSync; return d;
+    };
+    const first = await page(0);
+    const rows = [...(first.listings || [])];
+    if (!first.meta?.more) return rows;
+    if (onFirst) onFirst(rows.slice());
+    for (let off = 1000, done = false; !done && off <= 30000; off += 4000) {
+      const batch = await Promise.all([0, 1000, 2000, 3000].map((d) => off + d).filter((o) => o <= 30000).map(page));
+      for (const d of batch) { rows.push(...(d.listings || [])); if (!d.meta?.more) { done = true; break; } }
     }
     return rows;
   }
@@ -583,11 +593,19 @@
     const seq = ++loadSeq;
     if (!cache.has(qs)) { state.loaded = false; $("list").innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>'; $("count").textContent = ""; }
     try {
-      const rows = cache.get(qs) || await getAll(qs);
+      const show = (rows, partial) => {
+        if (seq !== loadSeq) return;                                 // a newer choice is already loading
+        state.all = rows.slice().sort((a, b) => sortKey(b) - sortKey(a));
+        state.loaded = true; state.partial = partial;
+        if (state.lastSync) { $("trustText").textContent = `Job boards last re-read ${timeOfDay(state.lastSync)}`; $("trust").hidden = false; }
+        urlReady = true;
+        render();
+      };
+      const rows = cache.get(qs) || await getAll(qs, (firstRows) => show(firstRows, true));   // newest 1,000 show right away
       cache.set(qs, rows);
-      if (seq !== loadSeq) return;                                   // a newer choice is already loading
+      if (seq !== loadSeq) return;
       state.all = rows.slice().sort((a, b) => sortKey(b) - sortKey(a));
-      state.loaded = true;
+      state.loaded = true; state.partial = false;
       if (state.lastSync) { $("trustText").textContent = `Job boards last re-read ${timeOfDay(state.lastSync)}`; $("trust").hidden = false; }
       urlReady = true;
       render();
