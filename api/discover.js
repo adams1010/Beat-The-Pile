@@ -121,7 +121,8 @@ export default async function handler(req, res) {
     await db.update(`company_candidates?id=eq.${encodeURIComponent(c.id)}`, {
       status: r.status,
       ats: r.ats || null,
-      config: r.status === "live" ? r.config : { triedHint: c.hint || null },   // remember which hint failed
+      // live: keep a name fix made earlier (config.listAs) unless this check found a better one
+      config: r.status === "live" ? { ...r.config, ...(c.config?.listAs && !r.config?.listAs ? { listAs: c.config.listAs } : {}) } : { triedHint: c.hint || null },   // failed: remember which hint failed
       enabled: r.status === "live",
       detail: r.detail || null,
       intern_count: r.intern_count ?? null,

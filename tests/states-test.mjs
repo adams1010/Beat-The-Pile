@@ -19,3 +19,14 @@ const cases = [
 let bad=0; for (const [s,w] of cases){ const g=extractStates(s); try{assert.deepEqual(g,w)}catch{bad++;console.log("✗",s,"→",g,"want",w)} }
 if (bad) process.exitCode = 1;
 console.log(bad?`${bad} bad`:`states: all ${cases.length} formats ✓`);
+
+// Country codes that look like states: Mumbai, IN ≠ Indiana · Düsseldorf, DE ≠ Delaware — but US towns with the same city names stay
+{
+  const { extractStates: x } = await import("../lib/filter.js");
+  const eq = (t, want) => { const got = JSON.stringify(x(t)); if (got !== JSON.stringify(want)) { console.error("FAIL", t, got); process.exit(1); } };
+  eq("One Lodha Place, Mumbai, IN", []); eq("Düsseldorf, DE", []); eq("Berlin, DE", []); eq("London, UK", []); eq("Toronto, ON", []); eq("Dublin, Ireland", []);
+  eq("https://condenast.wd115.myworkdayjobs.com/en-US/CondeCareers/job/One-Lodha-Place-Mumbai-IN/Art-Intern_R-13425", []);
+  eq("Indianapolis, IN", ["IN"]); eq("Berlin, NH", ["NH"]); eq("Warsaw, IN", ["IN"]); eq("Geneva, IL", ["IL"]); eq("London, KY", ["KY"]);
+  eq("Paris, TX", ["TX"]); eq("Cairo, IL", ["IL"]); eq("Dublin, OH", ["OH"]); eq("Melbourne, FL", ["FL"]); eq("Londonderry, NH", ["NH"]);
+  console.log("✓ foreign cities whose country code looks like a state are dropped; same-named US towns kept");
+}

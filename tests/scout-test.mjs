@@ -30,3 +30,13 @@ const { cleanName } = await import("../lib/scout.js");
 assert.equal(cleanName("3220 Analog Devices (Thailand) Co., Ltd."), "Analog Devices");
 assert.equal(cleanName("ABA - American Bankers Association"), "American Bankers Association");
 console.log("\nSCOUT TESTS PASSED");
+
+// Names (Nov 2026 cleanup): recruiting words off, "The … Company" kept whole, SHOUTING → normal case, acronyms kept
+{
+  const { cleanName } = await import("../lib/scout.js");
+  const want = { "The Nuclear Company": "The Nuclear Company", "The Options Clearing Corporation": "The Options Clearing Corporation", "RS&H Talent Acquisition": "RS&H",
+    "LandDesign Internships": "LandDesign", "Pediatrics Plus Website": "Pediatrics Plus", "CrowdStrike UK": "CrowdStrike", "REPUBLIC SERVICES": "Republic Services",
+    "HYDRIL USA DISTRIBUTION": "Hydril USA Distribution", "INFICON": "INFICON", "ABB": "ABB", "Boeing Company": "Boeing", "BAE Systems": "BAE Systems" };
+  for (const [a, b] of Object.entries(want)) if (cleanName(a) !== b) { console.error("FAIL cleanName", a, "→", cleanName(a)); process.exit(1); }
+  console.log("✓ company names: recruiting words, 'The … Company', shouting caps, acronyms");
+}
