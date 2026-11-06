@@ -47,6 +47,13 @@ async function syncOne(cfg, runStart, msLeft) {
   return entry;
 }
 
+export const HOT_BOOST_MS = 3 * 3600e3;
+/** Queue position: last sync time (never-synced = 0, first), minus a boost for companies posting right now. Exported for tests. */
+export function syncKey(id, last, hot) {
+  if (!last[id]) return 0;
+  return Date.parse(last[id]) - (hot.has(id) ? HOT_BOOST_MS : 0);
+}
+
 export default async function handler(req, res) {
   if (!isAuthorizedCron(req)) return res.status(401).json({ error: "Unauthorized" });
   if (!(await botOn("sync"))) return res.status(200).json({ off: true, bot: "sync" });
@@ -59,7 +66,14 @@ export default async function handler(req, res) {
     const runs = await db.selectAllAsAdmin("feed_last?select=company_id,ran_at&order=company_id.asc");
     for (const r of runs) if (!last[r.company_id]) last[r.company_id] = r.ran_at;
   } catch { /* first run */ }
-  companies.sort((a, b) => (last[a.id] || "").localeCompare(last[b.id] || ""));   // never-synced first
+  // Companies that posted something new in the last 3 days are read about twice as often (they count as 3 hours
+  // "older" in the queue): same total work, aimed where new internships actually appear. Never-synced stay first.
+  let hot = new Set();
+  try {
+    const since = new Date(Date.now() - 3 * 864e5).toISOString();
+    hot = new Set((await db.selectAllAsAdmin(`listings?select=company_id&first_seen=gte.${since}&closed_at=is.null&order=company_id.asc`)).map((r) => r.company_id));
+  } catch { /* no boost this run */ }
+  companies.sort((a, b) => syncKey(a.id, last, hot) - syncKey(b.id, last, hot));
 
   const report = await mapLimit(companies, 14, async (cfg) => {   // mostly waiting on company sites, so more at once
     const elapsed = Date.now() - t0;
