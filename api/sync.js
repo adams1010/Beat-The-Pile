@@ -13,6 +13,29 @@ export const config = { maxDuration: 60 };
 const START_BUDGET_MS = 40000;   // don't start a new company after this
 const HARD_STOP_MS = 54000;      // give up on a slow company before Vercel kills the function
 
+// A board that has been EMPTY or GONE (404/410) on every read for 24h+ really has no jobs (Nov 2026: Docugami's board
+// emptied, Allen Control Systems deleted theirs, and their old listings stayed up for days). Close those listings,
+// except ones the link checker has confirmed still open (link_ok = true): those point at a fetcher problem instead.
+export const GONE_AFTER_MS = 24 * 3600e3;
+const GONE_ERR = /HTTP (404|410)\b/;
+export function goneSince(runs, now) {
+  // runs: newest first. The streak is broken by any run that saw jobs or failed for another reason (timeout, 429…).
+  let start = null;
+  for (const r of runs) {
+    const empty = r.raw_count === 0 && (r.ok || /returned 0 jobs/.test(r.error || ""));
+    if (!(empty || GONE_ERR.test(r.error || ""))) break;
+    start = r.ran_at;
+  }
+  return start && now - Date.parse(start) >= GONE_AFTER_MS ? start : null;
+}
+async function closeIfGone(cfg, runStart, why) {
+  const runs = await db.selectAsAdmin(`feed_runs?select=ran_at,ok,raw_count,error&company_id=eq.${encodeURIComponent(cfg.id)}&order=ran_at.desc&limit=20`);
+  if (!goneSince([{ ran_at: runStart, ok: true, raw_count: 0, error: why === "404" ? "HTTP 404" : "" }, ...runs], Date.parse(runStart))) return false;
+  await db.update(`listings?company_id=eq.${encodeURIComponent(cfg.id)}&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.false)`, { closed_at: runStart });
+  console.warn(`[sync] ${cfg.id}: board ${why} for 24h+ → closed its listings (except ones with a confirmed-open link)`);
+  return true;
+}
+
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(`timed out after ${Math.round(ms / 1000)}s`)), ms))]);
 
 async function syncOne(cfg, runStart, msLeft) {
@@ -31,6 +54,7 @@ async function syncOne(cfg, runStart, msLeft) {
     if (raw === 0 && open.length > 0) {
       entry.closed_skipped = true;
       entry.error = "Board returned 0 jobs; kept existing listings. Check the fetcher.";
+      await closeIfGone(cfg, runStart, "empty");
     } else {
       // 3) Anything we didn't see this run is gone from the company's board → closed.
       await db.update(
@@ -40,7 +64,8 @@ async function syncOne(cfg, runStart, msLeft) {
     }
     entry.ok = !entry.closed_skipped;
   } catch (e) {
-    entry.error = String(e.message || e).slice(0, 500);   // fetch failed or timed out → close nothing
+    entry.error = String(e.message || e).slice(0, 500);   // fetch failed or timed out → close nothing…
+    if (GONE_ERR.test(entry.error)) { try { await closeIfGone(cfg, runStart, "404"); } catch { /* next run */ } }   // …unless the board itself is gone
   }
   try { await db.insert("feed_runs", [entry]); } catch (e) { console.error(`feed_runs log failed (${cfg.id}):`, e.message); }
   if (!entry.ok) console.warn(`[sync] ${cfg.id}: ${entry.error}`);

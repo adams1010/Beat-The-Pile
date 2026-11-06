@@ -44,3 +44,17 @@ assert.deepEqual(order, ["new", "b", "c", "a"], "b (hot, 2h ago) counts as 5h ag
 assert.equal(HOT_BOOST_MS, 3 * h);
 console.log("✓ sync queue: hot companies re-read about twice as often");
 console.log("BOTS SPEED TESTS PASSED");
+
+// ── Gone boards: empty or 404 on every read for 24h+ → listings close (link-confirmed ones stay) ──
+{
+  const { goneSince, GONE_AFTER_MS } = await import("../api/sync.js");
+  const t = Date.parse("2026-11-06T20:00:00Z"), hr = 3600e3, at = (hAgo) => new Date(t - hAgo * hr).toISOString();
+  const empty = (hAgo) => ({ ran_at: at(hAgo), ok: false, raw_count: 0, error: "Board returned 0 jobs; kept existing listings. Check the fetcher." });
+  assert.ok(goneSince([empty(0), empty(8), empty(16), empty(25)], t), "empty for 25h → gone");
+  assert.equal(goneSince([empty(0), empty(8), empty(16)], t), null, "only 16h → wait");
+  assert.equal(goneSince([empty(0), { ran_at: at(6), ok: true, raw_count: 40 }, empty(30)], t), null, "saw jobs 6h ago → streak broken");
+  assert.equal(goneSince([empty(0), { ran_at: at(10), ok: false, raw_count: 0, error: "timed out after 19s" }, empty(30)], t), null, "a timeout breaks the streak (unknown, not empty)");
+  assert.ok(goneSince([{ ran_at: at(0), ok: false, raw_count: 0, error: "x: Greenhouse HTTP 404" }, { ran_at: at(26), ok: false, raw_count: 0, error: "x: Greenhouse HTTP 404" }], t), "404 for 26h → gone");
+  assert.equal(GONE_AFTER_MS, 24 * hr);
+  console.log("✓ gone boards: 24h of empty/404 closes listings; timeouts and real jobs reset it");
+}
