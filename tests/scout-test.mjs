@@ -40,3 +40,19 @@ console.log("\nSCOUT TESTS PASSED");
   for (const [a, b] of Object.entries(want)) if (cleanName(a) !== b) { console.error("FAIL cleanName", a, "→", cleanName(a)); process.exit(1); }
   console.log("✓ company names: recruiting words, 'The … Company', shouting caps, acronyms");
 }
+
+// Lever (Nov 2026): boards come from jobs.lever.co, employer name from the page title, US internships only
+{
+  const { probe } = await import("../lib/scout.js");
+  globalThis.fetch = async (u) => { const s = String(u);
+    if (s.startsWith("https://api.lever.co/v0/postings/acme")) return { ok: true, status: 200, json: async () => [
+      { text: "Mechanical Engineering Intern", categories: { location: "Austin, TX" }, country: "US" },
+      { text: "Finance Intern", categories: { location: "London" }, country: "GB" },
+      { text: "Senior Engineer", categories: { location: "Austin, TX" }, country: "US" }], text: async () => "" };
+    if (s.startsWith("https://jobs.lever.co/acme")) return { ok: true, status: 200, text: async () => "<html><title>Acme Robotics &amp; Co - Jobs</title></html>", json: async () => ({}) };
+    return { ok: false, status: 404, json: async () => ({}), text: async () => "" }; };
+  const r = await probe({ ats: "lever", token: "acme" });
+  assert.equal(r.interns, 1, "London intern and senior role excluded"); assert.equal(r.me, 1);
+  assert.equal(r.company, "Acme Robotics & Co"); assert.equal(r.hint, "https://jobs.lever.co/acme");
+  console.log("✓ Lever boards: US internships counted, employer from page title");
+}

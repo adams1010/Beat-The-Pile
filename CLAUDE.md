@@ -93,7 +93,7 @@ with the CRON_SECRET. To add a bot: add it to `BOTS` in `lib/bots.js`, check the
 
 ## How companies get in (sources → proof → live)
 1. **Board Scout** (biggest source): Common Crawl's public index → ~14,600 job boards (Workday, Greenhouse, Ashby,
-   SmartRecruiters, iCIMS) → probes the ones we don't track for US internships → real employer name from the board →
+   SmartRecruiters, iCIMS, Lever since Nov 6) → probes the ones we don't track for US internships → real employer name from the board →
    `POST /api/discovery {action:"scout"}` inserts candidates (`id b-…`, `hint` = board URL, `priority`).
 2. **Backlog** (`data/backlog.json`, 3,000+ companies from 3 years of SimplifyJobs history; rebuild with
    `scripts/build-backlog.mjs`). The finder pulls 60 more whenever <120 are queued; it checks up to 60 per run, 12 at once.
