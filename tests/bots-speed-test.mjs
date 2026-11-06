@@ -22,9 +22,14 @@ assert.ok(peak <= _wdTest.PER_CLUSTER, `at most ${_wdTest.PER_CLUSTER} at once o
 console.log("✓ Workday: 429 waits and retries; capped requests per cluster");
 
 // a 429 that never clears still fails the company (after 2 retries), so the sync logs it
-globalThis.fetch = async () => ({ ok: false, status: 429, headers: { get: () => "0" }, json: async () => ({}) });
-await assert.rejects(fetchWorkday({ id: "busy", host: "busy.wd1.myworkdayjobs.com", tenant: "busy", site: "x" }), /Workday HTTP 429/);
-console.log("✓ Workday: a lasting 429 still reports an error");
+let hits = 0;
+globalThis.fetch = async () => { hits++; return { ok: false, status: 429, headers: { get: () => "0" }, json: async () => ({}) }; };
+await assert.rejects(fetchWorkday({ id: "busy", host: "busy.wd1.myworkdayjobs.com", tenant: "busy", site: "x" }), (e) => e.busy === true && /Workday busy/.test(e.message));
+const before = hits;
+await assert.rejects(fetchWorkday({ id: "busy2", host: "other.wd1.myworkdayjobs.com", tenant: "other", site: "x" }), (e) => e.busy === true);
+assert.equal(hits, before, "a cooled cluster gets no more requests this run");
+_wdTest.cooled.clear();
+console.log("✓ Workday: a lasting 429 cools that cluster for 90s and marks companies busy (skipped, not failed)");
 
 // ── Lever: paged, all postings collected ──
 const urls = [];

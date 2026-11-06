@@ -64,6 +64,7 @@ async function syncOne(cfg, runStart, msLeft) {
     }
     entry.ok = !entry.closed_skipped;
   } catch (e) {
+    if (e?.busy) return { company_id: cfg.id, skipped: true, busy: true };   // board host asked us to slow down: not a failure, first in line next run
     entry.error = String(e.message || e).slice(0, 500);   // fetch failed or timed out → close nothing…
     if (GONE_ERR.test(entry.error)) { try { await closeIfGone(cfg, runStart, "404"); } catch { /* next run */ } }   // …unless the board itself is gone
   }
@@ -108,7 +109,7 @@ export default async function handler(req, res) {
   const doneRuns = report.filter((r) => !r.skipped), failed = doneRuns.filter((r) => !r.ok);
   const kept = doneRuns.reduce((n, r) => n + (r.kept_count || 0), 0);
   await logRun("sync", failed.length < doneRuns.length, `Synced ${doneRuns.length} companies · ${kept} internships seen${failed.length ? ` · ${failed.length} boards didn't answer` : ""}`,
-    { synced: doneRuns.length, failed: failed.length, kept, deferred: report.length - doneRuns.length });
+    { synced: doneRuns.length, failed: failed.length, kept, deferred: report.length - doneRuns.length, busy: report.filter((r) => r.busy).length });
   return res.status(200).json({
     ranAt: runStart,
     synced: report.filter((r) => !r.skipped).length,
