@@ -46,7 +46,7 @@
   input:focus,textarea:focus{outline:2px solid var(--green);outline-offset:0;border-color:var(--green)}
   textarea{min-height:90px;resize:vertical}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
-  @media(max-width:600px){.row{grid-template-columns:1fr}.card{padding:18px}.hero .body{padding:0 18px 18px}}
+  @media(max-width:600px){.row{grid-template-columns:1fr}.card{padding:18px}.card.hero{padding:0}.hero .body{padding:0 18px 18px}}
   .rep{border:1px solid var(--line);border-radius:10px;padding:4px 12px 12px;margin-top:10px;position:relative}
   .rm{position:absolute;top:8px;right:8px;background:none;border:0;color:var(--muted);cursor:pointer;font:inherit;font-size:13px}
   .handle{display:flex;align-items:center;border:1px solid var(--line);border-radius:8px;background:#fff;overflow:hidden}
@@ -57,6 +57,15 @@
   .bar{position:sticky;bottom:0;background:rgba(246,247,249,.96);border-top:1px solid var(--line);padding:12px 0;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
   .msg{font-size:14px} .msg.err{color:var(--red)} .msg.ok{color:var(--green-dark)}
   .tabs{display:flex;gap:6px;margin-bottom:14px}
+  .toprow{display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+  .own{display:flex;gap:6px;padding-bottom:2px}
+  .own button,.own a{font:inherit;font-size:13.5px;font-weight:600;border:0;background:#EEF1F6;color:var(--navy);border-radius:8px;padding:7px 14px;cursor:pointer;text-decoration:none}
+  .own button:hover,.own a:hover{background:#E1E6EE}
+  .vis{margin-top:14px;font-size:13px;color:var(--muted);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .vis .dotv{width:7px;height:7px;border-radius:50%;background:#8590A6}.vis .dotv.on{background:var(--green)}
+  .edhead{display:flex;align-items:center;justify-content:space-between;margin:0 0 12px}
+  .edhead b{font-size:17px;color:var(--navy)}
+  .linkbtn{font:inherit;font-size:14px;font-weight:600;border:0;background:none;color:var(--green-dark);cursor:pointer;padding:6px 0}
   .tabs button{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);background:#fff;border-radius:8px;padding:7px 14px;cursor:pointer;color:var(--muted)}
   .tabs button[aria-pressed=true]{background:var(--navy);border-color:var(--navy);color:#fff}
   img.avatar{object-fit:cover;background:#fff;display:block}
@@ -79,7 +88,7 @@
   const initials = (n) => String(n || "?").trim().split(/\s+/).slice(0, 2).map((w) => w[0] || "").join("").toUpperCase() || "?";
   const handleFromPath = () => { const m = location.pathname.match(/^\/u\/([a-z0-9-]{3,30})\/?$/i); return m && m[1].toLowerCase() !== "edit" ? m[1].toLowerCase() : null; };
   const SKILLS = ["SolidWorks","AutoCAD","CATIA","Creo","Fusion 360","Inventor","NX","ANSYS","Abaqus","COMSOL","MATLAB","Simulink","Python","C++","Java","JavaScript","SQL","Excel","LabVIEW","Arduino","Raspberry Pi","3D printing","CNC machining","GD&T","FEA","CFD","Thermodynamics","Heat transfer","Fluid mechanics","Statics","Dynamics","Materials","Manufacturing processes","Lean / Six Sigma","Soldering","PCB design","Revit","Civil 3D","Project management","Technical writing","Public speaking","Leadership","Spanish"];
-  const S = { clerk: null, user: null, me: null, draft: null, tab: "edit" };
+  const S = { clerk: null, user: null, me: null, draft: null, tab: "preview" };
   const app = $("#app");
 
   // ── Public view (anyone, no sign-in) ──
@@ -93,13 +102,16 @@
       ${x.desc ? `<p>${esc(x.desc)}</p>` : ""}</div></div>`).join("");
     return `
       <section class="card hero"><div class="band"></div><div class="body">
-        ${p.photo && /^data:image\/(jpeg|png|webp);base64,/.test(p.photo) ? `<img class="avatar" src="${esc(p.photo)}" alt="${esc(p.name || "Profile photo")}">` : `<div class="avatar" aria-hidden="true">${esc(initials(p.name))}</div>`}
+        <div class="toprow">${p.photo && /^data:image\/(jpeg|png|webp);base64,/.test(p.photo) ? `<img class="avatar" src="${esc(p.photo)}" alt="${esc(p.name || "Profile photo")}">` : `<div class="avatar" aria-hidden="true">${esc(initials(p.name))}</div>`}
+        ${isPreview ? `<div class="own"><button type="button" data-tab="edit">Edit profile</button>${S.me && S.me.handle && S.me.profilePublic ? `<button type="button" id="shareP">Share</button>` : ""}</div>` : ""}</div>
         <h1>${esc(p.name || "Your name")}</h1>
         ${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
         <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}</div>
         ${p.lookingFor ? `<div class="looking">Looking for: ${esc(p.lookingFor)}</div>` : ""}
         <div class="btns">${resume ? `<a class="btn pri" href="${esc(resume)}" target="_blank" rel="noopener">View resume</a>` : isPreview && p.showResume ? `<span class="btn pri" title="Shows when your resume QR link is on">View resume</span>` : ""}${links}</div>
+        ${isPreview && S.me ? `<div class="vis"><span class="dotv${S.me.profilePublic && S.me.handle ? " on" : ""}" aria-hidden="true"></span>${S.me.profilePublic && S.me.handle ? `Public · <a href="/u/${esc(S.me.handle)}" target="_blank" style="color:var(--muted)">beatthepile.com/u/${esc(S.me.handle)}</a>` : "Private · only you can see this"}</div>` : ""}
       </div></section>
+      ${isPreview && !p.about && !(p.experience || []).length && !(p.projects || []).length && !(p.skills || []).length ? `<section class="card muted" style="font-size:14.5px">Add an About, experience and skills so recruiters see more than a name. <button type="button" class="linkbtn" data-tab="edit">Edit profile</button></section>` : ""}
       ${p.about ? `<section class="card"><h2>About</h2><p class="about">${esc(p.about)}</p></section>` : ""}
       ${exp ? `<section class="card"><h2>Experience</h2>${exp}</section>` : ""}
       ${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}
@@ -130,7 +142,7 @@
     const resumeOn = me.resume && me.resume.share;
     app.className = "";
     document.querySelector("main").innerHTML = `
-      <div class="tabs" role="group" aria-label="Profile view"><button data-tab="edit" aria-pressed="${S.tab === "edit"}">Edit</button><button data-tab="preview" aria-pressed="${S.tab === "preview"}">Preview</button></div>
+      ${S.tab === "preview" ? "" : `<div class="edhead"><button type="button" class="linkbtn" data-tab="preview">← Back to profile</button><b>Edit profile</b><span style="width:110px"></span></div>`}
       ${S.tab === "preview" ? profileHtml(d.p, resumeOn && d.p.showResume ? "/r/" + me.resume.token : null, true) : `
       <section class="card"><h2>Your link</h2>
         <label for="f_handle">Profile address</label>
@@ -175,12 +187,14 @@
         <label for="l_portfolio">Portfolio / website</label><input id="l_portfolio" data-link="portfolio" value="${esc(d.p.links.portfolio || "")}" placeholder="https://">
         <label class="switch"><input type="checkbox" id="f_resume" ${d.p.showResume ? "checked" : ""}><span><b>Show a "View resume" button</b><br><span class="muted small">${me.resume ? (me.resume.share ? "Uses your Career Fair resume link (on)." : "Your resume link is off — turn it on in <a href='/fair/' style='color:var(--green-dark)'>Career Fair Mode</a> for this to show.") : "Upload a resume in <a href='/fair/' style='color:var(--green-dark)'>Career Fair Mode</a> first."}</span></span></label>
       </section>`}
-      <div class="bar"><button class="btn pri" id="save">Save profile</button>${me.handle && me.profilePublic ? `<a class="btn" href="/u/${esc(me.handle)}" target="_blank">Open public page ↗</a>` : ""}<span class="msg" id="msg" role="status"></span></div>`;
+      ${S.tab === "preview" ? `<span class="msg" id="msg" role="status" hidden></span>` : `<div class="bar"><button class="btn pri" id="save">Save profile</button><button class="btn" type="button" data-tab="preview">Cancel</button><span class="msg" id="msg" role="status"></span></div>`}`;
     wire();
   }
   function wire(){
     const d = S.draft, main = document.querySelector("main");
-    main.querySelectorAll("[data-tab]").forEach((b) => b.onclick = () => { S.tab = b.dataset.tab; editor(); });
+    main.querySelectorAll("[data-tab]").forEach((b) => b.onclick = () => { S.tab = b.dataset.tab; if (S.tab === "preview") load(); editor(); window.scrollTo(0, 0); });
+    const sh = $("#shareP"); if (sh) sh.onclick = async () => { const url = location.origin + "/u/" + S.me.handle;
+      try { if (navigator.share) await navigator.share({ title: (S.me.profile && S.me.profile.name) || "My profile", url }); else { await navigator.clipboard.writeText(url); sh.textContent = "Link copied"; setTimeout(() => sh.textContent = "Share", 1600); } } catch {} };
     main.querySelectorAll("[data-k]").forEach((el) => el.oninput = () => { d.p[el.dataset.k] = el.value; });
     main.querySelectorAll("[data-list]").forEach((el) => el.oninput = () => { d.p[el.dataset.list][+el.dataset.i][el.dataset.f] = el.value; });
     main.querySelectorAll("[data-link]").forEach((el) => el.oninput = () => { d.p.links[el.dataset.link] = el.value.trim(); });
@@ -198,7 +212,7 @@
       const msg = $("#msg"); try { d.p.photo = await shrink(f); editor(); const m = $("#msg"); m.className = "msg"; m.textContent = "Photo ready — tap Save profile."; }
       catch (e) { msg.className = "msg err"; msg.textContent = e.message; } };
     const rp = $("#rmPhoto"); if (rp) rp.onclick = () => { d.p.photo = null; editor(); const m = $("#msg"); m.className = "msg"; m.textContent = "Photo removed — tap Save profile."; };
-    $("#save").onclick = save;
+    const sv = $("#save"); if (sv) sv.onclick = save;
   }
   // Photo → centered square, 320px, JPEG; quality steps down until it's small (server limit ~65 KB).
   function shrink(file){
@@ -227,7 +241,7 @@
     try {
       const p = { ...S.draft.p, gradYear: S.draft.p.gradYear ? Number(S.draft.p.gradYear) : null };
       S.me = await api("POST", { action: "profile", profile: p, handle: S.draft.handle.replace(/^-+|-+$/g, "") || null, public: S.draft.pub });
-      load(); remember(); editor(); const m = $("#msg"); m.className = "msg ok"; m.textContent = S.me.profilePublic ? "Saved — your page is live." : "Saved (private).";
+      load(); remember(); S.tab = "preview"; editor(); window.scrollTo(0, 0);
     } catch (e) { msg.className = "msg err"; msg.textContent = e.message; btn.disabled = false; }
   }
   function load(){
