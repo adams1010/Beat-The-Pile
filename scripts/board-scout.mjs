@@ -37,9 +37,10 @@ for (const [k, b] of all) {
 }
 console.log(`Crawls ${crawls.join(", ")}: ${all.size} boards · ${knownBoards.size} already tracked · probing ${todo.size}`);
 
-const { found, checked } = await scout(todo, { concurrency: 14, deadline: t0 + MAX_MINUTES * 6e4, onProgress: (n, f) => console.log(`  …${n} probed, ${f} with internships`) });
+const { found, checked, busy } = await scout(todo, { concurrency: 14, deadline: t0 + MAX_MINUTES * 6e4, onProgress: (n, f) => console.log(`  …${n} probed, ${f} with internships`) });
 const today = new Date().toISOString().slice(0, 10);
 for (const k of checked) state.checked[k] = today;
+if (busy) console.log(`${busy} boards were rate-limited (Paylocity) — left for the next run`);
 console.log(`Probed ${checked.length} boards in ${Math.round((Date.now() - t0) / 1000)}s → ${found.length} with US internships`);
 for (const f of found.slice(0, 25)) console.log(`  p${f.priority} ${f.company} (${f.ats}) · ${f.interns} interns, ${f.me} ME · e.g. ${f.sample[0]}`);
 

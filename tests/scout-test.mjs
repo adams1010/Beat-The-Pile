@@ -56,3 +56,17 @@ console.log("\nSCOUT TESTS PASSED");
   assert.equal(r.company, "Acme Robotics & Co"); assert.equal(r.hint, "https://jobs.lever.co/acme");
   console.log("✓ Lever boards: US internships counted, employer from page title");
 }
+
+// Paylocity + UKG in Board Scout (Nov 2026): names must match the website's own address; bot walls never become names
+{
+  const { siteName, nameForSite, siteDomain } = await import("../lib/scout.js");
+  assert.equal(siteName("Attention Required! | Cloudflare"), null); assert.equal(siteName("Just a moment..."), null);
+  assert.equal(nameForSite(["Geotechnical, Water, Ecology, Environmental, Construction Mgmt | GZA"], "gza.com"), "GZA", "the slogan is not the name");
+  assert.equal(nameForSite(["Canopy Children's Solutions"], "mycanopy.org"), "Canopy Children's Solutions");
+  assert.equal(nameForSite(["Oswego County Opportunities"], "oco.org"), "Oswego County Opportunities");
+  assert.equal(nameForSite(["LTS Lohmann"], "renpharm.com"), null, "a name unrelated to the address is dropped, not guessed");
+  assert.equal(nameForSite(["BioCryst® | Rare Disease"], "biocryst.com"), "BioCryst");
+  assert.equal(siteDomain("https://www.maxwellroofing.com/careers"), "maxwellroofing.com");
+  assert.equal(siteDomain("https://recruiting.paylocity.com/x"), null);
+  console.log("✓ Paylocity/UKG names: matched to the site's own address; Cloudflare pages and slogans rejected");
+}
