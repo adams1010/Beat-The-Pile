@@ -75,3 +75,4 @@ console.log("\nSCOUT TESTS PASSED");
   for (const [a, b] of [["Work at Simmons", "Simmons"], ["Join the Imagine team!", "Imagine"], ["Fenner Drives Portal", "Fenner Drives"]]) assert.equal(cleanName(a), b);
   console.log("✓ board titles like 'Work at X' / 'X Portal' → X"); }
 { const { cleanName } = await import("../lib/scout.js"); assert.equal(cleanName("YellaWood&reg; Pressure Treated Pine"), "YellaWood"); console.log("✓ ® / ™ taglines dropped"); }
+{ const { cleanName } = await import("../lib/scout.js"); assert.equal(cleanName("11th Second"), "11th Second"); assert.equal(cleanName("1010 Games"), "1010 Games"); assert.equal(cleanName("3220 Analog Devices (Thailand) Co., Ltd."), "Analog Devices"); console.log("✓ names that start with a number keep it"); }

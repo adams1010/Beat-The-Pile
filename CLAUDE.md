@@ -94,7 +94,7 @@ with the CRON_SECRET. To add a bot: add it to `BOTS` in `lib/bots.js`, check the
 
 ## How companies get in (sources → proof → live)
 1. **Board Scout** (biggest source): Common Crawl's public index → ~14,600 job boards (Workday, Greenhouse, Ashby,
-   SmartRecruiters, iCIMS, Lever since Nov 6) → probes the ones we don't track for US internships → real employer name from the board →
+   SmartRecruiters, iCIMS, Lever since Nov 6; Paylocity + UKG + BambooHR since Nov 7 — 37,000+ boards) → probes the ones we don't track for US internships → real employer name from the board →
    `POST /api/discovery {action:"scout"}` inserts candidates (`id b-…`, `hint` = board URL, `priority`).
 2. **Backlog** (`data/backlog.json`, 3,000+ companies from 3 years of SimplifyJobs history; rebuild with
    `scripts/build-backlog.mjs`). The finder pulls 60 more whenever <120 are queued; it checks up to 60 per run, 12 at once.
@@ -114,8 +114,10 @@ own domain, `/api/jobs`) · ashby · smartrecruiters · oracle · **eightfold** 
 `/api/apply/v2`) · paylocity · adp · **taleo** (Enterprise: `{tenant}.taleo.net/careersection/{section}`, portal id read
 from the search page and saved in config; keyword search "intern"/"co-op"; proof = tenant name or own-site link) ·
 **ukg** (UltiPro `recruiting{,2}.ultipro.com/{TENANT}/JobBoard/{guid}`; keyword search is broken so it reads every job;
-proof = own-site link only; every detail URL answers 200 → link checker skips it). Not yet: Avature, Dayforce,
-Taleo Business Edition (`*.tbe.taleo.net`), BambooHR, BrassRing. (Board Scout can't use Taleo: pages never name the employer.)
+proof = own-site link only; every detail URL answers 200 → link checker skips it) · **bamboohr** (`{slug}.bamboohr.com/careers/list` JSON; the board's
+"Internship" employment type counts even when the title doesn't say intern (`isIntern`); proof = board name/slug match or the board's own
+registered name from `/careers/company-info`; dead job pages redirect → link checker skips it). Not yet: Avature, Dayforce,
+Taleo Business Edition (`*.tbe.taleo.net`), BrassRing, Workable. (Board Scout can't use Taleo: pages never name the employer.)
 **Adding a reader:** fetcher in `lib/fetchers/` returning `[{sourceId,title,location,url,postedOn}]` → register in
 `fetchers/index.js` → `boardKey` in `lib/companies.js` → detection in `scanHtml` + a `verify…` proof in
 `lib/discover.js` → add the system to `NOW_READABLE` and bump `READERS_UPDATED_AT` in `api/discover.js` (re-tests

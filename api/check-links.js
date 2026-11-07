@@ -16,7 +16,7 @@ const BATCH = 700;          // oldest-checked first; whatever doesn't fit the ti
 const FAILS_TO_HIDE = 2;
 // These job pages are blank shells filled in by script, so a page fetch can't tell open from closed.
 // They're skipped here (and not queued) — the sync closes them when they leave the company's feed.
-export const PAGE_UNCHECKABLE = ["ashby", "smartrecruiters", "oracle", "eightfold", "paylocity", "adp", "jibe", "taleo", "ukg"];   // ukg: every detail URL answers 200; taleo: script-rendered pages
+export const PAGE_UNCHECKABLE = ["ashby", "smartrecruiters", "oracle", "eightfold", "paylocity", "adp", "jibe", "taleo", "ukg", "bamboohr"];   // ukg: every detail URL answers 200; taleo: script-rendered pages
 const TIME_BUDGET_MS = 50000;
 
 const DEAD_PHRASES = [

@@ -15,7 +15,7 @@ export const config = { maxDuration: 60 };
 const PER_RUN = 60;               // most checks finish in a few seconds (queued companies come with a board link)
 const START_BUDGET_MS = 22000;   // don't start a company after this
 const HARD_STOP_MS = 50000;      // give up on any company still running (Vercel kills the function at 60s)
-const READERS_UPDATED_AT = "2026-11-05T17:45:00Z";   // bump when a new reader ships → re-test companies parked before it
+const READERS_UPDATED_AT = "2026-11-07T06:00:00Z";   // bump when a new reader ships → re-test companies parked before it
 const RETRY_AFTER_DAYS = 14;
 
 export default async function handler(req, res) {
@@ -73,7 +73,7 @@ export default async function handler(req, res) {
 
   if (mark("hints")) return res.status(200).json({ marks });
   // 1c) A job system we just learned to read → re-test every company parked as "unsupported" on it
-  const NOW_READABLE = /\b(iCIMS|Oracle|Ashby|Eightfold|SmartRecruiters|Paylocity|ADP|Jibe|Taleo|UKG)\b/;   // add a system here when a new reader ships
+  const NOW_READABLE = /\b(iCIMS|Oracle|Ashby|Eightfold|SmartRecruiters|Paylocity|ADP|Jibe|Taleo|UKG|BambooHR)\b/;   // add a system here when a new reader ships
   // Only companies parked BEFORE the latest readers shipped — otherwise ones that are still unreadable loop forever
   const parked = await db.selectAllAsAdmin(`company_candidates?select=id,detail&status=eq.unsupported&checked_at=lt.${READERS_UPDATED_AT}`);
   const unpark = parked.filter((r) => NOW_READABLE.test(r.detail || "")).map((r) => r.id);
