@@ -12,7 +12,7 @@
   function upgrade(el) {
     if (!map || el.dataset.logoDone) return; el.dataset.logoDone = "1";
     const v = map[el.dataset.logoId]; if (!v) return;
-    const img = new Image(); img.alt = ""; img.decoding = "async"; img.loading = "lazy"; img.referrerPolicy = "no-referrer";
+    const img = new Image(); img.alt = ""; img.decoding = "async"; img.referrerPolicy = "no-referrer";
     img.onload = () => {
       if (img.naturalWidth < 24 && !v.startsWith("fav:")) return;          // tiny/broken icon → keep initials
       if (v.startsWith("fav:") && img.naturalWidth <= 16) return;          // Google's generic 16px globe = no real icon
@@ -20,13 +20,16 @@
     };
     img.src = src(v);
   }
-  const scan = (root) => root.querySelectorAll && root.querySelectorAll("[data-logo-id]:not([data-logo-done])").forEach(upgrade);
+  // only load logos that are on (or near) the screen — /jobs can hold 10,000+ tiles
+  const io = "IntersectionObserver" in window ? new IntersectionObserver((es) => { for (const e of es) if (e.isIntersecting) { io.unobserve(e.target); upgrade(e.target); } }, { rootMargin: "400px" }) : null;
+  const watch = (el) => { if (el.dataset.logoDone || el.dataset.logoWatch || !map || !map[el.dataset.logoId]) return; el.dataset.logoWatch = "1"; io ? io.observe(el) : upgrade(el); };
+  const scan = (root) => root.querySelectorAll && root.querySelectorAll("[data-logo-id]:not([data-logo-watch])").forEach(watch);
   function ready(m) { map = m || {}; scan(document); waiting.forEach((f) => f()); waiting = []; }
   try { const c = JSON.parse(sessionStorage.getItem(KEY) || "null"); if (c && Date.now() - c.t < TTL) ready(c.m); } catch {}
   if (!map) fetch("/api/listings?logos=1").then((r) => (r.ok ? r.json() : {})).then((m) => {
     try { sessionStorage.setItem(KEY, JSON.stringify({ t: Date.now(), m })); } catch {}
     ready(m);
   }).catch(() => ready({}));
-  new MutationObserver((ms) => { if (!map) return; for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1) { if (n.matches && n.matches("[data-logo-id]")) upgrade(n); scan(n); } })
+  new MutationObserver((ms) => { if (!map) return; for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1) { if (n.matches && n.matches("[data-logo-id]")) watch(n); scan(n); } })
     .observe(document.documentElement, { childList: true, subtree: true });
 })();
