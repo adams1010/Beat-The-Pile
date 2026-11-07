@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="canonical" href="https://www.beatthepile.com/demo/story/">
+<title>Demo — Beat the Pile</title>
+<meta name="description" content="Beat the Pile in 90 seconds: Career Fair Mode, internships straight from company job boards, tailored resumes, interview practice and a weekly email. Tap through at your own pace.">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Beat the Pile">
+<link rel="apple-touch-icon" href="/icons/icon-180.png">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#070F1E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--green:#0B7A55;--green-dark:#0A6647;--green-light:#EAF7F1;--mint:#2FD39A;--navy:#070F1E;--navy2:#0D1A2F;--ink:#0A1426;--muted:#55627A;
+        --amber:#FFC861;--red:#F87171;--violet:#A78BFA;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;margin:0}
+  body{background:#03070F;font-variant-numeric:tabular-nums;color:#fff;font-family:var(--font);-webkit-font-smoothing:antialiased;overflow:hidden;user-select:none;-webkit-user-select:none}
+  /* Story frame: phone-shaped on laptops, full screen on phones */
+  .frame{position:relative;height:100%;max-width:520px;margin:0 auto;background:var(--navy);overflow:hidden}
+  @media (min-width:700px){.frame{height:min(100%,920px);top:50%;transform:translateY(-50%);border-radius:28px;box-shadow:0 30px 90px rgba(0,0,0,.6)}}
+  .bars{position:absolute;top:0;left:0;right:0;z-index:20;display:flex;gap:4px;padding:12px 12px 0;padding-top:max(12px,env(safe-area-inset-top))}
+  .bars span{flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.25);overflow:hidden}
+  .bars span i{display:block;height:100%;width:0;background:#fff}
+  .head{position:absolute;top:22px;left:0;right:0;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:8px 14px;padding-top:max(8px,env(safe-area-inset-top))}
+  .brand{display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-weight:600;font-size:14px}
+  .brand b{width:26px;height:26px;border-radius:7px;background:var(--mint);color:var(--navy);display:grid;place-items:center;font-size:11px;font-weight:700}
+  .ctrl{display:flex;gap:6px}
+  .ctrl button,.ctrl a{font:600 12px var(--font);color:#fff;background:rgba(255,255,255,.12);border:0;border-radius:999px;padding:7px 11px;cursor:pointer;text-decoration:none}
+  .tapL,.tapR{position:absolute;top:70px;bottom:90px;z-index:10;pointer-events:none}
+  .tapL{left:0;width:30%}.tapR{right:0;width:70%}
+  .slide{position:absolute;inset:0;padding:96px 26px 110px;display:flex;flex-direction:column;justify-content:center;opacity:0;visibility:hidden;transition:opacity .35s}
+  .slide.on{opacity:1;visibility:visible}
+  .slide.on .rise{animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+  .slide.on .rise.d1{animation-delay:.15s}.slide.on .rise.d2{animation-delay:.35s}.slide.on .rise.d3{animation-delay:.6s}.slide.on .rise.d4{animation-delay:.9s}
+  @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  .kick{font-size:15px;font-weight:600;color:var(--mint);margin-bottom:10px}
+  .huge{font-size:clamp(84px,27vw,150px);font-weight:700;letter-spacing:-.05em;line-height:.9;margin:0}
+  .big{font-size:clamp(30px,8.5vw,44px);font-weight:700;line-height:1.05;letter-spacing:-.03em;margin:10px 0 0}
+  .mid{font-size:clamp(18px,4.8vw,22px);line-height:1.4;color:#C9D2E3;margin:14px 0 0}
+  .mid b{color:#fff}
+  .src{position:absolute;left:26px;right:26px;bottom:100px;font-size:11.5px;color:#8590A6;line-height:1.4}
+  .src a{color:#9FB0C6}
+  .g{color:var(--mint)}.a{color:var(--amber)}.r{color:var(--red)}.v{color:var(--violet)}
+  /* slide 2 — applicant pile */
+  .pile{display:grid;grid-template-columns:repeat(15,1fr);gap:4px;margin-top:20px}
+  .pile i{aspect-ratio:1;border-radius:3px;background:rgba(255,255,255,.18);opacity:0}
+  .slide.on .pile i{animation:pop .25s both}
+  .pile i.you{background:var(--mint);box-shadow:0 0 0 3px rgba(47,211,154,.35)}
+  @keyframes pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+  /* slide 4 — scattered tabs */
+  .tabs{position:relative;height:230px;margin-top:18px}
+  .tabs span{position:absolute;font-size:12px;font-weight:600;background:#fff;color:var(--ink);border-radius:8px;padding:7px 9px;white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.3);opacity:0}
+  .slide.on .tabs span{animation:drop .5s cubic-bezier(.2,.8,.2,1) both}
+  .tabs span s{color:#DC2626;text-decoration:none;font-size:10px;margin-left:4px}
+  @keyframes drop{from{opacity:0;transform:translateY(-30px) rotate(-6deg) scale(.9)}to{opacity:1}}
+  /* slide 5 — live counters */
+  .counters{display:grid;gap:10px;margin-top:18px}
+  .counter{display:flex;flex-direction:column;align-items:flex-start;gap:4px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:12px 16px}
+  .counter .n{font-size:clamp(34px,9.5vw,46px);font-weight:700;letter-spacing:-.03em;line-height:1}
+  .counter .l{font-size:15px;color:#C9D2E3;line-height:1.25}
+  /* slide 6 — live feed */
+  .feed{position:relative;height:330px;overflow:hidden;margin-top:16px;mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent)}
+  .feed .track{display:grid;gap:8px}
+  .slide.on .feed .track{animation:scrollup 22s linear infinite}
+  @keyframes scrollup{from{transform:translateY(0)}to{transform:translateY(-50%)}}
+  .job{background:#fff;color:var(--ink);border-radius:14px;padding:11px 13px}
+  .job .c{font-size:12px;font-weight:500;color:var(--muted)}
+  .job .t{font-size:14.5px;font-weight:600;color:var(--navy);line-height:1.25;margin:2px 0 3px}
+  .job .m{font-size:11.5px;color:var(--muted)}
+  .tag{font-size:10.5px;font-weight:600;padding:1px 6px;border-radius:999px;background:var(--green-light);color:var(--green-dark);margin-left:5px;vertical-align:2px}
+  /* slide 7 — check */
+  .checks{display:grid;gap:10px;margin-top:20px}
+  .chk{display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.06);border-radius:14px;padding:13px 14px;font-size:16px;line-height:1.3}
+  .chk i{flex:0 0 30px;height:30px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-weight:900}
+  .chk .y{background:rgba(14,138,95,.2);color:var(--green)}.chk .x{background:rgba(248,113,113,.18);color:var(--red)}
+  /* slide 8 — fair sequence */
+  .seq{position:relative;height:350px;margin-top:10px}
+  .phone{position:absolute;left:0;top:10px;width:150px;background:#fff;border-radius:26px;border:6px solid #1F2937;padding:12px;color:var(--navy);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+  .qr{width:92px;height:92px;margin:6px auto 4px;display:grid;grid-template-columns:repeat(21,1fr)}
+  .qr i{display:block}
+  .ph-t{text-align:center;font-weight:600;font-size:13px}.ph-s{text-align:center;color:var(--muted);font-size:10.5px}
+  .bubble{position:absolute;background:#fff;color:var(--navy);border-radius:14px;padding:10px 12px;font-size:12.5px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.45);opacity:0;width:calc(100% - 166px);max-width:220px;line-height:1.3}
+  .bubble small{display:block;font-weight:500;color:var(--muted);font-size:11px;margin-top:2px}
+  .slide.on .b1{animation:rise .5s 1.2s both}.slide.on .b2{animation:rise .5s 2.6s both}.slide.on .b3{animation:rise .5s 4.0s both}
+  .b1{right:0;top:20px}.b2{right:0;top:120px}.b3{right:0;top:220px;background:var(--green);color:#fff}.b3 small{color:#E6FBF4}
+  /* slide 9 — email typing */
+  .mail{background:#fff;color:var(--ink);border-radius:16px;padding:14px;margin-top:16px;font-size:13.5px;line-height:1.5;min-height:250px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+  .mail .h{font-size:11.5px;color:var(--muted);border-bottom:1px solid #E2EEEA;padding-bottom:8px;margin-bottom:8px}
+  .mail .body{white-space:pre-wrap}
+  .caret{display:inline-block;width:2px;height:1em;background:var(--green-dark);vertical-align:-2px;animation:blink 1s steps(1) infinite}
+  @keyframes blink{50%{opacity:0}}
+  .remind{display:flex;justify-content:space-between;align-items:center;background:#FFF4E6;color:#8A4B08;border-radius:12px;padding:10px 12px;margin-top:10px;font-size:13.5px;font-weight:600}
+  /* slide 10 — coming */
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .chips span{font-size:14px;font-weight:650;background:rgba(167,139,250,.14);border:1px solid rgba(167,139,250,.35);color:#E9E3FF;border-radius:999px;padding:8px 12px}
+  /* comparison */
+  .vs{display:grid;grid-template-columns:.9fr 1fr 1fr 1.1fr;gap:5px;margin-top:16px;font-size:12px;line-height:1.3}
+  .vs > div{background:rgba(255,255,255,.06);border-radius:8px;padding:8px 7px;color:#CBD5E1}
+  .vs .vh{background:none;font-weight:600;color:#fff;font-size:11.5px;padding:2px 7px}
+  .vs .vl{background:none;font-weight:600;color:#94A3B8;padding-left:0}
+  .vs .win{background:rgba(47,211,154,.12);color:#fff;font-weight:600;border:1px solid rgba(47,211,154,.35)}
+  .steps3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:16px}
+  .steps3 span{text-align:center;font-weight:600;font-size:15px;background:rgba(47,211,154,.1);border:1px solid rgba(47,211,154,.3);border-radius:12px;padding:14px 4px}
+  .routecard{background:rgba(255,255,255,.07);border-radius:14px;padding:13px;margin-top:16px;font-size:14px}
+  .routecard .stops,.stops{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .routecard .stops span{font-size:12px;font-weight:600;background:rgba(255,255,255,.1);border-radius:999px;padding:4px 9px}
+  .briefcard{background:#fff;color:var(--ink);border-radius:14px;padding:12px 13px;margin-top:10px}
+  .briefcard .bt{font-weight:600;color:var(--navy);font-size:15px}
+  .boothp{font-size:10.5px;font-weight:600;color:#B45309;background:#FFF4E6;border-radius:999px;padding:1px 7px;margin-left:4px;vertical-align:2px}
+  .bf{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:9px 0}
+  .bf div{background:#F8FAFC;border:1px solid #E2EEEA;border-radius:9px;padding:6px;text-align:center;font-size:10.5px;color:var(--muted)}
+  .bf b{display:block;font-size:17px;color:var(--navy)}
+  .ba{background:#EEF1F6;border-radius:9px;padding:8px 10px;font-size:12.5px;color:#0A1426}
+  .alertcard{background:#FFF7E6;border:1px solid #FCD9A5;color:#92400E;border-radius:14px;padding:13px 14px;margin-top:16px;font-weight:800;font-size:15px}
+
+  /* example label + new cards (tailor, interview, weekly email) */
+  .ex{display:inline-block;align-self:flex-start;font-size:11.5px;font-weight:500;color:#9FAAC0;border:1px solid #22304D;border-radius:999px;padding:3px 10px;margin:6px 0 4px}
+  .card{background:#fff;color:var(--ink);border-radius:16px;padding:14px;margin-top:10px;display:grid;gap:9px;font-size:14px;line-height:1.4}
+  .card .before{color:var(--muted);text-decoration:line-through;text-decoration-color:#C9D1DE}
+  .card .after{font-weight:600}.card .after::before{content:"→ ";color:var(--green)}
+  .card .kw{display:flex;gap:6px;flex-wrap:wrap}.card .kw span{background:var(--green-light);color:var(--green-dark);border-radius:999px;padding:3px 10px;font-size:12.5px;font-weight:500}
+  .card .gap{background:#FFF4E6;color:#8A4B08;border-radius:9px;padding:8px 10px;font-size:13px}
+  .card .q{font-weight:600;font-size:15px}
+  .ivrow{display:flex;align-items:center;gap:12px}.ivl{color:var(--muted);font-size:13.5px}
+  .ring{flex:none;width:52px;height:52px;border-radius:50%;border:4px solid var(--green);border-right-color:#DCE2EC;display:grid;place-items:center;font-weight:600;font-size:13px}
+  .grade{flex:none;width:52px;height:52px;border-radius:12px;background:var(--green-light);color:var(--green-dark);display:grid;place-items:center;font-weight:700;font-size:20px}
+  .erow{border-top:1px solid #E3E7ED;padding-top:8px;margin-top:8px;font-size:13.5px;color:var(--muted)}.erow b{color:var(--ink);font-weight:600}
+  /* CTA */
+  .cta{display:grid;gap:9px;margin-top:22px}
+  .btn{display:block;text-align:center;font:600 16px var(--font);padding:14px;border-radius:999px;text-decoration:none;color:#fff;border:1px solid rgba(255,255,255,.22);position:relative;z-index:15}
+  .btn.go{background:var(--green);border-color:var(--green)}
+  .btn.ghost{border:0;color:#9FAAC0;font-weight:500;font-size:14px;padding:6px}
+  .hint{position:absolute;bottom:max(26px,env(safe-area-inset-bottom));left:0;right:0;z-index:20;display:flex;justify-content:center;gap:10px;align-items:center;color:#94A3B8;font-size:12px;font-weight:600}
+  .hint button{font:600 13px var(--font);color:#fff;background:rgba(255,255,255,.12);border:0;border-radius:999px;padding:10px 16px;cursor:pointer}
+  .hint .nx{background:var(--green)}
+  @media (prefers-reduced-motion:reduce){.slide.on .rise,.slide.on .pile i,.slide.on .tabs span,.slide.on .feed .track,.slide.on .bubble{animation:none;opacity:1}}
+</style>
+</head>
+<body data-fb-button="off">
+<div class="frame" id="frame">
+  <div class="bars" id="bars"></div>
+  <div class="head">
+    <a class="brand" href="/"><b>BP</b>Beat the Pile</a>
+    <div class="ctrl"><button id="pp" aria-label="Pause">❚❚</button><a href="/jobs/">Skip →</a></div>
+  </div>
+  <div class="tapL" id="tapL" aria-hidden="true"></div><div class="tapR" id="tapR" aria-hidden="true"></div>
+
+  <!-- 1 -->
+  <section class="slide" data-dur="6000" aria-label="109 applications per internship">
+    <div class="kick rise">The competition</div>
+    <p class="huge rise d1"><span class="a" data-count="109">0</span></p>
+    <p class="big rise d2">applications for every internship.</p>
+    <div class="pile" id="pile" aria-hidden="true"></div>
+    <p class="mid rise d4">Up from <b>43</b> two years earlier. That green square is you.</p>
+    <div class="src">Handshake 2025 Internship Index: average applications per internship, 2024–25 vs 2022–23. <a href="https://nbcsandiego.com/news/business/money-report/applying-for-internships-is-nearly-twice-as-competitive-as-last-year-says-new-report-heres-why/3760360/" target="_blank" rel="noopener">source</a></div>
+  </section>
+
+  <!-- 2 -->
+  <section class="slide" data-dur="5500" aria-label="62 percent of interns get full-time offers">
+    <div class="kick rise">Why it matters</div>
+    <p class="huge rise d1"><span class="g" data-count="62">0</span><span class="g">%</span></p>
+    <p class="big rise d2">of interns get a full-time job offer.</p>
+    <p class="mid rise d3">The internship <b>is</b> the job interview.</p>
+    <div class="src">NACE 2025 Internship &amp; Co-op Report: average full-time offer rate for the 2024 intern class. <a href="https://naceweb.org/talent-acquisition/internships/intern-offer-and-conversion-rates-fall-acceptances-rise" target="_blank" rel="noopener">source</a></div>
+  </section>
+
+  <!-- 3 -->
+  <section class="slide" data-dur="6500" aria-label="Career fairs">
+    <div class="kick rise">The shortcut</div>
+    <p class="big rise d1">At a career fair, you skip the pile.</p>
+    <p class="mid rise d2">You're a face and a name, not resume #87. Then you forget who you met, what you talked about, and when to follow up.</p>
+    <p class="mid rise d3"><b class="g">Career Fair Mode handles all three.</b></p>
+    <div class="steps3 rise d4"><span>Before</span><span>During</span><span>After</span></div>
+  </section>
+
+  <!-- 4 -->
+  <section class="slide" data-dur="7500" aria-label="Before the fair">
+    <div class="kick rise">Before the fair</div>
+    <p class="big rise d1">Pick who you want. Get your route.</p>
+    <div class="ex rise d1">Example screen</div>
+    <div class="routecard rise d2"><b class="g">Your route</b> · 4 to go
+      <div class="stops"><span>#104 Southland</span><span>#109 Hensel</span><span>#410 Gilbane</span><span>#802 HITT</span></div></div>
+    <div class="briefcard rise d3"><div class="bt">Southland Industries <span class="boothp">Booth 104</span></div>
+      <div class="bf"><div><b>2</b>open internships</div><div><b>2</b>in your major</div><div><b>VA, CA</b>locations</div></div>
+      <div class="ba"><b>What they do</b> · what interns work on · <b>3 smart questions to ask</b></div></div>
+    <p class="mid rise d4">Walk up already knowing their open roles.</p>
+  </section>
+
+  <!-- 5 -->
+  <section class="slide" data-dur="7500" aria-label="During the fair">
+    <div class="kick rise">During the fair</div>
+    <p class="big rise d1">Your resume is a QR code.</p>
+    <div class="ex rise d1">Example screen · you choose when the link is on</div>
+    <div class="seq">
+      <div class="phone rise d2"><div class="ph-t">Scan for my resume</div><div class="qr" id="qr"></div><div class="ph-s">Engineering Expo · Booth 104</div></div>
+      <div class="bubble b1">Recruiter scans it<small>Your resume opens on their phone. No app needed.</small></div>
+      <div class="bubble b2">10-second note<small>"Mike: HVAC design, data centers, email him after"</small></div>
+      <div class="bubble b3">Route updates<small>3 booths to go</small></div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="slide" data-dur="8500" aria-label="After the fair">
+    <div class="kick rise">After the fair</div>
+    <p class="big rise d1">A reminder, and a follow-up already drafted.</p>
+    <div class="ex rise d1">Example email · you read it and send it yourself</div>
+    <div class="mail rise d2"><div class="h">To: Mike (recruiter)<br>Subject: Great talking HVAC design at the Engineering Expo</div><div class="body" id="mail"></div></div>
+    <div class="remind rise d3"><span>Reminder: follow up with Mike today</span><span style="white-space:nowrap;padding-left:10px">Next day</span></div>
+  </section>
+
+  <!-- 7 -->
+  <section class="slide" data-dur="6000" aria-label="The search is a mess">
+    <div class="kick rise">Then the search</div>
+    <p class="big rise d1">So you open 30 tabs.</p>
+    <div class="tabs" id="tabs" aria-hidden="true"></div>
+    <p class="mid rise d4">Every company has its own careers site. Lots of the links you find are <b>reposts or already closed.</b></p>
+  </section>
+
+  <!-- 8 -->
+  <section class="slide" data-dur="7000" aria-label="Beat the Pile did the searching">
+    <div class="kick rise">Beat the Pile</div>
+    <p class="big rise d1">We already opened every tab.</p>
+    <div class="counters rise d2">
+      <div class="counter"><span class="n g" data-live="boards">—</span><span class="l">company job boards we read <b>directly</b>, each re-read every few hours</span></div>
+      <div class="counter"><span class="n" data-live="n">—</span><span class="l">real internships open <b>right now</b>, every major</span></div>
+      <div class="counter"><span class="n a" data-live="me">—</span><span class="l">companies hiring interns <b>right now</b></span></div>
+    </div>
+    <p class="mid rise d4">Apply goes straight to the company's own page. Free.</p>
+  </section>
+
+  <!-- 9 -->
+  <section class="slide" data-dur="7000" aria-label="Real listings, live">
+    <div class="kick rise">Live right now</div>
+    <p class="big rise d1">Real. Open. Straight from the company.</p>
+    <div class="feed rise d2"><div class="track" id="feed"></div></div>
+    <p class="mid rise d3" id="feedNote" hidden>Live data didn't load just now. <a href="/jobs/" style="color:#8FE3C2">See today's list on the jobs page →</a></p>
+  </section>
+
+  <!-- 10 -->
+  <section class="slide" data-dur="8000" aria-label="Tailor your resume">
+    <div class="kick rise">Found one?</div>
+    <p class="big rise d1">Tailor your resume to that exact job.</p>
+    <div class="ex rise d1">Example suggestions · it only rewords what you've done</div>
+    <div class="card rise d2">
+      <div class="before">Worked on chassis for Formula SAE</div>
+      <div class="after">Designed and analyzed the chassis in SolidWorks, cutting weight by [#]%</div>
+      <div class="kw"><span>SolidWorks</span><span>GD&amp;T</span><span>FEA</span></div>
+      <div class="gap">They want PLC experience. Your resume doesn't show it, so don't fake it.</div>
+    </div>
+    <p class="mid rise d3">Lines that match the posting. Nothing made up.</p>
+  </section>
+
+  <!-- 11 -->
+  <section class="slide" data-dur="7500" aria-label="Practice the interview">
+    <div class="kick rise">Got the interview?</div>
+    <p class="big rise d1">Practice it out loud first.</p>
+    <div class="ex rise d1">Example practice round</div>
+    <div class="card rise d2">
+      <div class="q">"Tell me about a time a design didn't work the first time."</div>
+      <div class="ivrow"><span class="ring">0:54</span><span class="ivl">You answer out loud, on a timer, like the real thing.</span></div>
+      <div class="ivrow"><span class="grade">B+</span><span class="ivl">A grade on each answer: relevance, structure, specifics, delivery.</span></div>
+    </div>
+  </section>
+
+  <!-- 12 -->
+  <section class="slide" data-dur="6500" aria-label="Weekly email">
+    <div class="kick rise">Every week after</div>
+    <p class="big rise d1">New internships come to you.</p>
+    <div class="ex rise d1">Example email</div>
+    <div class="mail rise d2" style="min-height:0"><div class="h">Beat the Pile · weekly</div>
+      <div style="font-weight:700;font-size:15.5px;color:#0A1426">3 new Mechanical internships this week</div>
+      <div class="erow"><b>Mechanical Engineering Intern</b><br>Southland Industries · Dulles, VA</div>
+      <div class="erow"><b>Design Engineering Co-op</b><br>A company you follow · Richmond, VA</div></div>
+    <p class="mid rise d3">Pick your major and states. One email a week, only when there's something new.</p>
+  </section>
+
+  <!-- 13 -->
+  <section class="slide" data-dur="7500" aria-label="Why not LinkedIn or Handshake">
+    <div class="kick rise">"Why not just use LinkedIn?"</div>
+    <p class="big rise d1">Different job. Use both.</p>
+    <div class="vs rise d2">
+      <div class="vh"></div><div class="vh">LinkedIn / Indeed</div><div class="vh">Handshake</div><div class="vh g">Beat the Pile</div>
+      <div class="vl">Where jobs come from</div><div>Anyone posts: reposts, recruiters, agencies</div><div>Jobs employers chose to post there</div><div class="win">The company's own careers site</div>
+      <div class="vl">Closed jobs</div><div>Can linger after they close</div><div>Up to the employer</div><div class="win">Re-read every few hours; gone = removed</div>
+      <div class="vl">At the career fair</div><div>—</div><div>Register + check in</div><div class="win">Route, briefs, notes, follow-ups</div>
+    </div>
+    <p class="mid rise d3">Keep Handshake for signing up for fairs. Use Beat the Pile to <b>win the fair</b> and <b>find what's not there.</b></p>
+  </section>
+
+  <!-- 14 -->
+  <section class="slide" data-dur="0" aria-label="Get started">
+    <div class="kick rise">Your move</div>
+    <p class="big rise d1">Start in 30 seconds.</p>
+    <p class="mid rise d2">Free. No account needed to browse.</p>
+    <div class="cta rise d3">
+      <a class="btn go" href="/demo/">Try it hands-on (2 min) →</a>
+      <a class="btn" href="/fair/">Open Career Fair Mode</a>
+      <a class="btn" href="/jobs/">Browse internships</a>
+      <a class="btn" href="/#interview">Practice an interview</a>
+      <a class="btn" href="/season/">My Season</a>
+      <a class="btn" href="/radar/">Opening Radar</a>
+      <a class="btn ghost" href="#" id="fbBtn">Tell us what you think</a>
+    </div>
+  </section>
+
+  <div class="hint"><button id="back">←</button><span id="pos"></span><button class="nx" id="next">Next →</button></div>
+</div>
+
+<script>
+(function(){
+  const slides = [...document.querySelectorAll(".slide")], bars = document.getElementById("bars");
+  slides.forEach(() => { const s = document.createElement("span"); s.innerHTML = "<i></i>"; bars.appendChild(s); });
+  const fills = [...bars.querySelectorAll("i")];
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let i = 0, t0 = 0, raf = 0, paused = reduce, held = false, elapsed = 0;     // reduced motion → no auto-advance; tap Next
+  const live = { n: null, me: null, boards: null };
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+  function countUp(el, to, ms = 1100){
+    if (to == null || isNaN(to)) return;
+    if (reduce) { el.textContent = to.toLocaleString(); return; }
+    const s = performance.now(); const step = (now) => { const p = Math.min(1, (now - s) / ms); el.textContent = Math.round(to * (1 - Math.pow(1 - p, 3))).toLocaleString(); if (p < 1) requestAnimationFrame(step); }; requestAnimationFrame(step);
+  }
+  function enter(k){
+    const s = slides[k];
+    s.querySelectorAll("[data-count]").forEach((el) => countUp(el, +el.dataset.count));
+    s.querySelectorAll("[data-live]").forEach((el) => countUp(el, live[el.dataset.live]));
+    if (s.querySelector("#mail")) typeMail();
+  }
+  function show(k){
+    i = (k + slides.length) % slides.length; elapsed = 0; t0 = performance.now();
+    slides.forEach((s, n) => { s.classList.toggle("on", n === i); s.setAttribute("aria-hidden", String(n !== i)); });
+    fills.forEach((f, n) => { f.style.width = n < i ? "100%" : "0"; });
+    document.getElementById("pos").textContent = `${i + 1} / ${slides.length}`;
+    document.getElementById("next").textContent = i === slides.length - 1 ? "Replay ↺" : "Next →";
+    enter(i);
+  }
+  function tick(now){
+    const dur = +slides[i].dataset.dur;
+    if (!paused && !held && dur) {
+      elapsed += now - t0;
+      fills[i].style.width = Math.min(100, elapsed / dur * 100) + "%";
+      if (elapsed >= dur) { show(i + 1 < slides.length ? i + 1 : i); }
+    } else if (!dur) fills[i].style.width = "100%";
+    t0 = now; raf = requestAnimationFrame(tick);
+  }
+  const next = () => show(i === slides.length - 1 ? 0 : i + 1), back = () => show(Math.max(0, i - 1));
+  document.getElementById("next").onclick = next; document.getElementById("back").onclick = back;
+  // Tap left 30% = back, rest = next — but never steal a tap meant for a link or button on the slide
+  document.getElementById("frame").addEventListener("click", (e) => {
+    if (e.target.closest("a,button,input,select,textarea,summary,details,.head,.hint,.bars")) return;
+    if (window.getSelection && String(getSelection()).length) return;
+    const r = e.currentTarget.getBoundingClientRect(), y = e.clientY - r.top;
+    if (y < 70 || y > r.height - 90) return;
+    (e.clientX - r.left < r.width * 0.3 ? back : next)();
+  });
+  const pp = document.getElementById("pp");
+  const setPaused = (v) => { paused = v; pp.textContent = v ? "▶" : "❚❚"; pp.setAttribute("aria-label", v ? "Play" : "Pause"); };
+  pp.onclick = () => setPaused(!paused);
+  setPaused(paused);
+  // hold to pause (like Stories)
+  const frame = document.getElementById("frame");
+  frame.addEventListener("pointerdown", (e) => { if (e.target.closest("a,button")) return; held = true; });
+  ["pointerup","pointercancel","pointerleave"].forEach((ev) => frame.addEventListener(ev, () => { held = false; }));
+  document.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") next(); if (e.key === "ArrowLeft") back(); if (e.key === " ") { e.preventDefault(); setPaused(!paused); } });
+  document.addEventListener("visibilitychange", () => { if (document.hidden) held = true; else held = false; });
+  document.getElementById("fbBtn").onclick = (e) => { e.preventDefault(); window.iqReport && iqReport({ message: "Feedback on the demo: " }); };
+
+  // 109 applicants grid — you are one square
+  const pile = document.getElementById("pile");
+  for (let n = 0; n < 109; n++) { const el = document.createElement("i"); el.style.animationDelay = (0.6 + n * 0.012) + "s"; if (n === 61) el.className = "you"; pile.appendChild(el); }
+  // 30 tabs
+  const tabNames = ["Workday — Careers","Lockheed Careers","Handshake","LinkedIn Jobs","Indeed","Boeing Jobs","Company Careers","iCIMS — Apply","Taleo","Northrop Careers","Glassdoor","ZipRecruiter","Dominion Energy","Careers | Login","Job ID 4471","Search Results"];
+  const tabs = document.getElementById("tabs");
+  tabNames.forEach((t, n) => { const el = document.createElement("span"); el.innerHTML = esc(t) + (n % 3 === 1 ? "<s>closed</s>" : n % 5 === 2 ? "<s>404</s>" : ""); el.style.left = (4 + (n * 37) % 62) + "%"; el.style.top = ((n * 53) % 190) + "px"; el.style.transform = `rotate(${((n * 7) % 13) - 6}deg)`; el.style.animationDelay = (0.4 + n * 0.12) + "s"; tabs.appendChild(el); });
+  // decorative QR
+  const qr = document.getElementById("qr"); let seed = 11; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  const fnd = (r, c) => { for (const [r0, c0] of [[0,0],[0,14],[14,0]]) if (r >= r0 && r < r0 + 7 && c >= c0 && c < c0 + 7) { const a = r - r0, b = c - c0; return a === 0 || a === 6 || b === 0 || b === 6 || (a > 1 && a < 5 && b > 1 && b < 5); } return null; };
+  for (let r = 0; r < 21; r++) for (let c = 0; c < 21; c++) { const f = fnd(r, c); const el = document.createElement("i"); el.style.background = (f === null ? rnd() > .55 : f) ? "#0A1628" : "#fff"; qr.appendChild(el); }
+  // typing email
+  const MAIL = `Hi Mike,\n\nThanks for walking me through Southland's HVAC design work at the Engineering Expo. Hearing how interns support data center projects from layout through commissioning made me even more excited about the role.\n\nMy resume is linked here for easy reference.\n\nThanks again,\nAdam`;
+  let typing = 0;
+  function typeMail(){
+    const el = document.getElementById("mail"); const id = ++typing; let n = 0;
+    if (reduce) { el.textContent = MAIL; return; }
+    const step = () => { if (id !== typing) return; n += 2; el.innerHTML = esc(MAIL.slice(0, n)) + '<span class="caret"></span>'; if (n < MAIL.length) setTimeout(step, 22); };
+    setTimeout(step, 700);
+  }
+
+  // live data: tiny summary for the counters + a small sample of real listings (a mix of majors) for the feed
+  const ok = (r) => { if (!r.ok) throw new Error(r.status); return r.json(); };
+  const fail = () => { document.getElementById("feedNote").hidden = false; };
+  fetch("/api/listings?summary=1").then(ok).then((d) => {
+    live.n = d.allMajors; live.me = d.hiringNow; live.boards = d.companies;
+    if (slides[i].querySelector("[data-live]")) enter(i);
+  }).catch(() => {});
+  const SHORT = { mechanical: "Mech", electrical: "EE", civil: "Civil", chemical: "ChemE", industrial: "Mfg", software: "CS", data: "Data", cyber_it: "IT", product_design: "Design",
+    finance: "Finance", consulting: "Consulting", marketing: "Marketing", sales: "Sales", supply_chain: "Ops", people_hr: "HR", science_health: "Science", legal_policy: "Policy", education_social: "Education", engineering: "Eng" };
+  fetch("/api/listings?field=all&limit=400").then(ok).then((l) => {
+    const L = l.listings || [];
+    if (!L.length) return fail();
+    const seen = new Set(), pick = [];
+    // one per company, rotating through majors so the feed shows the range (real, newest listings)
+    const byField = {}; for (const x of L) if (SHORT[x.field]) (byField[x.field] ||= []).push(x);
+    const order = Object.keys(byField);
+    for (let round = 0; pick.length < 12 && round < 40; round++) for (const f of order) {
+      const x = byField[f].find((y) => !seen.has(y.company)); if (!x) continue; seen.add(x.company); pick.push(x); if (pick.length === 12) break; }
+    const html = pick.map((x) => `<div class="job"><div class="c">${esc(x.company)}</div><div class="t">${esc(x.title)}<span class="tag">${esc(SHORT[x.field])}</span></div><div class="m">${esc(x.location || x.state)}</div></div>`).join("");
+    document.getElementById("feed").innerHTML = html + html;   // doubled for a seamless loop
+  }).catch(fail);
+
+  show(0); raf = requestAnimationFrame(tick);
+})();
+</script>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

@@ -11,7 +11,7 @@
     ["/#resumebuilder", "Resume builder", "Starter resume from your answers"],
     ["/#score", "Resume check", "How a resume reads against a posting"],
     ["/#wall", "Community", "Tips from other students"],
-    ["/demo/", "How it works", "90-second walkthrough"],
+    ["/demo/", "Try it", "Hands-on demo in 2 minutes"],
   ];
   const path = location.pathname.replace(/index\.html$/, "");
   const cur = (h) => h === path || h.slice(0, -1) === path;
