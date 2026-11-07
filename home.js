@@ -1,4 +1,4 @@
-/* built from src/home.jsx 405c1e403b6fbb9a — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx dc918e05fe730bda — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -406,6 +406,387 @@ function dAgoLong(t) {
 const DM = {
   fontVariantNumeric: "tabular-nums"
 };
+const FEATURES = [{
+  k: "tailor",
+  name: "Tailor resume",
+  t: "Fit your resume to one posting.",
+  d: "See what to lead with, which words they use, and honest gaps. Nothing invented.",
+  h: "/jobs/"
+}, {
+  k: "alerts",
+  name: "Weekly alerts",
+  t: "New jobs, once a week.",
+  d: "Pick a major and states. One email when something new opens, none when nothing does.",
+  h: "/jobs/"
+}, {
+  k: "radar",
+  name: "Opening Radar",
+  t: "Know the week they open.",
+  d: "Estimates from past seasons, with a reminder a week before.",
+  h: "/radar/"
+}, {
+  k: "fair",
+  name: "Career Fair Mode",
+  t: "Walk in with a route.",
+  d: "Booths, open roles, a QR resume and follow-ups in one place.",
+  h: "/fair/"
+}, {
+  k: "season",
+  name: "My Season",
+  t: "Every application, one board.",
+  d: "Saved, applied, interviewing, offer. Plus a weekly goal and follow-up nudges.",
+  h: "/season/"
+}, {
+  k: "interview",
+  name: "Interview practice",
+  t: "Talk it out. Get a grade.",
+  d: "Answer out loud against a timer, get scored on every answer and a letter grade at the end.",
+  h: "/#interview"
+}];
+function FeatViz({
+  k
+}) {
+  const box = {
+    background: "#fff",
+    border: "1px solid #DCE2EC",
+    borderRadius: 10,
+    boxShadow: "0 6px 18px rgba(10,20,38,.06)"
+  };
+  const bar = (w, c = "#DCE2EC", h = 7) => React.createElement("span", {
+    style: {
+      display: "block",
+      height: h,
+      width: w,
+      background: c,
+      borderRadius: 99
+    }
+  });
+  if (k === "tailor") return React.createElement("div", {
+    style: {
+      ...box,
+      width: "88%",
+      padding: 12,
+      display: "grid",
+      gap: 8
+    }
+  }, React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      fontSize: 12,
+      fontWeight: 600
+    }
+  }, React.createElement("span", null, "Fit for this role"), React.createElement("span", {
+    style: {
+      color: "#0B7A55",
+      ...DM
+    }
+  }, "Strong")), React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 6,
+      flexWrap: "wrap"
+    }
+  }, ["SolidWorks", "GD&T", "testing"].map(x => React.createElement("span", {
+    key: x,
+    style: {
+      fontSize: 11,
+      background: "#E6F4EE",
+      color: "#0B7A55",
+      padding: "3px 8px",
+      borderRadius: 99
+    }
+  }, x)), React.createElement("span", {
+    style: {
+      fontSize: 11,
+      background: "#FBEFE6",
+      color: "#9A4B12",
+      padding: "3px 8px",
+      borderRadius: 99
+    }
+  }, "gap: FEA")), React.createElement("div", {
+    style: {
+      display: "grid",
+      gap: 5
+    }
+  }, bar("100%"), bar("72%", "#BFE6D4")));
+  if (k === "alerts") return React.createElement("div", {
+    style: {
+      ...box,
+      width: "88%",
+      padding: 12,
+      display: "grid",
+      gap: 8
+    }
+  }, React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 8,
+      alignItems: "center"
+    }
+  }, React.createElement("span", {
+    style: {
+      width: 26,
+      height: 26,
+      borderRadius: 7,
+      background: "#070F1E",
+      color: "#2FD39A",
+      fontSize: 11,
+      fontWeight: 700,
+      display: "grid",
+      placeItems: "center"
+    }
+  }, "BP"), React.createElement("span", {
+    style: {
+      fontSize: 12,
+      fontWeight: 600
+    }
+  }, "5 new internships this week")), [["Mechanical Intern", "Richmond, VA"], ["Test Engineering Co-op", "Arlington, VA"]].map(([a, b]) => React.createElement("div", {
+    key: a,
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      fontSize: 11,
+      borderTop: "1px solid #EEF1F6",
+      paddingTop: 6
+    }
+  }, React.createElement("span", {
+    style: {
+      fontWeight: 500
+    }
+  }, a), React.createElement("span", {
+    style: {
+      color: "#55627A"
+    }
+  }, b))));
+  if (k === "radar") {
+    const m = ["Jul", "Aug", "Sep", "Oct", "Nov"];
+    return React.createElement("div", {
+      style: {
+        ...box,
+        width: "88%",
+        padding: 12
+      }
+    }, React.createElement("div", {
+      style: {
+        fontSize: 12,
+        fontWeight: 600,
+        marginBottom: 10
+      }
+    }, "Usually opens ", React.createElement("span", {
+      style: {
+        color: "#0B7A55"
+      }
+    }, "~mid Aug")), React.createElement("div", {
+      style: {
+        position: "relative",
+        height: 8,
+        background: "#EEF1F6",
+        borderRadius: 99
+      }
+    }, React.createElement("span", {
+      style: {
+        position: "absolute",
+        left: "22%",
+        width: "18%",
+        top: 0,
+        bottom: 0,
+        background: "#BFE6D4",
+        borderRadius: 99
+      }
+    }), React.createElement("span", {
+      style: {
+        position: "absolute",
+        left: "30%",
+        top: -4,
+        width: 16,
+        height: 16,
+        marginLeft: -8,
+        borderRadius: "50%",
+        background: "#0B7A55",
+        border: "3px solid #fff",
+        boxShadow: "0 0 0 1px #0B7A55"
+      }
+    })), React.createElement("div", {
+      style: {
+        display: "flex",
+        justifyContent: "space-between",
+        fontSize: 10,
+        color: "#8D9AB3",
+        marginTop: 8
+      }
+    }, m.map(x => React.createElement("span", {
+      key: x
+    }, x))));
+  }
+  if (k === "fair") return React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12,
+      alignItems: "center",
+      width: "88%"
+    }
+  }, React.createElement("svg", {
+    viewBox: "0 0 140 100",
+    style: {
+      flex: 1,
+      height: 110
+    }
+  }, React.createElement("rect", {
+    x: "1",
+    y: "1",
+    width: "138",
+    height: "98",
+    rx: "10",
+    fill: "#fff",
+    stroke: "#DCE2EC"
+  }), [[20, 20], [60, 20], [100, 20], [20, 55], [60, 55], [100, 55], [40, 82], [80, 82]].map(([x, y], i) => React.createElement("rect", {
+    key: i,
+    x: x,
+    y: y - 6,
+    width: "22",
+    height: "12",
+    rx: "3",
+    fill: [0, 4, 7].includes(i) ? "#BFE6D4" : "#EEF1F6"
+  })), React.createElement("path", {
+    d: "M31 20 C 50 40, 60 40, 71 55 S 90 80, 91 82",
+    fill: "none",
+    stroke: "#0B7A55",
+    strokeWidth: "2",
+    strokeDasharray: "4 3"
+  }), [[31, 20, 1], [71, 55, 2], [91, 82, 3]].map(([x, y, n]) => React.createElement("g", {
+    key: n
+  }, React.createElement("circle", {
+    cx: x,
+    cy: y,
+    r: "7",
+    fill: "#0B7A55"
+  }), React.createElement("text", {
+    x: x,
+    y: y + 3.5,
+    fontSize: "9",
+    textAnchor: "middle",
+    fill: "#fff",
+    fontWeight: "700"
+  }, n)))), React.createElement("svg", {
+    viewBox: "0 0 7 7",
+    style: {
+      width: 56,
+      height: 56,
+      background: "#fff",
+      padding: 5,
+      border: "1px solid #DCE2EC",
+      borderRadius: 8
+    },
+    shapeRendering: "crispEdges"
+  }, "1110111101010111101111000000101101111010101110111".split("").map((b, i) => b === "1" && React.createElement("rect", {
+    key: i,
+    x: i % 7,
+    y: Math.floor(i / 7),
+    width: "1",
+    height: "1",
+    fill: "#0A1426"
+  }))));
+  if (k === "season") return React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "repeat(4,1fr)",
+      gap: 6,
+      width: "92%"
+    }
+  }, [["Saved", 3], ["Applied", 2], ["Interview", 1], ["Offer", 0]].map(([c, n]) => React.createElement("div", {
+    key: c,
+    style: {
+      background: "#EEF1F6",
+      borderRadius: 8,
+      padding: 6,
+      minHeight: 96
+    }
+  }, React.createElement("div", {
+    style: {
+      fontSize: 10,
+      fontWeight: 600,
+      color: "#55627A",
+      marginBottom: 6
+    }
+  }, c), Array.from({
+    length: n
+  }).map((_, i) => React.createElement("div", {
+    key: i,
+    style: {
+      ...box,
+      boxShadow: "none",
+      borderRadius: 6,
+      height: 18,
+      marginBottom: 4,
+      borderColor: c === "Interview" ? "#0B7A55" : "#DCE2EC",
+      background: c === "Interview" ? "#E6F4EE" : "#fff"
+    }
+  })))));
+  return React.createElement("div", {
+    style: {
+      ...box,
+      width: "88%",
+      padding: 12,
+      display: "flex",
+      gap: 14,
+      alignItems: "center"
+    }
+  }, React.createElement("span", {
+    style: {
+      width: 56,
+      height: 56,
+      borderRadius: 12,
+      background: "#070F1E",
+      color: "#2FD39A",
+      fontSize: 24,
+      fontWeight: 700,
+      display: "grid",
+      placeItems: "center",
+      flexShrink: 0
+    }
+  }, "B+"), React.createElement("div", {
+    style: {
+      flex: 1,
+      display: "grid",
+      gap: 6
+    }
+  }, [["Q1", 86], ["Q2", 74], ["Q3", 91]].map(([q, v]) => React.createElement("div", {
+    key: q,
+    style: {
+      display: "flex",
+      gap: 8,
+      alignItems: "center",
+      fontSize: 11
+    }
+  }, React.createElement("span", {
+    style: {
+      width: 18,
+      color: "#55627A"
+    }
+  }, q), React.createElement("span", {
+    style: {
+      flex: 1,
+      height: 6,
+      background: "#EEF1F6",
+      borderRadius: 99
+    }
+  }, React.createElement("span", {
+    style: {
+      display: "block",
+      height: 6,
+      width: v + "%",
+      background: "#0B7A55",
+      borderRadius: 99
+    }
+  })), React.createElement("span", {
+    style: {
+      ...DM,
+      width: 20
+    }
+  }, v)))));
+}
 function LandingD({
   onQuiz,
   onPage
@@ -953,46 +1334,94 @@ function LandingD({
       color: "#0B7A55",
       textDecoration: "none"
     }
-  }, "See internships \u2192"))))), React.createElement("section", {
+  }, "See internships \u2192"))))), React.createElement("section", null, React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "baseline",
+      marginBottom: 16,
+      gap: 12
+    }
+  }, React.createElement("h2", {
+    style: {
+      fontSize: 24,
+      fontWeight: 600,
+      letterSpacing: "-0.02em",
+      margin: 0,
+      color: "#0A1426"
+    }
+  }, "Everything after you find the job"), React.createElement("a", {
+    href: "/demo/",
+    style: {
+      fontSize: 14,
+      color: "#0B7A55",
+      textDecoration: "none",
+      fontWeight: 500
+    }
+  }, "See it in the 2-minute tour \u2192")), React.createElement("div", {
     className: "d-grid3"
-  }, [["Opening Radar", "Know the week they open.", "Estimates from past seasons, with a reminder a week before.", "/radar/"], ["Career Fair Mode", "Walk in with a route.", "Booths, open roles, a QR resume and follow-ups in one place.", "/fair/"], ["Interview practice", "Talk it out. Get a grade.", "Answer out loud against a timer, get scored on every answer and a letter grade at the end.", "/#interview"]].map(([k, t, d, h]) => React.createElement("a", {
-    key: k,
-    href: h,
-    onClick: h === "/#interview" ? e => {
+  }, FEATURES.map(f => React.createElement("a", {
+    key: f.k,
+    href: f.h,
+    onClick: f.h === "/#interview" ? e => {
       e.preventDefault();
       onPage("interview");
     } : undefined,
+    className: "d-feat",
     style: {
-      background: "#070F1E",
-      color: "#E8EDF5",
-      borderRadius: 14,
-      padding: 24,
-      border: "1px solid #1A2640",
+      ...card,
       textDecoration: "none",
-      display: "block"
+      color: "#0A1426",
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden"
+    }
+  }, React.createElement("div", {
+    "aria-hidden": "true",
+    style: {
+      background: "#F6F8FB",
+      borderBottom: "1px solid #EEF1F6",
+      height: 150,
+      position: "relative",
+      display: "grid",
+      placeItems: "center",
+      padding: 16
+    }
+  }, React.createElement(FeatViz, {
+    k: f.k
+  })), React.createElement("div", {
+    style: {
+      padding: 20
     }
   }, React.createElement("p", {
     style: {
       fontSize: 13,
       fontWeight: 600,
-      color: "#2FD39A",
-      margin: "0 0 10px"
+      color: "#0B7A55",
+      margin: "0 0 6px",
+      display: "flex",
+      justifyContent: "space-between"
     }
-  }, k), React.createElement("p", {
+  }, f.name, React.createElement("span", {
     style: {
-      fontSize: 18,
-      fontWeight: 600,
-      margin: "0 0 8px",
-      color: "#fff"
+      fontSize: 11,
+      fontWeight: 500,
+      color: "#8D9AB3"
     }
-  }, t), React.createElement("p", {
+  }, "Example preview")), React.createElement("p", {
+    style: {
+      fontSize: 17,
+      fontWeight: 600,
+      margin: "0 0 6px"
+    }
+  }, f.t), React.createElement("p", {
     style: {
       fontSize: 14,
       lineHeight: 1.5,
-      color: "#9FAAC0",
+      color: "#55627A",
       margin: 0
     }
-  }, d))))), React.createElement("footer", {
+  }, f.d))))))), React.createElement("footer", {
     style: {
       textAlign: "center",
       padding: "1.5rem",

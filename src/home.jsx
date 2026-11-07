@@ -101,6 +101,44 @@ const D_STATES={alabama:"AL",alaska:"AK",arizona:"AZ",arkansas:"AR",california:"
 function dAgo(t){const m=Math.max(0,Math.round((Date.now()-new Date(t))/6e4));return m<60?`${m||1}m`:m<1440?`${Math.round(m/60)}h`:`${Math.round(m/1440)}d`;}
 function dAgoLong(t){const m=Math.max(0,Math.round((Date.now()-new Date(t))/6e4));return m<60?`${m||1} min ago`:m<1440?`${Math.round(m/60)} h ago`:`${Math.round(m/1440)} days ago`;}
 const DM={fontVariantNumeric:"tabular-nums"};   // numbers line up; no "terminal" font
+
+// Homepage feature cards: each gets a small drawn preview of the real screen. Content is illustrative → labeled "Example".
+const FEATURES=[
+  {k:"tailor",name:"Tailor resume",t:"Fit your resume to one posting.",d:"See what to lead with, which words they use, and honest gaps. Nothing invented.",h:"/jobs/"},
+  {k:"alerts",name:"Weekly alerts",t:"New jobs, once a week.",d:"Pick a major and states. One email when something new opens, none when nothing does.",h:"/jobs/"},
+  {k:"radar",name:"Opening Radar",t:"Know the week they open.",d:"Estimates from past seasons, with a reminder a week before.",h:"/radar/"},
+  {k:"fair",name:"Career Fair Mode",t:"Walk in with a route.",d:"Booths, open roles, a QR resume and follow-ups in one place.",h:"/fair/"},
+  {k:"season",name:"My Season",t:"Every application, one board.",d:"Saved, applied, interviewing, offer. Plus a weekly goal and follow-up nudges.",h:"/season/"},
+  {k:"interview",name:"Interview practice",t:"Talk it out. Get a grade.",d:"Answer out loud against a timer, get scored on every answer and a letter grade at the end.",h:"/#interview"},
+];
+function FeatViz({k}){
+  const box={background:"#fff",border:"1px solid #DCE2EC",borderRadius:10,boxShadow:"0 6px 18px rgba(10,20,38,.06)"};
+  const bar=(w,c="#DCE2EC",h=7)=><span style={{display:"block",height:h,width:w,background:c,borderRadius:99}}/>;
+  if(k==="tailor") return(<div style={{...box,width:"88%",padding:12,display:"grid",gap:8}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:12,fontWeight:600}}><span>Fit for this role</span><span style={{color:"#0B7A55",...DM}}>Strong</span></div>
+    <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{["SolidWorks","GD&T","testing"].map(x=><span key={x} style={{fontSize:11,background:"#E6F4EE",color:"#0B7A55",padding:"3px 8px",borderRadius:99}}>{x}</span>)}<span style={{fontSize:11,background:"#FBEFE6",color:"#9A4B12",padding:"3px 8px",borderRadius:99}}>gap: FEA</span></div>
+    <div style={{display:"grid",gap:5}}>{bar("100%")}{bar("72%","#BFE6D4")}</div></div>);
+  if(k==="alerts") return(<div style={{...box,width:"88%",padding:12,display:"grid",gap:8}}>
+    <div style={{display:"flex",gap:8,alignItems:"center"}}><span style={{width:26,height:26,borderRadius:7,background:"#070F1E",color:"#2FD39A",fontSize:11,fontWeight:700,display:"grid",placeItems:"center"}}>BP</span><span style={{fontSize:12,fontWeight:600}}>5 new internships this week</span></div>
+    {[["Mechanical Intern","Richmond, VA"],["Test Engineering Co-op","Arlington, VA"]].map(([a,b])=><div key={a} style={{display:"flex",justifyContent:"space-between",fontSize:11,borderTop:"1px solid #EEF1F6",paddingTop:6}}><span style={{fontWeight:500}}>{a}</span><span style={{color:"#55627A"}}>{b}</span></div>)}</div>);
+  if(k==="radar"){const m=["Jul","Aug","Sep","Oct","Nov"];return(<div style={{...box,width:"88%",padding:12}}>
+    <div style={{fontSize:12,fontWeight:600,marginBottom:10}}>Usually opens <span style={{color:"#0B7A55"}}>~mid Aug</span></div>
+    <div style={{position:"relative",height:8,background:"#EEF1F6",borderRadius:99}}><span style={{position:"absolute",left:"22%",width:"18%",top:0,bottom:0,background:"#BFE6D4",borderRadius:99}}/><span style={{position:"absolute",left:"30%",top:-4,width:16,height:16,marginLeft:-8,borderRadius:"50%",background:"#0B7A55",border:"3px solid #fff",boxShadow:"0 0 0 1px #0B7A55"}}/></div>
+    <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"#8D9AB3",marginTop:8}}>{m.map(x=><span key={x}>{x}</span>)}</div></div>);}
+  if(k==="fair") return(<div style={{display:"flex",gap:12,alignItems:"center",width:"88%"}}>
+    <svg viewBox="0 0 140 100" style={{flex:1,height:110}}><rect x="1" y="1" width="138" height="98" rx="10" fill="#fff" stroke="#DCE2EC"/>
+      {[[20,20],[60,20],[100,20],[20,55],[60,55],[100,55],[40,82],[80,82]].map(([x,y],i)=><rect key={i} x={x} y={y-6} width="22" height="12" rx="3" fill={[0,4,7].includes(i)?"#BFE6D4":"#EEF1F6"}/>)}
+      <path d="M31 20 C 50 40, 60 40, 71 55 S 90 80, 91 82" fill="none" stroke="#0B7A55" strokeWidth="2" strokeDasharray="4 3"/>
+      {[[31,20,1],[71,55,2],[91,82,3]].map(([x,y,n])=><g key={n}><circle cx={x} cy={y} r="7" fill="#0B7A55"/><text x={x} y={y+3.5} fontSize="9" textAnchor="middle" fill="#fff" fontWeight="700">{n}</text></g>)}</svg>
+    <svg viewBox="0 0 7 7" style={{width:56,height:56,background:"#fff",padding:5,border:"1px solid #DCE2EC",borderRadius:8}} shapeRendering="crispEdges">{"1110111101010111101111000000101101111010101110111".split("").map((b,i)=>b==="1"&&<rect key={i} x={i%7} y={Math.floor(i/7)} width="1" height="1" fill="#0A1426"/>)}</svg></div>);
+  if(k==="season") return(<div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6,width:"92%"}}>
+    {[["Saved",3],["Applied",2],["Interview",1],["Offer",0]].map(([c,n])=><div key={c} style={{background:"#EEF1F6",borderRadius:8,padding:6,minHeight:96}}>
+      <div style={{fontSize:10,fontWeight:600,color:"#55627A",marginBottom:6}}>{c}</div>
+      {Array.from({length:n}).map((_,i)=><div key={i} style={{...box,boxShadow:"none",borderRadius:6,height:18,marginBottom:4,borderColor:c==="Interview"?"#0B7A55":"#DCE2EC",background:c==="Interview"?"#E6F4EE":"#fff"}}/>)}</div>)}</div>);
+  return(<div style={{...box,width:"88%",padding:12,display:"flex",gap:14,alignItems:"center"}}>
+    <span style={{width:56,height:56,borderRadius:12,background:"#070F1E",color:"#2FD39A",fontSize:24,fontWeight:700,display:"grid",placeItems:"center",flexShrink:0}}>B+</span>
+    <div style={{flex:1,display:"grid",gap:6}}>{[["Q1",86],["Q2",74],["Q3",91]].map(([q,v])=><div key={q} style={{display:"flex",gap:8,alignItems:"center",fontSize:11}}><span style={{width:18,color:"#55627A"}}>{q}</span><span style={{flex:1,height:6,background:"#EEF1F6",borderRadius:99}}><span style={{display:"block",height:6,width:v+"%",background:"#0B7A55",borderRadius:99}}/></span><span style={{...DM,width:20}}>{v}</span></div>)}</div></div>);
+}
 function LandingD({onQuiz,onPage}){
   const [sum,setSum]=React.useState(null),[sumErr,setSumErr]=React.useState(false),[fresh,setFresh]=React.useState(null);
   const [q,setQ]=React.useState(""),[where,setWhere]=React.useState("");
@@ -183,14 +221,20 @@ function LandingD({onQuiz,onPage}){
         </div>
       </section>}
 
-      <section className="d-grid3">
-        {[["Opening Radar","Know the week they open.","Estimates from past seasons, with a reminder a week before.","/radar/"],
-          ["Career Fair Mode","Walk in with a route.","Booths, open roles, a QR resume and follow-ups in one place.","/fair/"],
-          ["Interview practice","Talk it out. Get a grade.","Answer out loud against a timer, get scored on every answer and a letter grade at the end.","/#interview"]].map(([k,t,d,h])=>(
-          <a key={k} href={h} onClick={h==="/#interview"?(e)=>{e.preventDefault();onPage("interview");}:undefined} style={{background:"#070F1E",color:"#E8EDF5",borderRadius:14,padding:24,border:"1px solid #1A2640",textDecoration:"none",display:"block"}}>
-            <p style={{fontSize:13,fontWeight:600,color:"#2FD39A",margin:"0 0 10px"}}>{k}</p>
-            <p style={{fontSize:18,fontWeight:600,margin:"0 0 8px",color:"#fff"}}>{t}</p>
-            <p style={{fontSize:14,lineHeight:1.5,color:"#9FAAC0",margin:0}}>{d}</p></a>))}
+      <section>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#0A1426"}}>Everything after you find the job</h2><a href="/demo/" style={{fontSize:14,color:"#0B7A55",textDecoration:"none",fontWeight:500}}>See it in the 2-minute tour →</a></div>
+        <div className="d-grid3">
+          {FEATURES.map(f=>(
+            <a key={f.k} href={f.h} onClick={f.h==="/#interview"?(e)=>{e.preventDefault();onPage("interview");}:undefined} className="d-feat" style={{...card,textDecoration:"none",color:"#0A1426",display:"flex",flexDirection:"column",overflow:"hidden"}}>
+              <div aria-hidden="true" style={{background:"#F6F8FB",borderBottom:"1px solid #EEF1F6",height:150,position:"relative",display:"grid",placeItems:"center",padding:16}}>
+                <FeatViz k={f.k}/>
+              </div>
+              <div style={{padding:20}}>
+                <p style={{fontSize:13,fontWeight:600,color:"#0B7A55",margin:"0 0 6px",display:"flex",justifyContent:"space-between"}}>{f.name}<span style={{fontSize:11,fontWeight:500,color:"#8D9AB3"}}>Example preview</span></p>
+                <p style={{fontSize:17,fontWeight:600,margin:"0 0 6px"}}>{f.t}</p>
+                <p style={{fontSize:14,lineHeight:1.5,color:"#55627A",margin:0}}>{f.d}</p>
+              </div></a>))}
+        </div>
       </section>
     </main>
     <footer style={{textAlign:"center",padding:"1.5rem",color:"#55627A",fontSize:13,borderTop:"1px solid #DCE2EC",background:"#fff"}}>© 2026 Beat the Pile · Built for students · <a href="/privacy/" style={{color:"#55627A"}}>Privacy</a> · <button type="button" onClick={()=>window.iqReport&&window.iqReport()} style={{background:"none",border:"none",color:"#55627A",cursor:"pointer",font:"inherit",textDecoration:"underline",padding:0}}>Report a problem</button></footer>
