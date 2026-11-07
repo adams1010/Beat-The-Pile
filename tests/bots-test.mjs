@@ -30,7 +30,7 @@ assert.ok(r.body.bots.every((b) => b.enabled === true));
 r = await call("discovery", { query: { bots: "1" }, auth: tok("user_rando") }); assert.equal(r.body.public, true, "signed-in non-owner: still public view");
 // Owner (or the robot) gets the full control room
 r = await call("discovery", { query: { bots: "1" }, auth: tok("user_owner") });
-assert.equal(r.code, 200); assert.equal(r.body.bots.length, 8); assert.equal(r.body.bots[0].id, "finder"); assert.ok(r.body.bots[0].main);
+assert.equal(r.code, 200); assert.equal(r.body.bots.length, 9); assert.equal(r.body.bots[0].id, "finder"); assert.ok(r.body.bots[0].main);
 assert.ok(r.body.bots.every((b) => b.enabled), "default ON"); assert.equal(r.body.finder.counts.live, 1); assert.ok(r.body.finder.backlogLeft > 500);
 console.log("✓ control room data: 6 bots, all on by default, finder pipeline + backlog", r.body.finder.backlogLeft);
 
