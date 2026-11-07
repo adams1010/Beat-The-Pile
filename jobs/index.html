@@ -87,14 +87,24 @@
   .tag{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:6px;vertical-align:2px;margin-left:8px}
   .tag.new{background:var(--green-light);color:var(--green)}
   .tag.me{background:var(--green-light);color:var(--green-dark)}
-  .applycol{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+  .applycol{display:flex;flex-direction:column;align-items:stretch;gap:6px;min-width:112px}
+  .meta2{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.45}
+  .ic.heart{justify-content:center}
+  .row2{grid-column:2/-1;display:flex;flex-wrap:wrap;align-items:center;gap:2px 4px;margin-top:6px;padding-top:8px;border-top:1px solid #EEF1F6}
+  .card .row2 .lite{font:inherit;font-size:12.5px;font-weight:500;color:var(--muted);background:none;border:0;border-radius:999px;padding:5px 9px;cursor:pointer;text-decoration:none;min-height:30px;display:inline-flex;align-items:center}
+  .card .row2 .lite:hover{background:#F1F4F8;color:var(--ink)}
+  .card .row2 .lite[aria-pressed="true"]{color:var(--green-dark);font-weight:600}
+  .card .row2 a.rep.lite{margin-left:auto;color:var(--faint)}
+  @media (max-width:560px){.card .row2{gap:0}.card .row2 .lite{padding:5px 7px;font-size:12px}}
+  .card .applycol .ic.heart{font-size:13.5px;padding:8px 14px;min-height:38px}
   .apply{display:inline-block;background:var(--green);color:#fff;text-decoration:none;font-weight:600;font-size:14px;padding:9px 20px;border-radius:999px;white-space:nowrap;text-align:center}
   .apply:hover{background:var(--green-dark)}
   .src a.rep{color:var(--faint);text-decoration:underline}
   .src{font-size:11px;color:var(--faint)}
   @media (max-width:560px){
     .card{grid-template-columns:40px minmax(0,1fr);padding:14px}.lg{width:40px;height:40px;font-size:13px}
-    .applycol{grid-column:1/-1;align-items:stretch;margin-top:8px}
+    .applycol{grid-column:1/-1;flex-direction:row;margin-top:8px}.applycol .apply{flex:1}.applycol .heart{flex:none;min-width:96px}
+    .row2{grid-column:1/-1;margin-top:2px}
     .apply{text-align:center}
     .src{text-align:center}
   }
@@ -165,7 +175,7 @@
     <h1>Internships, straight from the source</h1>
     <p class="sub">Every major, pulled straight from each company's own job board. No reposts, no recruiters. When a company takes a job down, it drops off here too.</p>
     <div class="trust" id="trust" hidden><span class="dot"></span><span id="trustText"></span></div>
-    <a class="fairlink" href="/demo/">▶ New here? <b>Watch the 90-second demo</b></a>
+    <a class="fairlink" href="/demo/">▶ New here? <b>Take the 75-second tour</b></a>
   </div>
 </header>
 
@@ -335,9 +345,9 @@
     const u = state.user;
     const nm = u ? ([u.firstName, u.lastName].filter(Boolean).join(" ") || u.primaryEmailAddress?.emailAddress || "You") : "";
     const photo = state.profile?.photo && /^data:image\/(jpeg|png|webp);base64,/.test(state.profile.photo) ? state.profile.photo : null;
-    $("prof").innerHTML = `<div class="ban"></div><div class="body">${photo ? `<img class="av" src="${esc(photo)}" alt="">` : `<div class="av">${u ? esc(initials(nm)) : "?"}</div>`}`
+    $("prof").innerHTML = `<div class="ban"></div><div class="body">${photo ? `<img class="av" src="${esc(photo)}" alt="">` : `<div class="av">${u ? esc(initials(nm)) : `<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 5-6 8-6s6.5 2 8 6"/></svg>`}</div>`}`
       + (u ? `<p class="nm">${esc(nm)}</p><p class="sb">Looking at ${esc(MAJOR_LABEL())}</p><a href="/u/">${photo ? "View &amp; edit profile" : "Add a photo &amp; build your profile →"}</a>`
-           : `<p class="nm">Save, follow &amp; track</p><p class="sb">Sign in to keep a list, follow companies and get follow-up nudges.</p>${state.clerk ? `<button class="lnk" id="profSignIn">Sign in →</button>` : ""}`) + `</div>`;
+           : `<p class="nm">Save, follow &amp; track</p><p class="sb">Save jobs and follow companies right away, no account needed. Sign in to keep them on every device.</p>${state.clerk ? `<button class="lnk" id="profSignIn">Sign in →</button>` : ""}`) + `</div>`;
     const b = $("profSignIn"); if (b) b.onclick = () => state.clerk.openSignIn();
     // who's hiring the most in what you're looking at
     const per = new Map();
@@ -355,7 +365,7 @@
       const today = new Date().toISOString().slice(0, 10);
       const up = d.companies.filter((c) => !c.opened && c.typical && c.typical >= today && c.seasons >= 2).sort((a, b) => a.typical.localeCompare(b.typical)).slice(0, 5);
       if (!up.length) return;
-      const fmt = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" }).toUpperCase();
+      const fmt = (iso) => new Date(iso + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
       $("soon").innerHTML = up.map((c) => `<a class="rrow" href="/radar/"><span class="rn">${esc(c.name.trim())}</span><span class="rv">~${fmt(c.typical)}</span></a>`).join("");
       $("soonBox").hidden = false;
     }).catch(() => {});
@@ -449,19 +459,20 @@
       <article class="card${has("applied", j) ? " applied" : ""}${j.closed ? " closed" : ""}">
         <a class="lg" href="${coHref(j)}" aria-hidden="true" tabindex="-1">${esc(initials(j.company))}</a>
         <div style="min-width:0">
-          <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">New</span>' : ""}${j.match === "me" && STRICT_OK() ? '<span class="tag me">Mechanical</span>' : ""}${j.sites.length > 1 ? `<span class="tag multi">${j.sites.length} locations</span>` : j.count > 1 ? `<span class="tag multi">${j.count} openings</span>` : ""}${j.closed ? '<span class="tag closed">Closed — taken down by the company</span>' : ""}</div>
-          <div class="co"><a class="cn" href="${coHref(j)}">${esc(j.company)}</a> <span class="loc">· ${esc(j.sites[0].loc)}${j.sites.length > 1 ? ` +${j.sites.length - 1} more` : ""}</span>${j.company_id ? `<button class="follow" data-co="${esc(j.company_id)}" data-name="${esc(j.company)}" aria-pressed="${followed(j)}">${followed(j) ? "★ Following" : "☆ Follow"}</button>` : ""}</div>
-          <div class="meta">${FIELD_NAME[j.field] ? `<span>${esc(FIELD_NAME[j.field])}</span>` : ""}${seasonOf(j.title) ? `<span>${esc(seasonOf(j.title))}</span>` : ""}${needsClearance(j.title) ? `<span>US citizens / clearance</span>` : ""}<span>${esc(postedText(j))}</span></div>
+          <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">New</span>' : ""}${j.closed ? '<span class="tag closed">Closed by the company</span>' : ""}</div>
+          <div class="co"><a class="cn" href="${coHref(j)}">${esc(j.company)}</a> <span class="loc">· ${esc(j.sites[0].loc)}${j.sites.length > 1 ? ` +${j.sites.length - 1} more` : ""}</span></div>
+          <div class="meta2">${[esc(postedText(j)), j.sites.length > 1 ? `${j.sites.length} locations` : j.count > 1 ? `${j.count} openings` : "", seasonOf(j.title) ? esc(seasonOf(j.title)) : "", (state.major === "all" || !state.major) && FIELD_NAME[j.field] ? esc(FIELD_NAME[j.field]) : "", j.match === "me" && STRICT_OK() ? "Mechanical match" : "", needsClearance(j.title) ? "US citizens / clearance" : ""].filter(Boolean).join(" · ")}</div>
           ${j.sites.length > 1 ? `<details class="sites"><summary>All ${j.sites.length} locations</summary><ul>${j.sites.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.loc)}</a></li>`).join("")}</ul></details>` : ""}
         </div>
         <div class="applycol">
-          ${j.closed ? "" : `<a class="apply" href="${esc(j.url)}" target="_blank" rel="noopener" data-co="${esc(j.company)}">Apply →</a>`}
-          <span class="src">on ${esc(domain(j.url))} · <a href="#" class="rep" data-rep="${esc(j.id)}" data-what="${esc(j.company + " — " + j.title)}">Report</a></span>
-          <div class="mine">
-            <button class="ic save" data-act="saved" data-id="${esc(j.id)}" aria-pressed="${has("saved", j)}">${has("saved", j) ? "♥ Saved" : "♡ Save"}</button>
-            <button class="ic done" data-act="applied" data-id="${esc(j.id)}" aria-pressed="${has("applied", j)}">${has("applied", j) ? "✓ Applied" : "Mark applied"}</button>
-            ${j.closed ? "" : `<button class="tbtn" type="button" data-tailor="${esc(j.id)}" data-t="${esc(niceTitle(j.title))}" data-c="${esc(j.company)}" data-l="${esc(j.sites[0].loc)}" data-f="${esc(FIELD_NAME[j.field] || "")}" data-u="${esc(j.url)}">Tailor resume</button>`}
-          </div>
+          ${j.closed ? "" : `<a class="apply" href="${esc(j.url)}" target="_blank" rel="noopener" data-co="${esc(j.company)}" title="Opens ${esc(domain(j.url))}">Apply →</a>`}
+          <button class="ic save heart" data-act="saved" data-id="${esc(j.id)}" aria-pressed="${has("saved", j)}" aria-label="${has("saved", j) ? "Saved" : "Save"}">${has("saved", j) ? "♥ Saved" : "♡ Save"}</button>
+        </div>
+        <div class="row2">
+          <button class="ic done lite" data-act="applied" data-id="${esc(j.id)}" aria-pressed="${has("applied", j)}">${has("applied", j) ? "✓ Applied" : "Mark applied"}</button>
+          ${j.closed ? "" : `<button class="tbtn lite" type="button" data-tailor="${esc(j.id)}" data-t="${esc(niceTitle(j.title))}" data-c="${esc(j.company)}" data-l="${esc(j.sites[0].loc)}" data-f="${esc(FIELD_NAME[j.field] || "")}" data-u="${esc(j.url)}">Tailor resume</button>`}
+          ${j.company_id ? `<button class="follow lite" data-co="${esc(j.company_id)}" data-name="${esc(j.company)}" aria-pressed="${followed(j)}">${followed(j) ? "★ Following" : "☆ Follow " + esc(j.company.length > 18 ? "company" : j.company)}</button>` : ""}
+          <a href="#" class="rep lite" data-rep="${esc(j.id)}" data-what="${esc(j.company + " — " + j.title)}">Report</a>
         </div>
       </article>`).join("");
   }
@@ -611,7 +622,8 @@
   $("tlX").onclick = () => $("tailor").close();
   $("tailor").addEventListener("click", (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
   function toast(msg){
-    const t = document.createElement("div"); t.className = "toast"; t.textContent = msg;
+    document.querySelectorAll(".toast").forEach((x) => x.remove());   // one at a time, newest wins
+    const t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status"); t.textContent = msg;
     document.body.appendChild(t); setTimeout(() => t.remove(), 3200);
   }
   async function token(){ try { return await state.clerk?.session?.getToken(); } catch { return null; } }
