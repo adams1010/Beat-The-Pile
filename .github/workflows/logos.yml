@@ -1,0 +1,21 @@
+# Daily: 🖼 Logo Finder — find each live company's real website, PROVE it's theirs, save its logo (scripts/find-logos.mjs).
+name: logos
+on:
+  schedule:
+    - cron: "15 10 * * *"
+  workflow_dispatch:
+    inputs:
+      limit: { description: "Companies per run", default: "400" }
+permissions: { contents: read }
+concurrency: { group: logos, cancel-in-progress: false }
+jobs:
+  find:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Find logos
+        env: { CRON_SECRET: "${{ secrets.CRON_SECRET }}" }
+        run: node scripts/find-logos.mjs --limit=${{ github.event.inputs.limit || '400' }}

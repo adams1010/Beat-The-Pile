@@ -176,7 +176,7 @@ function LandingD({onQuiz,onPage}){
         <div className="d-grid4">
           {sum.top.slice(0,4).map(c=>(
             <article key={c.id} style={{...card,padding:20,display:"flex",flexDirection:"column",gap:12}}>
-              <div style={{display:"flex",gap:12,alignItems:"center"}}><span style={{width:44,height:44,borderRadius:10,background:"#F1F4F9",border:"1px solid #DCE2EC",display:"grid",placeItems:"center",fontWeight:600,flexShrink:0,color:"#0A1426"}}>{coInitials(c.company)}</span><p style={{fontWeight:600,margin:0,color:"#0A1426"}}>{c.company}</p></div>
+              <div style={{display:"flex",gap:12,alignItems:"center"}}><span data-logo-id={c.id} style={{width:44,height:44,borderRadius:10,background:"#F1F4F9",border:"1px solid #DCE2EC",display:"grid",placeItems:"center",fontWeight:600,flexShrink:0,color:"#0A1426"}}>{coInitials(c.company)}</span><p style={{fontWeight:600,margin:0,color:"#0A1426"}}>{c.company}</p></div>
               <div style={{fontSize:13,borderTop:"1px solid #EEF1F6",paddingTop:12,color:"#0A1426"}}><b style={{...DM,fontWeight:500}}>{c.n}</b> open internships</div>
               <a href={`/c/${encodeURIComponent(c.id)}`} style={{fontSize:13,fontWeight:600,color:"#0B7A55",textDecoration:"none"}}>See internships →</a>
             </article>))}

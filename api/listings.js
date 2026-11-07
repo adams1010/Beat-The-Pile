@@ -83,6 +83,15 @@ export default async function handler(req, res) {
   if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
   const q0 = req.query || {};
   if (q0.page != null) return companyHtml(String(q0.page).toLowerCase(), res);
+  if (q0.logos === "1") {                                  // company id → proven logo (Logo Finder). Small, cached.
+    try {
+      const rows = await db.selectAllAsAdmin("company_candidates?select=id,domain,logo&status=eq.live&logo=not.is.null&logo=neq.none&domain=not.is.null");
+      const out = {};
+      for (const r of rows) out[r.id] = r.logo === "fav" ? "fav:" + r.domain : r.logo;
+      res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
+      return res.status(200).json(out);
+    } catch (e) { console.error("[logos]", e); return res.status(503).json({ error: "Logos unavailable" }); }
+  }
   if (q0.sitemap === "1") {
     try {
       const ids = [...(await hiringCompanies()).keys()].filter((id) => /^[a-z0-9-]{2,80}$/.test(id)).sort();

@@ -24,7 +24,7 @@ const call = async (mod, { method = "GET", auth, body, query = {} } = {}) => { c
 
 // Public callers only get the switches (no users, AI spend, emails, run logs)
 let r = await call("discovery", { query: { bots: "1" } });
-assert.equal(r.code, 200); assert.equal(r.body.public, true); assert.equal(r.body.bots.length, 8);
+assert.equal(r.code, 200); assert.equal(r.body.public, true); assert.equal(r.body.bots.length, 9);
 assert.ok(!r.body.system && !r.body.ai && !r.body.finder && !r.body.bots[0].runs && !("changedBy" in r.body.bots[0]), "private numbers hidden");
 assert.ok(r.body.bots.every((b) => b.enabled === true));
 r = await call("discovery", { query: { bots: "1" }, auth: tok("user_rando") }); assert.equal(r.body.public, true, "signed-in non-owner: still public view");

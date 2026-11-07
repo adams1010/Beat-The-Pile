@@ -1,4 +1,4 @@
-/* built from src/home.jsx e1e864ba635ef756 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 405c1e403b6fbb9a — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -914,6 +914,7 @@ function LandingD({
       alignItems: "center"
     }
   }, React.createElement("span", {
+    "data-logo-id": c.id,
     style: {
       width: 44,
       height: 44,

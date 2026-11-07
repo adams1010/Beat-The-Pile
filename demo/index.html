@@ -220,7 +220,7 @@
       const draw = () => {
         const n = D.byField[D.major]; $("cnt").textContent = `${n ? n.toLocaleString() + " live " : ""}${LABEL[D.major]} internships · newest first`;
         $("list").innerHTML = D.jobs.slice(0, 5).map((j, i) => `<div class="card job fade" style="animation-delay:${i * 60}ms" data-id="${esc(j.id)}">
-          <div class="t">${esc(nice(j.title))}</div><div class="co"><span class="lg">${esc(initials(j.company))}</span>${esc(j.company)} · ${esc(j.location || "US")}</div>
+          <div class="t">${esc(nice(j.title))}</div><div class="co"><span class="lg" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</span>${esc(j.company)} · ${esc(j.location || "US")}</div>
           <div class="found">Found ${esc(ago(j.first_seen))} on ${esc(j.company)}'s own job board</div></div>`).join("") || `<div class="card">Live jobs didn't load. <a href="/jobs/">Open the jobs page</a></div>`;
         v.querySelectorAll(".job").forEach((el) => el.onclick = () => {
           if (el.querySelector(".acts")) return;
@@ -239,7 +239,7 @@
     mount(v) {
       const j = theJob(), list = coJobs(j.company), states = [...new Set(list.map((x) => x.state).filter(Boolean).join(",").split(",").filter(Boolean))].slice(0, 3);
       const r = D.radar && D.radar.find((c) => c.id === j.company_id);
-      v.innerHTML = `<div class="card fade"><div class="row" style="gap:12px"><span class="lg big">${esc(initials(j.company))}</span><div style="flex:1"><p class="h" style="margin:0">${esc(j.company)}</p><div class="sub" style="margin:2px 0 0">Internships pulled from ${esc(j.company)}'s own job board</div></div><button class="b" id="follow">+ Follow</button></div>
+      v.innerHTML = `<div class="card fade"><div class="row" style="gap:12px"><span class="lg big" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</span><div style="flex:1"><p class="h" style="margin:0">${esc(j.company)}</p><div class="sub" style="margin:2px 0 0">Internships pulled from ${esc(j.company)}'s own job board</div></div><button class="b" id="follow">+ Follow</button></div>
         <div class="kv"><div><b>${list.length || 1}</b>open now</div><div><b>${esc(states.join(", ") || j.state || "US")}</b>locations</div>${r && r.typicalNext ? `<div><b>${new Date(r.typicalNext).toLocaleDateString("en-US", { month: "short" })}</b>usually opens <span class="est">estimate</span></div>` : `<div><b>Live</b>re-read every few hours</div>`}</div></div>
         <div class="stack" style="margin-top:10px">${(list.length ? list : [j]).slice(0, 4).map((x, i) => `<div class="card fade" style="animation-delay:${120 + i * 70}ms"><div class="t" style="font-weight:600;font-size:14px">${esc(nice(x.title))}</div><div class="found">${esc(x.location || "")}</div></div>`).join("")}</div>`;
       $("follow").onclick = () => { D.followed = true; $("follow").className = "b on"; $("follow").textContent = "✓ Following"; $("follow").insertAdjacentHTML("afterend", ""); };
@@ -270,7 +270,7 @@ ${top.map((j) => `<div class="er"><b>${esc(nice(j.title))}</b><br>${esc(j.compan
     real: "Real AI, example resume", steps: [["#tb", "Tap Tailor resume"], ["#tgo", "Get suggestions"]],
     mount(v) {
       const j = theJob();
-      v.innerHTML = `<div class="card fade"><div class="t" style="font-weight:600">${esc(nice(j.title))}</div><div class="co"><span class="lg">${esc(initials(j.company))}</span>${esc(j.company)}</div><div class="acts"><span class="b on">✓ Saved</span><button class="b" id="tb">Tailor resume</button></div></div><div id="tl"></div>`;
+      v.innerHTML = `<div class="card fade"><div class="t" style="font-weight:600">${esc(nice(j.title))}</div><div class="co"><span class="lg" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</span>${esc(j.company)}</div><div class="acts"><span class="b on">✓ Saved</span><button class="b" id="tb">Tailor resume</button></div></div><div id="tl"></div>`;
       $("tb").onclick = () => {
         $("tl").innerHTML = `<div class="card fade" style="margin-top:10px"><div style="font-size:12.5px;font-weight:600;margin-bottom:6px">Your resume <span class="ex">Example</span></div><textarea class="res" readonly aria-label="Example resume">${esc(SAMPLE[D.major] || SAMPLE.mechanical)}</textarea><div class="acts"><button class="b go" id="tgo">Get suggestions</button></div></div>`;
         $("tgo").onclick = () => runTailor(j);
@@ -525,5 +525,6 @@ Thanks again,
 <script src="/nav.js" defer></script>
 <script src="/feedback.js" defer></script>
 <script src="/ph.js" defer></script>
+<script src="/logos.js" defer></script>
 </body>
 </html>

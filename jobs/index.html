@@ -353,7 +353,7 @@
     const per = new Map();
     for (const j of state.all) if (inView(j)) { const k = j.company_id || j.company; const e = per.get(k) || { n: 0, j }; e.n++; per.set(k, e); }
     const top = [...per.values()].sort((a, b) => b.n - a.n).slice(0, 6);
-    $("topCos").innerHTML = top.length ? top.map(({ n, j }) => `<a class="rrow" href="${coHref(j)}"><span class="lg">${esc(initials(j.company))}</span><span class="rn">${esc(j.company)}</span><span class="rv">${n}</span></a>`).join("")
+    $("topCos").innerHTML = top.length ? top.map(({ n, j }) => `<a class="rrow" href="${coHref(j)}"><span class="lg" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</span><span class="rn">${esc(j.company)}</span><span class="rv">${n}</span></a>`).join("")
       : `<p style="font-size:13px;color:var(--muted);margin:0">Nothing in this view yet.</p>`;
     loadSoon();
   }
@@ -378,7 +378,7 @@
     const f = new Map(); state.all.forEach((j) => { const k = FIELD_NAME[j.field] || "Other"; f.set(k, (f.get(k) || 0) + 1); });
     const bars = [...f.entries()].sort((a, b) => b[1] - a[1]).slice(0, 5), max = bars[0]?.[1] || 1;
     return `<section class="panel" style="margin-bottom:12px;padding:20px">
-      <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span class="lg" style="width:60px;height:60px;font-size:20px;border-radius:14px">${esc(initials(j0.company))}</span>
+      <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><span class="lg" data-logo-id="${esc(j0.company_id || "")}" style="width:60px;height:60px;font-size:20px;border-radius:14px">${esc(initials(j0.company))}</span>
         <div style="flex:1;min-width:200px"><h2 style="margin:0;font-size:24px;font-weight:600;letter-spacing:-.02em">${esc(j0.company)}</h2>
         <p style="margin:2px 0 0;font-size:14px;color:var(--muted)"><b style="font-family:var(--mono);color:var(--ink);font-weight:500">${state.all.length}</b> open internship${state.all.length === 1 ? "" : "s"}${sts.size ? ` · ${sts.size} state${sts.size === 1 ? "" : "s"}` : ""} · from their own job board (${esc(domain(j0.url))})</p></div>
         ${j0.company_id ? `<button class="chip follow" style="padding:8px 16px;color:var(--ink);border:1px solid #C9D1DE;border-radius:999px;font-size:13px" data-co="${esc(j0.company_id)}" data-name="${esc(j0.company)}" aria-pressed="${state.mine.starred.has(j0.company_id)}">${state.mine.starred.has(j0.company_id) ? "★ Following" : "☆ Follow"}</button>` : ""}</div>
@@ -457,7 +457,7 @@
     }
     $("list").innerHTML = companyHeader(rows) + rows.map((j) => `
       <article class="card${has("applied", j) ? " applied" : ""}${j.closed ? " closed" : ""}">
-        <a class="lg" href="${coHref(j)}" aria-hidden="true" tabindex="-1">${esc(initials(j.company))}</a>
+        <a class="lg" href="${coHref(j)}" aria-hidden="true" tabindex="-1" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</a>
         <div style="min-width:0">
           <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">New</span>' : ""}${j.closed ? '<span class="tag closed">Closed by the company</span>' : ""}</div>
           <div class="co"><a class="cn" href="${coHref(j)}">${esc(j.company)}</a> <span class="loc">· ${esc(j.sites[0].loc)}${j.sites.length > 1 ? ` +${j.sites.length - 1} more` : ""}</span></div>
@@ -839,6 +839,7 @@
 })();
 </script>
 <script src="/ph.js" defer></script>
+<script src="/logos.js" defer></script>
 <script src="/feedback.js" defer></script>
 </body>
 </html>

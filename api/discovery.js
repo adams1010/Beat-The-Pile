@@ -77,6 +77,21 @@ export default async function handler(req, res) {
       for (let i = 0; i < add.length; i += 200) await db.insertIgnore("company_candidates", add.slice(i, i + 200));
       return res.status(200).json({ ok: true, received: items.length, added: add.length });
     }
+    if (b?.action === "logos") {                          // 🖼 Logo Finder (GitHub) reports proven websites + icons
+      if (who !== "robot") return res.status(403).json({ error: "Robot only" });
+      const items = (Array.isArray(b.items) ? b.items : []).slice(0, 300), now = new Date().toISOString();
+      let saved = 0;
+      for (const it of items) {
+        const id = String(it.id || ""); if (!/^[a-z0-9-]{2,90}$/.test(id)) continue;
+        const domain = it.domain ? cleanDomain(it.domain) : null;
+        const logo = it.logo === "fav" || it.logo === "none" ? it.logo : (/^https:\/\//.test(String(it.logo || "")) ? cleanUrl(it.logo) : null);
+        if (domain && !/^[a-z0-9.-]+\.[a-z]{2,}$/.test(domain)) continue;
+        const patch = { logo: domain ? (logo && logo !== "none" ? logo : "fav") : "none", logo_checked_at: now };
+        if (domain) patch.domain = domain;
+        await db.update(`company_candidates?id=eq.${encodeURIComponent(id)}`, patch); saved++;
+      }
+      return res.status(200).json({ ok: true, saved });
+    }
     if (b?.action === "botlog") {                         // GitHub-run bots (browser pass, radar) report their runs
       if (who !== "robot" || !BOT_IDS.includes(b.bot)) return res.status(403).json({ error: "Robot only" });
       await logRun(b.bot, b.ok !== false, String(b.summary || "").slice(0, 300), b.stats && typeof b.stats === "object" ? b.stats : null);
@@ -120,6 +135,22 @@ export default async function handler(req, res) {
       for (const c of COMPANIES) take(c.ats, c);
       return res.status(200).json({ boards: [...known], names: [...new Set([...rows, ...COMPANIES].map((r) => normName(r.company)))] });
     } catch (e) { console.error("[discovery boards]", e); return res.status(500).json({ error: "Couldn't load boards" }); }
+  }
+  if (req.query?.logos === "todo") {                      // Logo Finder's work list (robot only)
+    if (!isAuthorizedCron(req)) return res.status(403).json({ error: "Robot only" });
+    try {
+      const lim = Math.max(1, Math.min(600, +req.query.limit || 400));
+      const old = new Date(Date.now() - 30 * 864e5).toISOString();
+      const rows = await db.selectAsAdmin(`company_candidates?select=id,company,domain,ats,config,hint&status=eq.live&or=(logo_checked_at.is.null,and(logo.eq.none,logo_checked_at.lt.${old}))&order=intern_count.desc.nullslast&limit=${lim}`);
+      // one listing link per company: if their job board lives on their own domain, that's the strongest lead
+      const urls = {};
+      for (let i = 0; i < rows.length; i += 80) {
+        const ids = rows.slice(i, i + 80).map((r) => r.id).join(",");
+        const ls = await db.selectAsAdmin(`listings?select=company_id,url&company_id=in.(${ids})&limit=400`);
+        for (const l of ls) (urls[l.company_id] ||= []).length < 2 && urls[l.company_id].push(l.url);
+      }
+      return res.status(200).json({ companies: rows.map((r) => ({ ...r, urls: [...(urls[r.id] || []), r.hint].filter(Boolean) })) });
+    } catch (e) { console.error("[discovery logos]", e); return res.status(500).json({ error: "Couldn't load the list" }); }
   }
   if (req.query?.bots !== undefined) {
     // Control room. Public callers (GitHub bots reading their switch) get ONLY the on/off switches.
