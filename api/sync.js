@@ -7,6 +7,7 @@ import { fetchCompany } from "../lib/fetchers/index.js";
 import { db, isAuthorizedCron } from "../lib/db.js";
 import { botOn, logRun } from "../lib/bots.js";
 import { mapLimit } from "../lib/http.js";
+import { geoFields } from "../lib/geocode.js";
 
 export const config = { maxDuration: 60 };
 
@@ -80,6 +81,22 @@ export function syncKey(id, last, hot) {
   return Date.parse(last[id]) - (hot.has(id) ? HOT_BOOST_MS : 0);
 }
 
+// Map points for listings saved before geocoding existed (or before a geocoder fix): a few seconds per run, one PATCH per
+// distinct location text. New and re-read listings get points in fetchCompany, so this list only shrinks.
+export async function fillGeo(msBudget, now = Date.now) {
+  const t0 = now(); let rows;
+  try { rows = await db.selectAsAdmin("listings?select=location,state&closed_at=is.null&geo_kind=is.null&limit=1000"); } catch { return 0; }
+  const groups = new Map(); for (const r of rows) groups.set(`${r.location}\u0000${r.state}`, r);
+  let done = 0;
+  await mapLimit([...groups.values()], 6, async (r) => {
+    if (now() - t0 > msBudget) return;
+    const f = geoFields(r.location, r.state);
+    const where = (v, k) => (v == null ? `${k}=is.null` : `${k}=eq.${encodeURIComponent(v)}`);
+    await db.update(`listings?${where(r.location, "location")}&${where(r.state, "state")}&geo_kind=is.null`, f).then(() => done++, () => {});
+  });
+  return done;
+}
+
 export default async function handler(req, res) {
   if (!isAuthorizedCron(req)) return res.status(401).json({ error: "Unauthorized" });
   if (!(await botOn("sync"))) return res.status(200).json({ off: true, bot: "sync" });
@@ -106,10 +123,11 @@ export default async function handler(req, res) {
     if (elapsed > START_BUDGET_MS) return { company_id: cfg.id, skipped: true };
     return syncOne(cfg, runStart, HARD_STOP_MS - elapsed);
   });
+  const geoFilled = await fillGeo(Math.min(8000, Math.max(0, 55000 - (Date.now() - t0)))).catch(() => 0);
   const doneRuns = report.filter((r) => !r.skipped), failed = doneRuns.filter((r) => !r.ok);
   const kept = doneRuns.reduce((n, r) => n + (r.kept_count || 0), 0);
   await logRun("sync", failed.length < doneRuns.length, `Synced ${doneRuns.length} companies · ${kept} internships seen${failed.length ? ` · ${failed.length} boards didn't answer` : ""}`,
-    { synced: doneRuns.length, failed: failed.length, kept, deferred: report.length - doneRuns.length, busy: report.filter((r) => r.busy).length });
+    { synced: doneRuns.length, failed: failed.length, kept, geoFilled, deferred: report.length - doneRuns.length, busy: report.filter((r) => r.busy).length });
   return res.status(200).json({
     ranAt: runStart,
     synced: report.filter((r) => !r.skipped).length,

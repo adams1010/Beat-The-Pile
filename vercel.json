@@ -229,7 +229,10 @@
   ],
   "functions": {
     "api/listings.js": {
-      "includeFiles": "radar/radar.json"
+      "includeFiles": "{radar/radar.json,data/us-places.json,data/us-zips.json}"
+    },
+    "api/sync.js": {
+      "includeFiles": "data/us-places.json"
     }
   }
 }

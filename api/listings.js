@@ -5,6 +5,7 @@
 //   GET /api/listings?state=VA&match=me          → strict ME titles only
 //   GET /api/listings?companies=x-abbott,boeing  → only these companies (career-fair lists)
 //   GET /api/listings?field=all | field=finance  → every major / one field (see lib/fields.js)
+//   GET /api/listings?near=24060&mi=50          → within 50 miles of a ZIP (or near=Blacksburg, VA), nearest first, with .mi
 //   GET /api/listings?limit=200&offset=400       → one page (default: everything, up to 20,000)
 //   GET /api/listings?ids=a:1,b:2                → these exact listings INCLUDING closed ones (your saved/applied history)
 //   GET /api/listings?summary=1                  → just counts + last update time (homepage/demo stats; tiny + cached)
@@ -16,6 +17,8 @@ import { db } from "../lib/db.js";
 import { FIELDS } from "../lib/fields.js";
 import { COMPANIES } from "../lib/companies.js";
 import { companyPage, radarFor, sitemap } from "../lib/companypage.js";
+import { lookupPlace, geocodeOne, miles } from "../lib/geocode.js";
+import { zipToState } from "../lib/geo.js";
 
 const FIELD_KEYS = new Set([...FIELDS.map(([k]) => k), "other"]);
 const STATES = new Set("AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY PR".split(" "));
@@ -38,7 +41,51 @@ export function parse(q) {
   const limit = raw("limit") ? Number(raw("limit")) : null, offset = raw("offset") ? Number(raw("offset")) : 0;
   if (limit != null && !(Number.isInteger(limit) && limit >= 1 && limit <= 1000)) errs.push("limit must be 1–1000");
   if (!(Number.isInteger(offset) && offset >= 0 && offset <= 20000)) errs.push("offset must be 0–20000");
-  return { errs, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, summary: raw("summary") === "1", names: raw("names") === "1" };
+  const near = raw("near").trim().slice(0, 60);
+  if (near && !/^[A-Za-z0-9 .,'-]+$/.test(near)) errs.push("near must be a 5-digit ZIP or 'City, ST'");
+  const mi = raw("mi") ? Number(raw("mi")) : 50;
+  if (!(Number.isInteger(mi) && mi >= 5 && mi <= 300)) errs.push("mi must be 5–300");
+  return { errs, near: near || null, mi, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, summary: raw("summary") === "1", names: raw("names") === "1" };
+}
+
+/** Same major filters as the main list (field / strict ME / companies), as a PostgREST query string tail. */
+function majorFilter(p) {
+  let q = "";
+  if (p.match) q += `&match=eq.${p.match}`;
+  else if (!p.field) q += "&match=not.is.null";
+  if (p.field && p.field !== "all") q += `&field=eq.${p.field}`;
+  if (p.companies.length) q += `&company_id=in.(${p.companies.join(",")})`;
+  return q;
+}
+/** "Within N miles of a ZIP / city": nearest first, each listing with its distance (city center to city center).
+ *  Only listings whose location names a real US city are on the map; remote and "4 Locations" postings are counted
+ *  separately so the page can say so instead of quietly hiding or guessing them. */
+async function nearby(p, res) {
+  const center = lookupPlace(p.near);
+  if (!center) { res.setHeader("Cache-Control", "no-store"); return res.status(400).json({ error: "We couldn't find that place. Try a 5-digit ZIP code, like 24060." }); }
+  const st = /^\d{5}$/.test(p.near) ? zipToState(p.near) : geocodeOne(p.near)?.state || null;
+  const dLat = p.mi / 69, dLng = p.mi / (69 * Math.cos((center[0] * Math.PI) / 180));
+  const r4 = (x) => Math.round(x * 1e4) / 1e4;
+  const box = `and(geo_lat.gte.${r4(center[0] - dLat)},geo_lat.lte.${r4(center[0] + dLat)},geo_lng.gte.${r4(center[1] - dLng)},geo_lng.lte.${r4(center[1] + dLng)})`;
+  const q = `listings?select=${COLS},geo_pts&${LIVE}${majorFilter(p)}&and=(or(${box},geo_n.gt.1))&order=first_seen.desc,id.asc`;
+  const cand = [];
+  for (let off = 0; off < 20000; off += 1000) { const page = await db.select(`${q}&limit=1000&offset=${off}`); cand.push(...page); if (page.length < 1000) break; }
+  const hits = [];
+  for (const l of cand) {
+    const d = Math.min(...(l.geo_pts || []).map((pt) => miles(center, pt)));
+    if (d <= p.mi) { const { geo_pts, ...rest } = l; hits.push({ ...rest, mi: Math.round(d) }); }
+  }
+  hits.sort((a, b) => a.mi - b.mi || (a.first_seen < b.first_seen ? 1 : -1));
+  const [remote, unplaced, lastRun] = await Promise.all([
+    db.count(`listings?${LIVE}${majorFilter(p)}&geo_kind=eq.remote`),
+    st ? db.count(`listings?${LIVE}${majorFilter(p)}&geo_kind=in.(multi,state)&state=ilike.*${st}*`) : 0,
+    db.select("feed_runs?select=ran_at&order=ran_at.desc&limit=1"),
+  ]);
+  const page = p.limit != null ? hits.slice(p.offset, p.offset + p.limit) : hits;
+  res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=3600");
+  return res.status(200).json({ listings: page, meta: { count: hits.length, lastSync: lastRun?.[0]?.ran_at || null,
+    near: { q: p.near, mi: p.mi, lat: center[0], lng: center[1], state: st }, remote, unplacedInState: unplaced,
+    ...(p.limit != null ? { limit: p.limit, offset: p.offset, more: p.offset + p.limit < hits.length } : {}) } });
 }
 
 /** One pass over every open internship: company_id → {company, n}, plus counts per field (major). */
@@ -130,6 +177,8 @@ export default async function handler(req, res) {
       const rows = await db.select(`listings?select=${COLS},closed_at,link_ok&id=in.(${encodeURIComponent(list)})`);
       return res.status(200).json({ listings: rows.map((l) => ({ ...l, open: !l.closed_at && l.link_ok !== false })), meta: { count: rows.length } });
     }
+
+    if (p.near) return await nearby(p, res);
 
     res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=3600");
     let q = `listings?select=${COLS}&${LIVE}&order=first_seen.desc,id.asc`;

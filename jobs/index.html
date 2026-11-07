@@ -46,6 +46,13 @@
   .seg{border-radius:999px}.seg button{border-radius:999px;font-weight:500}
   .statesel{font:inherit;font-size:13px;font-weight:500;border-radius:999px!important;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 10px;cursor:pointer}
   .statesel.on{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy)}
+  .near{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 4px 3px 12px}
+  .near.on{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy)}
+  .near select{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink);cursor:pointer;padding:2px 0}
+  .near input{font:inherit;font-size:13px;width:92px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--ink);background:#F6F8FB}
+  .near input:focus{outline:2px solid var(--green);outline-offset:1px;background:#fff}
+  .near .nx{border:0;background:none;font:inherit;font-size:15px;color:var(--muted,#55627A);cursor:pointer;padding:0 6px;line-height:1}
+  .meta2 .dist{color:var(--green);font-weight:600}
   .tag.multi{background:#EEF2FF;color:#3730A3}
   .toggle{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;border-radius:999px!important;color:var(--ink);cursor:pointer;user-select:none;
           background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 12px}
@@ -198,6 +205,9 @@
 <div class="controls">
     <div class="row">
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">All US states</option></select>
+      <form class="near" id="nearBox" role="search" aria-label="Internships near a place"><span>Within</span>
+        <select id="miSel" aria-label="Distance in miles"><option value="25">25 mi</option><option value="50" selected>50 mi</option><option value="100">100 mi</option><option value="200">200 mi</option></select>
+        <span>of</span><input id="nearIn" placeholder="ZIP code" inputmode="numeric" autocomplete="postal-code" maxlength="40" aria-label="ZIP code or City, ST"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
       <select class="statesel" id="majorSel" aria-label="Major">
         <option value="all">All majors</option>
         <optgroup label="Engineering"><option value="eng">All engineering</option><option value="mechanical">Mechanical &amp; Aerospace</option><option value="electrical">Electrical &amp; Computer Eng.</option><option value="civil">Civil, Construction &amp; Architecture</option><option value="chemical">Chemical &amp; Materials</option><option value="industrial">Industrial &amp; Manufacturing</option></optgroup>
@@ -240,7 +250,7 @@
 
 <script>
 (function(){
-  const state = { all: [], savedRows: [], followRows: [], major: "all", st: "ALL", meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
+  const state = { near: null, nearMeta: null, all: [], savedRows: [], followRows: [], major: "all", st: "ALL", meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
                   user: null, clerk: null, mine: { saved: new Set(), applied: new Set(), starred: new Set(), seenAt: null } };
   const NAMES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"Washington DC",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
   const statesOf = (j) => String(j.state || "").split(",").filter(Boolean);
@@ -425,7 +435,9 @@
     const rows = [...groups.values()];
     const has = (list, j) => j.ids.some((id) => state.mine[list].has(id));
     $("savedN").textContent = state.mine.saved.size ? `(${state.mine.saved.size})` : "";
-    $("note").innerHTML = (state.st !== "ALL" && !state.savedOnly && !state.followOnly
+    const nm = state.near && !state.savedOnly && !state.followOnly ? state.nearMeta : null;
+    const nearNote = nm ? `Nearest first. Distances are city center to city center. ${nm.unplacedInState ? `${nm.unplacedInState} more in ${esc(NAMES[nm.near.state] || nm.near.state)} ${nm.unplacedInState === 1 ? "doesn't" : "don't"} say which city. <button class="linkbtn" data-near-st="${esc(nm.near.state)}">See all of ${esc(NAMES[nm.near.state] || nm.near.state)}</button> ` : ""}${nm.remote ? `${nm.remote} remote not counted. ` : ""}` : "";
+    $("note").innerHTML = nearNote + (state.st !== "ALL" && !state.savedOnly && !state.followOnly
         ? `Showing ${esc(state.st.map((x) => NAMES[x] || x).join(" & "))}. <button class="linkbtn" id="goAll">See all US</button> `
         : "") + (state.company ? `One company, every major. <button class="linkbtn" id="allCos">Show all companies</button> ` : "") + (state.savedOnly || state.followOnly ? "Every major and state." : strict ? "Showing roles that say mechanical (or close, like manufacturing)." : `Major: <b>${esc(MAJOR_LABEL())}</b> (change it above).`)
       + (state.user ? " · ☆ Follow = flag new jobs from that company · ♡ Save = keep this job · Mark applied = add it to My Season" : "");
@@ -437,7 +449,7 @@
     const isNewAll = (j) => { const t = new Date(j.first_seen).getTime(); return t - firstImport > DAY && Date.now() - t < 3 * DAY; };
 
     const companies = new Set(rows.map((j) => j.company)).size;
-    const where = state.savedOnly ? "saved" : state.followOnly ? "you follow" : state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
+    const where = state.savedOnly ? "saved" : state.followOnly ? "you follow" : state.near && !state.company ? `within ${state.near.mi} mi of ${state.near.q}` : state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
     $("count").textContent = rows.length
       ? `${rows.length} internship${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"} ${where}` +
         (state.savedOnly || state.followOnly ? "" : ` · ${MAJOR_LABEL()}`) + (state.partial && !state.savedOnly && !state.followOnly ? " so far · loading the rest…" : "")
@@ -461,7 +473,7 @@
         <div style="min-width:0">
           <div class="title">${esc(niceTitle(j.title))}${isNew(j) ? '<span class="tag new">New</span>' : ""}${j.closed ? '<span class="tag closed">Closed by the company</span>' : ""}</div>
           <div class="co"><a class="cn" href="${coHref(j)}">${esc(j.company)}</a> <span class="loc">· ${esc(j.sites[0].loc)}${j.sites.length > 1 ? ` +${j.sites.length - 1} more` : ""}</span></div>
-          <div class="meta2">${[esc(postedText(j)), j.sites.length > 1 ? `${j.sites.length} locations` : j.count > 1 ? `${j.count} openings` : "", seasonOf(j.title) ? esc(seasonOf(j.title)) : "", (state.major === "all" || !state.major) && FIELD_NAME[j.field] ? esc(FIELD_NAME[j.field]) : "", j.match === "me" && STRICT_OK() ? "Mechanical match" : "", needsClearance(j.title) ? "US citizens / clearance" : ""].filter(Boolean).join(" · ")}</div>
+          <div class="meta2">${[state.near && j.mi != null ? `<span class="dist">${j.mi < 1 ? "Under 1" : "~" + j.mi} mi away</span>` : "", esc(postedText(j)), j.sites.length > 1 ? `${j.sites.length} locations` : j.count > 1 ? `${j.count} openings` : "", seasonOf(j.title) ? esc(seasonOf(j.title)) : "", (state.major === "all" || !state.major) && FIELD_NAME[j.field] ? esc(FIELD_NAME[j.field]) : "", j.match === "me" && STRICT_OK() ? "Mechanical match" : "", needsClearance(j.title) ? "US citizens / clearance" : ""].filter(Boolean).join(" · ")}</div>
           ${j.sites.length > 1 ? `<details class="sites"><summary>All ${j.sites.length} locations</summary><ul>${j.sites.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.loc)}</a></li>`).join("")}</ul></details>` : ""}
         </div>
         <div class="applycol">
@@ -484,7 +496,8 @@
     if (!urlReady) return;
     const p = new URLSearchParams();
     const st = state.st === "ALL" ? "all" : state.st.join(",");
-    if (st !== "all") p.set("state", st);
+    if (state.near) { p.set("near", state.near.q); p.set("mi", String(state.near.mi)); }
+    else if (st !== "all") p.set("state", st);
     if (state.company) p.set("company", state.company);
     if (state.major !== "all") p.set("major", state.major);
     if (state.meOnly && STRICT_OK()) p.set("me", "1");
@@ -504,6 +517,10 @@
     state.q = (p.get("q") || "").slice(0, 80); $("q").value = state.q;
     if (state.q && !p.get("state")) state.st = "ALL";              // a search link (e.g. from the Radar) looks nationwide
     state.savedOnly = p.get("view") === "saved"; state.followOnly = p.get("view") === "following";
+    const nq = (p.get("near") || "").trim().slice(0, 40), nmi = [25, 50, 100, 200].includes(+p.get("mi")) ? +p.get("mi") : 50;
+    state.near = nearOk(nq) ? { q: nq, mi: nmi } : null;
+    if (state.near) state.st = "ALL";
+    paintNear();
     $("savedOnly").setAttribute("aria-pressed", String(state.savedOnly)); $("followOnly").setAttribute("aria-pressed", String(state.followOnly));
     const key = state.st === "ALL" ? "ALL" : state.st.join(",");
     document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.state === key)));
@@ -514,10 +531,34 @@
   function readUrlButtons(){ const one = state.st !== "ALL" && state.st.length === 1 ? state.st[0] : ""; $("stateSel").value = one; $("stateSel").classList.toggle("on", state.st !== "ALL"); }
   document.addEventListener("click", (e) => {
     if (e.target.closest("#goAll")) { $("stateSel").value = ""; setView("ALL", null); }
+    const ns = e.target.closest("[data-near-st]"); if (ns) { $("stateSel").value = ns.dataset.nearSt; $("stateSel").classList.add("on"); setView([ns.dataset.nearSt], null); }
     if (e.target.closest("#resetF")) resetFilters();
     if (e.target.closest("#allCos")) { state.company = null; state.q = ""; $("q").value = ""; loadScope(); }
   });
+  // ── "Within N mi of a ZIP" (api/listings?near=; lib/geocode.js). Picking a state turns it off, and the other way round. ──
+  function nearOk(q){ return /^\d{5}$/.test(q) || /^[A-Za-z .'-]{2,30},\s*[A-Za-z]{2}$/.test(q); }
+  function paintNear(){
+    const on = !!state.near; $("nearBox").classList.toggle("on", on); $("nearX").hidden = !on;
+    if (on) { $("nearIn").value = state.near.q; $("miSel").value = String(state.near.mi); }
+  }
+  function setNear(q, mi){
+    q = (q || "").trim();
+    if (!q) return clearNear();
+    if (!nearOk(q)) { toast("Type a 5-digit ZIP code, like 24060"); return; }
+    state.near = { q, mi: +mi || 50 }; state.st = "ALL"; $("stateSel").value = ""; $("stateSel").classList.remove("on");
+    try { localStorage.setItem("btp_near", q); } catch {}
+    track("near_search", { mi: state.near.mi }); paintNear(); loadScope();
+  }
+  function clearNear(){ if (!state.near) return; state.near = null; state.nearMeta = null; $("nearIn").value = ""; paintNear(); loadScope(); }
+  $("nearBox").addEventListener("submit", (e) => { e.preventDefault(); setNear($("nearIn").value, $("miSel").value); });
+  $("nearIn").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); setNear($("nearIn").value, $("miSel").value); } });
+  $("nearIn").addEventListener("change", () => { const v = $("nearIn").value.trim(); if (nearOk(v) && (!state.near || state.near.q !== v)) setNear(v, $("miSel").value); });
+  $("miSel").addEventListener("change", () => { if (state.near) setNear(state.near.q, $("miSel").value); else $("nearIn").focus(); });
+  $("nearX").addEventListener("click", clearNear);
+  try { const last = localStorage.getItem("btp_near"); if (last && !$("nearIn").value) $("nearIn").placeholder = last; } catch {}
+
   function setView(st, btn){
+    if (state.near) { state.near = null; state.nearMeta = null; $("nearIn").value = ""; paintNear(); }
     state.st = st;
     document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === btn)));
     $("stateSel").classList.toggle("on", state.st !== "ALL");
@@ -543,7 +584,7 @@
     let x = false; try { x = localStorage.getItem("btp_mailme_x") === "1"; } catch {}
     const a = state.alerts, same = a && a.major === alertMajor() && (a.states || "") === alertStates();
     const placeTxt = state.st === "ALL" ? "anywhere in the US" : "in " + state.st.join(" & ");
-    if (state.savedOnly || state.followOnly || state.company || (!n && !a) || (x && !a)) { el.innerHTML = ""; return; }
+    if (state.near || state.savedOnly || state.followOnly || state.company || (!n && !a) || (x && !a)) { el.innerHTML = ""; return; }
     if (a && same) { el.innerHTML = `<div class="mailme"><span class="sp"><b>Weekly email on</b> · new ${esc(MAJOR_LABEL())} internships ${esc(placeTxt)}, plus companies you follow</span><button type="button" data-ma="test">Send me this week's</button><button type="button" data-ma="off">Turn off</button></div>`; return; }
     const lead = a ? `<b>Your weekly email</b> is set to a different view. Switch it to new ${esc(MAJOR_LABEL())} internships ${esc(placeTxt)}?`
                    : `<b>Get these by email.</b> New ${esc(MAJOR_LABEL())} internships ${esc(placeTxt)}, once a week. Only when there's something new.`;
@@ -754,8 +795,8 @@
   async function getAll(qs, onFirst){
     const page = async (off) => {
       const r = await fetch(`/api/listings?${qs}${qs ? "&" : ""}limit=1000&offset=${off}`);
-      if (!r.ok) throw new Error(r.status);
-      const d = await r.json(); if (d.meta?.lastSync) state.lastSync = d.meta.lastSync; return d;
+      if (!r.ok) { const e = new Error(r.status); e.status = r.status; throw e; }
+      const d = await r.json(); if (d.meta?.lastSync) state.lastSync = d.meta.lastSync; if (d.meta?.near && off === 0) state.nearMeta = d.meta; return d;
     };
     const first = await page(0);
     const rows = [...(first.listings || [])];
@@ -767,15 +808,16 @@
     }
     return rows;
   }
+  const order = () => state.near ? (a, b) => (a.mi - b.mi) || (sortKey(b) - sortKey(a)) : (a, b) => sortKey(b) - sortKey(a);
   async function loadScope(){
-    const where = state.st === "ALL" ? "" : `state=${state.st.join(",")}`;
+    const where = state.near ? `near=${encodeURIComponent(state.near.q)}&mi=${state.near.mi}` : state.st === "ALL" ? "" : `state=${state.st.join(",")}`;
     const qs = state.company ? `field=all&companies=${state.company}` : [majorParam(), where].filter(Boolean).join("&");
     const seq = ++loadSeq;
     if (!cache.has(qs)) { state.loaded = false; $("list").innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>'; $("count").textContent = ""; }
     try {
       const show = (rows, partial) => {
         if (seq !== loadSeq) return;                                 // a newer choice is already loading
-        state.all = rows.slice().sort((a, b) => sortKey(b) - sortKey(a));
+        state.all = rows.slice().sort(order());
         state.loaded = true; state.partial = partial;
         if (state.lastSync) { $("trustText").textContent = `Job boards last re-read ${timeOfDay(state.lastSync)}`; $("trust").hidden = false; }
         urlReady = true;
@@ -784,14 +826,15 @@
       const rows = cache.get(qs) || await getAll(qs, (firstRows) => show(firstRows, true));   // newest 1,000 show right away
       cache.set(qs, rows);
       if (seq !== loadSeq) return;
-      state.all = rows.slice().sort((a, b) => sortKey(b) - sortKey(a));
+      state.all = rows.slice().sort(order());
       state.loaded = true; state.partial = false;
       if (state.lastSync) { $("trustText").textContent = `Job boards last re-read ${timeOfDay(state.lastSync)}`; $("trust").hidden = false; }
       urlReady = true;
       render();
     } catch (e) {
-      console.error("[jobs] load/render failed", e);
       if (seq !== loadSeq) return;
+      if (!(e.status === 400 && state.near)) console.error("[jobs] load/render failed", e);
+      if (e.status === 400 && state.near) { $("list").innerHTML = `<div class="empty">We couldn't find “${esc(state.near.q)}”. Try a 5-digit ZIP code, like 24060.</div>`; $("count").textContent = ""; return; }
       $("list").innerHTML = '<div class="err" role="alert">Couldn’t load internships right now — that’s a problem on our side or your connection, not a sign there are no jobs. Refresh in a minute.</div>';
     }
   }
