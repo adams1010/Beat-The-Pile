@@ -7,10 +7,15 @@
   },
   "devDependencies": {
     "@babel/core": "7.26.0",
-    "@babel/preset-react": "7.26.3"
+    "@babel/preset-react": "7.26.3",
+    "topojson-client": "3.1.0",
+    "us-atlas": "3.0.1"
   },
   "scripts": {
     "build:home": "node scripts/build-home.mjs",
     "test": "bash tests/run.sh"
+  },
+  "dependencies": {
+    "d3-geo": "3.1.1"
   }
 }

@@ -18,6 +18,10 @@ import { FIELDS } from "../lib/fields.js";
 import { COMPANIES } from "../lib/companies.js";
 import { companyPage, radarFor, sitemap } from "../lib/companypage.js";
 import { lookupPlace, geocodeOne, miles } from "../lib/geocode.js";
+import { geoAlbersUsa } from "d3-geo";
+// Same projection as map/us.json (scripts/build-map.mjs): d3 Albers USA, scale 1300, 975×610.
+const PROJ = geoAlbersUsa().scale(1300).translate([487.5, 305]);
+export const project = (lat, lng) => { const xy = PROJ([lng, lat]); return xy ? [Math.round(xy[0] * 10) / 10, Math.round(xy[1] * 10) / 10] : null; };
 import { zipToState } from "../lib/geo.js";
 
 const FIELD_KEYS = new Set([...FIELDS.map(([k]) => k), "other"]);
@@ -46,6 +50,23 @@ export function parse(q) {
   const mi = raw("mi") ? Number(raw("mi")) : 50;
   if (!(Number.isInteger(mi) && mi >= 5 && mi <= 300)) errs.push("mi must be 5–300");
   return { errs, near: near || null, mi, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, summary: raw("summary") === "1", names: raw("names") === "1" };
+}
+
+/** Homepage map: every open internship with a real city, as dots on the US map (grouped into 6-px cells so nearby
+ *  postings share one dot). Counts are real; nothing is placed that the geocoder couldn't place (lib/geocode.js). */
+async function dots(p, res) {
+  const rows = await db.selectAllAsAdmin(`listings?select=geo_lat,geo_lng&${LIVE}${majorFilter(p)}&geo_lat=not.is.null`);
+  const cells = new Map(); let placed = 0;
+  for (const r of rows) {
+    const xy = project(r.geo_lat, r.geo_lng); if (!xy) continue;
+    placed++;
+    const k = `${Math.round(xy[0] / 6)},${Math.round(xy[1] / 6)}`;
+    const c = cells.get(k); if (c) { c[0] += xy[0]; c[1] += xy[1]; c[2]++; } else cells.set(k, [xy[0], xy[1], 1]);
+  }
+  const out = [...cells.values()].map(([x, y, n]) => [Math.round((x / n) * 10) / 10, Math.round((y / n) * 10) / 10, n]).sort((a, b) => a[2] - b[2]);
+  const total = await db.count(`listings?${LIVE}${majorFilter(p)}`);
+  res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
+  return res.status(200).json({ w: 975, h: 610, dots: out, placed, total });
 }
 
 /** Same major filters as the main list (field / strict ME / companies), as a PostgREST query string tail. */
@@ -84,7 +105,7 @@ async function nearby(p, res) {
   const page = p.limit != null ? hits.slice(p.offset, p.offset + p.limit) : hits;
   res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=3600");
   return res.status(200).json({ listings: page, meta: { count: hits.length, lastSync: lastRun?.[0]?.ran_at || null,
-    near: { q: p.near, mi: p.mi, lat: center[0], lng: center[1], state: st }, remote, unplacedInState: unplaced,
+    near: { q: p.near, mi: p.mi, lat: center[0], lng: center[1], state: st, xy: project(center[0], center[1]) }, remote, unplacedInState: unplaced,
     ...(p.limit != null ? { limit: p.limit, offset: p.offset, more: p.offset + p.limit < hits.length } : {}) } });
 }
 
@@ -179,6 +200,7 @@ export default async function handler(req, res) {
     }
 
     if (p.near) return await nearby(p, res);
+    if (req.query?.dots === "1") return await dots(p, res);
 
     res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=3600");
     let q = `listings?select=${COLS}&${LIVE}&order=first_seen.desc,id.asc`;

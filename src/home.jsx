@@ -139,9 +139,48 @@ function FeatViz({k}){
     <span style={{width:56,height:56,borderRadius:12,background:"#070F1E",color:"#2FD39A",fontSize:24,fontWeight:700,display:"grid",placeItems:"center",flexShrink:0}}>B+</span>
     <div style={{flex:1,display:"grid",gap:6}}>{[["Q1",86],["Q2",74],["Q3",91]].map(([q,v])=><div key={q} style={{display:"flex",gap:8,alignItems:"center",fontSize:11}}><span style={{width:18,color:"#55627A"}}>{q}</span><span style={{flex:1,height:6,background:"#EEF1F6",borderRadius:99}}><span style={{display:"block",height:6,width:v+"%",background:"#0B7A55",borderRadius:99}}/></span><span style={{...DM,width:20}}>{v}</span></div>)}</div></div>);
 }
+// The hero map: every dot is a real open internship whose location text names a real US city (api/listings ?dots=1).
+// Type a ZIP in the search and a circle shows how many are within 50 miles (the same numbers /jobs will show).
+const MILES_PX=1.609*1300/6371;   // Albers USA at scale 1300: ~0.33 px per mile (lower 48)
+function HeroMap({near,fresh,sum}){
+  const [geo,setGeo]=React.useState(null),[pts,setPts]=React.useState(null),[err,setErr]=React.useState(false);
+  React.useEffect(()=>{
+    const get=(u)=>fetch(u).then(r=>{if(!r.ok)throw 0;return r.json();});
+    Promise.all([get("/map/us.json"),get("/api/listings?dots=1&field=all")]).then(([g,d])=>{setGeo(g);setPts(d);}).catch(()=>setErr(true));
+  },[]);
+  const fmt=(n)=>n==null?"—":Number(n).toLocaleString();
+  const xy=near?.meta?.near?.xy, r=near?.meta?near.meta.near.mi*MILES_PX:0;
+  return(<aside style={{position:"relative",boxSizing:"border-box",background:"#0D1A2F",border:"1px solid #2A3B5C",borderRadius:16,padding:"18px 18px 14px",boxShadow:"0 24px 60px rgba(0,0,0,.45)",...DM}}>
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:12,fontFamily:"Geist,sans-serif"}}>
+      <span style={{fontSize:14,fontWeight:600,color:"#fff"}}>Every dot is a real internship</span>
+      <span style={{fontSize:12,color:"#8D9AB3"}}>{pts?`${fmt(pts.placed)} on the map`:""}</span></div>
+    <div style={{position:"relative",marginTop:8}}>
+      {err?<p style={{fontSize:13,color:"#8D9AB3",padding:"40px 0",textAlign:"center",fontFamily:"Geist,sans-serif"}}>Map didn't load. <a href="/jobs/" style={{color:"#2FD39A"}}>See the internships →</a></p>:
+      <svg viewBox="0 0 975 610" role="img" aria-label={pts?`Map of the US with ${fmt(pts.placed)} open internships, one dot per city`:"Loading map"} style={{width:"100%",height:"auto",display:"block"}}>
+        {geo&&<path d={geo.nation} fill="#11203A" stroke="#2A3B5C" strokeWidth="1"/>}
+        {geo&&<path d={geo.borders} fill="none" stroke="#1C2C48" strokeWidth=".8"/>}
+        {pts&&pts.dots.map(([x,y,n],i)=><circle key={i} cx={x} cy={y} r={1.6+Math.sqrt(n)*1.05} fill="#2FD39A" fillOpacity={n>20?.8:.55}/>)}
+        {xy&&<g><circle cx={xy[0]} cy={xy[1]} r={r} fill="#2FD39A" fillOpacity=".1" stroke="#fff" strokeWidth="3" strokeDasharray="7 5"/><circle cx={xy[0]} cy={xy[1]} r="5" fill="#fff"/></g>}
+      </svg>}
+      {near?.meta&&<div className="d-mapbadge" style={{position:"absolute",left:8,bottom:6,background:"rgba(7,15,30,.88)",border:"1px solid #2A3B5C",borderRadius:10,padding:"8px 12px",fontFamily:"Geist,sans-serif"}}>
+        <span style={{fontSize:20,fontWeight:600,color:"#fff"}}>{fmt(near.meta.count)}</span> <span style={{fontSize:13,color:"#CFD7E6"}}>within {near.meta.near.mi} mi of {near.meta.near.q}</span></div>}
+      {near?.bad&&<div style={{position:"absolute",left:8,bottom:6,fontSize:13,color:"#F2B8A2",fontFamily:"Geist,sans-serif"}}>We couldn't find that ZIP.</div>}
+    </div>
+    <div style={{borderTop:"1px solid #22304D",marginTop:10,paddingTop:8}}>
+      <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"#8D9AB3",fontFamily:"Geist,sans-serif",marginBottom:2}}><span>Just found</span><span>{sum?`${fmt(sum.allMajors)} open · ${fmt(sum.hiringNow)} companies hiring`:""}</span></div>
+      {(fresh||[]).slice(0,3).map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"flex",justifyContent:"space-between",gap:12,padding:"7px 0",borderTop:"1px solid #1A2640",textDecoration:"none",fontSize:13}}>
+        <span style={{color:"#fff",fontFamily:"Geist,sans-serif",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{j.company} <span style={{color:"#8D9AB3"}}>· {j.title}</span></span><span style={{color:"#2FD39A",flexShrink:0}}>{dAgo(j.first_seen)}</span></a>))}
+    </div>
+  </aside>);
+}
 function LandingD({onQuiz,onPage}){
   const [sum,setSum]=React.useState(null),[sumErr,setSumErr]=React.useState(false),[fresh,setFresh]=React.useState(null);
-  const [q,setQ]=React.useState(""),[where,setWhere]=React.useState("");
+  const [q,setQ]=React.useState(""),[where,setWhere]=React.useState(""),[near,setNear]=React.useState(null);
+  React.useEffect(()=>{   // a 5-digit ZIP in the location box → live "N within 50 mi" on the map
+    const z=where.trim(); if(!/^\d{5}$/.test(z)){setNear(null);return;}
+    let live=true; const t=setTimeout(()=>{fetch(`/api/listings?near=${z}&mi=50&field=all&limit=1&offset=0`).then(r=>r.ok?r.json():Promise.reject(r.status)).then(d=>{if(live)setNear({meta:d.meta});}).catch(()=>{if(live)setNear({bad:true});});},250);
+    return()=>{live=false;clearTimeout(t);};
+  },[where]);
   React.useEffect(()=>{
     const pre=window.__btpPre||{};window.__btpPre=null;   // started in index.html's <head>; used once
     const get=(u)=>fetch(u).then(r=>{if(!r.ok)throw 0;return r.json();});
@@ -149,7 +188,9 @@ function LandingD({onQuiz,onPage}){
     (pre.fresh||get("/api/listings?field=all&limit=80")).then(d=>{const co=new Set(),out=[];for(const l of d.listings||[]){if(co.has(l.company))continue;co.add(l.company);out.push(l);if(out.length===5)break;}setFresh(out);}).catch(()=>setFresh([]));
   },[]);
   const go=(e)=>{e.preventDefault();analytics.track("home_search",{has_query:!!q.trim(),has_state:!!where.trim()});const p=new URLSearchParams();if(q.trim())p.set("q",q.trim());
-    const w=where.trim().toLowerCase();const code=/^[a-z]{2}$/.test(w)?w.toUpperCase():(D_STATES[w]||null);
+    const w=where.trim().toLowerCase();
+    if(/^\d{5}$/.test(w)){p.set("near",w);p.set("mi","50");p.set("major","all");analytics.track("home_search_zip");location.href="/jobs/?"+p.toString();return;}
+    const code=/^[a-z]{2}$/.test(w)?w.toUpperCase():(D_STATES[w]||null);
     p.set("state",code&&Object.values(D_STATES).includes(code)?code:"all");if(w==="remote"&&!q.trim())p.set("q","remote");
     location.href="/jobs/?"+p.toString();};
   const fmt=(n)=>n==null?"—":Number(n).toLocaleString();
@@ -160,10 +201,10 @@ function LandingD({onQuiz,onPage}){
   return(<>
     <section style={{position:"relative",overflow:"hidden",background:"#070F1E",color:"#E8EDF5"}}>
       <div style={{...wrap,position:"relative",paddingTop:64,paddingBottom:48,display:"flex",gap:48,flexWrap:"wrap",alignItems:"center"}}>
-        <div style={{flex:"999 1 520px",minWidth:0}}>
+        <div style={{flex:"1 1 480px",minWidth:0}}>
           <p style={{fontSize:14,fontWeight:500,color:"#9FE5C8",margin:"0 0 18px"}}><span style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#2FD39A",marginRight:8,verticalAlign:1}}/>
             {sum?`${fmt(sum.companies)} company job boards${sum.lastSync?`, last checked ${dAgoLong(sum.lastSync)}`:""}`:sumErr?"Live numbers unavailable right now":"Loading the latest numbers…"}</p>
-          <h1 style={{fontSize:"clamp(2.3rem,5.6vw,4rem)",lineHeight:1.03,letterSpacing:"-0.035em",fontWeight:600,margin:"0 0 16px",color:"#fff"}}>Find your internship<br/>before the <span style={{color:"#2FD39A"}}>pile</span> does.</h1>
+          <h1 style={{fontSize:"clamp(2.3rem,5vw,3.6rem)",lineHeight:1.03,letterSpacing:"-0.035em",fontWeight:600,margin:"0 0 16px",color:"#fff"}}>Find your internship<br/>before the <span style={{color:"#2FD39A"}}>pile</span> does.</h1>
           <p style={{fontSize:18,lineHeight:1.5,color:"#9FAAC0",margin:"0 0 28px",maxWidth:560}}>Every major. Pulled straight from each company's own job board — no reposts, and jobs drop off when the company takes them down.</p>
           <form onSubmit={go} role="search" className="d-search" style={{display:"flex",alignItems:"stretch",background:"#fff",borderRadius:14,padding:6,boxShadow:"0 0 0 1px #2FD39A33, 0 20px 50px rgba(0,0,0,.35)",maxWidth:760}}>
             <label style={{flex:"3 1 0",display:"flex",alignItems:"center",gap:10,padding:"0 14px",minWidth:0}}>
@@ -172,7 +213,7 @@ function LandingD({onQuiz,onPage}){
             <span className="d-sep" style={{width:1,background:"#DCE2EC",margin:"10px 0"}}/>
             <label style={{flex:"2 1 0",display:"flex",alignItems:"center",gap:10,padding:"0 14px",minWidth:0}}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55627A" strokeWidth="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-              <input value={where} onChange={e=>setWhere(e.target.value)} aria-label="State" placeholder="State (e.g. Virginia or VA)" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#0A1426",height:48,background:"transparent",outline:"none"}}/></label>
+              <input value={where} onChange={e=>setWhere(e.target.value)} aria-label="ZIP code or state" placeholder="ZIP code or state" inputMode="text" autoComplete="postal-code" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#0A1426",height:48,background:"transparent",outline:"none"}}/></label>
             <button type="submit" style={{font:"inherit",fontSize:16,fontWeight:600,background:"#0B7A55",color:"#fff",border:0,padding:"0 28px",borderRadius:10,cursor:"pointer",minHeight:48}}>Search</button>
           </form>
           <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:16,alignItems:"center"}}>
@@ -181,26 +222,25 @@ function LandingD({onQuiz,onPage}){
           </div>
           <p style={{fontSize:13,color:"#8D9AB3",marginTop:18}}>Free · no account needed to browse · <button onClick={onQuiz} style={{background:"none",border:0,padding:0,color:"#2FD39A",cursor:"pointer",font:"inherit",fontWeight:600}}>2-minute match quiz</button> · <a href="/demo/" style={{color:"#2FD39A",fontWeight:600,textDecoration:"none"}}>90-second demo</a></p>
         </div>
-        <div style={{position:"relative",flex:"1 1 300px",maxWidth:420,minWidth:0,width:"100%"}}>
-        {/* the pile: a few application cards peeking out from under the live panel */}
-        {[["rotate(-9deg) translate(-22px,14px)",.6],["rotate(6deg) translate(18px,8px)",.8],["rotate(-3deg) translate(-6px,-6px)",1]].map(([t,o],i)=>(
-          <div key={i} aria-hidden="true" style={{position:"absolute",inset:0,borderRadius:16,background:"#0A1426",border:"1px solid rgba(174,185,204,.24)",transform:t,opacity:o}}/>))}
-        <aside style={{position:"relative",boxSizing:"border-box",background:"#0D1A2F",border:"1px solid #2A3B5C",borderRadius:16,padding:20,boxShadow:"0 24px 60px rgba(0,0,0,.45)",...DM}}>
-          <div style={{display:"flex",justifyContent:"space-between",fontSize:13,fontWeight:600,color:"#E8EDF5",marginBottom:10,fontFamily:"Geist,sans-serif"}}><span>Just found</span><span style={{color:"#8D9AB3",fontWeight:500}}>newest first</span></div>
-          {fresh===null?<div style={{height:200}} aria-hidden="true"/>:fresh.length===0?<p style={{fontSize:13,color:"#8D9AB3",fontFamily:"Geist,sans-serif"}}>Live list didn't load. <a href="/jobs/" style={{color:"#2FD39A"}}>Open the jobs page →</a></p>:
-            fresh.map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"flex",justifyContent:"space-between",gap:12,padding:"10px 0",borderTop:"1px solid #1A2640",textDecoration:"none",fontSize:13}}>
-              <span style={{color:"#fff",fontFamily:"Geist,sans-serif",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{j.company} <span style={{color:"#8D9AB3"}}>· {j.title}</span></span><span style={{color:"#2FD39A",flexShrink:0}}>{dAgo(j.first_seen)}</span></a>))}
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:12,marginTop:12,paddingTop:16,borderTop:"1px solid #22304D"}}>
-            <div><p style={{fontSize:26,color:"#fff",margin:0}}>{fmt(sum?.allMajors)}</p><p style={{fontSize:13,color:"#8D9AB3",margin:"4px 0 0",fontFamily:"Geist,sans-serif"}}>internships open now</p></div>
-            <div><p style={{fontSize:26,color:"#fff",margin:0}}>{fmt(sum?.hiringNow)}</p><p style={{fontSize:13,color:"#8D9AB3",margin:"4px 0 0",fontFamily:"Geist,sans-serif"}}>companies hiring</p></div>
-          </div>
-        </aside>
+        <div style={{position:"relative",flex:"1 1 340px",maxWidth:560,minWidth:0,width:"100%"}}>
+          <HeroMap near={near} fresh={fresh} sum={sum}/>
         </div>
       </div>
 
     </section>
 
     <main style={{...wrap,paddingTop:40,paddingBottom:64,display:"flex",flexDirection:"column",gap:40}}>
+      <section aria-labelledby="how-h">
+        <h2 id="how-h" style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:"0 0 16px",color:"#0A1426"}}>How a job gets here</h2>
+        <div className="d-grid3">
+          {[["1","Straight from the company",`We read ${sum?fmt(sum.companies):"thousands of"} company job boards directly, every few hours. Not scraped job sites, not reposts.`],
+            ["2","Proven to be theirs","A board only counts when we can prove it belongs to that company: their own website links to it, or the board itself names them."],
+            ["3","You apply on their site","Every Apply button goes to the employer. When they take a job down, it drops off here too."]].map(([n,t,d])=>(
+            <div key={n} style={{...card,borderRadius:12,padding:20,display:"flex",gap:14}}>
+              <span aria-hidden="true" style={{width:32,height:32,borderRadius:"50%",background:"#E6F4EE",color:"#0B7A55",fontWeight:600,display:"grid",placeItems:"center",flexShrink:0,...DM}}>{n}</span>
+              <div><p style={{fontSize:16,fontWeight:600,margin:"4px 0 6px",color:"#0A1426"}}>{t}</p><p style={{fontSize:14,lineHeight:1.5,color:"#55627A",margin:0}}>{d}</p></div></div>))}
+        </div>
+      </section>
       <section>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#0A1426"}}>Explore by major</h2><a href="/jobs/?major=all&state=all" style={{fontSize:14,color:"#0B7A55",textDecoration:"none",fontWeight:500}}>Every major →</a></div>
         <div className="d-grid4">

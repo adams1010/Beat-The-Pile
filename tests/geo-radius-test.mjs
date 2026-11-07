@@ -73,6 +73,14 @@ assert.equal(r.body.listings.length, 1); assert.equal(r.body.meta.more, true); a
 assert.equal((await call({ near: "99999", field: "all" })).code, 400, "unknown ZIP → plain 400");
 assert.equal((await call({ near: "24060", mi: "2" })).code, 400);
 assert.equal((await call({ near: "<script>" })).code, 400);
+r = await call({ dots: "1", field: "all" });
+assert.equal(r.code, 200); assert.equal(r.body.w, 975);
+const nDots = r.body.dots.reduce((n, d) => n + d[2], 0);
+assert.equal(nDots, r.body.placed, "every placed listing is in exactly one dot");
+assert.ok(r.body.placed < r.body.total, "remote / '4 Locations' / state-only listings are counted in total but never drawn");
+assert.ok(r.body.dots.every(([x, y]) => x > 0 && x < 975 && y > 0 && y < 610));
+r = await call({ near: "24060", mi: "50", field: "mechanical" }); assert.ok(r.body.meta.near.xy[0] > 700 && r.body.meta.near.xy[0] < 820, "Blacksburg sits in Virginia on the map");
+console.log("✓ /api/listings?dots=1: homepage map = only real placed listings, nothing guessed");
 console.log("✓ /api/listings?near=: radius, nearest first, crosses state lines, paging, honest counts of what isn't on the map");
 
 // ── backfill: old listings without points get them, one update per distinct location ──

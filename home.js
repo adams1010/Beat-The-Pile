@@ -1,4 +1,4 @@
-/* built from src/home.jsx 6ab644260bc862c9 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx cc9491f7ee606651 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -787,6 +787,197 @@ function FeatViz({
     }
   }, v)))));
 }
+const MILES_PX = 1.609 * 1300 / 6371;
+function HeroMap({
+  near,
+  fresh,
+  sum
+}) {
+  const [geo, setGeo] = React.useState(null),
+    [pts, setPts] = React.useState(null),
+    [err, setErr] = React.useState(false);
+  React.useEffect(() => {
+    const get = u => fetch(u).then(r => {
+      if (!r.ok) throw 0;
+      return r.json();
+    });
+    Promise.all([get("/map/us.json"), get("/api/listings?dots=1&field=all")]).then(([g, d]) => {
+      setGeo(g);
+      setPts(d);
+    }).catch(() => setErr(true));
+  }, []);
+  const fmt = n => n == null ? "—" : Number(n).toLocaleString();
+  const xy = near?.meta?.near?.xy,
+    r = near?.meta ? near.meta.near.mi * MILES_PX : 0;
+  return React.createElement("aside", {
+    style: {
+      position: "relative",
+      boxSizing: "border-box",
+      background: "#0D1A2F",
+      border: "1px solid #2A3B5C",
+      borderRadius: 16,
+      padding: "18px 18px 14px",
+      boxShadow: "0 24px 60px rgba(0,0,0,.45)",
+      ...DM
+    }
+  }, React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "baseline",
+      gap: 12,
+      fontFamily: "Geist,sans-serif"
+    }
+  }, React.createElement("span", {
+    style: {
+      fontSize: 14,
+      fontWeight: 600,
+      color: "#fff"
+    }
+  }, "Every dot is a real internship"), React.createElement("span", {
+    style: {
+      fontSize: 12,
+      color: "#8D9AB3"
+    }
+  }, pts ? `${fmt(pts.placed)} on the map` : "")), React.createElement("div", {
+    style: {
+      position: "relative",
+      marginTop: 8
+    }
+  }, err ? React.createElement("p", {
+    style: {
+      fontSize: 13,
+      color: "#8D9AB3",
+      padding: "40px 0",
+      textAlign: "center",
+      fontFamily: "Geist,sans-serif"
+    }
+  }, "Map didn't load. ", React.createElement("a", {
+    href: "/jobs/",
+    style: {
+      color: "#2FD39A"
+    }
+  }, "See the internships \u2192")) : React.createElement("svg", {
+    viewBox: "0 0 975 610",
+    role: "img",
+    "aria-label": pts ? `Map of the US with ${fmt(pts.placed)} open internships, one dot per city` : "Loading map",
+    style: {
+      width: "100%",
+      height: "auto",
+      display: "block"
+    }
+  }, geo && React.createElement("path", {
+    d: geo.nation,
+    fill: "#11203A",
+    stroke: "#2A3B5C",
+    strokeWidth: "1"
+  }), geo && React.createElement("path", {
+    d: geo.borders,
+    fill: "none",
+    stroke: "#1C2C48",
+    strokeWidth: ".8"
+  }), pts && pts.dots.map(([x, y, n], i) => React.createElement("circle", {
+    key: i,
+    cx: x,
+    cy: y,
+    r: 1.6 + Math.sqrt(n) * 1.05,
+    fill: "#2FD39A",
+    fillOpacity: n > 20 ? .8 : .55
+  })), xy && React.createElement("g", null, React.createElement("circle", {
+    cx: xy[0],
+    cy: xy[1],
+    r: r,
+    fill: "#2FD39A",
+    fillOpacity: ".1",
+    stroke: "#fff",
+    strokeWidth: "3",
+    strokeDasharray: "7 5"
+  }), React.createElement("circle", {
+    cx: xy[0],
+    cy: xy[1],
+    r: "5",
+    fill: "#fff"
+  }))), near?.meta && React.createElement("div", {
+    className: "d-mapbadge",
+    style: {
+      position: "absolute",
+      left: 8,
+      bottom: 6,
+      background: "rgba(7,15,30,.88)",
+      border: "1px solid #2A3B5C",
+      borderRadius: 10,
+      padding: "8px 12px",
+      fontFamily: "Geist,sans-serif"
+    }
+  }, React.createElement("span", {
+    style: {
+      fontSize: 20,
+      fontWeight: 600,
+      color: "#fff"
+    }
+  }, fmt(near.meta.count)), " ", React.createElement("span", {
+    style: {
+      fontSize: 13,
+      color: "#CFD7E6"
+    }
+  }, "within ", near.meta.near.mi, " mi of ", near.meta.near.q)), near?.bad && React.createElement("div", {
+    style: {
+      position: "absolute",
+      left: 8,
+      bottom: 6,
+      fontSize: 13,
+      color: "#F2B8A2",
+      fontFamily: "Geist,sans-serif"
+    }
+  }, "We couldn't find that ZIP.")), React.createElement("div", {
+    style: {
+      borderTop: "1px solid #22304D",
+      marginTop: 10,
+      paddingTop: 8
+    }
+  }, React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      fontSize: 12,
+      color: "#8D9AB3",
+      fontFamily: "Geist,sans-serif",
+      marginBottom: 2
+    }
+  }, React.createElement("span", null, "Just found"), React.createElement("span", null, sum ? `${fmt(sum.allMajors)} open · ${fmt(sum.hiringNow)} companies hiring` : "")), (fresh || []).slice(0, 3).map(j => React.createElement("a", {
+    key: j.id,
+    href: j.url,
+    target: "_blank",
+    rel: "noopener noreferrer",
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      gap: 12,
+      padding: "7px 0",
+      borderTop: "1px solid #1A2640",
+      textDecoration: "none",
+      fontSize: 13
+    }
+  }, React.createElement("span", {
+    style: {
+      color: "#fff",
+      fontFamily: "Geist,sans-serif",
+      minWidth: 0,
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap"
+    }
+  }, j.company, " ", React.createElement("span", {
+    style: {
+      color: "#8D9AB3"
+    }
+  }, "\xB7 ", j.title)), React.createElement("span", {
+    style: {
+      color: "#2FD39A",
+      flexShrink: 0
+    }
+  }, dAgo(j.first_seen))))));
+}
 function LandingD({
   onQuiz,
   onPage
@@ -795,7 +986,31 @@ function LandingD({
     [sumErr, setSumErr] = React.useState(false),
     [fresh, setFresh] = React.useState(null);
   const [q, setQ] = React.useState(""),
-    [where, setWhere] = React.useState("");
+    [where, setWhere] = React.useState(""),
+    [near, setNear] = React.useState(null);
+  React.useEffect(() => {
+    const z = where.trim();
+    if (!/^\d{5}$/.test(z)) {
+      setNear(null);
+      return;
+    }
+    let live = true;
+    const t = setTimeout(() => {
+      fetch(`/api/listings?near=${z}&mi=50&field=all&limit=1&offset=0`).then(r => r.ok ? r.json() : Promise.reject(r.status)).then(d => {
+        if (live) setNear({
+          meta: d.meta
+        });
+      }).catch(() => {
+        if (live) setNear({
+          bad: true
+        });
+      });
+    }, 250);
+    return () => {
+      live = false;
+      clearTimeout(t);
+    };
+  }, [where]);
   React.useEffect(() => {
     const pre = window.__btpPre || {};
     window.__btpPre = null;
@@ -825,6 +1040,14 @@ function LandingD({
     const p = new URLSearchParams();
     if (q.trim()) p.set("q", q.trim());
     const w = where.trim().toLowerCase();
+    if (/^\d{5}$/.test(w)) {
+      p.set("near", w);
+      p.set("mi", "50");
+      p.set("major", "all");
+      analytics.track("home_search_zip");
+      location.href = "/jobs/?" + p.toString();
+      return;
+    }
     const code = /^[a-z]{2}$/.test(w) ? w.toUpperCase() : D_STATES[w] || null;
     p.set("state", code && Object.values(D_STATES).includes(code) ? code : "all");
     if (w === "remote" && !q.trim()) p.set("q", "remote");
@@ -863,7 +1086,7 @@ function LandingD({
     }
   }, React.createElement("div", {
     style: {
-      flex: "999 1 520px",
+      flex: "1 1 480px",
       minWidth: 0
     }
   }, React.createElement("p", {
@@ -885,7 +1108,7 @@ function LandingD({
     }
   }), sum ? `${fmt(sum.companies)} company job boards${sum.lastSync ? `, last checked ${dAgoLong(sum.lastSync)}` : ""}` : sumErr ? "Live numbers unavailable right now" : "Loading the latest numbers…"), React.createElement("h1", {
     style: {
-      fontSize: "clamp(2.3rem,5.6vw,4rem)",
+      fontSize: "clamp(2.3rem,5vw,3.6rem)",
       lineHeight: 1.03,
       letterSpacing: "-0.035em",
       fontWeight: 600,
@@ -989,8 +1212,10 @@ function LandingD({
   })), React.createElement("input", {
     value: where,
     onChange: e => setWhere(e.target.value),
-    "aria-label": "State",
-    placeholder: "State (e.g. Virginia or VA)",
+    "aria-label": "ZIP code or state",
+    placeholder: "ZIP code or state",
+    inputMode: "text",
+    autoComplete: "postal-code",
     style: {
       flex: 1,
       minWidth: 0,
@@ -1068,133 +1293,16 @@ function LandingD({
   }, "90-second demo"))), React.createElement("div", {
     style: {
       position: "relative",
-      flex: "1 1 300px",
-      maxWidth: 420,
+      flex: "1 1 340px",
+      maxWidth: 560,
       minWidth: 0,
       width: "100%"
     }
-  }, [["rotate(-9deg) translate(-22px,14px)", .6], ["rotate(6deg) translate(18px,8px)", .8], ["rotate(-3deg) translate(-6px,-6px)", 1]].map(([t, o], i) => React.createElement("div", {
-    key: i,
-    "aria-hidden": "true",
-    style: {
-      position: "absolute",
-      inset: 0,
-      borderRadius: 16,
-      background: "#0A1426",
-      border: "1px solid rgba(174,185,204,.24)",
-      transform: t,
-      opacity: o
-    }
-  })), React.createElement("aside", {
-    style: {
-      position: "relative",
-      boxSizing: "border-box",
-      background: "#0D1A2F",
-      border: "1px solid #2A3B5C",
-      borderRadius: 16,
-      padding: 20,
-      boxShadow: "0 24px 60px rgba(0,0,0,.45)",
-      ...DM
-    }
-  }, React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      fontSize: 13,
-      fontWeight: 600,
-      color: "#E8EDF5",
-      marginBottom: 10,
-      fontFamily: "Geist,sans-serif"
-    }
-  }, React.createElement("span", null, "Just found"), React.createElement("span", {
-    style: {
-      color: "#8D9AB3",
-      fontWeight: 500
-    }
-  }, "newest first")), fresh === null ? React.createElement("div", {
-    style: {
-      height: 200
-    },
-    "aria-hidden": "true"
-  }) : fresh.length === 0 ? React.createElement("p", {
-    style: {
-      fontSize: 13,
-      color: "#8D9AB3",
-      fontFamily: "Geist,sans-serif"
-    }
-  }, "Live list didn't load. ", React.createElement("a", {
-    href: "/jobs/",
-    style: {
-      color: "#2FD39A"
-    }
-  }, "Open the jobs page \u2192")) : fresh.map(j => React.createElement("a", {
-    key: j.id,
-    href: j.url,
-    target: "_blank",
-    rel: "noopener noreferrer",
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      gap: 12,
-      padding: "10px 0",
-      borderTop: "1px solid #1A2640",
-      textDecoration: "none",
-      fontSize: 13
-    }
-  }, React.createElement("span", {
-    style: {
-      color: "#fff",
-      fontFamily: "Geist,sans-serif",
-      minWidth: 0,
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      whiteSpace: "nowrap"
-    }
-  }, j.company, " ", React.createElement("span", {
-    style: {
-      color: "#8D9AB3"
-    }
-  }, "\xB7 ", j.title)), React.createElement("span", {
-    style: {
-      color: "#2FD39A",
-      flexShrink: 0
-    }
-  }, dAgo(j.first_seen)))), React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap: 12,
-      marginTop: 12,
-      paddingTop: 16,
-      borderTop: "1px solid #22304D"
-    }
-  }, React.createElement("div", null, React.createElement("p", {
-    style: {
-      fontSize: 26,
-      color: "#fff",
-      margin: 0
-    }
-  }, fmt(sum?.allMajors)), React.createElement("p", {
-    style: {
-      fontSize: 13,
-      color: "#8D9AB3",
-      margin: "4px 0 0",
-      fontFamily: "Geist,sans-serif"
-    }
-  }, "internships open now")), React.createElement("div", null, React.createElement("p", {
-    style: {
-      fontSize: 26,
-      color: "#fff",
-      margin: 0
-    }
-  }, fmt(sum?.hiringNow)), React.createElement("p", {
-    style: {
-      fontSize: 13,
-      color: "#8D9AB3",
-      margin: "4px 0 0",
-      fontFamily: "Geist,sans-serif"
-    }
-  }, "companies hiring"))))))), React.createElement("main", {
+  }, React.createElement(HeroMap, {
+    near: near,
+    fresh: fresh,
+    sum: sum
+  })))), React.createElement("main", {
     style: {
       ...wrap,
       paddingTop: 40,
@@ -1203,7 +1311,57 @@ function LandingD({
       flexDirection: "column",
       gap: 40
     }
-  }, React.createElement("section", null, React.createElement("div", {
+  }, React.createElement("section", {
+    "aria-labelledby": "how-h"
+  }, React.createElement("h2", {
+    id: "how-h",
+    style: {
+      fontSize: 24,
+      fontWeight: 600,
+      letterSpacing: "-0.02em",
+      margin: "0 0 16px",
+      color: "#0A1426"
+    }
+  }, "How a job gets here"), React.createElement("div", {
+    className: "d-grid3"
+  }, [["1", "Straight from the company", `We read ${sum ? fmt(sum.companies) : "thousands of"} company job boards directly, every few hours. Not scraped job sites, not reposts.`], ["2", "Proven to be theirs", "A board only counts when we can prove it belongs to that company: their own website links to it, or the board itself names them."], ["3", "You apply on their site", "Every Apply button goes to the employer. When they take a job down, it drops off here too."]].map(([n, t, d]) => React.createElement("div", {
+    key: n,
+    style: {
+      ...card,
+      borderRadius: 12,
+      padding: 20,
+      display: "flex",
+      gap: 14
+    }
+  }, React.createElement("span", {
+    "aria-hidden": "true",
+    style: {
+      width: 32,
+      height: 32,
+      borderRadius: "50%",
+      background: "#E6F4EE",
+      color: "#0B7A55",
+      fontWeight: 600,
+      display: "grid",
+      placeItems: "center",
+      flexShrink: 0,
+      ...DM
+    }
+  }, n), React.createElement("div", null, React.createElement("p", {
+    style: {
+      fontSize: 16,
+      fontWeight: 600,
+      margin: "4px 0 6px",
+      color: "#0A1426"
+    }
+  }, t), React.createElement("p", {
+    style: {
+      fontSize: 14,
+      lineHeight: 1.5,
+      color: "#55627A",
+      margin: 0
+    }
+  }, d)))))), React.createElement("section", null, React.createElement("div", {
     style: {
       display: "flex",
       justifyContent: "space-between",
