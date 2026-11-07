@@ -441,7 +441,7 @@
       $("list").innerHTML = state.followOnly
         ? `<div class="empty">${state.user ? "Follow companies with ☆ on any internship (or in Career Fair Mode). New postings from them show up here first." : "Sign in to follow companies and get alerted when they post."}</div>`
         : state.savedOnly
-        ? `<div class="empty">${state.user ? "Nothing saved yet. Tap ♡ Save on any internship to keep it here." : "Sign in to save internships and track where you've applied."}</div>`
+        ? `<div class="empty">Nothing saved yet. Tap ♡ Save on any internship to keep it here.${state.user ? "" : " No account needed; sign in later to keep it on every device."}</div>`
         : `<div class="empty">No matches ${where}${state.all.length ? " for these filters" : " right now"}. ${state.all.length ? `<button class="linkbtn" id="resetF">Reset filters</button>` : "New postings are pulled from company boards every few hours."}</div>`;
       return;
     }
@@ -620,6 +620,27 @@
     if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error || r.status);
     return r.json();
   }
+  // ── Guest mode: Save / Mark applied / Follow work before signing in. Kept on this device only (localStorage
+  //    "btp_guest"), moved into the account on sign-in. Ids and company keys only — nothing personal. ──
+  const GUEST_KEY = "btp_guest", GUEST_MAX = 200;
+  function guestGet(){ try { const g = JSON.parse(localStorage.getItem(GUEST_KEY) || "{}"); return { saved: g.saved || [], applied: g.applied || [], starred: g.starred || [] }; } catch { return { saved: [], applied: [], starred: [] }; } }
+  function guestSet(m){ try { localStorage.setItem(GUEST_KEY, JSON.stringify({ saved: [...m.saved].slice(-GUEST_MAX), applied: [...m.applied].slice(-GUEST_MAX), starred: [...m.starred].slice(-GUEST_MAX) })); } catch {} }
+  function guestLoad(){ const g = guestGet(); state.mine = { saved: new Set(g.saved), applied: new Set(g.applied), starred: new Set(g.starred), seenAt: null }; }
+  let guestNudged = false;
+  function guestToast(msg){
+    toast(guestNudged ? msg : msg + " Sign in to keep it on every device.");
+    guestNudged = true;
+  }
+  async function guestMerge(){
+    const g = guestGet(); if (!g.saved.length && !g.applied.length && !g.starred.length) return 0;
+    let n = 0;
+    for (const id of g.saved) { if (!state.mine.saved.has(id)) { try { setMine(await api("POST", { list: "saved", id, on: true })); n++; } catch {} } }
+    for (const id of g.applied) { if (!state.mine.applied.has(id)) { try { setMine(await api("POST", { list: "applied", id, on: true })); n++; } catch {} } }
+    for (const co of g.starred) { if (!state.mine.starred.has(co)) { try { setMine(await api("POST", { action: "star", company: co, on: true })); n++; } catch {} } }
+    try { localStorage.removeItem(GUEST_KEY); } catch {}
+    track("guest_merged", { items: n });
+    return n;
+  }
   function setMine(d){ state.mine = { saved: new Set(d.saved || []), applied: new Set(d.applied || []),
                                      starred: d.starred ? new Set(d.starred) : state.mine.starred || new Set(), seenAt: d.seenAt !== undefined ? d.seenAt : state.mine.seenAt }; }
   function renderAcct(){
@@ -640,8 +661,9 @@
     if (state.user) { try { const d = await api("GET"); setMine(d); state.profile = d.profile || null; state.alerts = d.alerts || null; state.emailReady = !!d.emailReady;
         try { const n = d.profile?.name || [user.firstName, user.lastName].filter(Boolean).join(" ") || user.primaryEmailAddress?.emailAddress || "";
           localStorage.setItem("btp_me", JSON.stringify({ i: initials(n), photo: d.profile?.photo || null })); window.btpNavMe && window.btpNavMe(); } catch {}
+        const moved = await guestMerge(); if (moved) toast(`Moved ${moved} saved item${moved === 1 ? "" : "s"} from this device into your account`);
         markSeenSoon(); loadSaved(); loadFollowed(); } catch { toast("Couldn't load your saved list"); } }
-    else { try { localStorage.removeItem("btp_me"); window.btpNavMe && window.btpNavMe(); } catch {} state.profile = null; state.alerts = null; state.mine = { saved: new Set(), applied: new Set(), starred: new Set(), seenAt: null }; state.savedRows = []; state.followRows = []; }
+    else { try { localStorage.removeItem("btp_me"); window.btpNavMe && window.btpNavMe(); } catch {} state.profile = null; state.alerts = null; guestLoad(); state.savedRows = []; state.followRows = []; loadSaved(); loadFollowed(); }
     renderAcct(); render();
   }
   async function loadClerk(){
@@ -671,8 +693,10 @@
     seenTimer = setTimeout(() => api("POST", { action: "seen" }).catch(() => {}), 15000);
   }
   async function follow(co, name){
-    if (!state.clerk) return toast("Sign-in is unavailable right now");
-    if (!state.user) { toast("Sign in to follow companies"); return state.clerk.openSignIn(); }
+    if (!state.user) {
+      const on = !state.mine.starred.has(co); on ? state.mine.starred.add(co) : state.mine.starred.delete(co); guestSet(state.mine); render(); loadFollowed();
+      if (on) guestToast(`Following ${name}.`); return;
+    }
     const on = !state.mine.starred.has(co);
     on ? state.mine.starred.add(co) : state.mine.starred.delete(co); render();
     try { const d = await api("POST", { action: "star", company: co, on }); setMine(d); render(); loadFollowed();
@@ -680,8 +704,12 @@
     catch { on ? state.mine.starred.delete(co) : state.mine.starred.add(co); render(); toast("Couldn't save that — try again"); }
   }
   async function toggle(list, id, btn){
-    if (!state.clerk) return toast("Sign-in is unavailable right now");
-    if (!state.user) { toast(list === "saved" ? "Sign in to save internships" : "Sign in to track applications"); return state.clerk.openSignIn(); }
+    if (!state.user) {
+      const on = !state.mine[list].has(id); on ? state.mine[list].add(id) : state.mine[list].delete(id); guestSet(state.mine); render();
+      if (list === "saved") loadSaved();
+      if (on) { track(list === "saved" ? "guest_save" : "guest_applied", {}); guestToast(list === "saved" ? "Saved ♥ on this device." : "Marked applied ✓ on this device."); }
+      return;
+    }
     const on = !state.mine[list].has(id);
     on ? state.mine[list].add(id) : state.mine[list].delete(id);   // instant, then confirm with server
     render();
@@ -700,7 +728,7 @@
     if (!state.savedOnly) { state.followOnly = false; $("followOnly").setAttribute("aria-pressed", "false"); }
     state.savedOnly = !state.savedOnly; $("savedOnly").setAttribute("aria-pressed", String(state.savedOnly)); render();
   });
-  loadClerk();
+  guestLoad(); loadClerk();   // guest saves show right away; replaced by the account once signed in
 
   $("meOnly").addEventListener("change", (e) => { state.meOnly = e.target.checked; render(); });
   $("q").addEventListener("input", (e) => { state.q = e.target.value.trim(); render(); });
