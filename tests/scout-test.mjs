@@ -70,3 +70,7 @@ console.log("\nSCOUT TESTS PASSED");
   assert.equal(siteDomain("https://recruiting.paylocity.com/x"), null);
   console.log("✓ Paylocity/UKG names: matched to the site's own address; Cloudflare pages and slogans rejected");
 }
+
+{ const { cleanName } = await import("../lib/scout.js");
+  for (const [a, b] of [["Work at Simmons", "Simmons"], ["Join the Imagine team!", "Imagine"], ["Fenner Drives Portal", "Fenner Drives"]]) assert.equal(cleanName(a), b);
+  console.log("✓ board titles like 'Work at X' / 'X Portal' → X"); }
