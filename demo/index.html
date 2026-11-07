@@ -150,7 +150,7 @@
   const LABEL = Object.fromEntries(MAJORS.concat(MORE));
   const STEPS = [["find", "Find an internship"], ["fair", "Plan a career fair"], ["meet", "Meet a recruiter"], ["follow", "Follow up"], ["tailor", "Tailor your resume"], ["finish", "Your season"]];
   let saved = {}; try { saved = JSON.parse(localStorage.getItem("btp_major") ? JSON.stringify({ major: localStorage.getItem("btp_major") }) : "{}"); } catch {}
-  const S = { step: 0, done: new Set(), major: LABEL[saved.major] ? saved.major : "mechanical", jobs: [], loading: false, err: false, q: "",
+  const S = { byField: null, step: 0, done: new Set(), major: LABEL[saved.major] ? saved.major : "mechanical", jobs: [], loading: false, err: false, q: "",
     savedJob: null, openId: null, route: [], booths: [], rec: { name: "", company: "", note: "" }, tailor: null };
 
   const initials = (n) => { const w = String(n || "").replace(/[^A-Za-z0-9& ]/g, " ").split(/\s+/).filter((x) => x && !/^(and|of|the|&|inc|llc|corp|co)$/i.test(x)); if (!w.length) return "·"; return (w.length === 1 ? w[0].slice(0, 2) : w[0][0] + w[1][0]).toUpperCase(); };
@@ -173,6 +173,7 @@
   // ── 1. Find ──
   async function loadJobs() {
     S.loading = true; S.err = false; find();
+    if (!S.byField) fetch("/api/listings?summary=1").then((r) => r.ok ? r.json() : null).then((d) => { if (d && d.byField) { S.byField = d.byField; if (STEPS[S.step][0] === "find" && !S.loading) { find(); wireNav(); } } }).catch(() => {});
     try {
       const r = await fetch(`/api/listings?field=${encodeURIComponent(S.major)}&limit=120`);
       if (!r.ok) throw 0;
@@ -202,7 +203,7 @@
       <p class="lead">These are real, open internships our robot pulled from each company's own job board. Pick your major, then tap a job and save it.</p>
       <div class="pills">${majorPills}${moreSel}</div>
       <input type="search" id="q" placeholder="Filter by company, role or city" value="${esc(S.q)}" aria-label="Filter jobs">
-      ${S.loading || S.err ? "" : `<div class="count">${rows.length.toLocaleString()} live ${esc(LABEL[S.major] || "")} internships${rows.length > 40 ? " · showing the newest 40" : ""}</div>`}
+      ${S.loading || S.err ? "" : `<div class="count">${q ? `${rows.length.toLocaleString()} match "${esc(S.q)}" in the newest ${S.jobs.length}` : `${((S.byField && S.byField[S.major]) || rows.length).toLocaleString()} live ${esc(LABEL[S.major] || "")} internships right now${rows.length > 40 ? " · showing the newest 40" : ""}`}</div>`}
       ${list}
       ${S.savedJob ? `<div class="ok" style="margin-top:12px">Saved: ${esc(niceTitle(S.savedJob.title))} at ${esc(S.savedJob.company)}. In the real app it goes into My Season, where you track every application.</div>` : ""}
       ${navRow(!!S.savedJob)}`;
@@ -349,7 +350,7 @@
     $("stage").innerHTML = `<p class="kick">That's the whole season</p><h2>You just did in 2 minutes what usually takes 30 tabs</h2>
       <p class="lead">Everything you tried is free on the real site. Signing in saves your jobs, fair notes and follow-ups across devices.</p>
       <div class="donegrid">
-        <div class="dcard"><b>${S.done.has("find") ? "✓ " : ""}Find internships</b>${(S.jobs.length || 0).toLocaleString()}+ live ${esc(LABEL[S.major] || "")} internships, plus a weekly email of new ones. <a href="/jobs/?major=${m}">Open Jobs →</a></div>
+        <div class="dcard"><b>${S.done.has("find") ? "✓ " : ""}Find internships</b>${((S.byField && S.byField[S.major]) || S.jobs.length || 0).toLocaleString()} live ${esc(LABEL[S.major] || "")} internships, plus a weekly email of new ones. <a href="/jobs/?major=${m}">Open Jobs →</a></div>
         <div class="dcard"><b>${S.done.has("fair") ? "✓ " : ""}Career Fair Mode</b>Your school's real company list, booth route and briefs. <a href="/fair/">Open Career Fair Mode →</a></div>
         <div class="dcard"><b>${S.done.has("meet") ? "✓ " : ""}Resume QR + recruiter notes</b>Private until you turn it on. <a href="/fair/">Set up your QR →</a></div>
         <div class="dcard"><b>${S.done.has("follow") ? "✓ " : ""}Follow-ups</b>Drafts after every fair, reminders in your calendar, and application follow-ups tracked in My Season. <a href="/season/">Open My Season →</a></div>
