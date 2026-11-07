@@ -70,7 +70,8 @@ export default async function handler(req, res) {
         const hint = cleanUrl(it.hint);
         const n = normName(company), id = "b-" + slug(company).slice(0, 60);
         if (company.length < 2 || n.length < 2 || !hint || ids.has(id) || names.has(n)) continue;
-        add.push({ id, company, domain: null, key: keyFor(company), hint, source: `Board Scout (${String(it.ats || "").slice(0, 20)})`, status: "pending",
+        const dom = it.domain ? cleanDomain(it.domain) : null;            // the website the board itself links to (Paylocity/UKG)
+        add.push({ id, company, domain: dom && /^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(dom) ? dom : null, key: keyFor(company), hint, source: `Board Scout (${String(it.ats || "").slice(0, 20)})`, status: "pending",
                    priority: Math.max(0, Math.min(95, Math.round(Number(it.priority) || 0))) });
         ids.add(id); names.add(n);
       }
