@@ -134,6 +134,20 @@ fieldsForMajor` (tested for all 110 quiz majors). `/api/listings` default = engi
 would hit Vercel's 4.5 MB cap). Bots: finder/scout priority = number of internships (+ small engineering boost);
 nightly SimplifyJobs import takes every major; Radar keeps any company with 5+ postings and 2+ seasons (or tracked).
 
+## Distance search ("within N mi of a ZIP", live Nov 7 2026)
+`lib/geocode.js` turns employer location text into points using only the US Census Gazetteer (`data/us-places.json`,
+`data/us-zips.json`, rebuilt by `scripts/build-places.mjs <dir>` from the 2024 place/cousub/ZCTA files + the ZCTA↔place
+relationship file). Rules: a point only when a real city/town is found **in the state the text names**; regions ("Bay
+Area"), neighborhoods, truncated names and same-name towns in one state (two Cranberry/Hamilton Townships) stay unplaced;
+offshore Census points (San Francisco, Honolulu) are re-centered on land; a few big work sites that aren't Census places
+(`SITES`, e.g. Cranberry Township PA, Hunt Valley MD) use their own ZIP area. Measured on 13,942 live listings: 94% placed,
+99.9% of points in the stated state (rest = border towns). Listings store `geo_lat/geo_lng` (first point), `geo_pts`,
+`geo_n`, `geo_kind` (place|remote|multi|state|none) — set in `fetchCompany`; old rows backfilled by `fillGeo` in
+`api/sync.js`. API: `/api/listings?near=24060|City, ST&mi=5–300` → nearest first with `mi`, plus `meta.remote` and
+`meta.unplacedInState` so the page says what isn't on the map. `/jobs`: "Within [50 mi] of [ZIP]" (`?near=&mi=`);
+picking a state turns it off. Tests: `tests/geo-radius-test.mjs` (real formats + audit catches). Changing the geocoder?
+Re-run the measure/audit against a fresh pull of live locations before shipping.
+
 ## Data model (Supabase)
 `company_candidates` (robot queue + results: status, ats, config, hint, priority, detail) · `listings` (match, field,
 first_seen, closed_at, link_ok, link_fails) · `feed_runs` + view `feed_last` · `user_jobs` (saved, applied, apps,
