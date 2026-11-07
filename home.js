@@ -1,4 +1,4 @@
-/* built from src/home.jsx dc918e05fe730bda — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 6ab644260bc862c9 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -7747,7 +7747,9 @@ function App() {
   const Nav = () => {
     const slot = typeof document !== "undefined" ? document.getElementById("btpRight") : null;
     const acct = clerkUser ? React.createElement("button", {
-      onClick: () => setPage("profile"),
+      onClick: () => {
+        window.location.href = "/u/";
+      },
       title: clerkUser.primaryEmailAddress?.emailAddress || "Account",
       "aria-label": "Your profile",
       style: {
@@ -10661,6 +10663,19 @@ Thank you for your time,
     }, "Saving adds this to your saved resumes so it personalizes your match reasoning. You can edit it any time from Profile."))));
   }
   if (page === "profile") {
+    if (typeof window !== "undefined" && !window.__btpToU) {
+      window.__btpToU = true;
+      window.location.replace("/u/#kit");
+    }
+    return React.createElement("div", {
+      style: {
+        padding: "3rem",
+        textAlign: "center",
+        color: "#55627A"
+      }
+    }, "Opening your profile\u2026");
+  }
+  if (page === "profile_old_unused") {
     const inp = {
       width: "100%",
       padding: "11px 13px",

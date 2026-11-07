@@ -74,6 +74,20 @@
   .photo img,.photo .ph{width:84px;height:84px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--line)}
   .photo .ph{background:var(--green);color:#fff;display:grid;place-items:center;font-size:28px;font-weight:600}
   .btn{border-radius:999px}
+  .private{border-style:dashed;border-color:#C9D1DE;background:#FBFCFD}
+  .ptag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:var(--muted);background:#EEF1F6;border-radius:999px;padding:3px 10px;margin-bottom:10px}
+  .meter{height:8px;background:#EEF1F6;border-radius:99px;overflow:hidden;margin:8px 0 12px}.meter span{display:block;height:100%;background:var(--green);border-radius:99px}
+  .steps{list-style:none;margin:0;padding:0;display:grid;gap:6px}.steps li{display:flex;gap:10px;align-items:center;font-size:14.5px}
+  .steps .ck{width:18px;height:18px;border-radius:50%;border:2px solid #C9D1DE;flex-shrink:0}.steps .ck.on{background:var(--green);border-color:var(--green)}
+  .steps li.done{color:var(--muted);text-decoration:line-through}
+  .kv{display:grid;grid-template-columns:160px 1fr;gap:6px 12px;font-size:14.5px}.kv dt{color:var(--muted)}.kv dd{margin:0}
+  @media(max-width:600px){.kv{grid-template-columns:118px 1fr;font-size:14px}}
+  .toprow{flex-wrap:wrap}.own button,.own a{white-space:nowrap}
+  @media(max-width:600px){.own{flex-basis:100%;order:2;margin-top:10px}.own button{padding:7px 12px}}
+  .qrbox{position:fixed;inset:0;background:rgba(7,15,30,.55);display:grid;place-items:center;z-index:60;padding:16px}
+  .qrbox .in{background:#fff;border-radius:16px;padding:22px;max-width:340px;width:100%;text-align:center}
+  .qrbox svg{width:220px;height:220px}
+  .res{border:1px solid var(--line);border-radius:10px;padding:8px 12px 12px;margin-top:10px;position:relative;background:#fff}
 </style>
 <link rel="stylesheet" href="/d.css">
 </head>
@@ -88,8 +102,42 @@
   const initials = (n) => String(n || "?").trim().split(/\s+/).slice(0, 2).map((w) => w[0] || "").join("").toUpperCase() || "?";
   const handleFromPath = () => { const m = location.pathname.match(/^\/u\/([a-z0-9-]{3,30})\/?$/i); return m && m[1].toLowerCase() !== "edit" ? m[1].toLowerCase() : null; };
   const SKILLS = ["SolidWorks","AutoCAD","CATIA","Creo","Fusion 360","Inventor","NX","ANSYS","Abaqus","COMSOL","MATLAB","Simulink","Python","C++","Java","JavaScript","SQL","Excel","LabVIEW","Arduino","Raspberry Pi","3D printing","CNC machining","GD&T","FEA","CFD","Thermodynamics","Heat transfer","Fluid mechanics","Statics","Dynamics","Materials","Manufacturing processes","Lean / Six Sigma","Soldering","PCB design","Revit","Civil 3D","Project management","Technical writing","Public speaking","Leadership","Spanish"];
-  const S = { clerk: null, user: null, me: null, draft: null, tab: "preview" };
+  const S = { clerk: null, user: null, me: null, draft: null, tab: "preview", kit: {}, resumes: [], kitOk: false };
   const app = $("#app");
+
+  // ── Owner-only cards: profile strength + the private application kit (never shown on the public page) ──
+  function strength(p){
+    const k = S.kit || {}, me = S.me || {};
+    const items = [
+      ["Add a photo", !!p.photo], ["Write a headline", !!p.headline], ["Add your school and major", !!(p.school && p.major)],
+      ["Write an About", (p.about || "").length >= 40], ["Add an experience", (p.experience || []).length > 0], ["List 5+ skills", (p.skills || []).length >= 5],
+      ["Save a resume (for cover letters and auto-fill)", (S.resumes || []).some((r) => (r.text || "").length > 200)],
+      ["Add phone + email for applications", !!(k.phone && k.email)], ["Turn on your public link", !!(me.handle && me.profilePublic)],
+    ];
+    return { items, pct: Math.round(100 * items.filter((x) => x[1]).length / items.length) };
+  }
+  function ownerCards(p){
+    if (!S.me) return "";
+    const st = strength(p), todo = st.items.filter((x) => !x[1]), k = S.kit || {};
+    const yn = (v) => v === "Yes" ? "Yes" : v === "No" ? "No" : "—";
+    return `
+      ${st.pct < 100 ? `<section class="card"><div class="ptag">Only you see this</div>
+        <h2 style="margin:0">Profile strength: ${st.pct}%</h2><div class="meter"><span style="width:${st.pct}%"></span></div>
+        <ul class="steps">${[...todo.slice(0, 4), ...st.items.filter((x) => x[1]).slice(0, Math.max(0, 4 - todo.length))].map(([t, ok]) => `<li class="${ok ? "done" : ""}"><span class="ck${ok ? " on" : ""}" aria-hidden="true"></span>${esc(t)}</li>`).join("")}</ul>
+        <button class="btn" type="button" data-tab="edit" style="margin-top:12px">Finish your profile</button></section>` : ""}
+      `; }
+  function kitCard(p){
+    if (!S.me) return ""; const k = S.kit || {}; const yn = (v) => v === "Yes" ? "Yes" : v === "No" ? "No" : "—";
+    return `
+      <section class="card private" id="kitCard"><div class="ptag">Private · only you see this</div>
+        <h2>Application kit</h2>
+        <p class="small muted" style="margin:-4px 0 12px">Used to fill applications and write cover letters for you. Never shown on your public page.</p>
+        ${S.kitOk ? `<dl class="kv"><dt>Email</dt><dd>${esc(k.email || "—")}</dd><dt>Phone</dt><dd>${esc(k.phone || "—")}</dd><dt>GPA</dt><dd>${esc(k.gpa || "—")}</dd>
+          <dt>Graduation</dt><dd>${esc(k.gradDate || (p.gradYear ? "Class of " + p.gradYear : "—"))}</dd><dt>Authorized to work in the US</dt><dd>${yn(k.workAuth)}</dd><dt>Willing to relocate</dt><dd>${yn(k.relocate)}</dd>
+          <dt>Resumes</dt><dd>${(S.resumes || []).length ? S.resumes.map((r) => esc(r.name || "Resume")).join(", ") : "None saved yet"}</dd></dl>`
+          : `<p class="small muted">Couldn't load your application kit right now.</p>`}
+        <button class="btn" type="button" data-tab="edit" data-jump="kit" style="margin-top:12px">Edit application kit</button></section>`;
+  }
 
   // ── Public view (anyone, no sign-in) ──
   function profileHtml(p, resume, isPreview){
@@ -103,7 +151,7 @@
     return `
       <section class="card hero"><div class="band"></div><div class="body">
         <div class="toprow">${p.photo && /^data:image\/(jpeg|png|webp);base64,/.test(p.photo) ? `<img class="avatar" src="${esc(p.photo)}" alt="${esc(p.name || "Profile photo")}">` : `<div class="avatar" aria-hidden="true">${esc(initials(p.name))}</div>`}
-        ${isPreview ? `<div class="own"><button type="button" data-tab="edit">Edit profile</button>${S.me && S.me.handle && S.me.profilePublic ? `<button type="button" id="shareP">Share</button>` : ""}</div>` : ""}</div>
+        ${isPreview ? `<div class="own"><button type="button" data-tab="edit">Edit profile</button>${S.me && S.me.handle && S.me.profilePublic ? `<button type="button" id="shareP">Share</button><button type="button" id="qrP" title="A QR code recruiters can scan at a career fair">QR</button>` : ""}</div>` : ""}</div>
         <h1>${esc(p.name || "Your name")}</h1>
         ${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
         <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}</div>
@@ -111,11 +159,12 @@
         <div class="btns">${resume ? `<a class="btn pri" href="${esc(resume)}" target="_blank" rel="noopener">View resume</a>` : isPreview && p.showResume ? `<span class="btn pri" title="Shows when your resume QR link is on">View resume</span>` : ""}${links}</div>
         ${isPreview && S.me ? `<div class="vis"><span class="dotv${S.me.profilePublic && S.me.handle ? " on" : ""}" aria-hidden="true"></span>${S.me.profilePublic && S.me.handle ? `Public · <a href="/u/${esc(S.me.handle)}" target="_blank" style="color:var(--muted)">beatthepile.com/u/${esc(S.me.handle)}</a>` : "Private · only you can see this"}</div>` : ""}
       </div></section>
-      ${isPreview && !p.about && !(p.experience || []).length && !(p.projects || []).length && !(p.skills || []).length ? `<section class="card muted" style="font-size:14.5px">Add an About, experience and skills so recruiters see more than a name. <button type="button" class="linkbtn" data-tab="edit">Edit profile</button></section>` : ""}
+      ${isPreview ? ownerCards(p) : ""}
       ${p.about ? `<section class="card"><h2>About</h2><p class="about">${esc(p.about)}</p></section>` : ""}
       ${exp ? `<section class="card"><h2>Experience</h2>${exp}</section>` : ""}
       ${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}
       ${(p.skills || []).length ? `<section class="card"><h2>Skills</h2><div class="chips">${p.skills.map((s) => `<span class="chip">${esc(s)}</span>`).join("")}</div></section>` : ""}
+      ${isPreview ? kitCard(p) : ""}
       <p class="small muted" style="text-align:center">Profile on <a href="/" style="color:var(--green-dark)">Beat the Pile</a>${isPreview ? "" : ` · <a href="#" id="rep" style="color:var(--muted)">Report this profile</a>`}</p>`;
   }
   async function showPublic(h){
@@ -186,13 +235,30 @@
         <div><label for="l_github">GitHub</label><input id="l_github" data-link="github" value="${esc(d.p.links.github || "")}" placeholder="https://github.com/…"></div></div>
         <label for="l_portfolio">Portfolio / website</label><input id="l_portfolio" data-link="portfolio" value="${esc(d.p.links.portfolio || "")}" placeholder="https://">
         <label class="switch"><input type="checkbox" id="f_resume" ${d.p.showResume ? "checked" : ""}><span><b>Show a "View resume" button</b><br><span class="muted small">${me.resume ? (me.resume.share ? "Uses your Career Fair resume link (on)." : "Your resume link is off — turn it on in <a href='/fair/' style='color:var(--green-dark)'>Career Fair Mode</a> for this to show.") : "Upload a resume in <a href='/fair/' style='color:var(--green-dark)'>Career Fair Mode</a> first."}</span></span></label>
-      </section>`}
+      </section>
+      ${!S.kitOk ? `<section class="card private" id="kit"><div class="ptag">Private</div><h2>Application kit</h2><p class="small muted">Couldn't load your application kit right now, so it's hidden to keep it safe. Refresh in a minute.</p></section>` : `<section class="card private" id="kit"><div class="ptag">Private · only you see this</div><h2>Application kit</h2>
+        <p class="small muted" style="margin:-4px 0 4px">Fills applications and cover letters for you. Never on your public page.</p>
+        <div class="row"><div><label for="k_email">Email for applications</label><input id="k_email" data-kit="email" type="email" value="${esc(d.kit.email || "")}" placeholder="you@school.edu"></div>
+        <div><label for="k_phone">Phone</label><input id="k_phone" data-kit="phone" type="tel" value="${esc(d.kit.phone || "")}" placeholder="(555) 123-4567"></div></div>
+        <div class="row"><div><label for="k_gpa">GPA</label><input id="k_gpa" data-kit="gpa" value="${esc(d.kit.gpa || "")}" placeholder="3.6" inputmode="decimal" maxlength="5"></div>
+        <div><label for="k_grad">Expected graduation</label><input id="k_grad" data-kit="gradDate" value="${esc(d.kit.gradDate || "")}" placeholder="May 2029"></div></div>
+        <div class="row"><div><label for="k_auth">Authorized to work in the US?</label><select id="k_auth" data-kit="workAuth">${["", "Yes", "No"].map((v) => `<option value="${v}" ${d.kit.workAuth === v ? "selected" : ""}>${v || "Choose"}</option>`).join("")}</select></div>
+        <div><label for="k_rel">Willing to relocate?</label><select id="k_rel" data-kit="relocate">${["", "Yes", "No"].map((v) => `<option value="${v}" ${d.kit.relocate === v ? "selected" : ""}>${v || "Choose"}</option>`).join("")}</select></div></div>
+        <label for="k_why">What makes you stand out? (used in cover letters)</label><textarea id="k_why" data-kit="whyMe" maxlength="600" placeholder="A sentence or two about your standout experience, project, or drive.">${esc(d.kit.whyMe || "")}</textarea>
+        <h2 style="margin-top:18px">Resumes</h2>
+        <p class="small muted" style="margin:-4px 0 0">Keep a version per kind of role (e.g. "Finance", "Engineering"). Paste the text or upload a PDF, Word or text file.</p>
+        <div>${d.resumes.map((r, i) => `<div class="res"><button class="rm" data-rmres="${i}">Remove</button>
+          <label>Name</label><input data-res="${i}" data-f="name" value="${esc(r.name || "")}" placeholder="Resume ${i + 1}" style="max-width:320px">
+          <label>Text</label><textarea data-res="${i}" data-f="text" style="min-height:110px" placeholder="Paste this resume's text here">${esc(r.text || "")}</textarea>
+          <label class="btn" style="margin-top:8px;cursor:pointer;width:auto">Upload file<input type="file" data-upres="${i}" accept=".pdf,.docx,.txt" style="position:absolute;left:-9999px"></label></div>`).join("")}</div>
+        ${d.resumes.length < 6 ? `<button class="btn" type="button" id="addRes" style="margin-top:12px">+ Add resume</button>` : ""}
+      </section>`}`}
       ${S.tab === "preview" ? `<span class="msg" id="msg" role="status" hidden></span>` : `<div class="bar"><button class="btn pri" id="save">Save profile</button><button class="btn" type="button" data-tab="preview">Cancel</button><span class="msg" id="msg" role="status"></span></div>`}`;
     wire();
   }
   function wire(){
     const d = S.draft, main = document.querySelector("main");
-    main.querySelectorAll("[data-tab]").forEach((b) => b.onclick = () => { S.tab = b.dataset.tab; if (S.tab === "preview") load(); editor(); window.scrollTo(0, 0); });
+    main.querySelectorAll("[data-tab]").forEach((b) => b.onclick = () => { S.tab = b.dataset.tab; if (S.tab === "preview") load(); editor(); if (b.dataset.jump) jump(b.dataset.jump); else window.scrollTo(0, 0); });
     const sh = $("#shareP"); if (sh) sh.onclick = async () => { const url = location.origin + "/u/" + S.me.handle;
       try { if (navigator.share) await navigator.share({ title: (S.me.profile && S.me.profile.name) || "My profile", url }); else { await navigator.clipboard.writeText(url); sh.textContent = "Link copied"; setTimeout(() => sh.textContent = "Share", 1600); } } catch {} };
     main.querySelectorAll("[data-k]").forEach((el) => el.oninput = () => { d.p[el.dataset.k] = el.value; });
@@ -213,6 +279,43 @@
       catch (e) { msg.className = "msg err"; msg.textContent = e.message; } };
     const rp = $("#rmPhoto"); if (rp) rp.onclick = () => { d.p.photo = null; editor(); const m = $("#msg"); m.className = "msg"; m.textContent = "Photo removed — tap Save profile."; };
     const sv = $("#save"); if (sv) sv.onclick = save;
+    main.querySelectorAll("[data-kit]").forEach((el) => el.oninput = el.onchange = () => { d.kit[el.dataset.kit] = el.value; });
+    main.querySelectorAll("[data-res]").forEach((el) => el.oninput = () => { d.resumes[+el.dataset.res][el.dataset.f] = el.value; });
+    main.querySelectorAll("[data-rmres]").forEach((b) => b.onclick = () => { d.resumes.splice(+b.dataset.rmres, 1); editor(); jump("kit"); });
+    const ar = $("#addRes"); if (ar) ar.onclick = () => { d.resumes.push({ id: Date.now(), name: `Resume ${d.resumes.length + 1}`, text: "" }); editor(); jump("kit"); };
+    main.querySelectorAll("[data-upres]").forEach((inp) => inp.onchange = async () => { const f = inp.files && inp.files[0]; if (!f) return; const m = $("#msg");
+      try { m.className = "msg"; m.textContent = "Reading file…"; const t = await fileText(f); if (!t || t.length < 40) throw new Error("Couldn't read much text from that file — paste it instead.");
+        const r = d.resumes[+inp.dataset.upres]; r.text = t; if (/^Resume \d+$/.test(r.name || "")) r.name = (f.name || "").replace(/\.[^.]+$/, "").slice(0, 40); editor(); jump("kit"); const m2 = $("#msg"); m2.className = "msg"; m2.textContent = "Resume read — tap Save profile."; }
+      catch (e) { m.className = "msg err"; m.textContent = e.message; } });
+    const qr = $("#qrP"); if (qr) qr.onclick = showQr;
+  }
+  function jump(id){ const el = document.getElementById(id); if (el) el.scrollIntoView({ block: "start" }); }
+  async function loadPdf(){ if (window.pdfjsLib) return window.pdfjsLib;
+    await new Promise((ok, bad) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
+    window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; return window.pdfjsLib; }
+  async function fileText(file){
+    const n = (file.name || "").toLowerCase();
+    if (file.size > 4 * 1024 * 1024) throw new Error("That file is over 4 MB — paste the text instead.");
+    if (n.endsWith(".txt") || file.type === "text/plain") return (await file.text()).trim();
+    if (n.endsWith(".pdf") || file.type === "application/pdf") { const pdf = await (await loadPdf()).getDocument({ data: await file.arrayBuffer() }).promise; let out = "";
+      for (let i = 1; i <= pdf.numPages; i++) out += (await (await pdf.getPage(i)).getTextContent()).items.map((x) => x.str).join(" ") + "\n\n"; return out.trim(); }
+    if (n.endsWith(".docx")) { const m = new TextDecoder().decode(await file.arrayBuffer()).match(/<w:t[^>]*>([^<]*)<\/w:t>/g); if (m) return m.map((x) => x.replace(/<[^>]+>/g, "")).join(" ").replace(/\s+/g, " ").trim(); throw new Error("Couldn't read this .docx — paste the text instead."); }
+    throw new Error("Use a .pdf, .docx or .txt file — or paste the text.");
+  }
+  async function showQr(){
+    const url = location.origin + "/u/" + S.me.handle;
+    if (!window.qrcode) await new Promise((ok, bad) => { const s = document.createElement("script"); s.src = "/fair/qrcode.js"; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
+    const q = window.qrcode(0, "M"); q.addData(url); q.make();
+    const box = document.createElement("div"); box.className = "qrbox"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Your profile QR code");
+    box.innerHTML = `<div class="in">${q.createSvgTag({ cellSize: 6, margin: 2, scalable: true })}<p style="margin:8px 0 2px;font-weight:600;color:var(--navy)">Scan to see my profile</p><p class="small muted" style="margin:0 0 14px">${esc(url.replace(/^https?:\/\//, ""))}</p>
+      <div class="btns" style="justify-content:center"><a class="btn pri" download="my-profile-qr.gif" href="${q.createDataURL(12, 3)}">Download</a><button class="btn" type="button" id="qrX">Close</button></div></div>`;
+    document.body.appendChild(box); const close = () => box.remove();
+    box.onclick = (e) => { if (e.target === box) close(); }; box.querySelector("#qrX").onclick = close; document.addEventListener("keydown", function k(e){ if (e.key === "Escape") { close(); document.removeEventListener("keydown", k); } });
+  }
+  // Application kit lives with the homepage's data (table user_home via /api/usersync), so auto-fill + cover letters keep working.
+  async function sync(body){
+    const r = await fetch("/api/usersync", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Couldn't save your application kit"); return j;
   }
   // Photo → centered square, 320px, JPEG; quality steps down until it's small (server limit ~65 KB).
   function shrink(file){
@@ -241,6 +344,12 @@
     try {
       const p = { ...S.draft.p, gradYear: S.draft.p.gradYear ? Number(S.draft.p.gradYear) : null };
       S.me = await api("POST", { action: "profile", profile: p, handle: S.draft.handle.replace(/^-+|-+$/g, "") || null, public: S.draft.pub });
+      // One profile: the shared fields also go into the application kit the homepage uses (name, school, links, skills)
+      const resumes = S.draft.resumes.filter((r) => (r.text || "").trim()).slice(0, 6).map((r, i) => ({ id: r.id || Date.now() + i, name: (r.name || `Resume ${i + 1}`).slice(0, 60), text: String(r.text || "").slice(0, 30000) }));
+      const kit = { ...S.kit, ...S.draft.kit, fullName: p.name || "", school: p.school || "", major: p.major || "", linkedin: p.links.linkedin || S.kit.linkedin || "",
+        portfolio: p.links.portfolio || S.kit.portfolio || "", topSkills: (p.skills || []).join(", "), gradDate: S.draft.kit.gradDate || (p.gradYear ? `May ${p.gradYear}` : ""), resumes };
+      if (S.kitOk) try { await sync({ action: "set", kind: "profile", data: kit }); await sync({ action: "set", kind: "resumes", data: { list: resumes } }); S.kit = kit; S.resumes = resumes; S.kitOk = true; }
+      catch (e) { msg.className = "msg err"; msg.textContent = "Profile saved, but the application kit didn't: " + e.message; btn.disabled = false; return; }
       load(); remember(); S.tab = "preview"; editor(); window.scrollTo(0, 0);
     } catch (e) { msg.className = "msg err"; msg.textContent = e.message; btn.disabled = false; }
   }
@@ -249,8 +358,15 @@
     p.links = { ...(p.links || {}) }; p.skills = [...(p.skills || [])];
     p.experience = (p.experience || []).map((x) => ({ ...x })); p.projects = (p.projects || []).map((x) => ({ ...x }));
     if (!p.name && S.user) p.name = [S.user.firstName, S.user.lastName].filter(Boolean).join(" ");
+    // First visit after the old homepage profile: start from what's already in the application kit
+    const k = S.kit || {}; const https = (u) => (u && !/^https?:\/\//i.test(u) ? "https://" + u : u || "");
+    if (!p.name && k.fullName) p.name = k.fullName; if (!p.school && k.school) p.school = k.school; if (!p.major && k.major) p.major = k.major;
+    if (!p.gradYear && /\b(20\d\d)\b/.test(k.gradDate || "")) p.gradYear = k.gradDate.match(/\b(20\d\d)\b/)[1];
+    if (!p.links.linkedin && k.linkedin) p.links.linkedin = https(k.linkedin); if (!p.links.portfolio && k.portfolio) p.links.portfolio = https(k.portfolio);
+    if (!p.skills.length && k.topSkills) p.skills = String(k.topSkills).split(",").map((x) => x.trim()).filter(Boolean).slice(0, 30);
     p.gradYear = p.gradYear || "";
-    S.draft = { p, handle: S.me.handle || "", pub: S.me.profilePublic };
+    S.draft = { p, handle: S.me.handle || "", pub: S.me.profilePublic, kit: { email: k.email || S.user?.primaryEmailAddress?.emailAddress || "", phone: k.phone || "", gpa: k.gpa || "", gradDate: k.gradDate || "", workAuth: k.workAuth || "", relocate: k.relocate || "", whyMe: k.whyMe || "" },
+      resumes: (S.resumes || []).map((r) => ({ ...r })) };
   }
   async function onUser(u){
     try { if (u && window.btpIdentify) window.btpIdentify(u.id); } catch {}   // counted by account id only — never name/email
@@ -258,11 +374,17 @@
     if (!S.user) {
       try { localStorage.removeItem("btp_me"); window.btpNavMe && window.btpNavMe(); } catch {}
       document.querySelector("main").innerHTML = `<div class="card center"><h1 style="font-size:24px">Your internship profile</h1>
-        <p class="muted" style="max-width:46ch;margin:6px auto 16px">One clean page with your experience, projects, skills and resume — share the link with recruiters. It stays private until you turn it on.</p>
+        <p class="muted" style="max-width:48ch;margin:6px auto 16px">One profile for everything: a clean page with your experience, projects and skills to share with recruiters (private until you turn it on), plus a private application kit with your resumes that fills applications and cover letters for you.</p>
         <button class="btn pri" id="si">Sign in to build yours</button></div>`;
       $("#si").onclick = () => S.clerk.openSignIn({}); return;
     }
-    try { S.me = await api("GET"); load(); remember(); editor(); }
+    try {
+      const [me, home] = await Promise.all([api("GET"), sync({ action: "get_all" }).catch(() => null)]);
+      S.me = me; S.kitOk = !!home;
+      if (home) { const d = home.data || {}; S.kit = d.profile || {}; S.resumes = Array.isArray(d.resumes?.list) ? d.resumes.list : Array.isArray(S.kit.resumes) ? S.kit.resumes : []; }
+      load(); remember();
+      if (location.hash === "#kit") { S.tab = "edit"; editor(); jump("kit"); } else editor();
+    }
     catch { document.querySelector("main").innerHTML = '<div class="card center">Couldn’t load your profile right now. Refresh in a minute.</div>'; }
   }
   async function loadClerk(){

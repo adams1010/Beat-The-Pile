@@ -3024,7 +3024,7 @@ function App(){
   const Nav=()=>{
     const slot=typeof document!=="undefined"?document.getElementById("btpRight"):null;
     const acct=(clerkUser?(
-      <button onClick={()=>setPage("profile")} title={clerkUser.primaryEmailAddress?.emailAddress||"Account"} aria-label="Your profile"
+      <button onClick={()=>{window.location.href="/u/";}} title={clerkUser.primaryEmailAddress?.emailAddress||"Account"} aria-label="Your profile"
         style={{background:"#2FBF8A",border:"none",color:"#0B1220",width:30,height:30,borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:700,fontFamily:"inherit"}}>
         {(clerkUser.firstName||clerkUser.primaryEmailAddress?.emailAddress||"U").charAt(0).toUpperCase()}
       </button>
@@ -3873,7 +3873,12 @@ Thank you for your time,
   }
 
   // PROFILE
+  // One profile for the whole site (/u/): the old homepage profile form now lives there as the private "Application kit".
   if(page==="profile"){
+    if(typeof window!=="undefined"&&!window.__btpToU){window.__btpToU=true;window.location.replace("/u/#kit");}
+    return(<div style={{padding:"3rem",textAlign:"center",color:"#55627A"}}>Opening your profile…</div>);
+  }
+  if(page==="profile_old_unused"){
     const inp={width:"100%",padding:"11px 13px",borderRadius:var_r,border:"1.5px solid #E2E8F0",background:"#FBFBFC",color:"#0B1220",fontFamily:"var(--font)",fontSize:14,outline:"none",marginTop:5};
     const lbl={fontSize:12,fontWeight:700,color:"#4A5568"};
     const field=(label,key,placeholder,type="text")=>(

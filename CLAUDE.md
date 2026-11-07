@@ -50,7 +50,7 @@ Homepage screens have hash URLs (`/#quiz`, `/#dashboard`, `/#score`, …) so Bac
 `/fair` Career Fair Mode (QR resume, route, briefs, notes, follow-ups) · `/season` My Season (pipeline, weekly goal,
 apply speed, **Delete all my data**) · `/radar` Opening Radar · `/privacy` plain-words privacy page · `/bots` **Bot
 Control Room** (owner sign-in required to see numbers) · `/discovery` robot's company list + "Needs a link" sheet ·
-`/demo` story-style demo · `/u/` profile editor and `/u/<handle>` public profile (private until the student turns it on; noindex; https-only links; resume button only when the QR link is on; API `action:"profile"` + `GET /api/me?u=`) · `/` homepage (built from `src/home.jsx`).
+`/demo` story-style demo · `/u/` **the one profile** (Nov 7: the old homepage profile form is gone — `/#profile` redirects to `/u/#kit`; owner view adds Profile strength + a private **Application kit** = email/phone/GPA/work auth/relocate/why-me/resumes, stored in `user_home.profile`/`resumes` via `/api/usersync` so homepage auto-fill + cover letters still use it; saving /u/ also copies name/school/major/links/skills into the kit; profile QR for career fairs) and `/u/<handle>` public profile (private until the student turns it on; noindex; https-only links; resume button only when the QR link is on; API `action:"profile"` + `GET /api/me?u=`) · `/` homepage (built from `src/home.jsx`).
 Every page (homepage too) includes **`/nav.js`** (one shared top bar: Jobs · Career Fair · My Season · Radar · Tools ▾, phones get a Menu; it moves the page's `#acct` sign-in widget into the bar) and
 `/feedback.js` (Report a problem). Owner tools are not in the student nav.
 
