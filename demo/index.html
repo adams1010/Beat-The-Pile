@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Try Beat the Pile</title>
-<meta name="description" content="Try Beat the Pile hands-on in 2 minutes: find a real internship in your major, plan a career fair, save a recruiter, get a follow-up drafted and tailor your resume. No account needed.">
+<title>Beat the Pile Tour</title>
+<meta name="description" content="A guided, hands-on tour of every Beat the Pile feature: live internships for every major, company pages, weekly alerts, resume tailoring, Career Fair Mode, My Season, Opening Radar, interview practice and your profile.">
 <link rel="canonical" href="https://www.beatthepile.com/demo/">
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#070F1E">
@@ -12,356 +12,514 @@
 <link rel="icon" href="/icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--green:#0B7A55;--green-dark:#0A6647;--green-light:#EAF7F1;--mint:#2FD39A;--navy:#070F1E;--ink:#0A1426;--muted:#55627A;--faint:#8590A6;
-        --bg:#EEF1F6;--card:#fff;--line:#DCE2EC;--amber:#8A4B08;--amber-light:#FFF4E6;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  :root{--green:#0B7A55;--green-dark:#0A6647;--green-light:#EAF7F1;--mint:#2FD39A;--navy:#070F1E;--navy2:#0D1A2F;--line2:#22304D;
+        --ink:#0A1426;--muted:#55627A;--faint:#8590A6;--line:#DCE2EC;--bg:#EEF1F6;--amber:#8A4B08;--amber-light:#FFF4E6;
+        --font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--ease:cubic-bezier(.2,.8,.2,1)}
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
-  a{color:var(--green)}
+  html,body{margin:0;background:#050B16;color:#fff;font-family:var(--font);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
   button{font-family:inherit}
-  .hero{background:var(--navy);color:#fff;padding:28px 20px 30px}
-  .hero .in{max-width:1080px;margin:0 auto}
-  .hero h1{margin:0 0 6px;font-size:clamp(26px,5vw,36px);font-weight:700;letter-spacing:-.025em}
-  .hero p{margin:0;color:#9FAAC0;font-size:15.5px;line-height:1.5;max-width:640px}
-  .hero .meta{margin-top:12px;font-size:13px;color:#9FAAC0}.hero .meta a{color:var(--mint)}
-  .wrap{max-width:1080px;margin:0 auto;padding:18px 16px 80px;display:grid;grid-template-columns:250px minmax(0,1fr);gap:18px;align-items:start}
-  @media (max-width:820px){.wrap{grid-template-columns:1fr;padding-top:12px}}
-  /* step list */
-  .steps{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px;position:sticky;top:72px}
-  .steps ol{list-style:none;margin:0;padding:0;display:grid;gap:2px}
-  .steps button{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:0;background:none;padding:9px 10px;border-radius:9px;font-size:14px;color:var(--muted);cursor:pointer}
-  .steps button:hover{background:#F4F6F9}
-  .steps button[aria-current="step"]{background:var(--green-light);color:var(--ink);font-weight:600}
-  .steps .n{flex:none;width:24px;height:24px;border-radius:50%;border:1.5px solid #C9D1DE;display:grid;place-items:center;font-size:12px;font-weight:600;color:var(--muted);background:#fff}
-  .steps .done .n{background:var(--green);border-color:var(--green);color:#fff}
-  .steps .bar{height:4px;background:#E3E7ED;border-radius:9px;margin:10px 6px 4px;overflow:hidden}.steps .bar i{display:block;height:100%;background:var(--green);width:0;transition:width .3s}
-  .steps .lbl{font-size:12px;color:var(--faint);margin:2px 8px 0}
-  @media (max-width:820px){
-    .steps{position:static;padding:8px}
-    .steps ol{grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
-    .steps button{flex-direction:column;gap:4px;padding:6px 2px;font-size:11px;text-align:center}
-    .steps button .t{display:none}.steps button[aria-current="step"] .t{display:block}
-    .steps ol li:has(button[aria-current="step"]){grid-column:span 1}
-    .steps .lbl{display:none}
-  }
-  /* stage */
-  .stage{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px;min-height:420px}
-  @media (max-width:600px){.stage{padding:16px}}
-  .kick{font-size:13.5px;font-weight:600;color:var(--green);margin:0 0 4px}
-  .stage h2{margin:0 0 6px;font-size:clamp(21px,4vw,26px);font-weight:700;letter-spacing:-.02em}
-  .lead{margin:0 0 16px;color:var(--muted);font-size:15px;line-height:1.5}
-  .ex{display:inline-block;font-size:11.5px;font-weight:500;color:var(--muted);background:#F4F6F9;border:1px solid var(--line);border-radius:999px;padding:2px 9px;margin-left:6px;vertical-align:2px}
-  .pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
-  .pill{font-size:13.5px;font-weight:500;border:1px solid #C9D1DE;background:#fff;color:var(--ink);border-radius:999px;padding:7px 13px;cursor:pointer}
-  .pill:hover{border-color:var(--green)}.pill[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
-  select,input[type=search],input[type=text],textarea{font:inherit;font-size:15px;border:1px solid #C9D1DE;border-radius:10px;padding:10px 12px;background:#fff;color:var(--ink);width:100%}
-  select:focus,input:focus,textarea:focus{outline:2px solid var(--green);outline-offset:1px;border-color:var(--green)}
-  textarea{min-height:96px;resize:vertical;line-height:1.45}
-  .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:14.5px;font-weight:600;border-radius:999px;padding:10px 18px;border:1px solid #C9D1DE;background:#fff;color:var(--ink);cursor:pointer;text-decoration:none;min-height:42px}
-  .btn:hover{border-color:var(--green)}
-  .btn.go{background:var(--green);border-color:var(--green);color:#fff}.btn.go:hover{background:var(--green-dark)}
-  .btn[disabled]{opacity:.5;cursor:default}
-  .navrow{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line)}
-  .skip{border:0;background:none;color:var(--muted);font-size:14px;cursor:pointer;padding:8px 4px}
-  .note{font-size:13px;color:var(--muted);background:#F4F6F9;border-radius:9px;padding:9px 11px;line-height:1.45}
-  .ok{font-size:14px;color:var(--green-dark);background:var(--green-light);border-radius:9px;padding:9px 12px;font-weight:500}
-  /* job cards */
-  .count{font-size:13px;color:var(--muted);margin:12px 0 8px}
-  .jobs{display:grid;gap:8px;max-height:460px;overflow:auto;padding-right:2px}
-  .job{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:#fff;cursor:pointer;text-align:left;width:100%;font:inherit;color:inherit}
-  .job:hover{border-color:#B9C3D3}.job.open{border-color:var(--green);cursor:default}
-  .job .t{font-weight:600;font-size:15px;line-height:1.3}
-  .job .co{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13.5px;color:var(--muted)}
+  .theater{min-height:calc(100vh - 60px);min-height:calc(100dvh - 60px);display:flex;flex-direction:column;
+           background:radial-gradient(1200px 600px at 75% 30%,#0D1C33 0%,#050B16 70%)}
+  /* chapter rail */
+  .rail{display:flex;gap:6px;overflow-x:auto;padding:14px 20px 4px;scrollbar-width:none;max-width:1240px;width:100%;margin:0 auto}
+  .rail::-webkit-scrollbar{display:none}
+  .chip{flex:none;display:flex;align-items:center;gap:7px;border:1px solid var(--line2);background:transparent;color:#8A97B0;border-radius:999px;padding:6px 12px 6px 7px;font-size:12.5px;font-weight:500;cursor:pointer;transition:all .25s var(--ease)}
+  .chip i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:11px;font-weight:600;background:#13223B;color:#9FAAC0}
+  .chip:hover{border-color:#3A4D72;color:#C9D2E3}
+  .chip.done i{background:var(--mint);color:var(--navy)}
+  .chip[aria-current="step"]{background:#fff;color:var(--navy);border-color:#fff}
+  .chip[aria-current="step"] i{background:var(--navy);color:#fff}
+  .meter{max-width:1200px;width:calc(100% - 40px);margin:8px auto 0;height:2px;background:#13223B;border-radius:2px;overflow:hidden}
+  .meter b{display:block;height:100%;background:var(--mint);width:0;transition:width .6s var(--ease)}
+  /* scene */
+  .scene{flex:1;max-width:1240px;width:100%;margin:0 auto;padding:22px 20px 18px;display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:44px;align-items:center}
+  @media (max-width:900px){.scene{grid-template-columns:1fr;gap:16px;padding-top:14px;align-items:start}}
+  .copy .num{font-size:13px;font-weight:600;color:var(--mint);letter-spacing:.02em}
+  .copy h1{margin:8px 0 12px;font-size:clamp(30px,4.6vw,54px);line-height:1.02;font-weight:700;letter-spacing:-.035em;text-wrap:balance}
+  .copy h1 .w{display:inline-block;opacity:0;transform:translateY(18px);filter:blur(6px);transition:opacity .55s var(--ease),transform .55s var(--ease),filter .55s var(--ease)}
+  .copy h1.in .w{opacity:1;transform:none;filter:none}
+  .copy p{margin:0;color:#A9B4C9;font-size:clamp(15px,1.6vw,18px);line-height:1.5;max-width:480px;opacity:0;transform:translateY(10px);transition:all .6s var(--ease) .25s}
+  .copy.in p{opacity:1;transform:none}
+  .todo{margin-top:20px;display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line2);background:rgba(13,26,47,.7);border-radius:999px;padding:8px 14px 8px 10px;font-size:14px;color:#DCE3EF;opacity:0;transition:opacity .5s var(--ease) .45s}
+  .copy.in .todo{opacity:1}
+  .todo .dot{width:10px;height:10px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 0 rgba(47,211,154,.6);animation:pulse 1.6s infinite}
+  .todo.ok .dot{animation:none;box-shadow:none}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(47,211,154,.55)}70%{box-shadow:0 0 0 10px rgba(47,211,154,0)}100%{box-shadow:0 0 0 0 rgba(47,211,154,0)}}
+  .real{margin-top:12px;font-size:12.5px;color:#7F8CA5}
+  @media (max-width:900px){.copy h1{font-size:clamp(26px,7.4vw,36px);margin:6px 0 8px}.copy p{font-size:15px}.todo{margin-top:12px;font-size:13.5px}.real{display:none}}
+  /* app window */
+  .stagewrap{position:relative;perspective:1600px}
+  .win{position:relative;background:var(--bg);color:var(--ink);border-radius:16px;overflow:hidden;box-shadow:0 40px 90px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.06);
+       transform-origin:50% 60%;transition:transform .7s var(--ease),opacity .5s var(--ease)}
+  .win.out{opacity:0;transform:translateY(24px) scale(.97) rotateX(4deg)}
+  .bar{display:flex;align-items:center;gap:10px;background:#fff;border-bottom:1px solid var(--line);padding:9px 12px}
+  .bar .dots{display:flex;gap:5px}.bar .dots i{width:9px;height:9px;border-radius:50%;background:#DCE2EC}
+  .bar .url{flex:1;background:#F1F4F8;border-radius:8px;padding:5px 10px;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bar .url b{color:var(--ink);font-weight:500}
+  .view{height:min(560px,62vh);overflow:auto;padding:16px;position:relative;scroll-behavior:smooth}
+  @media (max-width:900px){.view{height:auto;min-height:380px;max-height:none;padding:12px}}
+  /* spotlight + cursor */
+  .spot{position:absolute;pointer-events:none;border-radius:12px;box-shadow:0 0 0 3px var(--mint),0 0 0 9999px rgba(7,15,30,.32);transition:all .45s var(--ease);opacity:0;z-index:20}
+  .spot.on{opacity:1;animation:ring 1.6s infinite}
+  @keyframes ring{0%,100%{box-shadow:0 0 0 3px var(--mint),0 0 0 9999px rgba(7,15,30,.32)}50%{box-shadow:0 0 0 6px rgba(47,211,154,.55),0 0 0 9999px rgba(7,15,30,.32)}}
+  .tip{position:absolute;z-index:21;pointer-events:none;background:var(--navy);color:#fff;font-size:12.5px;font-weight:600;border-radius:8px;padding:6px 10px;white-space:nowrap;opacity:0;transform:translateY(4px);transition:all .3s var(--ease)}
+  .tip.on{opacity:1;transform:none}
+  .tip::after{content:"";position:absolute;left:16px;top:100%;border:6px solid transparent;border-top-color:var(--navy)}
+  .tip.below::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:var(--navy)}
+  .cursor{position:absolute;z-index:30;width:22px;height:22px;pointer-events:none;transition:left .7s var(--ease),top .7s var(--ease),opacity .3s;opacity:0}
+  .cursor.on{opacity:1}
+  .cursor svg{filter:drop-shadow(0 2px 4px rgba(0,0,0,.35))}
+  .ripple{position:absolute;z-index:29;width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;border:2px solid var(--mint);pointer-events:none;animation:rip .55s var(--ease) forwards}
+  @keyframes rip{from{transform:scale(.3);opacity:1}to{transform:scale(1.6);opacity:0}}
+  .burst{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;z-index:25}
+  .burst span{background:var(--navy);color:#fff;border-radius:999px;padding:9px 16px;font-size:14px;font-weight:600;display:flex;gap:8px;align-items:center;animation:pop .9s var(--ease) forwards;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  .burst span::before{content:"✓";width:20px;height:20px;border-radius:50%;background:var(--mint);color:var(--navy);display:grid;place-items:center;font-size:12px}
+  @keyframes pop{0%{opacity:0;transform:scale(.85)}20%{opacity:1;transform:scale(1)}80%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
+  /* controls */
+  .ctrls{max-width:1240px;width:100%;margin:0 auto;padding:6px 20px 22px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .cbtn{border:1px solid var(--line2);background:transparent;color:#C9D2E3;border-radius:999px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:8px;min-height:44px}
+  .cbtn:hover{border-color:#3A4D72;color:#fff}
+  .cbtn.next{background:var(--mint);border-color:var(--mint);color:var(--navy)}
+  .cbtn.next:hover{background:#5BE0B0}
+  .cbtn.next.wait{background:transparent;color:#C9D2E3;border-color:var(--line2)}
+  .cbtn[disabled]{opacity:.35;cursor:default}
+  .cbtn .pl{width:0;height:0;border-left:8px solid currentColor;border-top:5px solid transparent;border-bottom:5px solid transparent}
+  .cbtn .pa{width:9px;height:10px;border-left:3px solid currentColor;border-right:3px solid currentColor}
+  .story{color:#8A97B0;font-size:13px}.story a{color:var(--mint)}
+  @media (max-width:600px){.story{display:none}.cbtn{padding:10px 13px;font-size:13.5px}}
+  @media (max-width:900px){.ctrls{position:sticky;bottom:0;z-index:40;background:rgba(5,11,22,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line2);padding:10px 16px calc(10px + env(safe-area-inset-bottom))}}
+  /* in-app UI (light) */
+  .h{font-size:17px;font-weight:700;letter-spacing:-.01em;margin:0 0 4px}
+  .sub{font-size:13px;color:var(--muted);margin:0 0 12px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .stack{display:grid;gap:8px}
+  .pills{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+  .pill{font-size:13px;font-weight:500;border:1px solid #C9D1DE;background:#fff;color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
+  .pill[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  .job{cursor:pointer;transition:border-color .2s}.job:hover{border-color:#B9C3D3}
+  .job .t{font-weight:600;font-size:14.5px;line-height:1.3}
+  .co{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:13px;color:var(--muted)}
   .lg{flex:none;width:26px;height:26px;border-radius:7px;background:#E7ECF4;color:var(--navy);font-size:11px;font-weight:700;display:grid;place-items:center}
-  .job .more{margin-top:10px;display:none;gap:8px;flex-wrap:wrap}.job.open .more{display:flex}
-  .saved{color:var(--green-dark);font-weight:600}
-  .skel{height:66px;border-radius:12px;background:linear-gradient(90deg,#F1F3F7,#E8ECF2,#F1F3F7);background-size:200% 100%;animation:sh 1.2s infinite}
+  .lg.big{width:48px;height:48px;border-radius:12px;font-size:17px}
+  .found{font-size:12px;color:var(--faint);margin-top:4px}
+  .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .b{display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:13.5px;font-weight:600;border-radius:999px;padding:8px 14px;border:1px solid #C9D1DE;background:#fff;color:var(--ink);cursor:pointer;text-decoration:none;min-height:38px}
+  .b.go{background:var(--green);border-color:var(--green);color:#fff}
+  .b.on{background:var(--green-light);border-color:#BFE3D2;color:var(--green-dark)}
+  .ex{display:inline-block;font-size:11px;font-weight:500;color:var(--muted);background:#F1F4F8;border:1px solid var(--line);border-radius:999px;padding:1px 8px;vertical-align:2px;margin-left:4px}
+  .est{font-size:11px;font-weight:600;color:var(--amber);background:var(--amber-light);border-radius:999px;padding:1px 8px;margin-left:4px}
+  .skel{height:70px;border-radius:12px;background:linear-gradient(90deg,#F1F3F7,#E6EAF0,#F1F3F7);background-size:200% 100%;animation:sh 1.2s infinite}
   @keyframes sh{to{background-position:-200% 0}}
-  /* fair */
-  .booths{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  @media (max-width:520px){.booths{grid-template-columns:1fr}}
-  .booth{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff;cursor:pointer;font:inherit;color:inherit;text-align:left}
-  .booth:hover{border-color:#B9C3D3}.booth[aria-pressed="true"]{border-color:var(--green);background:var(--green-light)}
-  .booth .bn{flex:none;font-size:12px;font-weight:600;color:var(--muted);background:#F4F6F9;border-radius:6px;padding:3px 7px}
-  .booth b{display:block;font-weight:600;font-size:14.5px}.booth small{color:var(--muted);font-size:12.5px}
-  .route{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:14px 0 10px;font-size:14px}
-  .route span{background:var(--navy);color:#fff;border-radius:999px;padding:5px 11px;font-size:13px;font-weight:500}
-  .brief{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff}
-  .brief h3{margin:0 0 8px;font-size:16px}.brief ul{margin:6px 0 0;padding-left:18px;font-size:14px;line-height:1.55}
-  .facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:8px 0}
-  .facts div{background:#F4F6F9;border-radius:9px;padding:8px 10px;font-size:12.5px;color:var(--muted)}.facts b{display:block;font-size:17px;color:var(--ink)}
-  /* meet */
-  .meet{display:grid;grid-template-columns:200px minmax(0,1fr);gap:18px;align-items:start}
-  @media (max-width:600px){.meet{grid-template-columns:1fr}}
-  .phone{border:8px solid var(--navy);border-radius:28px;background:#fff;padding:14px 12px;text-align:center;max-width:200px;margin:0 auto}
-  .phone .pt{font-weight:600;font-size:14px}.phone .ps{font-size:12px;color:var(--muted)}
-  .qr{width:120px;height:120px;margin:10px auto;display:grid;grid-template-columns:repeat(21,1fr)}.qr i{display:block}
-  .scan{margin-top:10px}
-  label{display:block;font-size:13px;font-weight:600;margin:10px 0 5px}
-  .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}@media (max-width:520px){.two{grid-template-columns:1fr}}
-  /* follow-up */
-  .remind{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--amber-light);color:var(--amber);border-radius:12px;padding:12px 14px;font-weight:600;font-size:14.5px;margin-bottom:12px}
-  .mail{border:1px solid var(--line);border-radius:12px;background:#fff;overflow:hidden}
-  .mail .h{padding:10px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--muted);line-height:1.6}
-  .mail pre{margin:0;padding:14px;font-family:inherit;font-size:14.5px;line-height:1.55;white-space:pre-wrap}
-  /* tailor results */
-  .res{display:grid;gap:12px}
-  .res h4{margin:0 0 4px;font-size:14.5px}
-  .rw{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.45;margin-top:6px}
-  .rw .b{color:var(--muted);text-decoration:line-through;text-decoration-color:#C9D1DE}.rw .a{margin-top:4px}.rw .a::before{content:"→ ";color:var(--green);font-weight:700}
-  .kw{display:flex;gap:6px;flex-wrap:wrap}.kw span{background:var(--green-light);color:var(--green-dark);border-radius:999px;padding:3px 10px;font-size:13px}
-  .res ul{margin:0;padding-left:18px;font-size:14px;line-height:1.5}
-  /* finish */
-  .donegrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0}
-  @media (max-width:520px){.donegrid{grid-template-columns:1fr}}
-  .dcard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:14px;line-height:1.45}
-  .dcard b{display:block;margin-bottom:2px}.dcard a{font-weight:600;text-decoration:none}
-  .cta{display:flex;gap:8px;flex-wrap:wrap}
-  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-  @media (prefers-reduced-motion:reduce){.skel{animation:none}}
+  .fade{animation:fin .5s var(--ease) both}@keyframes fin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .kv{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}
+  .kv div{background:#F4F6F9;border-radius:10px;padding:9px 10px;font-size:12px;color:var(--muted)}.kv b{display:block;font-size:18px;color:var(--ink)}
+  .mail{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .mail .mh{padding:9px 12px;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted);line-height:1.55}
+  .mail .mb{padding:12px;font-size:13.5px;line-height:1.5;white-space:pre-wrap}
+  .er{border-top:1px solid #E3E7ED;padding:8px 0;font-size:13px;color:var(--muted)}.er b{color:var(--ink);font-weight:600}
+  .slidein{animation:sl .6s var(--ease) both}@keyframes sl{from{opacity:0;transform:translateX(30px)}to{opacity:1;transform:none}}
+  .rw{border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:13px;line-height:1.45;background:#fff}
+  .rw .bf{color:var(--muted);text-decoration:line-through;text-decoration-color:#C9D1DE}.rw .af{margin-top:3px;font-weight:500}.rw .af::before{content:"→ ";color:var(--green);font-weight:700}
+  .kw{display:flex;gap:6px;flex-wrap:wrap}.kw span{background:var(--green-light);color:var(--green-dark);border-radius:999px;padding:3px 10px;font-size:12.5px}
+  textarea.res{width:100%;min-height:96px;font:13px/1.45 var(--font);border:1px solid #C9D1DE;border-radius:10px;padding:9px;color:var(--ink);resize:none}
+  .floor{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+  @media (max-width:520px){.floor{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .booth{position:relative;border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px;text-align:left;cursor:pointer;font:inherit;color:inherit;min-height:66px;transition:all .25s var(--ease)}
+  .booth .bn{font-size:11px;font-weight:600;color:var(--muted)}.booth b{display:block;font-size:12.5px;font-weight:600;line-height:1.25;margin-top:2px}
+  .booth small{font-size:11px;color:var(--muted)}
+  .booth.pick{border-color:var(--green);background:var(--green-light)}
+  .booth .ord{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;background:var(--navy);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;animation:pop2 .4s var(--ease)}
+  @keyframes pop2{from{transform:scale(0)}to{transform:scale(1)}}
+  .phone{width:210px;border:9px solid var(--navy);border-radius:30px;background:#fff;padding:14px 12px;margin:0 auto;text-align:center;position:relative}
+  .phone.dark{background:linear-gradient(160deg,#1B2B47,#0B1424);color:#fff;min-height:330px;text-align:left}
+  .qr{width:120px;height:120px;margin:8px auto;display:grid;grid-template-columns:repeat(21,1fr)}.qr i{display:block}
+  .notif{background:rgba(255,255,255,.92);color:var(--ink);border-radius:14px;padding:10px 12px;font-size:12.5px;line-height:1.35;margin-top:70px;cursor:pointer;animation:drop .6s var(--ease) both}
+  .notif b{display:block;font-size:11px;color:var(--muted);font-weight:600;margin-bottom:2px}
+  @keyframes drop{from{opacity:0;transform:translateY(-30px)}to{opacity:1;transform:none}}
+  .clock{font-size:44px;font-weight:600;text-align:center;margin-top:18px;letter-spacing:-.02em}.date{text-align:center;font-size:12px;color:#B8C2D6}
+  .kan{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .col{background:#E7ECF3;border-radius:12px;padding:8px;min-height:190px}
+  .col h4{margin:2px 4px 8px;font-size:12px;font-weight:600;color:var(--muted);display:flex;justify-content:space-between}
+  .kc{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 9px;font-size:12px;line-height:1.3;margin-bottom:6px}
+  .kc b{display:block;font-size:12.5px}.kc .b{min-height:28px;padding:4px 10px;font-size:12px;margin-top:6px}
+  .ring{--p:40;width:84px;height:84px;border-radius:50%;background:conic-gradient(var(--green) calc(var(--p)*1%),#E3E7ED 0);display:grid;place-items:center;transition:--p .8s}
+  .ring i{width:64px;height:64px;border-radius:50%;background:#fff;display:grid;place-items:center;font-style:normal;font-weight:700;font-size:16px}
+  .radar .card{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .radar small{color:var(--muted);font-size:12px}
+  .timer{width:96px;height:96px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:20px;background:conic-gradient(var(--green) calc(var(--p,0)*1%),#E3E7ED 0);position:relative}
+  .timer::before{content:"";position:absolute;inset:8px;border-radius:50%;background:#fff}.timer span{position:relative}
+  .gr{display:grid;grid-template-columns:72px 1fr;gap:14px;align-items:center}
+  .grade{width:72px;height:72px;border-radius:16px;background:var(--green-light);color:var(--green-dark);display:grid;place-items:center;font-size:30px;font-weight:700}
+  .bars{display:grid;gap:6px;font-size:12px;color:var(--muted)}.bars div{display:grid;grid-template-columns:72px 1fr 26px;gap:8px;align-items:center}
+  .bars s{display:block;height:6px;border-radius:6px;background:#E3E7ED;overflow:hidden;text-decoration:none}.bars s i{display:block;height:100%;background:var(--green);width:0;transition:width 1s var(--ease)}
+  .prof .band{height:70px;background:var(--navy);border-radius:12px 12px 0 0;margin:-12px -14px 0}
+  .prof .av{width:64px;height:64px;border-radius:50%;background:var(--mint);color:var(--navy);display:grid;place-items:center;font-weight:700;font-size:22px;border:4px solid #fff;margin-top:-32px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}.chips span{background:#F1F4F8;border-radius:999px;padding:3px 10px;font-size:12px}
+  .finale{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  @media (max-width:600px){.finale{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .fz{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 11px;font-size:12.5px;color:var(--muted);text-decoration:none;display:block;transition:border-color .2s}
+  .fz:hover{border-color:var(--green)}.fz b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:2px}.fz b::before{content:"✓ ";color:var(--green)}
+  @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
-<body>
+<body data-fb-button="off">
 <div id="acct" hidden></div>
-<header class="hero"><div class="in">
-  <h1>Try it yourself: a whole internship season in 2 minutes</h1>
-  <p>Six quick steps on real data. Find an internship in your major, plan a career fair, meet a recruiter, follow up, and tailor your resume. No account needed, and nothing you type here is saved.</p>
-  <div class="meta">Prefer to watch? <a href="/demo/story/">See the 90-second story version</a></div>
-</div></header>
-
-<main class="wrap">
-  <nav class="steps" aria-label="Demo steps">
-    <ol id="stepList"></ol>
-    <div class="bar" aria-hidden="true"><i id="barFill"></i></div>
-    <div class="lbl" id="progLbl">0 of 6 done</div>
-  </nav>
-  <section class="stage" id="stage" aria-live="polite"></section>
+<main class="theater">
+  <nav class="rail" id="rail" aria-label="Tour chapters"></nav>
+  <div class="meter" aria-hidden="true"><b id="meter"></b></div>
+  <section class="scene">
+    <div class="copy" id="copy" aria-live="polite"></div>
+    <div class="stagewrap"><div class="win" id="win">
+      <div class="bar"><div class="dots" aria-hidden="true"><i></i><i></i><i></i></div><div class="url" id="url"></div></div>
+      <div class="view" id="view"></div>
+    </div></div>
+  </section>
+  <div class="ctrls">
+    <button class="cbtn" type="button" id="back">← Back</button>
+    <span class="story">No account needed. Nothing you do here is saved. <a href="/demo/story/">90-second story version</a></span>
+    <div class="row"><button class="cbtn" type="button" id="auto"><span class="pl"></span> Watch it</button><button class="cbtn next wait" type="button" id="next">Next →</button></div>
+  </div>
 </main>
 
 <script>
 (function () {
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const track = (e, p) => { try { window.btpTrack && window.btpTrack(e, p || {}); } catch {} };
-  const MAJORS = [["mechanical", "Mechanical"], ["software", "Software & CS"], ["finance", "Finance"], ["marketing", "Marketing"],
-    ["civil", "Civil & construction"], ["data", "Data & AI"], ["science_health", "Science & health"], ["electrical", "Electrical"]];
-  const MORE = [["chemical", "Chemical"], ["industrial", "Industrial"], ["cyber_it", "Cyber & IT"], ["product_design", "Product & design"],
-    ["consulting", "Consulting"], ["sales", "Sales"], ["supply_chain", "Supply chain"], ["legal_policy", "Legal & policy"], ["people_hr", "People & HR"], ["education_social", "Education"]];
-  const LABEL = Object.fromEntries(MAJORS.concat(MORE));
-  const STEPS = [["find", "Find an internship"], ["fair", "Plan a career fair"], ["meet", "Meet a recruiter"], ["follow", "Follow up"], ["tailor", "Tailor your resume"], ["finish", "Your season"]];
-  let saved = {}; try { saved = JSON.parse(localStorage.getItem("btp_major") ? JSON.stringify({ major: localStorage.getItem("btp_major") }) : "{}"); } catch {}
-  const S = { byField: null, step: 0, done: new Set(), major: LABEL[saved.major] ? saved.major : "mechanical", jobs: [], loading: false, err: false, q: "",
-    savedJob: null, openId: null, route: [], booths: [], rec: { name: "", company: "", note: "" }, tailor: null };
-
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const initials = (n) => { const w = String(n || "").replace(/[^A-Za-z0-9& ]/g, " ").split(/\s+/).filter((x) => x && !/^(and|of|the|&|inc|llc|corp|co)$/i.test(x)); if (!w.length) return "·"; return (w.length === 1 ? w[0].slice(0, 2) : w[0][0] + w[1][0]).toUpperCase(); };
-  const niceTitle = (t) => { t = String(t || ""); if (t.length < 8 || t !== t.toUpperCase()) return t; return t.toLowerCase().replace(/\b([a-z])/g, (m) => m.toUpperCase()); };
-  const ago = (ts) => { const h = (Date.now() - Date.parse(ts)) / 36e5; if (!(h >= 0)) return ""; if (h < 1) return "in the last hour"; if (h < 24) return Math.round(h) + "h ago"; const d = Math.round(h / 24); return d === 1 ? "yesterday" : d + " days ago"; };
+  const nice = (t) => { t = String(t || ""); return t.length >= 8 && t === t.toUpperCase() ? t.toLowerCase().replace(/\b([a-z])/g, (m) => m.toUpperCase()) : t; };
+  const ago = (ts) => { const h = (Date.now() - Date.parse(ts)) / 36e5; if (!(h >= 0)) return "recently"; if (h < 1) return "in the last hour"; if (h < 24) return Math.round(h) + "h ago"; const d = Math.round(h / 24); return d === 1 ? "yesterday" : d + " days ago"; };
+  const MAJORS = [["mechanical", "Mechanical"], ["software", "Software"], ["finance", "Finance"], ["marketing", "Marketing"], ["science_health", "Health & science"], ["civil", "Civil"]];
+  const LABEL = Object.fromEntries(MAJORS);
 
-  function renderSteps() {
-    $("stepList").innerHTML = STEPS.map(([k, t], i) => `<li class="${S.done.has(k) ? "done" : ""}"><button type="button" data-go="${i}" ${i === S.step ? 'aria-current="step"' : ""}><span class="n">${S.done.has(k) ? "✓" : i + 1}</span><span class="t">${t}</span></button></li>`).join("");
-    const n = [...S.done].filter((k) => k !== "finish").length;
-    $("barFill").style.width = (n / 5 * 100) + "%"; $("progLbl").textContent = `${n} of 5 done`;
-    $("stepList").querySelectorAll("[data-go]").forEach((b) => b.onclick = () => go(+b.dataset.go));
-  }
-  function done(k) { if (!S.done.has(k)) { S.done.add(k); track("demo_step", { step: k, major: S.major }); } renderSteps(); }
-  function go(i) { S.step = Math.max(0, Math.min(STEPS.length - 1, i)); render(); const top = $("stage").getBoundingClientRect().top + scrollY - 80; if (scrollY > top) scrollTo({ top, behavior: "smooth" }); }
-  const navRow = (nextOk, nextLabel) => `<div class="navrow">${S.step > 0 ? `<button class="skip" type="button" data-nav="-1">← Back</button>` : "<span></span>"}
-    <div class="row">${nextOk ? "" : `<button class="skip" type="button" data-nav="1">Skip this step</button>`}<button class="btn go" type="button" data-nav="1" ${nextOk ? "" : "disabled"}>${nextLabel || "Next →"}</button></div></div>`;
-  function wireNav() { $("stage").querySelectorAll("[data-nav]").forEach((b) => b.onclick = () => go(S.step + +b.dataset.nav)); }
-  function render() { renderSteps(); ({ find, fair, meet, follow, tailor, finish })[STEPS[S.step][0]](); wireNav(); }
-
-  // ── 1. Find ──
+  // ── shared state (live data where it exists) ──
+  const D = { major: "mechanical", jobs: [], byField: {}, radar: null, job: null, followed: false, alerts: false, route: [], rec: "Jordan", tailored: null };
   async function loadJobs() {
-    S.loading = true; S.err = false; find();
-    if (!S.byField) fetch("/api/listings?summary=1").then((r) => r.ok ? r.json() : null).then((d) => { if (d && d.byField) { S.byField = d.byField; if (STEPS[S.step][0] === "find" && !S.loading) { find(); wireNav(); } } }).catch(() => {});
-    try {
-      const r = await fetch(`/api/listings?field=${encodeURIComponent(S.major)}&limit=120`);
-      if (!r.ok) throw 0;
-      const d = await r.json(); const list = Array.isArray(d) ? d : d.listings || [];
-      S.jobs = list.filter((j) => !j.closed_at).sort((a, b) => Date.parse(b.first_seen) - Date.parse(a.first_seen));
-    } catch { S.err = true; S.jobs = []; }
-    S.loading = false; if (STEPS[S.step][0] === "find") { find(); wireNav(); }
+    try { const r = await fetch(`/api/listings?field=${D.major}&limit=60`); const d = await r.json(); D.jobs = (d.listings || d || []).filter((j) => !j.closed_at).sort((a, b) => Date.parse(b.first_seen) - Date.parse(a.first_seen)); } catch { D.jobs = []; }
   }
-  function find() {
-    const q = S.q.trim().toLowerCase();
-    const rows = S.jobs.filter((j) => !q || (j.title + " " + j.company + " " + j.location).toLowerCase().includes(q));
-    const majorPills = MAJORS.map(([k, l]) => `<button class="pill" type="button" data-major="${k}" aria-pressed="${k === S.major}">${l}</button>`).join("");
-    const moreSel = `<select id="moreMajor" aria-label="More majors" style="width:auto;padding:6px 10px;font-size:13.5px;border-radius:999px"><option value="">More majors…</option>${MORE.map(([k, l]) => `<option value="${k}" ${k === S.major ? "selected" : ""}>${l}</option>`).join("")}</select>`;
-    let list;
-    if (S.loading) list = `<div class="jobs">${'<div class="skel"></div>'.repeat(4)}</div>`;
-    else if (S.err) list = `<div class="note">Live jobs didn't load just now. <button class="skip" type="button" id="retry" style="color:var(--green);font-weight:600">Try again</button></div>`;
-    else if (!rows.length) list = `<div class="note">Nothing matches "${esc(S.q)}". Try a company name or a city.</div>`;
-    else list = `<div class="jobs" id="jobs">${rows.slice(0, 40).map((j) => {
-      const open = S.openId === j.id, isSaved = S.savedJob && S.savedJob.id === j.id;
-      return `<div class="job${open ? " open" : ""}" data-id="${esc(j.id)}" role="button" tabindex="0" aria-expanded="${open}">
-        <div class="t">${esc(niceTitle(j.title))}</div>
-        <div class="co"><span class="lg" aria-hidden="true">${esc(initials(j.company))}</span><span>${esc(j.company)} · ${esc(j.location || "United States")}</span></div>
-        <div class="co" style="margin-top:4px;font-size:12.5px">Found ${esc(ago(j.first_seen))} on ${esc(j.company)}'s own job board</div>
-        <div class="more">${isSaved ? `<span class="saved">✓ Saved</span>` : `<button class="btn go" type="button" data-save="${esc(j.id)}">Save this job</button>`}
-          <a class="btn" href="${esc(j.url)}" target="_blank" rel="noopener">See the real posting ↗</a></div></div>`; }).join("")}</div>`;
-    $("stage").innerHTML = `<p class="kick">Step 1 of 5</p><h2>Find an internship in your major</h2>
-      <p class="lead">These are real, open internships our robot pulled from each company's own job board. Pick your major, then tap a job and save it.</p>
-      <div class="pills">${majorPills}${moreSel}</div>
-      <input type="search" id="q" placeholder="Filter by company, role or city" value="${esc(S.q)}" aria-label="Filter jobs">
-      ${S.loading || S.err ? "" : `<div class="count">${q ? `${rows.length.toLocaleString()} match "${esc(S.q)}" in the newest ${S.jobs.length}` : `${((S.byField && S.byField[S.major]) || rows.length).toLocaleString()} live ${esc(LABEL[S.major] || "")} internships right now${rows.length > 40 ? " · showing the newest 40" : ""}`}</div>`}
-      ${list}
-      ${S.savedJob ? `<div class="ok" style="margin-top:12px">Saved: ${esc(niceTitle(S.savedJob.title))} at ${esc(S.savedJob.company)}. In the real app it goes into My Season, where you track every application.</div>` : ""}
-      ${navRow(!!S.savedJob)}`;
-    $("stage").querySelectorAll("[data-major]").forEach((b) => b.onclick = () => setMajor(b.dataset.major));
-    $("moreMajor").onchange = (e) => e.target.value && setMajor(e.target.value);
-    const qi = $("q"); qi.oninput = () => { S.q = qi.value; const pos = qi.selectionStart; find(); wireNav(); const n = $("q"); n.focus(); n.setSelectionRange(pos, pos); };
-    if ($("retry")) $("retry").onclick = loadJobs;
-    $("stage").querySelectorAll(".job").forEach((el) => {
-      const open = () => { if (S.openId !== el.dataset.id) { S.openId = el.dataset.id; find(); wireNav(); } };
-      el.onclick = (e) => { if (!e.target.closest("a,button")) open(); };
-      el.onkeydown = (e) => { if ((e.key === "Enter" || e.key === " ") && e.target === el) { e.preventDefault(); open(); } };
-    });
-    $("stage").querySelectorAll("[data-save]").forEach((b) => b.onclick = () => { S.savedJob = S.jobs.find((j) => j.id === b.dataset.save); done("find"); find(); wireNav(); });
-  }
-  function setMajor(k) { S.major = k; S.q = ""; S.openId = null; S.booths = []; S.route = []; try { localStorage.setItem("btp_major", k); } catch {} loadJobs(); }
+  fetch("/api/listings?summary=1").then((r) => r.json()).then((d) => { D.byField = d.byField || {}; D.boards = d.companies || d.boards; }).catch(() => {});
+  const jobsReady = loadJobs();
+  setTimeout(() => { if (!D.radar) fetch("/radar/radar.json").then((r) => r.json()).then((d) => { D.radar = D.radar || d.companies || []; }).catch(() => {}); }, 2500);
+  const coJobs = (co) => D.jobs.filter((j) => j.company === co);
+  const theJob = () => D.job || D.jobs[0] || { id: "x", title: "Mechanical Engineering Intern", company: "Example Co", location: "Richmond, VA", url: "/jobs/", first_seen: new Date().toISOString() };
 
-  // ── 2. Fair ──
-  function fair() {
-    if (!S.booths.length) {
-      const by = new Map(); for (const j of S.jobs) { const c = by.get(j.company) || { company: j.company, n: 0, titles: [], locs: new Set() }; c.n++; const nt = niceTitle(j.title); if (c.titles.length < 3 && !c.titles.includes(nt)) c.titles.push(nt); if (j.state) String(j.state).split(",").forEach((s) => c.locs.add(s)); by.set(j.company, c); }
-      S.booths = [...by.values()].sort((a, b) => b.n - a.n).slice(0, 8).map((c, i) => ({ ...c, locs: [...c.locs].slice(0, 3), booth: 104 + i * 11 }));
-      if (S.savedJob && !S.booths.some((b) => b.company === S.savedJob.company)) S.booths.unshift({ company: S.savedJob.company, n: S.jobs.filter((j) => j.company === S.savedJob.company).length, titles: [niceTitle(S.savedJob.title)], locs: [S.savedJob.state].filter(Boolean), booth: 101 });
-    }
-    const picked = S.route.map((c) => S.booths.find((b) => b.company === c)).filter(Boolean);
-    const first = picked[0];
-    $("stage").innerHTML = `<p class="kick">Step 2 of 5</p><h2>Plan a career fair <span class="ex">Example fair</span></h2>
-      <p class="lead">Pick the companies you want to visit. You get a route and a quick brief on each one, built from their real open roles.</p>
-      ${S.booths.length ? `<div class="booths">${S.booths.map((b) => `<button class="booth" type="button" data-co="${esc(b.company)}" aria-pressed="${S.route.includes(b.company)}"><span class="bn">#${b.booth}</span><span><b>${esc(b.company)}</b><small>${b.n} open ${esc(LABEL[S.major] || "")} internship${b.n === 1 ? "" : "s"}</small></span></button>`).join("")}</div>`
-        : `<div class="note">Pick a major in step 1 first so we know which companies to show.</div>`}
-      ${picked.length ? `<div class="route" aria-label="Your route"><b>Your route:</b>${picked.map((b) => `<span>#${b.booth} ${esc(b.company)}</span>`).join("→")}</div>` : `<p class="note" style="margin-top:12px">Pick at least 2 booths.</p>`}
-      ${first ? `<div class="brief"><h3>Brief: ${esc(first.company)} <span class="ex">Booth #${first.booth}</span></h3>
-        <div class="facts"><div><b>${first.n}</b>open internships</div><div><b>${esc(LABEL[S.major] || "")}</b>your major</div><div><b>${esc(first.locs.join(", ") || "US")}</b>locations</div></div>
-        <div style="font-size:14px;margin-top:6px"><b>Roles they're hiring:</b> ${first.titles.map(esc).join(" · ")}</div>
-        <ul><li>What do interns on this team work on in their first month?</li><li>What made last year's best intern stand out?</li><li>Is there a deadline I should know about for ${esc(first.titles[0] || "this role")}?</li></ul>
-        <div class="note" style="margin-top:10px">Real fairs: Career Fair Mode loads your school's actual company list and booth numbers.</div></div>` : ""}
-      ${navRow(picked.length >= 2)}`;
-    $("stage").querySelectorAll("[data-co]").forEach((b) => b.onclick = () => { const c = b.dataset.co; S.route = S.route.includes(c) ? S.route.filter((x) => x !== c) : [...S.route, c]; if (S.route.length >= 2) done("fair"); fair(); wireNav(); });
-  }
+  // ── chapters ──
+  const CH = [];
+  const ch = (o) => CH.push(o);
 
-  // ── 3. Meet ──
-  function qrHtml() { let seed = 11; const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
-    const fnd = (r, c) => { for (const [r0, c0] of [[0, 0], [0, 14], [14, 0]]) if (r >= r0 && r < r0 + 7 && c >= c0 && c < c0 + 7) { const a = r - r0, b = c - c0; return a === 0 || a === 6 || b === 0 || b === 6 || (a > 1 && a < 5 && b > 1 && b < 5); } return null; };
-    let h = ""; for (let r = 0; r < 21; r++) for (let c = 0; c < 21; c++) { const f = fnd(r, c); h += `<i style="background:${(f === null ? rnd() > .55 : f) ? "#070F1E" : "#fff"}"></i>`; } return h; }
-  function meet() {
-    const cos = S.route.length ? S.route : S.booths.map((b) => b.company).slice(0, 4);
-    if (!S.rec.company) S.rec.company = cos[0] || (S.savedJob && S.savedJob.company) || "";
-    const scanned = S.rec.scanned;
-    $("stage").innerHTML = `<p class="kick">Step 3 of 5</p><h2>Meet a recruiter</h2>
-      <p class="lead">At the booth, your resume is a QR code. They scan it, and you jot a 10-second note so you remember the conversation.</p>
-      <div class="meet">
-        <div><div class="phone"><div class="pt">Scan for my resume</div><div class="qr" aria-label="Example QR code">${qrHtml()}</div><div class="ps">Booth #${esc((S.booths.find((b) => b.company === S.rec.company) || {}).booth || 104)}</div></div>
-          <div class="scan">${scanned ? `<div class="ok">Recruiter scanned it. Your resume opened on their phone, no app needed.</div>` : `<button class="btn go" type="button" id="scanBtn" style="width:100%">Recruiter scans it</button>`}</div></div>
-        <div>
-          <div class="two"><div><label for="rName">Recruiter's name</label><input type="text" id="rName" placeholder="e.g. Jordan" value="${esc(S.rec.name)}" autocomplete="off"></div>
-          <div><label for="rCo">Company</label><select id="rCo">${(cos.length ? cos : [S.rec.company]).filter(Boolean).map((c) => `<option ${c === S.rec.company ? "selected" : ""}>${esc(c)}</option>`).join("")}</select></div></div>
-          <label for="rNote">What you talked about</label>
-          <textarea id="rNote" placeholder="e.g. Team does data center design. Interns own one project. Email her about the spring deadline.">${esc(S.rec.note)}</textarea>
-          <div class="row" style="margin-top:10px"><button class="btn go" type="button" id="saveNote">Save note</button>${S.done.has("meet") ? `<span class="saved">✓ Saved for the follow-up</span>` : ""}</div>
-          <p class="note" style="margin-top:12px">In the real app your QR link is private until you turn it on, and you can kill it any time.</p>
-        </div></div>
-      ${navRow(S.done.has("meet"))}`;
-    if ($("scanBtn")) $("scanBtn").onclick = () => { S.rec.scanned = true; meet(); wireNav(); };
-    $("saveNote").onclick = () => {
-      S.rec.name = $("rName").value.trim() || "Jordan"; S.rec.company = $("rCo").value; S.rec.note = $("rNote").value.trim();
-      done("meet"); meet(); wireNav();
-    };
-  }
+  ch({ key: "find", label: "Find", url: "/jobs", title: "Every internship, straight from the source.",
+    line: "Real, open internships for every major, pulled from 3,000+ companies' own job boards. No reposts, no recruiters.",
+    real: "Live data", steps: [["[data-m]", "Pick a major", "below"], [".job", "Tap an internship"], ["#save", "Save it"]],
+    async mount(v) {
+      v.innerHTML = `<p class="h">Internships</p><p class="sub" id="cnt">Loading live listings…</p>
+        <div class="pills">${MAJORS.map(([k, l]) => `<button class="pill" data-m="${k}" aria-pressed="${k === D.major}">${l}</button>`).join("")}</div>
+        <div class="stack" id="list">${'<div class="skel"></div>'.repeat(3)}</div>`;
+      const draw = () => {
+        const n = D.byField[D.major]; $("cnt").textContent = `${n ? n.toLocaleString() + " live " : ""}${LABEL[D.major]} internships · newest first`;
+        $("list").innerHTML = D.jobs.slice(0, 5).map((j, i) => `<div class="card job fade" style="animation-delay:${i * 60}ms" data-id="${esc(j.id)}">
+          <div class="t">${esc(nice(j.title))}</div><div class="co"><span class="lg">${esc(initials(j.company))}</span>${esc(j.company)} · ${esc(j.location || "US")}</div>
+          <div class="found">Found ${esc(ago(j.first_seen))} on ${esc(j.company)}'s own job board</div></div>`).join("") || `<div class="card">Live jobs didn't load. <a href="/jobs/">Open the jobs page</a></div>`;
+        v.querySelectorAll(".job").forEach((el) => el.onclick = () => {
+          if (el.querySelector(".acts")) return;
+          D.job = D.jobs.find((j) => j.id === el.dataset.id);
+          el.insertAdjacentHTML("beforeend", `<div class="acts fade"><button class="b go" id="save">Save</button><a class="b" href="${esc(D.job.url)}" target="_blank" rel="noopener">Apply on ${esc(D.job.company)}'s site ↗</a></div>`);
+          $("save").onclick = (e) => { e.stopPropagation(); e.target.className = "b on"; e.target.textContent = "✓ Saved to My Season"; };
+        });
+      };
+      await jobsReady; draw();
+      v.querySelectorAll("[data-m]").forEach((b) => b.onclick = async () => { D.major = b.dataset.m; v.querySelectorAll("[data-m]").forEach((x) => x.setAttribute("aria-pressed", x === b)); $("list").innerHTML = '<div class="skel"></div>'.repeat(3); await loadJobs(); D.job = null; draw(); });
+    } });
 
-  // ── 4. Follow up ──
-  function draft() {   // same template the real Career Fair Mode uses (fair/index.html draft())
-    const n = S.rec.name || "Jordan", co = S.rec.company || "the company";
-    const b = S.booths.find((x) => x.company === co);
-    const role = S.savedJob && S.savedJob.company === co ? `the ${niceTitle(S.savedJob.title)} role` : b && b.titles[0] ? `the ${b.titles[0]} role` : `internship opportunities at ${co}`;
-    return `Hi ${n},\n\nThank you for taking the time to talk with me at the career fair today. I really enjoyed learning more about ${co} and ${role}.\n\n[Add one specific thing you two talked about. It's what makes them remember you.]\n\nI'm very interested in interning with your team and would love to hear about next steps. My resume is here for easy reference: [your resume link]\n\nThanks again,\n[Your name]`;
-  }
-  function follow() {
-    const text = draft();
-    $("stage").innerHTML = `<p class="kick">Step 4 of 5</p><h2>Follow up while they still remember you</h2>
-      <p class="lead">You get a reminder to follow up, and the message is already drafted. Add the one detail from your note, then send it yourself.</p>
-      <div class="remind"><span>Reminder: follow up with ${esc(S.rec.name || "Jordan")} at ${esc(S.rec.company || "the company")}</span><span style="white-space:nowrap">Next day</span></div>
-      ${S.rec.note ? `<div class="note" style="margin-bottom:10px"><b>Your note:</b> ${esc(S.rec.note)}</div>` : ""}
-      <div class="mail"><div class="h">To: ${esc(S.rec.name || "Jordan")} (${esc(S.rec.company || "recruiter")})<br>Subject: Great meeting you at the career fair</div><pre id="mailBody">${esc(text)}</pre></div>
-      <div class="row" style="margin-top:12px"><button class="btn go" type="button" id="copyMail">Copy message</button><span class="note" style="flex:1;min-width:200px">This is the same draft Career Fair Mode gives you. Reminders can go straight into your phone's calendar.</span></div>
-      ${navRow(true)}`;
-    done("follow");
-    $("copyMail").onclick = async (e) => { try { await navigator.clipboard.writeText(text); e.target.textContent = "Copied"; } catch { e.target.textContent = "Select the text to copy"; } };
-  }
+  ch({ key: "company", label: "Company pages", url: () => `/c/${theJob().company_id || "company"}`, title: "Know a company before you apply.",
+    line: "Every company gets a page: what they're hiring for right now, where, and when they usually open next season.",
+    real: "Live roles · Radar dates are estimates", steps: [["#follow", "Follow them"]],
+    mount(v) {
+      const j = theJob(), list = coJobs(j.company), states = [...new Set(list.map((x) => x.state).filter(Boolean).join(",").split(",").filter(Boolean))].slice(0, 3);
+      const r = D.radar && D.radar.find((c) => c.id === j.company_id);
+      v.innerHTML = `<div class="card fade"><div class="row" style="gap:12px"><span class="lg big">${esc(initials(j.company))}</span><div style="flex:1"><p class="h" style="margin:0">${esc(j.company)}</p><div class="sub" style="margin:2px 0 0">Internships pulled from ${esc(j.company)}'s own job board</div></div><button class="b" id="follow">+ Follow</button></div>
+        <div class="kv"><div><b>${list.length || 1}</b>open now</div><div><b>${esc(states.join(", ") || j.state || "US")}</b>locations</div>${r && r.typicalNext ? `<div><b>${new Date(r.typicalNext).toLocaleDateString("en-US", { month: "short" })}</b>usually opens <span class="est">estimate</span></div>` : `<div><b>Live</b>re-read every few hours</div>`}</div></div>
+        <div class="stack" style="margin-top:10px">${(list.length ? list : [j]).slice(0, 4).map((x, i) => `<div class="card fade" style="animation-delay:${120 + i * 70}ms"><div class="t" style="font-weight:600;font-size:14px">${esc(nice(x.title))}</div><div class="found">${esc(x.location || "")}</div></div>`).join("")}</div>`;
+      $("follow").onclick = () => { D.followed = true; $("follow").className = "b on"; $("follow").textContent = "✓ Following"; $("follow").insertAdjacentHTML("afterend", ""); };
+    } });
 
-  // ── 5. Tailor ──
-  const SAMPLE = {
-    default: "Alex Rivera · B.S. candidate, Virginia Tech, May 2028 · GPA 3.5\nStudent org treasurer: ran a $12,000 budget in Excel and reported to 40 members each month.\nResearch assistant: cleaned survey data and made charts for a professor's paper.\nCampus job: trained 6 new hires at the dining hall front desk.\nSkills: Excel, PowerPoint, basic Python, public speaking.",
-    mechanical: "Alex Rivera · B.S. Mechanical Engineering, Virginia Tech, May 2028 · GPA 3.5\nFormula SAE: worked on the chassis, modeled parts in SolidWorks.\nMachine shop assistant: ran a manual mill and lathe for student projects.\nStatics and dynamics tutor for 6 students.\nSkills: SolidWorks, MATLAB, Excel, hand calcs.",
-    software: "Alex Rivera · B.S. Computer Science, Virginia Tech, May 2028 · GPA 3.5\nBuilt a class-schedule web app with React and Node, used by 300 students.\nHackathon: made a Python script that sorts club emails.\nTA for intro programming: graded labs for 60 students.\nSkills: Python, JavaScript, React, Git, SQL.",
-    finance: "Alex Rivera · B.S. Finance, Virginia Tech, May 2028 · GPA 3.5\nStudent-managed investment fund: pitched 2 stocks, built DCF models in Excel.\nTreasurer, club soccer: ran a $12,000 budget.\nBank teller (summer): handled cash and helped customers open accounts.\nSkills: Excel, financial modeling, PowerPoint.",
-  };
-  function tailor() {
-    const j = S.savedJob || S.jobs[0];
-    if (!S.tailorResume) S.tailorResume = "";
-    const t = S.tailor;
-    $("stage").innerHTML = `<p class="kick">Step 5 of 5</p><h2>Tailor your resume to that exact job</h2>
-      <p class="lead">${j ? `For <b>${esc(niceTitle(j.title))}</b> at <b>${esc(j.company)}</b>. ` : ""}Paste your resume, or use our example. AI suggests sharper lines that match the job, and it never makes up experience.</p>
-      ${t && t.o ? tailorResult(t.o) : `
-      <label for="tRes">Resume</label>
-      <textarea id="tRes" placeholder="Paste your resume text here">${esc(S.tailorResume)}</textarea>
-      <div class="row" style="margin-top:10px"><button class="btn" type="button" id="useSample">Use an example resume</button><button class="btn go" type="button" id="tGo" ${t && t.busy ? "disabled" : ""}>${t && t.busy ? "Reading the job…" : "Get suggestions"}</button></div>
-      ${t && t.err ? `<div class="note" style="margin-top:10px">${esc(t.err)}</div>` : ""}
-      <p class="note" style="margin-top:12px">Your resume text is sent to our AI only to make these suggestions. It isn't stored.</p>`}
-      ${navRow(S.done.has("tailor"))}`;
-    if ($("useSample")) $("useSample").onclick = () => { $("tRes").value = SAMPLE[S.major] || SAMPLE.default; S.tailorResume = $("tRes").value; };
-    if ($("tGo")) $("tGo").onclick = () => runTailor(j);
-    if ($("tAgain")) $("tAgain").onclick = () => { S.tailor = null; tailor(); wireNav(); };
-  }
+  ch({ key: "alerts", label: "Weekly email", url: "/jobs", title: "New internships come to you.",
+    line: "Pick your major and states once. One email a week, only when there's something new, plus the companies you follow.",
+    real: "Example email with live listings", steps: [["#mailme", "Turn on the weekly email"]],
+    mount(v) {
+      v.innerHTML = `<div class="card row fade" style="justify-content:space-between"><span style="font-size:13.5px;flex:1;min-width:180px"><b>Get these by email.</b> New ${esc(LABEL[D.major])} internships, once a week.</span><button class="b go" id="mailme">Email me weekly</button></div><div id="em"></div>`;
+      $("mailme").onclick = () => {
+        D.alerts = true; $("mailme").className = "b on"; $("mailme").textContent = "✓ Weekly email on";
+        const top = D.jobs.slice(0, 3);
+        $("em").innerHTML = `<div class="mail slidein" style="margin-top:12px"><div class="mh">From: Beat the Pile · weekly <span class="ex">Example</span><br>To: you@school.edu</div>
+          <div class="mb"><b style="font-size:15px">${top.length} new ${esc(LABEL[D.major])} internships this week</b>
+${top.map((j) => `<div class="er"><b>${esc(nice(j.title))}</b><br>${esc(j.company)} · ${esc(j.location || "")}</div>`).join("")}${D.followed ? `<div class="er">+ new jobs from ${esc(theJob().company)}, a company you follow</div>` : ""}</div></div>`;
+      };
+    } });
+
+  const SAMPLE = { mechanical: "Formula SAE: worked on the chassis, modeled parts in SolidWorks.\nMachine shop assistant: ran a manual mill and lathe for student projects.\nStatics tutor for 6 students. Skills: SolidWorks, MATLAB, Excel.",
+    software: "Built a class-schedule web app with React and Node, used by 300 students.\nTA for intro programming: graded labs for 60 students.\nSkills: Python, JavaScript, React, Git, SQL.",
+    finance: "Student-managed investment fund: pitched 2 stocks, built DCF models in Excel.\nTreasurer, club soccer: ran a $12,000 budget.\nBank teller (summer). Skills: Excel, financial modeling.",
+    marketing: "Ran Instagram for a campus club: grew it from 400 to 1,900 followers in a year.\nMade flyers and short videos for 12 events.\nSkills: Canva, CapCut, Excel, writing.",
+    science_health: "Research assistant in a biology lab: ran PCR and logged results.\nHospital volunteer: 120 hours at the front desk.\nSkills: lab safety, Excel, R basics.",
+    civil: "Concrete canoe team: mixed and tested concrete samples.\nSummer job with a paving crew. Skills: AutoCAD, Excel, site safety." };
+  ch({ key: "tailor", label: "Tailor resume", url: "/jobs", title: "Tailor your resume to that exact job.",
+    line: "AI suggests sharper lines that match the posting, and flags what's missing. It only rewords what you've actually done.",
+    real: "Real AI, example resume", steps: [["#tb", "Tap Tailor resume"], ["#tgo", "Get suggestions"]],
+    mount(v) {
+      const j = theJob();
+      v.innerHTML = `<div class="card fade"><div class="t" style="font-weight:600">${esc(nice(j.title))}</div><div class="co"><span class="lg">${esc(initials(j.company))}</span>${esc(j.company)}</div><div class="acts"><span class="b on">✓ Saved</span><button class="b" id="tb">Tailor resume</button></div></div><div id="tl"></div>`;
+      $("tb").onclick = () => {
+        $("tl").innerHTML = `<div class="card fade" style="margin-top:10px"><div style="font-size:12.5px;font-weight:600;margin-bottom:6px">Your resume <span class="ex">Example</span></div><textarea class="res" readonly aria-label="Example resume">${esc(SAMPLE[D.major] || SAMPLE.mechanical)}</textarea><div class="acts"><button class="b go" id="tgo">Get suggestions</button></div></div>`;
+        $("tgo").onclick = () => runTailor(j);
+      };
+    } });
   async function runTailor(j) {
-    const resume = $("tRes").value.trim(); S.tailorResume = resume;
-    if (resume.length < 80) { S.tailor = { err: "Paste a few lines of your resume, or tap \"Use an example resume\"." }; tailor(); wireNav(); return; }
-    if (!j) { S.tailor = { err: "Pick a job in step 1 first." }; tailor(); wireNav(); return; }
-    S.tailor = { busy: true }; tailor(); wireNav();
+    $("tgo").disabled = true; $("tgo").textContent = "Reading the job…";
+    let o = null;
     try {
-      const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ feature: "tailor", input: { resume, role: niceTitle(j.title), company: j.company, location: j.location || "", field: LABEL[S.major] || "" } }) });
-      const d = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(d.error || "AI is busy right now. Try again in a minute.");
-      const m = String(d.text || "").match(/\{[\s\S]*\}/); const o = m ? JSON.parse(m[0]) : null;
-      if (!o) throw new Error("Couldn't read the suggestions. Try again.");
-      S.tailor = { o }; done("tailor"); track("tailor_done", { from: "demo" });
-    } catch (e) { S.tailor = { err: e.message }; }
-    if (STEPS[S.step][0] === "tailor") { tailor(); wireNav(); }
-  }
-  function tailorResult(o) {
-    const li = (a) => (Array.isArray(a) ? a : []).filter(Boolean).map((x) => `<li>${esc(String(x))}</li>`).join("");
-    const rws = (Array.isArray(o.rewrites) ? o.rewrites : []).slice(0, 3).map((r) => `<div class="rw"><div class="b">${esc(r.before || "")}</div><div class="a">${esc(r.after || "")}</div></div>`).join("");
-    const kws = (Array.isArray(o.keywords) ? o.keywords : []).slice(0, 8).map((k) => `<span>${esc(String(k))}</span>`).join("");
-    return `<div class="res">${o.fit ? `<div style="font-size:15px;line-height:1.5"><b>Fit:</b> ${esc(o.fit)}</div>` : ""}
-      ${rws ? `<div><h4>Sharper lines</h4>${rws}<div class="note" style="margin-top:6px">Fill any [brackets] with real numbers, or leave them out.</div></div>` : ""}
-      ${kws ? `<div><h4>Words from the job you can honestly use</h4><div class="kw">${kws}</div></div>` : ""}
-      ${li(o.gaps) ? `<div><h4>What they want that the resume doesn't show</h4><ul>${li(o.gaps)}</ul></div>` : ""}
-      <div class="row"><button class="btn" type="button" id="tAgain">Try another resume</button><span class="note">Real AI result. Check every line is true before you use it.</span></div></div>`;
+      const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ feature: "tailor", input: { resume: SAMPLE[D.major] || SAMPLE.mechanical, role: nice(j.title), company: j.company, location: j.location || "", field: LABEL[D.major] } }) });
+      const d = await r.json(); const m = String(d.text || "").match(/\{[\s\S]*\}/); o = m ? JSON.parse(m[0]) : null;
+    } catch {}
+    const real = !!o;
+    if (!o) o = { fit: "Good base: hands-on build work lines up with this role.", rewrites: [{ before: "Formula SAE: worked on the chassis, modeled parts in SolidWorks.", after: "Modeled Formula SAE chassis parts in SolidWorks and checked fit before machining." }], keywords: ["SolidWorks", "CAD", "machining"], gaps: ["If the posting asks for GD&T, add it only if you've used it."] };
+    D.tailored = true;
+    const rw = (o.rewrites || []).slice(0, 2).map((r) => `<div class="rw"><div class="bf">${esc(r.before)}</div><div class="af">${esc(r.after)}</div></div>`).join("");
+    $("tl").innerHTML = `<div class="card fade" style="margin-top:10px;display:grid;gap:10px">${o.fit ? `<div style="font-size:13.5px"><b>Fit:</b> ${esc(o.fit)}</div>` : ""}${rw}
+      <div class="kw">${(o.keywords || []).slice(0, 6).map((k) => `<span>${esc(k)}</span>`).join("")}</div>
+      ${(o.gaps || [])[0] ? `<div style="font-size:12.5px;color:var(--amber);background:var(--amber-light);border-radius:8px;padding:7px 9px">${esc(o.gaps[0])}</div>` : ""}
+      <div style="font-size:11.5px;color:var(--faint)">${real ? "Live AI result on this real job." : "Example result (AI was busy)."} Always check every line is true.</div></div>`;
+    $("view").scrollTop = 9999; engine.advance();
   }
 
-  // ── 6. Finish ──
-  function finish() {
-    done("finish");
-    const m = encodeURIComponent(S.major);
-    $("stage").innerHTML = `<p class="kick">That's the whole season</p><h2>You just did in 2 minutes what usually takes 30 tabs</h2>
-      <p class="lead">Everything you tried is free on the real site. Signing in saves your jobs, fair notes and follow-ups across devices.</p>
-      <div class="donegrid">
-        <div class="dcard"><b>${S.done.has("find") ? "✓ " : ""}Find internships</b>${((S.byField && S.byField[S.major]) || S.jobs.length || 0).toLocaleString()} live ${esc(LABEL[S.major] || "")} internships, plus a weekly email of new ones. <a href="/jobs/?major=${m}">Open Jobs →</a></div>
-        <div class="dcard"><b>${S.done.has("fair") ? "✓ " : ""}Career Fair Mode</b>Your school's real company list, booth route and briefs. <a href="/fair/">Open Career Fair Mode →</a></div>
-        <div class="dcard"><b>${S.done.has("meet") ? "✓ " : ""}Resume QR + recruiter notes</b>Private until you turn it on. <a href="/fair/">Set up your QR →</a></div>
-        <div class="dcard"><b>${S.done.has("follow") ? "✓ " : ""}Follow-ups</b>Drafts after every fair, reminders in your calendar, and application follow-ups tracked in My Season. <a href="/season/">Open My Season →</a></div>
-        <div class="dcard"><b>${S.done.has("tailor") ? "✓ " : ""}Tailor your resume</b>On every job card. <a href="/jobs/?major=${m}">Pick a job →</a></div>
-        <div class="dcard"><b>Practice the interview</b>Out loud, on a timer, with a grade. <a href="/#interview">Practice →</a></div>
-      </div>
-      <div class="cta"><a class="btn go" href="/jobs/?major=${m}">Start for real, free →</a><a class="btn" href="/demo/story/">Watch the 90-second story</a><button class="btn" type="button" id="restart">Start the demo over</button></div>`;
-    $("restart").onclick = () => { S.done.clear(); S.savedJob = null; S.route = []; S.rec = { name: "", company: "", note: "" }; S.tailor = null; S.openId = null; go(0); };
-  }
+  ch({ key: "fair", label: "Fair route", url: "/fair", title: "Walk into a career fair with a plan.",
+    line: "Pick the companies you want. Get a route through the booths and a quick brief on each, built from their real open roles.",
+    real: "Real companies · example fair layout", steps: [[".booth", "Tap a booth"], [".booth:not(.pick)", "Add one more"]],
+    mount(v) {
+      const by = new Map(); D.jobs.forEach((j) => by.set(j.company, (by.get(j.company) || 0) + 1));
+      const cos = [...by.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+      D.route = [];
+      v.innerHTML = `<p class="h">Spring career fair <span class="ex">Example floor</span></p><p class="sub">Tap the booths you want to hit.</p>
+        <div class="floor">${cos.map(([c, n], i) => `<button class="booth fade" style="animation-delay:${i * 50}ms" data-c="${esc(c)}"><span class="bn">#${104 + i * 11}</span><b>${esc(c)}</b><small>${n} open</small></button>`).join("")}</div><div id="brief"></div>`;
+      v.querySelectorAll(".booth").forEach((b) => b.onclick = () => {
+        if (b.classList.contains("pick")) return;
+        D.route.push(b.dataset.c); b.classList.add("pick"); b.insertAdjacentHTML("beforeend", `<span class="ord">${D.route.length}</span>`);
+        const c = D.route[0], roles = [...new Set(coJobs(c).map((x) => nice(x.title)))].slice(0, 2);
+        $("brief").innerHTML = `<div class="card fade" style="margin-top:12px"><div style="font-weight:600;font-size:14px">Route: ${D.route.map(esc).join(" → ")}</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:6px"><b style="color:var(--ink)">Brief: ${esc(c)}</b> · hiring ${roles.map(esc).join(", ")}</div>
+          <div style="font-size:13px;margin-top:6px">Ask: "What do interns on this team work on in their first month?"</div></div>`;
+      });
+    } });
 
-  render(); loadJobs();
+  function qr() { let s = 11; const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+    const f = (r, c) => { for (const [r0, c0] of [[0, 0], [0, 14], [14, 0]]) if (r >= r0 && r < r0 + 7 && c >= c0 && c < c0 + 7) { const a = r - r0, b = c - c0; return a === 0 || a === 6 || b === 0 || b === 6 || (a > 1 && a < 5 && b > 1 && b < 5); } return null; };
+    let h = ""; for (let r = 0; r < 21; r++) for (let c = 0; c < 21; c++) { const x = f(r, c); h += `<i style="background:${(x === null ? rnd() > .55 : x) ? "#070F1E" : "#fff"}"></i>`; } return h; }
+  ch({ key: "meet", label: "QR + notes", url: "/fair", title: "Your resume is a QR code.",
+    line: "Recruiters scan it, no app needed. Then jot a 10-second note so you remember the conversation. Private until you turn it on.",
+    real: "Example", steps: [["#scan", "Let the recruiter scan"], ["#note", "Save a quick note"]],
+    mount(v) {
+      const c = D.route[0] || theJob().company;
+      v.innerHTML = `<div class="row" style="align-items:flex-start;gap:16px;justify-content:center">
+        <div class="phone fade"><div style="font-weight:600;font-size:13px">Scan for my resume</div><div class="qr" aria-label="Example QR code">${qr()}</div><div style="font-size:11px;color:var(--muted)">Booth · ${esc(c)}</div></div>
+        <div style="flex:1;min-width:220px;display:grid;gap:8px"><button class="b go" id="scan">Recruiter scans it</button><div id="sc"></div></div></div>`;
+      $("scan").onclick = () => {
+        $("scan").className = "b on"; $("scan").textContent = "✓ Opened on their phone";
+        $("sc").innerHTML = `<div class="card fade"><div style="font-size:12px;color:var(--muted)">Recruiter</div><div style="font-weight:600">${esc(D.rec)} · ${esc(c)}</div><div style="font-size:12px;color:var(--muted);margin-top:8px">Your note</div><div id="nt" style="font-size:13.5px;min-height:38px"></div><div class="acts"><button class="b" id="note">Save note</button></div></div>`;
+        typeInto($("nt"), "Team does data center design. Interns own one project. Follow up about spring.");
+        $("note").onclick = () => { $("note").className = "b on"; $("note").textContent = "✓ Saved for your follow-up"; };
+      };
+    } });
+  async function typeInto(el, text) { if (reduce) { el.textContent = text; return; } for (let i = 1; i <= text.length; i++) { el.textContent = text.slice(0, i); await sleep(18); } }
+
+  ch({ key: "follow", label: "Follow-up", url: "/fair", title: "Follow up while they still remember you.",
+    line: "A reminder the next day, with the email already drafted. Add one detail from your note and send it yourself.",
+    real: "Same draft Career Fair Mode gives you", steps: [[".notif", "Open the reminder"]],
+    mount(v) {
+      const c = D.route[0] || theJob().company;
+      v.innerHTML = `<div class="row" style="align-items:flex-start;gap:16px;justify-content:center"><div class="phone dark fade"><div class="clock">9:41</div><div class="date">Tomorrow</div>
+        <div class="notif" id="nf"><b>BEAT THE PILE · now</b>Follow up with ${esc(D.rec)} at ${esc(c)} today. Your email is drafted.</div></div><div id="dr" style="flex:1;min-width:240px"></div></div>`;
+      $("nf").onclick = () => {
+        $("dr").innerHTML = `<div class="mail slidein"><div class="mh">To: ${esc(D.rec)} (${esc(c)})<br>Subject: Great meeting you at the career fair</div><div class="mb">Hi ${esc(D.rec)},
+
+Thank you for taking the time to talk with me at the career fair. I really enjoyed learning more about ${esc(c)}.
+
+<span style="background:var(--amber-light);color:var(--amber);border-radius:4px;padding:0 3px">[Add one thing you talked about: data center design, one project per intern]</span>
+
+I'd love to hear about next steps. My resume is linked here.
+
+Thanks again,
+[Your name]</div></div>`;
+      };
+    } });
+
+  ch({ key: "season", label: "My Season", url: "/season", title: "Your whole season, organized.",
+    line: "Every job you save and apply to, in one place. A weekly goal keeps you moving, and it tracks how fast you apply.",
+    real: "Your saved job + example entries", steps: [["#applied", "Mark it applied"]],
+    mount(v) {
+      const j = theJob();
+      v.innerHTML = `<div class="row" style="justify-content:space-between;margin-bottom:10px"><div><p class="h" style="margin:0">My Season</p><div class="sub" style="margin:2px 0 0">This week's goal</div></div><div class="ring" id="ring" style="--p:40"><i id="ringn">2/5</i></div></div>
+        <div class="kan"><div class="col"><h4>Saved <span>1</span></h4><div class="kc fade" id="kj"><b>${esc(nice(j.title))}</b>${esc(j.company)}<br><button class="b go" id="applied">Mark applied</button></div></div>
+        <div class="col" id="colA"><h4>Applied <span id="na">2</span></h4><div class="kc"><b>Design Intern</b>Example Co <span class="ex">Example</span></div><div class="kc"><b>Field Engineering Co-op</b>Example Inc <span class="ex">Example</span></div></div>
+        <div class="col"><h4>Interview <span>1</span></h4><div class="kc"><b>Project Intern</b>Example Group <span class="ex">Example</span></div></div></div>`;
+      $("applied").onclick = () => {
+        const k = $("kj"); k.querySelector("button").remove(); k.insertAdjacentHTML("beforeend", `<div style="color:var(--green-dark);font-weight:600;margin-top:4px">Early bird: applied fast</div>`);
+        $("colA").insertBefore(k, $("colA").children[1]); k.classList.remove("fade"); void k.offsetWidth; k.classList.add("fade");
+        $("na").textContent = "3"; $("ring").style.setProperty("--p", 60); $("ringn").textContent = "3/5";
+      };
+    } });
+
+  ch({ key: "radar", label: "Opening Radar", url: "/radar", title: "Know when applications open.",
+    line: "We track when each company opened in past seasons, so you can be first in line. Get a reminder a week before.",
+    real: "Real history · dates are estimates", steps: [["[data-rm]", "Remind me"]],
+    async mount(v) {
+      v.innerHTML = `<p class="h">Opening Radar</p><p class="sub">Not open yet · based on past seasons</p><div class="stack radar" id="rl">${'<div class="skel"></div>'.repeat(3)}</div>`;
+      if (!D.radar) { try { D.radar = (await (await fetch("/radar/radar.json")).json()).companies || []; } catch { D.radar = []; } }
+      const now = Date.now();
+      const pick = D.radar.filter((c) => c.seasons >= 2 && c.confidence !== "low" && c.typicalNext && Date.parse(c.typicalNext) > now && !c.openedNext).sort((a, b) => Date.parse(a.typicalNext) - Date.parse(b.typicalNext)).slice(0, 4);
+      $("rl").innerHTML = pick.map((c, i) => `<div class="card fade" style="animation-delay:${i * 70}ms"><div><b style="font-size:14px">${esc(c.name.trim())}</b><br><small>Usually opens around ${new Date(c.typicalNext).toLocaleDateString("en-US", { month: "short", day: "numeric" })} <span class="est">estimate</span> · ${c.seasons} seasons of data</small></div><button class="b" data-rm="${i}">Remind me</button></div>`).join("") || `<div class="card">Radar data didn't load. <a href="/radar/">Open Opening Radar</a></div>`;
+      v.querySelectorAll("[data-rm]").forEach((b) => b.onclick = () => { b.className = "b on"; b.textContent = "✓ A week before"; });
+    } });
+
+  ch({ key: "interview", label: "Interview practice", url: "/#interview", title: "Practice the interview out loud.",
+    line: "Real interview questions, a timer like the real thing, and a grade on every answer: relevance, structure, specifics, delivery.",
+    real: "Example round", steps: [["#ans", "Start answering"]],
+    mount(v) {
+      const j = theJob();
+      v.innerHTML = `<div class="card fade"><div style="font-size:12px;color:var(--muted)">Question 2 of 5 · ${esc(j.company)}</div><div style="font-weight:600;font-size:16px;margin:6px 0 12px">"Tell me about a time something you built didn't work the first time."</div>
+        <div class="row" style="gap:16px"><div class="timer" id="tm" style="--p:0"><span id="tt">1:30</span></div><div style="flex:1;min-width:160px;font-size:13px;color:var(--muted)">You answer out loud. It listens and transcribes.</div></div><div class="acts"><button class="b go" id="ans">Start answering</button></div></div><div id="gr"></div>`;
+      $("ans").onclick = async () => {
+        $("ans").className = "b on"; $("ans").textContent = "Listening…";
+        for (let s = 0; s <= 72; s += 6) { $("tm").style.setProperty("--p", s / 90 * 100); const l = 90 - s; $("tt").textContent = `${Math.floor(l / 60)}:${String(l % 60).padStart(2, "0")}`; await sleep(reduce ? 0 : 90); }
+        $("ans").textContent = "✓ Answer done";
+        $("gr").innerHTML = `<div class="card fade" style="margin-top:10px"><div class="gr"><div class="grade">B+</div><div class="bars">${[["Relevance", 4], ["Structure", 4], ["Specifics", 3], ["Delivery", 4]].map(([k, n]) => `<div><span>${k}</span><s><i data-w="${n * 20}"></i></s><span>${n}/5</span></div>`).join("")}</div></div>
+          <div style="font-size:12.5px;color:var(--muted);margin-top:8px">Tip: name the number. How much lighter, faster or cheaper did the fix make it? <span class="ex">Example</span></div></div>`;
+        await sleep(30); $("gr").querySelectorAll("[data-w]").forEach((i) => i.style.width = i.dataset.w + "%");
+      };
+    } });
+
+  ch({ key: "profile", label: "Profile", url: "/u/you", title: "A profile recruiters can actually find.",
+    line: "Your photo, experience, projects and skills on one clean page. Private until you turn it on, then share it with one tap.",
+    real: "Example profile", steps: [["#share", "Share your profile"]],
+    mount(v) {
+      v.innerHTML = `<div class="card prof fade"><div class="band"></div><div class="row" style="justify-content:space-between;align-items:flex-end"><div class="av">AR</div><div class="row"><button class="b" id="share">Share</button></div></div>
+        <div style="font-weight:700;font-size:17px;margin-top:6px">Alex Rivera <span class="ex">Example</span></div><div style="font-size:13px;color:var(--muted)">${esc(LABEL[D.major])} · Virginia Tech · 2028</div>
+        <div style="font-size:13px;margin-top:10px"><b>Experience</b><br>Formula SAE · chassis team<br>Machine shop assistant</div>
+        <div class="chips" style="margin-top:10px"><span>SolidWorks</span><span>MATLAB</span><span>Excel</span></div>
+        <div id="sh" style="font-size:12.5px;color:var(--muted);margin-top:10px">Private · only you can see this</div></div>`;
+      $("share").onclick = () => { $("share").className = "b on"; $("share").textContent = "✓ Link copied"; $("sh").innerHTML = `<span style="color:var(--green-dark);font-weight:600">Public · beatthepile.com/u/alex-rivera</span>`; };
+    } });
+
+  ch({ key: "finale", label: "Start", url: "/", title: "That's Beat the Pile.",
+    line: "Everything you just tried is free on the real site. Start with your major, or open any feature below.",
+    real: "", steps: [],
+    mount(v) {
+      const F = [["Live internships", "/jobs/?major=" + D.major, "Every major, from company job boards"], ["Company pages", "/jobs/", "Roles, locations, opening dates"], ["Weekly email", "/jobs/", "New jobs, once a week"],
+        ["Tailor resume", "/jobs/", "On every job card"], ["Career Fair Mode", "/fair/", "Route, briefs, QR, notes"], ["Follow-ups", "/fair/", "Reminders + drafts"],
+        ["My Season", "/season/", "Pipeline + weekly goal"], ["Opening Radar", "/radar/", "When companies open"], ["Interview practice", "/#interview", "Out loud, graded"], ["Profile", "/u/", "Share one link"]];
+      v.innerHTML = `<div class="finale">${F.map(([t, h, s], i) => `<a class="fz fade" style="animation-delay:${i * 45}ms" href="${h}"><b>${t}</b>${s}</a>`).join("")}</div>
+        <div class="acts" style="margin-top:14px;justify-content:center"><a class="b go" href="/jobs/?major=${D.major}" style="padding:12px 22px;font-size:15px">Start free →</a><button class="b" id="again">Replay the tour</button></div>`;
+      $("again").onclick = () => engine.go(0);
+    } });
+
+  // ── engine: chapters, spotlight, autoplay ──
+  const engine = { i: 0, step: 0, auto: false, done: new Set(), token: 0 };
+  const view = $("view"), win = $("win");
+  const spot = document.createElement("div"); spot.className = "spot"; const tip = document.createElement("div"); tip.className = "tip";
+  const cur = document.createElement("div"); cur.className = "cursor"; cur.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 2l15 9-7 1.5L8 20z" fill="#fff" stroke="#070F1E" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+  win.append(spot, tip, cur);
+  function rail() {
+    $("rail").innerHTML = CH.map((c, k) => `<button class="chip ${engine.done.has(c.key) ? "done" : ""}" type="button" data-k="${k}" ${k === engine.i ? 'aria-current="step"' : ""}><i>${engine.done.has(c.key) ? "✓" : k + 1}</i>${c.label}</button>`).join("");
+    $("rail").querySelectorAll("[data-k]").forEach((b) => b.onclick = () => { stopAuto(); engine.go(+b.dataset.k); });
+    const on = $("rail").querySelector('[aria-current="step"]'); if (on) on.scrollIntoView({ inline: "center", block: "nearest", behavior: reduce ? "auto" : "smooth" });
+    $("meter").style.width = (engine.i / (CH.length - 1) * 100) + "%";
+  }
+  function copy(c) {
+    const words = c.title.split(" ").map((w, k) => `<span class="w" style="transition-delay:${k * 55}ms">${esc(w)}</span>`).join(" ");
+    $("copy").className = "copy";
+    $("copy").innerHTML = `<div class="num">${String(engine.i + 1).padStart(2, "0")} / ${CH.length}${c.real ? ` · ${esc(c.real)}` : ""}</div><h1>${words}</h1><p>${esc(c.line)}</p>
+      ${c.steps.length ? `<div class="todo" id="todo"><span class="dot"></span><span id="todoT"></span></div>` : ""}`;
+    requestAnimationFrame(() => requestAnimationFrame(() => { $("copy").classList.add("in"); $("copy").querySelector("h1").classList.add("in"); }));
+  }
+  function place(el, label, below) {
+    const w = win.getBoundingClientRect(), r = el.getBoundingClientRect();
+    if (r.bottom > view.getBoundingClientRect().bottom || r.top < view.getBoundingClientRect().top) el.scrollIntoView({ block: "center", behavior: "auto" });
+    const r2 = el.getBoundingClientRect();
+    Object.assign(spot.style, { left: r2.left - w.left - 5 + "px", top: r2.top - w.top - 5 + "px", width: r2.width + 10 + "px", height: r2.height + 10 + "px" });
+    spot.classList.add("on");
+    tip.textContent = label; tip.classList.toggle("below", !!below);
+    const tw = Math.min(220, label.length * 7.4 + 24);
+    tip.style.left = Math.max(8, Math.min(w.width - tw - 8, r2.left - w.left)) + "px";
+    tip.style.top = (below ? r2.bottom - w.top + 12 : r2.top - w.top - 40) + "px";
+    tip.classList.add("on");
+  }
+  function hideSpot() { spot.classList.remove("on"); tip.classList.remove("on"); }
+  function target() { const s = CH[engine.i].steps[engine.step]; return s ? [view.querySelector(s[0]), s] : [null, null]; }
+  async function showStep() {
+    const t = engine.token, c = CH[engine.i];
+    if (engine.step >= c.steps.length) return complete();
+    let el, s; for (let k = 0; k < 60; k++) { [el, s] = target(); if (el || t !== engine.token) break; await sleep(100); }
+    if (t !== engine.token) return;
+    if (!el) { hideSpot(); return complete(true); }
+    if ($("todoT")) $("todoT").textContent = s[1];
+    place(el, s[1], s[2] === "below");
+    if (engine.auto) autoClick(el, t);
+  }
+  view.addEventListener("click", (e) => {
+    const s = CH[engine.i].steps[engine.step]; if (!s) return;
+    const hit = e.target.closest && e.target.closest(s[0]);
+    if (hit && view.contains(hit)) {
+      if (s[0] === "#tgo") { engine.step++; hideSpot(); return; }   // tailor advances when the AI answers
+      engine.step++; hideSpot(); setTimeout(showStep, 380);
+    }
+  }, true);
+  engine.advance = () => { if (CH[engine.i].key === "tailor") setTimeout(showStep, 200); };
+  addEventListener("resize", () => { const [el, s] = target(); if (el && spot.classList.contains("on")) place(el, s[1], s[2] === "below"); });
+  view.addEventListener("scroll", () => { const [el, s] = target(); if (el && spot.classList.contains("on")) place(el, s[1], s[2] === "below"); });
+  async function complete(skipped) {
+    const c = CH[engine.i]; const t = engine.token;
+    if (!skipped && !engine.done.has(c.key)) { engine.done.add(c.key); track("demo_chapter", { chapter: c.key, auto: engine.auto }); }
+    rail();
+    if ($("todo")) { $("todo").classList.add("ok"); $("todoT").textContent = "Done"; }
+    if (c.steps.length && !skipped) { const b = document.createElement("div"); b.className = "burst"; b.innerHTML = `<span>${esc(c.label)}</span>`; win.append(b); setTimeout(() => b.remove(), 950); }
+    $("next").classList.remove("wait");
+    if (engine.auto && engine.i < CH.length - 1) { await sleep(2300); if (engine.auto && t === engine.token) engine.go(engine.i + 1); }
+  }
+  async function autoClick(el, t) {
+    await sleep(900); if (!engine.auto || t !== engine.token) return;
+    const w = win.getBoundingClientRect(), r = el.getBoundingClientRect();
+    cur.classList.add("on"); cur.style.left = r.left - w.left + Math.min(r.width / 2, 60) + "px"; cur.style.top = r.top - w.top + r.height / 2 + "px";
+    await sleep(800); if (!engine.auto || t !== engine.token) return;
+    const rp = document.createElement("div"); rp.className = "ripple"; rp.style.left = cur.style.left; rp.style.top = cur.style.top; win.append(rp); setTimeout(() => rp.remove(), 600);
+    el.click();
+  }
+  engine.go = async (k) => {
+    engine.token++; const t = engine.token;
+    engine.i = Math.max(0, Math.min(CH.length - 1, k)); engine.step = 0; hideSpot();
+    const c = CH[engine.i];
+    win.classList.add("out"); await sleep(reduce ? 0 : 260); if (t !== engine.token) return;
+    $("url").innerHTML = `beatthepile.com<b>${esc(typeof c.url === "function" ? c.url() : c.url)}</b>`;
+    view.scrollTop = 0; copy(c); rail();
+    $("back").disabled = engine.i === 0; $("next").textContent = engine.i === CH.length - 1 ? "Start free →" : "Next →";
+    $("next").classList.toggle("wait", c.steps.length > 0 && !engine.done.has(c.key));
+    await c.mount(view); if (t !== engine.token) return;
+    win.classList.remove("out");
+    if (!c.steps.length) { if (!engine.done.has(c.key)) engine.done.add(c.key); rail(); stopAuto(); return; }
+    await sleep(reduce ? 0 : 650); if (t === engine.token) showStep();
+  };
+  function stopAuto() { engine.auto = false; cur.classList.remove("on"); $("auto").innerHTML = `<span class="pl"></span> Watch it`; }
+  $("auto").onclick = () => {
+    if (engine.auto) return stopAuto();
+    engine.auto = true; $("auto").innerHTML = `<span class="pa"></span> Pause`; track("demo_autoplay", {});
+    const [el] = target(); if (el) autoClick(el, engine.token); else if (engine.done.has(CH[engine.i].key) || !CH[engine.i].steps.length) engine.go(engine.i + 1);
+  };
+  $("next").onclick = () => { if (engine.i === CH.length - 1) { location.href = "/jobs/?major=" + D.major; return; } engine.go(engine.i + 1); };
+  $("back").onclick = () => { stopAuto(); engine.go(engine.i - 1); };
+  view.addEventListener("pointerdown", (e) => { if (engine.auto && e.isTrusted) stopAuto(); });
+  addEventListener("keydown", (e) => { if (e.target.closest("input,textarea")) return; if (e.key === "ArrowRight") $("next").click(); if (e.key === "ArrowLeft") $("back").click(); });
+  try { const m = localStorage.getItem("btp_major"); if (LABEL[m]) D.major = m; } catch {}
+  engine.go(0);
 })();
 </script>
 <script src="/nav.js" defer></script>
