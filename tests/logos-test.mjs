@@ -31,6 +31,8 @@ assert.equal(P({ html: page("Welcome", "About Acme Robotics"), finalUrl: "https:
 assert.equal(P({ html: page("Home", '<a href="https://boards.greenhouse.io/acmebot">Careers</a>'), finalUrl: "https://acme.io/", cand: { domain: "acme.io", kind: "guess" }, company: "Acme Robotics", ats: "greenhouse", config: { token: "acmebot" } }), "links to their job board");
 assert.equal(P({ html: page("Acme Robotics jobs"), finalUrl: "https://acme.wd1.myworkdayjobs.com/", cand: { domain: "myworkdayjobs.com", kind: "board" }, company: "Acme Robotics" }), null, "never the job board's own site");
 assert.equal(P({ html: page("Apex Clean Energy"), finalUrl: "https://apex.com/", cand: { domain: "apex.com", kind: "guess" }, company: "Apex Systems" }), null, "a different company with the same first word is rejected");
+assert.equal(P({ html: page("Wood | Home"), finalUrl: "https://wood.com/", cand: { domain: "wood.com", kind: "guess" }, company: "Wood" }), null, "short one-word guesses need their own job-board link");
+assert.equal(P({ html: page("Home", '<a href="https://boards.greenhouse.io/woodco">Jobs</a>'), finalUrl: "https://woodco.com/", cand: { domain: "woodco.com", kind: "guess" }, company: "Wood", ats: "greenhouse", config: { token: "woodco" } }), "links to their job board");
 console.log("✓ proof: title / own job-board link / board-on-site; redirects, look-alikes and ATS hosts rejected");
 
 // ── icons ──
