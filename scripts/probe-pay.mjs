@@ -16,7 +16,7 @@ async function urls(p) {
 const UA = { "User-Agent": "Mozilla/5.0 (compatible; BeatThePileBot/1.0; +https://www.beatthepile.com/)" };
 const pay = [...new Set((await urls("com,paylocity,recruiting)/")).map((u) => (u.match(/jobs\/(?:All|List)\/([0-9a-f-]{36})/i) || [])[1]).filter(Boolean).map((x) => x.toLowerCase()))];
 console.log("paylocity guids", pay.length);
-for (const g of pay.slice(0, 6)) {
+for (const g of pay.slice(0, 0)) {
   try { const h = await (await fetch(`https://recruiting.paylocity.com/recruiting/jobs/All/${g}`, { headers: UA })).text();
     const m = h.match(/window\.pageData\s*=\s*(\{.*?\});\s*(?:\n|<\/script>)/s); const d = m ? JSON.parse(m[1]) : {};
     const j0 = (d.Jobs || [])[0] || {};
@@ -26,9 +26,17 @@ for (const g of pay.slice(0, 6)) {
 }
 const ukg = [...new Set((await urls("com,ultipro,")).map((u) => (u.match(/(recruiting2?\.ultipro\.com\/[A-Z0-9]+\/JobBoard\/[0-9a-f-]{36})/i) || [])[1]).filter(Boolean))];
 console.log("ukg boards", ukg.length);
-for (const b of ukg.slice(0, 6)) {
+for (const b of ukg.slice(0, 0)) {
   try { const h = await (await fetch(`https://${b}/`, { headers: UA })).text();
     console.log("UKG", b, "| title:", (h.match(/<title>([^<]*)/) || [])[1]?.trim(), "| company?", (h.match(/"CompanyName"\s*:\s*"([^"]+)"|companyName\s*[:=]\s*["']([^"']+)/i) || []).slice(1).join(""), "| links:", (h.match(/href="(https?:\/\/(?![^"]*(ultipro|ukg))[^"]+)"/gi) || []).slice(0, 4).join(" "));
   } catch (e) { console.log("UKG", b, "ERR", e.message); }
 }
+for (const g of pay.slice(10, 22)) { try { const h = await (await fetch(`https://recruiting.paylocity.com/recruiting/jobs/All/${g}`, { headers: UA })).text(); const m = h.match(/window\.pageData\s*=\s*(\{.*?\});\s*(?:\n|<\/script>)/s); const d = m ? JSON.parse(m[1]) : {};
+  console.log("PAY2", (h.match(/<title>([^<]*)/) || [])[1], "| LogoHref:", d.LogoHref, "| ModuleTitle:", d.ModuleTitle, "| jobs:", (d.Jobs || []).length, "| interns:", (d.Jobs || []).filter((j) => /intern|co-?op/i.test(j.JobTitle)).length); } catch (e) { console.log("PAY2 ERR", e.message); } }
+for (const b of ukg.slice(6, 14)) { try { const h = await (await fetch(`https://${b}/`, { headers: UA })).text();
+  const t = h.match(/<title[^>]*>([\s\S]{0,200}?)<\/title>/i); const og = h.match(/<meta[^>]+(og:title|og:site_name|application-name)[^>]+>/gi);
+  const ext = [...h.matchAll(/<a[^>]+href="(https?:\/\/(?![^"]*(ultipro|ukg|mozilla|google|microsoft|arcgis))[^"]+)"[^>]*>([\s\S]{0,200}?)<\/a>/gi)].slice(0, 2).map((m) => m[1] + " ⟶ " + m[3].replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim().slice(0, 60));
+  const nm = h.match(/(CompanyName|companyName|TenantName|"Name")\s*["']?\s*[:=]\s*["']([^"']{2,80})/); const imgalt = h.match(/<img[^>]+alt="([^"]{2,80})"/i);
+  console.log("UKG2", b.split("/")[1], "| title:", t && t[1].replace(/\s+/g, " ").trim(), "| og:", (og || []).join(" ").slice(0, 150), "| name:", nm && nm[2], "| img alt:", imgalt && imgalt[1], "| ext:", ext.join(" ; "));
+} catch (e) { console.log("UKG2 ERR", e.message); } }
 console.log("PROBE_RESULT done");
