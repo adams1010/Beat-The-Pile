@@ -1,0 +1,10 @@
+const { latestCrawls, enumerate, scout } = await import(process.cwd() + "/lib/scout.js");
+const crawls = await latestCrawls(2);
+const all = await enumerate(crawls, ["paylocity", "ukg"]);
+const by = {}; for (const [, b] of all) by[b.ats] = (by[b.ats] || 0) + 1; console.log("boards", JSON.stringify(by));
+const pick = new Map([...all].filter(([, b]) => b.ats === "paylocity").slice(0, 600).concat([...all].filter(([, b]) => b.ats === "ukg").slice(0, 400)));
+const t0 = Date.now();
+const { found, checked } = await scout(pick, { concurrency: 14, deadline: t0 + 5.5 * 6e4 });
+console.log("probed", checked.length, "found", found.length, Math.round((Date.now() - t0) / 1000) + "s");
+for (const f of found) console.log("FOUND", f.ats, "|", f.company, "|", f.domain, "|", f.interns, "interns |", f.sample[0]);
+console.log("PROBE_RESULT", found.length);
