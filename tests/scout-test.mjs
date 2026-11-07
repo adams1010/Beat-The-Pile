@@ -74,3 +74,4 @@ console.log("\nSCOUT TESTS PASSED");
 { const { cleanName } = await import("../lib/scout.js");
   for (const [a, b] of [["Work at Simmons", "Simmons"], ["Join the Imagine team!", "Imagine"], ["Fenner Drives Portal", "Fenner Drives"]]) assert.equal(cleanName(a), b);
   console.log("✓ board titles like 'Work at X' / 'X Portal' → X"); }
+{ const { cleanName } = await import("../lib/scout.js"); assert.equal(cleanName("YellaWood&reg; Pressure Treated Pine"), "YellaWood"); console.log("✓ ® / ™ taglines dropped"); }
