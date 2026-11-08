@@ -21,6 +21,7 @@
 //   POST /api/me { action:"remind", on }            → email me when a follow-up is due (needs RESEND_API_KEY on the server)
 //   POST /api/me { action:"alerts", on, major, states } → weekly email of new internships for that major/places (+ followed companies)
 //   POST /api/me { action:"alerts_test" }          → send yourself this week's alert now (3 a day)
+//   POST /api/me { action:"orbit" }               → Orbit: classmates, people at companies you follow, activity (public profiles only)
 //   GET  /api/me?u=<handle>  (no sign-in)          → a PUBLIC profile (404 unless the student turned it on)
 //   GET  /api/me?unsub=<token> (no sign-in)        → one-click unsubscribe from reminder emails
 //   GET  /api/me?r=<token>   (no sign-in)          → the QR target: redirects to the resume if sharing is on
@@ -38,6 +39,7 @@ import { runReminders, emailFor, sendEmail, buildEmail } from "../lib/remind.js"
 import { runAlerts, cleanMajor, cleanStates, buildAlert, freshListings, matchesFor } from "../lib/alerts.js";
 import { dueFollowUps } from "../lib/followups.js";
 import { botOn, logRun } from "../lib/bots.js";
+import { orbitFor } from "../lib/orbit.js";
 
 const LISTS = ["saved", "applied"];
 const MAX = 500;
@@ -320,6 +322,12 @@ export default async function handler(req, res) {
       await dbDelete(`user_jobs?clerk_user_id=eq.${encodeURIComponent(uid)}`);
       await dbDelete(`user_home?clerk_user_id=eq.${encodeURIComponent(uid)}`);
       return res.status(200).json({ ok: true, deleted: true });
+    }
+
+    // ── Orbit (/orbit/): read-only, public profiles only ──
+    if (action === "orbit") {
+      if (!(await rateOk(`orbit:${uid}`, 60, 30))) return res.status(429).json({ error: "Slow down a little and try again" });
+      return res.status(200).json(await orbitFor(uid, await loadRow(uid)));
     }
 
     // ── Profile (LinkedIn-style page at /u/<handle>, private until the student turns it on) ──

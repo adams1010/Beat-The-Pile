@@ -4,40 +4,134 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Orbit — Beat the Pile</title>
-<meta name="description" content="Orbit: the students, alumni and recruiters around your internship search.">
+<meta name="description" content="Orbit: classmates in your major, students who interned where you're applying, and what's new at the companies you follow.">
 <link rel="canonical" href="https://www.beatthepile.com/orbit/">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="theme-color" content="#070F1E">
 <style>
-  /* Orbit (Nov 2026): first version is a "being built" page so the top-bar link works. The real page replaces this. */
-  :root{--green:#0B7A55;--ink:#0A1426;--muted:#55627A;--line:#DCE2EC;--bg:#EEF1F6;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  /* Orbit, part 1 (Nov 2026): POST /api/me {action:"orbit"} → lib/orbit.js. Public profiles only.
+     Part 2 (needs supabase/orbit.sql): Connect (two-way) + "Going to the same fair". */
+  :root{--green:#0B7A55;--green-l:#E7F4EE;--ink:#0A1426;--muted:#55627A;--line:#DCE2EC;--bg:#EEF1F6;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
   *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.55}
-  main{max-width:720px;margin:0 auto;padding:36px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
-  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:28px 28px 24px}
-  .ic{width:44px;height:44px;border-radius:12px;background:#E7F4EE;color:var(--green);display:grid;place-items:center;margin-bottom:14px}
-  h1{font-size:28px;line-height:1.15;margin:0 0 8px;letter-spacing:-.02em}
-  p{margin:0 0 12px;color:var(--muted);max-width:60ch}
-  ul{margin:4px 0 18px;padding-left:20px;color:var(--ink)} li{margin:4px 0}
-  .btn{display:inline-block;background:var(--green);color:#fff;text-decoration:none;font-weight:600;font-size:14px;padding:10px 18px;border-radius:999px}
-  .btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line);margin-left:8px}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5}
+  main{max-width:1180px;margin:0 auto;padding:24px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
+  .grid{display:grid;grid-template-columns:260px minmax(0,1fr) 320px;gap:20px;align-items:start}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px}
+  .side{position:sticky;top:80px}
+  h1{font-size:22px;margin:0 0 2px;letter-spacing:-.01em} h2{font-size:16px;margin:0 0 2px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0 0 14px}
+  .me .av{width:64px;height:64px;font-size:20px;margin-bottom:10px}
+  .me .nm{font-weight:650;font-size:16px}.me .ln{color:var(--muted);font-size:13px}
+  .stat{display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-top:1px solid #EEF1F6;color:var(--muted)} .stat b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .nudge{background:#FFF8E6;border:1px solid #F1DFAE;border-radius:10px;padding:10px 12px;font-size:13px;margin-top:12px}
+  .nudge a{color:#7A5200;font-weight:600}
+  section.card{margin-bottom:16px}
+  .people{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+  .p{border:1px solid var(--line);border-radius:12px;padding:16px 12px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;min-width:0}
+  .av{width:56px;height:56px;border-radius:50%;background:#0B7A55;color:#fff;display:grid;place-items:center;font-weight:600;overflow:hidden;flex-shrink:0}
+  .av img{width:100%;height:100%;object-fit:cover}
+  .p .nm{font-weight:600;margin-top:8px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .p .hl{color:var(--muted);font-size:12.5px;margin-top:2px;min-height:36px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .p .at{font-size:12.5px;margin-top:6px;color:var(--green);font-weight:600}
+  .btn{display:inline-block;margin-top:10px;font:inherit;font-size:13px;font-weight:600;border-radius:999px;padding:6px 16px;text-decoration:none;cursor:pointer;border:1px solid var(--green);color:var(--green);background:#fff}
+  .btn:hover{background:var(--green-l)} .btn.pri{background:var(--green);color:#fff} .btn.pri:hover{background:#086446}
+  .empty{color:var(--muted);font-size:13.5px;padding:6px 0}
+  .empty a{color:var(--green);font-weight:600}
+  .feed .it{padding:12px 0;border-top:1px solid #EEF1F6;font-size:13.5px} .feed .it:first-of-type{border-top:0}
+  .feed .k{font-size:12px;color:var(--muted)} .feed a{color:var(--ink);font-weight:600;text-decoration:none} .feed a:hover{text-decoration:underline}
+  .feed .tx{white-space:pre-wrap;overflow-wrap:anywhere}
+  .center{text-align:center;padding:40px 24px}
+  .orb-ic{width:44px;height:44px;border-radius:12px;background:var(--green-l);color:var(--green);display:grid;place-items:center;margin:0 auto 12px}
+  .soon{font-size:12px;color:var(--muted);margin-top:10px}
+  @media (max-width:1060px){.grid{grid-template-columns:240px minmax(0,1fr)}.feedcol{grid-column:1/-1}}
+  @media (max-width:720px){.grid{grid-template-columns:1fr}.side{position:static}.people{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
 <script src="/nav.js"></script>
-<main id="main">
-  <div class="card">
-    <div class="ic" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5S9.7 5.9 12 3.5z"/></svg></div>
-    <h1>Orbit</h1>
-    <p>Orbit is where you'll find the people around your internship search: classmates in your major, students heading to the same career fair, and people who've interned where you're applying.</p>
-    <p>We're building it now. To show up when it opens:</p>
-    <ul>
-      <li>Set up your profile and turn on "public"</li>
-      <li>Add your school, major and graduation year</li>
-    </ul>
-    <a class="btn" href="/u/">Set up my profile</a><a class="btn ghost" href="/jobs/">Browse internships</a>
-  </div>
-</main>
+<div id="acct"></div>
+<main id="main"><div class="card center">Loading Orbit…</div></main>
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const S = { clerk: null };
+  const GLOBE = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5S9.7 5.9 12 3.5z"/></svg>';
+  const initials = (n) => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";
+  const av = (p) => `<div class="av">${p.photo ? `<img alt="" src="${esc(p.photo)}">` : esc(initials(p.name))}</div>`;
+  const yr = (y) => y ? ` '${String(y).slice(2)}` : "";
+  const ago = (iso) => { const d = Math.floor((Date.now() - Date.parse(iso)) / 864e5); return d <= 0 ? "today" : d === 1 ? "yesterday" : `${d} days ago`; };
+
+  async function token(){ try { return await S.clerk?.session?.getToken(); } catch { return null; } }
+  async function api(body){
+    const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Couldn't load Orbit"); return j;
+  }
+
+  const person = (p) => `<div class="p">${av(p)}<div class="nm" title="${esc(p.name)}">${esc(p.name)}</div>
+    <div class="hl">${esc(p.headline || [p.major, p.school].filter(Boolean).join(" · ") + yr(p.gradYear))}</div>
+    ${p.at ? `<div class="at">${esc(p.role ? p.role + " at " : "Worked at ")}${esc(p.at)}</div>` : ""}
+    <a class="btn" href="/u/${encodeURIComponent(p.handle)}">View profile</a></div>`;
+  const people = (list, none) => list.length ? `<div class="people">${list.map(person).join("")}</div>` : `<p class="empty">${none}</p>`;
+
+  function render(o){
+    const m = o.me;
+    const nudges = [
+      !m.hasSchool || !m.hasMajor ? `Add your school and major to <a href="/u/">your profile</a> to see classmates.` : "",
+      !m.isPublic ? `You're not visible in Orbit yet. <a href="/u/">Make your profile public</a> so classmates can find you.` : "",
+    ].filter(Boolean).map((n) => `<div class="nudge">${n}</div>`).join("");
+    const feed = o.feed.length ? o.feed.map((f) => f.kind === "job"
+      ? `<div class="it"><div class="k">New internship · ${esc(ago(f.at))}</div><a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.title)}</a><div>${esc(f.company)}${f.location ? " · " + esc(f.location) : ""}</div></div>`
+      : `<div class="it"><div class="k">${esc(f.name)} posted${f.category ? " in " + esc(f.category) : ""} · ${esc(ago(f.at))}</div><div class="tx">${esc(f.text)}</div></div>`).join("")
+      : `<p class="empty">Nothing yet. Follow companies with ★ on <a href="/jobs/">Jobs</a> to see their new internships here.</p>`;
+    $("main").innerHTML = `<div class="grid">
+      <aside class="side"><div class="card me">${av({ name: m.name, photo: null })}
+        <div class="nm">${esc(m.name || "Your profile")}</div><div class="ln">${esc([m.major, m.school].filter(Boolean).join(" · ") + yr(m.gradYear)) || "No school or major yet"}</div>
+        <div class="stat" style="margin-top:12px"><span>Classmates in your major</span><b>${o.classmates.length}</b></div>
+        <div class="stat"><span>Companies you follow</span><b>${m.following}</b></div>
+        <div class="stat"><span>Visible in Orbit</span><b>${m.isPublic ? "Yes" : "No"}</b></div>
+        ${nudges}<a class="btn" href="/u/" style="width:100%;text-align:center">${m.handle ? "Edit profile" : "Set up profile"}</a>
+        <div class="soon">Connections and "going to the same fair" are coming soon.</div></div></aside>
+      <div>
+        <section class="card"><h1>Classmates in your major</h1><p class="sub">${m.hasSchool ? `Students at ${esc(m.school)} studying ${esc(m.major || "your major")} who made their profile public.` : "Add your school to your profile to see them."}</p>
+          ${people(o.classmates, m.hasSchool ? "No one in your major has a public profile yet. Share Orbit with a classmate." : `<a href="/u/">Add your school and major</a> first.`)}</section>
+        ${o.schoolmates.length ? `<section class="card"><h2>Also at ${esc(m.school)}</h2><p class="sub">Other majors at your school.</p>${people(o.schoolmates, "")}</section>` : ""}
+        <section class="card"><h2>Interned at companies you follow</h2><p class="sub">Students whose public profile lists experience at a company you follow. Good people to ask about the interview.</p>
+          ${people(o.atTargets, m.following ? "No public profiles list those companies yet." : `Follow companies with ★ on <a href="/jobs/">Jobs</a> or <a href="/fair/">Career Fair</a> to see who's been there.`)}</section>
+      </div>
+      <aside class="feedcol"><section class="card feed"><h2>Activity</h2><p class="sub">New internships at companies you follow, and posts from the student community.</p>${feed}</section></aside>
+    </div>`;
+  }
+
+  async function onUser(u){
+    if (!u) {
+      $("main").innerHTML = `<div class="card center"><div class="orb-ic">${GLOBE}</div><h1>Orbit</h1>
+        <p class="sub" style="max-width:52ch;margin:6px auto 16px">The people around your internship search: classmates in your major, students who interned where you're applying, and what's new at the companies you follow.</p>
+        <button class="btn pri" id="si">Sign in to see your Orbit</button></div>`;
+      $("#si").onclick = () => S.clerk.openSignIn({}); return;
+    }
+    try { render(await api({ action: "orbit" })); }
+    catch (e) { $("main").innerHTML = `<div class="card center">Couldn't load Orbit right now (${esc(e.message)}). Refresh in a minute.</div>`; }
+  }
+  async function loadClerk(){
+    try {
+      const pk = (await fetch("/api/config").then((r) => r.json())).clerkPublishableKey; if (!pk) throw 0;
+      if (!window.Clerk) {
+        const host = atob(pk.replace(/^pk_(test|live)_/, "")).replace(/\$$/, "").trim(); if (!/clerk/.test(host)) throw 0;
+        await new Promise((ok, bad) => { const s = document.createElement("script"); s.src = `https://${host}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`;
+          s.setAttribute("data-clerk-publishable-key", pk); s.async = true; s.crossOrigin = "anonymous"; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
+      }
+      if (typeof window.Clerk.load === "function" && !window.Clerk.loaded) await window.Clerk.load({});
+      S.clerk = window.Clerk;
+      let last = S.clerk.user?.id || null;
+      S.clerk.addListener?.(({ user }) => { const id = user?.id || null; if (id !== last) { last = id; onUser(user); } });
+      await onUser(S.clerk.user);
+    } catch { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; }
+  }
+  window.__orbitRender = render;   // used by the offline preview test
+  loadClerk();
+})();
+</script>
 <script src="/ph.js" defer></script>
 <script src="/feedback.js" defer></script>
 </body>

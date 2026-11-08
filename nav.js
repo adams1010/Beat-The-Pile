@@ -14,7 +14,7 @@
     profile: '<circle cx="12" cy="8.5" r="3.75"/><path d="M4.5 20c.9-3.6 3.9-5.75 7.5-5.75s6.6 2.15 7.5 5.75"/>',
     tools: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
   };
-  const svg = (k) => `<svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
+  const svg = (k) => `<svg class="btpic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
   const MAIN = [["/jobs/", "Jobs", "jobs"], ["/fair/", "Career Fair", "fair"], ["/orbit/", "Orbit", "orbit"], ["/season/", "My Season", "season"], ["/u/", "Profile", "profile"]];
   const TOOLS = [
     ["/radar/", "Opening Radar", "When each company usually opens internships"],
@@ -43,7 +43,7 @@
 .btpnav .links::-webkit-scrollbar{display:none}
 .btpnav .links a,.btpnav summary{color:var(--n-dim);text-decoration:none;font-size:13px;padding:8px 12px;border-radius:6px;white-space:nowrap;cursor:pointer}
 .btpnav .links>a,.btpnav .links>details>summary{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px 5px;font-size:12px;line-height:1;min-width:64px;border-bottom:2px solid transparent;border-radius:6px 6px 0 0}
-.btpnav .links .ic{display:block;flex-shrink:0}
+.btpnav .links .btpic{display:block;flex-shrink:0}
 .btpnav .links>a[aria-current=page]{background:transparent;border-bottom-color:var(--n-acc)}
 .btpnav .links a:hover,.btpnav summary:hover{color:#fff}
 .btpnav .links a[aria-current=page]{color:#fff;background:#16223A}
