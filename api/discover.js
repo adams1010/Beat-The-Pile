@@ -157,7 +157,9 @@ export async function refillFromBacklog() {
   const rows = await db.selectAllAsAdmin("company_candidates?select=id,company,ats,config");
   const ids = new Set(rows.map((r) => r.id));
   const names = new Set([...rows, ...COMPANIES].map((c) => normName(c.company)));
-  const known = (n) => names.has(n) || [...names].some((k) => k.length >= 5 && (k.startsWith(n) || n.startsWith(k)));
+  // Exact name only. A prefix match blocked parents behind subsidiaries (Amazon ⟵ "Amazon (Project Leo)", Sony ⟵ "Sony Interactive")
+  // and unrelated names (Squarespace ⟵ "Square"). Real duplicates are still caught: the same board is never listed twice (step 2).
+  const known = (n) => names.has(n);
   const next = [];
   for (const b of BACKLOG.companies || []) {
     const n = normName(b.company), id = "s-" + slug(b.company);

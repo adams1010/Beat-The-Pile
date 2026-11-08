@@ -198,7 +198,9 @@ export default async function handler(req, res) {
       const counts = {}; for (const c of cands) counts[c.status] = (counts[c.status] || 0) + 1;
       const slugify = (n) => "s-" + String(n).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
       const ids = new Set(cands.map((c) => c.id));
-      const backlogLeft = (BACKLOG.companies || []).filter((x) => !ids.has(slugify(x.company))).length;
+      // Same rule as the finder's refill (api/discover.js): skip ids and exact names already in the queue
+      const names = new Set(cands.map((c) => normName(c.company)));
+      const backlogLeft = (BACKLOG.companies || []).filter((x) => { const n = normName(x.company); return n.length >= 3 && !ids.has(slugify(x.company)) && !names.has(n); }).length;
       const day = Date.now() - 864e5;
       const recentLive = cands.filter((c) => c.status === "live" && c.verified_at).sort((a, z) => String(z.verified_at).localeCompare(String(a.verified_at))).slice(0, 8).map((c) => ({ company: c.company, at: c.verified_at }));
       return res.status(200).json({

@@ -3,7 +3,7 @@
 
 **Beat the Pile** (www.beatthepile.com — the bare domain redirects there; still also served at intern-iq-psi.vercel.app) helps **every student, any major,
 land an internship**: real internships **pulled straight from each company's own job board**, plus Career Fair Mode, My Season, and the Opening Radar.
-Owner: Adam Shiloni (VT mechanical engineering). **Positioning (Nov 2026): for every major — never write copy that implies it's only for engineers.** The repo/Vercel project/database keep the old "InternIQ" names — only
+Owner: Adam Shiloni (VT mechanical engineering). **Positioning (Nov 2026): for every major — never write copy that implies it's only for engineers.** The Vercel project and database keep the old "InternIQ" names (the GitHub repo is now adams1010/beat-the-pile) — only
 the brand changed. All student-facing copy says "Beat the Pile".
 Admins (can flip bot switches, paste links): `ADMIN_EMAILS` env, default shiloniadam10@gmail.com, mdxp21@gmail.com.
 
@@ -25,12 +25,17 @@ Admins (can flip bot switches, paste links): `ADMIN_EMAILS` env, default shiloni
 | Anthropic API (Haiku 4.5, $1/$5 per M tokens) | Briefs, AI follow-up emails, homepage AI. Every call costed in `ai_usage`; monthly cap on /bots (default $10). |
 
 The Claude workspace **can't reach company websites**. To test against real sites, dispatch `probe.yml`
-(`gh api -X POST repos/adams1010/InternIQ/actions/workflows/probe.yml/dispatches -f ref=<branch> -f "inputs[code]=<async JS>"`),
+(`gh api -X POST repos/adams1010/beat-the-pile/actions/workflows/probe.yml/dispatches -f ref=<branch> -f "inputs[code]=<async JS>"`),
 then read `PROBE_RESULT` from the run logs. In the JS, `await import(process.cwd() + "/lib/….js")` works. Use real
 tab/newline escapes (`"\t"`, `"\n"`) — the code is passed through bash single quotes.
 
-## Look & feel (Nov 2026)
-Font **Geist**; ink `#0B1220`, one accent green `#0E8A5F`, cool neutrals. No gradients, glows, rainbow chips or emoji
+## Look & feel (Nov 2026) — Direction D (Glassdoor × LinkedIn), live since Nov 5; "less AI" pass Nov 5 night
+Top bar + homepage hero: deep navy `#070F1E` (no grid, no scan line, no ticker, no blinking), mint `#2FD39A` accent, solid mint "BP"
+mark. Content area `#EEF1F6`, white 12px-radius cards, green actions `#0B7A55`, pill buttons. **No monospace/"terminal" font and
+no ALL-CAPS letter-spaced labels** — sentence case, Geist with `tabular-nums` for numbers. Job cards lead with the **role**, then a
+company line with an initials tile. /jobs = 3 columns on desktop; on phones the filter box is not sticky and Feedback is a small "?".
+Shared static-page theme: `/d.css`. Mockups: Design artifact 6iuFD7mA58DSdeeWUebJCo.
+Font **Geist**; ink `#0A1426`, one accent green `#0B7A55`, cool neutrals. No gradients, glows, rainbow chips or emoji
 in UI. Homepage tokens: `G/GD/GL/GM` at the top of `src/home.jsx`; static pages: CSS vars at the top of each page.
 Homepage `/#interview` = Interview practice (`/api/generate` feature `interview_turn`). Pro is **free during beta**
 (no payment exists — never show prices or "secure checkout" until Stripe is wired).
@@ -46,7 +51,7 @@ Homepage screens have hash URLs (`/#quiz`, `/#dashboard`, `/#score`, …) so Bac
 `/fair` Career Fair Mode (QR resume, route, briefs, notes, follow-ups) · `/season` My Season (pipeline, weekly goal,
 apply speed, **Delete all my data**) · `/radar` Opening Radar · `/privacy` plain-words privacy page · `/bots` **Bot
 Control Room** (owner sign-in required to see numbers) · `/discovery` robot's company list + "Needs a link" sheet ·
-`/demo` story-style demo · `/u/` profile editor and `/u/<handle>` public profile (private until the student turns it on; noindex; https-only links; resume button only when the QR link is on; API `action:"profile"` + `GET /api/me?u=`) · `/` homepage (built from `src/home.jsx`).
+`/demo` story-style demo · `/u/` **the one profile** (Nov 7: the old homepage profile form is gone — `/#profile` redirects to `/u/#kit`; owner view adds Profile strength + a private **Application kit** = email/phone/GPA/work auth/relocate/why-me/resumes, stored in `user_home.profile`/`resumes` via `/api/usersync` so homepage auto-fill + cover letters still use it; saving /u/ also copies name/school/major/links/skills into the kit; profile QR for career fairs) and `/u/<handle>` public profile (private until the student turns it on; noindex; https-only links; resume button only when the QR link is on; API `action:"profile"` + `GET /api/me?u=`) · `/` homepage (built from `src/home.jsx`).
 Every page (homepage too) includes **`/nav.js`** (one shared top bar: Jobs · Career Fair · My Season · Radar · Tools ▾, phones get a Menu; it moves the page's `#acct` sign-in widget into the bar) and
 `/feedback.js` (Report a problem). Owner tools are not in the student nav.
 
@@ -80,7 +85,8 @@ Every page (homepage too) includes **`/nav.js`** (one shared top bar: Jobs · Ca
 | 🔄 Internship Sync | Vercel cron 24×/day + GitHub `sync.yml` (3 passes per fire) | Vercel `api/sync.js` | `lib/fetchers/*`; 14 boards at once |
 | 🔗 Link Checker | after each GitHub sync pass + 09:45/21:45 UTC (Vercel); 700/run | Vercel `api/check-links.js` | hides only after 2 dead checks in a row; skips script-only ATS pages |
 | 📡 Opening Radar | daily 10:40 UTC | GitHub `radar.yml` | `scripts/build-radar.mjs` |
-| ✉️ Follow-up Emails | daily 13:20 UTC (Vercel cron `/api/remind` → `api/me.js?cron=remind`) | Vercel | `lib/remind.js`, rule in `lib/followups.js` (applied 5–45 days, not followed up). Opt-in, ≤1 email/3 days, one-click unsubscribe. Off without `RESEND_API_KEY`; sender `REMIND_FROM` (default reminders@beatthepile.com, domain verified in Resend). |
+| 🖼 Logo Finder | daily 10:15 UTC | GitHub `logos.yml` | `lib/logos.js`, `scripts/find-logos.mjs`. Proves the company's website (own job-board link, board on their domain, or title names them — every name word) before saving `company_candidates.logo` (https icon, `fav` = Google s2 icon of the proven `domain`, `none`). `/logos.js` swaps any `[data-logo-id]` initials tile; initials stay when unproven. Public map: `/api/listings?logos=1`. |
+| ✉️ Follow-up Emails + weekly Job Alerts | daily 13:20 UTC (Vercel cron `/api/remind` → `api/me.js?cron=remind`) | Vercel | `lib/remind.js`, rule in `lib/followups.js` (applied 5–45 days, not followed up). Opt-in, ≤1 email/3 days, one-click unsubscribe. **Job alerts** (`lib/alerts.js`, same cron): opt-in on /jobs for the current major+states (`user_jobs.alert_on/alert_major/alert_states/alert_last_sent`) + followed companies; ≤1/week, none when nothing new; unsub `?unsub=<token>&k=alerts`. Off without `RESEND_API_KEY`; sender `REMIND_FROM` (default reminders@beatthepile.com, domain verified in Resend). |
 
 Every bot calls `botOn(id)` before working and `logRun(id, ok, summary, stats)` after (`lib/bots.js`).
 GitHub-run bots read their switch from `GET /api/discovery?bots=1` and report via `POST /api/discovery {action:"botlog"}`
@@ -89,7 +95,7 @@ with the CRON_SECRET. To add a bot: add it to `BOTS` in `lib/bots.js`, check the
 
 ## How companies get in (sources → proof → live)
 1. **Board Scout** (biggest source): Common Crawl's public index → ~14,600 job boards (Workday, Greenhouse, Ashby,
-   SmartRecruiters, iCIMS) → probes the ones we don't track for US internships → real employer name from the board →
+   SmartRecruiters, iCIMS, Lever since Nov 6; Paylocity + UKG + BambooHR since Nov 7 — 37,000+ boards) → probes the ones we don't track for US internships → real employer name from the board →
    `POST /api/discovery {action:"scout"}` inserts candidates (`id b-…`, `hint` = board URL, `priority`).
 2. **Backlog** (`data/backlog.json`, 3,000+ companies from 3 years of SimplifyJobs history; rebuild with
    `scripts/build-backlog.mjs`). The finder pulls 60 more whenever <120 are queued; it checks up to 60 per run, 12 at once.
@@ -109,8 +115,10 @@ own domain, `/api/jobs`) · ashby · smartrecruiters · oracle · **eightfold** 
 `/api/apply/v2`) · paylocity · adp · **taleo** (Enterprise: `{tenant}.taleo.net/careersection/{section}`, portal id read
 from the search page and saved in config; keyword search "intern"/"co-op"; proof = tenant name or own-site link) ·
 **ukg** (UltiPro `recruiting{,2}.ultipro.com/{TENANT}/JobBoard/{guid}`; keyword search is broken so it reads every job;
-proof = own-site link only; every detail URL answers 200 → link checker skips it). Not yet: Avature, Dayforce,
-Taleo Business Edition (`*.tbe.taleo.net`), BambooHR, BrassRing. (Board Scout can't use Taleo: pages never name the employer.)
+proof = own-site link only; every detail URL answers 200 → link checker skips it) · **bamboohr** (`{slug}.bamboohr.com/careers/list` JSON; the board's
+"Internship" employment type counts even when the title doesn't say intern (`isIntern`); proof = board name/slug match or the board's own
+registered name from `/careers/company-info`; dead job pages redirect → link checker skips it). Not yet: Avature, Dayforce,
+Taleo Business Edition (`*.tbe.taleo.net`), BrassRing, Workable. (Board Scout can't use Taleo: pages never name the employer.)
 **Adding a reader:** fetcher in `lib/fetchers/` returning `[{sourceId,title,location,url,postedOn}]` → register in
 `fetchers/index.js` → `boardKey` in `lib/companies.js` → detection in `scanHtml` + a `verify…` proof in
 `lib/discover.js` → add the system to `NOW_READABLE` and bump `READERS_UPDATED_AT` in `api/discover.js` (re-tests
@@ -129,6 +137,20 @@ fieldsForMajor` (tested for all 110 quiz majors). `/api/listings` default = engi
 would hit Vercel's 4.5 MB cap). Bots: finder/scout priority = number of internships (+ small engineering boost);
 nightly SimplifyJobs import takes every major; Radar keeps any company with 5+ postings and 2+ seasons (or tracked).
 
+## Distance search ("within N mi of a ZIP", live Nov 7 2026)
+`lib/geocode.js` turns employer location text into points using only the US Census Gazetteer (`data/us-places.json`,
+`data/us-zips.json`, rebuilt by `scripts/build-places.mjs <dir>` from the 2024 place/cousub/ZCTA files + the ZCTA↔place
+relationship file). Rules: a point only when a real city/town is found **in the state the text names**; regions ("Bay
+Area"), neighborhoods, truncated names and same-name towns in one state (two Cranberry/Hamilton Townships) stay unplaced;
+offshore Census points (San Francisco, Honolulu) are re-centered on land; a few big work sites that aren't Census places
+(`SITES`, e.g. Cranberry Township PA, Hunt Valley MD) use their own ZIP area. Measured on 13,942 live listings: 94% placed,
+99.9% of points in the stated state (rest = border towns). Listings store `geo_lat/geo_lng` (first point), `geo_pts`,
+`geo_n`, `geo_kind` (place|remote|multi|state|none) — set in `fetchCompany`; old rows backfilled by `fillGeo` in
+`api/sync.js`. API: `/api/listings?near=24060|City, ST&mi=5–300` → nearest first with `mi`, plus `meta.remote` and
+`meta.unplacedInState` so the page says what isn't on the map. `/jobs`: "Within [50 mi] of [ZIP]" (`?near=&mi=`);
+picking a state turns it off. Tests: `tests/geo-radius-test.mjs` (real formats + audit catches). Changing the geocoder?
+Re-run the measure/audit against a fresh pull of live locations before shipping.
+
 ## Data model (Supabase)
 `company_candidates` (robot queue + results: status, ats, config, hint, priority, detail) · `listings` (match, field,
 first_seen, closed_at, link_ok, link_fails) · `feed_runs` + view `feed_last` · `user_jobs` (saved, applied, apps,
@@ -140,8 +162,8 @@ Functions: `rate_take`, `ai_reserve` (service role only). Storage bucket `resume
 `/api/discovery?bots=1` is public **switches only**; full control-room data needs an owner token or CRON_SECRET.
 
 ## Working on it
-- Clone: `/home/claude/interniq` (repo adams1010/InternIQ). Push to `main` deploys (check
-  `gh api repos/adams1010/InternIQ/commits/<sha>/status`).
+- Clone: `/home/claude/beat-the-pile` (repo adams1010/beat-the-pile; renamed from InternIQ). Push to `main` deploys (check
+  `gh api repos/adams1010/beat-the-pile/commits/<sha>/status`).
 - Tests: `bash tests/run.sh` (offline, everything faked via `tests/fakedb.mjs`). Add a test for every bot/reader/API change.
 - Risky robot changes: push a branch, run `probe.yml` with `ref=<branch>` against real sites, then merge.
 - Secrets in GitHub: `CRON_SECRET` only. Everything else lives in Vercel env.

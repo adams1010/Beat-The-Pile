@@ -2,7 +2,7 @@
 
 **Beat the Pile** (www.beatthepile.com — the bare domain redirects there; still also served at intern-iq-psi.vercel.app) helps **every student, any major,
 land an internship**: real internships **pulled straight from each company's own job board**, plus Career Fair Mode, My Season, and the Opening Radar.
-Owner: Adam Shiloni (VT mechanical engineering). **Positioning (Nov 2026): for every major — never write copy that implies it's only for engineers.** The repo/Vercel project/database keep the old "InternIQ" names — only
+Owner: Adam Shiloni (VT mechanical engineering). **Positioning (Nov 2026): for every major — never write copy that implies it's only for engineers.** The Vercel project and database keep the old "InternIQ" names (the GitHub repo is now adams1010/beat-the-pile) — only
 the brand changed. All student-facing copy says "Beat the Pile".
 Admins (can flip bot switches, paste links): `ADMIN_EMAILS` env, default shiloniadam10@gmail.com, mdxp21@gmail.com.
 
@@ -24,7 +24,7 @@ Admins (can flip bot switches, paste links): `ADMIN_EMAILS` env, default shiloni
 | Anthropic API (Haiku 4.5, $1/$5 per M tokens) | Briefs, AI follow-up emails, homepage AI. Every call costed in `ai_usage`; monthly cap on /bots (default $10). |
 
 The Claude workspace **can't reach company websites**. To test against real sites, dispatch `probe.yml`
-(`gh api -X POST repos/adams1010/InternIQ/actions/workflows/probe.yml/dispatches -f ref=<branch> -f "inputs[code]=<async JS>"`),
+(`gh api -X POST repos/adams1010/beat-the-pile/actions/workflows/probe.yml/dispatches -f ref=<branch> -f "inputs[code]=<async JS>"`),
 then read `PROBE_RESULT` from the run logs. In the JS, `await import(process.cwd() + "/lib/….js")` works. Use real
 tab/newline escapes (`"\t"`, `"\n"`) — the code is passed through bash single quotes.
 
@@ -161,8 +161,8 @@ Functions: `rate_take`, `ai_reserve` (service role only). Storage bucket `resume
 `/api/discovery?bots=1` is public **switches only**; full control-room data needs an owner token or CRON_SECRET.
 
 ## Working on it
-- Clone: `/home/claude/interniq` (repo adams1010/InternIQ). Push to `main` deploys (check
-  `gh api repos/adams1010/InternIQ/commits/<sha>/status`).
+- Clone: `/home/claude/beat-the-pile` (repo adams1010/beat-the-pile; renamed from InternIQ). Push to `main` deploys (check
+  `gh api repos/adams1010/beat-the-pile/commits/<sha>/status`).
 - Tests: `bash tests/run.sh` (offline, everything faked via `tests/fakedb.mjs`). Add a test for every bot/reader/API change.
 - Risky robot changes: push a branch, run `probe.yml` with `ref=<branch>` against real sites, then merge.
 - Secrets in GitHub: `CRON_SECRET` only. Everything else lives in Vercel env.
