@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>My Season — Beat the Pile</title>
-<meta name="description" content="Your internship season in one place: every application, where it stands, your weekly goal, and how fast you apply.">
+<meta name="description" content="Your internship and job search in one place: every application, where it stands, your weekly goal, and how fast you apply.">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <link rel="icon" href="/icons/icon-192.png">
@@ -183,7 +183,7 @@
   function render(){
     const el = $("#app");
     if (!S.user) {
-      el.innerHTML = `<div class="card gate"><h2>Your internship season, organized</h2><p style="color:var(--muted);margin:0 0 14px">Track every application from applied to offer, set a weekly goal, and see how fast you apply after jobs post.</p>${S.clerk ? `<button class="btn go" id="gs" style="padding:12px 18px;font-size:15px">Sign in to start</button>` : `<p style="color:var(--muted)">Loading sign-in…</p>`}</div>
+      el.innerHTML = `<div class="card gate"><h2>Your internship and job search, organized</h2><p style="color:var(--muted);margin:0 0 14px">Track every application from applied to offer, set a weekly goal, and see how fast you apply after jobs post.</p>${S.clerk ? `<button class="btn go" id="gs" style="padding:12px 18px;font-size:15px">Sign in to start</button>` : `<p style="color:var(--muted)">Loading sign-in…</p>`}</div>
         <section class="card" aria-label="Example season" style="margin-top:12px;padding:18px">
           <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:12px"><b style="font-size:15px">What it looks like</b><span style="font-size:12px;font-weight:600;color:var(--faint);background:var(--bg);padding:2px 8px;border-radius:6px">Example · not real data</span></div>
           <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;text-align:center;margin-bottom:14px">

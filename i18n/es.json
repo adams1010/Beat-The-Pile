@@ -678,9 +678,35 @@
   "Open to Internships": "Abierto a prácticas",
   "Open to Full-time jobs": "Abierto a empleos de tiempo completo",
   "Top skills first.": "Primero las habilidades principales.",
-  "One page for your experience, projects and skills, plus a QR code for career fairs. Free.": "Una página para tu experiencia, proyectos y habilidades, más un código QR para ferias de empleo. Gratis."
+  "One page for your experience, projects and skills, plus a QR code for career fairs. Free.": "Una página para tu experiencia, proyectos y habilidades, más un código QR para ferias de empleo. Gratis.",
+  "Internships and jobs, straight from the source": "Prácticas y empleos, directo de la fuente",
+  "Internships first, plus new-grad and entry-level jobs. Every major, pulled straight from each company's own job board. No reposts, no recruiters. When a company takes a job down, it drops off here too.": "Primero prácticas, y también empleos para recién graduados y de nivel inicial. Todas las carreras, sacados directamente de la bolsa de empleo de cada empresa. Sin reposteos ni reclutadores. Cuando una empresa retira una oferta, también desaparece aquí.",
+  "Internships & new-grad jobs — Beat the Pile": "Prácticas y empleos para recién graduados — Beat the Pile",
+  "Search internships, jobs, companies": "Busca prácticas, empleos, empresas",
+  "Full-time": "Tiempo completo",
+  "Both": "Ambos",
+  "Job type": "Tipo de empleo",
+  "I'm looking for an internship or job": "Busco una práctica o un empleo",
+  "I'm hiring interns or new grads": "Busco practicantes o recién graduados",
+  "Internships first, plus new-grad jobs, from company job boards. Every major. Career Fair Mode, My Season, Orbit.": "Primero prácticas, y también empleos para recién graduados, de las bolsas de empleo de las empresas. Todas las carreras. Modo feria de empleo, Mi temporada, Orbit.",
+  "Find students and recent grads by major, school and skills, and meet them at career fairs. Free during beta.": "Encuentra estudiantes y recién graduados por carrera, universidad y habilidades, y conócelos en ferias de empleo. Gratis durante la beta.",
+  "Find internships and jobs →": "Buscar prácticas y empleos →",
+  "Hire interns and new grads from every major.": "Contrata practicantes y recién graduados de todas las carreras.",
+  "Find your next interns and new grads": "Encuentra a tus próximos practicantes y recién graduados",
+  "Built for internships and first jobs, not everything": "Hecho para prácticas y primeros empleos, no para todo",
+  "Your career profile": "Tu perfil profesional",
+  "Your internship and job search, organized": "Tu búsqueda de prácticas y empleo, organizada",
+  "Create a free account to find interns and new grads from every major.": "Crea una cuenta gratis para encontrar practicantes y recién graduados de todas las carreras."
  },
  "patterns": [
+  [
+   "^([\\d,]+) full-time jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
+   "$1 empleos de tiempo completo en $2 empresas$3"
+  ],
+  [
+   "^([\\d,]+) jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
+   "$1 empleos en $2 empresas$3"
+  ],
   [
    "^Found (today|yesterday|\\d+ days? ago) \\(posting date not shown by employer\\)$",
    "Encontrada $1 (el empleador no muestra la fecha)"

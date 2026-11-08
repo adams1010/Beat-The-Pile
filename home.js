@@ -1,4 +1,4 @@
-/* built from src/home.jsx 7ed45d7b278b4a46 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 3e2303164320eb69 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -1126,7 +1126,7 @@ function LandingD({
       margin: "0 0 28px",
       maxWidth: 560
     }
-  }, "Every major. Pulled straight from each company's own job board \u2014 no reposts, and jobs drop off when the company takes them down."), React.createElement("form", {
+  }, "Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board \u2014 no reposts, and jobs drop off when the company takes them down."), React.createElement("form", {
     onSubmit: go,
     role: "search",
     className: "d-search",

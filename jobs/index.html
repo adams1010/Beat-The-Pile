@@ -9,8 +9,8 @@
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Internships — Beat the Pile</title>
-<meta name="description" content="Internships for every major, pulled straight from each company's own job board. Every board is re-read every few hours, so closed jobs drop off.">
+<title>Internships &amp; new-grad jobs — Beat the Pile</title>
+<meta name="description" content="Internships and new-grad jobs for every major, pulled straight from each company's own job board. Every board is re-read every few hours, so closed jobs drop off.">
 <link rel="canonical" href="https://www.beatthepile.com/jobs/">
 <style>
   :root{
@@ -184,8 +184,8 @@
 <header>
   <div class="wrap">
     <div class="topbar"><span class="brand">Internships</span><div class="acct" id="acct"></div></div>
-    <h1>Internships, straight from the source</h1>
-    <p class="sub">Every major, pulled straight from each company's own job board. No reposts, no recruiters. When a company takes a job down, it drops off here too.</p>
+    <h1>Internships and jobs, straight from the source</h1>
+    <p class="sub">Internships first, plus new-grad and entry-level jobs. Every major, pulled straight from each company's own job board. No reposts, no recruiters. When a company takes a job down, it drops off here too.</p>
     <div class="trust" id="trust" hidden><span class="dot"></span><span id="trustText"></span></div>
     <a class="fairlink" href="/demo/">▶ New here? <b>Take the 75-second tour</b></a>
   </div>
@@ -457,7 +457,7 @@
     const companies = new Set(rows.map((j) => j.company)).size;
     const where = state.savedOnly ? "saved" : state.followOnly ? "you follow" : state.near && !state.company ? `within ${state.near.mi} mi of ${state.near.q}` : state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
     $("count").textContent = rows.length
-      ? `${rows.length} internship${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"} ${where}` +
+      ? `${rows.length} ${state.kind === "fulltime" ? "full-time job" : state.kind === "all" ? "job" : "internship"}${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"} ${where}` +
         (state.savedOnly || state.followOnly ? "" : ` · ${MAJOR_LABEL()}`) + (state.partial && !state.savedOnly && !state.followOnly ? " so far · loading the rest…" : "")
       : "";
 

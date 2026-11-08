@@ -96,7 +96,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   const nav = document.createElement("nav"); nav.className = "btpnav"; nav.setAttribute("aria-label", "Main");
   nav.innerHTML = `<a class="btpskip" href="#main">Skip to content</a><div class="in">
     <a class="logo" href="/" aria-label="Beat the Pile home"><img src="/brand/logo-white.png" alt="Beat the Pile" width="95" height="38"></a>
-    <form class="q" role="search" action="/jobs/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search internships" placeholder="Search internships, companies, majors"><input type="hidden" name="state" value="all"><kbd>/</kbd></form>
+    <form class="q" role="search" action="/jobs/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search internships" placeholder="Search internships, jobs, companies"><input type="hidden" name="state" value="all"><kbd>/</kbd></form>
     <div class="links">${MAIN.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${svg(k)}<span>${t}</span></a>`).join("")}
       <details><summary>${svg("tools")}<span class="lbl">Tools</span></summary><div class="menu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}<div class="sep"></div>${langItem(true)}</div></details></div>
     <details class="mob"><summary>Menu</summary><div class="menu" role="menu">${MAIN.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div>${TOOLS.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div>${langItem(false)}</div></details>
@@ -140,10 +140,10 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   }
   window.btpSaveRole = saveRole;
   window.btpRoleCards = (pre) => `<div class="btprole-cards">
-      <button class="btprole-card${pre === "student" ? " on" : ""}" data-role="student"><span class="btprole-ic">${svg("jobs")}</span><b>I'm looking for an internship</b>
-        <small>Real internships from company job boards, every major. Career Fair Mode, My Season, Orbit.</small><span class="btprole-go">Find internships →</span></button>
-      <button class="btprole-card${pre === "employer" ? " on" : ""}" data-role="employer"><span class="btprole-ic">${svg("talent")}</span><b>I'm hiring interns</b>
-        <small>Find students by major, school and skills, and meet them at career fairs. Free during beta.</small><span class="btprole-go">Find interns →</span></button></div>`;
+      <button class="btprole-card${pre === "student" ? " on" : ""}" data-role="student"><span class="btprole-ic">${svg("jobs")}</span><b>I'm looking for an internship or job</b>
+        <small>Internships first, plus new-grad jobs, from company job boards. Every major. Career Fair Mode, My Season, Orbit.</small><span class="btprole-go">Find internships and jobs →</span></button>
+      <button class="btprole-card${pre === "employer" ? " on" : ""}" data-role="employer"><span class="btprole-ic">${svg("talent")}</span><b>I'm hiring interns or new grads</b>
+        <small>Find students and recent grads by major, school and skills, and meet them at career fairs. Free during beta.</small><span class="btprole-go">Find interns →</span></button></div>`;
   const sheetCss = `.btprole{position:fixed;inset:0;z-index:200;background:rgba(6,10,44,.72);display:grid;place-items:center;padding:16px;font-family:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
 .btprole .box{background:#fff;border-radius:16px;max-width:760px;width:100%;padding:28px;box-shadow:0 24px 60px rgba(6,10,44,.4)}
 .btprole h2{margin:0 0 4px;font-size:24px;color:#060A2C;letter-spacing:-.01em}.btprole p{margin:0 0 18px;color:#55627A}

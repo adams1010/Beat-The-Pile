@@ -1,8 +1,8 @@
 # Beat the Pile (formerly InternIQ) — read this first
 
 **Beat the Pile** (www.beatthepile.com — the bare domain redirects there; still also served at intern-iq-psi.vercel.app) helps **every student, any major,
-land an internship**: real internships **pulled straight from each company's own job board**, plus Career Fair Mode, My Season, and the Opening Radar.
-Owner: Adam Shiloni (VT mechanical engineering). **Positioning (Nov 2026): for every major — never write copy that implies it's only for engineers.** The Vercel project and database keep the old "InternIQ" names (the GitHub repo is now adams1010/beat-the-pile) — only
+land an internship — and their first full-time job**: real internships **pulled straight from each company's own job board**, plus Career Fair Mode, My Season, and the Opening Radar.
+Owner: Adam Shiloni (VT mechanical engineering). **Positioning (Nov 2026): for every major — never write copy that implies it's only for engineers. Internships first, early-career full-time too (Nov 8) — lead with internships, never drop them.** The Vercel project and database keep the old "InternIQ" names (the GitHub repo is now adams1010/beat-the-pile) — only
 the brand changed. All student-facing copy says "Beat the Pile".
 Admins (can flip bot switches, paste links): `ADMIN_EMAILS` env, default shiloniadam10@gmail.com, mdxp21@gmail.com.
 
@@ -150,6 +150,18 @@ fieldsForMajor` (tested for all 110 quiz majors). `/api/listings` default = engi
 `btp_major`, shared with `/fair`) and loads one major + place at a time in pages of 1,000 (all majors in one response
 would hit Vercel's 4.5 MB cap). Bots: finder/scout priority = number of internships (+ small engineering boost);
 nightly SimplifyJobs import takes every major; Radar keeps any company with 5+ postings and 2+ seasons (or tracked).
+
+## Full-time (early-career) jobs (Nov 8 2026)
+Internships stay first, but the readers also keep **early-career full-time** roles: `lib/fields.js isEarlyCareer()` (new grad,
+entry level, early career, rotational / development programs, "Engineer I / Analyst 1", "Associate … Engineer/Analyst", junior …;
+never senior/lead/manager/II+/"N+ years", never internships, years < 2026 dropped). Keyword readers add `EARLY_QUERIES`
+("new grad", "entry level", "graduate") capped at `EARLY_PAGES` (2) pages each, and a failed early search never costs the
+internships; Workday adds the same keyword searches after the intern facet; Greenhouse/Lever/Ashby/BambooHR/Paylocity/ADP/UKG
+already read every job. **No new column:** `/api/listings?kind=intern|fulltime|all` (default `intern`, so old pages are unchanged)
+filters with PostgREST `title=imatch.<INTERN_PG>`; every row comes back with `kind`; `summary` keeps `allMajors` = internships and
+adds `fulltime`. `/jobs` has an Internships · Full-time · Both switch (`?kind=`) and a "Full-time" badge. Probed Nov 8 on real
+boards (Boeing, Northrop, L3Harris, BWXT, Merck, Stripe, Palantir): 3–28 early-career roles each, ≤8 s per company.
+Tests: `tests/fulltime-test.mjs`.
 
 ## Distance search ("within N mi of a ZIP", live Nov 7 2026)
 `lib/geocode.js` turns employer location text into points using only the US Census Gazetteer (`data/us-places.json`,

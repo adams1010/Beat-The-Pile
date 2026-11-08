@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Profile — Beat the Pile</title>
-<meta name="description" content="A student's internship profile on Beat the Pile.">
+<meta name="description" content="A student's career profile on Beat the Pile.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="/icons/icon-192.png">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
@@ -428,7 +428,7 @@
     S.user = u || null;
     if (!S.user) {
       try { localStorage.removeItem("btp_me"); window.btpNavMe && window.btpNavMe(); } catch {}
-      document.querySelector("main").innerHTML = `<div class="card center"><h1 style="font-size:24px">Your internship profile</h1>
+      document.querySelector("main").innerHTML = `<div class="card center"><h1 style="font-size:24px">Your career profile</h1>
         <p class="muted" style="max-width:48ch;margin:6px auto 16px">One profile for everything: a clean page with your experience, projects and skills to share with recruiters (private until you turn it on), plus a private application kit with your resumes that fills applications and cover letters for you.</p>
         <button class="btn pri" id="si">Sign in to build yours</button></div>`;
       $("#si").onclick = () => S.clerk.openSignIn({}); return;
