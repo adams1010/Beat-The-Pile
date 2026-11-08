@@ -643,7 +643,42 @@
   "open internships on Beat the Pile right now": "prácticas abiertas en Beat the Pile ahora mismo",
   "companies hiring interns right now": "empresas contratando practicantes ahora mismo",
   "Virginia Tech career fairs in Career Fair Mode": "ferias de empleo de Virginia Tech en el Modo feria de empleo",
-  "Example": "Ejemplo"
+  "Example": "Ejemplo",
+  "Your orbit": "Tu órbita",
+  "The people around your search, closest first. Tap anyone to see their profile.": "Las personas alrededor de tu búsqueda, de la más cercana a la más lejana. Toca a cualquiera para ver su perfil.",
+  "Inner orbit": "Órbita interna",
+  "Your major, your school": "Tu carrera, tu universidad",
+  "Campus": "Campus",
+  "Other majors at your school": "Otras carreras en tu universidad",
+  "Insiders": "Conocedores",
+  "Interned where you're aiming": "Hicieron prácticas donde apuntas",
+  "Signals": "Señales",
+  "New openings at companies you follow, and posts from students.": "Nuevas vacantes en empresas que sigues y publicaciones de estudiantes.",
+  "You're visible in other students' orbits.": "Eres visible en las órbitas de otros estudiantes.",
+  "No one in your major has a public profile yet. Invite a classmate.": "Aún nadie de tu carrera tiene perfil público. Invita a un compañero.",
+  "No one else at your school has a public profile yet.": "Aún nadie más de tu universidad tiene perfil público.",
+  "No public profiles list the companies you follow yet.": "Aún ningún perfil público incluye las empresas que sigues.",
+  "Interviews + offers": "Entrevistas + ofertas",
+  "Companies followed": "Empresas seguidas",
+  "Profile strength": "Fuerza del perfil",
+  "Getting started": "Empezando",
+  "Taking shape": "Tomando forma",
+  "Strong": "Sólido",
+  "Ready for recruiters": "Listo para reclutadores",
+  "Do it →": "Hazlo →",
+  "Who can see you": "Quién puede verte",
+  "Anyone with your link": "Cualquiera con tu enlace",
+  "Students at your school, in Orbit": "Estudiantes de tu universidad, en Orbit",
+  "Employers, in Find talent": "Empleadores, en Buscar talento",
+  "Change who can see you": "Cambiar quién puede verte",
+  "On": "Activado",
+  "Every step done. Recruiters see your best side.": "Todos los pasos listos. Los reclutadores ven tu mejor versión.",
+  "Open to": "Abierto a",
+  "Full-time jobs": "Empleos de tiempo completo",
+  "Open to Internships": "Abierto a prácticas",
+  "Open to Full-time jobs": "Abierto a empleos de tiempo completo",
+  "Top skills first.": "Primero las habilidades principales.",
+  "One page for your experience, projects and skills, plus a QR code for career fairs. Free.": "Una página para tu experiencia, proyectos y habilidades, más un código QR para ferias de empleo. Gratis."
  },
  "patterns": [
   [
@@ -777,6 +812,14 @@
   [
    "^([\\d,]+) students? found$",
    "$1 estudiantes encontrados"
+  ],
+  [
+   "^(\\d+) steps? to go\\. Complete profiles get found in Orbit and by employers\\.$",
+   "Te faltan $1 pasos. Los perfiles completos aparecen en Orbit y ante los empleadores."
+  ],
+  [
+   "^New opening · (.+)$",
+   "Nueva vacante · $1"
   ]
  ]
 }

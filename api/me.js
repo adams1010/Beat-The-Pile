@@ -197,7 +197,8 @@ function cleanProfile(p) {
     projects: arr(p.projects, 8).map((x) => ({ name: txt(x?.name, 100), desc: txt(x?.desc, 600), link: httpsUrl(x?.link) })).filter((x) => x.name),
     links: { linkedin: httpsUrl(p.links?.linkedin), github: httpsUrl(p.links?.github), portfolio: httpsUrl(p.links?.portfolio) },
     showResume: p.showResume === true,
-    openToEmployers: p.openToEmployers === true,          // "Let employers find me" (Find talent); off unless the student turns it on
+    openToEmployers: p.openToEmployers === true,
+    openTo: (Array.isArray(p.openTo) ? p.openTo : []).filter((x) => x === "intern" || x === "fulltime").slice(0, 2),   // "Open to" badges          // "Let employers find me" (Find talent); off unless the student turns it on
     photo: cleanPhoto(p.photo),
   };
 }

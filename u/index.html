@@ -87,6 +87,30 @@
   .qrbox{position:fixed;inset:0;background:rgba(6,10,44,.55);display:grid;place-items:center;z-index:60;padding:16px}
   .qrbox .in{background:#fff;border-radius:16px;padding:22px;max-width:340px;width:100%;text-align:center}
   .qrbox svg{width:220px;height:220px}
+  /* Nov 8 engagement pass: open-to badges, season strip, strength ring, visibility panel, highlights */
+  .opento{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .opento span{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:999px;padding:5px 12px;background:#060A2C;color:#B0F701}
+  .opento span::before{content:"";width:7px;height:7px;border-radius:50%;background:#B0F701}
+  .hl{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line);margin:18px -24px -22px;}
+  .hl div{padding:12px 8px;text-align:center;border-left:1px solid var(--line)}.hl div:first-child{border-left:0}
+  .hl b{display:block;font-size:20px;color:var(--navy);font-variant-numeric:tabular-nums}.hl span{font-size:12.5px;color:var(--muted)}
+  .season{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .season a{display:block;text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--navy);background:#fff}
+  .season a:hover{border-color:var(--green);background:var(--green-light)}
+  .season b{display:block;font-size:24px;font-variant-numeric:tabular-nums;line-height:1.1}.season span{font-size:12.5px;color:var(--muted)}
+  .strong{display:flex;gap:18px;align-items:center}
+  .ring{flex-shrink:0;position:relative;width:96px;height:96px}.ring b{position:absolute;inset:0;display:grid;place-items:center;font-size:22px;color:var(--navy)}
+  .lvl{display:inline-block;font-size:12px;font-weight:700;color:#060A2C;background:#B0F701;border-radius:999px;padding:2px 10px;margin-bottom:4px}
+  .next{display:grid;gap:8px;margin-top:14px}
+  .next button{font:inherit;text-align:left;display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--navy);font-size:14.5px}
+  .next button:hover{border-color:var(--green);background:var(--green-light)}.next button i{font-style:normal;color:var(--green);font-weight:600;font-size:13px;white-space:nowrap}
+  .who{display:grid;gap:8px}.who div{display:flex;align-items:center;gap:10px;font-size:14.5px;border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .who .st{margin-left:auto;font-size:12.5px;font-weight:600;border-radius:999px;padding:3px 10px;background:#EEF1F6;color:var(--muted);white-space:nowrap}
+  .who .st.on{background:var(--green-light);color:var(--green-dark)}
+  .who svg{flex-shrink:0;color:var(--navy)}
+  .chip.top{background:#060A2C;color:#fff;border-color:#060A2C}
+  .cta{background:#060A2C;color:#fff;border:0}.cta h2{color:#fff}.cta p{color:#C9D2E3}
+  @media(max-width:600px){.season{grid-template-columns:repeat(2,1fr)}.hl{margin:16px -18px -18px}.strong{flex-direction:column;align-items:flex-start}}
   .res{border:1px solid var(--line);border-radius:10px;padding:8px 12px 12px;margin-top:10px;position:relative;background:#fff}
 </style>
 <link rel="stylesheet" href="/d.css">
@@ -116,16 +140,38 @@
     ];
     return { items, pct: Math.round(100 * items.filter((x) => x[1]).length / items.length) };
   }
+  const OPEN_TO = { intern: "Internships", fulltime: "Full-time jobs" };
+  const LEVELS = [[0, "Getting started"], [40, "Taking shape"], [70, "Strong"], [100, "Ready for recruiters"]];
+  const ringSvg = (pct) => { const r = 40, c = 2 * Math.PI * r;
+    return `<div class="ring"><svg width="96" height="96" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="${r}" fill="none" stroke="#EEF1F6" stroke-width="9"/>
+      <circle cx="48" cy="48" r="${r}" fill="none" stroke="#4A7000" stroke-width="9" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c * (1 - pct / 100)}" transform="rotate(-90 48 48)"/></svg><b>${pct}%</b></div>`; };
+  const WHO_IC = {
+    link: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
+    orbit: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5S9.7 5.9 12 3.5z"/></svg>',
+    biz: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M4 20.5V6.5L12 3.5v17"/><path d="M12 9.5h8v11"/><path d="M3 20.5h18"/></svg>',
+  };
   function ownerCards(p){
     if (!S.me) return "";
-    const st = strength(p), todo = st.items.filter((x) => !x[1]), k = S.kit || {};
-    const yn = (v) => v === "Yes" ? "Yes" : v === "No" ? "No" : "—";
+    const st = strength(p), todo = st.items.filter((x) => !x[1]), me = S.me;
+    const lvl = [...LEVELS].reverse().find(([n]) => st.pct >= n)[1];
+    const apps = me.apps || [], interviews = apps.filter((a) => a.stage === "interview" || a.stage === "offer").length;
+    const pub = !!(me.handle && me.profilePublic);
     return `
-      ${st.pct < 100 ? `<section class="card"><div class="ptag">Only you see this</div>
-        <h2 style="margin:0">Profile strength: ${st.pct}%</h2><div class="meter"><span style="width:${st.pct}%"></span></div>
-        <ul class="steps">${[...todo.slice(0, 4), ...st.items.filter((x) => x[1]).slice(0, Math.max(0, 4 - todo.length))].map(([t, ok]) => `<li class="${ok ? "done" : ""}"><span class="ck${ok ? " on" : ""}" aria-hidden="true"></span>${esc(t)}</li>`).join("")}</ul>
-        <button class="btn" type="button" data-tab="edit" style="margin-top:12px">Finish your profile</button></section>` : ""}
-      `; }
+      <section class="card"><div class="ptag">Only you see this</div><h2>Your season</h2>
+        <div class="season"><a href="/jobs/?view=saved"><b>${(me.saved || []).length}</b><span>Saved</span></a><a href="/season/"><b>${apps.length || (me.applied || []).length}</b><span>Applied</span></a>
+          <a href="/season/"><b>${interviews}</b><span>Interviews + offers</span></a><a href="/jobs/?view=following"><b>${(me.starred || []).length}</b><span>Companies followed</span></a></div></section>
+      <section class="card"><div class="ptag">Only you see this</div>
+        <div class="strong">${ringSvg(st.pct)}<div><span class="lvl">${esc(lvl)}</span><h2 style="margin:2px 0 2px">Profile strength</h2>
+          <p class="small muted" style="margin:0">${todo.length ? `${todo.length} step${todo.length === 1 ? "" : "s"} to go. Complete profiles get found in Orbit and by employers.` : "Every step done. Recruiters see your best side."}</p></div></div>
+        ${todo.length ? `<div class="next">${todo.slice(0, 3).map(([t]) => `<button type="button" data-tab="edit" data-jump="${/resume|phone/i.test(t) ? "kit" : ""}">${esc(t)}<i>Do it →</i></button>`).join("")}</div>` : ""}</section>
+      <section class="card"><div class="ptag">Only you see this</div><h2>Who can see you</h2>
+        <div class="who">
+          <div>${WHO_IC.link}<span>Anyone with your link</span><span class="st${pub ? " on" : ""}">${pub ? "On" : "Off"}</span></div>
+          <div>${WHO_IC.orbit}<span>Students at your school, in Orbit</span><span class="st${pub && p.school ? " on" : ""}">${pub && p.school ? "On" : "Off"}</span></div>
+          <div>${WHO_IC.biz}<span>Employers, in Find talent</span><span class="st${pub && p.openToEmployers ? " on" : ""}">${pub && p.openToEmployers ? "On" : "Off"}</span></div>
+        </div>
+        <button class="btn" type="button" data-tab="edit" data-jump="visibility" style="margin-top:12px">Change who can see you</button></section>`;
+  }
   function kitCard(p){
     if (!S.me) return ""; const k = S.kit || {}; const yn = (v) => v === "Yes" ? "Yes" : v === "No" ? "No" : "—";
     return `
@@ -155,16 +201,19 @@
         <h1>${esc(p.name || "Your name")}</h1>
         ${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
         <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}</div>
+        ${(p.openTo || []).length ? `<div class="opento">${p.openTo.map((k) => `<span>Open to ${esc(OPEN_TO[k] || k)}</span>`).join("")}</div>` : ""}
         ${p.lookingFor ? `<div class="looking">Looking for: ${esc(p.lookingFor)}</div>` : ""}
         <div class="btns">${resume ? `<a class="btn pri" href="${esc(resume)}" target="_blank" rel="noopener">View resume</a>` : isPreview && p.showResume ? `<span class="btn pri" title="Shows when your resume QR link is on">View resume</span>` : ""}${links}</div>
         ${isPreview && S.me ? `<div class="vis"><span class="dotv${S.me.profilePublic && S.me.handle ? " on" : ""}" aria-hidden="true"></span>${S.me.profilePublic && S.me.handle ? `Public · <a href="/u/${esc(S.me.handle)}" target="_blank" style="color:var(--muted)">beatthepile.com/u/${esc(S.me.handle)}</a>` : "Private · only you can see this"}</div>` : ""}
+        ${((p.experience || []).length + (p.projects || []).length + (p.skills || []).length) ? `<div class="hl"><div><b>${(p.experience || []).length}</b><span>Experience</span></div><div><b>${(p.projects || []).length}</b><span>Projects</span></div><div><b>${(p.skills || []).length}</b><span>Skills</span></div></div>` : ""}
       </div></section>
       ${isPreview ? ownerCards(p) : ""}
       ${p.about ? `<section class="card"><h2>About</h2><p class="about">${esc(p.about)}</p></section>` : ""}
       ${exp ? `<section class="card"><h2>Experience</h2>${exp}</section>` : ""}
       ${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}
-      ${(p.skills || []).length ? `<section class="card"><h2>Skills</h2><div class="chips">${p.skills.map((s) => `<span class="chip">${esc(s)}</span>`).join("")}</div></section>` : ""}
+      ${(p.skills || []).length ? `<section class="card"><h2>Skills</h2><div class="chips">${p.skills.map((s, i) => `<span class="chip${i < 3 ? " top" : ""}">${esc(s)}</span>`).join("")}</div>${p.skills.length > 3 ? `<p class="small muted" style="margin:8px 0 0">Top skills first.</p>` : ""}</section>` : ""}
       ${isPreview ? kitCard(p) : ""}
+      ${isPreview ? "" : `<section class="card cta"><h2>Make your own profile</h2><p class="small" style="margin:0 0 12px">One page for your experience, projects and skills, plus a QR code for career fairs. Free.</p><a class="btn pri" href="/start/" style="background:#B0F701;border-color:#B0F701;color:#060A2C">Get started</a></section>`}
       <p class="small muted" style="text-align:center">Profile on <a href="/" style="color:var(--green-dark)">Beat the Pile</a>${isPreview ? "" : ` · <a href="#" id="rep" style="color:var(--muted)">Report this profile</a>`}</p>`;
   }
   async function showPublic(h){
@@ -184,7 +233,7 @@
     const r = await fetch("/api/me", { method, headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) }, body: body ? JSON.stringify(body) : undefined });
     const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Something went wrong"); return j;
   }
-  const blank = () => ({ photo: null, name: "", headline: "", school: "", major: "", gradYear: "", location: "", lookingFor: "", about: "", skills: [], experience: [], projects: [], links: {}, showResume: false, openToEmployers: false });
+  const blank = () => ({ photo: null, name: "", headline: "", school: "", major: "", gradYear: "", location: "", lookingFor: "", about: "", skills: [], experience: [], projects: [], links: {}, showResume: false, openToEmployers: false, openTo: [] });
   function editor(){
     const d = S.draft, me = S.me;
     const field = (k, label, ph, attrs = "") => `<div><label for="f_${k}">${label}</label><input id="f_${k}" data-k="${k}" value="${esc(d.p[k] ?? "")}" placeholder="${esc(ph)}" ${attrs}></div>`;
@@ -193,7 +242,7 @@
     document.querySelector("main").innerHTML = `
       ${S.tab === "preview" ? "" : `<div class="edhead"><button type="button" class="linkbtn" data-tab="preview">← Back to profile</button><b>Edit profile</b><span style="width:110px"></span></div>`}
       ${S.tab === "preview" ? profileHtml(d.p, resumeOn && d.p.showResume ? "/r/" + me.resume.token : null, true) : `
-      <section class="card"><h2>Your link</h2>
+      <section class="card" id="visibility"><h2>Your link</h2>
         <label for="f_handle">Profile address</label>
         <div class="handle"><span>beatthepile.com/u/</span><input id="f_handle" value="${esc(d.handle)}" placeholder="jordan-lee" autocomplete="off" spellcheck="false"></div>
         <label class="switch"><input type="checkbox" id="f_public" ${d.pub ? "checked" : ""}><span><b>Public profile</b><br><span class="muted small">Off = only you can see it. On = anyone with the link (recruiters, friends) can view it, and students at your school can find you in Orbit. It's never in search engines.</span></span></label>
@@ -211,6 +260,7 @@
         <div class="row">${field("school", "School", "Virginia Tech")}${field("major", "Major", "Finance")}</div>
         <div class="row">${field("gradYear", "Graduation year", "2029", 'inputmode="numeric" maxlength="4"')}${field("location", "Location", "Richmond, VA")}</div>
         ${field("lookingFor", "Looking for", "Summer 2027 internship")}
+        <div><label>Open to</label><div style="display:flex;gap:16px;flex-wrap:wrap">${Object.entries(OPEN_TO).map(([k, t]) => `<label class="switch" style="margin:0;font-weight:500"><input type="checkbox" data-opento="${k}" ${(d.p.openTo || []).includes(k) ? "checked" : ""}><span>${t}</span></label>`).join("")}</div></div>
         <label for="f_about">About</label><textarea id="f_about" data-k="about" maxlength="1200" placeholder="A few sentences about what you build and what you want to learn.">${esc(d.p.about)}</textarea>
       </section>
       <section class="card"><h2>Experience</h2><div id="exp">${d.p.experience.map((x, i) => `
@@ -278,6 +328,7 @@
     const pub = $("#f_public"); if (pub) pub.onchange = () => { d.pub = pub.checked; };
     const rs = $("#f_resume"); if (rs) rs.onchange = () => { d.p.showResume = rs.checked; };
     const oe = $("#f_employers"); if (oe) oe.onchange = () => { d.p.openToEmployers = oe.checked; };
+    main.querySelectorAll("[data-opento]").forEach((el) => el.onchange = () => { const k = el.dataset.opento; d.p.openTo = (d.p.openTo || []).filter((x) => x !== k); if (el.checked) d.p.openTo.push(k); });
     const ph = $("#f_photo"); if (ph) ph.onchange = async () => { const f = ph.files && ph.files[0]; if (!f) return;
       const msg = $("#msg"); try { d.p.photo = await shrink(f); editor(); const m = $("#msg"); m.className = "msg"; m.textContent = "Photo ready — tap Save profile."; }
       catch (e) { msg.className = "msg err"; msg.textContent = e.message; } };
@@ -360,7 +411,7 @@
   function load(){
     const p = { ...blank(), ...(S.me.profile || {}) };
     p.links = { ...(p.links || {}) }; p.skills = [...(p.skills || [])];
-    p.experience = (p.experience || []).map((x) => ({ ...x })); p.projects = (p.projects || []).map((x) => ({ ...x }));
+    p.experience = (p.experience || []).map((x) => ({ ...x })); p.projects = (p.projects || []).map((x) => ({ ...x })); p.openTo = [...(p.openTo || [])];
     if (!p.name && S.user) p.name = [S.user.firstName, S.user.lastName].filter(Boolean).join(" ");
     // First visit after the old homepage profile: start from what's already in the application kit
     const k = S.kit || {}; const https = (u) => (u && !/^https?:\/\//i.test(u) ? "https://" + u : u || "");

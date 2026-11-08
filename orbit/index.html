@@ -43,6 +43,22 @@
   .center{text-align:center;padding:40px 24px}
   .orb-ic{width:44px;height:44px;border-radius:12px;background:var(--green-l);color:var(--green);display:grid;place-items:center;margin:0 auto 12px}
   .soon{font-size:12px;color:var(--muted);margin-top:10px}
+  /* Nov 8: Orbit is drawn as an orbit — you in the middle, three rings of people around you */
+  .sky{background:#060A2C;border-radius:16px;color:#fff;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:center;margin-bottom:16px}
+  .sky h1{color:#fff;font-size:24px;margin:0 0 4px}.sky .sub{color:#C9D2E3;margin:0 0 12px}
+  .sky svg{width:100%;height:auto;display:block;max-height:420px}
+  .sky .node{cursor:pointer}.sky .node:focus{outline:none}.sky .node:focus circle,.sky .node:hover circle{stroke:#B0F701;stroke-width:3}
+  .legend{display:grid;gap:10px}
+  .legend button{font:inherit;text-align:left;display:flex;align-items:center;gap:10px;background:#0E1440;border:1px solid #1E2A5C;color:#fff;border-radius:12px;padding:12px;cursor:pointer}
+  .legend button[aria-pressed=true]{border-color:#B0F701;background:#141B4D}
+  .legend i{width:12px;height:12px;border-radius:50%;flex-shrink:0;border:2px solid}
+  .legend b{font-variant-numeric:tabular-nums;font-size:18px;margin-left:auto}.legend small{display:block;color:#8D9AB3;font-size:12px}
+  .gravity{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13px;color:#C9D2E3}
+  .gravity a{color:#B0F701}
+  .feed h2::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#4A7000;margin-right:8px;vertical-align:middle}
+  .grid2{grid-template-columns:minmax(0,1fr) 340px}
+  @media (max-width:1060px){.grid.grid2{grid-template-columns:1fr}}
+  @media (max-width:860px){.sky{grid-template-columns:1fr}}
   @media (max-width:1060px){.grid{grid-template-columns:240px minmax(0,1fr)}.feedcol{grid-column:1/-1}}
   @media (max-width:720px){.grid{grid-template-columns:1fr}.side{position:static}.people{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
@@ -74,33 +90,55 @@
     <a class="btn" href="/u/${encodeURIComponent(p.handle)}">View profile</a></div>`;
   const people = (list, none) => list.length ? `<div class="people">${list.map(person).join("")}</div>` : `<p class="empty">${none}</p>`;
 
+  const RINGS = [
+    ["inner", "Inner orbit", "Your major, your school", "#B0F701"],
+    ["campus", "Campus", "Other majors at your school", "#7FB2FF"],
+    ["insiders", "Insiders", "Interned where you're aiming", "#FFB86B"],
+  ];
+  function sky(o){
+    const sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets };
+    const R = { inner: 92, campus: 150, insiders: 205 }, C = 230;
+    let nodes = "", rings = "";
+    RINGS.forEach(([k, , , col], ri) => {
+      rings += `<circle cx="${C}" cy="${C}" r="${R[k]}" fill="none" stroke="${col}" stroke-opacity=".35" stroke-dasharray="${ri === 2 ? "3 6" : "none"}"/>`;
+      const list = sets[k].slice(0, ri === 0 ? 8 : 12), n = list.length;
+      list.forEach((p, i) => {
+        const a = (i / Math.max(n, 1)) * Math.PI * 2 - Math.PI / 2 + ri * 0.45;
+        const x = C + R[k] * Math.cos(a), y = C + R[k] * Math.sin(a);
+        nodes += `<a class="node" href="/u/${encodeURIComponent(p.handle)}" tabindex="0" aria-label="${esc(p.name)}"><title>${esc(p.name)}${p.at ? " · " + esc(p.at) : ""}</title>
+          <circle cx="${x}" cy="${y}" r="19" fill="#0E1440" stroke="${col}" stroke-width="2"/>
+          <text x="${x}" y="${y + 4.5}" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">${esc(initials(p.name))}</text></a>`;
+      });
+    });
+    const me = o.me;
+    return `<svg viewBox="0 0 460 460" role="img" aria-label="Your orbit: ${o.classmates.length} in your major, ${o.schoolmates.length} on campus, ${o.atTargets.length} insiders">
+      ${rings}<circle cx="${C}" cy="${C}" r="34" fill="#B0F701"/><text x="${C}" y="${C + 6}" text-anchor="middle" font-size="16" font-weight="700" fill="#060A2C">${esc(initials(me.name) || "You")}</text>
+      <text x="${C}" y="${C + 52}" text-anchor="middle" font-size="11" fill="#8D9AB3">You</text>${nodes}</svg>`;
+  }
   function render(o){
-    const m = o.me;
-    const nudges = [
-      !m.hasSchool || !m.hasMajor ? `Add your school and major to <a href="/u/">your profile</a> to see classmates.` : "",
-      !m.isPublic ? `You're not visible in Orbit yet. <a href="/u/">Make your profile public</a> so classmates can find you.` : "",
-    ].filter(Boolean).map((n) => `<div class="nudge">${n}</div>`).join("");
+    S.o = o; const m = o.me, ring = S.ring || "inner";
+    const sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets };
+    const gravity = !m.hasSchool || !m.hasMajor ? `<span>Add your school and major to <a href="/u/">your profile</a> to fill your orbit.</span>`
+      : !m.isPublic ? `<span>You're invisible to others. <a href="/u/">Make your profile public</a> to show up in their orbits.</span>`
+      : `<span>You're visible in other students' orbits.</span>`;
+    const empty = { inner: m.hasSchool ? "No one in your major has a public profile yet. Invite a classmate." : `<a href="/u/">Add your school and major</a> first.`,
+      campus: m.hasSchool ? "No one else at your school has a public profile yet." : `<a href="/u/">Add your school</a> first.`,
+      insiders: m.following ? "No public profiles list the companies you follow yet." : `Follow companies with ☆ on <a href="/jobs/">Jobs</a> to find insiders.` };
+    const [, title, desc] = RINGS.find((r) => r[0] === ring);
     const feed = o.feed.length ? o.feed.map((f) => f.kind === "job"
-      ? `<div class="it"><div class="k">New internship · ${esc(ago(f.at))}</div><a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.title)}</a><div>${esc(f.company)}${f.location ? " · " + esc(f.location) : ""}</div></div>`
+      ? `<div class="it"><div class="k">New opening · ${esc(ago(f.at))}</div><a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.title)}</a><div>${esc(f.company)}${f.location ? " · " + esc(f.location) : ""}</div></div>`
       : `<div class="it"><div class="k">${esc(f.name)} posted${f.category ? " in " + esc(f.category) : ""} · ${esc(ago(f.at))}</div><div class="tx">${esc(f.text)}</div></div>`).join("")
-      : `<p class="empty">Nothing yet. Follow companies with ★ on <a href="/jobs/">Jobs</a> to see their new internships here.</p>`;
-    $("main").innerHTML = `<div class="grid">
-      <aside class="side"><div class="card me">${av({ name: m.name, photo: null })}
-        <div class="nm">${esc(m.name || "Your profile")}</div><div class="ln">${esc([m.major, m.school].filter(Boolean).join(" · ") + yr(m.gradYear)) || "No school or major yet"}</div>
-        <div class="stat" style="margin-top:12px"><span>Classmates in your major</span><b>${o.classmates.length}</b></div>
-        <div class="stat"><span>Companies you follow</span><b>${m.following}</b></div>
-        <div class="stat"><span>Visible in Orbit</span><b>${m.isPublic ? "Yes" : "No"}</b></div>
-        ${nudges}<a class="btn" href="/u/" style="width:100%;text-align:center">${m.handle ? "Edit profile" : "Set up profile"}</a>
-        <div class="soon">Connections and "going to the same fair" are coming soon.</div></div></aside>
-      <div>
-        <section class="card"><h1>Classmates in your major</h1><p class="sub">${m.hasSchool ? `Students at ${esc(m.school)} studying ${esc(m.major || "your major")} who made their profile public.` : "Add your school to your profile to see them."}</p>
-          ${people(o.classmates, m.hasSchool ? "No one in your major has a public profile yet. Share Orbit with a classmate." : `<a href="/u/">Add your school and major</a> first.`)}</section>
-        ${o.schoolmates.length ? `<section class="card"><h2>Also at ${esc(m.school)}</h2><p class="sub">Other majors at your school.</p>${people(o.schoolmates, "")}</section>` : ""}
-        <section class="card"><h2>Interned at companies you follow</h2><p class="sub">Students whose public profile lists experience at a company you follow. Good people to ask about the interview.</p>
-          ${people(o.atTargets, m.following ? "No public profiles list those companies yet." : `Follow companies with ★ on <a href="/jobs/">Jobs</a> or <a href="/fair/">Career Fair</a> to see who's been there.`)}</section>
-      </div>
-      <aside class="feedcol"><section class="card feed"><h2>Activity</h2><p class="sub">New internships at companies you follow, and posts from the student community.</p>${feed}</section></aside>
-    </div>`;
+      : `<p class="empty">Quiet for now. Follow companies with ☆ on <a href="/jobs/">Jobs</a> and their new openings land here.</p>`;
+    $("main").innerHTML = `
+      <div class="sky"><div><h1>Your orbit</h1><p class="sub">The people around your search, closest first. Tap anyone to see their profile.</p>${sky(o)}</div>
+        <div><div class="legend">${RINGS.map(([k, t, d, col]) => `<button type="button" data-ring="${k}" aria-pressed="${k === ring}"><i style="border-color:${col}"></i><span>${t}<small>${d}</small></span><b>${sets[k].length}</b></button>`).join("")}</div>
+          <div class="gravity">${gravity}</div>
+          <div class="soon" style="color:#8D9AB3">Connections and "going to the same fair" are coming soon.</div></div></div>
+      <div class="grid grid2">
+        <section class="card"><h2>${title}</h2><p class="sub">${desc}${ring === "inner" && m.hasSchool ? ` · ${esc(m.major || "")} at ${esc(m.school)}` : ""}</p>${people(sets[ring], empty[ring])}</section>
+        <aside class="feedcol"><section class="card feed"><h2>Signals</h2><p class="sub">New openings at companies you follow, and posts from students.</p>${feed}</section></aside>
+      </div>`;
+    document.querySelectorAll("[data-ring]").forEach((b) => b.onclick = () => { S.ring = b.dataset.ring; render(S.o); });
   }
 
   async function onUser(u){
