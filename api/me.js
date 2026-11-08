@@ -22,6 +22,7 @@
 //   POST /api/me { action:"alerts", on, major, states } → weekly email of new internships for that major/places (+ followed companies)
 //   POST /api/me { action:"alerts_test" }          → send yourself this week's alert now (3 a day)
 //   POST /api/me { action:"orbit" }               → Orbit: classmates, people at companies you follow, activity (public profiles only)
+//   POST /api/me { action:"talent", q, major, school, gradYear } → employers only: opted-in student profiles
 //   GET  /api/me?u=<handle>  (no sign-in)          → a PUBLIC profile (404 unless the student turned it on)
 //   GET  /api/me?unsub=<token> (no sign-in)        → one-click unsubscribe from reminder emails
 //   GET  /api/me?r=<token>   (no sign-in)          → the QR target: redirects to the resume if sharing is on
@@ -40,6 +41,7 @@ import { runAlerts, cleanMajor, cleanStates, buildAlert, freshListings, matchesF
 import { dueFollowUps } from "../lib/followups.js";
 import { botOn, logRun } from "../lib/bots.js";
 import { orbitFor } from "../lib/orbit.js";
+import { talentFor, roleOf } from "../lib/talent.js";
 
 const LISTS = ["saved", "applied"];
 const MAX = 500;
@@ -195,6 +197,7 @@ function cleanProfile(p) {
     projects: arr(p.projects, 8).map((x) => ({ name: txt(x?.name, 100), desc: txt(x?.desc, 600), link: httpsUrl(x?.link) })).filter((x) => x.name),
     links: { linkedin: httpsUrl(p.links?.linkedin), github: httpsUrl(p.links?.github), portfolio: httpsUrl(p.links?.portfolio) },
     showResume: p.showResume === true,
+    openToEmployers: p.openToEmployers === true,          // "Let employers find me" (Find talent); off unless the student turns it on
     photo: cleanPhoto(p.photo),
   };
 }
@@ -206,7 +209,7 @@ async function publicProfile(req, res) {
   if (!r || r.profile_public !== true || !r.profile) return res.status(404).json({ error: "No profile here" });
   const p = cleanProfile(r.profile);          // re-cleaned on the way out, too
   const resume = p.showResume && r.resume_path && r.resume_share === true && r.resume_token ? `/r/${r.resume_token}` : null;
-  delete p.showResume;
+  delete p.showResume; delete p.openToEmployers;
   res.setHeader("Cache-Control", "public, max-age=60");
   return res.status(200).json({ handle: r.handle, profile: p, resume });
 }
@@ -328,6 +331,14 @@ export default async function handler(req, res) {
     if (action === "orbit") {
       if (!(await rateOk(`orbit:${uid}`, 60, 30))) return res.status(429).json({ error: "Slow down a little and try again" });
       return res.status(200).json(await orbitFor(uid, await loadRow(uid)));
+    }
+
+    // ── Find talent (/business/talent/): employer accounts only; students who opted in only ──
+    if (action === "talent") {
+      if ((await roleOf(uid)) !== "employer") return res.status(403).json({ error: "Find talent is for employer accounts. Choose \"I'm hiring\" on /start/ to switch." });
+      if (!(await rateOk(`talent:${uid}`, 3600, 120))) return res.status(429).json({ error: "That's a lot of searches — try again in a bit" });
+      const t = (v, n) => String(v ?? "").slice(0, n);
+      return res.status(200).json(await talentFor({ q: t(body.q, 120), major: t(body.major, 80), school: t(body.school, 100), gradYear: Number(body.gradYear) || null }));
     }
 
     // ── Profile (LinkedIn-style page at /u/<handle>, private until the student turns it on) ──

@@ -12,10 +12,16 @@
     orbit: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5S9.7 5.9 12 3.5z"/>',
     season: '<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M21 20H3"/>',
     profile: '<circle cx="12" cy="8.5" r="3.75"/><path d="M4.5 20c.9-3.6 3.9-5.75 7.5-5.75s6.6 2.15 7.5 5.75"/>',
+    talent: '<circle cx="9" cy="8.5" r="3.25"/><path d="M3 19.5c.6-3.1 3-5 6-5s5.4 1.9 6 5"/><circle cx="17" cy="9.5" r="2.5"/><path d="M16 14.6c2.6-.3 4.6 1.3 5 4.9"/>',
+    business: '<path d="M4 20.5V6.5L12 3.5v17"/><path d="M12 9.5h8v11"/><path d="M3 20.5h18"/><path d="M7.5 8.5h1M7.5 12h1M7.5 15.5h1M15.5 13h1M15.5 16.5h1"/>',
     tools: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
   };
   const svg = (k) => `<svg class="btpic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
-  const MAIN = [["/jobs/", "Jobs", "jobs"], ["/fair/", "Career Fair", "fair"], ["/orbit/", "Orbit", "orbit"], ["/season/", "My Season", "season"], ["/u/", "Profile", "profile"]];
+  // Account type (chosen once after sign-in on /start/ or in the welcome sheet below): "student" | "employer" | null
+  let ROLE = null; try { ROLE = localStorage.getItem("btp_role"); } catch {}
+  const MAIN = ROLE === "employer"
+    ? [["/business/talent/", "Talent", "talent"], ["/fair/", "Career Fair", "fair"], ["/jobs/", "Jobs", "jobs"], ["/business/", "Business", "business"]]
+    : [["/jobs/", "Jobs", "jobs"], ["/fair/", "Career Fair", "fair"], ["/orbit/", "Orbit", "orbit"], ["/season/", "My Season", "season"], ["/u/", "Profile", "profile"], ["/business/", "For business", "business"]];
   const TOOLS = [
     ["/radar/", "Opening Radar", "When each company usually opens internships"],
     ["/#quiz", "Match quiz", "Real openings matched to your major"],
@@ -123,4 +129,46 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     }
   };
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);
+
+  // ── Welcome sheet: right after someone signs in for the first time, ask "looking" or "hiring" (saved on their Clerk account) ──
+  const DEST = { student: "/jobs/", employer: "/business/talent/" };
+  async function saveRole(role, go){
+    const u = window.Clerk && window.Clerk.user;
+    try { if (u) await u.update({ unsafeMetadata: { ...(u.unsafeMetadata || {}), role } }); } catch {}
+    try { localStorage.setItem("btp_role", role); } catch {}
+    location.href = go || DEST[role];
+  }
+  window.btpSaveRole = saveRole;
+  window.btpRoleCards = (pre) => `<div class="btprole-cards">
+      <button class="btprole-card${pre === "student" ? " on" : ""}" data-role="student"><span class="btprole-ic">${svg("jobs")}</span><b>I'm looking for an internship</b>
+        <small>Real internships from company job boards, every major. Career Fair Mode, My Season, Orbit.</small><span class="btprole-go">Find internships →</span></button>
+      <button class="btprole-card${pre === "employer" ? " on" : ""}" data-role="employer"><span class="btprole-ic">${svg("talent")}</span><b>I'm hiring interns</b>
+        <small>Find students by major, school and skills, and meet them at career fairs. Free during beta.</small><span class="btprole-go">Find interns →</span></button></div>`;
+  const sheetCss = `.btprole{position:fixed;inset:0;z-index:200;background:rgba(6,10,44,.72);display:grid;place-items:center;padding:16px;font-family:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.btprole .box{background:#fff;border-radius:16px;max-width:760px;width:100%;padding:28px;box-shadow:0 24px 60px rgba(6,10,44,.4)}
+.btprole h2{margin:0 0 4px;font-size:24px;color:#060A2C;letter-spacing:-.01em}.btprole p{margin:0 0 18px;color:#55627A}
+.btprole-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btprole-card{font:inherit;text-align:left;cursor:pointer;background:#fff;border:2px solid #DCE2EC;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:8px;color:#060A2C;transition:border-color .12s,box-shadow .12s}
+.btprole-card:hover,.btprole-card:focus-visible,.btprole-card.on{border-color:#4A7000;box-shadow:0 0 0 4px #F2FADF;outline:0}
+.btprole-card b{font-size:18px}.btprole-card small{color:#55627A;font-size:14px;line-height:1.45}
+.btprole-ic{width:44px;height:44px;border-radius:12px;background:#060A2C;color:#B0F701;display:grid;place-items:center}
+.btprole-go{margin-top:auto;color:#4A7000;font-weight:600;font-size:14px;padding-top:6px}
+@media (max-width:620px){.btprole-cards{grid-template-columns:1fr}.btprole .box{padding:20px}}`;
+  const sc = document.createElement("style"); sc.textContent = sheetCss; document.head.appendChild(sc);
+  document.addEventListener("click", (e) => { const c = e.target.closest && e.target.closest(".btprole-card"); if (c) { c.disabled = true; saveRole(c.dataset.role); } });
+  function sheet(){
+    if (document.querySelector(".btprole") || path.startsWith("/start")) return;
+    const d = document.createElement("div"); d.className = "btprole"; d.setAttribute("role", "dialog"); d.setAttribute("aria-modal", "true"); d.setAttribute("aria-label", "Welcome");
+    d.innerHTML = `<div class="box"><h2>Welcome to Beat the Pile</h2><p>What brings you here? You can switch later.</p>${window.btpRoleCards()}</div>`;
+    document.body.appendChild(d); d.querySelector(".btprole-card").focus();
+  }
+  let tries = 0;
+  const watch = setInterval(() => {      // pages load Clerk themselves; once it's ready, sync the role or ask for it
+    const C = window.Clerk; if (++tries > 60) return clearInterval(watch);
+    if (!C || !C.loaded) return;
+    clearInterval(watch);
+    const role = C.user && C.user.unsafeMetadata && C.user.unsafeMetadata.role;
+    if (role && role !== ROLE) { try { localStorage.setItem("btp_role", role); } catch {} if (role === "employer" || ROLE === "employer") location.reload(); }
+    else if (C.user && !role) sheet();
+  }, 500);
 })();

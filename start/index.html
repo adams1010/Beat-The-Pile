@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Get started — Beat the Pile</title>
+<meta name="description" content="Join Beat the Pile: find an internship in any major, or find interns for your company.">
+<link rel="canonical" href="https://www.beatthepile.com/start/">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#060A2C">
+<style>
+  /* /start/ (Nov 2026): step 1 = email (Clerk sign-in / sign-up), step 2 = "looking" or "hiring" (Clerk unsafeMetadata.role).
+     ?role=employer|student preselects a card; ?next=/path sends them somewhere specific after. */
+  :root{--navy:#060A2C;--lime:#B0F701;--green:#4A7000;--ink:#060A2C;--muted:#55627A;--line:#DCE2EC;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:var(--navy);color:#fff;font-family:var(--font);font-size:16px;line-height:1.5}
+  main{max-width:820px;margin:0 auto;padding:48px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
+  .steps{display:flex;gap:8px;justify-content:center;margin-bottom:22px;font-size:13px;color:#9FAAC0}
+  .steps span{padding:4px 12px;border-radius:999px;border:1px solid #22304D}.steps span.on{background:var(--lime);color:var(--navy);border-color:var(--lime);font-weight:600}
+  h1{font-size:clamp(28px,4.5vw,40px);line-height:1.1;letter-spacing:-.025em;text-align:center;margin:0 0 10px}
+  h1 em{font-style:normal;color:var(--lime)}
+  .lead{text-align:center;color:#C9D2E3;margin:0 auto 28px;max-width:52ch}
+  .panel{background:#fff;color:var(--ink);border-radius:16px;padding:28px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+  #signin{display:flex;justify-content:center;min-height:120px}
+  .center{text-align:center;color:var(--muted)}
+  .switch{text-align:center;margin-top:18px;font-size:14px;color:#9FAAC0}.switch a{color:var(--lime)}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main">
+  <div class="steps" aria-hidden="true"><span id="s1" class="on">1 · Your email</span><span id="s2">2 · Looking or hiring</span></div>
+  <div id="view"><p class="center">Loading…</p></div>
+</main>
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const qs = new URLSearchParams(location.search);
+  const pre = ["student", "employer"].includes(qs.get("role")) ? qs.get("role") : null;
+  const next = /^\/[a-z0-9/_#?=&-]*$/i.test(qs.get("next") || "") ? qs.get("next") : null;
+  function stepEmail(C){
+    $("#s1").className = "on"; $("#s2").className = "";
+    $("#view").innerHTML = `<h1>Beat the pile. <em>Start here.</em></h1>
+      <p class="lead">${pre === "employer" ? "Create a free account to find interns from every major." : "Enter your email to sign in or create a free account. Students and companies both start here."}</p>
+      <div class="panel"><div id="signin"></div></div>`;
+    try { C.mountSignIn($("#signin"), { forceRedirectUrl: location.href, signUpForceRedirectUrl: location.href, withSignUp: true }); }
+    catch { $("#signin").innerHTML = `<button class="btn" id="si" style="font:inherit;font-weight:600;background:#4A7000;color:#fff;border:0;border-radius:999px;padding:12px 24px;cursor:pointer">Continue with email</button>`; $("#si").onclick = () => C.openSignIn({}); }
+  }
+  function stepRole(C){
+    $("#s1").className = ""; $("#s2").className = "on";
+    const has = C.user.unsafeMetadata && C.user.unsafeMetadata.role;
+    $("#view").innerHTML = `<h1>What brings you to <em>Beat the Pile</em>?</h1>
+      <p class="lead">${has ? "You can switch any time. This changes your top bar and home screen." : "Pick one to set up your home screen. You can switch later."}</p>
+      <div class="panel">${window.btpRoleCards(pre || has || null)}</div>
+      <p class="switch">Signed in as ${String(C.user.primaryEmailAddress?.emailAddress || "").replace(/[<>&"]/g, "")} · <a href="#" id="out">Use a different account</a></p>`;
+    document.querySelectorAll(".btprole-card").forEach((b) => b.addEventListener("click", (e) => { e.stopPropagation(); b.disabled = true; window.btpSaveRole(b.dataset.role, next); }, true));
+    $("#out").onclick = async (e) => { e.preventDefault(); await C.signOut(); location.reload(); };
+  }
+  async function loadClerk(){
+    try {
+      const pk = (await fetch("/api/config").then((r) => r.json())).clerkPublishableKey; if (!pk) throw 0;
+      if (!window.Clerk) {
+        const host = atob(pk.replace(/^pk_(test|live)_/, "")).replace(/\$$/, "").trim(); if (!/clerk/.test(host)) throw 0;
+        await new Promise((ok, bad) => { const s = document.createElement("script"); s.src = `https://${host}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`;
+          s.setAttribute("data-clerk-publishable-key", pk); s.async = true; s.crossOrigin = "anonymous"; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
+      }
+      if (typeof window.Clerk.load === "function" && !window.Clerk.loaded) await window.Clerk.load({});
+      const C = window.Clerk;
+      const show = () => (C.user ? stepRole(C) : stepEmail(C));
+      let last = C.user?.id || null; C.addListener?.(({ user }) => { const id = user?.id || null; if (id !== last) { last = id; show(); } });
+      show();
+    } catch { $("#view").innerHTML = '<div class="panel center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; }
+  }
+  window.__startPreview = (who) => who ? stepRole({ user: { unsafeMetadata: {}, primaryEmailAddress: { emailAddress: "you@school.edu" } }, signOut(){} }) : stepEmail({ mountSignIn(el){ el.innerHTML = '<div style="width:380px;max-width:100%;border:1px dashed #DCE2EC;border-radius:12px;padding:30px;text-align:center;color:#55627A">Clerk email box</div>'; } });
+  loadClerk();
+})();
+</script>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

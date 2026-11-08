@@ -184,7 +184,7 @@
     const r = await fetch("/api/me", { method, headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) }, body: body ? JSON.stringify(body) : undefined });
     const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Something went wrong"); return j;
   }
-  const blank = () => ({ photo: null, name: "", headline: "", school: "", major: "", gradYear: "", location: "", lookingFor: "", about: "", skills: [], experience: [], projects: [], links: {}, showResume: false });
+  const blank = () => ({ photo: null, name: "", headline: "", school: "", major: "", gradYear: "", location: "", lookingFor: "", about: "", skills: [], experience: [], projects: [], links: {}, showResume: false, openToEmployers: false });
   function editor(){
     const d = S.draft, me = S.me;
     const field = (k, label, ph, attrs = "") => `<div><label for="f_${k}">${label}</label><input id="f_${k}" data-k="${k}" value="${esc(d.p[k] ?? "")}" placeholder="${esc(ph)}" ${attrs}></div>`;
@@ -196,7 +196,8 @@
       <section class="card"><h2>Your link</h2>
         <label for="f_handle">Profile address</label>
         <div class="handle"><span>beatthepile.com/u/</span><input id="f_handle" value="${esc(d.handle)}" placeholder="jordan-lee" autocomplete="off" spellcheck="false"></div>
-        <label class="switch"><input type="checkbox" id="f_public" ${d.pub ? "checked" : ""}><span><b>Public profile</b><br><span class="muted small">Off = only you can see it. On = anyone with the link (recruiters, friends) can view it. It's never listed or searchable.</span></span></label>
+        <label class="switch"><input type="checkbox" id="f_public" ${d.pub ? "checked" : ""}><span><b>Public profile</b><br><span class="muted small">Off = only you can see it. On = anyone with the link (recruiters, friends) can view it, and students at your school can find you in Orbit. It's never in search engines.</span></span></label>
+        <label class="switch"><input type="checkbox" id="f_employers" ${d.p.openToEmployers ? "checked" : ""}><span><b>Let employers find me</b><br><span class="muted small">Companies hiring interns can find your public profile in Find talent by major, school and skills. Needs a public profile. Off unless you turn it on.</span></span></label>
         ${me.handle && me.profilePublic ? `<p class="small" style="margin:10px 0 0">Live at <a href="/u/${esc(me.handle)}" style="color:var(--green-dark)">beatthepile.com/u/${esc(me.handle)}</a></p>` : ""}
       </section>
       <section class="card"><h2>Basics</h2>
@@ -276,6 +277,7 @@
     const h = $("#f_handle"); if (h) h.oninput = () => { h.value = h.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").slice(0, 30); d.handle = h.value; };
     const pub = $("#f_public"); if (pub) pub.onchange = () => { d.pub = pub.checked; };
     const rs = $("#f_resume"); if (rs) rs.onchange = () => { d.p.showResume = rs.checked; };
+    const oe = $("#f_employers"); if (oe) oe.onchange = () => { d.p.openToEmployers = oe.checked; };
     const ph = $("#f_photo"); if (ph) ph.onchange = async () => { const f = ph.files && ph.files[0]; if (!f) return;
       const msg = $("#msg"); try { d.p.photo = await shrink(f); editor(); const m = $("#msg"); m.className = "msg"; m.textContent = "Photo ready — tap Save profile."; }
       catch (e) { msg.className = "msg err"; msg.textContent = e.message; } };

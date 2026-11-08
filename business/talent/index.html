@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Find talent — Beat the Pile for Business</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#060A2C">
+<style>
+  /* /business/talent/ (Nov 2026): employer search. POST /api/me {action:"talent"} → lib/talent.js.
+     Only students with a public profile AND "Let employers find me" on. Employer accounts only (Clerk role). */
+  :root{--navy:#060A2C;--lime:#B0F701;--green:#4A7000;--tint:#F2FADF;--ink:#060A2C;--muted:#55627A;--line:#DCE2EC;--bg:#EEF1F6;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5}
+  .band{background:var(--navy);color:#fff;padding:28px 0 26px}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
+  h1{font-size:28px;margin:0 0 4px;letter-spacing:-.02em}.band p{margin:0;color:#C9D2E3}
+  form.f{display:grid;grid-template-columns:2fr 1.3fr 1.3fr .8fr auto;gap:10px;margin-top:18px}
+  form.f input,form.f select{font:inherit;font-size:14px;border:1px solid #2A3566;background:#0E1440;color:#fff;border-radius:10px;padding:11px 12px;min-width:0}
+  form.f input::placeholder{color:#8D9AB3}
+  form.f input:focus,form.f select:focus{outline:2px solid var(--lime);outline-offset:1px}
+  .btn{font:inherit;font-weight:600;font-size:14px;border-radius:999px;padding:10px 20px;border:0;cursor:pointer;text-decoration:none;display:inline-block}
+  .btn.lime{background:var(--lime);color:var(--navy)}.btn.out{background:#fff;border:1px solid var(--green);color:var(--green)}.btn.out:hover{background:var(--tint)}
+  main.wrap{padding-top:22px;padding-bottom:60px}
+  .meta{color:var(--muted);font-size:14px;margin:0 0 14px}
+  .res{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  .c{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:10px}
+  .top{display:flex;gap:12px;align-items:center}
+  .av{width:52px;height:52px;border-radius:50%;background:var(--navy);color:var(--lime);display:grid;place-items:center;font-weight:600;overflow:hidden;flex-shrink:0}
+  .av img{width:100%;height:100%;object-fit:cover}
+  .nm{font-weight:650;font-size:16px}.sub{color:var(--muted);font-size:13px}
+  .hl{font-size:14px}
+  .exp{font-size:13px;color:#3A4560;background:#F7F8FB;border-radius:8px;padding:8px 10px}
+  .sk{display:flex;gap:6px;flex-wrap:wrap}.sk span{font-size:12px;background:var(--tint);color:var(--green);border-radius:999px;padding:3px 9px}
+  .c .btn{align-self:flex-start;margin-top:auto}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:32px;text-align:center;max-width:640px;margin:20px auto}
+  .card p{color:var(--muted)}
+  @media (max-width:860px){form.f{grid-template-columns:1fr 1fr}form.f .q{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<div class="band"><div class="wrap">
+  <h1>Find talent</h1>
+  <p>Students who chose to be found by employers. Search by skills, major, school and graduation year.</p>
+  <form class="f" id="f" role="search">
+    <input class="q" id="q" placeholder="Skills or keywords, e.g. SolidWorks, Python, financial modeling" aria-label="Skills or keywords">
+    <input id="major" placeholder="Major, e.g. Mechanical Engineering" aria-label="Major">
+    <input id="school" placeholder="School, e.g. Virginia Tech" aria-label="School">
+    <select id="yr" aria-label="Graduation year"><option value="">Any year</option></select>
+    <button class="btn lime" type="submit">Search</button>
+  </form>
+</div></div>
+<main id="main" class="wrap"><div id="out"><div class="card">Loading…</div></div></main>
+<script>
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const S = { clerk: null };
+  const y = new Date().getFullYear(); $("#yr").innerHTML += [0, 1, 2, 3, 4].map((i) => `<option>${y + i}</option>`).join("");
+  const initials = (n) => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";
+  async function token(){ try { return await S.clerk?.session?.getToken(); } catch { return null; } }
+  function render(d){
+    if (!d.results.length) { $("#out").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">No students match yet</h2><p>Try fewer filters. Students only appear here after they turn on "Let employers find me" on their profile, so the directory grows as more students join.</p></div>`; return; }
+    $("#out").innerHTML = `<p class="meta">${d.total} student${d.total === 1 ? "" : "s"} found${d.total > d.results.length ? `, showing the top ${d.results.length}` : ""}</p>
+      <div class="res">${d.results.map((p) => `<div class="c">
+        <div class="top"><div class="av">${p.photo ? `<img alt="" src="${esc(p.photo)}">` : esc(initials(p.name))}</div>
+          <div><div class="nm">${esc(p.name)}</div><div class="sub">${esc([p.major, p.school].filter(Boolean).join(" · "))}${p.gradYear ? ` · Class of ${p.gradYear}` : ""}</div></div></div>
+        ${p.headline ? `<div class="hl">${esc(p.headline)}</div>` : ""}
+        ${p.latest && (p.latest.title || p.latest.org) ? `<div class="exp">${esc([p.latest.title, p.latest.org].filter(Boolean).join(" at "))}</div>` : ""}
+        ${p.lookingFor ? `<div class="sub">Looking for: ${esc(p.lookingFor)}</div>` : ""}
+        ${p.skills.length ? `<div class="sk">${p.skills.map((s) => `<span>${esc(s)}</span>`).join("")}</div>` : ""}
+        <a class="btn out" href="/u/${encodeURIComponent(p.handle)}" target="_blank" rel="noopener">View profile</a></div>`).join("")}</div>`;
+  }
+  async function search(){
+    $("#out").innerHTML = `<div class="card">Searching…</div>`;
+    try {
+      const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) },
+        body: JSON.stringify({ action: "talent", q: $("#q").value, major: $("#major").value, school: $("#school").value, gradYear: $("#yr").value }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.status === 403) { $("#out").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">Find talent is for employer accounts</h2><p>${esc(j.error || "")}</p><a class="btn lime" href="/start/?role=employer">Switch to an employer account</a></div>`; return; }
+      if (!r.ok) throw new Error(j.error || "Search failed");
+      render(j);
+    } catch (e) { $("#out").innerHTML = `<div class="card">Couldn't search right now (${esc(e.message)}). Try again in a minute.</div>`; }
+  }
+  $("#f").addEventListener("submit", (e) => { e.preventDefault(); search(); });
+  async function onUser(u){
+    if (!u) { $("#out").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">Sign in to find talent</h2><p>Create a free employer account to search students by major, school and skills.</p><a class="btn lime" href="/start/?role=employer">Get started</a></div>`; return; }
+    search();
+  }
+  async function loadClerk(){
+    try {
+      const pk = (await fetch("/api/config").then((r) => r.json())).clerkPublishableKey; if (!pk) throw 0;
+      if (!window.Clerk) {
+        const host = atob(pk.replace(/^pk_(test|live)_/, "")).replace(/\$$/, "").trim(); if (!/clerk/.test(host)) throw 0;
+        await new Promise((ok, bad) => { const s = document.createElement("script"); s.src = `https://${host}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`;
+          s.setAttribute("data-clerk-publishable-key", pk); s.async = true; s.crossOrigin = "anonymous"; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
+      }
+      if (typeof window.Clerk.load === "function" && !window.Clerk.loaded) await window.Clerk.load({});
+      S.clerk = window.Clerk;
+      let last = S.clerk.user?.id || null; S.clerk.addListener?.(({ user }) => { const id = user?.id || null; if (id !== last) { last = id; onUser(user); } });
+      onUser(S.clerk.user);
+    } catch { $("#out").innerHTML = '<div class="card">Sign-in is temporarily unavailable. Try again in a minute.</div>'; }
+  }
+  window.__talentRender = render;
+  loadClerk();
+})();
+</script>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

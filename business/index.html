@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Beat the Pile for Business — Hire interns from every major</title>
+<meta name="description" content="Find interns from every major. Your openings are already on Beat the Pile, pulled from your own job board. Search students who opted in, and meet them at career fairs. Free during beta.">
+<link rel="canonical" href="https://www.beatthepile.com/business/">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#060A2C">
+<meta property="og:title" content="Beat the Pile for Business">
+<meta property="og:description" content="Hire interns from every major. Free during beta.">
+<meta property="og:image" content="https://www.beatthepile.com/icons/icon-512.png">
+<style>
+  /* /business/ (Nov 2026): the employer side. Every number here is live (api/listings?summary=1, fair/fairs.json).
+     No testimonials, no logos of companies that haven't agreed, no prices (free during beta). The talent mock is labeled "Example". */
+  :root{--navy:#060A2C;--navy2:#0E1440;--lime:#B0F701;--green:#4A7000;--tint:#F2FADF;--ink:#060A2C;--muted:#55627A;--line:#DCE2EC;--bg:#EEF1F6;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.55}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 max(20px,env(safe-area-inset-right,0px)) 0 max(20px,env(safe-area-inset-left,0px))}
+  a{color:var(--green)}
+  .btn{display:inline-flex;align-items:center;gap:8px;font:inherit;font-weight:600;font-size:15px;border-radius:999px;padding:12px 22px;text-decoration:none;cursor:pointer;border:0}
+  .btn.lime{background:var(--lime);color:var(--navy)}.btn.lime:hover{background:#C4FA3A}
+  .btn.ghost{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.28)}.btn.ghost:hover{border-color:#fff}
+  .btn.dark{background:var(--navy);color:#fff}.btn.dark:hover{background:#141B4D}
+
+  .hero{background:var(--navy);color:#fff;padding:64px 0 72px;overflow:hidden}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+  .kick{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:#D9F99A;margin:0 0 18px}
+  .kick i{width:7px;height:7px;border-radius:50%;background:var(--lime);display:inline-block}
+  h1{font-size:clamp(2.2rem,4.8vw,3.5rem);line-height:1.04;letter-spacing:-.035em;font-weight:650;margin:0 0 18px}
+  h1 em{font-style:normal;color:var(--lime)}
+  .hero p.sub{font-size:18px;color:#C9D2E3;max-width:34em;margin:0 0 28px}
+  .ctas{display:flex;gap:12px;flex-wrap:wrap}
+  .note{font-size:13px;color:#8D9AB3;margin-top:16px}
+
+  /* the example search card */
+  .mock{background:#fff;color:var(--ink);border-radius:16px;padding:18px;box-shadow:0 30px 70px rgba(0,0,0,.45);position:relative}
+  .mock .tag{position:absolute;top:-11px;right:16px;background:#FFF4E6;color:#8A4B08;font-size:12px;font-weight:600;border-radius:999px;padding:3px 10px;border:1px solid #F3D3A8}
+  .mock .bar{display:flex;gap:8px;margin-bottom:12px}
+  .mock .in{flex:1;border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:14px;color:var(--muted)}
+  .mock .chip{border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;white-space:nowrap}
+  .mock .chip.on{background:var(--tint);border-color:#DDF3A8;color:var(--green);font-weight:600}
+  .person{display:flex;gap:12px;align-items:flex-start;padding:12px 4px;border-top:1px solid #EEF1F6}
+  .person:first-of-type{border-top:0}
+  .av{width:42px;height:42px;border-radius:50%;background:var(--navy);color:var(--lime);display:grid;place-items:center;font-weight:600;font-size:14px;flex-shrink:0}
+  .person b{display:block;font-size:15px}.person span{font-size:13px;color:var(--muted)}
+  .sk{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.sk i{font-style:normal;font-size:11.5px;background:#F1F4F9;border-radius:999px;padding:2px 8px;color:#3A4560}
+
+  .live{background:var(--navy2);color:#fff;border-top:1px solid #1A2350}
+  .live .wrap{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;padding-top:22px;padding-bottom:22px}
+  .live div{display:flex;align-items:baseline;gap:10px}
+  .live b{font-size:28px;font-weight:650;color:var(--lime);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .live span{font-size:14px;color:#C9D2E3}
+
+  section{padding:76px 0}
+  .eyebrow{font-size:14px;font-weight:600;color:var(--green);margin:0 0 8px}
+  h2{font-size:clamp(1.7rem,3.2vw,2.4rem);line-height:1.1;letter-spacing:-.025em;margin:0 0 12px}
+  .intro{color:var(--muted);font-size:17px;max-width:44em;margin:0 0 36px}
+  .grid4{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+  .feat{border:1px solid var(--line);border-radius:16px;padding:24px;background:#fff}
+  .feat .ic{width:44px;height:44px;border-radius:12px;background:var(--navy);color:var(--lime);display:grid;place-items:center;margin-bottom:14px}
+  .feat h3{font-size:19px;margin:0 0 6px;letter-spacing:-.01em}.feat p{margin:0;color:var(--muted)}
+
+  .how{background:var(--bg)}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;counter-reset:s}
+  .step{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px;position:relative}
+  .step::before{counter-increment:s;content:counter(s);width:34px;height:34px;border-radius:50%;background:var(--lime);color:var(--navy);font-weight:700;display:grid;place-items:center;margin-bottom:14px}
+  .step h3{margin:0 0 6px;font-size:18px}.step p{margin:0;color:var(--muted)}
+
+  .compare{width:100%;border-collapse:collapse;font-size:15px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .compare th,.compare td{padding:14px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  .compare th{background:#F7F8FB;font-size:14px}.compare td:first-child{font-weight:600;width:28%}
+  .compare .us{background:var(--tint)}
+  .tw{overflow-x:auto}
+
+  .faq details{border-bottom:1px solid var(--line);padding:16px 0}
+  .faq summary{font-weight:600;font-size:17px;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:12px}
+  .faq summary::-webkit-details-marker{display:none}.faq summary::after{content:"+";color:var(--green);font-size:22px;line-height:1}
+  .faq details[open] summary::after{content:"–"}
+  .faq p{color:var(--muted);margin:10px 0 0;max-width:60em}
+
+  .cta{background:var(--navy);color:#fff;text-align:center;padding:72px 0}
+  .cta h2{color:#fff}.cta p{color:#C9D2E3;margin:0 auto 26px;max-width:40em}
+
+  @media (max-width:900px){.hero .wrap{grid-template-columns:1fr}.grid4,.steps{grid-template-columns:1fr}.live .wrap{grid-template-columns:1fr;gap:8px}}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main">
+  <header class="hero">
+    <div class="wrap">
+      <div>
+        <p class="kick"><i></i>Beat the Pile for Business</p>
+        <h1>Hire interns from <em>every major</em>, before the pile does.</h1>
+        <p class="sub">Students come to Beat the Pile to find internships pulled straight from company job boards. Your openings are probably here already. Now find the students behind the applications.</p>
+        <div class="ctas"><a class="btn lime" href="/start/?role=employer">Find interns, free</a><a class="btn ghost" href="#how">See how it works</a></div>
+        <p class="note">Free during beta · no job posting needed · students choose to be found</p>
+      </div>
+      <div class="mock" aria-label="Example of the Find talent search">
+        <span class="tag">Example</span>
+        <div class="bar"><div class="in">SolidWorks, thermal, FEA</div></div>
+        <div class="bar" style="flex-wrap:wrap"><span class="chip on">Mechanical Engineering</span><span class="chip">Virginia Tech</span><span class="chip">Class of 2027</span></div>
+        <div class="person"><div class="av">AR</div><div><b>Example student A</b><span>Mechanical Engineering · Class of 2027</span><div class="sk"><i>SolidWorks</i><i>GD&amp;T</i><i>MATLAB</i></div></div></div>
+        <div class="person"><div class="av">JK</div><div><b>Example student B</b><span>Mechanical Engineering · Class of 2027</span><div class="sk"><i>FEA</i><i>Thermal analysis</i><i>Python</i></div></div></div>
+        <div class="person"><div class="av">TL</div><div><b>Example student C</b><span>Aerospace Engineering · Class of 2028</span><div class="sk"><i>CAD</i><i>Composites</i><i>Testing</i></div></div></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="live" aria-label="Live numbers">
+    <div class="wrap">
+      <div><b id="nOpen">—</b><span>open internships on Beat the Pile right now</span></div>
+      <div><b id="nCos">—</b><span>companies hiring interns right now</span></div>
+      <div><b id="nFairs">—</b><span>Virginia Tech career fairs in Career Fair Mode</span></div>
+    </div>
+  </div>
+
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">Why recruit here</p>
+      <h2>Meet students where they're already searching</h2>
+      <p class="intro">Job boards bury you in reposts and stale listings. Beat the Pile only shows real openings from each company's own careers site, so students who find you here are looking at your real roles.</p>
+      <div class="grid4">
+        <div class="feat"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8.5 7V5.5A1.5 1.5 0 0 1 10 4h4a1.5 1.5 0 0 1 1.5 1.5V7"/><path d="M3 12.5h18"/></svg></div>
+          <h3>Your openings are already listed</h3><p>We read thousands of company job boards several times a day. If you post internships on your careers site, students see them here with a direct link to your apply page. No posting, no fee.</p></div>
+        <div class="feat"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8.5" r="3.25"/><path d="M3 19.5c.6-3.1 3-5 6-5s5.4 1.9 6 5"/><circle cx="17" cy="9.5" r="2.5"/><path d="M16 14.6c2.6-.3 4.6 1.3 5 4.9"/></svg></div>
+          <h3>Find talent by major, school and skills</h3><p>Search student profiles: experience, projects, skills, graduation year. Every student in search turned on "Let employers find me." Nobody is listed without saying yes.</p></div>
+        <div class="feat"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5c0 1.4 1.1 2.5 2.5 2.5S9 10.9 9 9.5c0 1.4 1.1 2.5 2.5 2.5h1c1.4 0 2.5-1.1 2.5-2.5 0 1.4 1.1 2.5 2.5 2.5S20 10.9 20 9.5"/><path d="M5.5 12v8h13v-8"/><path d="M10 20v-4.5h4V20"/></svg></div>
+          <h3>Better career fairs</h3><p>Students walk up already knowing your open roles. Scan their resume QR at your booth, and they leave with notes and a reminder to follow up with you.</p></div>
+        <div class="feat"><div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5S9.7 5.9 12 3.5z"/></svg></div>
+          <h3>Every major, not just computer science</h3><p>Engineering, finance, marketing, supply chain, science, policy and more. Students pick their major and see the roles that fit, and so do you.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how" id="how">
+    <div class="wrap">
+      <p class="eyebrow">How it works</p>
+      <h2>Three steps, about five minutes</h2>
+      <p class="intro">Sign up with your work email and pick "I'm hiring interns."</p>
+      <div class="steps">
+        <div class="step"><h3>Create your account</h3><p>Enter your email, then choose "I'm hiring interns." Your top bar switches to the employer view.</p></div>
+        <div class="step"><h3>Search students</h3><p>Filter by major, school, graduation year and skills. Open a profile to see experience, projects and links.</p></div>
+        <div class="step"><h3>Reach out and meet</h3><p>Connect through the links on their profile, and meet them at the career fairs where they're bringing their game plan.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="wrap">
+      <p class="eyebrow">How it compares</p>
+      <h2>Built for internships, not everything</h2>
+      <div class="tw"><table class="compare">
+        <tr><th></th><th>Big job boards</th><th>Campus portals</th><th class="us">Beat the Pile</th></tr>
+        <tr><td>Where listings come from</td><td>Reposts and paid listings</td><td>Jobs you post to each school</td><td class="us">Your own careers site, read automatically</td></tr>
+        <tr><td>Majors</td><td>Everything, mixed together</td><td>Varies by school</td><td class="us">Every major, sorted for students</td></tr>
+        <tr><td>Finding students</td><td>Paid recruiter seats</td><td>School by school</td><td class="us">Students who opted in, free during beta</td></tr>
+        <tr><td>Career fairs</td><td>—</td><td>Registration</td><td class="us">Students arrive knowing your open roles</td></tr>
+      </table></div>
+    </div>
+  </section>
+
+  <section class="how faq">
+    <div class="wrap">
+      <p class="eyebrow">Questions</p>
+      <h2>Good to know</h2>
+      <details><summary>Is it free?</summary><p>Yes, during the beta. We'll tell you well ahead of time before anything changes.</p></details>
+      <details><summary>Do I need to post my internships?</summary><p>No. We read your careers site directly. If your openings aren't showing up, use Feedback (bottom right) and send us your careers page link.</p></details>
+      <details><summary>Which students can I see?</summary><p>Only students who made their profile public and turned on "Let employers find me." You see what they chose to show: name, school, major, graduation year, skills, experience and projects. Never their email, phone or private application details.</p></details>
+      <details><summary>How do I contact a student?</summary><p>Through the links they share on their profile (like LinkedIn), or at a career fair. In-app messaging is coming.</p></details>
+      <details><summary>Are you affiliated with a university?</summary><p>No. Beat the Pile is an independent, student-built product. Career fair dates come from each school's public calendar.</p></details>
+    </div>
+  </section>
+
+  <section class="cta">
+    <div class="wrap">
+      <h2>Find your next interns</h2>
+      <p>Create a free account and start searching students by major, school and skills.</p>
+      <a class="btn lime" href="/start/?role=employer">Get started, free</a>
+    </div>
+  </section>
+</main>
+<script>
+(() => {
+  const fmt = (n) => n == null ? "—" : Number(n).toLocaleString();
+  fetch("/api/listings?summary=1").then((r) => r.ok ? r.json() : Promise.reject()).then((s) => {
+    document.getElementById("nOpen").textContent = fmt(s.allMajors ?? s.listings);
+    document.getElementById("nCos").textContent = fmt(s.hiringNow ?? s.companies);
+  }).catch(() => {});
+  fetch("/fair/fairs.json").then((r) => r.json()).then((d) => { document.getElementById("nFairs").textContent = fmt((d.fairs || []).length); }).catch(() => {});
+})();
+</script>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>
