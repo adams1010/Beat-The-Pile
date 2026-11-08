@@ -30,12 +30,12 @@ then read `PROBE_RESULT` from the run logs. In the JS, `await import(process.cwd
 tab/newline escapes (`"\t"`, `"\n"`) — the code is passed through bash single quotes.
 
 ## Look & feel (Nov 2026) — Direction D (Glassdoor × LinkedIn), live since Nov 5; "less AI" pass Nov 5 night
-Top bar + homepage hero: deep navy `#070F1E` (no grid, no scan line, no ticker, no blinking), mint `#2FD39A` accent, solid mint "BP"
-mark. Content area `#EEF1F6`, white 12px-radius cards, green actions `#0B7A55`, pill buttons. **No monospace/"terminal" font and
+Top bar + homepage hero: navy `#060A2C` (no grid, no scan line, no ticker, no blinking), lime `#B0F701` accent, the Beat the Pile
+logo. Content area `#EEF1F6`, white 12px-radius cards, dark-lime actions `#4A7000`, pill buttons. **No monospace/"terminal" font and
 no ALL-CAPS letter-spaced labels** — sentence case, Geist with `tabular-nums` for numbers. Job cards lead with the **role**, then a
 company line with an initials tile. /jobs = 3 columns on desktop; on phones the filter box is not sticky and Feedback is a small "?".
 Shared static-page theme: `/d.css`. Mockups: Design artifact 6iuFD7mA58DSdeeWUebJCo.
-Font **Geist**; ink `#0A1426`, one accent green `#0B7A55`, cool neutrals. No gradients, glows, rainbow chips or emoji
+Font **Geist**; ink `#060A2C`, one accent (dark lime `#4A7000` on white, lime `#B0F701` on navy), cool neutrals. No gradients, glows, rainbow chips or emoji
 in UI. Homepage tokens: `G/GD/GL/GM` at the top of `src/home.jsx`; static pages: CSS vars at the top of each page.
 Homepage `/#interview` = Interview practice (`/api/generate` feature `interview_turn`). Pro is **free during beta**
 (no payment exists — never show prices or "secure checkout" until Stripe is wired).
@@ -54,6 +54,14 @@ Control Room** (owner sign-in required to see numbers) · `/discovery` robot's c
 `/demo` story-style demo · `/orbit` **Orbit** (Nov 8; the people side, LinkedIn "My Network"-style): part 1 live = classmates (same school + major, public profiles only), other majors at your school, students who interned at companies you follow (profile experience org = followed company), activity feed (new internships at followed companies + approved community posts) — `POST /api/me {action:"orbit"}` → `lib/orbit.js`. Part 2 = two-way Connect + "going to the same fair" (opt-in), needs `supabase/orbit.sql` run first · `/u/` **the one profile** (Nov 7: the old homepage profile form is gone — `/#profile` redirects to `/u/#kit`; owner view adds Profile strength + a private **Application kit** = email/phone/GPA/work auth/relocate/why-me/resumes, stored in `user_home.profile`/`resumes` via `/api/usersync` so homepage auto-fill + cover letters still use it; saving /u/ also copies name/school/major/links/skills into the kit; profile QR for career fairs) and `/u/<handle>` public profile (private until the student turns it on; noindex; https-only links; resume button only when the QR link is on; API `action:"profile"` + `GET /api/me?u=`) · `/` homepage (built from `src/home.jsx`).
 Every page (homepage too) includes **`/nav.js`** (one shared top bar: Jobs · Career Fair · Orbit · My Season · Profile · Tools ▾ — a line icon above each label (inline SVG, class `btpic`; never emoji); Radar lives under Tools; phones get a Menu; it moves the page's `#acct` sign-in widget into the bar) and
 `/feedback.js` (Report a problem). Owner tools are not in the student nav.
+**Spanish (Nov 8):** `nav.js` loads **`/i18n.js`**; Tools ▾ → Language (and a Language card on `/u/`) sets localStorage `btp_lang`
+(`en`|`es`). In Spanish it swaps whole text nodes / placeholder / aria-label / title that exactly match an English key in
+**`i18n/es.json`** (`strings`), plus `patterns` for numbers ("12 open"), and "·"-joined parts one by one; a MutationObserver
+covers later renders. Employer data (titles, companies, places) is never in the dictionary. **New UI text? Add its Spanish to
+`i18n/es.json`** (`tests/i18n-test.mjs`). Wrap anything that must not change in `data-noi18n`.
+**Brand (Nov 8):** logo in `brand/` (`logo-white.png` in the navy top bar, `logo.png` on light, `mark.png`), icons in `icons/`.
+Colors from the logo: navy `#060A2C`, lime `#B0F701` (on dark only — 1.3:1 on white), dark lime `#4A7000` for buttons/links
+on white, tints `#F2FADF`/`#DDF3A8`.
 
 ## Privacy, AI and data-integrity rules (from the Nov 2026 audit — keep them)
 - **Resume QR**: new uploads start **private** (`resume_share=false`); students turn it on. `rotate` = new token (old QR

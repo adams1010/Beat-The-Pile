@@ -75,9 +75,14 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
 @media (max-width:900px){.btpnav .q{display:none}}
 @media (max-width:640px){.btpnav #acct span,.btpnav #acct .who{display:none}
   .btpnav .links{display:none}.btpnav .mob{display:block;margin-left:auto}.btpnav .mob summary{color:#fff;border:1px solid rgba(255,255,255,.18);padding:7px 10px}
-  .btpnav .mob .menu{left:8px!important;right:8px;min-width:0}.btpnav .menu .sep{height:1px;background:#E3E7ED;margin:6px 4px}}
+  .btpnav .mob .menu{left:8px!important;right:8px;min-width:0}}
+.btpnav .menu .sep{height:1px;background:#E3E7ED;margin:6px 4px}
 @media print{.btpnav{display:none}}`;
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
+  // Site language (English / Español): /i18n.js translates the page when Spanish is picked.
+  if (!document.querySelector('script[src="/i18n.js"]')) { const i = document.createElement("script"); i.src = "/i18n.js"; document.head.appendChild(i); }
+  let LANG = "en"; try { LANG = localStorage.getItem("btp_lang") === "es" ? "es" : "en"; } catch {}
+  const langItem = (rich) => `<a role="menuitem" href="#" data-btp-lang="${LANG === "es" ? "en" : "es"}">${rich ? `<b>Language</b><small>${LANG === "es" ? "Switch to English" : "Cambiar a español"}</small>` : `<b>${LANG === "es" ? "English" : "Español"}</b>`}</a>`;
   if (!document.querySelector('link[href*="family=Geist"]')) {
     const f = document.createElement("link"); f.rel = "stylesheet";
     f.href = "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap"; document.head.appendChild(f);
@@ -87,8 +92,8 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     <a class="logo" href="/" aria-label="Beat the Pile home"><img src="/brand/logo-white.png" alt="Beat the Pile" width="95" height="38"></a>
     <form class="q" role="search" action="/jobs/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search internships" placeholder="Search internships, companies, majors"><input type="hidden" name="state" value="all"><kbd>/</kbd></form>
     <div class="links">${MAIN.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${svg(k)}<span>${t}</span></a>`).join("")}
-      <details><summary>${svg("tools")}<span class="lbl">Tools</span></summary><div class="menu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}</div></details></div>
-    <details class="mob"><summary>Menu</summary><div class="menu" role="menu">${MAIN.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div>${TOOLS.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}</div></details>
+      <details><summary>${svg("tools")}<span class="lbl">Tools</span></summary><div class="menu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}<div class="sep"></div>${langItem(true)}</div></details></div>
+    <details class="mob"><summary>Menu</summary><div class="menu" role="menu">${MAIN.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div>${TOOLS.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div>${langItem(false)}</div></details>
     <div class="right" id="btpRight"><a class="me" id="btpMe" href="/u/" hidden></a></div></div>`;
   addEventListener("keydown", (e) => { const t = e.target.tagName; if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(t) && !e.target.isContentEditable) { const i = nav.querySelector(".q input"); if (i && i.offsetParent) { e.preventDefault(); i.focus(); } } });
   // your photo/initials (saved by the profile page or the homepage after sign-in) → links to your profile
@@ -113,6 +118,8 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
       document.addEventListener("keydown", (e) => { if (e.key === "Escape") det.open = false; });
       addEventListener("resize", () => det.open && place());
       det.querySelectorAll(".menu a").forEach((a) => a.addEventListener("click", () => { det.open = false; }));
+      det.querySelectorAll("[data-btp-lang]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault();
+        const l = a.dataset.btpLang; if (window.btpI18n) window.btpI18n.set(l); else { try { localStorage.setItem("btp_lang", l); } catch {} location.reload(); } }));
     }
   };
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);

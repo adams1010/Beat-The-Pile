@@ -230,6 +230,8 @@
         <label for="f_skill">Add a skill</label><input id="f_skill" list="skilllist" placeholder="Start typing, e.g. SolidWorks, then Enter" ${d.p.skills.length >= 30 ? "disabled" : ""}>
         <datalist id="skilllist">${SKILLS.filter((s) => !d.p.skills.includes(s)).map((s) => `<option value="${esc(s)}">`).join("")}</datalist>
       </section>
+      <section class="card" id="language"><h2>Language</h2><p class="small muted">Pick the language for menus, buttons and help text. Job titles and company names stay as the employer wrote them.</p>
+        ${window.btpI18n ? window.btpI18n.picker() : ""}</section>
       <section class="card"><h2>Links</h2>
         <div class="row"><div><label for="l_linkedin">LinkedIn</label><input id="l_linkedin" data-link="linkedin" value="${esc(d.p.links.linkedin || "")}" placeholder="https://linkedin.com/in/…"></div>
         <div><label for="l_github">GitHub</label><input id="l_github" data-link="github" value="${esc(d.p.links.github || "")}" placeholder="https://github.com/…"></div></div>
