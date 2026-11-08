@@ -12,7 +12,7 @@ for (const t of no) assert.ok(!isEarlyCareer(t), "should NOT be early-career: " 
 assert.equal(kindOf("Finance Intern"), "intern"); assert.equal(kindOf("Associate Engineer"), "fulltime"); assert.equal(kindOf("Senior Engineer"), null);
 // The Postgres pattern agrees with the JS rule on real titles (International / Internal are not internships)
 const pg = new RegExp(INTERN_PG, "i");
-for (const t of ["Mechanical Engineering Intern", "Co-op Engineer", "Summer Analyst 2027", "Internship - Finance"]) assert.ok(pg.test(t), t);
+for (const t of ["Mechanical Engineering Intern", "Co-op Engineer", "Summer Analyst 2027", "Internship - Finance", "Construction Internships 2027"]) assert.ok(pg.test(t), t);
 for (const t of ["International Trade Analyst I", "Internal Audit Associate Analyst", "Associate Engineer"]) assert.ok(!pg.test(t), t);
 
 // The readers keep early-career titles (Greenhouse returns every job; the shared filter decides)
@@ -31,12 +31,13 @@ env(); const f = installFake({});
 const L = f.T("listings"), now = new Date().toISOString();
 const row = (id, title) => L.push({ id, company_id: "acme", company: "Acme", title, field: "mechanical", match: "me", state: "VA", url: "https://x/" + id, first_seen: now, closed_at: null, link_ok: true });
 row("a1", "Mechanical Engineering Intern"); row("a2", "Associate Mechanical Engineer"); row("a3", "Manufacturing Co-op"); row("a4", "International Engineer I");
+row("a5", "Commercial Construction Internships 2027"); row("a6", "Volunteer/Student Positions");   // plural title; a board-flagged internship
 const api = (await import("../api/listings.js")).default;
 const get = async (q) => (await invoke(api, { method: "GET", query: q })).body;
-assert.deepEqual((await get({})).listings.map((l) => l.id).sort(), ["a1", "a3"], "default = internships only (no change for old pages)");
+assert.deepEqual((await get({})).listings.map((l) => l.id).sort(), ["a1", "a3", "a5", "a6"], "default = internships (incl. board-flagged ones and plural titles)");
 assert.deepEqual((await get({ kind: "fulltime" })).listings.map((l) => [l.id, l.kind]).sort(), [["a2", "fulltime"], ["a4", "fulltime"]]);
-assert.equal((await get({ kind: "all" })).listings.length, 4);
+assert.equal((await get({ kind: "all" })).listings.length, 6);
 assert.equal((await invoke(api, { method: "GET", query: { kind: "senior" } })).code, 400);
 const sum = await get({ summary: "1" });
-assert.equal(sum.allMajors, 2, "headline numbers stay internships"); assert.equal(sum.fulltime, 2);
+assert.equal(sum.allMajors, 4, "headline numbers stay internships"); assert.equal(sum.fulltime, 2);
 console.log("✓ full-time: early-career rules, Postgres pattern = JS rule, readers keep them, kind=intern default / fulltime / all, summary split");

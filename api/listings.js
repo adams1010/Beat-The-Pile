@@ -16,7 +16,7 @@
 //   GET /sitemap.xml   (→ ?sitemap=1)            → main pages + every company hiring now
 // Bad parameters → 400 with what's wrong. A database problem → 503 (never an empty list that looks like "no jobs").
 import { db } from "../lib/db.js";
-import { FIELDS, INTERN_PG, kindOf } from "../lib/fields.js";
+import { FIELDS, INTERN_PG, EARLY_PG, kindOf } from "../lib/fields.js";
 import { COMPANIES } from "../lib/companies.js";
 import { companyPage, radarFor, sitemap } from "../lib/companypage.js";
 import { lookupPlace, geocodeOne, miles } from "../lib/geocode.js";
@@ -74,7 +74,10 @@ async function dots(p, res) {
 }
 
 /** Same major filters as the main list (field / strict ME / companies), as a PostgREST query string tail. */
-const KIND_Q = { intern: `&title=imatch.${encodeURIComponent(INTERN_PG)}`, fulltime: `&title=not.imatch.${encodeURIComponent(INTERN_PG)}`, all: "" };
+// internships = everything that isn't a real early-career title (keeps board-flagged interns); full-time = early-career title, not an internship
+const PG = (s) => encodeURIComponent(`"${s.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`);   // PostgREST: quote values that contain , ( )
+const KIND_Q = { intern: `&or=(title.imatch.${PG(INTERN_PG)},title.not.imatch.${PG(EARLY_PG)})`,
+                 fulltime: `&and=(title.imatch.${PG(EARLY_PG)},title.not.imatch.${PG(INTERN_PG)})`, all: "" };
 const withKind = (rows) => rows.map((l) => ({ ...l, kind: kindOf(l.title) === "fulltime" ? "fulltime" : "intern" }));   // board-flagged interns (BambooHR) stay "intern"
 function majorFilter(p) {
   let q = KIND_Q[p.kind || "intern"];

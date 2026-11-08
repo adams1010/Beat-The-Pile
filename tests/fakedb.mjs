@@ -35,14 +35,20 @@ function test(row, col, expr) {
     const a = decodeURIComponent(arg); const x = isNaN(Number(a)) ? Date.parse(a) : Number(a); const y = isNaN(Number(v)) ? Date.parse(v) : Number(v);
     return op === "gt" ? y > x : op === "gte" ? y >= x : op === "lt" ? y < x : y <= x; }
   if (op === "in") { const list = decodeURIComponent(arg).replace(/^\(|\)$/g, "").split(",").map((x) => x.replace(/^"|"$/g, "")); return list.includes(String(v)); }
-  if (op === "imatch" || op === "match") { const re = new RegExp(decodeURIComponent(arg), op === "imatch" ? "i" : ""); return re.test(String(v ?? "")); }   // Postgres POSIX regex ≈ JS here
+  if (op === "imatch" || op === "match") {   // Postgres regex ≈ JS here (\y = word boundary in Postgres)
+    let src = decodeURIComponent(arg); if (src.startsWith('"') && src.endsWith('"')) src = src.slice(1, -1).replace(/\\(["\\])/g, "$1");
+    return new RegExp(src.replace(/\\y/g, "\\b"), op === "imatch" ? "i" : "").test(String(v ?? "")); }
   if (op === "ilike") { const pat = decodeURIComponent(arg).toLowerCase().replace(/\*/g, ""); return String(v ?? "").toLowerCase().includes(pat); }
   return true;
 }
 function logic(row, expr) {        // or=(a.eq.1,b.is.null)  and=(or(state.ilike.*VA*,...))
   const inner = expr.replace(/^\(|\)$/g, "");
   const parts = []; let depth = 0, cur = "";
-  for (const ch of inner) { if (ch === "(") depth++; if (ch === ")") depth--; if (ch === "," && depth === 0) { parts.push(cur); cur = ""; } else cur += ch; }
+  let q = false, esc = false;      // PostgREST: "double-quoted" values may hold , ( ) — \" and \\ escape inside them
+  for (const ch of inner) {
+    if (q) { if (esc) { cur += ch; esc = false; } else if (ch === "\\") esc = true; else if (ch === '"') q = false; else cur += ch; continue; }
+    if (ch === '"') { q = true; continue; }
+    if (ch === "(") depth++; if (ch === ")") depth--; if (ch === "," && depth === 0) { parts.push(cur); cur = ""; } else cur += ch; }
   if (cur) parts.push(cur);
   return parts.map((p) => {
     if (p.startsWith("or(")) return { or: p.slice(2) };
