@@ -37,7 +37,7 @@ function fold(rows, into = {}) {
   return into;
 }
 
-// Big engineering employers students ask about — always on the radar even if InternIQ doesn't read their board yet
+// Big engineering employers students ask about — always on the radar even if Beat the Pile doesn't read their board yet
 const MAJORS = ["Boeing","Lockheed Martin","Northrop Grumman","RTX","Raytheon","Collins Aerospace","Pratt & Whitney","GE Aerospace","GE Vernova",
   "General Dynamics","Gulfstream","BAE Systems","L3Harris","Textron","Bell","Sikorsky","Huntington Ingalls Industries","Blue Origin","SpaceX",
   "Tesla","General Motors","Ford Motor Company","Ford","Stellantis","Rivian","Lucid Motors","John Deere","Caterpillar","Cummins","Honeywell",
@@ -49,7 +49,7 @@ const MAJORS = ["Boeing","Lockheed Martin","Northrop Grumman","RTX","Raytheon","
 const args = process.argv.slice(2);
 const flag = (name) => { const i = args.indexOf(name); if (i < 0) return null; const v = args[i + 1]; args.splice(i, 2); return v; };
 const trackedFile = flag("--tracked");
-// InternIQ's own company list ([{id, company}]) — these link to Follow on the site
+// Beat the Pile's own company list ([{id, company}]) — these link to Follow on the site
 const tracked = new Map();
 if (trackedFile) for (const t of JSON.parse(fs.readFileSync(trackedFile, "utf8"))) {
   for (const n of [t.company, String(t.company).replace(/\s*\(.*\)\s*/g, " ")]) { const k = normName(n); if (k && !tracked.has(k)) tracked.set(k, t.id); }
@@ -78,7 +78,7 @@ const median = (a) => { const s = [...a].sort((x, y) => x - y), m = s.length >> 
 const out = [];
 for (const [k, c] of Object.entries(merged)) {
   const eng = +c.eng || 0, id = tracked.get(k) || null;
-  // Keep: companies on InternIQ, big engineering employers, or clearly hardware-focused companies
+  // Keep: companies on Beat the Pile, big engineering employers, or clearly hardware-focused companies
   // Keep (all majors, Nov 2026): companies on Beat the Pile, big employers students ask about, or any company with a real
   // posting history (5+ internships in the public list). Tiny or one-off posters are left out — their dates mean little.
   if (!id && !MAJORS.includes(k) && (+c.all || 0) < 5) continue;

@@ -1,15 +1,15 @@
 // /feedback.js — floating "Report a problem" button for any Beat the Pile page. Include with <script src="/feedback.js" defer></script>.
 (function () {
   if (window.__iqFeedback) return; window.__iqFeedback = true;
-  const css = `.iqfb-btn{position:fixed;right:14px;bottom:14px;z-index:70;font:500 13px "Geist",-apple-system,Segoe UI,Roboto,sans-serif;background:#fff;color:#0B1220;border:1px solid #D5DBE3;border-radius:8px;padding:8px 12px;box-shadow:0 2px 8px rgba(11,18,32,.08);cursor:pointer}
+  const css = `.iqfb-btn{position:fixed;right:14px;bottom:14px;z-index:70;font:500 13px "Geist",-apple-system,Segoe UI,Roboto,sans-serif;background:#fff;color:#060A2C;border:1px solid #D5DBE3;border-radius:8px;padding:8px 12px;box-shadow:0 2px 8px rgba(6,10,44,.08);cursor:pointer}
 .iqfb-scrim{position:fixed;inset:0;background:rgba(10,22,40,.45);z-index:71;display:none}.iqfb-scrim.on{display:block}
 .iqfb{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:72;width:min(420px,calc(100vw - 32px));background:#fff;border-radius:16px;padding:18px;display:none;font-family:-apple-system,Segoe UI,Roboto,sans-serif;color:#1E293B}
-.iqfb.on{display:block}.iqfb h3{margin:0 0 4px;font-size:18px;color:#0A1628}.iqfb p{margin:0 0 12px;color:#64748B;font-size:13px}
-.iqfb .k{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.iqfb .k button{font:600 13px inherit;padding:7px 10px;border-radius:999px;border:1px solid #E2EEEA;background:#fff;color:#64748B;cursor:pointer}
-.iqfb .k button[aria-pressed=true]{background:#0A1628;color:#fff;border-color:#0A1628}
-.iqfb textarea,.iqfb input{width:100%;box-sizing:border-box;font:16px inherit;padding:10px;border:1px solid #E2EEEA;border-radius:10px;margin-bottom:8px}
+.iqfb.on{display:block}.iqfb h3{margin:0 0 4px;font-size:18px;color:#060A2C}.iqfb p{margin:0 0 12px;color:#64748B;font-size:13px}
+.iqfb .k{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.iqfb .k button{font:600 13px inherit;padding:7px 10px;border-radius:999px;border:1px solid #EEF6D8;background:#fff;color:#64748B;cursor:pointer}
+.iqfb .k button[aria-pressed=true]{background:#060A2C;color:#fff;border-color:#060A2C}
+.iqfb textarea,.iqfb input{width:100%;box-sizing:border-box;font:16px inherit;padding:10px;border:1px solid #EEF6D8;border-radius:10px;margin-bottom:8px}
 .iqfb textarea{min-height:90px}.iqfb .row{display:flex;gap:8px;justify-content:flex-end}
-.iqfb .row button{font:700 14px inherit;padding:10px 14px;border-radius:10px;border:1px solid #E2EEEA;background:#fff;cursor:pointer}.iqfb .row .go{background:#0B7A55;border-color:#0B7A55;color:#fff}
+.iqfb .row button{font:700 14px inherit;padding:10px 14px;border-radius:10px;border:1px solid #EEF6D8;background:#fff;cursor:pointer}.iqfb .row .go{background:#4A7000;border-color:#4A7000;color:#fff}
 @media (max-width:640px){.iqfb-btn{width:38px;height:38px;padding:0;border-radius:50%;font-size:0;right:10px;bottom:10px;opacity:.9;box-shadow:0 4px 14px rgba(10,22,40,.12)}.iqfb-btn::after{content:"?";font-size:17px;font-weight:600;color:#55627A}}
 @media print{.iqfb-btn{display:none}}`;
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
@@ -52,11 +52,11 @@
     function finish() { s.done = 1; try { localStorage.setItem(KEY, JSON.stringify(s)); } catch {} }
     function showPulse() {
       const st2 = document.createElement("style");
-      st2.textContent = `.iqp{position:fixed;right:14px;bottom:62px;z-index:69;width:min(330px,calc(100vw - 28px));background:#fff;border:1px solid #DCE2EC;border-radius:12px;padding:14px;box-shadow:0 8px 24px rgba(10,20,38,.12);font:14px "Geist",-apple-system,Segoe UI,Roboto,sans-serif;color:#0A1426}
+      st2.textContent = `.iqp{position:fixed;right:14px;bottom:62px;z-index:69;width:min(330px,calc(100vw - 28px));background:#fff;border:1px solid #DCE2EC;border-radius:12px;padding:14px;box-shadow:0 8px 24px rgba(10,20,38,.12);font:14px "Geist",-apple-system,Segoe UI,Roboto,sans-serif;color:#060A2C}
 .iqp b{display:block;font-weight:600;margin-bottom:8px;padding-right:22px}.iqp .x{position:absolute;top:8px;right:8px;border:0;background:none;font-size:18px;color:#8590A6;cursor:pointer;line-height:1;padding:4px}
-.iqp .o{display:flex;gap:6px;flex-wrap:wrap}.iqp .o button{font:500 13px inherit;padding:7px 12px;border-radius:999px;border:1px solid #C9D1DE;background:#fff;color:#0A1426;cursor:pointer}
-.iqp .o button:hover{border-color:#0B7A55}.iqp textarea{width:100%;box-sizing:border-box;font:16px inherit;padding:8px;border:1px solid #C9D1DE;border-radius:8px;margin:10px 0 8px;min-height:64px}
-.iqp .go{font:600 13px inherit;padding:8px 14px;border-radius:999px;border:0;background:#0B7A55;color:#fff;cursor:pointer}.iqp small{color:#55627A}
+.iqp .o{display:flex;gap:6px;flex-wrap:wrap}.iqp .o button{font:500 13px inherit;padding:7px 12px;border-radius:999px;border:1px solid #C9D1DE;background:#fff;color:#060A2C;cursor:pointer}
+.iqp .o button:hover{border-color:#4A7000}.iqp textarea{width:100%;box-sizing:border-box;font:16px inherit;padding:8px;border:1px solid #C9D1DE;border-radius:8px;margin:10px 0 8px;min-height:64px}
+.iqp .go{font:600 13px inherit;padding:8px 14px;border-radius:999px;border:0;background:#4A7000;color:#fff;cursor:pointer}.iqp small{color:#55627A}
 @media (max-width:640px){.iqp{right:10px;left:10px;width:auto;bottom:58px}}@media print{.iqp{display:none}}`;
       document.head.appendChild(st2);
       const c = document.createElement("div"); c.className = "iqp"; c.setAttribute("role", "region"); c.setAttribute("aria-label", "Quick question");

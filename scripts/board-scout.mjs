@@ -5,7 +5,7 @@
 import fs from "node:fs";
 import { latestCrawls, enumerate, scout } from "../lib/scout.js";
 
-const SITE = process.env.SITE || "https://intern-iq-psi.vercel.app";
+const SITE = process.env.SITE || "https://www.beatthepile.com";
 const arg = (k, d) => { const a = process.argv.find((x) => x.startsWith(`--${k}=`)); return a ? a.split("=")[1] : d; };
 const DRY = process.argv.includes("--dry");
 const LIMIT = +arg("limit", 20000);

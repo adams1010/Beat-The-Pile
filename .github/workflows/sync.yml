@@ -16,9 +16,9 @@ jobs:
         run: |
           fail=0
           for pass in 1 2 3; do
-            code=$(curl -s -o out.json -w '%{http_code}' --max-time 70 -H "Authorization: Bearer $CRON_SECRET" https://intern-iq-psi.vercel.app/api/sync)
+            code=$(curl -s -o out.json -w '%{http_code}' --max-time 70 -H "Authorization: Bearer $CRON_SECRET" https://www.beatthepile.com/api/sync)
             head -c 400 out.json; echo; echo "sync pass $pass: HTTP $code"; [ "$code" = 200 ] || fail=1
-            code=$(curl -s -o out.json -w '%{http_code}' --max-time 70 -H "Authorization: Bearer $CRON_SECRET" https://intern-iq-psi.vercel.app/api/check-links)
+            code=$(curl -s -o out.json -w '%{http_code}' --max-time 70 -H "Authorization: Bearer $CRON_SECRET" https://www.beatthepile.com/api/check-links)
             head -c 300 out.json; echo; echo "links pass $pass: HTTP $code"; [ "$code" = 200 ] || fail=1
           done
           exit $fail

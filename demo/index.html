@@ -7,13 +7,13 @@
 <meta name="description" content="A guided, hands-on tour of every Beat the Pile feature: live internships for every major, company pages, weekly alerts, resume tailoring, Career Fair Mode, My Season, Opening Radar, interview practice and your profile.">
 <link rel="canonical" href="https://www.beatthepile.com/demo/">
 <link rel="manifest" href="/manifest.webmanifest">
-<meta name="theme-color" content="#070F1E">
+<meta name="theme-color" content="#060A2C">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <link rel="icon" href="/icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root{--green:#0B7A55;--green-dark:#0A6647;--green-light:#EAF7F1;--mint:#2FD39A;--navy:#070F1E;--navy2:#0D1A2F;--line2:#22304D;
-        --ink:#0A1426;--muted:#55627A;--faint:#8590A6;--line:#DCE2EC;--bg:#EEF1F6;--amber:#8A4B08;--amber-light:#FFF4E6;
+  :root{--green:#4A7000;--green-dark:#3A5A00;--green-light:#F2FADF;--mint:#B0F701;--navy:#060A2C;--navy2:#0E1440;--line2:#22304D;
+        --ink:#060A2C;--muted:#55627A;--faint:#8590A6;--line:#DCE2EC;--bg:#EEF1F6;--amber:#8A4B08;--amber-light:#FFF4E6;
         --font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--ease:cubic-bezier(.2,.8,.2,1)}
   *{box-sizing:border-box}
   html,body{margin:0;background:#050B16;color:#fff;font-family:var(--font);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
@@ -42,9 +42,9 @@
   .copy.in p{opacity:1;transform:none}
   .todo{margin-top:20px;display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line2);background:rgba(13,26,47,.7);border-radius:999px;padding:8px 14px 8px 10px;font-size:14px;color:#DCE3EF;opacity:0;transition:opacity .5s var(--ease) .45s}
   .copy.in .todo{opacity:1}
-  .todo .dot{width:10px;height:10px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 0 rgba(47,211,154,.6);animation:pulse 1.6s infinite}
+  .todo .dot{width:10px;height:10px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 0 rgba(176,247,1,.6);animation:pulse 1.6s infinite}
   .todo.ok .dot{animation:none;box-shadow:none}
-  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(47,211,154,.55)}70%{box-shadow:0 0 0 10px rgba(47,211,154,0)}100%{box-shadow:0 0 0 0 rgba(47,211,154,0)}}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(176,247,1,.55)}70%{box-shadow:0 0 0 10px rgba(176,247,1,0)}100%{box-shadow:0 0 0 0 rgba(176,247,1,0)}}
   .real{margin-top:12px;font-size:12.5px;color:#7F8CA5}
   @media (max-width:900px){.copy h1{font-size:clamp(26px,7.4vw,36px);margin:6px 0 8px}.copy p{font-size:15px}.todo{margin-top:12px;font-size:13.5px}.real{display:none}}
   /* app window */
@@ -59,9 +59,9 @@
   .view{height:min(560px,62vh);overflow:auto;padding:16px;position:relative;scroll-behavior:smooth}
   @media (max-width:900px){.view{height:auto;min-height:380px;max-height:none;padding:12px}}
   /* spotlight + cursor */
-  .spot{position:absolute;pointer-events:none;border-radius:12px;box-shadow:0 0 0 3px var(--mint),0 0 0 9999px rgba(7,15,30,.32);transition:all .45s var(--ease);opacity:0;z-index:20}
+  .spot{position:absolute;pointer-events:none;border-radius:12px;box-shadow:0 0 0 3px var(--mint),0 0 0 9999px rgba(6,10,44,.32);transition:all .45s var(--ease);opacity:0;z-index:20}
   .spot.on{opacity:1;animation:ring 1.6s infinite}
-  @keyframes ring{0%,100%{box-shadow:0 0 0 3px var(--mint),0 0 0 9999px rgba(7,15,30,.32)}50%{box-shadow:0 0 0 6px rgba(47,211,154,.55),0 0 0 9999px rgba(7,15,30,.32)}}
+  @keyframes ring{0%,100%{box-shadow:0 0 0 3px var(--mint),0 0 0 9999px rgba(6,10,44,.32)}50%{box-shadow:0 0 0 6px rgba(176,247,1,.55),0 0 0 9999px rgba(6,10,44,.32)}}
   .tip{position:absolute;z-index:21;pointer-events:none;background:var(--navy);color:#fff;font-size:12.5px;font-weight:600;border-radius:8px;padding:6px 10px;white-space:nowrap;opacity:0;transform:translateY(4px);transition:all .3s var(--ease)}
   .tip.on{opacity:1;transform:none}
   .tip::after{content:"";position:absolute;left:16px;top:100%;border:6px solid transparent;border-top-color:var(--navy)}
@@ -315,7 +315,7 @@ ${top.map((j) => `<div class="er"><b>${esc(nice(j.title))}</b><br>${esc(j.compan
 
   function qr() { let s = 11; const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
     const f = (r, c) => { for (const [r0, c0] of [[0, 0], [0, 14], [14, 0]]) if (r >= r0 && r < r0 + 7 && c >= c0 && c < c0 + 7) { const a = r - r0, b = c - c0; return a === 0 || a === 6 || b === 0 || b === 6 || (a > 1 && a < 5 && b > 1 && b < 5); } return null; };
-    let h = ""; for (let r = 0; r < 21; r++) for (let c = 0; c < 21; c++) { const x = f(r, c); h += `<i style="background:${(x === null ? rnd() > .55 : x) ? "#070F1E" : "#fff"}"></i>`; } return h; }
+    let h = ""; for (let r = 0; r < 21; r++) for (let c = 0; c < 21; c++) { const x = f(r, c); h += `<i style="background:${(x === null ? rnd() > .55 : x) ? "#060A2C" : "#fff"}"></i>`; } return h; }
   ch({ key: "meet", label: "QR + notes", url: "/fair", title: "Your resume is a QR code.",
     line: "Recruiters scan it, no app needed. Then jot a 10-second note so you remember the conversation. Private until you turn it on.",
     real: "Example", steps: [["#scan", "Let the recruiter scan"], ["#note", "Save a quick note"]],
@@ -427,7 +427,7 @@ Thanks again,
   const engine = { i: 0, step: 0, auto: false, done: new Set(), token: 0 };
   const view = $("view"), win = $("win");
   const spot = document.createElement("div"); spot.className = "spot"; const tip = document.createElement("div"); tip.className = "tip";
-  const cur = document.createElement("div"); cur.className = "cursor"; cur.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 2l15 9-7 1.5L8 20z" fill="#fff" stroke="#070F1E" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
+  const cur = document.createElement("div"); cur.className = "cursor"; cur.innerHTML = `<svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 2l15 9-7 1.5L8 20z" fill="#fff" stroke="#060A2C" stroke-width="1.6" stroke-linejoin="round"/></svg>`;
   win.append(spot, tip, cur);
   function rail() {
     $("rail").innerHTML = CH.map((c, k) => `<button class="chip ${engine.done.has(c.key) ? "done" : ""}" type="button" data-k="${k}" ${k === engine.i ? 'aria-current="step"' : ""}><i>${engine.done.has(c.key) ? "✓" : k + 1}</i>${c.label}</button>`).join("");

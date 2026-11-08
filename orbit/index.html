@@ -7,11 +7,11 @@
 <meta name="description" content="Orbit: classmates in your major, students who interned where you're applying, and what's new at the companies you follow.">
 <link rel="canonical" href="https://www.beatthepile.com/orbit/">
 <link rel="icon" href="/icons/icon-192.png">
-<meta name="theme-color" content="#070F1E">
+<meta name="theme-color" content="#060A2C">
 <style>
   /* Orbit, part 1 (Nov 2026): POST /api/me {action:"orbit"} → lib/orbit.js. Public profiles only.
      Part 2 (needs supabase/orbit.sql): Connect (two-way) + "Going to the same fair". */
-  :root{--green:#0B7A55;--green-l:#E7F4EE;--ink:#0A1426;--muted:#55627A;--line:#DCE2EC;--bg:#EEF1F6;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  :root{--green:#4A7000;--green-l:#F2FADF;--ink:#060A2C;--muted:#55627A;--line:#DCE2EC;--bg:#EEF1F6;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5}
   main{max-width:1180px;margin:0 auto;padding:24px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
@@ -28,13 +28,13 @@
   section.card{margin-bottom:16px}
   .people{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
   .p{border:1px solid var(--line);border-radius:12px;padding:16px 12px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;min-width:0}
-  .av{width:56px;height:56px;border-radius:50%;background:#0B7A55;color:#fff;display:grid;place-items:center;font-weight:600;overflow:hidden;flex-shrink:0}
+  .av{width:56px;height:56px;border-radius:50%;background:#4A7000;color:#fff;display:grid;place-items:center;font-weight:600;overflow:hidden;flex-shrink:0}
   .av img{width:100%;height:100%;object-fit:cover}
   .p .nm{font-weight:600;margin-top:8px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .p .hl{color:var(--muted);font-size:12.5px;margin-top:2px;min-height:36px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .p .at{font-size:12.5px;margin-top:6px;color:var(--green);font-weight:600}
   .btn{display:inline-block;margin-top:10px;font:inherit;font-size:13px;font-weight:600;border-radius:999px;padding:6px 16px;text-decoration:none;cursor:pointer;border:1px solid var(--green);color:var(--green);background:#fff}
-  .btn:hover{background:var(--green-l)} .btn.pri{background:var(--green);color:#fff} .btn.pri:hover{background:#086446}
+  .btn:hover{background:var(--green-l)} .btn.pri{background:var(--green);color:#fff} .btn.pri:hover{background:#3A5A00}
   .empty{color:var(--muted);font-size:13.5px;padding:6px 0}
   .empty a{color:var(--green);font-weight:600}
   .feed .it{padding:12px 0;border-top:1px solid #EEF1F6;font-size:13.5px} .feed .it:first-of-type{border-top:0}

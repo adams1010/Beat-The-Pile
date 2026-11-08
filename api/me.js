@@ -216,9 +216,9 @@ async function unsubscribe(req, res) {
   const alerts = req.query.k === "alerts";
   if (TOKEN_OK.test(t)) await db.updateReturning(`user_jobs?remind_unsub=eq.${encodeURIComponent(t)}`, alerts ? { alert_on: false } : { remind_email: false });
   return res.status(200).send(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Unsubscribed</title>
-<body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;display:grid;place-items:center;min-height:90vh;margin:0;background:#FBFBFC;color:#0B1220">
-<div style="text-align:center;padding:24px"><div style="color:#0E8A5F;font-weight:700">Beat the Pile</div><h1 style="font-size:22px">You're unsubscribed</h1>
-<p style="color:#5B6675">${alerts ? `No more weekly job alert emails. Turn them back on anytime on <a href="/jobs/" style="color:#0B6E4B">Jobs</a>.` : `No more follow-up reminder emails. Turn them back on anytime in <a href="/season/" style="color:#0B6E4B">My Season</a>.`}</p></div>`);
+<body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;display:grid;place-items:center;min-height:90vh;margin:0;background:#FBFBFC;color:#060A2C">
+<div style="text-align:center;padding:24px"><div style="color:#4A7000;font-weight:700">Beat the Pile</div><h1 style="font-size:22px">You're unsubscribed</h1>
+<p style="color:#5B6675">${alerts ? `No more weekly job alert emails. Turn them back on anytime on <a href="/jobs/" style="color:#3A5A00">Jobs</a>.` : `No more follow-up reminder emails. Turn them back on anytime in <a href="/season/" style="color:#3A5A00">My Season</a>.`}</p></div>`);
 }
 
 async function resumeRedirect(req, res) {
@@ -227,7 +227,7 @@ async function resumeRedirect(req, res) {
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     return res.status(404).send(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Resume not shared</title>
 <body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;display:grid;place-items:center;min-height:90vh;margin:0;background:#F8FFFE;color:#1E293B">
-<div style="text-align:center;padding:24px"><div style="color:#00C285;font-weight:800">Beat the Pile</div><h1 style="font-size:22px">This resume isn't shared right now</h1>
+<div style="text-align:center;padding:24px"><div style="color:#4A7000;font-weight:800">Beat the Pile</div><h1 style="font-size:22px">This resume isn't shared right now</h1>
 <p style="color:#64748B">The student turned off this link or replaced it with a new one.</p></div>`);
   };
   if (!TOKEN_OK.test(t)) return notShared();

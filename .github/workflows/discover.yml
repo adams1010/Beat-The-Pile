@@ -28,7 +28,7 @@ jobs:
           if [ -z "$CRON_SECRET" ]; then echo "Add the CRON_SECRET repo secret first"; exit 1; fi
           for pass in 1 2 3; do
           code=$(curl -s -o out.json -w '%{http_code}' --max-time 70 \
-            -H "Authorization: Bearer $CRON_SECRET" "https://intern-iq-psi.vercel.app/api/discover?x=1${{ inputs.import && '&import=1' || '' }}${{ inputs.query && format('&{0}', inputs.query) || '' }}")
+            -H "Authorization: Bearer $CRON_SECRET" "https://www.beatthepile.com/api/discover?x=1${{ inputs.import && '&import=1' || '' }}${{ inputs.query && format('&{0}', inputs.query) || '' }}")
           cat out.json | head -c 1500; echo
           echo "pass $pass: HTTP $code"
           [ "$code" = 200 ] || exit 1

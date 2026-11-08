@@ -2,11 +2,11 @@
 // For each live company without a checked logo: try likely websites (known domain → domain its job board lives on →
 // name.com guesses), PROVE the site is theirs (lib/logos.js proveSite), pick its best icon, and send the result back.
 // Nothing proven = recorded as "none" (initials stay); re-checked after 30 days.
-//   node scripts/find-logos.mjs [--limit=400] [--base=https://intern-iq-psi.vercel.app]
+//   node scripts/find-logos.mjs [--limit=400] [--base=https://www.beatthepile.com]
 import { candidates, proveSite, pickIcon } from "../lib/logos.js";
 
 const arg = (k, d) => (process.argv.find((a) => a.startsWith(`--${k}=`)) || "").split("=").slice(1).join("=") || d;
-const BASE = arg("base", "https://intern-iq-psi.vercel.app"), LIMIT = +arg("limit", 400), SECRET = process.env.CRON_SECRET;
+const BASE = arg("base", "https://www.beatthepile.com"), LIMIT = +arg("limit", 400), SECRET = process.env.CRON_SECRET;
 const UA = "Mozilla/5.0 (compatible; BeatThePileBot/1.0; +https://www.beatthepile.com/)";
 const auth = { Authorization: `Bearer ${SECRET}`, "Content-Type": "application/json" };
 

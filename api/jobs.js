@@ -1,4 +1,4 @@
-// InternIQ backend — Adzuna search proxy
+// Beat the Pile backend — Adzuna search proxy
 // mode=main: runs parallel searches, filters by relevance before returning
 
 export default async function handler(req, res) {

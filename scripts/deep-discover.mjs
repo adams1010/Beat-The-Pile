@@ -6,7 +6,7 @@
 import { chromium } from "playwright";
 import { scanHtml } from "../lib/discover.js";
 
-const SITE = process.env.SITE || "https://intern-iq-psi.vercel.app";
+const SITE = process.env.SITE || "https://www.beatthepile.com";
 const DRY = process.argv.includes("--dry");
 const LIMIT = +(process.argv.find((a) => a.startsWith("--limit=")) || "--limit=40").split("=")[1];
 const DEBUG = process.argv.includes("--debug");

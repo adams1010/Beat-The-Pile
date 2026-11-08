@@ -1,10 +1,10 @@
 const {useState,useEffect,useRef,useCallback}=React;
 
 // Design tokens: one calm green accent on near-black ink and cool neutrals. No gradients, no glows.
-const G="#0B7A55",GD="#0A6647",GL="#EAF7F1",GM="#C6E8D8";   // Direction D green (matches /jobs + static pages)
+const G="#4A7000",GD="#3A5A00",GL="#F2FADF",GM="#DDF3A8";   // Direction D green (matches /jobs + static pages)
 const AM="#B45309",AL="#FFF7ED";
 const CR="#B42318",CL="#FEF3F2";
-const PALETTE=Array(12).fill("#0B1220");   // selected chips: one ink color (was a rainbow)
+const PALETTE=Array(12).fill("#060A2C");   // selected chips: one ink color (was a rainbow)
 // Loading messages cycle every 600ms during the AI results call.
 // Mix of progress updates + real, useful tips — so the wait feels productive instead of repetitive.
 const LOAD_MSGS=[
@@ -60,10 +60,10 @@ const LiveStats=()=>{
   },[]);
   const fmt=(n)=>n==null?"—":n.toLocaleString();
   const ago=(t)=>{if(!t)return null;const m=Math.round((Date.now()-new Date(t))/6e4);return m<60?`${Math.max(1,m)} min ago`:m<1440?`${Math.round(m/60)} hr ago`:`${Math.round(m/1440)} days ago`;};
-  const items=[{v:d?.allMajors,l:"open internships right now, every major",c:"#0B1220"},{v:d?.hiringNow,l:"companies hiring interns right now",c:"#0B1220"},{v:d?.companies,l:"company job boards we read directly",c:G}];
+  const items=[{v:d?.allMajors,l:"open internships right now, every major",c:"#060A2C"},{v:d?.hiringNow,l:"companies hiring interns right now",c:"#060A2C"},{v:d?.companies,l:"company job boards we read directly",c:G}];
   return (<div style={{maxWidth:760,margin:"0 auto"}}>
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:"1rem"}}>
-    {items.map((s,i)=>(<div key={i} style={{background:"#fff",border:"1px solid #EEF6F2",borderRadius:14,padding:"1.75rem 1.25rem",textAlign:"center",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
+    {items.map((s,i)=>(<div key={i} style={{background:"#fff",border:"1px solid #F2FADF",borderRadius:14,padding:"1.75rem 1.25rem",textAlign:"center",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
       <div style={{fontSize:38,fontWeight:700,color:s.c,lineHeight:1,marginBottom:"0.5rem",letterSpacing:"-1.5px"}}>{err?"—":fmt(s.v)}</div>
       <p style={{fontSize:12,color:"#4A5568",lineHeight:1.5,fontWeight:500}}>{s.l}</p></div>))}
     </div>
@@ -81,17 +81,17 @@ const JobPreview=()=>{
   },[]);
   const host=(u)=>{try{return new URL(u).hostname.replace(/^www\./,"");}catch(e){return "";}};
   const ago=(t)=>{const d=Math.floor((Date.now()-new Date(t))/864e5);return d<=0?"today":d===1?"yesterday":`${d} days ago`;};
-  if(err)return <p style={{fontSize:12.5,color:"#6B7280",marginTop:22}}>Live preview didn't load. <a href="/jobs/" style={{color:"#0B6E4B",fontWeight:700}}>See today's internships →</a></p>;
+  if(err)return <p style={{fontSize:12.5,color:"#6B7280",marginTop:22}}>Live preview didn't load. <a href="/jobs/" style={{color:"#3A5A00",fontWeight:700}}>See today's internships →</a></p>;
   if(!jobs)return <div style={{height:150,marginTop:22}} aria-hidden="true"/>;
   if(!jobs.length)return null;
   return (<div style={{marginTop:26,textAlign:"left",display:"flex",flexDirection:"column",gap:8}}>
     <p style={{fontSize:12,fontWeight:600,color:"#6B7280",margin:"0 0 2px"}}>Open right now · real listings</p>
-    {jobs.map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"block",background:"#fff",border:"1px solid #E3E7ED",borderRadius:12,padding:"12px 14px",textDecoration:"none",color:"#0B1220"}}>
-      <div style={{fontSize:12,fontWeight:700,color:"#0B6E4B"}}>{j.company}</div>
+    {jobs.map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"block",background:"#fff",border:"1px solid #E3E7ED",borderRadius:12,padding:"12px 14px",textDecoration:"none",color:"#060A2C"}}>
+      <div style={{fontSize:12,fontWeight:700,color:"#3A5A00"}}>{j.company}</div>
       <div style={{fontSize:15,fontWeight:700,lineHeight:1.3,margin:"2px 0 3px"}}>{j.title}</div>
       <div style={{fontSize:12,color:"#6B7280"}}>{String(j.location||j.state||"").split("|")[0]} · from {host(j.url)} · found {ago(j.first_seen)}</div>
     </a>))}
-    <a href="/jobs/" style={{fontSize:13,fontWeight:700,color:"#0B6E4B",textAlign:"center",marginTop:4}}>See all of them →</a>
+    <a href="/jobs/" style={{fontSize:13,fontWeight:700,color:"#3A5A00",textAlign:"center",marginTop:4}}>See all of them →</a>
   </div>);
 };
 
@@ -115,29 +115,29 @@ function FeatViz({k}){
   const box={background:"#fff",border:"1px solid #DCE2EC",borderRadius:10,boxShadow:"0 6px 18px rgba(10,20,38,.06)"};
   const bar=(w,c="#DCE2EC",h=7)=><span style={{display:"block",height:h,width:w,background:c,borderRadius:99}}/>;
   if(k==="tailor") return(<div style={{...box,width:"88%",padding:12,display:"grid",gap:8}}>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:12,fontWeight:600}}><span>Fit for this role</span><span style={{color:"#0B7A55",...DM}}>Strong</span></div>
-    <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{["SolidWorks","GD&T","testing"].map(x=><span key={x} style={{fontSize:11,background:"#E6F4EE",color:"#0B7A55",padding:"3px 8px",borderRadius:99}}>{x}</span>)}<span style={{fontSize:11,background:"#FBEFE6",color:"#9A4B12",padding:"3px 8px",borderRadius:99}}>gap: FEA</span></div>
-    <div style={{display:"grid",gap:5}}>{bar("100%")}{bar("72%","#BFE6D4")}</div></div>);
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:12,fontWeight:600}}><span>Fit for this role</span><span style={{color:"#4A7000",...DM}}>Strong</span></div>
+    <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{["SolidWorks","GD&T","testing"].map(x=><span key={x} style={{fontSize:11,background:"#F2FADF",color:"#4A7000",padding:"3px 8px",borderRadius:99}}>{x}</span>)}<span style={{fontSize:11,background:"#FBEFE6",color:"#9A4B12",padding:"3px 8px",borderRadius:99}}>gap: FEA</span></div>
+    <div style={{display:"grid",gap:5}}>{bar("100%")}{bar("72%","#DDF3A8")}</div></div>);
   if(k==="alerts") return(<div style={{...box,width:"88%",padding:12,display:"grid",gap:8}}>
-    <div style={{display:"flex",gap:8,alignItems:"center"}}><span style={{width:26,height:26,borderRadius:7,background:"#070F1E",color:"#2FD39A",fontSize:11,fontWeight:700,display:"grid",placeItems:"center"}}>BP</span><span style={{fontSize:12,fontWeight:600}}>5 new internships this week</span></div>
+    <div style={{display:"flex",gap:8,alignItems:"center"}}><img src="/brand/mark.png" alt="" width="26" height="26" style={{width:26,height:26,objectFit:"contain"}}/><span style={{fontSize:12,fontWeight:600}}>5 new internships this week</span></div>
     {[["Mechanical Intern","Richmond, VA"],["Test Engineering Co-op","Arlington, VA"]].map(([a,b])=><div key={a} style={{display:"flex",justifyContent:"space-between",fontSize:11,borderTop:"1px solid #EEF1F6",paddingTop:6}}><span style={{fontWeight:500}}>{a}</span><span style={{color:"#55627A"}}>{b}</span></div>)}</div>);
   if(k==="radar"){const m=["Jul","Aug","Sep","Oct","Nov"];return(<div style={{...box,width:"88%",padding:12}}>
-    <div style={{fontSize:12,fontWeight:600,marginBottom:10}}>Usually opens <span style={{color:"#0B7A55"}}>~mid Aug</span></div>
-    <div style={{position:"relative",height:8,background:"#EEF1F6",borderRadius:99}}><span style={{position:"absolute",left:"22%",width:"18%",top:0,bottom:0,background:"#BFE6D4",borderRadius:99}}/><span style={{position:"absolute",left:"30%",top:-4,width:16,height:16,marginLeft:-8,borderRadius:"50%",background:"#0B7A55",border:"3px solid #fff",boxShadow:"0 0 0 1px #0B7A55"}}/></div>
+    <div style={{fontSize:12,fontWeight:600,marginBottom:10}}>Usually opens <span style={{color:"#4A7000"}}>~mid Aug</span></div>
+    <div style={{position:"relative",height:8,background:"#EEF1F6",borderRadius:99}}><span style={{position:"absolute",left:"22%",width:"18%",top:0,bottom:0,background:"#DDF3A8",borderRadius:99}}/><span style={{position:"absolute",left:"30%",top:-4,width:16,height:16,marginLeft:-8,borderRadius:"50%",background:"#4A7000",border:"3px solid #fff",boxShadow:"0 0 0 1px #4A7000"}}/></div>
     <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"#8D9AB3",marginTop:8}}>{m.map(x=><span key={x}>{x}</span>)}</div></div>);}
   if(k==="fair") return(<div style={{display:"flex",gap:12,alignItems:"center",width:"88%"}}>
     <svg viewBox="0 0 140 100" style={{flex:1,height:110}}><rect x="1" y="1" width="138" height="98" rx="10" fill="#fff" stroke="#DCE2EC"/>
-      {[[20,20],[60,20],[100,20],[20,55],[60,55],[100,55],[40,82],[80,82]].map(([x,y],i)=><rect key={i} x={x} y={y-6} width="22" height="12" rx="3" fill={[0,4,7].includes(i)?"#BFE6D4":"#EEF1F6"}/>)}
-      <path d="M31 20 C 50 40, 60 40, 71 55 S 90 80, 91 82" fill="none" stroke="#0B7A55" strokeWidth="2" strokeDasharray="4 3"/>
-      {[[31,20,1],[71,55,2],[91,82,3]].map(([x,y,n])=><g key={n}><circle cx={x} cy={y} r="7" fill="#0B7A55"/><text x={x} y={y+3.5} fontSize="9" textAnchor="middle" fill="#fff" fontWeight="700">{n}</text></g>)}</svg>
-    <svg viewBox="0 0 7 7" style={{width:56,height:56,background:"#fff",padding:5,border:"1px solid #DCE2EC",borderRadius:8}} shapeRendering="crispEdges">{"1110111101010111101111000000101101111010101110111".split("").map((b,i)=>b==="1"&&<rect key={i} x={i%7} y={Math.floor(i/7)} width="1" height="1" fill="#0A1426"/>)}</svg></div>);
+      {[[20,20],[60,20],[100,20],[20,55],[60,55],[100,55],[40,82],[80,82]].map(([x,y],i)=><rect key={i} x={x} y={y-6} width="22" height="12" rx="3" fill={[0,4,7].includes(i)?"#DDF3A8":"#EEF1F6"}/>)}
+      <path d="M31 20 C 50 40, 60 40, 71 55 S 90 80, 91 82" fill="none" stroke="#4A7000" strokeWidth="2" strokeDasharray="4 3"/>
+      {[[31,20,1],[71,55,2],[91,82,3]].map(([x,y,n])=><g key={n}><circle cx={x} cy={y} r="7" fill="#4A7000"/><text x={x} y={y+3.5} fontSize="9" textAnchor="middle" fill="#fff" fontWeight="700">{n}</text></g>)}</svg>
+    <svg viewBox="0 0 7 7" style={{width:56,height:56,background:"#fff",padding:5,border:"1px solid #DCE2EC",borderRadius:8}} shapeRendering="crispEdges">{"1110111101010111101111000000101101111010101110111".split("").map((b,i)=>b==="1"&&<rect key={i} x={i%7} y={Math.floor(i/7)} width="1" height="1" fill="#060A2C"/>)}</svg></div>);
   if(k==="season") return(<div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6,width:"92%"}}>
     {[["Saved",3],["Applied",2],["Interview",1],["Offer",0]].map(([c,n])=><div key={c} style={{background:"#EEF1F6",borderRadius:8,padding:6,minHeight:96}}>
       <div style={{fontSize:10,fontWeight:600,color:"#55627A",marginBottom:6}}>{c}</div>
-      {Array.from({length:n}).map((_,i)=><div key={i} style={{...box,boxShadow:"none",borderRadius:6,height:18,marginBottom:4,borderColor:c==="Interview"?"#0B7A55":"#DCE2EC",background:c==="Interview"?"#E6F4EE":"#fff"}}/>)}</div>)}</div>);
+      {Array.from({length:n}).map((_,i)=><div key={i} style={{...box,boxShadow:"none",borderRadius:6,height:18,marginBottom:4,borderColor:c==="Interview"?"#4A7000":"#DCE2EC",background:c==="Interview"?"#F2FADF":"#fff"}}/>)}</div>)}</div>);
   return(<div style={{...box,width:"88%",padding:12,display:"flex",gap:14,alignItems:"center"}}>
-    <span style={{width:56,height:56,borderRadius:12,background:"#070F1E",color:"#2FD39A",fontSize:24,fontWeight:700,display:"grid",placeItems:"center",flexShrink:0}}>B+</span>
-    <div style={{flex:1,display:"grid",gap:6}}>{[["Q1",86],["Q2",74],["Q3",91]].map(([q,v])=><div key={q} style={{display:"flex",gap:8,alignItems:"center",fontSize:11}}><span style={{width:18,color:"#55627A"}}>{q}</span><span style={{flex:1,height:6,background:"#EEF1F6",borderRadius:99}}><span style={{display:"block",height:6,width:v+"%",background:"#0B7A55",borderRadius:99}}/></span><span style={{...DM,width:20}}>{v}</span></div>)}</div></div>);
+    <span style={{width:56,height:56,borderRadius:12,background:"#060A2C",color:"#B0F701",fontSize:24,fontWeight:700,display:"grid",placeItems:"center",flexShrink:0}}>B+</span>
+    <div style={{flex:1,display:"grid",gap:6}}>{[["Q1",86],["Q2",74],["Q3",91]].map(([q,v])=><div key={q} style={{display:"flex",gap:8,alignItems:"center",fontSize:11}}><span style={{width:18,color:"#55627A"}}>{q}</span><span style={{flex:1,height:6,background:"#EEF1F6",borderRadius:99}}><span style={{display:"block",height:6,width:v+"%",background:"#4A7000",borderRadius:99}}/></span><span style={{...DM,width:20}}>{v}</span></div>)}</div></div>);
 }
 // The hero map: every dot is a real open internship whose location text names a real US city (api/listings ?dots=1).
 // Type a city ("Blacksburg, VA") or ZIP in the search and a circle shows how many are within 50 miles (the same numbers /jobs will show).
@@ -150,26 +150,26 @@ function HeroMap({near,fresh,sum}){
   },[]);
   const fmt=(n)=>n==null?"—":Number(n).toLocaleString();
   const xy=near?.meta?.near?.xy, r=near?.meta?near.meta.near.mi*MILES_PX:0;
-  return(<aside style={{position:"relative",boxSizing:"border-box",background:"#0D1A2F",border:"1px solid #2A3B5C",borderRadius:16,padding:"18px 18px 14px",boxShadow:"0 24px 60px rgba(0,0,0,.45)",...DM}}>
+  return(<aside style={{position:"relative",boxSizing:"border-box",background:"#0E1440",border:"1px solid #2A3B5C",borderRadius:16,padding:"18px 18px 14px",boxShadow:"0 24px 60px rgba(0,0,0,.45)",...DM}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:12,fontFamily:"Geist,sans-serif"}}>
       <span style={{fontSize:14,fontWeight:600,color:"#fff"}}>Every dot is a real internship</span>
       <span style={{fontSize:12,color:"#8D9AB3"}}>{pts?`${fmt(pts.placed)} on the map`:""}</span></div>
     <div style={{position:"relative",marginTop:8}}>
-      {err?<p style={{fontSize:13,color:"#8D9AB3",padding:"40px 0",textAlign:"center",fontFamily:"Geist,sans-serif"}}>Map didn't load. <a href="/jobs/" style={{color:"#2FD39A"}}>See the internships →</a></p>:
+      {err?<p style={{fontSize:13,color:"#8D9AB3",padding:"40px 0",textAlign:"center",fontFamily:"Geist,sans-serif"}}>Map didn't load. <a href="/jobs/" style={{color:"#B0F701"}}>See the internships →</a></p>:
       <svg viewBox="0 0 975 610" role="img" aria-label={pts?`Map of the US with ${fmt(pts.placed)} open internships, one dot per city`:"Loading map"} style={{width:"100%",height:"auto",display:"block"}}>
         {geo&&<path d={geo.nation} fill="#11203A" stroke="#2A3B5C" strokeWidth="1"/>}
         {geo&&<path d={geo.borders} fill="none" stroke="#1C2C48" strokeWidth=".8"/>}
-        {pts&&pts.dots.map(([x,y,n],i)=><circle key={i} cx={x} cy={y} r={1.6+Math.sqrt(n)*1.05} fill="#2FD39A" fillOpacity={n>20?.8:.55}/>)}
-        {xy&&<g><circle cx={xy[0]} cy={xy[1]} r={r} fill="#2FD39A" fillOpacity=".1" stroke="#fff" strokeWidth="3" strokeDasharray="7 5"/><circle cx={xy[0]} cy={xy[1]} r="5" fill="#fff"/></g>}
+        {pts&&pts.dots.map(([x,y,n],i)=><circle key={i} cx={x} cy={y} r={1.6+Math.sqrt(n)*1.05} fill="#B0F701" fillOpacity={n>20?.8:.55}/>)}
+        {xy&&<g><circle cx={xy[0]} cy={xy[1]} r={r} fill="#B0F701" fillOpacity=".1" stroke="#fff" strokeWidth="3" strokeDasharray="7 5"/><circle cx={xy[0]} cy={xy[1]} r="5" fill="#fff"/></g>}
       </svg>}
-      {near?.meta&&<div className="d-mapbadge" style={{position:"absolute",left:8,bottom:6,background:"rgba(7,15,30,.88)",border:"1px solid #2A3B5C",borderRadius:10,padding:"8px 12px",fontFamily:"Geist,sans-serif"}}>
+      {near?.meta&&<div className="d-mapbadge" style={{position:"absolute",left:8,bottom:6,background:"rgba(6,10,44,.88)",border:"1px solid #2A3B5C",borderRadius:10,padding:"8px 12px",fontFamily:"Geist,sans-serif"}}>
         <span style={{fontSize:20,fontWeight:600,color:"#fff"}}>{fmt(near.meta.count)}</span> <span style={{fontSize:13,color:"#CFD7E6"}}>within {near.meta.near.mi} mi of {near.meta.near.q}</span></div>}
       {near?.bad&&<div style={{position:"absolute",left:8,bottom:6,fontSize:13,color:"#F2B8A2",fontFamily:"Geist,sans-serif"}}>We couldn't find that city. Try “Blacksburg, VA”.</div>}
     </div>
     <div style={{borderTop:"1px solid #22304D",marginTop:10,paddingTop:8}}>
       <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"#8D9AB3",fontFamily:"Geist,sans-serif",marginBottom:2}}><span>Just found</span><span>{sum?`${fmt(sum.allMajors)} open · ${fmt(sum.hiringNow)} companies hiring`:""}</span></div>
       {(fresh||[]).slice(0,3).map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"flex",justifyContent:"space-between",gap:12,padding:"7px 0",borderTop:"1px solid #1A2640",textDecoration:"none",fontSize:13}}>
-        <span style={{color:"#fff",fontFamily:"Geist,sans-serif",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{j.company} <span style={{color:"#8D9AB3"}}>· {j.title}</span></span><span style={{color:"#2FD39A",flexShrink:0}}>{dAgo(j.first_seen)}</span></a>))}
+        <span style={{color:"#fff",fontFamily:"Geist,sans-serif",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{j.company} <span style={{color:"#8D9AB3"}}>· {j.title}</span></span><span style={{color:"#B0F701",flexShrink:0}}>{dAgo(j.first_seen)}</span></a>))}
     </div>
   </aside>);
 }
@@ -201,28 +201,28 @@ function LandingD({onQuiz,onPage}){
   const card={background:"#fff",border:"1px solid #DCE2EC",borderRadius:14};
   const wrap={maxWidth:1240,margin:"0 auto",padding:"0 24px"};
   return(<>
-    <section style={{position:"relative",overflow:"hidden",background:"#070F1E",color:"#E8EDF5"}}>
+    <section style={{position:"relative",overflow:"hidden",background:"#060A2C",color:"#E8EDF5"}}>
       <div style={{...wrap,position:"relative",paddingTop:64,paddingBottom:48,display:"flex",gap:48,flexWrap:"wrap",alignItems:"center"}}>
         <div style={{flex:"1 1 480px",minWidth:0}}>
-          <p style={{fontSize:14,fontWeight:500,color:"#9FE5C8",margin:"0 0 18px"}}><span style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#2FD39A",marginRight:8,verticalAlign:1}}/>
+          <p style={{fontSize:14,fontWeight:500,color:"#D9F99A",margin:"0 0 18px"}}><span style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#B0F701",marginRight:8,verticalAlign:1}}/>
             {sum?`${fmt(sum.companies)} company job boards${sum.lastSync?`, last checked ${dAgoLong(sum.lastSync)}`:""}`:sumErr?"Live numbers unavailable right now":"Loading the latest numbers…"}</p>
-          <h1 style={{fontSize:"clamp(2.3rem,5vw,3.6rem)",lineHeight:1.03,letterSpacing:"-0.035em",fontWeight:600,margin:"0 0 16px",color:"#fff"}}>Find your internship<br/>before the <span style={{color:"#2FD39A"}}>pile</span> does.</h1>
+          <h1 style={{fontSize:"clamp(2.3rem,5vw,3.6rem)",lineHeight:1.03,letterSpacing:"-0.035em",fontWeight:600,margin:"0 0 16px",color:"#fff"}}>Find your internship<br/>before the <span style={{color:"#B0F701"}}>pile</span> does.</h1>
           <p style={{fontSize:18,lineHeight:1.5,color:"#9FAAC0",margin:"0 0 28px",maxWidth:560}}>Every major. Pulled straight from each company's own job board — no reposts, and jobs drop off when the company takes them down.</p>
           <form onSubmit={go} role="search" className="d-search" style={{display:"flex",alignItems:"stretch",background:"#fff",borderRadius:14,padding:6,boxShadow:"0 0 0 1px #2FD39A33, 0 20px 50px rgba(0,0,0,.35)",maxWidth:760}}>
             <label style={{flex:"3 1 0",display:"flex",alignItems:"center",gap:10,padding:"0 14px",minWidth:0}}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55627A" strokeWidth="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
-              <input value={q} onChange={e=>setQ(e.target.value)} aria-label="Role, company or major" placeholder="Role, company or major" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#0A1426",height:48,background:"transparent",outline:"none"}}/></label>
+              <input value={q} onChange={e=>setQ(e.target.value)} aria-label="Role, company or major" placeholder="Role, company or major" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#060A2C",height:48,background:"transparent",outline:"none"}}/></label>
             <span className="d-sep" style={{width:1,background:"#DCE2EC",margin:"10px 0"}}/>
             <label style={{flex:"2 1 0",display:"flex",alignItems:"center",gap:10,padding:"0 14px",minWidth:0}}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55627A" strokeWidth="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-              <input value={where} onChange={e=>setWhere(e.target.value)} aria-label="City or state" placeholder="City or state" inputMode="text" autoComplete="address-level2" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#0A1426",height:48,background:"transparent",outline:"none"}}/></label>
-            <button type="submit" style={{font:"inherit",fontSize:16,fontWeight:600,background:"#0B7A55",color:"#fff",border:0,padding:"0 28px",borderRadius:10,cursor:"pointer",minHeight:48}}>Search</button>
+              <input value={where} onChange={e=>setWhere(e.target.value)} aria-label="City or state" placeholder="City or state" inputMode="text" autoComplete="address-level2" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#060A2C",height:48,background:"transparent",outline:"none"}}/></label>
+            <button type="submit" style={{font:"inherit",fontSize:16,fontWeight:600,background:"#4A7000",color:"#fff",border:0,padding:"0 28px",borderRadius:10,cursor:"pointer",minHeight:48}}>Search</button>
           </form>
           <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:16,alignItems:"center"}}>
             <span style={{fontSize:13,color:"#8D9AB3",marginRight:4}}>Popular:</span>
             {pills.map(k=><a key={k} href={`/jobs/?major=${k}&state=all`} style={{fontSize:13,color:"#CFD7E6",textDecoration:"none",border:"1px solid #22304D",padding:"6px 12px",borderRadius:999}}>{D_FIELD[k].split(" & ")[0]}</a>)}
           </div>
-          <p style={{fontSize:13,color:"#8D9AB3",marginTop:18}}>Free · no account needed to browse · <button onClick={onQuiz} style={{background:"none",border:0,padding:0,color:"#2FD39A",cursor:"pointer",font:"inherit",fontWeight:600}}>2-minute match quiz</button> · <a href="/demo/" style={{color:"#2FD39A",fontWeight:600,textDecoration:"none"}}>90-second demo</a></p>
+          <p style={{fontSize:13,color:"#8D9AB3",marginTop:18}}>Free · no account needed to browse · <button onClick={onQuiz} style={{background:"none",border:0,padding:0,color:"#B0F701",cursor:"pointer",font:"inherit",fontWeight:600}}>2-minute match quiz</button> · <a href="/demo/" style={{color:"#B0F701",fontWeight:600,textDecoration:"none"}}>90-second demo</a></p>
         </div>
         <div style={{position:"relative",flex:"1 1 340px",maxWidth:560,minWidth:0,width:"100%"}}>
           <HeroMap near={near} fresh={fresh} sum={sum}/>
@@ -233,46 +233,46 @@ function LandingD({onQuiz,onPage}){
 
     <main style={{...wrap,paddingTop:40,paddingBottom:64,display:"flex",flexDirection:"column",gap:40}}>
       <section aria-labelledby="how-h">
-        <h2 id="how-h" style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:"0 0 16px",color:"#0A1426"}}>How a job gets here</h2>
+        <h2 id="how-h" style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:"0 0 16px",color:"#060A2C"}}>How a job gets here</h2>
         <div className="d-grid3">
           {[["1","Straight from the company",`We read ${sum?fmt(sum.companies):"thousands of"} company job boards directly, every few hours. Not scraped job sites, not reposts.`],
             ["2","Proven to be theirs","A board only counts when we can prove it belongs to that company: their own website links to it, or the board itself names them."],
             ["3","You apply on their site","Every Apply button goes to the employer. When they take a job down, it drops off here too."]].map(([n,t,d])=>(
             <div key={n} style={{...card,borderRadius:12,padding:20,display:"flex",gap:14}}>
-              <span aria-hidden="true" style={{width:32,height:32,borderRadius:"50%",background:"#E6F4EE",color:"#0B7A55",fontWeight:600,display:"grid",placeItems:"center",flexShrink:0,...DM}}>{n}</span>
-              <div><p style={{fontSize:16,fontWeight:600,margin:"4px 0 6px",color:"#0A1426"}}>{t}</p><p style={{fontSize:14,lineHeight:1.5,color:"#55627A",margin:0}}>{d}</p></div></div>))}
+              <span aria-hidden="true" style={{width:32,height:32,borderRadius:"50%",background:"#F2FADF",color:"#4A7000",fontWeight:600,display:"grid",placeItems:"center",flexShrink:0,...DM}}>{n}</span>
+              <div><p style={{fontSize:16,fontWeight:600,margin:"4px 0 6px",color:"#060A2C"}}>{t}</p><p style={{fontSize:14,lineHeight:1.5,color:"#55627A",margin:0}}>{d}</p></div></div>))}
         </div>
       </section>
       <section>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#0A1426"}}>Explore by major</h2><a href="/jobs/?major=all&state=all" style={{fontSize:14,color:"#0B7A55",textDecoration:"none",fontWeight:500}}>Every major →</a></div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#060A2C"}}>Explore by major</h2><a href="/jobs/?major=all&state=all" style={{fontSize:14,color:"#4A7000",textDecoration:"none",fontWeight:500}}>Every major →</a></div>
         <div className="d-grid4">
           {(fields||Object.keys(D_FIELD).slice(0,8).map(k=>[k,null])).map(([k,n])=>(
-            <a key={k} href={`/jobs/?major=${k}&state=all`} style={{...card,borderRadius:12,textDecoration:"none",color:"#0A1426",padding:18,display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}><span style={{fontWeight:500}}>{D_FIELD[k]}</span><span style={{...DM,fontSize:13,color:"#55627A"}}>{n==null?"":fmt(n)}</span></a>))}
+            <a key={k} href={`/jobs/?major=${k}&state=all`} style={{...card,borderRadius:12,textDecoration:"none",color:"#060A2C",padding:18,display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}><span style={{fontWeight:500}}>{D_FIELD[k]}</span><span style={{...DM,fontSize:13,color:"#55627A"}}>{n==null?"":fmt(n)}</span></a>))}
         </div>
       </section>
 
       {sum?.top?.length>0&&<section>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#0A1426"}}>Hiring the most interns right now</h2><a href="/radar/" style={{fontSize:14,color:"#0B7A55",textDecoration:"none",fontWeight:500}}>When companies open →</a></div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#060A2C"}}>Hiring the most interns right now</h2><a href="/radar/" style={{fontSize:14,color:"#4A7000",textDecoration:"none",fontWeight:500}}>When companies open →</a></div>
         <div className="d-grid4">
           {sum.top.slice(0,4).map(c=>(
             <article key={c.id} style={{...card,padding:20,display:"flex",flexDirection:"column",gap:12}}>
-              <div style={{display:"flex",gap:12,alignItems:"center"}}><span data-logo-id={c.id} style={{width:44,height:44,borderRadius:10,background:"#F1F4F9",border:"1px solid #DCE2EC",display:"grid",placeItems:"center",fontWeight:600,flexShrink:0,color:"#0A1426"}}>{coInitials(c.company)}</span><p style={{fontWeight:600,margin:0,color:"#0A1426"}}>{c.company}</p></div>
-              <div style={{fontSize:13,borderTop:"1px solid #EEF1F6",paddingTop:12,color:"#0A1426"}}><b style={{...DM,fontWeight:500}}>{c.n}</b> open internships</div>
-              <a href={`/c/${encodeURIComponent(c.id)}`} style={{fontSize:13,fontWeight:600,color:"#0B7A55",textDecoration:"none"}}>See internships →</a>
+              <div style={{display:"flex",gap:12,alignItems:"center"}}><span data-logo-id={c.id} style={{width:44,height:44,borderRadius:10,background:"#F1F4F9",border:"1px solid #DCE2EC",display:"grid",placeItems:"center",fontWeight:600,flexShrink:0,color:"#060A2C"}}>{coInitials(c.company)}</span><p style={{fontWeight:600,margin:0,color:"#060A2C"}}>{c.company}</p></div>
+              <div style={{fontSize:13,borderTop:"1px solid #EEF1F6",paddingTop:12,color:"#060A2C"}}><b style={{...DM,fontWeight:500}}>{c.n}</b> open internships</div>
+              <a href={`/c/${encodeURIComponent(c.id)}`} style={{fontSize:13,fontWeight:600,color:"#4A7000",textDecoration:"none"}}>See internships →</a>
             </article>))}
         </div>
       </section>}
 
       <section>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#0A1426"}}>Everything after you find the job</h2><a href="/demo/" style={{fontSize:14,color:"#0B7A55",textDecoration:"none",fontWeight:500}}>See it in the 2-minute tour →</a></div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#060A2C"}}>Everything after you find the job</h2><a href="/demo/" style={{fontSize:14,color:"#4A7000",textDecoration:"none",fontWeight:500}}>See it in the 2-minute tour →</a></div>
         <div className="d-grid3">
           {FEATURES.map(f=>(
-            <a key={f.k} href={f.h} onClick={f.h==="/#interview"?(e)=>{e.preventDefault();onPage("interview");}:undefined} className="d-feat" style={{...card,textDecoration:"none",color:"#0A1426",display:"flex",flexDirection:"column",overflow:"hidden"}}>
+            <a key={f.k} href={f.h} onClick={f.h==="/#interview"?(e)=>{e.preventDefault();onPage("interview");}:undefined} className="d-feat" style={{...card,textDecoration:"none",color:"#060A2C",display:"flex",flexDirection:"column",overflow:"hidden"}}>
               <div aria-hidden="true" style={{background:"#F6F8FB",borderBottom:"1px solid #EEF1F6",height:150,position:"relative",display:"grid",placeItems:"center",padding:16}}>
                 <FeatViz k={f.k}/>
               </div>
               <div style={{padding:20}}>
-                <p style={{fontSize:13,fontWeight:600,color:"#0B7A55",margin:"0 0 6px",display:"flex",justifyContent:"space-between"}}>{f.name}<span style={{fontSize:11,fontWeight:500,color:"#8D9AB3"}}>Example preview</span></p>
+                <p style={{fontSize:13,fontWeight:600,color:"#4A7000",margin:"0 0 6px",display:"flex",justifyContent:"space-between"}}>{f.name}<span style={{fontSize:11,fontWeight:500,color:"#8D9AB3"}}>Example preview</span></p>
                 <p style={{fontSize:17,fontWeight:600,margin:"0 0 6px"}}>{f.t}</p>
                 <p style={{fontSize:14,lineHeight:1.5,color:"#55627A",margin:0}}>{f.d}</p>
               </div></a>))}
@@ -291,7 +291,7 @@ const MAJORS=["Accounting","Actuarial Science","Advertising","Aerospace Engineer
 // RECRUITER-OPTIMIZED EXTRACURRICULARS
 const EXT_CATS=[
   {
-    id:"leadership",label:"Leadership & Orgs",icon:"",color:"#0B7A55",
+    id:"leadership",label:"Leadership & Orgs",icon:"",color:"#4A7000",
     why:"Leadership roles are the #1 thing recruiters look for beyond GPA.",
     options:[
       {name:"Student Government",roles:["Senator/Representative","Committee Chair","VP / Secretary","President"]},
@@ -552,7 +552,7 @@ function BlurCard({company}){
       <div style={{filter:"blur(8px)",opacity:0.3,padding:"1.5rem",pointerEvents:"none",userSelect:"none"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"0.75rem"}}>
           <div>
-            <div style={{fontWeight:700,fontSize:16,color:"#0B1220"}}>{company?.name||"Regional Company"}</div>
+            <div style={{fontWeight:700,fontSize:16,color:"#060A2C"}}>{company?.name||"Regional Company"}</div>
             <div style={{color:"#4A5568",fontSize:13,marginTop:2}}>{company?.role||"Internship Role"}</div>
             <div style={{color:"#6B7280",fontSize:12,marginTop:2}}>{company?.location||"City, ST"}</div>
           </div>
@@ -564,9 +564,9 @@ function BlurCard({company}){
         <div style={{fontSize:13,color:"#4A5568",lineHeight:1.5}}>{company?.reason||"Strong local fit for your major and profile."}</div>
       </div>
       <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(255,255,255,0.5)"}}>
-        <div style={{textAlign:"center",padding:"20px 28px",background:"white",borderRadius:var_rl,border:`1.5px solid ${GL}`,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
+        <div style={{textAlign:"center",padding:"20px 28px",background:"white",borderRadius:var_rl,border:`1.5px solid ${GL}`,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
           <div style={{fontSize:28,marginBottom:8}}></div>
-          <div style={{fontWeight:700,fontSize:14,color:"#0B1220",marginBottom:4}}>Unlock with Pro</div>
+          <div style={{fontWeight:700,fontSize:14,color:"#060A2C",marginBottom:4}}>Unlock with Pro</div>
           <div style={{fontSize:12,color:"#4A5568"}}>See this match + {" "}
             <span style={{color:G,fontWeight:600}}>7 more companies</span>
           </div>
@@ -1002,7 +1002,7 @@ function ScoreExplainerCard({ job, profile, isPro, setShowProModal, isExpanded, 
 
 
 // ── Interview practice: a mock interviewer that asks one question at a time and coaches each answer ──
-const IV={ink:"#0A1426",dim:"#55627A",line:"#DCE2EC",soft:"#F1F4F9",acc:"#0B7A55",accSoft:"#EAF7F1",font:'"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif'};
+const IV={ink:"#060A2C",dim:"#55627A",line:"#DCE2EC",soft:"#F1F4F9",acc:"#4A7000",accSoft:"#F2FADF",font:'"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif'};
 // Grade from the per-answer rubric (relevance/structure/specifics/delivery, 0–5 each). Pure, so it's easy to check.
 const IV_KEYS=[["relevance","Answered the question"],["structure","Structure (STAR)"],["specifics","Specifics & numbers"],["delivery","Delivery & time"]];
 function ivPct(sc){if(!sc)return null;let t=0;for(const[k]of IV_KEYS)t+=Math.max(0,Math.min(5,Number(sc[k])||0));return Math.round(t/20*100);}
@@ -1201,7 +1201,7 @@ function InterviewSim({major,defaultCompany,defaultRole}){
           {summary?(
             <div style={{border:`1px solid ${IV.line}`,borderRadius:14,padding:20,background:"#fff"}}>
               <div style={{display:"flex",gap:20,alignItems:"center",flexWrap:"wrap"}}>
-                <div style={{width:96,height:96,borderRadius:16,background:"#070F1E",color:"#2FD39A",display:"grid",placeItems:"center",...mono,fontSize:40,fontWeight:500}} aria-label={`Grade ${grade?grade.letter:"not available"}`}>{grade?grade.letter:"—"}</div>
+                <div style={{width:96,height:96,borderRadius:16,background:"#060A2C",color:"#B0F701",display:"grid",placeItems:"center",...mono,fontSize:40,fontWeight:500}} aria-label={`Grade ${grade?grade.letter:"not available"}`}>{grade?grade.letter:"—"}</div>
                 <div style={{flex:1,minWidth:200}}>
                   <h2 style={{font:`600 22px ${IV.font}`,margin:"0 0 4px"}}>{grade?`${grade.overall}% overall`:"How it went"}</h2>
                   <p style={{fontSize:12.5,color:IV.dim,margin:"0 0 8px"}}>AI estimate from {grade?grade.n:0} graded answer{grade&&grade.n===1?"":"s"} · not a hiring decision</p>
@@ -1219,7 +1219,7 @@ function InterviewSim({major,defaultCompany,defaultRole}){
               <button style={{...btn(true),marginTop:16}} onClick={quit}>Practice again</button>
             </div>
           ):waiting?(
-            <div style={{position:"sticky",bottom:12,background:"#fff",border:`1px solid ${lowTime?"#F4B4AE":IV.line}`,borderRadius:14,padding:12,boxShadow:"0 6px 20px rgba(11,18,32,.08)"}}>
+            <div style={{position:"sticky",bottom:12,background:"#fff",border:`1px solid ${lowTime?"#F4B4AE":IV.line}`,borderRadius:14,padding:12,boxShadow:"0 6px 20px rgba(6,10,44,.08)"}}>
               {/* the clock */}
               <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:10}}>
                 <span style={{...mono,fontSize:22,minWidth:64,color:phase==="think"?"#B45309":lowTime?"#B42318":IV.ink}} aria-live="off">{phase==="reading"?"··":ivClock(left)}</span>
@@ -1263,7 +1263,7 @@ function SkillPicker({options,value,onToggle,major}){
   const [q,setQ]=React.useState("");
   const general=SKILLS_BY_FIELD.default.filter(o=>!options.includes(o));
   const custom=value.filter(v=>!options.includes(v)&&!general.includes(v));
-  const ink="#0B1220",line="#D5DBE3",dim="#5B6675";
+  const ink="#060A2C",line="#D5DBE3",dim="#5B6675";
   const chip=(o)=>{const on=value.includes(o);return(
     <button key={o} type="button" aria-pressed={on} onClick={()=>onToggle(o)}
       style={{display:"inline-flex",alignItems:"center",gap:6,minHeight:40,padding:"8px 14px",borderRadius:999,fontSize:14.5,fontWeight:500,cursor:"pointer",fontFamily:"inherit",
@@ -1274,7 +1274,7 @@ function SkillPicker({options,value,onToggle,major}){
   return (<div>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:12,marginBottom:10}}>
       <p style={{fontSize:13,fontWeight:600,color:ink,margin:0}}>For {major||"your major"}</p>
-      <p aria-live="polite" style={{fontSize:13,color:value.length?"#0B7A55":dim,margin:0,fontWeight:value.length?600:400}}>{value.length?`${value.length} picked`:"Tap any that fit — skip the rest"}</p>
+      <p aria-live="polite" style={{fontSize:13,color:value.length?"#4A7000":dim,margin:0,fontWeight:value.length?600:400}}>{value.length?`${value.length} picked`:"Tap any that fit — skip the rest"}</p>
     </div>
     <div style={{display:"flex",flexWrap:"wrap",gap:8}}>{options.map(chip)}</div>
     <p style={{fontSize:13,fontWeight:600,color:ink,margin:"20px 0 10px"}}>Good for any major</p>
@@ -2657,15 +2657,15 @@ function App(){
   const ProModal=()=>(
     <div style={{position:"fixed",inset:0,background:"rgba(10,22,40,0.6)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem",backdropFilter:"blur(4px)"}} onClick={()=>setShowProModal(false)}>
       <div style={{background:"#fff",borderRadius:var_rxl,padding:"2.5rem",maxWidth:460,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.2)",animation:"pop 0.3s ease",position:"relative",maxHeight:"90vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
-        <button onClick={()=>setShowProModal(false)} aria-label="Close" style={{position:"absolute",top:14,right:14,width:32,height:32,borderRadius:"50%",background:"#F1F5F4",border:"none",color:"#4A5568",fontSize:18,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--font)"}}>×</button>
+        <button onClick={()=>setShowProModal(false)} aria-label="Close" style={{position:"absolute",top:14,right:14,width:32,height:32,borderRadius:"50%",background:"#F5F8EE",border:"none",color:"#4A5568",fontSize:18,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--font)"}}>×</button>
         <div style={{background:`${G}15`,borderRadius:var_rl,padding:"1.25rem",marginBottom:"1.25rem",border:`1px solid ${GL}`}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
-            <span style={{fontWeight:700,fontSize:22,color:"#0B1220",letterSpacing:"-0.5px"}}>Beat the Pile Pro</span>
+            <span style={{fontWeight:700,fontSize:22,color:"#060A2C",letterSpacing:"-0.5px"}}>Beat the Pile Pro</span>
             <span style={{marginLeft:"auto",background:GL,color:G,fontSize:11,fontWeight:700,padding:"3px 10px",borderRadius:99}}>Beta</span>
           </div>
           <p style={{color:"#4A5568",fontSize:14,lineHeight:1.5}}><strong style={{color:G}}>Free during the beta.</strong> No card needed. We'll tell you well before anything costs money.</p>
         </div>
-        <div style={{background:`#0B1220`,borderRadius:var_rl,padding:"1.25rem",marginBottom:"1.25rem",border:`1px solid #2563EB30`}}>
+        <div style={{background:`#060A2C`,borderRadius:var_rl,padding:"1.25rem",marginBottom:"1.25rem",border:`1px solid #2563EB30`}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
             <span style={{fontSize:22}}></span>
             <p style={{fontWeight:700,fontSize:15,color:"#fff",letterSpacing:"-0.3px"}}>AI Resume Builder</p>
@@ -2686,11 +2686,11 @@ function App(){
           ].map((f,i)=>(
             <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start"}}>
               <div aria-hidden="true" style={{width:20,height:20,borderRadius:6,background:GL,color:G,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:12,fontWeight:700,marginTop:2}}>✓</div>
-              <div><p style={{fontWeight:700,fontSize:13.5,color:"#0B1220"}}>{f.title}</p><p style={{fontSize:12.5,color:"#4A5568",marginTop:2,lineHeight:1.45}}>{f.desc}</p></div>
+              <div><p style={{fontWeight:700,fontSize:13.5,color:"#060A2C"}}>{f.title}</p><p style={{fontSize:12.5,color:"#4A5568",marginTop:2,lineHeight:1.45}}>{f.desc}</p></div>
             </div>
           ))}
         </div>
-        <button onClick={()=>{analytics.track("pro_upgrade_clicked");setIsPro(true);setShowProModal(false);setProNudge(null);}} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"15px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:16,fontWeight:700,letterSpacing:"-0.3px",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
+        <button onClick={()=>{analytics.track("pro_upgrade_clicked");setIsPro(true);setShowProModal(false);setProNudge(null);}} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"15px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:16,fontWeight:700,letterSpacing:"-0.3px",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
           Unlock Pro — free during beta
         </button>
         <p style={{textAlign:"center",fontSize:12,color:"#6B7280",marginTop:10}}>Unlocks on this device right away. Nothing to pay.</p>
@@ -2712,12 +2712,12 @@ function App(){
       <div style={{position:"fixed",inset:0,background:"rgba(10,22,40,0.5)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem",backdropFilter:"blur(3px)"}} onClick={()=>{setRoleModal(null);setCustomActText("");}}>
         <div style={{background:"#fff",borderRadius:var_rxl,padding:"2rem",maxWidth:380,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.15)",animation:"pop 0.25s ease"}} onClick={e=>e.stopPropagation()}>
           <p style={{fontSize:12,fontWeight:600,color:"#6B7280",marginBottom:8}}>Your Role</p>
-          <h3 style={{fontWeight:700,fontSize:18,color:"#0B1220",marginBottom:"0.25rem",letterSpacing:"-0.3px"}}>{act.name}</h3>
+          <h3 style={{fontWeight:700,fontSize:18,color:"#060A2C",marginBottom:"0.25rem",letterSpacing:"-0.3px"}}>{act.name}</h3>
           {isCustom?(
             <>
               <p style={{color:"#4A5568",fontSize:13,marginBottom:10}}>Type the actual name of your activity or organization.</p>
               <input type="text" value={customActText} onChange={e=>setCustomActText(e.target.value)} placeholder="e.g. Robotics Club, Class President..." maxLength={60} autoFocus
-                style={{width:"100%",padding:"11px 13px",borderRadius:var_r,border:`1.5px solid ${customActText?G:"#E2E8F0"}`,background:"#FBFBFC",color:"#0B1220",fontFamily:"var(--font)",fontSize:14,outline:"none",marginBottom:14}}/>
+                style={{width:"100%",padding:"11px 13px",borderRadius:var_r,border:`1.5px solid ${customActText?G:"#E2E8F0"}`,background:"#FBFBFC",color:"#060A2C",fontFamily:"var(--font)",fontSize:14,outline:"none",marginBottom:14}}/>
             </>
           ):(
             <p style={{color:"#4A5568",fontSize:13,marginBottom:"1.5rem"}}>Select your level of involvement.</p>
@@ -2729,7 +2729,7 @@ function App(){
                 <button key={role} onClick={()=>pickRole(roleModal.catId,act.name,role,isCustom?customActText:undefined)} disabled={!canConfirmCustom}
                   style={{padding:"12px 16px",borderRadius:var_r,border:`1.5px solid ${isSel?G:"#E2E8F0"}`,background:isSel?GL:"#fff",cursor:canConfirmCustom?"pointer":"not-allowed",fontFamily:"var(--font)",textAlign:"left",display:"flex",alignItems:"center",justifyContent:"space-between",transition:"all 0.15s"}}>
                   <div>
-                    <span style={{fontWeight:isSel?700:500,fontSize:14,color:isSel?GD:"#0B1220"}}>{role}</span>
+                    <span style={{fontWeight:isSel?700:500,fontSize:14,color:isSel?GD:"#060A2C"}}>{role}</span>
                   </div>
                   {isSel&&<span style={{fontSize:16,color:G}}>✓</span>}
                 </button>
@@ -2778,7 +2778,7 @@ function App(){
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
             <div>
               <p style={{fontSize:12,fontWeight:600,color:"#6B7280"}}>Assisted Apply</p>
-              <h3 style={{fontWeight:700,fontSize:20,color:"#0B1220",letterSpacing:"-0.4px"}}>{c.name}</h3>
+              <h3 style={{fontWeight:700,fontSize:20,color:"#060A2C",letterSpacing:"-0.4px"}}>{c.name}</h3>
               <p style={{color:"#4A5568",fontSize:13}}>{c.role}</p>
             </div>
             <button onClick={()=>setApplyModal(null)} style={{background:"none",border:"none",fontSize:22,color:"#6B7280",cursor:"pointer",lineHeight:1}}>×</button>
@@ -2788,9 +2788,9 @@ function App(){
             /* Application limit reached — value-first Pro wall */
             <div style={{background:`${GL}`,border:`1px solid ${G}25`,borderRadius:var_rl,padding:"1.75rem 1.5rem",textAlign:"center",marginTop:10}}>
               <p style={{fontSize:30,marginBottom:8}}></p>
-              <p style={{fontWeight:700,fontSize:18,color:"#0B1220",marginBottom:6,letterSpacing:"-0.3px"}}>You've used your {FREE_APPLICATIONS} free applications</p>
+              <p style={{fontWeight:700,fontSize:18,color:"#060A2C",marginBottom:6,letterSpacing:"-0.3px"}}>You've used your {FREE_APPLICATIONS} free applications</p>
               <p style={{fontSize:13.5,color:"#4A5568",lineHeight:1.55,marginBottom:16,maxWidth:380,margin:"0 auto 16px"}}>You applied to {appliedCos.slice(0,FREE_APPLICATIONS).join(", ")} with Beat the Pile's help. Go Pro for <strong>unlimited applications</strong> — auto-fill and a tailored cover letter for every job, plus follow-up reminders.</p>
-              <button onClick={()=>{setApplyModal(null);setShowProModal(true);}} style={{background:`${G}`,border:"none",color:"#fff",padding:"13px 30px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Go Pro — unlimited applications</button>
+              <button onClick={()=>{setApplyModal(null);setShowProModal(true);}} style={{background:`${G}`,border:"none",color:"#fff",padding:"13px 30px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Go Pro — unlimited applications</button>
               <p style={{fontSize:11.5,color:"#6B7280",marginTop:12}}>You can still open {c.name}'s site directly from your matches anytime.</p>
             </div>
           ):(<>
@@ -2798,7 +2798,7 @@ function App(){
             // Real Adzuna posting from the main search — direct apply link, always works
             <>
               <a href={safeHttpUrl(c.applyUrl)} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)}
-                style={{display:"block",textAlign:"center",background:`${G}`,color:"#fff",padding:"13px",borderRadius:var_rl,fontWeight:700,fontSize:15,textDecoration:"none",boxShadow:"0 1px 2px rgba(11,18,32,.06)",margin:"10px 0 4px"}}>
+                style={{display:"block",textAlign:"center",background:`${G}`,color:"#fff",padding:"13px",borderRadius:var_rl,fontWeight:700,fontSize:15,textDecoration:"none",boxShadow:"0 1px 2px rgba(6,10,44,.06)",margin:"10px 0 4px"}}>
                 ✓ Apply to {c.role||"this role"} at {c.name} ↗
               </a>
               <p style={{fontSize:11,color:GD,textAlign:"center",fontWeight:700,marginBottom:10}}>Live posting{c.location?` · ${c.location}`:""}{c.created?` · posted ${(new Date(c.created)).toLocaleDateString()}`:""}</p>
@@ -2806,7 +2806,7 @@ function App(){
           ):safeHttpUrl(adzunaLink&&adzunaLink.applyUrl)?(
             <>
               <a href={safeHttpUrl(adzunaLink.applyUrl)} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)}
-                style={{display:"block",textAlign:"center",background:`${G}`,color:"#fff",padding:"13px",borderRadius:var_rl,fontWeight:700,fontSize:15,textDecoration:"none",boxShadow:"0 1px 2px rgba(11,18,32,.06)",margin:"10px 0 4px"}}>
+                style={{display:"block",textAlign:"center",background:`${G}`,color:"#fff",padding:"13px",borderRadius:var_rl,fontWeight:700,fontSize:15,textDecoration:"none",boxShadow:"0 1px 2px rgba(6,10,44,.06)",margin:"10px 0 4px"}}>
                 ✓ Apply to {adzunaLink.title||(c.role+" at "+c.name)} ↗
               </a>
               <p style={{fontSize:11,color:GD,textAlign:"center",fontWeight:700,marginBottom:10}}>Live posting{adzunaLink.location?` · ${adzunaLink.location}`:""}</p>
@@ -2825,7 +2825,7 @@ function App(){
               const siteHref=companyWebsiteUrl(c);
               const googleHref=googleSearchUrl(c);
               const btnStyle={display:"flex",alignItems:"center",justifyContent:"center",gap:6,padding:"9px 8px",borderRadius:var_r,fontWeight:700,fontSize:13,textDecoration:"none"};
-              const outline={...btnStyle,background:"#fff",color:"#0B1220",border:`1.5px solid #E2E8F0`};
+              const outline={...btnStyle,background:"#fff",color:"#060A2C",border:`1.5px solid #E2E8F0`};
               if(isNat){
                 // National companies are on all the major platforms
                 return(<>
@@ -2853,7 +2853,7 @@ function App(){
 
           {!ready?(
             <div style={{background:AL,border:`1px solid ${AM}40`,borderRadius:var_rl,padding:"1.25rem",textAlign:"center"}}>
-              <p style={{fontWeight:700,fontSize:15,color:"#0B1220",marginBottom:6}}>Finish your profile to auto-fill</p>
+              <p style={{fontWeight:700,fontSize:15,color:"#060A2C",marginBottom:6}}>Finish your profile to auto-fill</p>
               <p style={{fontSize:13,color:"#4A5568",marginBottom:12,lineHeight:1.5}}>Save your info once and every application gets a copy-paste card plus a tailored cover letter.</p>
               <button onClick={()=>{setApplyModal(null);setPage("profile");}} style={{background:`${G}`,border:"none",color:"#fff",padding:"11px 22px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700}}>Set up my profile →</button>
             </div>
@@ -2861,13 +2861,13 @@ function App(){
             {/* AUTOFILL CARD */}
             <div style={{border:`1.5px solid ${GL}`,borderRadius:var_rl,padding:"1rem 1.1rem",marginBottom:14}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-                <p style={{fontWeight:700,fontSize:14,color:"#0B1220"}}>Your info — tap any field to copy</p>
+                <p style={{fontWeight:700,fontSize:14,color:"#060A2C"}}>Your info — tap any field to copy</p>
                 <button onClick={()=>copyText(allText,"all")} style={{background:GL,border:`1px solid ${GM}`,color:GD,padding:"5px 12px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:12,fontWeight:700}}>{copied==="all"?"✓ Copied all":"Copy all"}</button>
               </div>
               <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:6}}>
                 {rows.map((r,i)=>(
                   <button key={i} onClick={()=>copyText(r[1],"r"+i)} style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:8,background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_r,padding:"8px 11px",cursor:"pointer",fontFamily:"var(--font)",textAlign:"left"}}>
-                    <span style={{minWidth:0}}><span style={{display:"block",fontSize:12,color:"#6B7280",fontWeight:600}}>{r[0]}</span><span style={{display:"block",fontSize:13,color:"#0B1220",fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r[1]}</span></span>
+                    <span style={{minWidth:0}}><span style={{display:"block",fontSize:12,color:"#6B7280",fontWeight:600}}>{r[0]}</span><span style={{display:"block",fontSize:13,color:"#060A2C",fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{r[1]}</span></span>
                     <span style={{fontSize:12,color:copied==="r"+i?G:"#6B7280",fontWeight:700,flexShrink:0}}>{copied==="r"+i?"✓":"copy"}</span>
                   </button>
                 ))}
@@ -2877,7 +2877,7 @@ function App(){
             {/* APPLICATION KIT */}
             <div style={{border:`1.5px solid ${GL}`,borderRadius:var_rl,padding:"1rem 1.1rem"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-                <p style={{fontWeight:700,fontSize:14,color:"#0B1220"}}>Application kit</p>
+                <p style={{fontWeight:700,fontSize:14,color:"#060A2C"}}>Application kit</p>
                 {kit.company===c.name&&kit.coverLetter&&!kit.loading&&<button onClick={()=>generateKit(c)} style={{background:"none",border:"none",color:GD,cursor:"pointer",fontFamily:"var(--font)",fontSize:12,fontWeight:700}}>↻ Regenerate</button>}
               </div>
               {kit.company!==c.name&&!kit.loading?(
@@ -2885,7 +2885,7 @@ function App(){
                   {(profile.resumes||[]).filter(r=>r.text).length>0&&(
                     <div style={{marginBottom:10}}>
                       <label style={{fontSize:12,fontWeight:700,color:"#4A5568",display:"block",marginBottom:5}}>Tailor from which resume?</label>
-                      <select value={chosenResumeId||""} onChange={e=>setChosenResumeId(e.target.value?Number(e.target.value):null)} style={{width:"100%",padding:"9px 11px",borderRadius:var_r,border:`1.5px solid #E2E8F0`,background:"#FBFBFC",color:"#0B1220",fontFamily:"var(--font)",fontSize:13.5,outline:"none"}}>
+                      <select value={chosenResumeId||""} onChange={e=>setChosenResumeId(e.target.value?Number(e.target.value):null)} style={{width:"100%",padding:"9px 11px",borderRadius:var_r,border:`1.5px solid #E2E8F0`,background:"#FBFBFC",color:"#060A2C",fontFamily:"var(--font)",fontSize:13.5,outline:"none"}}>
                         <option value="">Profile info only</option>
                         {(profile.resumes||[]).filter(r=>r.text).map(r=>(<option key={r.id} value={r.id}>{r.name}</option>))}
                       </select>
@@ -2902,7 +2902,7 @@ function App(){
               {kit.company===c.name&&kit.coverLetter&&!kit.loading&&(<>
                 <p style={{fontSize:11.5,color:"#6B7280",margin:"0 0 6px",lineHeight:1.45}}><b>Draft</b> written by AI from your profile{chosenResumeId?" and the resume you picked":""}. Edit it here before you paste it anywhere.</p>
                 <div style={{position:"relative",marginBottom:10}}>
-                  <textarea value={kit.coverLetter} onChange={e=>setKit(k=>({...k,coverLetter:e.target.value}))} style={{width:"100%",minHeight:160,background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_r,padding:"11px 12px",fontFamily:"var(--font)",fontSize:13,lineHeight:1.6,color:"#0B1220",resize:"vertical",outline:"none"}}/>
+                  <textarea value={kit.coverLetter} onChange={e=>setKit(k=>({...k,coverLetter:e.target.value}))} style={{width:"100%",minHeight:160,background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_r,padding:"11px 12px",fontFamily:"var(--font)",fontSize:13,lineHeight:1.6,color:"#060A2C",resize:"vertical",outline:"none"}}/>
                   <button onClick={()=>copyText(kit.coverLetter,"cl")} style={{position:"absolute",top:8,right:8,background:GD,border:"none",color:"#fff",padding:"4px 12px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:11,fontWeight:700}}>{copied==="cl"?"✓ Copied":"Copy"}</button>
                 </div>
                 {kit.tips&&kit.tips.length>0&&(
@@ -2931,7 +2931,7 @@ function App(){
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
             <div>
               <p style={{fontSize:12,fontWeight:600,color:"#6B7280"}}>Your Answers</p>
-              <h3 style={{fontWeight:700,fontSize:20,color:"#0B1220",letterSpacing:"-0.4px"}}>Tap any answer to change it</h3>
+              <h3 style={{fontWeight:700,fontSize:20,color:"#060A2C",letterSpacing:"-0.4px"}}>Tap any answer to change it</h3>
               <p style={{color:"#4A5568",fontSize:13,marginTop:2}}>Update one thing and we'll instantly recalculate — no need to redo the quiz.</p>
             </div>
             <button onClick={()=>setShowReview(false)} style={{background:"none",border:"none",fontSize:22,color:"#6B7280",cursor:"pointer",lineHeight:1}}>×</button>
@@ -2943,7 +2943,7 @@ function App(){
                 <span style={{fontSize:18,flexShrink:0}}>{icons[s.key]||"•"}</span>
                 <span style={{flex:1,minWidth:0}}>
                   <span style={{display:"block",fontSize:11,color:"#6B7280",fontWeight:700}}>{s.label}</span>
-                  <span style={{display:"block",fontSize:14,color:"#0B1220",fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{answerLabel(s.key)}</span>
+                  <span style={{display:"block",fontSize:14,color:"#060A2C",fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{answerLabel(s.key)}</span>
                 </span>
                 <span style={{color:GD,fontSize:13,fontWeight:700,flexShrink:0}}>Change ›</span>
               </button>
@@ -2963,7 +2963,7 @@ function App(){
     }[proNudge.reason]||"Unlock more with Pro.";
     return(
       <div style={{position:"fixed",left:0,right:0,bottom:16,zIndex:350,display:"flex",justifyContent:"center",padding:"0 1rem",pointerEvents:"none"}}>
-        <div style={{pointerEvents:"auto",background:"#0B1220",color:"#fff",borderRadius:var_rl,padding:"13px 14px 13px 16px",maxWidth:440,width:"100%",boxShadow:"0 12px 40px rgba(0,0,0,0.3)",display:"flex",alignItems:"center",gap:12,animation:"fadeUp 0.3s ease"}}>
+        <div style={{pointerEvents:"auto",background:"#060A2C",color:"#fff",borderRadius:var_rl,padding:"13px 14px 13px 16px",maxWidth:440,width:"100%",boxShadow:"0 12px 40px rgba(0,0,0,0.3)",display:"flex",alignItems:"center",gap:12,animation:"fadeUp 0.3s ease"}}>
           <span style={{fontSize:13.5,lineHeight:1.4,flex:1}}>{msg}</span>
           <button onClick={()=>{setProNudge(null);setShowProModal(true);}} style={{background:G,border:"none",color:"#fff",padding:"8px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,whiteSpace:"nowrap"}}>See Pro</button>
           <button onClick={()=>{analytics.track("nudge_dismissed",{reason:proNudge.reason});setProNudge(null);}} style={{background:"none",border:"none",color:"#6B7280",cursor:"pointer",fontSize:18,lineHeight:1}}>×</button>
@@ -2985,7 +2985,7 @@ function App(){
           <button onClick={()=>setShowSignInModal(false)} style={{position:"absolute",top:10,right:10,background:"#F1F5F9",border:"none",width:32,height:32,borderRadius:"50%",cursor:"pointer",fontSize:16,fontWeight:700,color:"#4A5568",lineHeight:1}}>×</button>
           <div style={{textAlign:"center",marginBottom:12}}>
             <p style={{fontSize:12,color:"#6B7280",fontWeight:600}}>Save your progress</p>
-            <h3 style={{fontSize:20,fontWeight:700,color:"#0B1220",margin:"4px 0 6px"}}>Sign in to Beat the Pile</h3>
+            <h3 style={{fontSize:20,fontWeight:700,color:"#060A2C",margin:"4px 0 6px"}}>Sign in to Beat the Pile</h3>
             <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.5}}>Your tracker, profile, and resumes sync across all your devices. Sign in once — pick up where you left off anywhere.</p>
           </div>
           {/* Clerk's prebuilt sign-in UI mounts here */}
@@ -3020,7 +3020,7 @@ function App(){
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
             <div>
               <p style={{fontSize:12,fontWeight:600,color:"#6B7280"}}>Follow-up email</p>
-              <h3 style={{fontWeight:700,fontSize:20,color:"#0B1220",letterSpacing:"-0.4px"}}>{a.company}</h3>
+              <h3 style={{fontWeight:700,fontSize:20,color:"#060A2C",letterSpacing:"-0.4px"}}>{a.company}</h3>
               <p style={{color:"#4A5568",fontSize:13}}>{a.role}</p>
             </div>
             <button onClick={()=>setFollowUpModal(null)} style={{background:"none",border:"none",fontSize:22,color:"#6B7280",cursor:"pointer",lineHeight:1}}>×</button>
@@ -3035,7 +3035,7 @@ function App(){
           ):kit.company===a.company&&kit.coverLetter?(<>
             <p style={{fontSize:11.5,color:"#6B7280",margin:"0 0 6px",lineHeight:1.45}}><b>Draft</b> — edit it before you send. Nothing is sent for you.</p>
             <div style={{position:"relative",marginBottom:10}}>
-              <textarea value={kit.coverLetter} onChange={e=>setKit(k=>({...k,coverLetter:e.target.value}))} style={{width:"100%",minHeight:200,background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_r,padding:"12px",fontFamily:"var(--font)",fontSize:13,lineHeight:1.6,color:"#0B1220",resize:"vertical",outline:"none"}}/>
+              <textarea value={kit.coverLetter} onChange={e=>setKit(k=>({...k,coverLetter:e.target.value}))} style={{width:"100%",minHeight:200,background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_r,padding:"12px",fontFamily:"var(--font)",fontSize:13,lineHeight:1.6,color:"#060A2C",resize:"vertical",outline:"none"}}/>
               <button onClick={()=>copyText(kit.coverLetter,"fu")} style={{position:"absolute",top:8,right:8,background:GD,border:"none",color:"#fff",padding:"5px 14px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:11,fontWeight:700}}>{copied==="fu"?"✓ Copied":"Copy"}</button>
             </div>
             {/* Open in email app — parses Subject line and pre-fills mailto */}
@@ -3053,7 +3053,7 @@ function App(){
                 {kit.tips.map((t,i)=>(<div key={i} style={{display:"flex",gap:8,fontSize:12.5,color:"#4A5568",lineHeight:1.5}}><span style={{color:G,fontWeight:700}}>›</span><span>{t}</span></div>))}
               </div>
             )}
-            <button onClick={()=>{markFollowedUp(a.company);setFollowUpModal(null);}} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"13px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14.5,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>I sent it — mark as followed up ✓</button>
+            <button onClick={()=>{markFollowedUp(a.company);setFollowUpModal(null);}} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"13px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14.5,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>I sent it — mark as followed up ✓</button>
           </>):null}
         </div>
       </div>
@@ -3067,15 +3067,15 @@ function App(){
     const slot=typeof document!=="undefined"?document.getElementById("btpRight"):null;
     const acct=(clerkUser?(
       <button onClick={()=>{window.location.href="/u/";}} title={clerkUser.primaryEmailAddress?.emailAddress||"Account"} aria-label="Your profile"
-        style={{background:"#2FBF8A",border:"none",color:"#0B1220",width:30,height:30,borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:700,fontFamily:"inherit"}}>
+        style={{background:"#B0F701",border:"none",color:"#060A2C",width:30,height:30,borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:700,fontFamily:"inherit"}}>
         {(clerkUser.firstName||clerkUser.primaryEmailAddress?.emailAddress||"U").charAt(0).toUpperCase()}
       </button>
     ):(
-      <button onClick={openSignIn} style={{background:"#2FBF8A",border:"1px solid #2FBF8A",color:"#0B1220",padding:"6px 12px",borderRadius:7,cursor:"pointer",fontSize:13,fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>Sign in</button>
+      <button onClick={openSignIn} style={{background:"#B0F701",border:"1px solid #B0F701",color:"#060A2C",padding:"6px 12px",borderRadius:7,cursor:"pointer",fontSize:13,fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>Sign in</button>
     ));
     return (<>
       {slot?ReactDOM.createPortal(acct,slot):null}
-      {saveNote&&<div role="status" style={{position:"fixed",left:"50%",bottom:22,transform:"translateX(-50%)",background:"#0B1220",color:"#fff",padding:"10px 16px",borderRadius:10,fontSize:13.5,fontWeight:500,zIndex:2000,maxWidth:"90vw",boxShadow:"0 6px 20px rgba(0,0,0,.25)"}}>{saveNote}</div>}
+      {saveNote&&<div role="status" style={{position:"fixed",left:"50%",bottom:22,transform:"translateX(-50%)",background:"#060A2C",color:"#fff",padding:"10px 16px",borderRadius:10,fontSize:13.5,fontWeight:500,zIndex:2000,maxWidth:"90vw",boxShadow:"0 6px 20px rgba(0,0,0,.25)"}}>{saveNote}</div>}
     </>);
   };
 
@@ -3126,7 +3126,7 @@ function App(){
           {editStep!==null
             ? <p style={{fontSize:12,color:GD,fontWeight:600,marginBottom:"0.4rem"}}>Editing one answer</p>
             : <p style={{fontSize:12,color:"#6B7280",fontWeight:600,marginBottom:"0.4rem"}}>Step {step+1} of {STEPS.length}</p>}
-          <h2 className="fade-up" key={step} style={{fontSize:"clamp(1.4rem,3vw,2rem)",fontWeight:700,letterSpacing:"-0.8px",marginBottom:"0.5rem",lineHeight:1.2,color:"#0B1220"}}>{cur.label}</h2>
+          <h2 className="fade-up" key={step} style={{fontSize:"clamp(1.4rem,3vw,2rem)",fontWeight:700,letterSpacing:"-0.8px",marginBottom:"0.5rem",lineHeight:1.2,color:"#060A2C"}}>{cur.label}</h2>
           {STEP_HINTS[cur.key]&&<p style={{fontSize:13,color:"#4A5568",marginBottom:"1.75rem",lineHeight:1.5,padding:"8px 12px",background:"#FBFBFC",borderRadius:var_r,border:`1px solid ${GL}`}}>{STEP_HINTS[cur.key]}</p>}
 
           {/* SEARCH */}
@@ -3157,7 +3157,7 @@ function App(){
                 <div style={{position:"relative",marginBottom:8}}>
                   <span style={{position:"absolute",left:13,top:"50%",transform:"translateY(-50%)",fontSize:16}}></span>
                   <input type="text" value={searchQ} onChange={e=>setSearchQ(e.target.value)} placeholder="Start typing..." autoFocus
-                    style={{width:"100%",padding:"13px 14px 13px 42px",borderRadius:var_rl,border:`1.5px solid ${searchQ?G:"#E2E8F0"}`,background:"#FBFBFC",color:"#0B1220",fontFamily:"var(--font)",fontSize:15,outline:"none",transition:"border-color 0.2s"}}/>
+                    style={{width:"100%",padding:"13px 14px 13px 42px",borderRadius:var_rl,border:`1.5px solid ${searchQ?G:"#E2E8F0"}`,background:"#FBFBFC",color:"#060A2C",fontFamily:"var(--font)",fontSize:15,outline:"none",transition:"border-color 0.2s"}}/>
                 </div>
                 <div style={{maxHeight:300,overflowY:"auto",display:"flex",flexDirection:"column",gap:5}}>
                   {cur.options.filter(o=>cur.key==="university"?schoolMatches(o,searchQ):o.toLowerCase().includes(searchQ.toLowerCase())).map(o=>{
@@ -3174,14 +3174,14 @@ function App(){
                           // Users who want more can use "Edit answers" later, or stay if they tapped "+ Add another".
                           const wasFirstPick=picked.length===0&&!addingMore&&editStep===null;
                           if(wasFirstPick){setTimeout(()=>{const ni=nextStepIndex(step);if(ni>=0)setStep(ni);else setPage("emailgate");},250);}
-                        }} style={{background:isPicked?GL:"#fff",border:`1.5px solid ${isPicked?G:"#E2E8F0"}`,color:isPicked?GD:"#0B1220",padding:"11px 14px",borderRadius:var_r,cursor:isPicked||atMax?"not-allowed":"pointer",fontFamily:"var(--font)",fontSize:14,textAlign:"left",transition:"all 0.1s",opacity:isPicked||atMax?0.55:1}}>
+                        }} style={{background:isPicked?GL:"#fff",border:`1.5px solid ${isPicked?G:"#E2E8F0"}`,color:isPicked?GD:"#060A2C",padding:"11px 14px",borderRadius:var_r,cursor:isPicked||atMax?"not-allowed":"pointer",fontFamily:"var(--font)",fontSize:14,textAlign:"left",transition:"all 0.1s",opacity:isPicked||atMax?0.55:1}}>
                           {isPicked?"✓ Already picked · ":""}{o}
                         </button>
                       );
                     }
                     return (
                       <button key={o} onClick={()=>setA(cur.key,o,true)}
-                        style={{background:ans[cur.key]===o?GL:"#fff",border:`1.5px solid ${ans[cur.key]===o?G:"#E2E8F0"}`,color:ans[cur.key]===o?GD:"#0B1220",padding:"11px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,textAlign:"left",transition:"all 0.1s"}}>
+                        style={{background:ans[cur.key]===o?GL:"#fff",border:`1.5px solid ${ans[cur.key]===o?G:"#E2E8F0"}`,color:ans[cur.key]===o?GD:"#060A2C",padding:"11px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,textAlign:"left",transition:"all 0.1s"}}>
                         {ans[cur.key]===o&&"✓ "}{o}
                       </button>
                     );
@@ -3203,7 +3203,7 @@ function App(){
             {cur.subLabel&&<p style={{fontSize:13,color:"#4A5568",lineHeight:1.5,marginBottom:12}}>{cur.subLabel}</p>}
             <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
               {cur.options.map((o,i)=>{const c=PALETTE[i%PALETTE.length];const sel=ans[cur.key]===o;
-                return<button key={o} onClick={()=>setA(cur.key,o,true)} style={{background:sel?c:"#fff",border:`1.5px solid ${sel?c:"#E2E8F0"}`,color:sel?"#fff":"#0B1220",padding:"10px 20px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:sel?700:400,transition:"all 0.18s",boxShadow:sel?`0 2px 10px ${c}40`:"none"}}>{o}</button>;
+                return<button key={o} onClick={()=>setA(cur.key,o,true)} style={{background:sel?c:"#fff",border:`1.5px solid ${sel?c:"#E2E8F0"}`,color:sel?"#fff":"#060A2C",padding:"10px 20px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:sel?700:400,transition:"all 0.18s",boxShadow:sel?`0 2px 10px ${c}40`:"none"}}>{o}</button>;
               })}
             </div>
           </div>)}
@@ -3232,7 +3232,7 @@ function App(){
                     style={{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 16px",background:catSelected.length>0?`${cat.color}10`:"#FBFBFC",cursor:"pointer",fontFamily:"var(--font)",border:"none"}}>
                     <div style={{display:"flex",alignItems:"center",gap:10}}>
                       
-                      <span style={{fontWeight:700,fontSize:14,color:"#0B1220"}}>{cat.label}</span>
+                      <span style={{fontWeight:700,fontSize:14,color:"#060A2C"}}>{cat.label}</span>
                       {catSelected.length>0&&<span style={{background:cat.color,color:"#fff",fontSize:11,fontWeight:700,padding:"2px 9px",borderRadius:99}}>{catSelected.length}</span>}
                     </div>
                     <span style={{color:"#6B7280",fontSize:13,fontWeight:600}}>{isExp?"▲":"▼"}</span>
@@ -3245,7 +3245,7 @@ function App(){
                           const picked=extPicks.find(x=>x.activity===opt.name);
                           return(
                             <button key={opt.name} onClick={()=>{setRoleModal({catId:cat.id,actName:opt.name});setCustomActText("");}}
-                              style={{background:picked?cat.color:"#fff",border:`1.5px solid ${picked?cat.color:"#E2E8F0"}`,color:picked?"#fff":"#0B1220",padding:"8px 14px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:picked?700:400,display:"flex",alignItems:"center",gap:6,transition:"all 0.15s"}}>
+                              style={{background:picked?cat.color:"#fff",border:`1.5px solid ${picked?cat.color:"#E2E8F0"}`,color:picked?"#fff":"#060A2C",padding:"8px 14px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:picked?700:400,display:"flex",alignItems:"center",gap:6,transition:"all 0.15s"}}>
                               {picked&&"✓ "}{opt.name}
                               {picked&&<span style={{background:"rgba(255,255,255,0.25)",padding:"0px 6px",borderRadius:99,fontSize:10}}>{picked.role}</span>}
                             </button>
@@ -3271,7 +3271,7 @@ function App(){
 
             {/* Upload + saved-resume buttons */}
             <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:12}}>
-              <label style={{flex:"1 1 auto",background:`${G}`,color:"#fff",padding:"12px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,textAlign:"center",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
+              <label style={{flex:"1 1 auto",background:`${G}`,color:"#fff",padding:"12px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,textAlign:"center",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
                 Upload file (PDF, DOCX, TXT)
                 <input type="file" accept=".pdf,.txt,.docx" onChange={e=>{handleQuizResumeUpload(e.target.files);e.target.value="";}} style={{display:"none"}}/>
               </label>
@@ -3286,14 +3286,14 @@ function App(){
             <p style={{fontSize:12,color:"#6B7280",margin:"10px 0",textAlign:"center"}}>— or paste it below —</p>
 
             <textarea value={ans.resume||""} onChange={e=>setA("resume",e.target.value)} placeholder="Paste your resume text here…"
-              style={{width:"100%",minHeight:170,padding:"12px 14px",borderRadius:var_rl,border:`1.5px solid ${(ans.resume||"").length>40?G:"#E2E8F0"}`,background:"#FBFBFC",color:"#0B1220",fontFamily:"var(--font)",fontSize:13.5,lineHeight:1.5,outline:"none",resize:"vertical",transition:"border-color 0.2s"}}/>
+              style={{width:"100%",minHeight:170,padding:"12px 14px",borderRadius:var_rl,border:`1.5px solid ${(ans.resume||"").length>40?G:"#E2E8F0"}`,background:"#FBFBFC",color:"#060A2C",fontFamily:"var(--font)",fontSize:13.5,lineHeight:1.5,outline:"none",resize:"vertical",transition:"border-color 0.2s"}}/>
 
             {(ans.resume||"").length>40&&<p style={{fontSize:13,color:GD,fontWeight:700,marginTop:8}}>✓ Got your resume ({(ans.resume||"").length.toLocaleString()} chars) — we'll use it to tailor your matches</p>}
 
             {/* Subtle 'no resume yet' path — sets a flag so we offer the builder after the quiz, then advances */}
             {(ans.resume||"").length<=40&&(
               <div style={{marginTop:18,padding:"14px 16px",background:"#F8FAFC",border:"1px dashed #CBD5E1",borderRadius:var_rl}}>
-                <p style={{fontSize:13,color:"#0B1220",fontWeight:700,marginBottom:4}}>Don't have a resume yet?</p>
+                <p style={{fontSize:13,color:"#060A2C",fontWeight:700,marginBottom:4}}>Don't have a resume yet?</p>
                 <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.5,marginBottom:10}}>That's fine — most freshmen and sophomores don't. We'll help you build a starter resume from your quiz answers right after.</p>
                 <button onClick={()=>{
                   setAns(p=>({...p,needsResumeBuilder:true}));
@@ -3306,7 +3306,7 @@ function App(){
           {/* ZIP */}
           {cur.type==="zip"&&(<div className="fade-up">
             <input type="text" inputMode="numeric" maxLength={5} value={ans.zip} onChange={e=>setA("zip",e.target.value.replace(/\D/g,""))} placeholder="19006" autoFocus
-              style={{width:"100%",fontSize:36,fontWeight:700,padding:"18px",borderRadius:var_rl,border:`2px solid ${/^\d{5}$/.test(ans.zip)?G:"#E2E8F0"}`,background:"#FBFBFC",color:"#0B1220",fontFamily:"var(--font)",outline:"none",letterSpacing:10,textAlign:"center",transition:"border-color 0.2s"}}/>
+              style={{width:"100%",fontSize:36,fontWeight:700,padding:"18px",borderRadius:var_rl,border:`2px solid ${/^\d{5}$/.test(ans.zip)?G:"#E2E8F0"}`,background:"#FBFBFC",color:"#060A2C",fontFamily:"var(--font)",outline:"none",letterSpacing:10,textAlign:"center",transition:"border-color 0.2s"}}/>
             {/^\d{5}$/.test(ans.zip)&&<p style={{fontSize:14,color:GD,fontWeight:700,marginTop:10,textAlign:"center"}}>✓ Got it</p>}
             {!/^\d{5}$/.test(ans.zip)&&<p style={{fontSize:13,color:"#6B7280",marginTop:10,textAlign:"center"}}>We use this to factor location into your matches</p>}
           </div>)}
@@ -3328,7 +3328,7 @@ function App(){
               <>
                 <button onClick={()=>{setEditStep(null);setPage("results");}} style={{background:"#FBFBFC",border:`1.5px solid #E2E8F0`,color:"#4A5568",padding:"13px 16px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:600}}>Cancel</button>
                 <button onClick={()=>{if(!canNext())return;setEditStep(null);analytics.track("answer_edited");setShowReview(true);setPage("results");window.scrollTo(0,0);}} disabled={!canNext()}
-                  style={{background:canNext()?"#fff":"#F1F5F4",border:`1.5px solid ${canNext()?G:"#E2E8F0"}`,color:canNext()?GD:"#6B7280",padding:"13px 16px",borderRadius:var_rl,cursor:canNext()?"pointer":"not-allowed",fontFamily:"var(--font)",fontSize:14,fontWeight:700}}>
+                  style={{background:canNext()?"#fff":"#F5F8EE",border:`1.5px solid ${canNext()?G:"#E2E8F0"}`,color:canNext()?GD:"#6B7280",padding:"13px 16px",borderRadius:var_rl,cursor:canNext()?"pointer":"not-allowed",fontFamily:"var(--font)",fontSize:14,fontWeight:700}}>
                   Save &amp; edit more
                 </button>
                 <button onClick={saveEdit} disabled={!canNext()}
@@ -3358,17 +3358,17 @@ function App(){
         <SignInModal/>
       <Nav/>
       <div style={{maxWidth:480,margin:"0 auto",padding:"3rem 1.5rem"}}>
-        <div className="fade-up" style={{background:"#fff",border:`1.5px solid ${GL}`,borderRadius:var_rxl,padding:"2.5rem 2rem",textAlign:"center",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
+        <div className="fade-up" style={{background:"#fff",border:`1.5px solid ${GL}`,borderRadius:var_rxl,padding:"2.5rem 2rem",textAlign:"center",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
           <div style={{fontSize:34,marginBottom:8}}></div>
-          <h2 style={{fontSize:"clamp(1.5rem,3.5vw,2rem)",fontWeight:700,letterSpacing:"-1px",marginBottom:10,color:"#0B1220"}}>Want internship updates by email?</h2>
+          <h2 style={{fontSize:"clamp(1.5rem,3.5vw,2rem)",fontWeight:700,letterSpacing:"-1px",marginBottom:10,color:"#060A2C"}}>Want internship updates by email?</h2>
           <p style={{color:"#4A5568",fontSize:15,lineHeight:1.6,marginBottom:"1.5rem"}}><b>Optional.</b> Your matches show up either way. Leave your email if you'd like occasional internship tips and updates from Beat the Pile.</p>
           <input type="email" value={email} autoFocus placeholder="you@email.com"
             onChange={e=>{setEmail(e.target.value);setEmailErr("");}}
             onKeyDown={e=>{if(e.key==="Enter")submitEmail();}}
             style={{width:"100%",padding:"14px 16px",borderRadius:var_rl,border:`1.5px solid ${emailErr?CR:/.+@.+\..+/.test(email)?G:"#E2E8F0"}`,background:"#FBFBFC",fontFamily:"var(--font)",fontSize:16,textAlign:"center",outline:"none",marginBottom:8}}/>
           {emailErr&&<p style={{color:CR,fontSize:13,marginBottom:8}}>{emailErr}</p>}
-          <button onClick={submitEmail} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"15px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:16,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Save email &amp; show my matches →</button>
-          <button onClick={()=>{setEmailErr("");calcResults();}} style={{width:"100%",background:"#fff",border:"1.5px solid #E2E8F0",color:"#0B1220",padding:"13px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,marginTop:8}}>Skip — just show my matches</button>
+          <button onClick={submitEmail} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"15px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:16,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Save email &amp; show my matches →</button>
+          <button onClick={()=>{setEmailErr("");calcResults();}} style={{width:"100%",background:"#fff",border:"1.5px solid #E2E8F0",color:"#060A2C",padding:"13px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,marginTop:8}}>Skip — just show my matches</button>
           <p style={{fontSize:11.5,color:"#6B7280",marginTop:14,lineHeight:1.5}}>Your email goes to our email-list provider (MailerLite). We only email about internships and Beat the Pile, never sell your info, and you can unsubscribe anytime. <a href="/privacy/" style={{color:"#4A5568"}}>Privacy</a></p>
         </div>
       </div>
@@ -3434,7 +3434,7 @@ function App(){
               </div>
               <div style={{background:GL,borderRadius:var_rxl,padding:"1.5rem",maxWidth:380,margin:"0 auto"}}>
                 <div style={{width:`${loadPct}%`,height:4,background:G,borderRadius:99,marginBottom:"1rem",transition:"width 1.8s ease"}}/>
-                <p style={{fontWeight:700,fontSize:17,marginBottom:"0.5rem",color:"#0B1220"}}>{loadMsg}</p>
+                <p style={{fontWeight:700,fontSize:17,marginBottom:"0.5rem",color:"#060A2C"}}>{loadMsg}</p>
                 <p style={{color:"#4A5568",fontSize:14}}>Matching {ans.major} opportunities to your profile...</p>
               </div>
             </div>
@@ -3444,12 +3444,12 @@ function App(){
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"2rem",flexWrap:"wrap",gap:12}}>
                 <div>
                   <p style={{fontSize:12,color:"#6B7280",fontWeight:600}}>Your Matches</p>
-                  <h2 style={{fontSize:"clamp(1.8rem,4vw,2.6rem)",fontWeight:700,letterSpacing:"-1.5px",marginTop:"0.2rem",color:"#0B1220"}}>Here's where you stand.</h2>
+                  <h2 style={{fontSize:"clamp(1.8rem,4vw,2.6rem)",fontWeight:700,letterSpacing:"-1.5px",marginTop:"0.2rem",color:"#060A2C"}}>Here's where you stand.</h2>
                   <p style={{color:"#4A5568",fontSize:13,marginTop:4}}>{ans.major} · {ans.gpa} GPA · {ans.gradYear}{ans.type&&ans.type!=="Any"?` · ${ans.type}`:""}</p>
                 </div>
                 <div style={{display:"flex",gap:8,flexShrink:0,flexWrap:"wrap",justifyContent:"flex-end"}}>
-                  <button onClick={()=>setShowReview(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"10px 18px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,whiteSpace:"nowrap",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Edit answers</button>
-                  <button onClick={calcResults} style={{background:"#FBFBFC",border:`1.5px solid ${GL}`,color:"#0B1220",padding:"10px 18px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,whiteSpace:"nowrap"}}>↻ Refresh</button>
+                  <button onClick={()=>setShowReview(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"10px 18px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,whiteSpace:"nowrap",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Edit answers</button>
+                  <button onClick={calcResults} style={{background:"#FBFBFC",border:`1.5px solid ${GL}`,color:"#060A2C",padding:"10px 18px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,whiteSpace:"nowrap"}}>↻ Refresh</button>
                   <button onClick={()=>{setEditStep(null);setShowReview(false);setStep(0);setSearchQ("");setPage("quiz");window.scrollTo(0,0);}} style={{background:"#fff",border:`1.5px solid #E2E8F0`,color:"#4A5568",padding:"10px 18px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,whiteSpace:"nowrap"}}>↺ Redo quiz</button>
                 </div>
               </div>
@@ -3461,10 +3461,10 @@ function App(){
                 const decent=results.filter(r=>r.match>=50&&r.match<70).length;
                 return(
                   <div style={{background:"#fff",border:"1px solid #E3E7ED",borderRadius:var_rl,padding:"14px 18px",marginBottom:16,display:"flex",alignItems:"baseline",gap:22,flexWrap:"wrap"}}>
-                    <div><span style={{fontSize:26,fontWeight:700,letterSpacing:"-0.03em",color:"#0B1220"}}>{results.length}</span><span style={{fontSize:13,color:"#5B6675",marginLeft:6}}>open {results.length===1?"internship":"internships"} for you</span></div>
-                    <div><span style={{fontSize:18,fontWeight:650,color:"#0B1220"}}>{top}%</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>top match (estimate)</span></div>
-                    {strong>0&&<div><span style={{fontSize:18,fontWeight:650,color:"#0B1220"}}>{strong}</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>strong {strong===1?"match":"matches"}</span></div>}
-                    {decent>0&&<div><span style={{fontSize:18,fontWeight:650,color:"#0B1220"}}>{decent}</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>worth a shot</span></div>}
+                    <div><span style={{fontSize:26,fontWeight:700,letterSpacing:"-0.03em",color:"#060A2C"}}>{results.length}</span><span style={{fontSize:13,color:"#5B6675",marginLeft:6}}>open {results.length===1?"internship":"internships"} for you</span></div>
+                    <div><span style={{fontSize:18,fontWeight:650,color:"#060A2C"}}>{top}%</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>top match (estimate)</span></div>
+                    {strong>0&&<div><span style={{fontSize:18,fontWeight:650,color:"#060A2C"}}>{strong}</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>strong {strong===1?"match":"matches"}</span></div>}
+                    {decent>0&&<div><span style={{fontSize:18,fontWeight:650,color:"#060A2C"}}>{decent}</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>worth a shot</span></div>}
                   </div>
                 );
               })()}
@@ -3504,7 +3504,7 @@ function App(){
                 return (
                   <div style={{background:"#F8FAFC",border:`1px solid #E2E8F0`,borderRadius:var_rl,marginBottom:16,overflow:"hidden"}}>
                     <button onClick={()=>setInsightsOpen(o=>!o)} style={{width:"100%",background:"transparent",border:"none",padding:"11px 14px",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",fontFamily:"var(--font)",textAlign:"left"}}>
-                      <span style={{fontSize:12.5,fontWeight:700,color:"#0B1220",letterSpacing:"0.3px"}}>Context for these results <span style={{color:"#6B7280",fontWeight:600,marginLeft:6,fontSize:11.5}}>({lines.length} {lines.length===1?"note":"notes"})</span></span>
+                      <span style={{fontSize:12.5,fontWeight:700,color:"#060A2C",letterSpacing:"0.3px"}}>Context for these results <span style={{color:"#6B7280",fontWeight:600,marginLeft:6,fontSize:11.5}}>({lines.length} {lines.length===1?"note":"notes"})</span></span>
                       <span style={{fontSize:13,color:"#6B7280",transform:insightsOpen?"rotate(180deg)":"rotate(0deg)",transition:"transform 0.2s"}}>▼</span>
                     </button>
                     {insightsOpen&&(
@@ -3527,7 +3527,7 @@ function App(){
               {/* First-visit hint — animated arrow + label teaching new users how to apply/track */}
               {showResultsHint&&topPicks.length>0&&(
                 <div style={{position:"relative",marginBottom:14}}>
-                  <div style={{background:"#F2F4F7",color:"#0B1220",borderRadius:var_rl,padding:"10px 14px",display:"flex",alignItems:"center",gap:12}}>
+                  <div style={{background:"#F2F4F7",color:"#060A2C",borderRadius:var_rl,padding:"10px 14px",display:"flex",alignItems:"center",gap:12}}>
                                         <div style={{flex:1,minWidth:0}}>
                       <p style={{fontSize:13.5,fontWeight:650,marginBottom:2,lineHeight:1.3}}>Open any card to apply</p>
                       <p style={{fontSize:12,color:"#5B6675",lineHeight:1.4}}>Each card links to the company's own posting. Mark it applied and it's tracked for follow-ups.</p>
@@ -3546,7 +3546,7 @@ function App(){
                 </div>
               ):results.length===0?(
                 <div style={{background:"#F8FAFC",border:"1.5px solid #E2E8F0",borderRadius:var_rl,padding:"14px 16px",marginBottom:14}}>
-                  <p style={{fontSize:13.5,fontWeight:700,color:"#0B1220",marginBottom:4}}>No open {ans.major||""} internships found{ans.type==="Remote"?" that are remote":" in your area or anywhere in the US"} right now</p>
+                  <p style={{fontSize:13.5,fontWeight:700,color:"#060A2C",marginBottom:4}}>No open {ans.major||""} internships found{ans.type==="Remote"?" that are remote":" in your area or anywhere in the US"} right now</p>
                   <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.5,marginBottom:8}}>We only show real openings we found on companies' own job boards, so this list can be empty for some majors. New companies are added every day.</p>
                   <a href="/jobs/?state=all" style={{color:GD,fontWeight:700,fontSize:13}}>Browse every internship →</a>
                 </div>
@@ -3557,7 +3557,7 @@ function App(){
                 const hasResume=(ans.resume||"").length>80||(profile.resumes||[]).filter(r=>r.text).length>0;
                 if(hasResume)return null;
                 return(
-                  <div style={{background:`#0B1220`,borderRadius:var_rxl,padding:"1.25rem 1.5rem",marginBottom:18,display:"flex",gap:14,alignItems:"center",flexWrap:"wrap",boxShadow:"0 6px 24px rgba(10,22,40,0.2)"}}>
+                  <div style={{background:`#060A2C`,borderRadius:var_rxl,padding:"1.25rem 1.5rem",marginBottom:18,display:"flex",gap:14,alignItems:"center",flexWrap:"wrap",boxShadow:"0 6px 24px rgba(10,22,40,0.2)"}}>
                     <div style={{flex:1,minWidth:220}}>
                       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:5}}>
                         <span style={{fontSize:20}}></span>
@@ -3565,17 +3565,17 @@ function App(){
                       </div>
                       <p style={{fontSize:13,color:"#94A3B8",lineHeight:1.5}}>Beat the Pile generates a starter resume from your quiz answers — your major, activities, skills, all filled in. Edit it, then use it on every application.</p>
                     </div>
-                    <button onClick={()=>setPage("resumebuilder")} style={{flexShrink:0,background:`${G}`,border:"none",color:"#fff",padding:"12px 20px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,whiteSpace:"nowrap",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Build my resume ↗</button>
+                    <button onClick={()=>setPage("resumebuilder")} style={{flexShrink:0,background:`${G}`,border:"none",color:"#fff",padding:"12px 20px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,whiteSpace:"nowrap",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Build my resume ↗</button>
                   </div>
                 );
               })()}
 
               {/* TOP PICKS — highlighted best matches worth your energy first */}
               {topPicks.length>0&&(
-                <div style={{background:`#fff`,border:`1.5px solid ${G}`,borderRadius:var_rxl,padding:"1.25rem 1.4rem",marginBottom:18,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
+                <div style={{background:`#fff`,border:`1.5px solid ${G}`,borderRadius:var_rxl,padding:"1.25rem 1.4rem",marginBottom:18,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
                   <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
                     <span style={{fontSize:18}}></span>
-                    <h3 style={{fontWeight:700,fontSize:17,color:"#0B1220",letterSpacing:"-0.4px"}}>Top picks for you</h3>
+                    <h3 style={{fontWeight:700,fontSize:17,color:"#060A2C",letterSpacing:"-0.4px"}}>Top picks for you</h3>
                   </div>
                   <p style={{fontSize:12.5,color:"#4A5568",marginBottom:12,lineHeight:1.5}}>Of all your matches, these are the strongest realistic shots — where your time is best spent first.</p>
                   <div style={{display:"flex",flexDirection:"column",gap:8}}>
@@ -3584,12 +3584,12 @@ function App(){
                         <span style={{fontSize:20,fontWeight:700,color:G,minWidth:48}}>{c.match}%</span>
                         <div style={{flex:1,minWidth:0}}>
                           <div style={{display:"flex",alignItems:"center",gap:6}}>
-                            <p style={{fontWeight:600,fontSize:14,color:"#0B1220",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.role||"Internship"}</p>
+                            <p style={{fontWeight:600,fontSize:14,color:"#060A2C",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.role||"Internship"}</p>
                             {isLikelyNational(c)&&<span style={{flexShrink:0,fontSize:9.5,fontWeight:700,color:"#2563EB",background:"#2563EB15",padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>Big name</span>}
                             {c.personalized&&<span style={{flexShrink:0,fontSize:9.5,fontWeight:700,color:GD,background:GL,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>Personalized</span>}
                             {(()=>{const b=bandLabel(c.locationBand);return b?<span style={{flexShrink:0,fontSize:9.5,fontWeight:700,color:b.color,background:b.bg,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>{b.text}</span>:null;})()}
                           </div>
-                          <p style={{fontSize:12,color:"#4A5568",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>at <b style={{fontWeight:600,color:"#0B1220"}}>{c.name}</b>{c.location?` · ${c.location}`:""}</p>
+                          <p style={{fontSize:12,color:"#4A5568",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>at <b style={{fontWeight:600,color:"#060A2C"}}>{c.name}</b>{c.location?` · ${c.location}`:""}</p>
                         </div>
                         <button onClick={()=>openApply(c)} style={{background:`${G}`,border:"none",color:"#fff",padding:"8px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:12.5,fontWeight:700,flexShrink:0}}>Apply ↗</button>
                       </div>
@@ -3639,16 +3639,16 @@ function App(){
                       <div style={cardStyle}>
 
                         {/* ── FRONT — original full card ── */}
-                        <div onClick={()=>{setExpandedCard(i);fetchCardIntel(c);}} style={{...faceBase,background:"#fff",border:"1px solid #E3E7ED",padding:"1.5rem",display:"flex",flexDirection:"column",gap:"0.75rem",boxShadow:"0 1px 2px rgba(11,18,32,.06)",cursor:"pointer",overflowY:"auto"}}>
+                        <div onClick={()=>{setExpandedCard(i);fetchCardIntel(c);}} style={{...faceBase,background:"#fff",border:"1px solid #E3E7ED",padding:"1.5rem",display:"flex",flexDirection:"column",gap:"0.75rem",boxShadow:"0 1px 2px rgba(6,10,44,.06)",cursor:"pointer",overflowY:"auto"}}>
                           {/* Header */}
                           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
                             <div style={{flex:1,minWidth:0,paddingRight:12}}>
                               <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
-                                <p style={{fontWeight:600,fontSize:16,letterSpacing:"-0.2px",color:"#0B1220",lineHeight:1.3}}>{c.role||"Internship"}</p>
+                                <p style={{fontWeight:600,fontSize:16,letterSpacing:"-0.2px",color:"#060A2C",lineHeight:1.3}}>{c.role||"Internship"}</p>
                               </div>
                               <div style={{display:"flex",alignItems:"center",gap:8,marginTop:6,flexWrap:"wrap"}}>
-                                <span aria-hidden="true" style={{width:24,height:24,borderRadius:6,background:"#F1F4F9",border:"1px solid #DCE2EC",display:"grid",placeItems:"center",fontSize:10,fontWeight:600,color:"#0B1220",flexShrink:0}}>{coInitials(c.name)}</span>
-                                <p style={{fontSize:14,fontWeight:500,color:"#0B1220"}}><span style={{position:"absolute",left:-9999}}>Company: </span>{c.name}</p>
+                                <span aria-hidden="true" style={{width:24,height:24,borderRadius:6,background:"#F1F4F9",border:"1px solid #DCE2EC",display:"grid",placeItems:"center",fontSize:10,fontWeight:600,color:"#060A2C",flexShrink:0}}>{coInitials(c.name)}</span>
+                                <p style={{fontSize:14,fontWeight:500,color:"#060A2C"}}><span style={{position:"absolute",left:-9999}}>Company: </span>{c.name}</p>
                                 {isLikelyNational(c)&&<span style={{fontSize:9.5,fontWeight:700,color:"#2563EB",background:"#2563EB15",padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>Big name</span>}
                                 {c.personalized&&<span style={{fontSize:9.5,fontWeight:700,color:GD,background:GL,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>Personalized</span>}
                                 {locationBadge}
@@ -3697,7 +3697,7 @@ function App(){
                           <p style={{fontSize:10.5,color:"#C3D1D8",textAlign:"center",marginTop:"auto",letterSpacing:"0.3px"}}>tap anywhere to see company info →</p>
                           {/* Actions — stopPropagation so clicks on buttons don't flip */}
                           <div style={{display:"flex",flexDirection:"column",gap:6}} onClick={e=>e.stopPropagation()}>
-                            <button onClick={()=>openApply(c)} style={{background:`${G}`,color:"#fff",padding:"13px 8px",borderRadius:var_r,fontSize:14.5,fontWeight:700,border:"none",cursor:"pointer",fontFamily:"var(--font)",textAlign:"center",width:"100%",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Apply now ↗</button>
+                            <button onClick={()=>openApply(c)} style={{background:`${G}`,color:"#fff",padding:"13px 8px",borderRadius:var_r,fontSize:14.5,fontWeight:700,border:"none",cursor:"pointer",fontFamily:"var(--font)",textAlign:"center",width:"100%",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Apply now ↗</button>
                             <div style={{display:"flex",gap:6}}>
                               <button onClick={()=>{toggleSaveJob(c);analytics.track(saved?"job_unsaved":"job_saved",{company:c.name});}} style={{flex:1,background:saved?"#F5F3FF":"#fff",border:`1.5px solid ${saved?"#7C3AED":"#E2E8F0"}`,color:saved?"#7C3AED":"#6B7280",padding:"9px 13px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>{saved?"Saved":"Save"}</button>
                               <button onClick={()=>track(c)} style={{flex:1,background:isTracked?GL:"#fff",border:`1.5px solid ${isTracked?G:"#E2E8F0"}`,color:isTracked?GD:"#6B7280",padding:"9px 13px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>{isTracked?"✓ Tracked":"+ Track"}</button>
@@ -3706,7 +3706,7 @@ function App(){
                         </div>
 
                         {/* ── BACK — company intel ── */}
-                        <div style={{...faceBase,transform:"rotateY(180deg)",background:"#0B1220",padding:"1.4rem",display:"flex",flexDirection:"column",gap:10,overflowY:"auto"}}>
+                        <div style={{...faceBase,transform:"rotateY(180deg)",background:"#060A2C",padding:"1.4rem",display:"flex",flexDirection:"column",gap:10,overflowY:"auto"}}>
                           {/* Back header */}
                           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:2}}>
                             <div>
@@ -3842,14 +3842,14 @@ Thank you for your time,
         <div style={{maxWidth:760,margin:"0 auto",padding:"1.5rem 1rem 4rem"}}>
           <button onClick={()=>setPage(results.length>0?"results":"landing")} style={{background:"transparent",border:"none",color:GD,padding:0,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:600,marginBottom:14}}>← {results.length>0?"Back to results":"Back to home"}</button>
           <p style={{fontSize:12,fontWeight:600,color:G,marginBottom:6}}>Resume builder</p>
-          <h1 style={{fontSize:30,fontWeight:700,letterSpacing:"-1px",color:"#0B1220",marginBottom:10}}>Let's build your starter resume.</h1>
+          <h1 style={{fontSize:30,fontWeight:700,letterSpacing:"-1px",color:"#060A2C",marginBottom:10}}>Let's build your starter resume.</h1>
           <p style={{color:"#4A5568",fontSize:14.5,lineHeight:1.55,marginBottom:22}}>We'll use your quiz answers to build the structure with your real info filled in. There'll be <strong>[bracketed placeholders]</strong> where you need to add specifics yourself — like bullets describing what you did in each activity. Honest start, not a finished resume.</p>
 
           {/* Initial state — show preview of what we'll use, then a Generate button */}
           {!builderState.text&&!builderState.loading&&(
             <div style={{background:GL,border:`1px solid ${GM}`,borderRadius:var_rl,padding:"16px 18px",marginBottom:16}}>
               <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:10}}>What we'll use</p>
-              <div style={{display:"flex",flexDirection:"column",gap:6,fontSize:13,color:"#0B1220"}}>
+              <div style={{display:"flex",flexDirection:"column",gap:6,fontSize:13,color:"#060A2C"}}>
                 <p><strong>Major:</strong> {ans.major||<em style={{color:"#6B7280"}}>(not set)</em>}</p>
                 <p><strong>University:</strong> {ans.university||<em style={{color:"#6B7280"}}>(not set)</em>}</p>
                 <p><strong>Graduation:</strong> {ans.gradYear||<em style={{color:"#6B7280"}}>(not set)</em>} &nbsp; <strong>GPA:</strong> {ans.gpa||<em style={{color:"#6B7280"}}>(not set)</em>}</p>
@@ -3860,7 +3860,7 @@ Thank you for your time,
           )}
 
           {!builderState.text&&!builderState.loading&&(
-            <button onClick={buildStarterResume} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"15px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
+            <button onClick={buildStarterResume} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"15px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
               Build my starter resume
             </button>
           )}
@@ -3884,7 +3884,7 @@ Thank you for your time,
               </div>
 
               <textarea value={builderState.text} onChange={e=>setBuilderState(s=>({...s,text:e.target.value}))} spellCheck="true"
-                style={{width:"100%",minHeight:520,padding:"14px",borderRadius:var_rl,border:`1.5px solid ${GM}`,background:"#fff",color:"#0B1220",fontFamily:"ui-monospace, 'SF Mono', Menlo, Consolas, monospace",fontSize:13,lineHeight:1.55,outline:"none",resize:"vertical",whiteSpace:"pre-wrap"}}/>
+                style={{width:"100%",minHeight:520,padding:"14px",borderRadius:var_rl,border:`1.5px solid ${GM}`,background:"#fff",color:"#060A2C",fontFamily:"ui-monospace, 'SF Mono', Menlo, Consolas, monospace",fontSize:13,lineHeight:1.55,outline:"none",resize:"vertical",whiteSpace:"pre-wrap"}}/>
 
               <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:14}}>
                 <button onClick={()=>{navigator.clipboard.writeText(builderState.text);analytics.track("resume_builder_copied");}}
@@ -3904,7 +3904,7 @@ Thank you for your time,
                   {isPro?"⬇ Download PDF":<>⬇ Download PDF <span style={{fontSize:10,marginLeft:4}}>Pro</span></>}
                 </button>
                 <button onClick={()=>{saveBuilderResumeToProfile();setPage("results");}}
-                  style={{flex:"1 1 100%",background:`${G}`,border:"none",color:"#fff",padding:"13px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Save to my profile & use for matches</button>
+                  style={{flex:"1 1 100%",background:`${G}`,border:"none",color:"#fff",padding:"13px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Save to my profile & use for matches</button>
               </div>
               <p style={{fontSize:11.5,color:"#6B7280",textAlign:"center",marginTop:10,lineHeight:1.5}}>Saving adds this to your saved resumes so it personalizes your match reasoning. You can edit it any time from Profile.</p>
             </div>
@@ -3921,14 +3921,14 @@ Thank you for your time,
     return(<div style={{padding:"3rem",textAlign:"center",color:"#55627A"}}>Opening your profile…</div>);
   }
   if(page==="profile_old_unused"){
-    const inp={width:"100%",padding:"11px 13px",borderRadius:var_r,border:"1.5px solid #E2E8F0",background:"#FBFBFC",color:"#0B1220",fontFamily:"var(--font)",fontSize:14,outline:"none",marginTop:5};
+    const inp={width:"100%",padding:"11px 13px",borderRadius:var_r,border:"1.5px solid #E2E8F0",background:"#FBFBFC",color:"#060A2C",fontFamily:"var(--font)",fontSize:14,outline:"none",marginTop:5};
     const lbl={fontSize:12,fontWeight:700,color:"#4A5568"};
     const field=(label,key,placeholder,type="text")=>(
       <div><label style={lbl}>{label}</label><input type={type} value={profile[key]||""} placeholder={placeholder} onChange={e=>setP(key,e.target.value)} style={inp}/></div>
     );
     const yesno=(label,key)=>(
       <div><label style={lbl}>{label}</label><div style={{display:"flex",gap:8,marginTop:6}}>
-        {["Yes","No"].map(o=>(<button key={o} onClick={()=>setP(key,o)} style={{flex:1,background:profile[key]===o?G:"#fff",border:`1.5px solid ${profile[key]===o?G:"#E2E8F0"}`,color:profile[key]===o?"#fff":"#0B1220",padding:"10px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:profile[key]===o?700:400}}>{o}</button>))}
+        {["Yes","No"].map(o=>(<button key={o} onClick={()=>setP(key,o)} style={{flex:1,background:profile[key]===o?G:"#fff",border:`1.5px solid ${profile[key]===o?G:"#E2E8F0"}`,color:profile[key]===o?"#fff":"#060A2C",padding:"10px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:profile[key]===o?700:400}}>{o}</button>))}
       </div></div>
     );
     return(
@@ -3938,7 +3938,7 @@ Thank you for your time,
         <Nav/>
         <div style={{maxWidth:640,margin:"0 auto",padding:"2.5rem 1.5rem"}}>
           <p style={{fontSize:12,color:"#6B7280",fontWeight:600}}>Your Profile</p>
-          <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:700,letterSpacing:"-1px",marginTop:"0.3rem",marginBottom:"0.4rem",color:"#0B1220"}}>Fill it once. Apply faster everywhere.</h2>
+          <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:700,letterSpacing:"-1px",marginTop:"0.3rem",marginBottom:"0.4rem",color:"#060A2C"}}>Fill it once. Apply faster everywhere.</h2>
           <p style={{color:"#4A5568",fontSize:14,lineHeight:1.6,marginBottom:"1.5rem"}}>Save your info and Beat the Pile auto-fills a copy-paste card and a tailored cover letter on every application — so you stop retyping the same fields on fifty different sites.</p>
 
           {/* Account section — sign in / sign out + cross-device sync status */}
@@ -3955,12 +3955,12 @@ Thank you for your time,
                    "Syncing your data…"}
                 </p>
               </>):(<>
-                <p style={{fontSize:13.5,fontWeight:700,color:"#0B1220"}}>Not signed in</p>
+                <p style={{fontSize:13.5,fontWeight:700,color:"#060A2C"}}>Not signed in</p>
                 <p style={{fontSize:12,color:"#4A5568",lineHeight:1.4,marginTop:2}}>Sign in to sync your tracker, profile, and resumes across all your devices.</p>
               </>)}
             </div>
             {clerkUser?(
-              <button onClick={signOut} style={{flexShrink:0,background:"#fff",color:"#0B1220",border:"1.5px solid #E2E8F0",padding:"8px 14px",borderRadius:var_r,fontFamily:"var(--font)",fontSize:12.5,fontWeight:700,cursor:"pointer"}}>Sign out</button>
+              <button onClick={signOut} style={{flexShrink:0,background:"#fff",color:"#060A2C",border:"1.5px solid #E2E8F0",padding:"8px 14px",borderRadius:var_r,fontFamily:"var(--font)",fontSize:12.5,fontWeight:700,cursor:"pointer"}}>Sign out</button>
             ):(
               <button onClick={openSignIn} style={{flexShrink:0,background:"#4F46E5",color:"#fff",border:"none",padding:"8px 14px",borderRadius:var_r,fontFamily:"var(--font)",fontSize:12.5,fontWeight:700,cursor:"pointer"}}>Sign in</button>
             )}
@@ -4017,7 +4017,7 @@ Thank you for your time,
               {(profile.resumes||[]).map(r=>(
                 <div key={r.id} style={{border:`1px solid ${GL}`,borderRadius:var_rl,padding:"1rem",background:"#fff"}}>
                   <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:8}}>
-                    <input value={r.name} onChange={e=>updateResume(r.id,"name",e.target.value)} placeholder="Resume name" style={{flex:1,padding:"8px 11px",borderRadius:var_r,border:`1.5px solid #E2E8F0`,background:"#FBFBFC",color:"#0B1220",fontFamily:"var(--font)",fontSize:14,fontWeight:700,outline:"none"}}/>
+                    <input value={r.name} onChange={e=>updateResume(r.id,"name",e.target.value)} placeholder="Resume name" style={{flex:1,padding:"8px 11px",borderRadius:var_r,border:`1.5px solid #E2E8F0`,background:"#FBFBFC",color:"#060A2C",fontFamily:"var(--font)",fontSize:14,fontWeight:700,outline:"none"}}/>
                     <label style={{background:"#fff",border:"1.5px solid #E2E8F0",color:GD,padding:"7px 12px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:12.5,fontWeight:700,whiteSpace:"nowrap",display:"flex",alignItems:"center",gap:5}}>
                       Upload
                       <input type="file" accept=".pdf,.txt,.docx" onChange={e=>{handleResumeUpload(r.id,e.target.files);e.target.value="";}} style={{display:"none"}}/>
@@ -4033,7 +4033,7 @@ Thank you for your time,
           </div>
 
           <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
-            <button onClick={saveProfile} style={{background:`${G}`,border:"none",color:"#fff",padding:"13px 28px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>{profileSaved?"✓ Saved":"Save profile"}</button>
+            <button onClick={saveProfile} style={{background:`${G}`,border:"none",color:"#fff",padding:"13px 28px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>{profileSaved?"✓ Saved":"Save profile"}</button>
             <button onClick={clearProfile} style={{background:"#fff",border:"1.5px solid #E2E8F0",color:"#4A5568",padding:"13px 20px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:600}}>Clear my data</button>
             {profileReady()&&<span style={{fontSize:13,color:GD,fontWeight:700}}>Ready to auto-fill applications ✓</span>}
           </div>
@@ -4064,7 +4064,7 @@ Thank you for your time,
         <Nav/>
         <div style={{maxWidth:680,margin:"0 auto",padding:"2rem 1.25rem 4rem"}}>
           <p style={{fontSize:12,color:"#6B7280",fontWeight:600,marginBottom:6}}>Community Wall</p>
-          <h1 style={{fontSize:30,fontWeight:700,letterSpacing:"-0.8px",color:"#0B1220",marginBottom:8}}>You're not alone in this.</h1>
+          <h1 style={{fontSize:30,fontWeight:700,letterSpacing:"-0.8px",color:"#060A2C",marginBottom:8}}>You're not alone in this.</h1>
           <p style={{color:"#4A5568",fontSize:14.5,lineHeight:1.55,marginBottom:22}}>A space for the wins, the frustrations, and the questions. Posts are checked by AI moderation, so keep it real but keep it kind. Post anonymously or with your name — your choice on every post.</p>
 
           {/* Testimonials carousel — same data as the landing page, compact horizontal scroll here */}
@@ -4074,11 +4074,11 @@ Thank you for your time,
               {TESTIMONIALS.map((t,i)=>(
                 <div key={i} style={{background:"#FBFBFC",border:`1.5px solid ${GL}`,borderRadius:var_rl,padding:"1rem 1.1rem",display:"flex",flexDirection:"column",gap:8,minWidth:230,maxWidth:230,flexShrink:0}}>
                   <div style={{display:"flex",gap:2}}>{[...Array(t.stars)].map((_,j)=><span key={j} style={{color:"#F59E0B",fontSize:12}}>★</span>)}</div>
-                  <p style={{fontSize:12.5,color:"#0B1220",lineHeight:1.55,fontStyle:"italic",flex:1}}>"{t.quote}"</p>
+                  <p style={{fontSize:12.5,color:"#060A2C",lineHeight:1.55,fontStyle:"italic",flex:1}}>"{t.quote}"</p>
                   <div style={{display:"flex",alignItems:"center",gap:8}}>
                     <div style={{width:28,height:28,borderRadius:"50%",background:`${G}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:10.5,fontWeight:700,color:"#fff",flexShrink:0}}>{t.avatar}</div>
                     <div>
-                      <p style={{fontWeight:700,fontSize:11.5,color:"#0B1220"}}>{t.name}</p>
+                      <p style={{fontWeight:700,fontSize:11.5,color:"#060A2C"}}>{t.name}</p>
                       <p style={{fontSize:10.5,color:"#6B7280"}}>{t.detail}</p>
                     </div>
                   </div>
@@ -4097,14 +4097,14 @@ Thank you for your time,
               <button onClick={()=>setWallNameMode("named")} style={{background:wallNameMode==="named"?G:"transparent",color:wallNameMode==="named"?"#fff":"#4A5568",border:`1.5px solid ${wallNameMode==="named"?G:"#E2E8F0"}`,padding:"5px 12px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:12.5,fontWeight:700}}>Use my name</button>
               {wallNameMode==="named"&&(
                 <input type="text" value={wallDisplayName} onChange={e=>setWallDisplayName(e.target.value)} placeholder="Display name" maxLength={30}
-                  style={{flex:"1 1 140px",padding:"6px 10px",borderRadius:var_r,border:`1px solid #E2E8F0`,background:"#fff",color:"#0B1220",fontFamily:"var(--font)",fontSize:13,outline:"none"}}/>
+                  style={{flex:"1 1 140px",padding:"6px 10px",borderRadius:var_r,border:`1px solid #E2E8F0`,background:"#fff",color:"#060A2C",fontFamily:"var(--font)",fontSize:13,outline:"none"}}/>
               )}
             </div>
 
             <textarea value={wallDraft} onChange={e=>setWallDraft(e.target.value)} placeholder={wallNameMode==="anon"?"Vent. Celebrate. Ask. (Anonymous.)":"Vent. Celebrate. Ask. (Your name will be shown.)"} maxLength={600}
-              style={{width:"100%",minHeight:90,padding:"10px 12px",borderRadius:var_r,border:`1px solid #E2E8F0`,background:"#fff",color:"#0B1220",fontFamily:"var(--font)",fontSize:14,lineHeight:1.5,outline:"none",resize:"vertical"}}/>
+              style={{width:"100%",minHeight:90,padding:"10px 12px",borderRadius:var_r,border:`1px solid #E2E8F0`,background:"#fff",color:"#060A2C",fontFamily:"var(--font)",fontSize:14,lineHeight:1.5,outline:"none",resize:"vertical"}}/>
             <div style={{display:"flex",gap:8,marginTop:10,alignItems:"center",flexWrap:"wrap"}}>
-              <select value={wallCategory} onChange={e=>setWallCategory(e.target.value)} style={{padding:"7px 11px",borderRadius:var_r,border:`1px solid #E2E8F0`,background:"#fff",color:"#0B1220",fontFamily:"var(--font)",fontSize:13,cursor:"pointer"}}>
+              <select value={wallCategory} onChange={e=>setWallCategory(e.target.value)} style={{padding:"7px 11px",borderRadius:var_r,border:`1px solid #E2E8F0`,background:"#fff",color:"#060A2C",fontFamily:"var(--font)",fontSize:13,cursor:"pointer"}}>
                 <option value="">No category</option>
                 <option value="win">Win</option>
                 <option value="vent">Vent</option>
@@ -4130,7 +4130,7 @@ Thank you for your time,
           ):wallPosts.length===0?(
             <div style={{background:"#F8FAFC",borderRadius:var_rl,border:`1px dashed #E2E8F0`,padding:"2rem 1.5rem"}}>
               <p style={{fontSize:28,textAlign:"center",marginBottom:8}}></p>
-              <p style={{fontSize:15,color:"#0B1220",fontWeight:700,textAlign:"center",marginBottom:6}}>Quiet here right now</p>
+              <p style={{fontSize:15,color:"#060A2C",fontWeight:700,textAlign:"center",marginBottom:6}}>Quiet here right now</p>
               <p style={{fontSize:13,color:"#4A5568",lineHeight:1.55,textAlign:"center",marginBottom:18,maxWidth:380,marginLeft:"auto",marginRight:"auto"}}>The first real story always feels weird to post, but it's what makes this a place. Try something like:</p>
               <div style={{display:"flex",flexDirection:"column",gap:8,maxWidth:420,margin:"0 auto"}}>
                 <div style={{background:"#fff",border:`1px solid #E2E8F0`,borderRadius:var_r,padding:"10px 13px"}}>
@@ -4166,7 +4166,7 @@ Thank you for your time,
                 return (
                   <div key={p.id} style={{background:"#fff",border:`1px solid #E2E8F0`,borderRadius:var_rl,padding:"14px 16px",position:"relative"}}>
                     {p.category&&<p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:6}}>{p.category==="win"?"Win":p.category==="vent"?"Vent":p.category==="question"?"Question":p.category==="advice"?"Advice":p.category}</p>}
-                    <p style={{fontSize:14,lineHeight:1.55,color:"#0B1220",whiteSpace:"pre-wrap"}}>{p.content}</p>
+                    <p style={{fontSize:14,lineHeight:1.55,color:"#060A2C",whiteSpace:"pre-wrap"}}>{p.content}</p>
                     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:8,gap:8,flexWrap:"wrap"}}>
                       <p style={{fontSize:11,color:"#6B7280"}}>
                         {p.display_name?<><strong style={{color:"#4A5568"}}>{author}</strong></>:"anonymous"} · {relTime(p.created_at)}
@@ -4186,14 +4186,14 @@ Thank you for your time,
 
                     {/* Replies section */}
                     {isOpen&&(
-                      <div style={{marginTop:12,paddingTop:12,borderTop:`1px solid #F1F5F4`}}>
+                      <div style={{marginTop:12,paddingTop:12,borderTop:`1px solid #F5F8EE`}}>
                         {replies.length>0?(
                           <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:10}}>
                             {replies.map(r=>{
                               const rAuthor=(r.display_name&&r.display_name.trim())?r.display_name:"anonymous";
                               return (
                                 <div key={r.id} style={{background:"#F8FAFC",borderRadius:var_r,padding:"9px 12px",borderLeft:`3px solid ${GM}`}}>
-                                  <p style={{fontSize:13,lineHeight:1.5,color:"#0B1220",whiteSpace:"pre-wrap"}}>{r.content}</p>
+                                  <p style={{fontSize:13,lineHeight:1.5,color:"#060A2C",whiteSpace:"pre-wrap"}}>{r.content}</p>
                                   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginTop:5}}>
                                     <p style={{fontSize:10.5,color:"#6B7280"}}>
                                       {r.display_name?<strong style={{color:"#4A5568"}}>{rAuthor}</strong>:"anonymous"} · {relTime(r.created_at)}
@@ -4211,7 +4211,7 @@ Thank you for your time,
                         )}
                         {/* Reply composer */}
                         <textarea value={replyDraft} onChange={e=>setWallReplyDraft(prev=>({...prev,[p.id]:e.target.value}))} placeholder={wallNameMode==="anon"?"Reply anonymously…":"Reply with your name…"} maxLength={400}
-                          style={{width:"100%",minHeight:55,padding:"8px 10px",borderRadius:var_r,border:`1px solid #E2E8F0`,background:"#fff",color:"#0B1220",fontFamily:"var(--font)",fontSize:13,lineHeight:1.5,outline:"none",resize:"vertical"}}/>
+                          style={{width:"100%",minHeight:55,padding:"8px 10px",borderRadius:var_r,border:`1px solid #E2E8F0`,background:"#fff",color:"#060A2C",fontFamily:"var(--font)",fontSize:13,lineHeight:1.5,outline:"none",resize:"vertical"}}/>
                         <div style={{display:"flex",alignItems:"center",gap:8,marginTop:6,flexWrap:"wrap"}}>
                           <span style={{fontSize:11,color:replyRemaining<40?(replyRemaining<0?CR:AM):"#6B7280"}}>{replyRemaining} left</span>
                           <button onClick={()=>submitReply(p.id)} disabled={replyTooShort||wallReplySubmitting[p.id]||replyRemaining<0}
@@ -4248,7 +4248,7 @@ Thank you for your time,
         <Nav/>
         <div style={{maxWidth:680,margin:"0 auto",padding:"2.5rem 1.5rem"}}>
           <p style={{fontSize:12,color:"#6B7280",fontWeight:600}}>Tips & Resources</p>
-          <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:700,letterSpacing:"-1px",marginTop:"0.3rem",marginBottom:"0.5rem",color:"#0B1220"}}>How to actually land the internship.</h2>
+          <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:700,letterSpacing:"-1px",marginTop:"0.3rem",marginBottom:"0.5rem",color:"#060A2C"}}>How to actually land the internship.</h2>
           <p style={{color:"#4A5568",fontSize:14.5,lineHeight:1.6,marginBottom:"1.5rem"}}>Honest, no-fluff advice on timing, applications, and standing out — the stuff that actually moves the needle, in one place.</p>
 
           {/* Category filter */}
@@ -4261,12 +4261,12 @@ Thank you for your time,
           {/* Tips */}
           <div style={{display:"flex",flexDirection:"column",gap:12}}>
             {shown.map((t,i)=>(
-              <div key={i} className="card-hover" style={{background:"#fff",border:`1px solid ${GL}`,borderLeft:`4px solid ${G}`,borderRadius:var_rl,padding:"1.25rem 1.4rem",boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>
+              <div key={i} className="card-hover" style={{background:"#fff",border:`1px solid ${GL}`,borderLeft:`4px solid ${G}`,borderRadius:var_rl,padding:"1.25rem 1.4rem",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
                 <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
                   
                   <div>
                     <span style={{fontSize:12,fontWeight:600,color:GD}}>{t.cat}</span>
-                    <h3 style={{fontSize:16,fontWeight:700,color:"#0B1220",letterSpacing:"-0.3px",lineHeight:1.2}}>{t.title}</h3>
+                    <h3 style={{fontSize:16,fontWeight:700,color:"#060A2C",letterSpacing:"-0.3px",lineHeight:1.2}}>{t.title}</h3>
                   </div>
                 </div>
                 <p style={{fontSize:14,color:"#4A5568",lineHeight:1.65}}>{t.text}</p>
@@ -4276,9 +4276,9 @@ Thank you for your time,
 
           {/* Honest CTA back to the tool */}
           <div style={{background:`${GL}`,border:`1px solid ${G}25`,borderRadius:var_rl,padding:"1.5rem",marginTop:18,textAlign:"center"}}>
-            <p style={{fontWeight:700,fontSize:17,color:"#0B1220",marginBottom:6,letterSpacing:"-0.3px"}}>Ready to put this into action?</p>
+            <p style={{fontWeight:700,fontSize:17,color:"#060A2C",marginBottom:6,letterSpacing:"-0.3px"}}>Ready to put this into action?</p>
             <p style={{fontSize:13.5,color:"#4A5568",lineHeight:1.55,marginBottom:14}}>Get your honest odds and a tailored list of internships to apply to.</p>
-            <button onClick={()=>{setStep(0);setEditStep(null);setPage("quiz");window.scrollTo(0,0);}} style={{background:`${G}`,border:"none",color:"#fff",padding:"12px 28px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Find my matches →</button>
+            <button onClick={()=>{setStep(0);setEditStep(null);setPage("quiz");window.scrollTo(0,0);}} style={{background:`${G}`,border:"none",color:"#fff",padding:"12px 28px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Find my matches →</button>
           </div>
 
           <p style={{fontSize:11.5,color:"#6B7280",lineHeight:1.5,textAlign:"center",marginTop:16}}>More tips are added over time. Have one worth sharing? We'd love to hear it — reach out anytime.</p>
@@ -4295,10 +4295,10 @@ Thank you for your time,
       return (
         <div style={{marginBottom:18}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:6}}>
-            <p style={{fontSize:13,fontWeight:700,color:"#0B1220"}}>{label}</p>
+            <p style={{fontSize:13,fontWeight:700,color:"#060A2C"}}>{label}</p>
             <p style={{fontSize:24,fontWeight:700,color:color,fontFamily:"var(--font)"}}>{pct}%</p>
           </div>
-          <div style={{height:8,background:"#F1F5F4",borderRadius:99,overflow:"hidden"}}>
+          <div style={{height:8,background:"#F5F8EE",borderRadius:99,overflow:"hidden"}}>
             <div style={{width:pct+"%",height:"100%",background:color,transition:"width 0.6s"}}/>
           </div>
           <p style={{fontSize:13,color:"#4A5568",marginTop:8,lineHeight:1.5}}>{verdict}</p>
@@ -4311,7 +4311,7 @@ Thank you for your time,
           <div key={i} style={{display:"flex",alignItems:"flex-start",gap:9,padding:"10px 12px",background:f.good?"#F0FDF4":"#FEF2F2",border:`1px solid ${f.good?"#86EFAC":"#FECACA"}`,borderRadius:var_r}}>
             <span style={{fontSize:15,flexShrink:0,marginTop:1}}>{f.good?"✓":"✗"}</span>
             <div style={{flex:1}}>
-              <p style={{fontSize:13,fontWeight:700,color:"#0B1220"}}>{f.label}</p>
+              <p style={{fontSize:13,fontWeight:700,color:"#060A2C"}}>{f.label}</p>
               <p style={{fontSize:12.5,color:"#4A5568",marginTop:2,lineHeight:1.5}}>{f.note}</p>
             </div>
           </div>
@@ -4325,22 +4325,22 @@ Thank you for your time,
         <Nav/>
         <div style={{maxWidth:760,margin:"0 auto",padding:"1.5rem 1rem 4rem"}}>
           <p style={{fontSize:12,fontWeight:600,color:G,marginBottom:6}}>Score a job</p>
-          <h1 style={{fontSize:32,fontWeight:700,letterSpacing:"-1px",color:"#0B1220",marginBottom:10}}>See what the screener sees.</h1>
+          <h1 style={{fontSize:32,fontWeight:700,letterSpacing:"-1px",color:"#060A2C",marginBottom:10}}>See what the screener sees.</h1>
           <p style={{color:"#4A5568",fontSize:15,lineHeight:1.55,marginBottom:24}}>Before a recruiter ever looks at you, software often does. Paste your resume, the job description, or both and our AI gives you an honest breakdown and real fixes. <strong>This is coaching: the scores are our AI's estimate, not a number from Workday, Greenhouse or any employer.</strong> What you paste is sent to our AI provider (Anthropic) to write the breakdown.</p>
 
           {!scoreResult&&(
             <>
               <div style={{display:"flex",flexDirection:"column",gap:18,marginBottom:20}}>
                 <div>
-                  <label style={{fontSize:13,fontWeight:700,color:"#0B1220",marginBottom:6,display:"block"}}>Your resume <span style={{color:"#6B7280",fontWeight:500}}>(paste the text, optional but helps)</span></label>
+                  <label style={{fontSize:13,fontWeight:700,color:"#060A2C",marginBottom:6,display:"block"}}>Your resume <span style={{color:"#6B7280",fontWeight:500}}>(paste the text, optional but helps)</span></label>
                   <textarea value={scoreResume} onChange={e=>setScoreResume(e.target.value)} placeholder="Paste your resume text here..."
-                    style={{width:"100%",minHeight:160,padding:"12px",borderRadius:var_r,border:`1.5px solid #E2E8F0`,background:"#FBFBFC",fontFamily:"var(--font)",fontSize:13.5,lineHeight:1.5,color:"#0B1220",resize:"vertical",outline:"none"}}/>
+                    style={{width:"100%",minHeight:160,padding:"12px",borderRadius:var_r,border:`1.5px solid #E2E8F0`,background:"#FBFBFC",fontFamily:"var(--font)",fontSize:13.5,lineHeight:1.5,color:"#060A2C",resize:"vertical",outline:"none"}}/>
                   {(profile.resumes||[]).length>0&&<button onClick={()=>{const r=(profile.resumes||[]).find(x=>x.id===chosenResumeId)||(profile.resumes||[])[0];if(r&&r.text)setScoreResume(r.text);}} style={{marginTop:6,background:"transparent",border:"none",color:GD,fontSize:12,fontWeight:700,cursor:"pointer",padding:0,fontFamily:"var(--font)"}}>↳ Use my saved resume</button>}
                 </div>
                 <div>
-                  <label style={{fontSize:13,fontWeight:700,color:"#0B1220",marginBottom:6,display:"block"}}>Job description <span style={{color:"#6B7280",fontWeight:500}}>(paste from the posting, optional but helps)</span></label>
+                  <label style={{fontSize:13,fontWeight:700,color:"#060A2C",marginBottom:6,display:"block"}}>Job description <span style={{color:"#6B7280",fontWeight:500}}>(paste from the posting, optional but helps)</span></label>
                   <textarea value={scoreJD} onChange={e=>setScoreJD(e.target.value)} placeholder="Paste the job description here..."
-                    style={{width:"100%",minHeight:160,padding:"12px",borderRadius:var_r,border:`1.5px solid #E2E8F0`,background:"#FBFBFC",fontFamily:"var(--font)",fontSize:13.5,lineHeight:1.5,color:"#0B1220",resize:"vertical",outline:"none"}}/>
+                    style={{width:"100%",minHeight:160,padding:"12px",borderRadius:var_r,border:`1.5px solid #E2E8F0`,background:"#FBFBFC",fontFamily:"var(--font)",fontSize:13.5,lineHeight:1.5,color:"#060A2C",resize:"vertical",outline:"none"}}/>
                 </div>
               </div>
               <button onClick={scoreApplication} disabled={scoreLoading||(!scoreResume.trim()&&!scoreJD.trim())}
@@ -4374,16 +4374,16 @@ Thank you for your time,
 
               {scoreResult.fixes&&scoreResult.fixes.length>0&&(
                 <div style={{padding:"20px",background:"#FEF7E6",border:`1px solid #F4D77E`,borderRadius:var_rl}}>
-                  <p style={{fontSize:13,fontWeight:700,color:"#0B1220",marginBottom:12}}>Top fixes — do these before you apply</p>
+                  <p style={{fontSize:13,fontWeight:700,color:"#060A2C",marginBottom:12}}>Top fixes — do these before you apply</p>
                   <ol style={{margin:0,paddingLeft:18,display:"flex",flexDirection:"column",gap:8}}>
                     {scoreResult.fixes.map((f,i)=>(
-                      <li key={i} style={{fontSize:13,color:"#0B1220",lineHeight:1.5}}>{f}</li>
+                      <li key={i} style={{fontSize:13,color:"#060A2C",lineHeight:1.5}}>{f}</li>
                     ))}
                   </ol>
                 </div>
               )}
 
-              <button onClick={()=>{setScoreResult(null);setScoreError("");}} style={{background:"#fff",border:`1.5px solid ${GL}`,color:"#0B1220",padding:"13px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700}}>↺ Score another</button>
+              <button onClick={()=>{setScoreResult(null);setScoreError("");}} style={{background:"#fff",border:`1.5px solid ${GL}`,color:"#060A2C",padding:"13px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700}}>↺ Score another</button>
             </div>
           )}
         </div>
@@ -4448,13 +4448,13 @@ Thank you for your time,
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:"2rem"}}>
           <div>
             <p style={{fontSize:12,color:"#6B7280",fontWeight:600}}>Dashboard</p>
-            <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:700,letterSpacing:"-1px",marginTop:"0.3rem",color:"#0B1220"}}>Your applications.</h2>
+            <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:700,letterSpacing:"-1px",marginTop:"0.3rem",color:"#060A2C"}}>Your applications.</h2>
           </div>
           {isPro?<span style={{background:GL,color:GD,border:`1px solid ${GM}`,padding:"6px 16px",borderRadius:99,fontSize:13,fontWeight:700}}>Pro Active</span>
-          :<button onClick={()=>setShowProModal(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"9px 20px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>Upgrade to Pro</button>}
+          :<button onClick={()=>setShowProModal(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"9px 20px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Upgrade to Pro</button>}
         </div>
         {clerkUser?(
-          <a href="/season/" style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,background:"#fff",border:"1px solid #E3E7ED",borderRadius:var_rl,padding:"12px 16px",marginBottom:14,textDecoration:"none",color:"#0B1220"}}>
+          <a href="/season/" style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,background:"#fff",border:"1px solid #E3E7ED",borderRadius:var_rl,padding:"12px 16px",marginBottom:14,textDecoration:"none",color:"#060A2C"}}>
             <span style={{fontSize:13.5,lineHeight:1.45}}><strong>This tracker is part of My Season.</strong> <span style={{color:"#5B6675"}}>Everything here also shows there, with jobs you marked applied, follow-ups due and email reminders.</span></span>
             <span style={{fontSize:13.5,fontWeight:650,color:GD,whiteSpace:"nowrap"}}>Open My Season →</span>
           </a>
@@ -4493,7 +4493,7 @@ Thank you for your time,
             <div style={{background:card.bg,border:`1.5px solid ${card.color}25`,borderLeft:`4px solid ${card.color}`,borderRadius:var_rl,padding:"14px 16px",marginBottom:"1.25rem",display:"flex",gap:12,alignItems:"flex-start"}}>
               
               <div style={{flex:1,minWidth:0}}>
-                <p style={{fontWeight:700,fontSize:14,color:"#0B1220",lineHeight:1.3}}>{card.title}</p>
+                <p style={{fontWeight:700,fontSize:14,color:"#060A2C",lineHeight:1.3}}>{card.title}</p>
                 <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.5,marginTop:3}}>{card.body}</p>
                 <button onClick={card.action} style={{marginTop:9,background:"none",border:`1.5px solid ${card.color}`,color:card.color,padding:"6px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>{card.cta}</button>
               </div>
@@ -4515,7 +4515,7 @@ Thank you for your time,
           <div id="saved-jobs-section" style={{background:"#F5F3FF",border:`1.5px solid #7C3AED25`,borderRadius:var_rl,overflow:"hidden",marginBottom:"1rem"}}>
             <div style={{padding:"1rem 1.25rem",borderBottom:"1px solid #E9D5FF",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <div>
-                <h3 style={{fontWeight:700,fontSize:15,color:"#0B1220"}}>Saved — haven't applied yet</h3>
+                <h3 style={{fontWeight:700,fontSize:15,color:"#060A2C"}}>Saved — haven't applied yet</h3>
                 <p style={{fontSize:12,color:"#7C3AED",marginTop:2}}>{savedJobs.length} job{savedJobs.length>1?"s":""} saved from your matches{clerkUser?" · also in My Season → Saved":" on this device"} · <a href="/jobs/?view=saved" style={{color:"#7C3AED",fontWeight:700}}>Jobs-page saves →</a></p>
               </div>
               <button onClick={()=>setPage("results")} style={{background:"#7C3AED",color:"#fff",border:"none",padding:"6px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>View results →</button>
@@ -4523,7 +4523,7 @@ Thank you for your time,
             {savedJobs.map((j,i)=>(
               <div key={i} style={{padding:"0.85rem 1.25rem",borderBottom:i<savedJobs.length-1?"1px solid #E9D5FF":"none",display:"flex",alignItems:"center",gap:12}}>
                 <div style={{flex:1,minWidth:0}}>
-                  <p style={{fontWeight:700,fontSize:14,color:"#0B1220",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{j.name}</p>
+                  <p style={{fontWeight:700,fontSize:14,color:"#060A2C",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{j.name}</p>
                   <p style={{fontSize:12.5,color:"#6B7280",marginTop:2}}>{j.role} · {j.location}</p>
                 </div>
                 <span style={{fontSize:12,fontWeight:700,color:"#7C3AED",background:"#EDE9FE",padding:"3px 10px",borderRadius:99,flexShrink:0}}>{j.match}% match</span>
@@ -4546,10 +4546,10 @@ Thank you for your time,
             notes and deadline are preserved. Native HTML5 DnD — no external library. */}
         <div id="tracker-section" style={{marginBottom:"1rem"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12,flexWrap:"wrap",gap:8}}>
-            <h3 style={{fontWeight:700,fontSize:15,color:"#0B1220"}}>Application Tracker</h3>
+            <h3 style={{fontWeight:700,fontSize:15,color:"#060A2C"}}>Application Tracker</h3>
             <div style={{display:"flex",gap:8}}>
               <button onClick={exportTrackerCsv} disabled={tracked.length===0} title={isPro?"Export as CSV":"CSV export is a Pro feature"} style={{background:"#fff",border:`1.5px solid ${GL}`,color:tracked.length===0?"#CBD5E0":GD,padding:"6px 14px",borderRadius:var_r,cursor:tracked.length===0?"not-allowed":"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,opacity:tracked.length===0?0.6:1}}>⤓ Export{!isPro&&" "}</button>
-              <button onClick={()=>setAddAppModal(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"6px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}}>+ Add Application</button>
+              <button onClick={()=>setAddAppModal(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"6px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>+ Add Application</button>
             </div>
           </div>
 
@@ -4571,7 +4571,7 @@ Thank you for your time,
                   style={{flex:"0 0 230px",minWidth:230,background:isOver?col.tint+"12":"#FBFBFC",border:`1.5px solid ${isOver?col.tint:GL}`,borderRadius:var_rl,padding:10,alignSelf:"flex-start",transition:"background 0.15s ease,border-color 0.15s ease"}}>
                   <div style={{display:"flex",alignItems:"center",gap:7,padding:"2px 4px 10px"}}>
                     <span style={{width:9,height:9,borderRadius:"50%",background:col.tint,flexShrink:0}}/>
-                    <span style={{fontSize:13,fontWeight:700,color:"#0B1220"}}>{col.key}</span>
+                    <span style={{fontSize:13,fontWeight:700,color:"#060A2C"}}>{col.key}</span>
                     <span style={{marginLeft:"auto",fontSize:11,fontWeight:700,color:"#6B7280",background:"#fff",border:`1px solid ${GL}`,borderRadius:99,padding:"1px 8px"}}>{items.length}</span>
                   </div>
 
@@ -4591,7 +4591,7 @@ Thank you for your time,
                           onDragEnd={()=>{setDragCompany(null);setDragOverStage(null);}}
                           style={{background:"#fff",border:`1.5px solid ${GL}`,borderLeft:a.flag?`3px solid ${AM}`:"3px solid transparent",borderRadius:var_r,padding:"9px 10px",cursor:"grab",opacity:isDragging?0.5:1,transform:isDragging?"scale(1.02)":"none",boxShadow:isDragging?"0 10px 22px rgba(0,0,0,0.14)":"0 1px 2px rgba(0,0,0,0.04)",transition:"box-shadow 0.12s ease,transform 0.12s ease"}}>
                           <div style={{display:"flex",justifyContent:"space-between",gap:6,alignItems:"flex-start"}}>
-                            <p style={{fontWeight:700,fontSize:13.5,color:"#0B1220",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",minWidth:0}}>{a.company}</p>
+                            <p style={{fontWeight:700,fontSize:13.5,color:"#060A2C",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",minWidth:0}}>{a.company}</p>
                             <div style={{display:"flex",gap:3,flexShrink:0}}>
                               <button onClick={()=>toggleFlag(i)} title={a.flag?"Unflag":"Flag for follow-up"} style={{background:"none",border:"none",cursor:"pointer",fontSize:13,color:a.flag?AM:"#CBD5E0",padding:0,lineHeight:1}}></button>
                               <button onClick={()=>{if(window.confirm(`Remove ${a.company}?`))setTracked(p=>p.filter((x,j)=>j!==i));}} title="Remove" style={{background:"none",border:"none",cursor:"pointer",fontSize:12,color:"#CBD5E0",padding:0,lineHeight:1}}>✕</button>
@@ -4618,9 +4618,9 @@ Thank you for your time,
                             <div style={{marginTop:7}}>
                               <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:6}}>
                                 <label style={{fontSize:10.5,color:"#6B7280",fontWeight:600}}>Deadline</label>
-                                <input type="date" value={a.deadline||""} onChange={e=>setTracked(p=>p.map((x,j)=>j===i?{...x,deadline:e.target.value}:x))} style={{padding:"2px 6px",border:"1.5px solid #E2E8F0",borderRadius:var_r,color:"#0B1220",background:"#FBFBFC",fontFamily:"var(--font)",cursor:"pointer"}}/>
+                                <input type="date" value={a.deadline||""} onChange={e=>setTracked(p=>p.map((x,j)=>j===i?{...x,deadline:e.target.value}:x))} style={{padding:"2px 6px",border:"1.5px solid #E2E8F0",borderRadius:var_r,color:"#060A2C",background:"#FBFBFC",fontFamily:"var(--font)",cursor:"pointer"}}/>
                               </div>
-                              <textarea value={noteText} onChange={e=>setAppNotes(p=>({...p,[a.company]:e.target.value}))} placeholder="Recruiter name, portal link, screen notes…" style={{width:"100%",minHeight:54,padding:"7px 9px",borderRadius:var_r,border:`1.5px solid #7C3AED30`,background:"#FAF5FF",color:"#0B1220",fontFamily:"var(--font)",lineHeight:1.5,outline:"none",resize:"vertical"}}/>
+                              <textarea value={noteText} onChange={e=>setAppNotes(p=>({...p,[a.company]:e.target.value}))} placeholder="Recruiter name, portal link, screen notes…" style={{width:"100%",minHeight:54,padding:"7px 9px",borderRadius:var_r,border:`1.5px solid #7C3AED30`,background:"#FAF5FF",color:"#060A2C",fontFamily:"var(--font)",lineHeight:1.5,outline:"none",resize:"vertical"}}/>
                             </div>
                           )}
                         </div>
@@ -4634,7 +4634,7 @@ Thank you for your time,
         </div>
         <div style={{background:`${GL}`,border:`1.5px solid ${G}25`,borderRadius:var_rl,padding:"1.5rem 1.75rem"}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
-            <h3 style={{fontWeight:700,fontSize:17,letterSpacing:"-0.4px",color:"#0B1220"}}>Smart follow-ups</h3>
+            <h3 style={{fontWeight:700,fontSize:17,letterSpacing:"-0.4px",color:"#060A2C"}}>Smart follow-ups</h3>
           </div>
           <p style={{color:"#4A5568",fontSize:14,lineHeight:1.6,marginBottom:14}}>Most students never follow up — and a short, polite one keeps you on the recruiter's radar. Beat the Pile tracks the timing for you and, when an application hits the 5-day mark, drafts a tailored follow-up email you send from your own inbox. You stay the sender; we handle the reminder and the words.</p>
           <div style={{display:"flex",gap:14,flexWrap:"wrap",fontSize:12.5,color:GD,fontWeight:700}}>
@@ -4653,7 +4653,7 @@ Thank you for your time,
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
                 <div>
                   <p style={{fontSize:12,fontWeight:600,color:"#6B7280"}}>Interview Prep</p>
-                  <h3 style={{fontWeight:700,fontSize:19,color:"#0B1220",letterSpacing:"-0.4px",marginTop:2}}>{prepModal.company}</h3>
+                  <h3 style={{fontWeight:700,fontSize:19,color:"#060A2C",letterSpacing:"-0.4px",marginTop:2}}>{prepModal.company}</h3>
                   <p style={{fontSize:13,color:"#4A5568"}}>{prepModal.role}</p>
                 </div>
                 <button onClick={()=>setPrepModal(null)} style={{background:"none",border:"none",fontSize:22,color:"#6B7280",cursor:"pointer",lineHeight:1}}>×</button>
@@ -4668,13 +4668,13 @@ Thank you for your time,
                 {prepResult.tips&&prepResult.tips.length>0&&(
                   <div style={{background:AL,border:`1px solid ${AM}25`,borderRadius:var_r,padding:"12px 14px",marginBottom:16}}>
                     <p style={{fontSize:12,fontWeight:600,color:AM,marginBottom:8}}>Before you go in</p>
-                    {prepResult.tips.map((t,i)=><p key={i} style={{fontSize:13,color:"#0B1220",lineHeight:1.5,marginBottom:i<prepResult.tips.length-1?6:0}}>→ {t}</p>)}
+                    {prepResult.tips.map((t,i)=><p key={i} style={{fontSize:13,color:"#060A2C",lineHeight:1.5,marginBottom:i<prepResult.tips.length-1?6:0}}>→ {t}</p>)}
                   </div>
                 )}
                 <div style={{display:"flex",flexDirection:"column",gap:12}}>
                   {prepResult.questions.map((q,i)=>(
                     <div key={i} style={{background:"#FBFBFC",border:`1.5px solid ${GL}`,borderRadius:var_r,padding:"12px 14px"}}>
-                      <p style={{fontWeight:700,fontSize:14,color:"#0B1220",lineHeight:1.4,marginBottom:8}}>{i+1}. {q.q}</p>
+                      <p style={{fontWeight:700,fontSize:14,color:"#060A2C",lineHeight:1.4,marginBottom:8}}>{i+1}. {q.q}</p>
                       <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.55,background:GL,borderRadius:var_r,padding:"8px 10px"}}>{q.framework}</p>
                     </div>
                   ))}
@@ -4689,23 +4689,23 @@ Thank you for your time,
           <div style={{position:"fixed",inset:0,background:"rgba(10,22,40,0.65)",zIndex:500,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"1.5rem 1rem",backdropFilter:"blur(4px)",overflowY:"auto"}} onClick={()=>setAddAppModal(false)}>
             <form onClick={e=>e.stopPropagation()} onSubmit={submitAddApp} style={{background:"#fff",borderRadius:var_rxl,padding:"1.75rem",maxWidth:420,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.25)",animation:"pop 0.25s ease",margin:"auto 0"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
-                <h3 style={{fontWeight:700,fontSize:19,color:"#0B1220",letterSpacing:"-0.4px"}}>Add Application</h3>
+                <h3 style={{fontWeight:700,fontSize:19,color:"#060A2C",letterSpacing:"-0.4px"}}>Add Application</h3>
                 <button type="button" onClick={()=>setAddAppModal(false)} style={{background:"none",border:"none",fontSize:22,color:"#6B7280",cursor:"pointer",lineHeight:1}}>×</button>
               </div>
               <label style={{display:"block",fontSize:12,fontWeight:600,color:"#4A5568",marginBottom:4}}>Company *</label>
-              <input value={addForm.company} onChange={e=>setAddForm(f=>({...f,company:e.target.value}))} autoFocus placeholder="e.g. Google" style={{width:"100%",marginBottom:12,padding:"9px 11px",border:`1.5px solid ${GL}`,borderRadius:var_r,color:"#0B1220",background:"#FBFBFC",fontFamily:"var(--font)",outline:"none"}}/>
+              <input value={addForm.company} onChange={e=>setAddForm(f=>({...f,company:e.target.value}))} autoFocus placeholder="e.g. Google" style={{width:"100%",marginBottom:12,padding:"9px 11px",border:`1.5px solid ${GL}`,borderRadius:var_r,color:"#060A2C",background:"#FBFBFC",fontFamily:"var(--font)",outline:"none"}}/>
               <label style={{display:"block",fontSize:12,fontWeight:600,color:"#4A5568",marginBottom:4}}>Role</label>
-              <input value={addForm.role} onChange={e=>setAddForm(f=>({...f,role:e.target.value}))} placeholder="e.g. Marketing Intern" style={{width:"100%",marginBottom:12,padding:"9px 11px",border:`1.5px solid ${GL}`,borderRadius:var_r,color:"#0B1220",background:"#FBFBFC",fontFamily:"var(--font)",outline:"none"}}/>
+              <input value={addForm.role} onChange={e=>setAddForm(f=>({...f,role:e.target.value}))} placeholder="e.g. Marketing Intern" style={{width:"100%",marginBottom:12,padding:"9px 11px",border:`1.5px solid ${GL}`,borderRadius:var_r,color:"#060A2C",background:"#FBFBFC",fontFamily:"var(--font)",outline:"none"}}/>
               <div style={{display:"flex",gap:10,marginBottom:18}}>
                 <div style={{flex:1}}>
                   <label style={{display:"block",fontSize:12,fontWeight:600,color:"#4A5568",marginBottom:4}}>Stage</label>
-                  <select value={addForm.status} onChange={e=>setAddForm(f=>({...f,status:e.target.value}))} style={{width:"100%",padding:"9px 10px",border:`1.5px solid ${GL}`,borderRadius:var_r,color:"#0B1220",background:"#FBFBFC",fontFamily:"var(--font)",cursor:"pointer"}}>
+                  <select value={addForm.status} onChange={e=>setAddForm(f=>({...f,status:e.target.value}))} style={{width:"100%",padding:"9px 10px",border:`1.5px solid ${GL}`,borderRadius:var_r,color:"#060A2C",background:"#FBFBFC",fontFamily:"var(--font)",cursor:"pointer"}}>
                     {["Saved","Applied","Interview","Offer","Rejected"].map(s=><option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
                 <div style={{flex:1}}>
                   <label style={{display:"block",fontSize:12,fontWeight:600,color:"#4A5568",marginBottom:4}}>Date</label>
-                  <input type="date" value={addForm.date} onChange={e=>setAddForm(f=>({...f,date:e.target.value}))} style={{width:"100%",padding:"8px 10px",border:`1.5px solid ${GL}`,borderRadius:var_r,color:"#0B1220",background:"#FBFBFC",fontFamily:"var(--font)",cursor:"pointer"}}/>
+                  <input type="date" value={addForm.date} onChange={e=>setAddForm(f=>({...f,date:e.target.value}))} style={{width:"100%",padding:"8px 10px",border:`1.5px solid ${GL}`,borderRadius:var_r,color:"#060A2C",background:"#FBFBFC",fontFamily:"var(--font)",cursor:"pointer"}}/>
                 </div>
               </div>
               <div style={{display:"flex",justifyContent:"flex-end",gap:8}}>
@@ -4716,7 +4716,7 @@ Thank you for your time,
           </div>
         )}
         {/* FOUNDER ANALYTICS — instrument the funnel. Device-local only (see note). */}
-        {/[?&]dev=1/.test(location.search)&&<details style={{marginTop:14,background:"#0B1220",borderRadius:var_rl,padding:"0.5rem 1rem",color:"#fff"}}>
+        {/[?&]dev=1/.test(location.search)&&<details style={{marginTop:14,background:"#060A2C",borderRadius:var_rl,padding:"0.5rem 1rem",color:"#fff"}}>
           <summary style={{cursor:"pointer",fontSize:13,fontWeight:700,padding:"8px 0",listStyle:"none"}}>Founder stats (this device only)</summary>
           <div style={{paddingBottom:12}}>
             {(()=>{const s=analytics.read();const keys=["quiz_completed","return_visit","email_captured","application_started","application_tracked","followup_generated","followup_marked_sent","cover_letter_generated","pro_modal_opened","pro_upgrade_clicked"];return(
@@ -4758,12 +4758,12 @@ class AppErrorBoundary extends React.Component {
   render(){
     if(!this.state.hasError) return this.props.children;
     return React.createElement('div',{style:{minHeight:"100vh",background:"#FBFBFC",display:"flex",alignItems:"center",justifyContent:"center",padding:"1.5rem",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif"}},
-      React.createElement('div',{style:{background:"#fff",border:"1px solid #EEF6F2",borderRadius:16,boxShadow:"0 8px 32px rgba(0,0,0,0.1)",padding:"2rem 1.75rem",maxWidth:440,width:"100%",textAlign:"center"}},
-        React.createElement('div',{style:{width:48,height:48,margin:"0 auto 14px",background:"#0B7A55",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}},""),
-        React.createElement('h2',{style:{fontSize:20,fontWeight:700,color:"#0B1220",margin:"0 0 6px",letterSpacing:"-0.4px"}},"Something went wrong"),
+      React.createElement('div',{style:{background:"#fff",border:"1px solid #F2FADF",borderRadius:16,boxShadow:"0 8px 32px rgba(0,0,0,0.1)",padding:"2rem 1.75rem",maxWidth:440,width:"100%",textAlign:"center"}},
+        React.createElement('div',{style:{width:48,height:48,margin:"0 auto 14px",background:"#4A7000",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}},""),
+        React.createElement('h2',{style:{fontSize:20,fontWeight:700,color:"#060A2C",margin:"0 0 6px",letterSpacing:"-0.4px"}},"Something went wrong"),
         React.createElement('p',{style:{fontSize:13.5,color:"#4A5568",lineHeight:1.55,margin:"0 0 18px"}},"The app hit an unexpected error. Your saved progress is safe — try again, or reload the page."),
         React.createElement('div',{style:{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}},
-          React.createElement('button',{onClick:()=>this.setState({hasError:false,msg:""}),style:{background:"#0B7A55",border:"none",color:"#fff",padding:"11px 22px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",fontSize:14,fontWeight:700,boxShadow:"0 1px 2px rgba(11,18,32,.06)"}},"Try again"),
+          React.createElement('button',{onClick:()=>this.setState({hasError:false,msg:""}),style:{background:"#4A7000",border:"none",color:"#fff",padding:"11px 22px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",fontSize:14,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}},"Try again"),
           React.createElement('button',{onClick:()=>{try{location.reload();}catch(e){}},style:{background:"#fff",border:"1.5px solid #E2E8F0",color:"#4A5568",padding:"11px 22px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",fontSize:14,fontWeight:700}},"Reload page")
         ),
         this.state.msg&&React.createElement('p',{style:{fontSize:11,color:"#6B7280",marginTop:16,fontFamily:"monospace",wordBreak:"break-word"}},this.state.msg)

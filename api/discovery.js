@@ -1,6 +1,6 @@
 // /api/discovery.js — the /discovery page's data.
 //   GET  → public progress feed (every candidate company, its status, and any link already tried)
-//   POST → admin only (InternIQ owner, signed in with Clerk):
+//   POST → admin only (Beat the Pile owner, signed in with Clerk):
 //          { id, hint }                 paste a job-board link for a company the robot couldn't find
 //          { company, domain, hint? }   add a brand-new company to the robot's list
 //          A pasted link is never trusted by itself — the robot re-checks it and must still prove it's theirs.
@@ -43,7 +43,7 @@ export default async function handler(req, res) {
     // The nightly browser pass (GitHub Actions, holds CRON_SECRET) may also suggest links — they get the same proof checks
     if (isAuthorizedCron(req)) who = "robot";
     else try { who = await adminEmail(req); } catch { return res.status(503).json({ error: "Sign-in check unavailable" }); }
-    if (!who) return res.status(403).json({ error: "Only the InternIQ owner can edit the robot's list" });
+    if (!who) return res.status(403).json({ error: "Only the Beat the Pile owner can edit the robot's list" });
 
     let b = req.body; if (typeof b === "string") { try { b = JSON.parse(b); } catch { b = {}; } }
     // ── Bot control room ──

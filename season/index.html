@@ -8,9 +8,9 @@
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <link rel="icon" href="/icons/icon-192.png">
-<meta name="theme-color" content="#0A1628">
+<meta name="theme-color" content="#060A2C">
 <style>
-  :root{--green:#0E8A5F;--green-dark:#0B6E4B;--green-light:#EEF6F2;--navy:#0B1220;--ink:#1A2230;--muted:#64748B;--faint:#94A3B8;
+  :root{--green:#4A7000;--green-dark:#3A5A00;--green-light:#F2FADF;--navy:#060A2C;--ink:#1A2230;--muted:#64748B;--faint:#94A3B8;
         --bg:#FBFBFC;--line:#E3E7ED;--amber:#B45309;--amber-light:#FFF4E6;--blue:#1D4ED8;--blue-light:#EFF6FF;--violet:#6D28D9;--violet-light:#F5F3FF;--red:#B91C1C;--red-light:#FEF2F2;
         --font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
   *{box-sizing:border-box}
@@ -158,7 +158,7 @@
 
   function ring(v, goal){
     const p = Math.min(1, v / goal), C = 2 * Math.PI * 50;
-    return `<div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#E2EEEA" stroke-width="12"/><circle cx="60" cy="60" r="50" fill="none" stroke="${p >= 1 ? "#0E8A5F" : "#0A1628"}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - p)}"/></svg>
+    return `<div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#EEF6D8" stroke-width="12"/><circle cx="60" cy="60" r="50" fill="none" stroke="${p >= 1 ? "#4A7000" : "#060A2C"}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C * (1 - p)}"/></svg>
       <div class="c"><div><b>${v}/${goal}</b><small>this week</small></div></div></div>`;
   }
 

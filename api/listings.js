@@ -130,7 +130,7 @@ async function hiringCompanies() {
 
 const plain = (res, code, title, msg) => {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
-  return res.status(code).send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>${title} · Beat the Pile</title><link rel="stylesheet" href="/d.css"></head><body style="margin:0;font-family:Geist,system-ui,sans-serif"><script src="/nav.js"></script><main style="max-width:640px;margin:0 auto;padding:56px 20px"><h1 style="font-weight:600;letter-spacing:-.02em">${title}</h1><p style="color:#55627A">${msg}</p><p><a href="/jobs/" style="color:#0B7A55;font-weight:600">Browse internships →</a></p></main></body></html>`);
+  return res.status(code).send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>${title} · Beat the Pile</title><link rel="stylesheet" href="/d.css"></head><body style="margin:0;font-family:Geist,system-ui,sans-serif"><script src="/nav.js"></script><main style="max-width:640px;margin:0 auto;padding:56px 20px"><h1 style="font-weight:600;letter-spacing:-.02em">${title}</h1><p style="color:#55627A">${msg}</p><p><a href="/jobs/" style="color:#4A7000;font-weight:600">Browse internships →</a></p></main></body></html>`);
 };
 /** /c/<id>: one company's page. Unknown company → 404; database trouble → 503 (never a page that pretends nothing is open). */
 async function companyHtml(id, res) {

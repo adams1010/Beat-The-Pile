@@ -1,8 +1,8 @@
 /* /d.css — Direction D look for the static pages (Career Fair, My Season, Radar).
    Load it AFTER the page's own <style> so these win. Same tokens as /jobs and the homepage. */
 :root{
-  --green:#0B7A55; --green-dark:#0B6E4B; --green-light:#EAF7F1; --mint:#2FD39A;
-  --navy:#0A1426; --ink:#0A1426; --muted:#55627A; --faint:#8590A6;
+  --green:#4A7000; --green-dark:#3A5A00; --green-light:#F2FADF; --mint:#B0F701;
+  --navy:#060A2C; --ink:#060A2C; --muted:#55627A; --faint:#8590A6;
   --bg:#EEF1F6; --card:#FFFFFF; --line:#DCE2EC; --amber:#8A4B08; --amber-light:#FEF3E2;
   --mono:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
 }
@@ -11,10 +11,10 @@ body{background:var(--bg);font-variant-numeric:tabular-nums}
 @media (max-width:640px){.controls{top:52px}}
 
 /* page header: the same deep navy as the top bar, lighter type */
-header{background:#070F1E;border-bottom:1px solid #1A2640}
+header{background:#060A2C;border-bottom:1px solid #1A2640}
 header h1{font-weight:600;letter-spacing:-.025em}
 header .sub,header p{color:#9FAAC0}
-header .trend{background:#0D1A2F;border:1px solid #22304D;border-radius:14px}
+header .trend{background:#0E1440;border:1px solid #22304D;border-radius:14px}
 header .trend .n,header .big{color:var(--mint);font-family:var(--mono);font-weight:500}
 
 /* cards */
@@ -41,4 +41,4 @@ header .trend .n,header .big{color:var(--mint);font-family:var(--mono);font-weig
 /* small mono labels for counts/dates */
 .stat b,.stats b,.ring b,.when,.meta time{font-family:var(--mono);font-weight:500}
 
-.toast{background:#070F1E;border-radius:999px}
+.toast{background:#060A2C;border-radius:999px}

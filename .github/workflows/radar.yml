@@ -1,4 +1,4 @@
-# Daily: rebuild the Opening Radar (radar/radar.json) from the public SimplifyJobs list + InternIQ's company list.
+# Daily: rebuild the Opening Radar (radar/radar.json) from the public SimplifyJobs list + Beat the Pile's company list.
 # Past seasons are already baked into radar/history.json; this only folds in the current season.
 name: radar
 on:
@@ -18,21 +18,21 @@ jobs:
       - name: Check the on/off switch (/bots)
         id: sw
         run: |
-          on=$(curl -s https://intern-iq-psi.vercel.app/api/discovery?bots=1 | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{try{const b=JSON.parse(d).bots.find(x=>x.id==="radar");console.log(b&&b.enabled===false?"off":"on")}catch{console.log("on")}})')
+          on=$(curl -s https://www.beatthepile.com/api/discovery?bots=1 | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{try{const b=JSON.parse(d).bots.find(x=>x.id==="radar");console.log(b&&b.enabled===false?"off":"on")}catch{console.log("on")}})')
           echo "on=$on" >> $GITHUB_OUTPUT; echo "radar switch: $on"
       - name: Download current internship list
         if: steps.sw.outputs.on == 'on'
         run: curl -sfL --retry 3 -o /tmp/current.json https://raw.githubusercontent.com/SimplifyJobs/Summer2027-Internships/dev/.github/scripts/listings.json
-      - name: Get InternIQ's company list
+      - name: Get Beat the Pile's company list
         if: steps.sw.outputs.on == 'on'
         run: |
           node -e '
             const fs = require("fs");
             (async () => {
               const out = [];
-              try { const d = await (await fetch("https://intern-iq-psi.vercel.app/api/discovery")).json();
+              try { const d = await (await fetch("https://www.beatthepile.com/api/discovery")).json();
                     for (const r of (d.rows || d.companies || [])) if (r.id && r.company && r.status !== "duplicate") out.push({ id: r.id, company: r.company }); } catch (e) { console.log("discovery:", e.message); }
-              try { const l = await (await fetch("https://intern-iq-psi.vercel.app/api/listings")).json();
+              try { const l = await (await fetch("https://www.beatthepile.com/api/listings")).json();
                     for (const j of (l.listings || [])) if (j.company_id) out.push({ id: j.company_id, company: j.company }); } catch (e) { console.log("listings:", e.message); }
               fs.writeFileSync("/tmp/tracked.json", JSON.stringify(out)); console.log("tracked names:", out.length);
             })();'
@@ -43,7 +43,7 @@ jobs:
         if: steps.sw.outputs.on == 'on'
         run: |
           if git diff --quiet radar/radar.json; then echo "no change"; exit 0; fi
-          git config user.name "interniq-radar"; git config user.email "radar@users.noreply.github.com"
+          git config user.name "btp-radar"; git config user.email "radar@users.noreply.github.com"
           git add radar/radar.json && git commit -m "Radar: daily refresh" && git push
       - name: Report to /bots
         if: always() && steps.sw.outputs.on == 'on'
@@ -51,5 +51,5 @@ jobs:
         run: |
           ok=${{ job.status == 'success' }}
           summary=$(node -e 'try{const d=require("./radar/radar.json");console.log(`${d.companies.length} companies tracked · ${d.companies.filter(c=>c.opened).length} opened for Summer ${d.season}`)}catch{console.log("Radar build failed")}')
-          curl -s -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $CRON_SECRET" https://intern-iq-psi.vercel.app/api/discovery \
+          curl -s -X POST -H "Content-Type: application/json" -H "Authorization: Bearer $CRON_SECRET" https://www.beatthepile.com/api/discovery \
             -d "{\"action\":\"botlog\",\"bot\":\"radar\",\"ok\":$ok,\"summary\":\"$summary\"}"

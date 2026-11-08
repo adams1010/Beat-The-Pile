@@ -10,7 +10,7 @@ Everything here is also visible live at **/bots** (system map, ranked "where to 
 ## Common problems → fix
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| Finder dot amber, "no run for N hr" | GitHub's 15-min schedule skipped runs (it does) — Vercel's hourly cron is the backstop | Usually self-heals. Force one: `gh api -X POST repos/adams1010/InternIQ/actions/workflows/discover.yml/dispatches -f ref=main` |
+| Finder dot amber, "no run for N hr" | GitHub's 15-min schedule skipped runs (it does) — Vercel's hourly cron is the backstop | Usually self-heals. Force one: `gh api -X POST repos/adams1010/beat-the-pile/actions/workflows/discover.yml/dispatches -f ref=main` |
 | Queue 0 and backlog 0 | Sources exhausted | Run Board Scout now (`board-scout.yml`), paste links on /discovery, or rebuild the backlog |
 | Many `board_error` with "answered 403/429" | Site rate-limits datacenter IPs | They retry in 14 days automatically; browser pass handles JS sites |
 | Many `identity_failed` | Board found but can't prove it's theirs (parent company portal, odd name) | Paste the company's real careers link on /discovery — an own-site link is proof |

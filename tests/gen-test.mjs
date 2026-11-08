@@ -4,10 +4,10 @@ import { installFake, invoke, env } from "./fakedb.mjs";
 env();
 const f = installFake({ anthropic: () => ({ text: "hi" }) });
 const g = (await import("../api/generate.js")).default;
-const SITE = "https://intern-iq-psi.vercel.app";
+const SITE = "https://www.beatthepile.com";
 let ipn = 0;
 const call = (body, headers = { origin: SITE }, ip = "1.2.3." + (++ipn)) =>
-  invoke(g, { method: "POST", body, headers: { host: "intern-iq-psi.vercel.app", "x-forwarded-for": ip, ...headers } });
+  invoke(g, { method: "POST", body, headers: { host: "www.beatthepile.com", "x-forwarded-for": ip, ...headers } });
 
 assert.equal((await call({ feature: "intel", input: { name: "Boeing" } }, {})).code, 403, "no origin = blocked");
 assert.equal((await call({ feature: "intel", input: { name: "Boeing" } }, { origin: "https://evil.com" })).code, 403);
