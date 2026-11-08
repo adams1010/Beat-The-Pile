@@ -35,6 +35,7 @@ function test(row, col, expr) {
     const a = decodeURIComponent(arg); const x = isNaN(Number(a)) ? Date.parse(a) : Number(a); const y = isNaN(Number(v)) ? Date.parse(v) : Number(v);
     return op === "gt" ? y > x : op === "gte" ? y >= x : op === "lt" ? y < x : y <= x; }
   if (op === "in") { const list = decodeURIComponent(arg).replace(/^\(|\)$/g, "").split(",").map((x) => x.replace(/^"|"$/g, "")); return list.includes(String(v)); }
+  if (op === "imatch" || op === "match") { const re = new RegExp(decodeURIComponent(arg), op === "imatch" ? "i" : ""); return re.test(String(v ?? "")); }   // Postgres POSIX regex ≈ JS here
   if (op === "ilike") { const pat = decodeURIComponent(arg).toLowerCase().replace(/\*/g, ""); return String(v ?? "").toLowerCase().includes(pat); }
   return true;
 }
