@@ -1,11 +1,23 @@
 // /nav.js — the one top bar for every page. Include with <script src="/nav.js"></script> right after <body>.
-//   Jobs · Career Fair · My Season · Radar · Tools ▾ · [account]   (follow-ups live in My Season)
+//   Jobs · Career Fair · Orbit · My Season · Profile · Tools ▾ · [account]   (follow-ups live in My Season; Radar is under Tools)
+//   Each top-bar item has a line icon above its label (LinkedIn-style). Icons are inline SVG, 24px grid, 1.75 stroke — no emoji.
 // "Saved" lives inside My Season (and the ♡ Saved filter on Jobs). Owner tools (/bots, /discovery) are not listed.
 // If the page has an #acct element (its sign-in / sign-out widget), it is moved into the bar's right side.
 (function () {
   if (window.__btpNav) return; window.__btpNav = true;
-  const MAIN = [["/jobs/", "Jobs"], ["/fair/", "Career Fair"], ["/season/", "My Season"], ["/radar/", "Radar"], ["/u/", "Profile"]];
+  // Line icons (24×24, stroke = currentColor) so they follow the link color and never look like emoji.
+  const ICON = {
+    jobs: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8.5 7V5.5A1.5 1.5 0 0 1 10 4h4a1.5 1.5 0 0 1 1.5 1.5V7"/><path d="M3 12.5h18"/>',
+    fair: '<path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5c0 1.4 1.1 2.5 2.5 2.5S9 10.9 9 9.5c0 1.4 1.1 2.5 2.5 2.5h1c1.4 0 2.5-1.1 2.5-2.5 0 1.4 1.1 2.5 2.5 2.5S20 10.9 20 9.5"/><path d="M5.5 12v8h13v-8"/><path d="M10 20v-4.5h4V20"/>',
+    orbit: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5S9.7 5.9 12 3.5z"/>',
+    season: '<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M21 20H3"/>',
+    profile: '<circle cx="12" cy="8.5" r="3.75"/><path d="M4.5 20c.9-3.6 3.9-5.75 7.5-5.75s6.6 2.15 7.5 5.75"/>',
+    tools: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
+  };
+  const svg = (k) => `<svg class="ic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
+  const MAIN = [["/jobs/", "Jobs", "jobs"], ["/fair/", "Career Fair", "fair"], ["/orbit/", "Orbit", "orbit"], ["/season/", "My Season", "season"], ["/u/", "Profile", "profile"]];
   const TOOLS = [
+    ["/radar/", "Opening Radar", "When each company usually opens internships"],
     ["/#quiz", "Match quiz", "Real openings matched to your major"],
     ["/#interview", "Interview practice", "Talk it out against a timer, get graded"],
     ["/#resumebuilder", "Resume builder", "Starter resume from your answers"],
@@ -30,12 +42,16 @@
 .btpnav .links{display:flex;align-items:center;gap:2px;flex:0 1 auto;margin-left:auto;min-width:0;overflow-x:auto;scrollbar-width:none}
 .btpnav .links::-webkit-scrollbar{display:none}
 .btpnav .links a,.btpnav summary{color:var(--n-dim);text-decoration:none;font-size:13px;padding:8px 12px;border-radius:6px;white-space:nowrap;cursor:pointer}
+.btpnav .links>a,.btpnav .links>details>summary{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px 5px;font-size:12px;line-height:1;min-width:64px;border-bottom:2px solid transparent;border-radius:6px 6px 0 0}
+.btpnav .links .ic{display:block;flex-shrink:0}
+.btpnav .links>a[aria-current=page]{background:transparent;border-bottom-color:var(--n-acc)}
 .btpnav .links a:hover,.btpnav summary:hover{color:#fff}
 .btpnav .links a[aria-current=page]{color:#fff;background:#16223A}
 .btpnav details{position:relative}
 .btpnav summary{list-style:none;display:flex;align-items:center;gap:4px}
+.btpnav .links>details>summary .lbl{display:flex;align-items:center}
 .btpnav summary::-webkit-details-marker{display:none}
-.btpnav summary::after{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);margin-left:4px}
+.btpnav .mob summary::after,.btpnav .links summary .lbl::after{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);margin-left:4px}
 .btpnav .menu{position:fixed;margin-top:8px;min-width:280px;background:#fff;color:#0A1426;border:1px solid #DCE2EC;border-radius:12px;box-shadow:0 16px 40px rgba(7,15,30,.22);padding:6px;z-index:60}
 .btpnav .menu a{display:block;padding:10px 12px;border-radius:8px;color:#0A1426;text-decoration:none;transition:background .12s}
 .btpnav .menu a:hover,.btpnav .menu a:focus-visible{background:#F1F4F9;color:#0A1426;box-shadow:inset 3px 0 0 #0B7A55}
@@ -69,8 +85,8 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   nav.innerHTML = `<a class="btpskip" href="#main">Skip to content</a><div class="in">
     <a class="logo" href="/"><span class="mark" aria-hidden="true">BP</span><span class="word">Beat the Pile</span></a>
     <form class="q" role="search" action="/jobs/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search internships" placeholder="Search internships, companies, majors"><input type="hidden" name="state" value="all"><kbd>/</kbd></form>
-    <div class="links">${MAIN.map(([h, t]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${t}</a>`).join("")}
-      <details><summary>Tools</summary><div class="menu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}</div></details></div>
+    <div class="links">${MAIN.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${svg(k)}<span>${t}</span></a>`).join("")}
+      <details><summary>${svg("tools")}<span class="lbl">Tools</span></summary><div class="menu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}</div></details></div>
     <details class="mob"><summary>Menu</summary><div class="menu" role="menu">${MAIN.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div>${TOOLS.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}</div></details>
     <div class="right" id="btpRight"><a class="me" id="btpMe" href="/u/" hidden></a></div></div>`;
   addEventListener("keydown", (e) => { const t = e.target.tagName; if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(t) && !e.target.isContentEditable) { const i = nav.querySelector(".q input"); if (i && i.offsetParent) { e.preventDefault(); i.focus(); } } });
@@ -90,7 +106,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", later); else later();
     for (const det of nav.querySelectorAll("details")) {
       const place = () => { const r = det.querySelector("summary").getBoundingClientRect(), m = det.querySelector(".menu");
-        m.style.top = r.bottom + "px"; if (!det.classList.contains("mob")) m.style.left = Math.max(8, Math.min(r.left, innerWidth - 276)) + "px"; };
+        m.style.top = r.bottom + "px"; if (!det.classList.contains("mob")) m.style.left = Math.max(8, Math.min(r.left, innerWidth - m.offsetWidth - 8)) + "px"; };
       det.addEventListener("toggle", () => det.open && place());
       document.addEventListener("click", (e) => { if (det.open && !det.contains(e.target)) det.open = false; });
       document.addEventListener("keydown", (e) => { if (e.key === "Escape") det.open = false; });

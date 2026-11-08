@@ -1,4 +1,4 @@
-/* built from src/home.jsx cc9491f7ee606651 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx a44b00be5e57f08a — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -929,7 +929,7 @@ function HeroMap({
       color: "#F2B8A2",
       fontFamily: "Geist,sans-serif"
     }
-  }, "We couldn't find that ZIP.")), React.createElement("div", {
+  }, "We couldn't find that city. Try \u201CBlacksburg, VA\u201D.")), React.createElement("div", {
     style: {
       borderTop: "1px solid #22304D",
       marginTop: 10,
@@ -978,6 +978,7 @@ function HeroMap({
     }
   }, dAgo(j.first_seen))))));
 }
+const D_NEAR = v => /^\d{5}$/.test(v) || /^[A-Za-z .'-]{2,30},\s*[A-Za-z]{2}$/.test(v);
 function LandingD({
   onQuiz,
   onPage
@@ -990,13 +991,13 @@ function LandingD({
     [near, setNear] = React.useState(null);
   React.useEffect(() => {
     const z = where.trim();
-    if (!/^\d{5}$/.test(z)) {
+    if (!D_NEAR(z)) {
       setNear(null);
       return;
     }
     let live = true;
     const t = setTimeout(() => {
-      fetch(`/api/listings?near=${z}&mi=50&field=all&limit=1&offset=0`).then(r => r.ok ? r.json() : Promise.reject(r.status)).then(d => {
+      fetch(`/api/listings?near=${encodeURIComponent(z)}&mi=50&field=all&limit=1&offset=0`).then(r => r.ok ? r.json() : Promise.reject(r.status)).then(d => {
         if (live) setNear({
           meta: d.meta
         });
@@ -1040,8 +1041,8 @@ function LandingD({
     const p = new URLSearchParams();
     if (q.trim()) p.set("q", q.trim());
     const w = where.trim().toLowerCase();
-    if (/^\d{5}$/.test(w)) {
-      p.set("near", w);
+    if (D_NEAR(w)) {
+      p.set("near", where.trim());
       p.set("mi", "50");
       p.set("major", "all");
       analytics.track("home_search_zip");
@@ -1212,10 +1213,10 @@ function LandingD({
   })), React.createElement("input", {
     value: where,
     onChange: e => setWhere(e.target.value),
-    "aria-label": "ZIP code or state",
-    placeholder: "ZIP code or state",
+    "aria-label": "City or state",
+    placeholder: "City or state",
     inputMode: "text",
-    autoComplete: "postal-code",
+    autoComplete: "address-level2",
     style: {
       flex: 1,
       minWidth: 0,

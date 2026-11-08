@@ -140,7 +140,7 @@ function FeatViz({k}){
     <div style={{flex:1,display:"grid",gap:6}}>{[["Q1",86],["Q2",74],["Q3",91]].map(([q,v])=><div key={q} style={{display:"flex",gap:8,alignItems:"center",fontSize:11}}><span style={{width:18,color:"#55627A"}}>{q}</span><span style={{flex:1,height:6,background:"#EEF1F6",borderRadius:99}}><span style={{display:"block",height:6,width:v+"%",background:"#0B7A55",borderRadius:99}}/></span><span style={{...DM,width:20}}>{v}</span></div>)}</div></div>);
 }
 // The hero map: every dot is a real open internship whose location text names a real US city (api/listings ?dots=1).
-// Type a ZIP in the search and a circle shows how many are within 50 miles (the same numbers /jobs will show).
+// Type a city ("Blacksburg, VA") or ZIP in the search and a circle shows how many are within 50 miles (the same numbers /jobs will show).
 const MILES_PX=1.609*1300/6371;   // Albers USA at scale 1300: ~0.33 px per mile (lower 48)
 function HeroMap({near,fresh,sum}){
   const [geo,setGeo]=React.useState(null),[pts,setPts]=React.useState(null),[err,setErr]=React.useState(false);
@@ -164,7 +164,7 @@ function HeroMap({near,fresh,sum}){
       </svg>}
       {near?.meta&&<div className="d-mapbadge" style={{position:"absolute",left:8,bottom:6,background:"rgba(7,15,30,.88)",border:"1px solid #2A3B5C",borderRadius:10,padding:"8px 12px",fontFamily:"Geist,sans-serif"}}>
         <span style={{fontSize:20,fontWeight:600,color:"#fff"}}>{fmt(near.meta.count)}</span> <span style={{fontSize:13,color:"#CFD7E6"}}>within {near.meta.near.mi} mi of {near.meta.near.q}</span></div>}
-      {near?.bad&&<div style={{position:"absolute",left:8,bottom:6,fontSize:13,color:"#F2B8A2",fontFamily:"Geist,sans-serif"}}>We couldn't find that ZIP.</div>}
+      {near?.bad&&<div style={{position:"absolute",left:8,bottom:6,fontSize:13,color:"#F2B8A2",fontFamily:"Geist,sans-serif"}}>We couldn't find that city. Try “Blacksburg, VA”.</div>}
     </div>
     <div style={{borderTop:"1px solid #22304D",marginTop:10,paddingTop:8}}>
       <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"#8D9AB3",fontFamily:"Geist,sans-serif",marginBottom:2}}><span>Just found</span><span>{sum?`${fmt(sum.allMajors)} open · ${fmt(sum.hiringNow)} companies hiring`:""}</span></div>
@@ -173,12 +173,14 @@ function HeroMap({near,fresh,sum}){
     </div>
   </aside>);
 }
+// The hero's "City or state" box: "Blacksburg, VA" or a 5-digit ZIP = distance search; a state name/code = state filter.
+const D_NEAR=(v)=>/^\d{5}$/.test(v)||/^[A-Za-z .'-]{2,30},\s*[A-Za-z]{2}$/.test(v);
 function LandingD({onQuiz,onPage}){
   const [sum,setSum]=React.useState(null),[sumErr,setSumErr]=React.useState(false),[fresh,setFresh]=React.useState(null);
   const [q,setQ]=React.useState(""),[where,setWhere]=React.useState(""),[near,setNear]=React.useState(null);
-  React.useEffect(()=>{   // a 5-digit ZIP in the location box → live "N within 50 mi" on the map
-    const z=where.trim(); if(!/^\d{5}$/.test(z)){setNear(null);return;}
-    let live=true; const t=setTimeout(()=>{fetch(`/api/listings?near=${z}&mi=50&field=all&limit=1&offset=0`).then(r=>r.ok?r.json():Promise.reject(r.status)).then(d=>{if(live)setNear({meta:d.meta});}).catch(()=>{if(live)setNear({bad:true});});},250);
+  React.useEffect(()=>{   // "City, ST" (or a 5-digit ZIP) in the location box → live "N within 50 mi" on the map
+    const z=where.trim(); if(!D_NEAR(z)){setNear(null);return;}
+    let live=true; const t=setTimeout(()=>{fetch(`/api/listings?near=${encodeURIComponent(z)}&mi=50&field=all&limit=1&offset=0`).then(r=>r.ok?r.json():Promise.reject(r.status)).then(d=>{if(live)setNear({meta:d.meta});}).catch(()=>{if(live)setNear({bad:true});});},250);
     return()=>{live=false;clearTimeout(t);};
   },[where]);
   React.useEffect(()=>{
@@ -189,7 +191,7 @@ function LandingD({onQuiz,onPage}){
   },[]);
   const go=(e)=>{e.preventDefault();analytics.track("home_search",{has_query:!!q.trim(),has_state:!!where.trim()});const p=new URLSearchParams();if(q.trim())p.set("q",q.trim());
     const w=where.trim().toLowerCase();
-    if(/^\d{5}$/.test(w)){p.set("near",w);p.set("mi","50");p.set("major","all");analytics.track("home_search_zip");location.href="/jobs/?"+p.toString();return;}
+    if(D_NEAR(w)){p.set("near",where.trim());p.set("mi","50");p.set("major","all");analytics.track("home_search_zip");location.href="/jobs/?"+p.toString();return;}
     const code=/^[a-z]{2}$/.test(w)?w.toUpperCase():(D_STATES[w]||null);
     p.set("state",code&&Object.values(D_STATES).includes(code)?code:"all");if(w==="remote"&&!q.trim())p.set("q","remote");
     location.href="/jobs/?"+p.toString();};
@@ -213,7 +215,7 @@ function LandingD({onQuiz,onPage}){
             <span className="d-sep" style={{width:1,background:"#DCE2EC",margin:"10px 0"}}/>
             <label style={{flex:"2 1 0",display:"flex",alignItems:"center",gap:10,padding:"0 14px",minWidth:0}}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55627A" strokeWidth="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-              <input value={where} onChange={e=>setWhere(e.target.value)} aria-label="ZIP code or state" placeholder="ZIP code or state" inputMode="text" autoComplete="postal-code" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#0A1426",height:48,background:"transparent",outline:"none"}}/></label>
+              <input value={where} onChange={e=>setWhere(e.target.value)} aria-label="City or state" placeholder="City or state" inputMode="text" autoComplete="address-level2" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#0A1426",height:48,background:"transparent",outline:"none"}}/></label>
             <button type="submit" style={{font:"inherit",fontSize:16,fontWeight:600,background:"#0B7A55",color:"#fff",border:0,padding:"0 28px",borderRadius:10,cursor:"pointer",minHeight:48}}>Search</button>
           </form>
           <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:16,alignItems:"center"}}>

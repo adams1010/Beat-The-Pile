@@ -49,7 +49,7 @@
   .near{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px 4px 3px 12px}
   .near.on{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy)}
   .near select{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink);cursor:pointer;padding:2px 0}
-  .near input{font:inherit;font-size:13px;width:92px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--ink);background:#F6F8FB}
+  .near input{font:inherit;font-size:13px;width:150px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--ink);background:#F6F8FB}
   .near input:focus{outline:2px solid var(--green);outline-offset:1px;background:#fff}
   .near .nx{border:0;background:none;font:inherit;font-size:15px;color:var(--muted,#55627A);cursor:pointer;padding:0 6px;line-height:1}
   .meta2 .dist{color:var(--green);font-weight:600}
@@ -207,7 +207,7 @@
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">All US states</option></select>
       <form class="near" id="nearBox" role="search" aria-label="Internships near a place"><span>Within</span>
         <select id="miSel" aria-label="Distance in miles"><option value="25">25 mi</option><option value="50" selected>50 mi</option><option value="100">100 mi</option><option value="200">200 mi</option></select>
-        <span>of</span><input id="nearIn" placeholder="ZIP code" inputmode="numeric" autocomplete="postal-code" maxlength="40" aria-label="ZIP code or City, ST"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
+        <span>of</span><input id="nearIn" placeholder="City or state" autocomplete="address-level2" maxlength="40" aria-label="City or state, like Blacksburg, VA or Virginia"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
       <select class="statesel" id="majorSel" aria-label="Major">
         <option value="all">All majors</option>
         <optgroup label="Engineering"><option value="eng">All engineering</option><option value="mechanical">Mechanical &amp; Aerospace</option><option value="electrical">Electrical &amp; Computer Eng.</option><option value="civil">Civil, Construction &amp; Architecture</option><option value="chemical">Chemical &amp; Materials</option><option value="industrial">Industrial &amp; Manufacturing</option></optgroup>
@@ -535,8 +535,13 @@
     if (e.target.closest("#resetF")) resetFilters();
     if (e.target.closest("#allCos")) { state.company = null; state.q = ""; $("q").value = ""; loadScope(); }
   });
-  // ── "Within N mi of a ZIP" (api/listings?near=; lib/geocode.js). Picking a state turns it off, and the other way round. ──
+  // ── "Within N mi of a city" (api/listings?near=; lib/geocode.js). Picking a state turns it off, and the other way round. ──
+  // The box asks for "City or state": "Blacksburg, VA" → distance search; "Virginia" / "VA" → that state's filter.
+  // A 5-digit ZIP still works (old links, people who type one anyway).
   function nearOk(q){ return /^\d{5}$/.test(q) || /^[A-Za-z .'-]{2,30},\s*[A-Za-z]{2}$/.test(q); }
+  function stateFrom(q){ const t = q.trim().replace(/\.$/, "").toLowerCase(); if (!t) return null;
+    for (const [ab, nm] of Object.entries(NAMES)) if (t === ab.toLowerCase() || t === nm.toLowerCase()) return ab;
+    return null; }
   function paintNear(){
     const on = !!state.near; $("nearBox").classList.toggle("on", on); $("nearX").hidden = !on;
     if (on) { $("nearIn").value = state.near.q; $("miSel").value = String(state.near.mi); }
@@ -544,7 +549,9 @@
   function setNear(q, mi){
     q = (q || "").trim();
     if (!q) return clearNear();
-    if (!nearOk(q)) { toast("Type a 5-digit ZIP code, like 24060"); return; }
+    const st = stateFrom(q);
+    if (st) { $("nearIn").value = ""; $("stateSel").value = st; return setView([st], null); }   // setView turns distance off
+    if (!nearOk(q)) { toast("Type a city and state, like Blacksburg, VA — or just a state, like Virginia"); return; }
     state.near = { q, mi: +mi || 50 }; state.st = "ALL"; $("stateSel").value = ""; $("stateSel").classList.remove("on");
     try { localStorage.setItem("btp_near", q); } catch {}
     track("near_search", { mi: state.near.mi }); paintNear(); loadScope();
@@ -552,7 +559,7 @@
   function clearNear(){ if (!state.near) return; state.near = null; state.nearMeta = null; $("nearIn").value = ""; paintNear(); loadScope(); }
   $("nearBox").addEventListener("submit", (e) => { e.preventDefault(); setNear($("nearIn").value, $("miSel").value); });
   $("nearIn").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); setNear($("nearIn").value, $("miSel").value); } });
-  $("nearIn").addEventListener("change", () => { const v = $("nearIn").value.trim(); if (nearOk(v) && (!state.near || state.near.q !== v)) setNear(v, $("miSel").value); });
+  $("nearIn").addEventListener("change", () => { const v = $("nearIn").value.trim(); if ((nearOk(v) || stateFrom(v)) && (!state.near || state.near.q !== v)) setNear(v, $("miSel").value); });
   $("miSel").addEventListener("change", () => { if (state.near) setNear(state.near.q, $("miSel").value); else $("nearIn").focus(); });
   $("nearX").addEventListener("click", clearNear);
   try { const last = localStorage.getItem("btp_near"); if (last && !$("nearIn").value) $("nearIn").placeholder = last; } catch {}
@@ -834,7 +841,7 @@
     } catch (e) {
       if (seq !== loadSeq) return;
       if (!(e.status === 400 && state.near)) console.error("[jobs] load/render failed", e);
-      if (e.status === 400 && state.near) { $("list").innerHTML = `<div class="empty">We couldn't find “${esc(state.near.q)}”. Try a 5-digit ZIP code, like 24060.</div>`; $("count").textContent = ""; return; }
+      if (e.status === 400 && state.near) { $("list").innerHTML = `<div class="empty">We couldn't find “${esc(state.near.q)}”. Try a city and state, like Blacksburg, VA.</div>`; $("count").textContent = ""; return; }
       $("list").innerHTML = '<div class="err" role="alert">Couldn’t load internships right now — that’s a problem on our side or your connection, not a sign there are no jobs. Refresh in a minute.</div>';
     }
   }

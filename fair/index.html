@@ -272,16 +272,21 @@
   async function loadFairs(){
     const d = await fetch("/fair/fairs.json").then((r) => r.json());
     S.fairs = d.fairs || [];
-    const want = new URLSearchParams(location.search).get("fair") || store.get("iq_fair") || S.fairs[0]?.id;
-    $("#fairsel").innerHTML = S.fairs.map((f) => `<option value="${esc(f.id)}">${esc(f.school + " — " + f.name)}</option>`).join("");
+    // Default: the fair in the link, else the last one you used, else the first fair whose employer list is out
+    const want = new URLSearchParams(location.search).get("fair") || store.get("iq_fair") || (S.fairs.find((f) => f.companies.length) || S.fairs[0])?.id;
+    // Grouped by school; every option says its term ("Business Horizons Career Fair — Spring 2027")
+    const schools = [...new Set(S.fairs.map((f) => f.school))];
+    $("#fairsel").innerHTML = schools.map((sc) => `<optgroup label="${esc(sc)}">${S.fairs.filter((f) => f.school === sc)
+      .map((f) => `<option value="${esc(f.id)}">${esc(f.name + (f.term ? " — " + f.term : ""))}</option>`).join("")}</optgroup>`).join("");
     pickFair(S.fairs.find((f) => f.id === want) ? want : S.fairs[0].id);
   }
   async function pickFair(id){
     S.fair = S.fairs.find((f) => f.id === id); store.set("iq_fair", id);
     $("#fairsel").value = id; S.open.clear();
     const booths = S.fair.companies.filter((c) => c.booth).length;
-    $("#fairmeta").textContent = [S.fair.name, S.fair.when, S.fair.where, `${S.fair.companies.length} employers`,
-      booths ? `booth numbers for ${booths}` : "booth numbers not published yet"].filter(Boolean).join(" · ");
+    $("#fairmeta").textContent = (S.fair.companies.length
+      ? [S.fair.term, S.fair.when, S.fair.where, `${S.fair.companies.length} employers`, booths ? `booth numbers for ${booths}` : "booth numbers not published yet"]
+      : [S.fair.term, S.fair.when, S.fair.where, "employer list not posted yet"]).filter(Boolean).join(" · ");
     S.listingsErr = false;
     renderCompanies();
     const ids = [...new Set(S.fair.companies.map((c) => c.id).filter(Boolean))];
@@ -349,6 +354,13 @@
   const talked = () => new Set(S.me.notes.filter((n) => n.fair === S.fair?.name).map((n) => n.companyId || n.company));
   function renderCompanies(){
     if (!S.fair) return;
+    if (!S.fair.companies.length) {     // announced fair, employer list not out yet
+      $("#chips").innerHTML = "";
+      $("#cos").innerHTML = `<div class="empty"><b>${esc(S.fair.name)} — ${esc(S.fair.term || "")}</b><br>${esc(S.fair.when || "")} · ${esc(S.fair.where || "")}<br><br>
+        The employer list isn't out yet. VT usually posts it on Handshake a week or two before the fair, and we'll add it here with every company's open internships.
+        ${S.fair.source ? `<br><a href="${esc(S.fair.source)}" target="_blank" rel="noopener">VT's career fair calendar ↗</a>` : ""}</div>`;
+      return;
+    }
     const t = talked();
     const stars = new Set(S.me.starred || []);
     const all = S.fair.companies.map((c) => { const jobs = ((c.id && S.listings[c.id]) || []).slice().sort((a, b) => inMajor(b) - inMajor(a));
@@ -418,7 +430,7 @@
     const mine = jobs.filter(inMajor).length;
     const states = Object.entries(jobs.reduce((m, j) => { for (const s of String(j.state || "").split(",").filter(Boolean)) m[s] = (m[s] || 0) + 1; return m; }, {})).sort((a, b) => b[1] - a[1]).map(([s]) => s);
     const newest = jobs.map((j) => j.first_seen).filter(Boolean).sort().pop();
-    const others = S.fairs.filter((f) => f.id !== S.fair.id && f.companies.some((x) => x.id === c.id)).map((f) => f.name);
+    const others = S.fairs.filter((f) => f.id !== S.fair.id && f.companies.some((x) => x.id === c.id)).map((f) => f.name + (f.term ? " (" + f.term + ")" : ""));
     $("#briefBody").innerHTML = `
       <div class="row" style="justify-content:space-between"><strong style="font-size:19px;color:var(--navy)">${esc(c.name)}</strong>${c.booth ? `<span class="booth">Booth ${esc(c.booth)}</span>` : ""}</div>
       <div class="facts">

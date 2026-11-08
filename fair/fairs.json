@@ -1,636 +1,88 @@
 {
- "updated": "2026-11-01",
+ "updated": "2026-11-08",
  "fairs": [
   {
-   "id": "vt-construction",
+   "id": "vt-business-horizons-s27",
+   "name": "Business Horizons Career Fair",
+   "school": "Virginia Tech",
+   "term": "Spring 2027",
+   "date": "2027-02-04",
+   "when": "Feb 4, 2027",
+   "where": "Blacksburg, VA",
+   "source": "https://career.vt.edu/resources/career-fairs/",
+   "companies": []
+  },
+  {
+   "id": "vt-cs-source-s27",
+   "name": "CS | Source Career Fair",
+   "school": "Virginia Tech",
+   "term": "Spring 2027",
+   "date": "2027-02-09",
+   "when": "Feb 9, 2027",
+   "where": "Blacksburg, VA",
+   "source": "https://career.vt.edu/resources/career-fairs/",
+   "companies": []
+  },
+  {
+   "id": "vt-connection-s27",
+   "name": "Connection Job Fair (all majors)",
+   "school": "Virginia Tech",
+   "term": "Spring 2027",
+   "date": "2027-02-10",
+   "when": "Feb 10, 2027",
+   "where": "Blacksburg, VA",
+   "source": "https://career.vt.edu/resources/career-fairs/",
+   "companies": []
+  },
+  {
+   "id": "vt-clahs-s27",
+   "name": "CLAHS Career Fair",
+   "school": "Virginia Tech",
+   "term": "Spring 2027",
+   "date": "2027-02-17",
+   "when": "Feb 17, 2027",
+   "where": "Blacksburg, VA",
+   "source": "https://career.vt.edu/resources/career-fairs/",
+   "companies": []
+  },
+  {
+   "id": "vt-construction-s27",
    "name": "Construction Industry Career Fair",
    "school": "Virginia Tech",
-   "when": "Spring 2026 (Feb 18) — Spring 2027 list added when posted",
+   "term": "Spring 2027",
+   "date": "2027-02-18",
+   "when": "Feb 18, 2027",
    "where": "Blacksburg, VA",
-   "companies": [
-    {
-     "name": "A M King",
-     "booth": "311",
-     "id": "x-a-m-king",
-     "domain": "amkinggroup.com"
-    },
-    {
-     "name": "Adams Construction",
-     "booth": "609",
-     "id": "x-adams-construction",
-     "domain": "adamspaving.com"
-    },
-    {
-     "name": "Administrative Controls Management"
-    },
-    {
-     "name": "Allan Myers",
-     "booth": "801",
-     "id": "x-allan-myers",
-     "domain": "allanmyers.com"
-    },
-    {
-     "name": "American Contracting & Environmental Services",
-     "booth": "702",
-     "id": "x-american-contracting-and-environmental-services",
-     "domain": "aceservinc.com"
-    },
-    {
-     "name": "AnderCorp",
-     "id": "x-andercorp",
-     "domain": "andercorp.com"
-    },
-    {
-     "name": "Annandale Millwork",
-     "id": "x-annandale-millwork",
-     "domain": "amcasc.com"
-    },
-    {
-     "name": "Archer Western (Walsh Group)",
-     "booth": "807",
-     "id": "x-the-walsh-group",
-     "domain": "walshgroup.com"
-    },
-    {
-     "name": "ARCO Design/Build",
-     "booth": "1007",
-     "id": "x-arco-design-build",
-     "domain": "thearcoway.com"
-    },
-    {
-     "name": "ATCS",
-     "booth": "405",
-     "id": "x-atcs",
-     "domain": "atcsplc.com"
-    },
-    {
-     "name": "B&S Site Development",
-     "id": "x-bands-site-development",
-     "domain": "bandssite.com"
-    },
-    {
-     "name": "Baker Construction",
-     "booth": "604",
-     "id": "x-baker-construction",
-     "domain": "bakerconstruction.com"
-    },
-    {
-     "name": "Barton Malow",
-     "booth": "106",
-     "id": "x-barton-malow",
-     "domain": "bartonmalow.com"
-    },
-    {
-     "name": "Beazer Homes",
-     "booth": "705",
-     "id": "x-beazer-homes",
-     "domain": "beazer.com"
-    },
-    {
-     "name": "Branch Group",
-     "booth": "804",
-     "id": "x-branch-group",
-     "domain": "branchgroup.com"
-    },
-    {
-     "name": "Branscome",
-     "booth": "203",
-     "id": "x-branscome",
-     "domain": "branscome.com"
-    },
-    {
-     "name": "Breeden Construction",
-     "booth": "709",
-     "id": "x-breeden-construction",
-     "domain": "breedenconstruction.com"
-    },
-    {
-     "name": "Brinkmann Constructors",
-     "booth": "508",
-     "id": "x-brinkmann-constructors",
-     "domain": "brinkmannconstructors.com"
-    },
-    {
-     "name": "Britt, Peters & Associates",
-     "id": "x-britt-peters-and-associates",
-     "domain": "brittpeters.com"
-    },
-    {
-     "name": "Caton Construction Group",
-     "booth": "408",
-     "id": "x-caton-construction-group",
-     "domain": "ccg-builds.com"
-    },
-    {
-     "name": "CBG Building Company",
-     "booth": "402",
-     "id": "x-cbg-building-company",
-     "domain": "cbgbuildingcompany.com"
-    },
-    {
-     "name": "Century Concrete",
-     "booth": "809",
-     "id": "x-century-concrete",
-     "domain": "centuryconcreteinc.com"
-    },
-    {
-     "name": "Chesapeake Controls",
-     "booth": "1008",
-     "id": "x-chesapeake-controls",
-     "domain": "chesapeakecontrols.com"
-    },
-    {
-     "name": "Chiaramonte Construction"
-    },
-    {
-     "name": "Cianbro",
-     "booth": "711",
-     "id": "x-cianbro",
-     "domain": "cianbro.com"
-    },
-    {
-     "name": "Clancy & Theys",
-     "booth": "309",
-     "id": "x-clancy-and-theys",
-     "domain": "clancytheys.com"
-    },
-    {
-     "name": "Clark Construction",
-     "booth": "805",
-     "id": "x-clark-construction",
-     "domain": "clarkconstruction.com"
-    },
-    {
-     "name": "Coastal Construction",
-     "booth": "707",
-     "id": "x-coastal-construction",
-     "domain": "coastalconstruction.com"
-    },
-    {
-     "name": "ColonialWebb",
-     "booth": "211",
-     "id": "x-colonialwebb",
-     "domain": "colonialwebb.com"
-    },
-    {
-     "name": "Concorde Construction",
-     "booth": "703",
-     "id": "x-concorde-construction",
-     "domain": "concordeconst.com"
-    },
-    {
-     "name": "Consigli",
-     "id": "x-consigli",
-     "domain": "consigli.com"
-    },
-    {
-     "name": "Crowder Construction",
-     "booth": "511",
-     "id": "x-crowder-construction",
-     "domain": "crowderusa.com"
-    },
-    {
-     "name": "D.R. Horton",
-     "booth": "1004",
-     "id": "x-d-r-horton",
-     "domain": "drhorton.com"
-    },
-    {
-     "name": "DAVIS Construction",
-     "booth": "202",
-     "id": "x-davis-construction",
-     "domain": "davisconstruction.com"
-    },
-    {
-     "name": "DPR Construction",
-     "booth": "108",
-     "id": "x-dpr-construction",
-     "domain": "dpr.com"
-    },
-    {
-     "name": "Dustin Construction",
-     "booth": "210",
-     "id": "x-dustin-construction",
-     "domain": "dustinconstruction.com"
-    },
-    {
-     "name": "E.C. Pace",
-     "booth": "509",
-     "id": "x-e-c-pace",
-     "domain": "ecpace.com"
-    },
-    {
-     "name": "Eagle Construction of VA",
-     "booth": "506"
-    },
-    {
-     "name": "English Construction",
-     "booth": "603",
-     "id": "x-english-construction",
-     "domain": "englishconst.com"
-    },
-    {
-     "name": "Evans General Contractors",
-     "booth": "606",
-     "id": "x-evans-general-contractors",
-     "domain": "evansgeneralcontractors.com"
-    },
-    {
-     "name": "Faulconer Construction",
-     "id": "x-faulconer-construction",
-     "domain": "faulconerconstruction.com"
-    },
-    {
-     "name": "FlatironDragados",
-     "booth": "305",
-     "id": "x-flatirondragados",
-     "domain": "fdcorp.com"
-    },
-    {
-     "name": "Garney Construction",
-     "id": "x-garney-construction",
-     "domain": "garney.com"
-    },
-    {
-     "name": "George Harms Construction",
-     "booth": "1009",
-     "id": "x-george-harms-construction",
-     "domain": "ghcci.com"
-    },
-    {
-     "name": "Gilbane",
-     "booth": "410",
-     "id": "x-gilbane",
-     "domain": "gilbaneco.com"
-    },
-    {
-     "name": "Greenwood Homes",
-     "booth": "406"
-    },
-    {
-     "name": "Harkins Builders",
-     "booth": "113",
-     "id": "x-harkins-builders",
-     "domain": "harkinsbuilders.com"
-    },
-    {
-     "name": "Haskell",
-     "booth": "501",
-     "id": "x-haskell",
-     "domain": "haskell.com"
-    },
-    {
-     "name": "Hazen and Sawyer",
-     "booth": "209",
-     "id": "x-hazen-and-sawyer",
-     "domain": "hazenandsawyer.com"
-    },
-    {
-     "name": "Helix Electric",
-     "booth": "212",
-     "id": "x-helix-electric",
-     "domain": "helixelectric.com"
-    },
-    {
-     "name": "Henderson Inc",
-     "booth": "710",
-     "id": "x-henderson-inc",
-     "domain": "hendersoninc.com"
-    },
-    {
-     "name": "Hensel Phelps",
-     "booth": "109",
-     "id": "x-hensel-phelps",
-     "domain": "henselphelps.com"
-    },
-    {
-     "name": "HITT Contracting",
-     "booth": "802",
-     "id": "x-hitt-contracting",
-     "domain": "hitt.com"
-    },
-    {
-     "name": "Hoar Construction",
-     "booth": "411",
-     "id": "x-hoar-construction",
-     "domain": "hoar.com"
-    },
-    {
-     "name": "Hoffman & Hoffman",
-     "booth": "605",
-     "id": "x-hoffman-and-hoffman",
-     "domain": "hoffman-hoffman.com"
-    },
-    {
-     "name": "Holder Construction",
-     "booth": "803",
-     "id": "x-holder-construction",
-     "domain": "holderconstruction.com"
-    },
-    {
-     "name": "Hourigan",
-     "booth": "102",
-     "id": "x-hourigan",
-     "domain": "hourigan.group"
-    },
-    {
-     "name": "I. L. Long Construction",
-     "booth": "510"
-    },
-    {
-     "name": "Innovative Refrigeration Systems",
-     "id": "x-innovative-refrigeration-systems",
-     "domain": "r717.net"
-    },
-    {
-     "name": "Jamerson Lewis Construction",
-     "booth": "708",
-     "id": "x-jamerson-lewis-construction",
-     "domain": "jamersonlewis.com"
-    },
-    {
-     "name": "JCM Associates",
-     "booth": "409",
-     "id": "x-jcm-associates",
-     "domain": "gojcm.com"
-    },
-    {
-     "name": "JE Dunn Construction",
-     "booth": "205",
-     "id": "x-je-dunn-construction",
-     "domain": "jedunn.com"
-    },
-    {
-     "name": "KBS Inc",
-     "booth": "602",
-     "id": "x-kbs-inc",
-     "domain": "kbsgc.com"
-    },
-    {
-     "name": "Kjellstrom + Lee",
-     "booth": "704",
-     "id": "x-kjellstrom-lee",
-     "domain": "kjellstromandlee.com"
-    },
-    {
-     "name": "Kokosing",
-     "booth": "110",
-     "id": "x-kokosing",
-     "domain": "kokosing.biz"
-    },
-    {
-     "name": "L.F. Jennings",
-     "booth": "1002",
-     "id": "x-l-f-jennings",
-     "domain": "lfjennings.com"
-    },
-    {
-     "name": "Lithko Contracting",
-     "booth": "308",
-     "id": "x-lithko-contracting",
-     "domain": "lithko.com"
-    },
-    {
-     "name": "Manganaro",
-     "booth": "610",
-     "id": "x-manganaro",
-     "domain": "manganaro.com"
-    },
-    {
-     "name": "Mark Turner Construction",
-     "booth": "608",
-     "id": "x-mark-turner-construction",
-     "domain": "markturnerconstruction.com"
-    },
-    {
-     "name": "Martin Horn",
-     "id": "x-martin-horn",
-     "domain": "martinhorn.com"
-    },
-    {
-     "name": "MBP",
-     "booth": "505",
-     "id": "x-mbp",
-     "domain": "mbpce.com"
-    },
-    {
-     "name": "MEB",
-     "booth": "100",
-     "id": "x-meb",
-     "domain": "meb.group"
-    },
-    {
-     "name": "Miller Construction Services",
-     "booth": "407"
-    },
-    {
-     "name": "Miller Electric Company",
-     "booth": "607",
-     "id": "x-miller-electric-company",
-     "domain": "mecojax.com"
-    },
-    {
-     "name": "Momentum Earthworks",
-     "booth": "403",
-     "id": "x-momentum-earthworks",
-     "domain": "momentumearthworks.com"
-    },
-    {
-     "name": "Moore's Electrical & Mechanical",
-     "booth": "206",
-     "id": "x-moore-s-electrical-and-mechanical",
-     "domain": "mooreselectrical.com"
-    },
-    {
-     "name": "New Dominion Construction",
-     "booth": "201"
-    },
-    {
-     "name": "New South Construction",
-     "id": "x-new-south-construction",
-     "domain": "newsouthconstruction.com"
-    },
-    {
-     "name": "Otis",
-     "booth": "507",
-     "id": "x-otis",
-     "domain": "otis.com"
-    },
-    {
-     "name": "PC Construction",
-     "booth": "312",
-     "id": "x-pc-construction",
-     "domain": "pcconstruction.com"
-    },
-    {
-     "name": "Performance Contracting",
-     "booth": "112",
-     "id": "x-performance-contracting",
-     "domain": "performancecontracting.com"
-    },
-    {
-     "name": "Pizzano Contractors",
-     "booth": "306"
-    },
-    {
-     "name": "Plano-Coudon",
-     "booth": "207"
-    },
-    {
-     "name": "Precision Walls",
-     "booth": "808",
-     "id": "x-precision-walls",
-     "domain": "precisionwalls.com"
-    },
-    {
-     "name": "Procon Consulting",
-     "booth": "107",
-     "id": "x-procon-consulting",
-     "domain": "proconconsulting.com"
-    },
-    {
-     "name": "R.W. Murray",
-     "booth": "101",
-     "id": "x-r-w-murray",
-     "domain": "rwmurray.com"
-    },
-    {
-     "name": "rand* construction",
-     "booth": "302",
-     "id": "x-rand-construction",
-     "domain": "randcc.com"
-    },
-    {
-     "name": "RK&K",
-     "booth": "103",
-     "id": "x-rkandk",
-     "domain": "rkk.com"
-    },
-    {
-     "name": "Robbins Construction Group",
-     "booth": "310"
-    },
-    {
-     "name": "Rosendin",
-     "booth": "601",
-     "id": "x-rosendin",
-     "domain": "rosendin.com"
-    },
-    {
-     "name": "Ruston Paving",
-     "id": "x-ruston-paving",
-     "domain": "rustonpaving.com"
-    },
-    {
-     "name": "Sargent Corporation",
-     "booth": "503",
-     "id": "x-sargent-corporation",
-     "domain": "sargent.us"
-    },
-    {
-     "name": "Shirley Contracting",
-     "booth": "204",
-     "id": "x-shirley-contracting",
-     "domain": "shirleycontracting.com"
-    },
-    {
-     "name": "Skanska",
-     "booth": "806",
-     "id": "x-skanska",
-     "domain": "skanska.com"
-    },
-    {
-     "name": "Southland Concrete",
-     "booth": "300"
-    },
-    {
-     "name": "Southland Industries",
-     "booth": "104",
-     "id": "x-southland-industries",
-     "domain": "southlandind.com"
-    },
-    {
-     "name": "Swinerton",
-     "booth": "111",
-     "id": "x-swinerton",
-     "domain": "swinerton.com"
-    },
-    {
-     "name": "T5 Data Centers",
-     "booth": "307",
-     "id": "x-t5-data-centers",
-     "domain": "t5datacenters.com"
-    },
-    {
-     "name": "Terra Site Constructors",
-     "booth": "208",
-     "id": "x-terra-site-constructors",
-     "domain": "terrasiteco.com"
-    },
-    {
-     "name": "The Christman Company",
-     "booth": "105",
-     "id": "x-the-christman-company",
-     "domain": "christmanco.com"
-    },
-    {
-     "name": "The NRP Group",
-     "id": "x-the-nrp-group",
-     "domain": "nrpgroup.com"
-    },
-    {
-     "name": "The Old Dominion Group"
-    },
-    {
-     "name": "The Poole and Kent Corporation",
-     "id": "x-poole-and-kent",
-     "domain": "poole-kent.com"
-    },
-    {
-     "name": "TMG Construction"
-    },
-    {
-     "name": "Turner Construction",
-     "id": "x-turner-construction",
-     "domain": "turnerconstruction.com"
-    },
-    {
-     "name": "Ulliman Schutte Construction",
-     "id": "x-ulliman-schutte-construction",
-     "domain": "ullimanschutte.com"
-    },
-    {
-     "name": "W. M. Jordan",
-     "id": "x-w-m-jordan",
-     "domain": "wmjordan.com"
-    },
-    {
-     "name": "Whiting-Turner",
-     "id": "x-whiting-turner",
-     "domain": "whiting-turner.com"
-    },
-    {
-     "name": "William A. Hazel",
-     "id": "x-william-a-hazel",
-     "domain": "wahazel.com"
-    },
-    {
-     "name": "Winmar Construction",
-     "id": "x-winmar-construction",
-     "domain": "winmarconstruction.com"
-    },
-    {
-     "name": "WRA",
-     "id": "x-wra",
-     "domain": "wrallp.com"
-    }
-   ]
+   "source": "https://career.vt.edu/resources/career-fairs/",
+   "companies": []
+  },
+  {
+   "id": "vt-cameo-s27",
+   "name": "Engineering CareerFest by CAMEO",
+   "school": "Virginia Tech",
+   "term": "Spring 2027",
+   "date": "2027-02-22",
+   "when": "Feb 22, 2027 (interviews Feb 23)",
+   "where": "Blacksburg, VA",
+   "source": "https://career.vt.edu/resources/career-fairs/",
+   "companies": []
+  },
+  {
+   "id": "vt-real-estate-s27",
+   "name": "Property Management / Real Estate Career Fair",
+   "school": "Virginia Tech",
+   "term": "Spring 2027",
+   "date": "2027-02-23",
+   "when": "Feb 23, 2027",
+   "where": "Blacksburg, VA",
+   "source": "https://career.vt.edu/resources/career-fairs/",
+   "companies": []
   },
   {
    "id": "vt-expo",
    "name": "Engineering Expo",
    "school": "Virginia Tech",
-   "when": "Fall 2026 · employers recruiting MEs",
+   "when": "Sep 15–17, 2026 · employers recruiting MEs",
    "where": "Blacksburg, VA",
    "companies": [
     {
@@ -1582,13 +1034,14 @@
      "id": "x-zim-aircraft-cabin-solutions",
      "domain": "zim-aircraft-seating.com"
     }
-   ]
+   ],
+   "term": "Fall 2026"
   },
   {
    "id": "vt-aero-defense",
    "name": "Aerospace, Defense & Intelligence Career Fair",
    "school": "Virginia Tech",
-   "when": "Fall 2026 (Sep 22)",
+   "when": "Sep 22, 2026",
    "where": "Squires, Blacksburg, VA",
    "companies": [
     {
@@ -1768,7 +1221,635 @@
     {
      "name": "US Army DEVCOM CBC"
     }
-   ]
+   ],
+   "term": "Fall 2026"
+  },
+  {
+   "id": "vt-construction",
+   "name": "Construction Industry Career Fair",
+   "school": "Virginia Tech",
+   "when": "Feb 18, 2026",
+   "where": "Blacksburg, VA",
+   "companies": [
+    {
+     "name": "A M King",
+     "booth": "311",
+     "id": "x-a-m-king",
+     "domain": "amkinggroup.com"
+    },
+    {
+     "name": "Adams Construction",
+     "booth": "609",
+     "id": "x-adams-construction",
+     "domain": "adamspaving.com"
+    },
+    {
+     "name": "Administrative Controls Management"
+    },
+    {
+     "name": "Allan Myers",
+     "booth": "801",
+     "id": "x-allan-myers",
+     "domain": "allanmyers.com"
+    },
+    {
+     "name": "American Contracting & Environmental Services",
+     "booth": "702",
+     "id": "x-american-contracting-and-environmental-services",
+     "domain": "aceservinc.com"
+    },
+    {
+     "name": "AnderCorp",
+     "id": "x-andercorp",
+     "domain": "andercorp.com"
+    },
+    {
+     "name": "Annandale Millwork",
+     "id": "x-annandale-millwork",
+     "domain": "amcasc.com"
+    },
+    {
+     "name": "Archer Western (Walsh Group)",
+     "booth": "807",
+     "id": "x-the-walsh-group",
+     "domain": "walshgroup.com"
+    },
+    {
+     "name": "ARCO Design/Build",
+     "booth": "1007",
+     "id": "x-arco-design-build",
+     "domain": "thearcoway.com"
+    },
+    {
+     "name": "ATCS",
+     "booth": "405",
+     "id": "x-atcs",
+     "domain": "atcsplc.com"
+    },
+    {
+     "name": "B&S Site Development",
+     "id": "x-bands-site-development",
+     "domain": "bandssite.com"
+    },
+    {
+     "name": "Baker Construction",
+     "booth": "604",
+     "id": "x-baker-construction",
+     "domain": "bakerconstruction.com"
+    },
+    {
+     "name": "Barton Malow",
+     "booth": "106",
+     "id": "x-barton-malow",
+     "domain": "bartonmalow.com"
+    },
+    {
+     "name": "Beazer Homes",
+     "booth": "705",
+     "id": "x-beazer-homes",
+     "domain": "beazer.com"
+    },
+    {
+     "name": "Branch Group",
+     "booth": "804",
+     "id": "x-branch-group",
+     "domain": "branchgroup.com"
+    },
+    {
+     "name": "Branscome",
+     "booth": "203",
+     "id": "x-branscome",
+     "domain": "branscome.com"
+    },
+    {
+     "name": "Breeden Construction",
+     "booth": "709",
+     "id": "x-breeden-construction",
+     "domain": "breedenconstruction.com"
+    },
+    {
+     "name": "Brinkmann Constructors",
+     "booth": "508",
+     "id": "x-brinkmann-constructors",
+     "domain": "brinkmannconstructors.com"
+    },
+    {
+     "name": "Britt, Peters & Associates",
+     "id": "x-britt-peters-and-associates",
+     "domain": "brittpeters.com"
+    },
+    {
+     "name": "Caton Construction Group",
+     "booth": "408",
+     "id": "x-caton-construction-group",
+     "domain": "ccg-builds.com"
+    },
+    {
+     "name": "CBG Building Company",
+     "booth": "402",
+     "id": "x-cbg-building-company",
+     "domain": "cbgbuildingcompany.com"
+    },
+    {
+     "name": "Century Concrete",
+     "booth": "809",
+     "id": "x-century-concrete",
+     "domain": "centuryconcreteinc.com"
+    },
+    {
+     "name": "Chesapeake Controls",
+     "booth": "1008",
+     "id": "x-chesapeake-controls",
+     "domain": "chesapeakecontrols.com"
+    },
+    {
+     "name": "Chiaramonte Construction"
+    },
+    {
+     "name": "Cianbro",
+     "booth": "711",
+     "id": "x-cianbro",
+     "domain": "cianbro.com"
+    },
+    {
+     "name": "Clancy & Theys",
+     "booth": "309",
+     "id": "x-clancy-and-theys",
+     "domain": "clancytheys.com"
+    },
+    {
+     "name": "Clark Construction",
+     "booth": "805",
+     "id": "x-clark-construction",
+     "domain": "clarkconstruction.com"
+    },
+    {
+     "name": "Coastal Construction",
+     "booth": "707",
+     "id": "x-coastal-construction",
+     "domain": "coastalconstruction.com"
+    },
+    {
+     "name": "ColonialWebb",
+     "booth": "211",
+     "id": "x-colonialwebb",
+     "domain": "colonialwebb.com"
+    },
+    {
+     "name": "Concorde Construction",
+     "booth": "703",
+     "id": "x-concorde-construction",
+     "domain": "concordeconst.com"
+    },
+    {
+     "name": "Consigli",
+     "id": "x-consigli",
+     "domain": "consigli.com"
+    },
+    {
+     "name": "Crowder Construction",
+     "booth": "511",
+     "id": "x-crowder-construction",
+     "domain": "crowderusa.com"
+    },
+    {
+     "name": "D.R. Horton",
+     "booth": "1004",
+     "id": "x-d-r-horton",
+     "domain": "drhorton.com"
+    },
+    {
+     "name": "DAVIS Construction",
+     "booth": "202",
+     "id": "x-davis-construction",
+     "domain": "davisconstruction.com"
+    },
+    {
+     "name": "DPR Construction",
+     "booth": "108",
+     "id": "x-dpr-construction",
+     "domain": "dpr.com"
+    },
+    {
+     "name": "Dustin Construction",
+     "booth": "210",
+     "id": "x-dustin-construction",
+     "domain": "dustinconstruction.com"
+    },
+    {
+     "name": "E.C. Pace",
+     "booth": "509",
+     "id": "x-e-c-pace",
+     "domain": "ecpace.com"
+    },
+    {
+     "name": "Eagle Construction of VA",
+     "booth": "506"
+    },
+    {
+     "name": "English Construction",
+     "booth": "603",
+     "id": "x-english-construction",
+     "domain": "englishconst.com"
+    },
+    {
+     "name": "Evans General Contractors",
+     "booth": "606",
+     "id": "x-evans-general-contractors",
+     "domain": "evansgeneralcontractors.com"
+    },
+    {
+     "name": "Faulconer Construction",
+     "id": "x-faulconer-construction",
+     "domain": "faulconerconstruction.com"
+    },
+    {
+     "name": "FlatironDragados",
+     "booth": "305",
+     "id": "x-flatirondragados",
+     "domain": "fdcorp.com"
+    },
+    {
+     "name": "Garney Construction",
+     "id": "x-garney-construction",
+     "domain": "garney.com"
+    },
+    {
+     "name": "George Harms Construction",
+     "booth": "1009",
+     "id": "x-george-harms-construction",
+     "domain": "ghcci.com"
+    },
+    {
+     "name": "Gilbane",
+     "booth": "410",
+     "id": "x-gilbane",
+     "domain": "gilbaneco.com"
+    },
+    {
+     "name": "Greenwood Homes",
+     "booth": "406"
+    },
+    {
+     "name": "Harkins Builders",
+     "booth": "113",
+     "id": "x-harkins-builders",
+     "domain": "harkinsbuilders.com"
+    },
+    {
+     "name": "Haskell",
+     "booth": "501",
+     "id": "x-haskell",
+     "domain": "haskell.com"
+    },
+    {
+     "name": "Hazen and Sawyer",
+     "booth": "209",
+     "id": "x-hazen-and-sawyer",
+     "domain": "hazenandsawyer.com"
+    },
+    {
+     "name": "Helix Electric",
+     "booth": "212",
+     "id": "x-helix-electric",
+     "domain": "helixelectric.com"
+    },
+    {
+     "name": "Henderson Inc",
+     "booth": "710",
+     "id": "x-henderson-inc",
+     "domain": "hendersoninc.com"
+    },
+    {
+     "name": "Hensel Phelps",
+     "booth": "109",
+     "id": "x-hensel-phelps",
+     "domain": "henselphelps.com"
+    },
+    {
+     "name": "HITT Contracting",
+     "booth": "802",
+     "id": "x-hitt-contracting",
+     "domain": "hitt.com"
+    },
+    {
+     "name": "Hoar Construction",
+     "booth": "411",
+     "id": "x-hoar-construction",
+     "domain": "hoar.com"
+    },
+    {
+     "name": "Hoffman & Hoffman",
+     "booth": "605",
+     "id": "x-hoffman-and-hoffman",
+     "domain": "hoffman-hoffman.com"
+    },
+    {
+     "name": "Holder Construction",
+     "booth": "803",
+     "id": "x-holder-construction",
+     "domain": "holderconstruction.com"
+    },
+    {
+     "name": "Hourigan",
+     "booth": "102",
+     "id": "x-hourigan",
+     "domain": "hourigan.group"
+    },
+    {
+     "name": "I. L. Long Construction",
+     "booth": "510"
+    },
+    {
+     "name": "Innovative Refrigeration Systems",
+     "id": "x-innovative-refrigeration-systems",
+     "domain": "r717.net"
+    },
+    {
+     "name": "Jamerson Lewis Construction",
+     "booth": "708",
+     "id": "x-jamerson-lewis-construction",
+     "domain": "jamersonlewis.com"
+    },
+    {
+     "name": "JCM Associates",
+     "booth": "409",
+     "id": "x-jcm-associates",
+     "domain": "gojcm.com"
+    },
+    {
+     "name": "JE Dunn Construction",
+     "booth": "205",
+     "id": "x-je-dunn-construction",
+     "domain": "jedunn.com"
+    },
+    {
+     "name": "KBS Inc",
+     "booth": "602",
+     "id": "x-kbs-inc",
+     "domain": "kbsgc.com"
+    },
+    {
+     "name": "Kjellstrom + Lee",
+     "booth": "704",
+     "id": "x-kjellstrom-lee",
+     "domain": "kjellstromandlee.com"
+    },
+    {
+     "name": "Kokosing",
+     "booth": "110",
+     "id": "x-kokosing",
+     "domain": "kokosing.biz"
+    },
+    {
+     "name": "L.F. Jennings",
+     "booth": "1002",
+     "id": "x-l-f-jennings",
+     "domain": "lfjennings.com"
+    },
+    {
+     "name": "Lithko Contracting",
+     "booth": "308",
+     "id": "x-lithko-contracting",
+     "domain": "lithko.com"
+    },
+    {
+     "name": "Manganaro",
+     "booth": "610",
+     "id": "x-manganaro",
+     "domain": "manganaro.com"
+    },
+    {
+     "name": "Mark Turner Construction",
+     "booth": "608",
+     "id": "x-mark-turner-construction",
+     "domain": "markturnerconstruction.com"
+    },
+    {
+     "name": "Martin Horn",
+     "id": "x-martin-horn",
+     "domain": "martinhorn.com"
+    },
+    {
+     "name": "MBP",
+     "booth": "505",
+     "id": "x-mbp",
+     "domain": "mbpce.com"
+    },
+    {
+     "name": "MEB",
+     "booth": "100",
+     "id": "x-meb",
+     "domain": "meb.group"
+    },
+    {
+     "name": "Miller Construction Services",
+     "booth": "407"
+    },
+    {
+     "name": "Miller Electric Company",
+     "booth": "607",
+     "id": "x-miller-electric-company",
+     "domain": "mecojax.com"
+    },
+    {
+     "name": "Momentum Earthworks",
+     "booth": "403",
+     "id": "x-momentum-earthworks",
+     "domain": "momentumearthworks.com"
+    },
+    {
+     "name": "Moore's Electrical & Mechanical",
+     "booth": "206",
+     "id": "x-moore-s-electrical-and-mechanical",
+     "domain": "mooreselectrical.com"
+    },
+    {
+     "name": "New Dominion Construction",
+     "booth": "201"
+    },
+    {
+     "name": "New South Construction",
+     "id": "x-new-south-construction",
+     "domain": "newsouthconstruction.com"
+    },
+    {
+     "name": "Otis",
+     "booth": "507",
+     "id": "x-otis",
+     "domain": "otis.com"
+    },
+    {
+     "name": "PC Construction",
+     "booth": "312",
+     "id": "x-pc-construction",
+     "domain": "pcconstruction.com"
+    },
+    {
+     "name": "Performance Contracting",
+     "booth": "112",
+     "id": "x-performance-contracting",
+     "domain": "performancecontracting.com"
+    },
+    {
+     "name": "Pizzano Contractors",
+     "booth": "306"
+    },
+    {
+     "name": "Plano-Coudon",
+     "booth": "207"
+    },
+    {
+     "name": "Precision Walls",
+     "booth": "808",
+     "id": "x-precision-walls",
+     "domain": "precisionwalls.com"
+    },
+    {
+     "name": "Procon Consulting",
+     "booth": "107",
+     "id": "x-procon-consulting",
+     "domain": "proconconsulting.com"
+    },
+    {
+     "name": "R.W. Murray",
+     "booth": "101",
+     "id": "x-r-w-murray",
+     "domain": "rwmurray.com"
+    },
+    {
+     "name": "rand* construction",
+     "booth": "302",
+     "id": "x-rand-construction",
+     "domain": "randcc.com"
+    },
+    {
+     "name": "RK&K",
+     "booth": "103",
+     "id": "x-rkandk",
+     "domain": "rkk.com"
+    },
+    {
+     "name": "Robbins Construction Group",
+     "booth": "310"
+    },
+    {
+     "name": "Rosendin",
+     "booth": "601",
+     "id": "x-rosendin",
+     "domain": "rosendin.com"
+    },
+    {
+     "name": "Ruston Paving",
+     "id": "x-ruston-paving",
+     "domain": "rustonpaving.com"
+    },
+    {
+     "name": "Sargent Corporation",
+     "booth": "503",
+     "id": "x-sargent-corporation",
+     "domain": "sargent.us"
+    },
+    {
+     "name": "Shirley Contracting",
+     "booth": "204",
+     "id": "x-shirley-contracting",
+     "domain": "shirleycontracting.com"
+    },
+    {
+     "name": "Skanska",
+     "booth": "806",
+     "id": "x-skanska",
+     "domain": "skanska.com"
+    },
+    {
+     "name": "Southland Concrete",
+     "booth": "300"
+    },
+    {
+     "name": "Southland Industries",
+     "booth": "104",
+     "id": "x-southland-industries",
+     "domain": "southlandind.com"
+    },
+    {
+     "name": "Swinerton",
+     "booth": "111",
+     "id": "x-swinerton",
+     "domain": "swinerton.com"
+    },
+    {
+     "name": "T5 Data Centers",
+     "booth": "307",
+     "id": "x-t5-data-centers",
+     "domain": "t5datacenters.com"
+    },
+    {
+     "name": "Terra Site Constructors",
+     "booth": "208",
+     "id": "x-terra-site-constructors",
+     "domain": "terrasiteco.com"
+    },
+    {
+     "name": "The Christman Company",
+     "booth": "105",
+     "id": "x-the-christman-company",
+     "domain": "christmanco.com"
+    },
+    {
+     "name": "The NRP Group",
+     "id": "x-the-nrp-group",
+     "domain": "nrpgroup.com"
+    },
+    {
+     "name": "The Old Dominion Group"
+    },
+    {
+     "name": "The Poole and Kent Corporation",
+     "id": "x-poole-and-kent",
+     "domain": "poole-kent.com"
+    },
+    {
+     "name": "TMG Construction"
+    },
+    {
+     "name": "Turner Construction",
+     "id": "x-turner-construction",
+     "domain": "turnerconstruction.com"
+    },
+    {
+     "name": "Ulliman Schutte Construction",
+     "id": "x-ulliman-schutte-construction",
+     "domain": "ullimanschutte.com"
+    },
+    {
+     "name": "W. M. Jordan",
+     "id": "x-w-m-jordan",
+     "domain": "wmjordan.com"
+    },
+    {
+     "name": "Whiting-Turner",
+     "id": "x-whiting-turner",
+     "domain": "whiting-turner.com"
+    },
+    {
+     "name": "William A. Hazel",
+     "id": "x-william-a-hazel",
+     "domain": "wahazel.com"
+    },
+    {
+     "name": "Winmar Construction",
+     "id": "x-winmar-construction",
+     "domain": "winmarconstruction.com"
+    },
+    {
+     "name": "WRA",
+     "id": "x-wra",
+     "domain": "wrallp.com"
+    }
+   ],
+   "term": "Spring 2026"
   }
- ]
+ ],
+ "note": "Spring 2027 dates from VT Career & Professional Development (https://career.vt.edu/resources/career-fairs/), read Nov 7 2026. Employer lists are added when VT posts them on Handshake."
 }
