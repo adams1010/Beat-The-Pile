@@ -16,7 +16,7 @@
 //   GET /sitemap.xml   (→ ?sitemap=1)            → main pages + every company hiring now
 // Bad parameters → 400 with what's wrong. A database problem → 503 (never an empty list that looks like "no jobs").
 import { db } from "../lib/db.js";
-import { FIELDS, INTERN_PG, EARLY_PG, kindOf } from "../lib/fields.js";
+import { FIELDS, FULLTIME_PG, kindOf } from "../lib/fields.js";
 import { COMPANIES } from "../lib/companies.js";
 import { companyPage, radarFor, sitemap } from "../lib/companypage.js";
 import { lookupPlace, geocodeOne, miles } from "../lib/geocode.js";
@@ -74,10 +74,13 @@ async function dots(p, res) {
 }
 
 /** Same major filters as the main list (field / strict ME / companies), as a PostgREST query string tail. */
-// internships = everything that isn't a real early-career title (keeps board-flagged interns); full-time = early-career title, not an internship
-const PG = (s) => encodeURIComponent(`"${s.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`);   // PostgREST: quote values that contain , ( )
-const KIND_Q = { intern: `&or=(title.imatch.${PG(INTERN_PG)},title.not.imatch.${PG(EARLY_PG)})`,
-                 fulltime: `&and=(title.imatch.${PG(EARLY_PG)},title.not.imatch.${PG(INTERN_PG)})`, all: "" };
+// internships = every title that isn't a real early-career full-time title (keeps board-flagged interns);
+// full-time = early-career title and not an internship. One regex, plain filters (no or()/and() quoting).
+const KIND_ON = { intern: `&title=not.imatch.${encodeURIComponent(FULLTIME_PG)}`, fulltime: `&title=imatch.${encodeURIComponent(FULLTIME_PG)}`, all: "" };
+// Safety net: if the database ever rejects the pattern, this instance stops filtering by kind (rows still carry kind)
+// instead of failing every /jobs load. Logged as [listings] kind filter off.
+let kindOk = true;
+const KIND_Q = new Proxy(KIND_ON, { get: (t, k) => (kindOk ? t[k] : "") });
 const withKind = (rows) => rows.map((l) => ({ ...l, kind: kindOf(l.title) === "fulltime" ? "fulltime" : "intern" }));   // board-flagged interns (BambooHR) stay "intern"
 function majorFilter(p) {
   let q = KIND_Q[p.kind || "intern"];
@@ -235,6 +238,7 @@ export default async function handler(req, res) {
       ...(p.limit != null ? { limit: p.limit, offset: p.offset, more: listings.length === p.limit } : {}) } });
   } catch (e) {
     console.error("[listings]", e);
+    if (kindOk && /imatch|regular expression|PGRST|400/i.test(String(e?.message || e))) { kindOk = false; console.error("[listings] kind filter off"); return handler(req, res); }
     res.setHeader("Cache-Control", "no-store");
     return res.status(503).json({ error: "Couldn't load internships right now — try again in a minute" });
   }
