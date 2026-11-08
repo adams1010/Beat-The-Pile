@@ -6,7 +6,8 @@ const { isEarlyCareer, kindOf, INTERN_PG } = await import("../lib/fields.js");
 const yes = ["Software Engineer, New Grad 2027", "Entry Level Mechanical Engineer", "Associate Engineer", "Mechanical Engineer I", "Analyst I - Finance",
   "Engineering Development Program (EDP)", "Graduate Engineer Trainee", "Early Career Data Scientist", "Junior Accountant", "University Graduate - Hardware Engineer"];
 const no = ["Senior Mechanical Engineer", "Mechanical Engineer II", "Engineering Manager", "Associate Director, Marketing", "Mechanical Engineering Intern",
-  "Principal Analyst", "Graduate Research Assistant", "Staff Engineer", "Software Engineer", "Associate", "Engineer III", "New Grad 2024 Software Engineer", "Lead Technician"];
+  "Principal Analyst", "Graduate Research Assistant", "Staff Engineer", "Software Engineer", "Associate", "Engineer III", "New Grad 2024 Software Engineer", "Lead Technician",
+  "Auto Repair Specialist I", "Automotive Technician (Entry Level)", "Automotive Repair Specialist I, $5,000 Sign-on Bonus", "RIA Associate Regional Consultant - US Wealth, AVP"];   // live CarMax / State Street catches, Nov 8
 for (const t of yes) assert.ok(isEarlyCareer(t), "should be early-career: " + t);
 for (const t of no) assert.ok(!isEarlyCareer(t), "should NOT be early-career: " + t);
 assert.equal(kindOf("Finance Intern"), "intern"); assert.equal(kindOf("Associate Engineer"), "fulltime"); assert.equal(kindOf("Senior Engineer"), null);
