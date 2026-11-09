@@ -40,6 +40,8 @@
   /* Nov 8: the filter box no longer sticks (it covered a third of the screen while scrolling); "Filters ↑" brings you back */
   .controls{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;scroll-margin-top:72px}
   .more{display:flex;justify-content:center;padding:8px 0 4px}
+  .simhead{grid-column:1/-1;background:#fff;border:1px solid var(--line,#DCE2EC);border-radius:12px;padding:12px 16px;font-size:14px}
+  .simhead b{display:block;font-size:15px}.simhead span{color:var(--muted,#55627A)}
   .moreb{font:inherit;font-size:14px;font-weight:600;color:var(--green);background:#fff;border:1px solid var(--green);border-radius:999px;padding:9px 20px;cursor:pointer}
   .moreb:hover{background:var(--green-light)}
   .totop{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));z-index:15;font:inherit;font-size:14px;font-weight:600;
@@ -197,6 +199,7 @@
 </head>
 <body>
 <script src="/nav.js"></script>
+<script src="/jobs/search.js"></script>
 <script src="/resume-file.js"></script>
 <header>
   <div class="wrap">
@@ -429,10 +432,8 @@
   function render(){
     try { renderRails(); } catch (e) { console.error("[jobs] rails", e); }
     if (!state.loaded) return;
-    const q = state.q.toLowerCase();
     const strict = state.meOnly && STRICT_OK();
-    const matches = (j) => (!strict || j.match === "me") &&
-      (!q || (j.company + " " + j.title + " " + j.location).toLowerCase().includes(q));
+    const matches = (j) => !strict || j.match === "me";   // the search words are applied below (jobs/search.js)
     // "Saved" view shows everything you saved, in any state
     const followed = (j) => state.mine.starred.has(j.company_id);
     const newForMe = (j) => followed(j) && state.mine.seenAt && new Date(j.first_seen) > new Date(state.mine.seenAt);
@@ -441,19 +442,26 @@
       ? state.savedRows.filter((j) => state.mine.saved.has(j.id) && matches(j))
       : state.followOnly ? state.followRows.filter((j) => followed(j) && matches(j)).sort((a, b) => newForMe(b) - newForMe(a))
       : state.all.filter((j) => inView(j) && matches(j));
+    // Search: jobs that fit every word first; if only a few, similar roles after them (never a dead end).
+    const S = window.btpJobSearch ? btpJobSearch.rank(filtered, state.q, { field: (j) => FIELD_NAME[j.field] || "" })
+      : { exact: filtered.filter((j) => !state.q || (j.company + " " + j.title + " " + j.location).toLowerCase().includes(state.q.toLowerCase())), similar: [], terms: null };
     const fresh = state.followRows.filter(newForMe).length;
     $("followN").textContent = state.mine.starred.size ? `(${state.mine.starred.size})` : "";
     $("alert").innerHTML = fresh && !state.followOnly ? `<button class="alert" id="alertBtn"><span>${fresh} new internship${fresh > 1 ? "s" : ""} from companies you follow</span><span>See →</span></button>` : "";
 
     // Same company + same title = one card. Different places become "N locations" with a list of each one's own link.
-    const groups = new Map();
-    for (const j of filtered) {
-      const k = (j.company + "|" + niceTitle(j.title)).toLowerCase().replace(/\s+/g, " ");
-      const site = { id: j.id, loc: cleanLocation(j), url: j.url };
-      if (groups.has(k)) { const g = groups.get(k); g.count++; g.ids.push(j.id); if (!g.sites.some((x) => x.loc === site.loc)) g.sites.push(site); }
-      else groups.set(k, { ...j, count: 1, ids: [j.id], sites: [site] });
-    }
-    const rows = [...groups.values()];
+    const group = (list) => { const groups = new Map();
+      for (const j of list) {
+        const k = (j.company + "|" + niceTitle(j.title)).toLowerCase().replace(/\s+/g, " ");
+        const site = { id: j.id, loc: cleanLocation(j), url: j.url };
+        if (groups.has(k)) { const g = groups.get(k); g.count++; g.ids.push(j.id); if (!g.sites.some((x) => x.loc === site.loc)) g.sites.push(site); }
+        else groups.set(k, { ...j, count: 1, ids: [j.id], sites: [site] });
+      }
+      return [...groups.values()]; };
+    const rows = group(S.exact);
+    const exactKeys = new Set(rows.map((j) => (j.company + "|" + niceTitle(j.title)).toLowerCase().replace(/\s+/g, " ")));
+    const simRows = group(S.similar).filter((j) => !exactKeys.has((j.company + "|" + niceTitle(j.title)).toLowerCase().replace(/\s+/g, " ")));
+    if (simRows.length) simRows[0]._simFirst = true;
     const has = (list, j) => j.ids.some((id) => state.mine[list].has(id));
     $("savedN").textContent = state.mine.saved.size ? `(${state.mine.saved.size})` : "";
     const nm = state.near && !state.savedOnly && !state.followOnly ? state.nearMeta : null;
@@ -474,22 +482,25 @@
     const where = state.savedOnly ? "saved" : state.followOnly ? "you follow" : state.near && !state.company ? `within ${state.near.mi} mi of ${state.near.q}` : state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
     $("count").textContent = rows.length
       ? `${rows.length} ${state.kind === "fulltime" ? "full-time job" : state.kind === "all" ? "job" : "internship"}${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"} ${where}` +
-        (state.savedOnly || state.followOnly ? "" : ` · ${MAJOR_LABEL()}`) + (state.partial && !state.savedOnly && !state.followOnly ? " so far · loading the rest…" : "")
-      : "";
+        (state.savedOnly || state.followOnly ? "" : ` · ${MAJOR_LABEL()}`) + (simRows.length ? ` · plus ${simRows.length} similar` : "") + (state.partial && !state.savedOnly && !state.followOnly ? " so far · loading the rest…" : "")
+      : simRows.length ? `${simRows.length} similar ${state.kind === "fulltime" ? "job" : state.kind === "all" ? "job" : "internship"}${simRows.length === 1 ? "" : "s"} ${where}` : "";
 
     renderMailme(rows.length);
-    if (!rows.length && state.partial && !state.savedOnly && !state.followOnly){   // don't say "nothing found" until every page is in
+    const allMaj = state.major !== "all" && !state.savedOnly && !state.followOnly && !state.company;
+    const widen = allMaj ? ` <button class="linkbtn" id="qAllMaj">Search every major</button>` : "";
+    if (!rows.length && !simRows.length && state.partial && !state.savedOnly && !state.followOnly){   // don't say "nothing found" until every page is in
       $("list").innerHTML = '<div class="skel"></div><div class="skel"></div>'; $("count").textContent = "Searching every listing…"; syncUrl(); return;
     }
-    if (!rows.length){
+    if (!rows.length && !simRows.length){
       $("list").innerHTML = state.followOnly
         ? `<div class="empty">${state.user ? "Follow companies with ☆ on any internship (or in Career Fair Mode). New postings from them show up here first." : "Sign in to follow companies and get alerted when they post."}</div>`
         : state.savedOnly
         ? `<div class="empty">Nothing saved yet. Tap ♡ Save on any internship to keep it here.${state.user ? "" : " No account needed; sign in later to keep it on every device."}</div>`
-        : `<div class="empty">No matches ${where}${state.all.length ? " for these filters" : " right now"}. ${state.all.length ? `<button class="linkbtn" id="resetF">Reset filters</button>` : "New postings are pulled from company boards every few hours."}</div>`;
+        : `<div class="empty">No matches ${where}${state.all.length ? " for these filters" : " right now"}.${state.q ? " Try fewer or simpler words." : ""}${widen} ${state.all.length ? `<button class="linkbtn" id="resetF">Reset filters</button>` : "New postings are pulled from company boards every few hours."}</div>`;
       return;
     }
-    const tpl = (j) => `
+    const simHead = () => `<div class="simhead"><b>${rows.length ? "Similar roles" : `No exact matches for “${esc(state.q)}”`}</b><span>${rows.length ? "These fit some of your words." : "Here are the closest roles. They fit some of your words."}${widen}</span></div>`;
+    const tpl = (j) => (j._simFirst ? simHead() : "") + `
       <article class="card${has("applied", j) ? " applied" : ""}${j.closed ? " closed" : ""}">
         <a class="lg" href="${coHref(j)}" aria-hidden="true" tabindex="-1" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</a>
         <div style="min-width:0">
@@ -513,8 +524,8 @@
     // A filter change starts over at the top page; re-renders from Save/Apply clicks keep what you've already scrolled through.
     const sig = [state.kind, state.major, state.q, state.st === "ALL" ? "ALL" : state.st.join(","), state.near?.q, state.near?.mi, state.meOnly, state.savedOnly, state.followOnly, state.company].join("|");
     if (sig !== LIST.sig) { LIST.sig = sig; LIST.shown = PAGE; }
-    LIST.rows = rows; LIST.tpl = tpl;
-    $("list").innerHTML = companyHeader(rows) + rows.slice(0, LIST.shown).map(tpl).join("") + moreHtml();
+    LIST.rows = rows.concat(simRows); LIST.tpl = tpl;
+    $("list").innerHTML = companyHeader(rows) + LIST.rows.slice(0, LIST.shown).map(tpl).join("") + moreHtml();
     watchMore();
   }
   const PAGE = 40, LIST = { sig: null, shown: PAGE, rows: [], tpl: null, io: null };
@@ -561,7 +572,7 @@
     document.querySelectorAll("[data-kind]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.kind === state.kind)));
     const co = (p.get("company") || "").toLowerCase(); state.company = /^[a-z0-9-]{2,80}$/.test(co) ? co : null;   // from the Radar: one company
     const mj = (p.get("major") || "").toLowerCase();
-    state.major = MAJOR_KEYS.includes(mj) ? mj : state.meOnly ? "mechanical" : defaultMajor();   // old ?me=1 links still work
+    state.major = MAJOR_KEYS.includes(mj) ? mj : state.meOnly ? "mechanical" : p.get("q") ? "all" : defaultMajor();   // old ?me=1 links still work; a search link looks at every major
     state.q = (p.get("q") || "").slice(0, 80); $("q").value = state.q;
     if (state.q && !p.get("state")) state.st = "ALL";              // a search link (e.g. from the Radar) looks nationwide
     state.savedOnly = p.get("view") === "saved"; state.followOnly = p.get("view") === "following";
@@ -581,6 +592,7 @@
     if (e.target.closest("#goAll")) { $("stateSel").value = ""; setView("ALL", null); }
     const ns = e.target.closest("[data-near-st]"); if (ns) { $("stateSel").value = ns.dataset.nearSt; $("stateSel").classList.add("on"); setView([ns.dataset.nearSt], null); }
     if (e.target.closest("#resetF")) resetFilters();
+    if (e.target.closest("#qAllMaj")) { $("majorSel").value = "all"; $("majorSel").dispatchEvent(new Event("change")); }
     if (e.target.closest("#allCos")) { state.company = null; state.q = ""; $("q").value = ""; loadScope(); }
   });
   // ── "Within N mi of a city" (api/listings?near=; lib/geocode.js). Picking a state turns it off, and the other way round. ──

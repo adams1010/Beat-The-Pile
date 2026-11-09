@@ -104,12 +104,12 @@ const DM={fontVariantNumeric:"tabular-nums"};   // numbers line up; no "terminal
 
 // Homepage feature cards: each gets a small drawn preview of the real screen. Content is illustrative → labeled "Example".
 const FEATURES=[
-  {k:"tailor",name:"Tailor resume",t:"Fit your resume to one posting.",d:"See what to lead with, which words they use, and honest gaps. Nothing invented.",h:"/jobs/"},
+  {k:"tailor",name:"Resume builder",t:"Build your resume, then fit it.",d:"A starter resume from your answers, then see what to lead with for one posting. Nothing invented.",h:"/#resumebuilder",pg:"resumebuilder"},
   {k:"alerts",name:"Weekly alerts",t:"New jobs, once a week.",d:"Pick a major and states. One email when something new opens, none when nothing does.",h:"/jobs/"},
   {k:"radar",name:"Opening Radar",t:"Know the week they open.",d:"Estimates from past seasons, with a reminder a week before.",h:"/radar/"},
   {k:"fair",name:"Career Fair Mode",t:"Walk in with a route.",d:"Booths, open roles, a QR resume and follow-ups in one place.",h:"/fair/"},
   {k:"season",name:"My Season",t:"Every application, one board.",d:"Saved, applied, interviewing, offer. Plus a weekly goal and follow-up nudges.",h:"/season/"},
-  {k:"interview",name:"Interview practice",t:"Talk it out. Get a grade.",d:"Answer out loud against a timer, get scored on every answer and a letter grade at the end.",h:"/#interview"},
+  {k:"interview",name:"Interview practice",t:"Talk it out. Get a grade.",d:"Answer out loud against a timer, get scored on every answer and a letter grade at the end.",h:"/#interview",pg:"interview"},
 ];
 function FeatViz({k}){
   const box={background:"#fff",border:"1px solid #DCE2EC",borderRadius:10,boxShadow:"0 6px 18px rgba(10,20,38,.06)"};
@@ -180,6 +180,8 @@ const D_NEAR=(v)=>/^\d{5}$/.test(v)||/^[A-Za-z .'-]{2,30},\s*[A-Za-z]{2}$/.test(
 function LandingD({onQuiz,onPage}){
   const [sum,setSum]=React.useState(null),[sumErr,setSumErr]=React.useState(false),[fresh,setFresh]=React.useState(null);
   const [q,setQ]=React.useState(""),[where,setWhere]=React.useState(""),[near,setNear]=React.useState(null);
+  const [found,setFound]=React.useState(null);   // founding members: real count from /api/me?founding=1 (lib/founding.js)
+  React.useEffect(()=>{fetch("/api/me?founding=1").then(r=>r.ok?r.json():null).then(d=>{if(d&&typeof d.left==="number")setFound(d);}).catch(()=>{});},[]);
   React.useEffect(()=>{   // "City, ST" (or a 5-digit ZIP) in the location box → live "N within 50 mi" on the map
     const z=where.trim(); if(!D_NEAR(z)){setNear(null);return;}
     let live=true; const t=setTimeout(()=>{fetch(`/api/listings?near=${encodeURIComponent(z)}&mi=50&field=all&limit=1&offset=0`).then(r=>r.ok?r.json():Promise.reject(r.status)).then(d=>{if(live)setNear({meta:d.meta});}).catch(()=>{if(live)setNear({bad:true});});},250);
@@ -191,7 +193,7 @@ function LandingD({onQuiz,onPage}){
     (pre.sum||get("/api/listings?summary=1")).then(setSum).catch(()=>setSumErr(true));
     (pre.fresh||get("/api/listings?field=all&limit=80")).then(d=>{const co=new Set(),out=[];for(const l of d.listings||[]){if(co.has(l.company))continue;co.add(l.company);out.push(l);if(out.length===5)break;}setFresh(out);}).catch(()=>setFresh([]));
   },[]);
-  const go=(e)=>{e.preventDefault();analytics.track("home_search",{has_query:!!q.trim(),has_state:!!where.trim()});const p=new URLSearchParams();if(q.trim())p.set("q",q.trim());
+  const go=(e)=>{e.preventDefault();analytics.track("home_search",{has_query:!!q.trim(),has_state:!!where.trim()});const p=new URLSearchParams();if(q.trim()){p.set("q",q.trim());p.set("major","all");}
     const w=where.trim().toLowerCase();
     if(!D_ISSTATE(w)&&D_NEAR(w)){p.set("near",where.trim());p.set("mi","50");p.set("major","all");analytics.track("home_search_zip");location.href="/jobs/?"+p.toString();return;}
     const code=/^[a-z]{2}$/.test(w)?w.toUpperCase():(D_STATES[w]||null);
@@ -225,6 +227,7 @@ function LandingD({onQuiz,onPage}){
             {pills.map(k=><a key={k} href={`/jobs/?major=${k}&state=all`} style={{fontSize:13,color:"#CFD7E6",textDecoration:"none",border:"1px solid #22304D",padding:"6px 12px",borderRadius:999}}>{D_FIELD[k].split(" & ")[0]}</a>)}
           </div>
           <p style={{fontSize:13,color:"#8D9AB3",marginTop:18}}>Free · no account needed to browse · <button onClick={onQuiz} style={{background:"none",border:0,padding:0,color:"#B0F701",cursor:"pointer",font:"inherit",fontWeight:600}}>2-minute match quiz</button> · <a href="/demo/" style={{color:"#B0F701",fontWeight:600,textDecoration:"none"}}>90-second demo</a></p>
+          {found&&found.left>0&&<p style={{fontSize:13.5,color:"#CFD7E6",marginTop:10,display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><span style={{fontWeight:600,color:"#B0F701",...DM}}>{found.left} of {found.total} founding spots left</span><span>The first {found.total} students keep every Pro feature free, for life.</span><a href="/start/" style={{color:"#B0F701",fontWeight:600,textDecoration:"none"}}>Claim yours →</a></p>}
         </div>
         <div style={{position:"relative",flex:"1 1 340px",maxWidth:560,minWidth:0,width:"100%"}}>
           <HeroMap near={near} fresh={fresh} sum={sum}/>
@@ -234,19 +237,8 @@ function LandingD({onQuiz,onPage}){
     </section>
 
     <main style={{...wrap,paddingTop:40,paddingBottom:64,display:"flex",flexDirection:"column",gap:40}}>
-      <section aria-labelledby="how-h">
-        <h2 id="how-h" style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:"0 0 16px",color:"#060A2C"}}>How a job gets here</h2>
-        <div className="d-grid3">
-          {[["1","Straight from the company",`We read ${sum?fmt(sum.companies):"thousands of"} company job boards directly, every few hours. Not scraped job sites, not reposts.`],
-            ["2","Proven to be theirs","A board only counts when we can prove it belongs to that company: their own website links to it, or the board itself names them."],
-            ["3","You apply on their site","Every Apply button goes to the employer. When they take a job down, it drops off here too."]].map(([n,t,d])=>(
-            <div key={n} style={{...card,borderRadius:12,padding:20,display:"flex",gap:14}}>
-              <span aria-hidden="true" style={{width:32,height:32,borderRadius:"50%",background:"#F2FADF",color:"#4A7000",fontWeight:600,display:"grid",placeItems:"center",flexShrink:0,...DM}}>{n}</span>
-              <div><p style={{fontSize:16,fontWeight:600,margin:"4px 0 6px",color:"#060A2C"}}>{t}</p><p style={{fontSize:14,lineHeight:1.5,color:"#55627A",margin:0}}>{d}</p></div></div>))}
-        </div>
-      </section>
       <section>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#060A2C"}}>Explore by major</h2><a href="/jobs/?major=all&state=all" style={{fontSize:14,color:"#4A7000",textDecoration:"none",fontWeight:500}}>Every major →</a></div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#060A2C"}}>Explore by major</h2><a href="/majors/" style={{fontSize:14,color:"#4A7000",textDecoration:"none",fontWeight:500}}>Every major →</a></div>
         <div className="d-grid4">
           {(fields||Object.keys(D_FIELD).slice(0,8).map(k=>[k,null])).map(([k,n])=>(
             <a key={k} href={`/jobs/?major=${k}&state=all`} style={{...card,borderRadius:12,textDecoration:"none",color:"#060A2C",padding:18,display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}><span style={{fontWeight:500}}>{D_FIELD[k]}</span><span style={{...DM,fontSize:13,color:"#55627A"}}>{n==null?"":fmt(n)}</span></a>))}
@@ -266,10 +258,10 @@ function LandingD({onQuiz,onPage}){
       </section>}
 
       <section>
-        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#060A2C"}}>Everything after you find the job</h2><a href="/demo/" style={{fontSize:14,color:"#4A7000",textDecoration:"none",fontWeight:500}}>See it in the 2-minute tour →</a></div>
+        <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#060A2C"}}>What we offer</h2><a href="/demo/" style={{fontSize:14,color:"#4A7000",textDecoration:"none",fontWeight:500}}>See it in the 2-minute tour →</a></div>
         <div className="d-grid3">
           {FEATURES.map(f=>(
-            <a key={f.k} href={f.h} onClick={f.h==="/#interview"?(e)=>{e.preventDefault();onPage("interview");}:undefined} className="d-feat" style={{...card,textDecoration:"none",color:"#060A2C",display:"flex",flexDirection:"column",overflow:"hidden"}}>
+            <a key={f.k} href={f.h} onClick={f.pg?(e)=>{e.preventDefault();onPage(f.pg);window.scrollTo(0,0);}:undefined} className="d-feat" style={{...card,textDecoration:"none",color:"#060A2C",display:"flex",flexDirection:"column",overflow:"hidden"}}>
               <div aria-hidden="true" style={{background:"#F6F8FB",borderBottom:"1px solid #EEF1F6",height:150,position:"relative",display:"grid",placeItems:"center",padding:16}}>
                 <FeatViz k={f.k}/>
               </div>
@@ -2239,6 +2231,13 @@ function App(){
     }
   }
   // Quiz-step resume uploader — writes to ans.resume so the AI can use it for personalized reasoning
+  // Quiz resume step: once a resume is in (upload or saved one), show "Got it" for a moment, then go to the next question.
+  function pickQuizResume(text,name){
+    setAns(p=>({...p,resume:text,resumeName:name||"Your saved resume",needsResumeBuilder:false}));
+    if(editStep!==null)return;
+    const from=step;
+    setTimeout(()=>{setStep(cur=>{if(cur!==from)return cur;const ni=nextStepIndex(from);if(ni<0){setPage("emailgate");return cur;}return ni;});},700);
+  }
   async function handleQuizResumeUpload(fileList){
     setResumeUploadErr("");
     const file=fileList&&fileList[0];
@@ -2248,7 +2247,7 @@ function App(){
     try{
       const text=await extractTextFromFile(file);
       if(!text||text.length<40){throw new Error("Couldn't read much text from that file. Try a PDF exported from Word or Google Docs.");}
-      setA("resume",text);setA("resumeName",file.name);
+      pickQuizResume(text,file.name);
       analytics.track("resume_uploaded",{type:file.name.split(".").pop().toLowerCase(),chars:text.length,where:"quiz"});
     }catch(e){
       setResumeUploadErr(String(e.message||e));
@@ -3279,7 +3278,7 @@ function App(){
                 <input type="file" accept=".pdf,.txt,.docx" onChange={e=>{handleQuizResumeUpload(e.target.files);e.target.value="";}} style={{display:"none"}}/>
               </label>
               {(profile.resumes||[]).filter(r=>r.text).length>0&&(
-                <button onClick={()=>{const r=(profile.resumes||[]).find(x=>x.text);if(r)setA("resume",r.text);}} style={{flex:"0 1 auto",background:"#fff",border:`1.5px solid ${GM}`,color:GD,padding:"12px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13.5,fontWeight:700,whiteSpace:"nowrap"}}>↳ Use saved resume</button>
+                <button onClick={()=>{const r=(profile.resumes||[]).find(x=>x.text);if(r)pickQuizResume(r.text,r.file?.name||r.name||"Your saved resume");}} style={{flex:"0 1 auto",background:"#fff",border:`1.5px solid ${GM}`,color:GD,padding:"12px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13.5,fontWeight:700,whiteSpace:"nowrap"}}>↳ Use saved resume</button>
               )}
             </div>
 
@@ -3862,6 +3861,12 @@ Thank you for your time,
             </div>
           )}
 
+          {!builderState.text&&!builderState.loading&&!ans.major&&(
+            <div style={{background:"#F8FAFC",border:"1px solid #DCE2EC",borderRadius:var_rl,padding:"14px 16px",marginBottom:12}}>
+              <p style={{fontSize:14,fontWeight:700,color:"#060A2C",marginBottom:4}}>Start with the 2-minute quiz</p>
+              <p style={{fontSize:13,color:"#4A5568",lineHeight:1.5,marginBottom:10}}>Your major, school, skills and activities fill in the resume. Without them it'd be mostly blanks.</p>
+              <button onClick={()=>{setStep(0);setPage("quiz");window.scrollTo(0,0);}} style={{background:G,border:"none",color:"#fff",padding:"10px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700}}>Take the quiz →</button>
+            </div>)}
           {!builderState.text&&!builderState.loading&&(
             <button onClick={buildStarterResume} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"15px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
               Build my starter resume

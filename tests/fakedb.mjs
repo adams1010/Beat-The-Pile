@@ -86,8 +86,13 @@ export function installFake({ jwk, anthropic, clerkUsers = {} } = {}) {
   globalThis.fetch = async (u, o = {}) => {
     u = String(u); const m = (o.method || "GET").toUpperCase();
     if (u.startsWith("https://api.clerk.com/v1/jwks")) return resp(200, { keys: jwk ? [jwk] : [] });
+    // Clerk user list (oldest first = the order clerkUsers was written in) and server-only public metadata
+    if (u.startsWith("https://api.clerk.com/v1/users?")) { calls.clerkList = (calls.clerkList || 0) + 1;
+      return resp(200, Object.entries(clerkUsers).map(([id, em]) => ({ id, unsafe_metadata: em?.role ? { role: em.role } : {}, public_metadata: em?.public || {} }))); }
+    if (/^https:\/\/api\.clerk\.com\/v1\/users\/[^/]+\/metadata$/.test(u) && m === "PATCH") { const id = decodeURIComponent(u.split("/").slice(-2)[0]);
+      const em = clerkUsers[id]; if (!em || typeof em !== "object") return resp(404, {}); em.public = { ...(em.public || {}), ...JSON.parse(o.body).public_metadata }; return resp(200, { id }); }
     if (u.startsWith("https://api.clerk.com/v1/users/")) { const id = decodeURIComponent(u.split("/").pop()); const em = clerkUsers[id];
-      if (em && typeof em === "object") return resp(200, { id, first_name: em.first_name || null, last_name: em.last_name || null, unsafe_metadata: em.role ? { role: em.role } : {},
+      if (em && typeof em === "object") return resp(200, { id, first_name: em.first_name || null, last_name: em.last_name || null, unsafe_metadata: em.role ? { role: em.role } : {}, public_metadata: em.public || {},
         email_addresses: [{ email_address: em.email, verification: { status: "verified" } }] });
       return em ? resp(200, { email_addresses: [{ email_address: em, verification: { status: "verified" } }] }) : resp(404, {}); }
     if (u.startsWith("https://api.resend.com/emails")) { calls.emails = calls.emails || []; const b = JSON.parse(o.body); calls.emails.push(b);

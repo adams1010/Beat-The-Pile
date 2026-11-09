@@ -48,6 +48,7 @@ import { orbitFor } from "../lib/orbit.js";
 import { orbitExtras, orbitAction, deleteOrbitData } from "../lib/orbitnet.js";
 import { bizAction, publicCompany, isVerifiedEmployer } from "../lib/employer.js";
 import { cleanInternship, internPeers } from "../lib/internship.js";
+import { foundingCount, foundingFor } from "../lib/founding.js";
 import { talentFor, roleOf } from "../lib/talent.js";
 
 const LISTS = ["saved", "applied"];
@@ -217,14 +218,15 @@ async function clerkUser(uid) {
 async function publicProfile(req, res) {
   const h = String(req.query.u || "").toLowerCase();
   if (!HANDLE_OK.test(h)) return res.status(404).json({ error: "No profile here" });
-  const rows = await db.selectAsAdmin(`user_jobs?select=profile,handle,profile_public,resume_token,resume_share,resume_path&handle=eq.${encodeURIComponent(h)}&limit=1`);
+  const rows = await db.selectAsAdmin(`user_jobs?select=clerk_user_id,profile,handle,profile_public,resume_token,resume_share,resume_path&handle=eq.${encodeURIComponent(h)}&limit=1`);
   const r = rows[0];
   if (!r || r.profile_public !== true || !r.profile) return res.status(404).json({ error: "No profile here" });
   const p = cleanProfile(r.profile);          // re-cleaned on the way out, too
   const resume = p.showResume && r.resume_path && r.resume_share === true && r.resume_token ? `/r/${r.resume_token}` : null;
   delete p.showResume; delete p.openToEmployers;
   res.setHeader("Cache-Control", "public, max-age=60");
-  return res.status(200).json({ handle: r.handle, profile: p, resume });
+  const founding = await foundingFor(r.clerk_user_id).catch(() => null);
+  return res.status(200).json({ handle: r.handle, profile: p, resume, founding });
 }
 async function unsubscribe(req, res) {
   const t = String(req.query.unsub || "");
@@ -268,6 +270,11 @@ export default async function handler(req, res) {
       res.setHeader("Cache-Control", "public, max-age=120"); return res.status(200).json(c);
     } catch { return res.status(503).json({ error: "Company pages are temporarily unavailable" }); }
   }
+  // Founding members counter (homepage, /start/): real count of student sign-ups, capped at 150
+  if (req.method === "GET" && req.query?.founding !== undefined) {
+    try { res.setHeader("Cache-Control", "public, max-age=120"); return res.status(200).json(await foundingCount()); }
+    catch { return res.status(503).json({ error: "Founding count unavailable right now" }); }
+  }
   if (req.method === "GET" && req.query?.u !== undefined) {
     try { return await publicProfile(req, res); } catch { return res.status(503).json({ error: "Profiles are temporarily unavailable" }); }
   }
@@ -302,7 +309,7 @@ export default async function handler(req, res) {
   const stop = (error, status = 400) => ({ error, status });
 
   try {
-    if (req.method === "GET") return res.status(200).json(view(await loadRow(uid)));
+    if (req.method === "GET") return res.status(200).json({ ...view(await loadRow(uid)), founding: await foundingFor(uid).catch(() => null) });
     if (req.method !== "POST") return res.status(405).json({ error: "GET or POST" });
 
     let body = req.body;

@@ -98,6 +98,7 @@
   .qrbox svg{width:220px;height:220px}
   /* Nov 8 engagement pass: open-to badges, season strip, strength ring, visibility panel, highlights */
   .opento{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .founding{display:inline-block;margin:6px 0 0;font-size:12.5px;font-weight:600;color:#4A7000;background:#F2FADF;border:1px solid #DDF3A8;border-radius:999px;padding:3px 10px}
   .orbitact{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}.orbitact:empty{display:none}
   .orbitact .btn{margin:0}
   .tagio{font-size:13px;font-weight:600;color:#4A7000;background:#F2FADF;border:1px solid #DDF3A8;border-radius:999px;padding:6px 12px}
@@ -238,7 +239,7 @@
 
   const seenMe = () => { try { return !!localStorage.getItem("btp_me"); } catch { return false; } };
   // ── Public view (anyone, no sign-in) ──
-  function profileHtml(p, resume, isPreview){
+  function profileHtml(p, resume, isPreview, founding){
     const where = [p.school, p.major, p.gradYear ? "Class of " + p.gradYear : ""].filter(Boolean).join(" · ");
     const links = [["linkedin","LinkedIn"],["github","GitHub"],["portfolio","Portfolio"]].filter(([k]) => safeUrl(p.links?.[k]))
       .map(([k, t]) => `<a class="btn" href="${esc(p.links[k])}" target="_blank" rel="noopener nofollow ugc">${t} ↗</a>`).join("");
@@ -251,6 +252,7 @@
         <div class="toprow">${p.photo && /^data:image\/(jpeg|png|webp);base64,/.test(p.photo) ? `<img class="avatar" src="${esc(p.photo)}" alt="${esc(p.name || "Profile photo")}">` : `<div class="avatar" aria-hidden="true">${esc(initials(p.name))}</div>`}
         ${isPreview ? `<div class="own"><button type="button" data-tab="edit">Edit profile</button>${S.me && S.me.handle && S.me.profilePublic ? `<button type="button" id="shareP">Share</button><button type="button" id="qrP" title="A QR code recruiters can scan at a career fair">QR</button>` : ""}</div>` : ""}</div>
         <h1>${esc(p.name || "Your name")}</h1>
+        ${founding ? `<p class="founding" title="One of the first 150 students on Beat the Pile">Founding member #${+founding}</p>` : ""}
         ${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
         <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}</div>
         ${(p.openTo || []).length ? `<div class="opento">${p.openTo.map((k) => `<span>Open to ${esc(OPEN_TO[k] || k)}</span>`).join("")}</div>` : ""}
@@ -276,7 +278,7 @@
     if (r.status === 404) { document.querySelector("main").innerHTML = `<div class="card center"><h1 style="font-size:22px">No public profile here</h1><p class="muted">This student hasn't made a profile public, or the link changed.</p><a class="btn pri" href="/u/">Make your own profile</a></div>`; return; }
     const d = await r.json();
     document.title = (d.profile.name || "Profile") + " — Beat the Pile";
-    document.querySelector("main").innerHTML = profileHtml(d.profile, d.resume, false);
+    document.querySelector("main").innerHTML = profileHtml(d.profile, d.resume, false, d.founding);
     orbitButtons(d.handle, d.profile.name);
     $("#rep")?.addEventListener("click", (e) => { e.preventDefault(); window.iqReport ? window.iqReport({ message: "Report profile /u/" + d.handle + "\n" }) : alert("Use the Feedback button to report."); });
   }
@@ -295,7 +297,7 @@
     app.className = "";
     document.querySelector("main").innerHTML = `
       ${S.tab === "preview" ? "" : `<div class="edhead"><button type="button" class="linkbtn" data-tab="preview">← Back to profile</button><b>Edit profile</b><span style="width:110px"></span></div>`}
-      ${S.tab === "preview" ? profileHtml(d.p, resumeOn && d.p.showResume ? "/r/" + me.resume.token : null, true) : `
+      ${S.tab === "preview" ? profileHtml(d.p, resumeOn && d.p.showResume ? "/r/" + me.resume.token : null, true, me.founding) : `
       <section class="card fill" id="fill"><div class="fi">${FILE_IC}</div><div style="flex:1;min-width:0"><h2 style="margin:0 0 2px">Fill your profile from your resume</h2>
         <p class="small muted" style="margin:0">Upload your resume (PDF or Word) and we'll fill in your school, major, experience, projects, skills and links. Nothing is saved until you check it and tap Save profile.</p></div>
         <label class="btn pri" style="cursor:pointer;margin:0;flex-shrink:0">Upload resume<input type="file" id="fillRes" accept="${btpResumeFile.accept}" style="position:absolute;left:-9999px"></label></section>

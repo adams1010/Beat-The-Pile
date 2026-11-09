@@ -1,4 +1,4 @@
-/* built from src/home.jsx 1d0ee88293297f05 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 38983571d23dc6ff — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -408,10 +408,11 @@ const DM = {
 };
 const FEATURES = [{
   k: "tailor",
-  name: "Tailor resume",
-  t: "Fit your resume to one posting.",
-  d: "See what to lead with, which words they use, and honest gaps. Nothing invented.",
-  h: "/jobs/"
+  name: "Resume builder",
+  t: "Build your resume, then fit it.",
+  d: "A starter resume from your answers, then see what to lead with for one posting. Nothing invented.",
+  h: "/#resumebuilder",
+  pg: "resumebuilder"
 }, {
   k: "alerts",
   name: "Weekly alerts",
@@ -441,7 +442,8 @@ const FEATURES = [{
   name: "Interview practice",
   t: "Talk it out. Get a grade.",
   d: "Answer out loud against a timer, get scored on every answer and a letter grade at the end.",
-  h: "/#interview"
+  h: "/#interview",
+  pg: "interview"
 }];
 function FeatViz({
   k
@@ -991,6 +993,12 @@ function LandingD({
   const [q, setQ] = React.useState(""),
     [where, setWhere] = React.useState(""),
     [near, setNear] = React.useState(null);
+  const [found, setFound] = React.useState(null);
+  React.useEffect(() => {
+    fetch("/api/me?founding=1").then(r => r.ok ? r.json() : null).then(d => {
+      if (d && typeof d.left === "number") setFound(d);
+    }).catch(() => {});
+  }, []);
   React.useEffect(() => {
     const z = where.trim();
     if (!D_NEAR(z)) {
@@ -1041,7 +1049,10 @@ function LandingD({
       has_state: !!where.trim()
     });
     const p = new URLSearchParams();
-    if (q.trim()) p.set("q", q.trim());
+    if (q.trim()) {
+      p.set("q", q.trim());
+      p.set("major", "all");
+    }
     const w = where.trim().toLowerCase();
     if (!D_ISSTATE(w) && D_NEAR(w)) {
       p.set("near", where.trim());
@@ -1293,7 +1304,30 @@ function LandingD({
       fontWeight: 600,
       textDecoration: "none"
     }
-  }, "90-second demo"))), React.createElement("div", {
+  }, "90-second demo")), found && found.left > 0 && React.createElement("p", {
+    style: {
+      fontSize: 13.5,
+      color: "#CFD7E6",
+      marginTop: 10,
+      display: "flex",
+      gap: 8,
+      alignItems: "center",
+      flexWrap: "wrap"
+    }
+  }, React.createElement("span", {
+    style: {
+      fontWeight: 600,
+      color: "#B0F701",
+      ...DM
+    }
+  }, found.left, " of ", found.total, " founding spots left"), React.createElement("span", null, "The first ", found.total, " students keep every Pro feature free, for life."), React.createElement("a", {
+    href: "/start/",
+    style: {
+      color: "#B0F701",
+      fontWeight: 600,
+      textDecoration: "none"
+    }
+  }, "Claim yours \u2192"))), React.createElement("div", {
     style: {
       position: "relative",
       flex: "1 1 340px",
@@ -1314,57 +1348,7 @@ function LandingD({
       flexDirection: "column",
       gap: 40
     }
-  }, React.createElement("section", {
-    "aria-labelledby": "how-h"
-  }, React.createElement("h2", {
-    id: "how-h",
-    style: {
-      fontSize: 24,
-      fontWeight: 600,
-      letterSpacing: "-0.02em",
-      margin: "0 0 16px",
-      color: "#060A2C"
-    }
-  }, "How a job gets here"), React.createElement("div", {
-    className: "d-grid3"
-  }, [["1", "Straight from the company", `We read ${sum ? fmt(sum.companies) : "thousands of"} company job boards directly, every few hours. Not scraped job sites, not reposts.`], ["2", "Proven to be theirs", "A board only counts when we can prove it belongs to that company: their own website links to it, or the board itself names them."], ["3", "You apply on their site", "Every Apply button goes to the employer. When they take a job down, it drops off here too."]].map(([n, t, d]) => React.createElement("div", {
-    key: n,
-    style: {
-      ...card,
-      borderRadius: 12,
-      padding: 20,
-      display: "flex",
-      gap: 14
-    }
-  }, React.createElement("span", {
-    "aria-hidden": "true",
-    style: {
-      width: 32,
-      height: 32,
-      borderRadius: "50%",
-      background: "#F2FADF",
-      color: "#4A7000",
-      fontWeight: 600,
-      display: "grid",
-      placeItems: "center",
-      flexShrink: 0,
-      ...DM
-    }
-  }, n), React.createElement("div", null, React.createElement("p", {
-    style: {
-      fontSize: 16,
-      fontWeight: 600,
-      margin: "4px 0 6px",
-      color: "#060A2C"
-    }
-  }, t), React.createElement("p", {
-    style: {
-      fontSize: 14,
-      lineHeight: 1.5,
-      color: "#55627A",
-      margin: 0
-    }
-  }, d)))))), React.createElement("section", null, React.createElement("div", {
+  }, React.createElement("section", null, React.createElement("div", {
     style: {
       display: "flex",
       justifyContent: "space-between",
@@ -1381,7 +1365,7 @@ function LandingD({
       color: "#060A2C"
     }
   }, "Explore by major"), React.createElement("a", {
-    href: "/jobs/?major=all&state=all",
+    href: "/majors/",
     style: {
       fontSize: 14,
       color: "#4A7000",
@@ -1511,7 +1495,7 @@ function LandingD({
       margin: 0,
       color: "#060A2C"
     }
-  }, "Everything after you find the job"), React.createElement("a", {
+  }, "What we offer"), React.createElement("a", {
     href: "/demo/",
     style: {
       fontSize: 14,
@@ -1524,9 +1508,10 @@ function LandingD({
   }, FEATURES.map(f => React.createElement("a", {
     key: f.k,
     href: f.h,
-    onClick: f.h === "/#interview" ? e => {
+    onClick: f.pg ? e => {
       e.preventDefault();
-      onPage("interview");
+      onPage(f.pg);
+      window.scrollTo(0, 0);
     } : undefined,
     className: "d-feat",
     style: {
@@ -5660,6 +5645,27 @@ function App() {
       setResumeUploading(false);
     }
   }
+  function pickQuizResume(text, name) {
+    setAns(p => ({
+      ...p,
+      resume: text,
+      resumeName: name || "Your saved resume",
+      needsResumeBuilder: false
+    }));
+    if (editStep !== null) return;
+    const from = step;
+    setTimeout(() => {
+      setStep(cur => {
+        if (cur !== from) return cur;
+        const ni = nextStepIndex(from);
+        if (ni < 0) {
+          setPage("emailgate");
+          return cur;
+        }
+        return ni;
+      });
+    }, 700);
+  }
   async function handleQuizResumeUpload(fileList) {
     setResumeUploadErr("");
     const file = fileList && fileList[0];
@@ -5674,8 +5680,7 @@ function App() {
       if (!text || text.length < 40) {
         throw new Error("Couldn't read much text from that file. Try a PDF exported from Word or Google Docs.");
       }
-      setA("resume", text);
-      setA("resumeName", file.name);
+      pickQuizResume(text, file.name);
       analytics.track("resume_uploaded", {
         type: file.name.split(".").pop().toLowerCase(),
         chars: text.length,
@@ -8582,7 +8587,7 @@ function App() {
     })), (profile.resumes || []).filter(r => r.text).length > 0 && React.createElement("button", {
       onClick: () => {
         const r = (profile.resumes || []).find(x => x.text);
-        if (r) setA("resume", r.text);
+        if (r) pickQuizResume(r.text, r.file?.name || r.name || "Your saved resume");
       },
       style: {
         flex: "0 1 auto",
@@ -10614,7 +10619,46 @@ Thank you for your time,
       style: {
         color: "#6B7280"
       }
-    }, "(none listed)")))), !builderState.text && !builderState.loading && React.createElement("button", {
+    }, "(none listed)")))), !builderState.text && !builderState.loading && !ans.major && React.createElement("div", {
+      style: {
+        background: "#F8FAFC",
+        border: "1px solid #DCE2EC",
+        borderRadius: var_rl,
+        padding: "14px 16px",
+        marginBottom: 12
+      }
+    }, React.createElement("p", {
+      style: {
+        fontSize: 14,
+        fontWeight: 700,
+        color: "#060A2C",
+        marginBottom: 4
+      }
+    }, "Start with the 2-minute quiz"), React.createElement("p", {
+      style: {
+        fontSize: 13,
+        color: "#4A5568",
+        lineHeight: 1.5,
+        marginBottom: 10
+      }
+    }, "Your major, school, skills and activities fill in the resume. Without them it'd be mostly blanks."), React.createElement("button", {
+      onClick: () => {
+        setStep(0);
+        setPage("quiz");
+        window.scrollTo(0, 0);
+      },
+      style: {
+        background: G,
+        border: "none",
+        color: "#fff",
+        padding: "10px 16px",
+        borderRadius: var_r,
+        cursor: "pointer",
+        fontFamily: "var(--font)",
+        fontSize: 14,
+        fontWeight: 700
+      }
+    }, "Take the quiz \u2192")), !builderState.text && !builderState.loading && React.createElement("button", {
       onClick: buildStarterResume,
       style: {
         width: "100%",

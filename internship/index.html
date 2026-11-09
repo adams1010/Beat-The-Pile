@@ -23,7 +23,7 @@
   .phases button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;cursor:pointer;color:var(--muted)}
   .phases button[aria-pressed=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
   .phases button.now::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--lime);margin-left:6px;vertical-align:1px}
-  .ck{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid #EEF1F6;cursor:pointer}.ck:first-of-type{border-top:0}
+  .ck{font-weight:400;margin:0;display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid #EEF1F6;cursor:pointer}.ck:first-of-type{border-top:0}
   .ck input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--green);flex-shrink:0;cursor:pointer}
   .ck b{display:block;font-size:14.5px;font-weight:600}.ck span{display:block;font-size:13px;color:var(--muted)}
   .ck.done b{color:var(--muted);text-decoration:line-through}
@@ -35,7 +35,7 @@
   .bul li{margin:6px 0}
   .peers .it{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #EEF1F6;text-decoration:none;color:inherit}.peers .it:first-child{border-top:0}
   .peers .av{width:38px;height:38px;font-size:13px}.peers b{display:block;font-size:14px}.peers span{font-size:12.5px;color:var(--muted)}
-  .sw{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;margin-top:12px}.sw input{width:auto;margin-top:3px;accent-color:var(--green)}
+  .sw{font-weight:400;display:flex;gap:10px;align-items:flex-start;font-size:13.5px;margin-top:12px}.sw input{width:auto;margin-top:3px;accent-color:var(--green)}
   .offer{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 14px}
   .offer button{font:inherit;text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;cursor:pointer}
   .offer button:hover{border-color:var(--green)}.offer button b{display:block;font-size:14px}.offer button span{font-size:12.5px;color:var(--muted)}
@@ -228,7 +228,7 @@
   async function loadPeers(){
     const el = $("#peers"); if (!el) return;
     if (LOCAL) { el.innerHTML = `<p class="empty">Available once My Internship is fully set up.</p>`; return; }
-    try { PEERS = PEERS || await biz.api({ action: "intern_peers" }); }
+    try { PEERS = PEERS || await biz.api({ action: "intern_peers" }); PEERS = { alumni: PEERS?.alumni || [], incoming: PEERS?.incoming || [] }; }
     catch { el.innerHTML = `<p class="empty">Couldn't load right now.</p>`; return; }
     const row = (p, sub) => `<a class="it" href="/u/${encodeURIComponent(p.handle)}"><div class="av">${p.photo ? `<img alt="" src="${esc(p.photo)}">` : esc(initials(p.name))}</div><div><b>${esc(p.name)}</b><span>${esc(sub)}</span></div></a>`;
     el.innerHTML = `<h3 style="font-size:13.5px;margin:4px 0">Interned there before</h3>${PEERS.alumni.length ? PEERS.alumni.map((p) => row(p, [p.role, p.when].filter(Boolean).join(" · "))).join("") : `<p class="empty">No one with a public profile yet.</p>`}

@@ -43,7 +43,10 @@
     $("#s1").className = "on"; $("#s2").className = "";
     $("#view").innerHTML = `<h1>Beat the pile. <em>Start here.</em></h1>
       <p class="lead">${pre === "employer" ? "Sign in or create your company account. Next you'll set up your company and confirm your work email." : "Enter your email to sign in or create a free account. Students and companies both start here."}</p>
+      ${pre === "employer" ? "" : `<p class="lead" id="found" hidden></p>`}
       <div class="panel"><div id="signin"></div></div>`;
+    if (pre !== "employer") fetch("/api/me?founding=1").then((r) => r.ok ? r.json() : null).then((d) => { const el = $("#found");   // real count (lib/founding.js)
+      if (el && d && d.left > 0) { el.innerHTML = `<b style="color:#4A7000">${+d.left} of ${+d.total} founding spots left.</b> The first ${+d.total} students keep every Pro feature free, for life.`; el.hidden = false; } }).catch(() => {});
     try { C.mountSignIn($("#signin"), { forceRedirectUrl: location.href, signUpForceRedirectUrl: location.href, withSignUp: true }); }
     catch { $("#signin").innerHTML = `<button class="btn" id="si" style="font:inherit;font-weight:600;background:#4A7000;color:#fff;border:0;border-radius:999px;padding:12px 24px;cursor:pointer">Continue with email</button>`; $("#si").onclick = () => C.openSignIn({}); }
   }

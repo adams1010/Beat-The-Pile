@@ -7,7 +7,7 @@ import { discoverOne } from "../lib/discover.js";
 import { db, isAuthorizedCron } from "../lib/db.js";
 import { botOn, logRun } from "../lib/bots.js";
 import { mapLimit, get } from "../lib/http.js";
-import { SIMPLIFY_URL, pickCompanies, normName, keyFor } from "../lib/simplify.js";
+import { SIMPLIFY_URL, SIMPLIFY_NEWGRAD_URL, pickCompanies, normName, keyFor } from "../lib/simplify.js";
 import BACKLOG from "../data/backlog.json" with { type: "json" };
 
 export const config = { maxDuration: 60 };
@@ -16,7 +16,10 @@ const PER_RUN = 60;               // most checks finish in a few seconds (queued
 const START_BUDGET_MS = 22000;   // don't start a company after this
 const HARD_STOP_MS = 50000;      // give up on any company still running (Vercel kills the function at 60s)
 const READERS_UPDATED_AT = "2026-11-07T06:00:00Z";   // bump when a new reader ships → re-test companies parked before it
-const RETRY_AFTER_DAYS = 14;
+// Failed checks are retried after 14 days — 7 in peak hiring season (Aug–Feb), when boards fill up fast — up to 6 tries.
+const inSeason = (d = new Date()) => { const m = d.getUTCMonth(); return m >= 7 || m <= 1; };
+const RETRY_AFTER_DAYS = inSeason() ? 7 : 14;
+const MAX_TRIES = 6;
 
 export default async function handler(req, res) {
   if (!isAuthorizedCron(req)) return res.status(401).json({ error: "Unauthorized" });
@@ -37,8 +40,16 @@ export default async function handler(req, res) {
       const boards = new Set(COMPANIES.map(boardKey));
       for (const x of rows) if (x.ats && x.config) boards.add(boardKey({ ats: x.ats, ...x.config }));
       const fresh = pickCompanies(listings, names, boards, { anyMajor: true });   // all majors (Nov 2026)
+      // + the new-grad list (Nov 9). A failure there never costs the internship import.
+      let ng = [];
+      try {
+        const r2 = await get(SIMPLIFY_NEWGRAD_URL, { timeoutMs: 20000 });
+        if (r2.ok) { for (const f of fresh) names.add(normName(f.company));
+          ng = pickCompanies(await r2.json(), names, boards, { newGrad: true }); }
+      } catch (e) { console.error("[import new-grad]", e.message); }
+      fresh.push(...ng);
       for (let i = 0; i < fresh.length; i += 200) await db.insertIgnore("company_candidates", fresh.slice(i, i + 200));
-      await logRun("import", true, fresh.length ? `Found ${fresh.length} new companies: ${fresh.slice(0, 5).map((f) => f.company).join(", ")}${fresh.length > 5 ? "…" : ""}` : "No new companies today", { imported: fresh.length });
+      await logRun("import", true, fresh.length ? `Found ${fresh.length} new companies: ${fresh.slice(0, 5).map((f) => f.company).join(", ")}${fresh.length > 5 ? "…" : ""}` : "No new companies today", { imported: fresh.length, newGrad: ng.length });
       return res.status(200).json({ imported: fresh.length, companies: fresh.slice(0, 50).map((f) => f.company) });
     } catch (e) {
       await logRun("import", false, "Import failed: " + String(e.message || e).slice(0, 150));
@@ -92,10 +103,10 @@ export default async function handler(req, res) {
   for (const r of liveRows) if (r.ats && r.config) taken.set(boardKey({ ats: r.ats, ...r.config }), r.id);
 
   if (mark("taken")) return res.status(200).json({ marks });
-  // 3) Next batch: never-tried first; failures get retried after 2 weeks (max 4 tries)
+  // 3) Next batch: never-tried first; failures get retried after RETRY_AFTER_DAYS (max MAX_TRIES tries)
   const cutoff = new Date(Date.now() - RETRY_AFTER_DAYS * 86400000).toISOString();
   const rows = await db.selectAsAdmin(
-    `company_candidates?select=*&or=(status.eq.pending,and(status.in.(error,blocked,no_board,board_error),checked_at.lt.${cutoff},attempts.lt.4))` +
+    `company_candidates?select=*&or=(status.eq.pending,and(status.in.(error,blocked,no_board,board_error),checked_at.lt.${cutoff},attempts.lt.${MAX_TRIES}))` +
     `&order=priority.desc,checked_at.asc.nullsfirst&limit=${Math.min(+req.query?.n || PER_RUN, PER_RUN)}`
   );
 
@@ -108,7 +119,7 @@ export default async function handler(req, res) {
     const left = t0 + HARD_STOP_MS - Date.now();
     try {
       r = await Promise.race([discoverOne(c, { deadline }),
-        new Promise((ok) => setTimeout(() => ok({ status: "no_board", detail: "Careers site too slow to check — retried in 2 weeks" }), left))]);
+        new Promise((ok) => setTimeout(() => ok({ status: "no_board", detail: `Careers site too slow to check — retried in ${RETRY_AFTER_DAYS} days` }), left))]);
     }
     catch (e) { r = { status: "error", detail: String(e.message || e).slice(0, 300) }; }
 

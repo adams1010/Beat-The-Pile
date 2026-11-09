@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Every major — Beat the Pile</title>
+<meta name="description" content="Pick your major and see real internships for it, pulled straight from each company's own job board. Over 100 majors.">
+<link rel="canonical" href="https://www.beatthepile.com/majors/">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#060A2C">
+<style>
+  /* /majors/ (Nov 9): "Every major" from the homepage. 109 quiz majors → /jobs field keys. MAP is generated from
+     lib/geo.js fieldsForMajor (tests/majors-page-test.mjs fails if they drift). First field = where the major opens. */
+  :root{--green:#4A7000;--navy:#060A2C;--ink:#060A2C;--muted:#55627A;--line:#DCE2EC;--bg:#EEF1F6;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5}
+  main{max-width:1100px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px))}
+  h1{font-size:30px;letter-spacing:-.02em;margin:4px 0 6px}
+  h2{font-size:19px;margin:28px 0 12px}
+  .lead{color:var(--muted);margin:0 0 18px;max-width:62ch}
+  .search{display:flex;gap:8px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:6px;max-width:620px}
+  .search input{flex:1;min-width:0;border:0;font:inherit;font-size:16px;padding:10px 12px;outline:none;background:transparent}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px}
+  .f{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;text-decoration:none;color:inherit;display:flex;justify-content:space-between;gap:10px;align-items:center}
+  .f:hover,.mj:hover{border-color:var(--green)}
+  .f b{font-weight:600}.n{font-variant-numeric:tabular-nums;color:var(--muted);font-size:13.5px;white-space:nowrap}
+  .mjs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+  .mj{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  .mj a.go{color:var(--ink);text-decoration:none;font-weight:600;display:block}
+  .mj .also{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .mj .also a{color:var(--green);text-decoration:none}
+  .letter{grid-column:1/-1;font-size:13px;color:var(--muted);font-weight:600;margin:8px 0 0}
+  .empty{color:var(--muted)}
+  .all{display:inline-block;margin-top:12px;color:var(--green);font-weight:600;text-decoration:none}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main">
+  <h1>Pick your major</h1>
+  <p class="lead">Tap your major to see internships that fit it. Many majors fit more than one area, so we show where else to look too.</p>
+  <form class="search" role="search" onsubmit="return false"><input id="q" type="search" placeholder="Search majors, like nursing or finance" aria-label="Search majors" autocomplete="off"></form>
+  <a class="all" href="/jobs/?major=all&amp;state=all" data-pick="all">Or see every internship, all majors →</a>
+  <h2>Your major</h2>
+  <div class="mjs" id="mjs"></div>
+  <h2>Or browse by area</h2>
+  <div class="grid" id="areas"></div>
+</main>
+<script>
+(() => {
+  const AREAS = [["eng","All engineering"],["mechanical","Mechanical & Aerospace"],["electrical","Electrical & Computer Eng."],["civil","Civil, Construction & Architecture"],["chemical","Chemical & Materials"],["industrial","Industrial & Manufacturing"],
+    ["software","Software & Computer Science"],["data","Data & AI"],["cyber_it","Cybersecurity & IT"],["product_design","Product & Design"],["finance","Finance, Accounting & Insurance"],["consulting","Consulting & Strategy"],
+    ["marketing","Marketing, Media & Communications"],["sales","Sales & Business Development"],["supply_chain","Supply Chain, Operations & Projects"],["people_hr","HR & People"],["science_health","Science, Health & Environment"],
+    ["legal_policy","Legal, Policy & Government"],["education_social","Education & Social Impact"],["other","Other / general"]];
+  const LABEL = Object.fromEntries(AREAS);
+  const MAP = {"Accounting": ["finance", "consulting"], "Actuarial Science": ["data", "finance"], "Advertising": ["marketing"], "Aerospace Engineering": ["mechanical", "eng"], "Agricultural Science": ["science_health"], "Animation": ["product_design"], "Anthropology": ["people_hr", "education_social"], "Applied Mathematics": ["data"], "Architecture": ["civil"], "Art History": ["education_social", "legal_policy", "marketing"], "Artificial Intelligence": ["software", "data"], "Astronomy": ["science_health"], "Athletic Training": ["science_health"], "Biochemistry": ["science_health"], "Bioinformatics": ["data", "science_health"], "Biology": ["science_health"], "Biomedical Engineering": ["mechanical", "electrical", "science_health", "eng"], "Business Administration": ["consulting", "sales", "marketing", "supply_chain", "finance"], "Business Analytics": ["data", "consulting", "sales", "marketing", "supply_chain", "finance"], "Chemical Engineering": ["chemical", "eng"], "Chemistry": ["science_health"], "Civil Engineering": ["civil", "eng"], "Classics": ["education_social", "legal_policy"], "Cognitive Science": ["science_health"], "Communications": ["marketing"], "Computer Engineering": ["electrical", "eng"], "Computer Science": ["software", "data"], "Construction Management": ["civil"], "Criminal Justice": ["legal_policy"], "Culinary Arts": ["marketing", "education_social"], "Cybersecurity": ["cyber_it", "data"], "Dance": ["marketing", "education_social"], "Data Science": ["data"], "Dental (Pre-Dental)": ["science_health"], "Early Childhood Education": ["education_social"], "Economics": ["finance", "consulting"], "Education": ["education_social"], "Electrical Engineering": ["electrical", "eng"], "English / Literature": ["marketing"], "Entrepreneurship": ["consulting", "sales", "marketing", "supply_chain", "finance"], "Environmental Engineering": ["civil", "eng"], "Environmental Science": ["science_health"], "Exercise Science / Kinesiology": ["science_health"], "Fashion Design": ["product_design"], "Film & Television": ["marketing"], "Finance": ["finance", "consulting"], "Fine Arts": ["product_design"], "Food Science": ["science_health"], "Forensic Science": ["science_health"], "Game Design": ["software", "data", "product_design"], "Geography": ["science_health", "civil"], "Geology": ["science_health"], "Graphic Design": ["product_design"], "Health Sciences": ["science_health"], "History": ["education_social", "legal_policy"], "Hospitality Management": ["consulting", "sales", "marketing", "supply_chain", "finance"], "Human Resources": ["people_hr"], "Industrial Design": ["product_design"], "Industrial Engineering": ["industrial", "supply_chain", "eng"], "Information Systems": ["cyber_it", "data"], "Information Technology": ["cyber_it", "data"], "Interior Design": ["product_design"], "International Business": ["consulting", "sales", "marketing", "supply_chain", "finance"], "International Relations": ["legal_policy", "education_social"], "Journalism": ["marketing"], "Law (Pre-Law)": ["legal_policy"], "Liberal Arts": ["education_social", "legal_policy"], "Linguistics": ["marketing"], "Management": ["consulting", "sales", "marketing", "supply_chain", "finance"], "Management Information Systems": ["cyber_it", "data"], "Marketing": ["marketing"], "Materials Science": ["chemical", "mechanical", "eng"], "Mathematics": ["data"], "Mechanical Engineering": ["mechanical", "eng"], "Medicine (Pre-Med)": ["science_health"], "Microbiology": ["science_health"], "Music": ["marketing", "education_social"], "Music Production": ["marketing"], "Neuroscience": ["science_health"], "Nursing": ["science_health"], "Nutrition & Dietetics": ["science_health"], "Occupational Therapy": ["science_health"], "Operations Management": ["supply_chain", "industrial"], "Pharmacy (Pre-Pharmacy)": ["science_health"], "Philosophy": ["legal_policy"], "Photography": ["product_design"], "Physical Therapy": ["science_health"], "Physician Assistant (Pre-PA)": ["science_health"], "Physics": ["science_health"], "Political Science": ["legal_policy"], "Psychology": ["people_hr", "education_social", "science_health"], "Public Health": ["science_health"], "Public Policy": ["legal_policy"], "Public Relations": ["marketing"], "Real Estate": ["finance", "consulting"], "Religious Studies": ["education_social", "legal_policy"], "Robotics": ["mechanical", "eng"], "Social Work": ["people_hr", "education_social"], "Sociology": ["people_hr", "education_social"], "Software Engineering": ["software", "data", "eng"], "Spanish": ["education_social", "legal_policy"], "Sports Management": ["consulting", "sales", "marketing", "supply_chain", "finance"], "Statistics": ["data"], "Supply Chain Management": ["supply_chain", "industrial"], "Sustainability": ["science_health", "civil"], "Theater Arts": ["marketing", "education_social"], "Urban Planning": ["civil"], "Veterinary (Pre-Vet)": ["science_health"], "Women's & Gender Studies": ["education_social", "legal_policy"]};
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const href = (k) => `/jobs/?major=${k}&state=all`;
+  let counts = null;
+  let EN = true; try { EN = !localStorage.getItem("btp_lang") || localStorage.getItem("btp_lang") === "en"; } catch {}   // A–Z letters only make sense in English order
+  const n = (k) => { if (!counts) return ""; const v = k === "eng" ? ["mechanical","electrical","civil","chemical","industrial","engineering"].reduce((s, x) => s + (counts[x] || 0), 0) : counts[k]; return v ? `${Number(v).toLocaleString()} open` : ""; };
+  function areas(){ document.getElementById("areas").innerHTML = AREAS.map(([k, l]) => `<a class="f" href="${href(k)}" data-pick="${k}"><b>${esc(l)}</b><span class="n">${n(k)}</span></a>`).join(""); }
+  function majors(){
+    const raw = document.getElementById("q").value.trim().toLowerCase();
+    const words = raw.split(/\s+/).filter(Boolean);
+    const list = Object.keys(MAP).filter((m) => !words.length || words.every((w) => m.toLowerCase().includes(w) || MAP[m].some((k) => (LABEL[k] || "").toLowerCase().includes(w))));
+    let last = "";
+    document.getElementById("mjs").innerHTML = list.length ? list.map((m) => {
+      const [first, ...rest] = MAP[m], L = m[0].toUpperCase(); const head = !words.length && EN && L !== last ? `<p class="letter" data-noi18n>${L}</p>` : ""; last = L;
+      const also = rest.filter((k) => k !== "eng" && LABEL[k]).slice(0, 3);
+      return `${head}<div class="mj"><a class="go" href="${href(first)}" data-pick="${first}">${esc(m)}</a>${also.length ? `<div class="also">Also: ${also.map((k) => `<a href="${href(k)}" data-pick="${k}">${esc(LABEL[k])}</a>`).join(" · ")}</div>` : ""}</div>`;
+    }).join("") : `<p class="empty">No major matches that. Try a shorter word, or <a href="/jobs/?major=all&amp;state=all" data-pick="all">see every internship</a>.</p>`;
+  }
+  // Remember the choice the same way /jobs does, so the jobs page opens on it next time.
+  document.addEventListener("click", (e) => { const a = e.target.closest("[data-pick]"); if (a) try { localStorage.setItem("btp_major", a.dataset.pick); } catch {} });
+  document.getElementById("q").addEventListener("input", majors);
+  areas(); majors();
+  fetch("/api/listings?summary=1").then((r) => r.ok ? r.json() : null).then((d) => { if (d?.byField) { counts = d.byField; areas(); } }).catch(() => {});
+})();
+</script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>
