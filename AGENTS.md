@@ -60,11 +60,13 @@ profile from your resume" → `/api/generate` feature `profile_fill` (copy-only 
 experience/projects/skills, and keeps the file in the kit (`resumes.list[].file` = name/size/pages/kind). Photo upload has a
 crop + zoom dialog. The Orbit/Talent tab badge (`orbit_count` = unread + requests, "10+") loads on every page, re-checks every 30 s
 and on tab focus; nav.js loads Clerk itself on pages that don't, if this browser was signed in before.
-**Spanish (Nov 8):** `nav.js` loads **`/i18n.js`**; Tools ▾ → Language (and a Language card on `/u/`) sets localStorage `btp_lang`
-(`en`|`es`). In Spanish it swaps whole text nodes / placeholder / aria-label / title that exactly match an English key in
-**`i18n/es.json`** (`strings`), plus `patterns` for numbers ("12 open"), and "·"-joined parts one by one; a MutationObserver
-covers later renders. Employer data (titles, companies, places) is never in the dictionary. **New UI text? Add its Spanish to
-`i18n/es.json`** (`tests/i18n-test.mjs`). Wrap anything that must not change in `data-noi18n`.
+**Languages (Nov 8): English, Español, Français, Deutsch, Nederlands.** `nav.js` loads **`/i18n.js`**; the account menu (your picture) →
+Language (and a Language card on `/u/`) sets localStorage `btp_lang` (`en`|`es`|`fr`|`de`|`nl`). Non-English swaps whole text nodes /
+placeholder / aria-label / title that exactly match an English key in **`i18n/<lang>.json`** (`strings`, ~1,090 keys, same keys in
+all four), plus `patterns` for numbers/names ("12 open", "Ana wants to join your orbit"; captured parts are translated too), and
+"·"-joined parts one by one; a MutationObserver covers later renders. Employer data (titles, companies, places) is never in the
+dictionary. **New UI text? Add it to all four files** (`tests/i18n-test.mjs` fails if a language is missing a key or pattern).
+Wrap anything that must not change in `data-noi18n`.
 **Two sides (Nov 8): students + employers.** After sign-in everyone picks a role once — `/start/` (step 1 Clerk email box, step 2
 "I'm looking for an internship" / "I'm hiring interns") or the welcome sheet `nav.js` shows to a signed-in account with no role.
 Saved in Clerk `unsafeMetadata.role` (`student`|`employer`) + localStorage `btp_role`. **The business side is its own site (Nov 8):**

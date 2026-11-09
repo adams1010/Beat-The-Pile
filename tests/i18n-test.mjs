@@ -16,4 +16,13 @@ assert.equal(one("Lockheed Martin"), null, "company names are data");
 const js = fs.readFileSync(new URL("../i18n.js", import.meta.url), "utf8");
 assert.ok(/localStorage\.getItem\("btp_lang"\)/.test(js) && /data-noi18n/.test(js));
 assert.ok(fs.readFileSync(new URL("../nav.js", import.meta.url), "utf8").includes('"/i18n.js"'), "nav loads i18n on every page");
-console.log(`✓ i18n: ${Object.keys(S).length} Spanish strings + ${P.length} patterns; data (titles, companies) untouched`);
+// Nov 8: French, German, Dutch — the same keys and patterns as Spanish, every value filled, every pattern compiles.
+for (const l of ["fr", "de", "nl"]) {
+  const x = JSON.parse(fs.readFileSync(new URL(`../i18n/${l}.json`, import.meta.url), "utf8"));
+  const missing = Object.keys(S).filter((k) => !(k in x.strings)); assert.deepEqual(missing, [], `${l} missing keys`);
+  for (const [k, v] of Object.entries(x.strings)) assert.ok(typeof v === "string" && v.trim(), `${l}: empty translation for ${k}`);
+  assert.equal(x.patterns.length, d.patterns.length, `${l} pattern count`);
+  x.patterns.forEach(([re], i) => { assert.equal(re, d.patterns[i][0], `${l} pattern ${i} order`); new RegExp(re); });
+}
+assert.ok(/LANGS = \{ en: "English", es: "Español", fr: "Français", de: "Deutsch", nl: "Nederlands" \}/.test(js), "i18n.js knows all five");
+console.log(`✓ i18n: ${Object.keys(S).length} strings + ${P.length} patterns in es/fr/de/nl; data (titles, companies) untouched`);

@@ -28,9 +28,10 @@
   let dict = null, pats = [];
   const SKIP = /^(SCRIPT|STYLE|TEXTAREA|CODE|PRE|NOSCRIPT|SVG)$/;
   // dictionary, then number patterns; a pattern's captured parts are translated too when they're known phrases
-  function one(t) {
+  function one(t, depth = 0) {
     if (dict[t] != null) return dict[t];
-    for (const [re, to] of pats) { const m = t.match(re); if (m) return to.replace(/\$(\d)/g, (_, i) => { const g = m[+i] ?? ""; return dict[g] ?? g; }); }
+    // a pattern's captured parts are translated too ("Found 8 days ago (…)" → the "8 days ago" part by its own pattern)
+    for (const [re, to] of pats) { const m = t.match(re); if (m) return to.replace(/\$(\d)/g, (_, i) => { const g = m[+i] ?? ""; return dict[g] ?? (depth < 2 && g && g !== t ? one(g, depth + 1) : null) ?? g; }); }
     return null;
   }
   function tr(raw) {

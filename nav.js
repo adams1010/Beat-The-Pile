@@ -231,7 +231,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   const paintBadge = (n) => { n = Number(n) || 0;
     nav.querySelectorAll(".btpbadge").forEach((b) => { b.hidden = n <= 0; b.textContent = n >= 10 ? "10+" : String(n); });
     const a = nav.querySelector('.links a[href="/orbit/"],.links a[href="/business/talent/"]');
-    if (a) { const t = a.textContent.trim(); a.setAttribute("aria-label", n > 0 ? `${t}, ${n >= 10 ? "10 or more" : n} new` : t); } };
+    if (a) { const t = (a.querySelector(":scope > span:last-child") || a).textContent.trim(); a.setAttribute("aria-label", n > 0 ? `${t}, ${n >= 10 ? "10 or more" : n} new` : t); } };
   window.btpOrbitBadge = (n) => { try { sessionStorage.setItem("btp_orbit_n", JSON.stringify({ n, at: Date.now() })); } catch {} paintBadge(n); };
   // Checked on every page load (cached 15 s so quick page hops don't re-ask), then every 30 s while the tab is open
   // and visible, and again whenever you come back to the tab — so it shows up without visiting Orbit or refreshing.
