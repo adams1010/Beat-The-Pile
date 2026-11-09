@@ -141,6 +141,7 @@ with the CRON_SECRET. To add a bot: add it to `BOTS` in `lib/bots.js`, check the
 4. The **Company Finder** retries failed checks after 14 days (7 in hiring season Aug–Feb), up to 6 tries; it takes the queue by `priority desc` (ME-heavy ~60–95, other engineering ~20–40, other majors
    <20), finds each company's board (or uses the hint), and **proves** it's theirs before enabling it.
 
+**Website guessing** (`guessDomain`, for Paylocity/UKG boards that name a company but have no website on file): .com, .org, .net, .us, .ai, .io, .co, with and without www (Nov 9: + .org/.net/.us/bare domain), 20 s cap; the page must carry the full name AND link to that exact board — a guessed site linking to some other board is still held back.
 **Proof rules** (`lib/discover.js` verify*): linked from the company's own site; or board name matches the company key
 (≥4 chars, or exact 3-letter key); or most sampled postings name the company as employer (Workday
 `hiringOrganization` 2-of-3, SmartRecruiters company, Jibe `hiring_organization`). iCIMS needs the name in the portal
@@ -179,7 +180,7 @@ nightly SimplifyJobs import takes every major; Radar keeps any company with 5+ p
 Internships stay first, but the readers also keep **early-career full-time** roles: `lib/fields.js isEarlyCareer()` (new grad,
 entry level, early career, rotational / development programs, "Engineer I / Analyst 1", "Associate … Engineer/Analyst", junior …;
 never senior/lead/manager/II+/"N+ years", never internships, years < 2026 dropped). Keyword readers add `EARLY_QUERIES`
-("new grad", "entry level", "graduate") capped at `EARLY_PAGES` (2) pages each, and a failed early search never costs the
+("new grad", "entry level", "graduate", + "associate" since Nov 9 — probed on 26 Workday boards, it roughly doubles the new-grad roles found) capped at `EARLY_PAGES` (2) pages each, and a failed early search never costs the
 internships; Workday adds the same keyword searches after the intern facet; Greenhouse/Lever/Ashby/BambooHR/Paylocity/ADP/UKG
 already read every job. **No new column:** `/api/listings?kind=intern|fulltime|all` (default `intern`, so old pages are unchanged)
 filters with PostgREST `title=imatch.<INTERN_PG>`; every row comes back with `kind`; `summary` keeps `allMajors` = internships and

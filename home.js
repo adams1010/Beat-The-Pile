@@ -1,4 +1,4 @@
-/* built from src/home.jsx c4a8d75fc0436cbd — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx ca9df4d3444933dd — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -944,7 +944,7 @@ function HeroMap({
       fontFamily: "Geist,sans-serif",
       marginBottom: 2
     }
-  }, React.createElement("span", null, "Just found"), React.createElement("span", null, sum ? `${fmt(sum.allMajors)} open · ${fmt(sum.hiringNow)} companies hiring` : "")), (fresh || []).slice(0, 3).map(j => React.createElement("a", {
+  }, React.createElement("span", null, "Just found"), React.createElement("span", null, sum ? `${fmt(sum.allMajors)} internships · ${fmt(sum.fulltime)} jobs · ${fmt(sum.hiringNow)} companies` : "")), (fresh || []).slice(0, 3).map(j => React.createElement("a", {
     key: j.id,
     href: j.url,
     target: "_blank",
