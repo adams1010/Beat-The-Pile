@@ -181,7 +181,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     const box = nav.querySelector("#btpAcct"), si = nav.querySelector("#btpSignIn"); if (!box) return;
     let me = null; try { me = JSON.parse(localStorage.getItem("btp_me") || "null"); } catch {}
     const u = ACCT.user, signedIn = u ? true : u === null ? false : !!me;
-    box.hidden = !signedIn; si.hidden = signedIn || (u === undefined && seenSignIn());
+    box.hidden = !signedIn; si.hidden = signedIn || (u === undefined && seenSignIn()) || path.startsWith("/start");   // already on the sign-in page
     if (!signedIn) return;
     const email = u?.primaryEmailAddress?.emailAddress || "";
     const name = [u?.firstName, u?.lastName].filter(Boolean).join(" ") || (me && me.n) || email.split("@")[0] || "Your account";

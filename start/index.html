@@ -21,7 +21,13 @@
   h1 em{font-style:normal;color:var(--lime)}
   .lead{text-align:center;color:#C9D2E3;margin:0 auto 28px;max-width:52ch}
   .panel{background:#fff;color:var(--ink);border-radius:16px;padding:28px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
-  #signin{display:flex;justify-content:center;min-height:120px}
+  #signin{display:flex;justify-content:center;min-height:120px;width:100%}
+  /* Nov 9: Clerk's own card is ~400px wide with its own shadow; inside our panel on a phone it ran off the right edge.
+     Let it fill the panel, centered, with no second card around it. */
+  #signin .cl-rootBox,#signin .cl-cardBox,#signin .cl-card{width:100%!important;max-width:420px!important;margin:0 auto!important;box-shadow:none!important;border:0!important}
+  #signin .cl-card{padding:0!important;background:transparent!important}
+  #signin .cl-footer{background:transparent!important}
+  @media (max-width:520px){.panel{padding:20px 16px}}
   .center{text-align:center;color:var(--muted)}
   .switch{text-align:center;margin-top:18px;font-size:14px;color:#9FAAC0}.switch a{color:var(--lime)}
 </style>
@@ -47,7 +53,9 @@
       <div class="panel"><div id="signin"></div></div>`;
     if (pre !== "employer") fetch("/api/me?founding=1").then((r) => r.ok ? r.json() : null).then((d) => { const el = $("#found");   // real count (lib/founding.js)
       if (el && d && d.left > 0) { el.innerHTML = `<b style="color:#4A7000">${+d.left} of ${+d.total} founding spots left.</b> The first ${+d.total} students keep every Pro feature free, for life.`; el.hidden = false; } }).catch(() => {});
-    try { C.mountSignIn($("#signin"), { forceRedirectUrl: location.href, signUpForceRedirectUrl: location.href, withSignUp: true }); }
+    try { C.mountSignIn($("#signin"), { forceRedirectUrl: location.href, signUpForceRedirectUrl: location.href, withSignUp: true,
+      appearance: { elements: { rootBox: { width: "100%", maxWidth: "420px", margin: "0 auto" }, cardBox: { width: "100%", maxWidth: "420px", boxShadow: "none", border: "none" },
+        card: { width: "100%", boxShadow: "none", border: "none", padding: "0", background: "transparent" }, footer: { background: "transparent" } } } }); }
     catch { $("#signin").innerHTML = `<button class="btn" id="si" style="font:inherit;font-weight:600;background:#4A7000;color:#fff;border:0;border-radius:999px;padding:12px 24px;cursor:pointer">Continue with email</button>`; $("#si").onclick = () => C.openSignIn({}); }
   }
   function stepRole(C){
