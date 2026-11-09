@@ -113,14 +113,16 @@
       const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) },
         body: JSON.stringify({ action: "talent", q: $("#q").value, major: $("#major").value, school: $("#school").value, gradYear: $("#yr").value }) });
       const j = await r.json().catch(() => ({}));
-      if (r.status === 403) { $("#out").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">Find talent is for employer accounts</h2><p>${esc(j.error || "")}</p><a class="btn lime" href="/start/?role=employer">Switch to an employer account</a></div>`; return; }
+      if (r.status === 403 && j.pending) { $("#out").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">Your company is being verified</h2><p>We check every company before it can search and contact students, usually within a day. Haven't confirmed your work email yet? <a href="/business/setup/">Finish setup</a>.</p><a class="btn lime" href="/business/company/">Build your company page meanwhile</a></div>`; return; }
+      if (r.status === 403) { $("#out").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">Find talent is for employer accounts</h2><p>${esc(j.error || "")}</p><a class="btn lime" href="/start/?role=employer">Set up a company account</a></div>`; return; }
       if (!r.ok) throw new Error(j.error || "Search failed");
       render(j);
     } catch (e) { $("#out").innerHTML = `<div class="card">Couldn't search right now (${esc(e.message)}). Try again in a minute.</div>`; }
   }
   $("#f").addEventListener("submit", (e) => { e.preventDefault(); search(); });
+  { const u = new URLSearchParams(location.search); for (const k of ["q", "major", "school"]) if (u.get(k)) $("#" + k).value = u.get(k).slice(0, 120); }
   async function onUser(u){
-    if (!u) { $("#out").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">Sign in to find talent</h2><p>Create a free employer account to search students by major, school and skills.</p><a class="btn lime" href="/start/?role=employer">Get started</a></div>`; return; }
+    if (!u) { $("#out").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">Sign in to find talent</h2><p>Sign in to your company account to search students by major, school and skills.</p><a class="btn lime" href="/start/?role=employer">Get started</a></div>`; return; }
     search();
   }
   async function loadClerk(){

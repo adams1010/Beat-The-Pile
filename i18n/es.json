@@ -751,7 +751,14 @@
   "Zoom in": "Acercar",
   "Zoom out": "Alejar",
   "Filling in your profile… (about 10 seconds)": "Completando tu perfil… (unos 10 segundos)",
-  "Reading your resume…": "Leyendo tu currículum…"
+  "Reading your resume…": "Leyendo tu currículum…",
+  "Home": "Inicio",
+  "Career Fairs": "Ferias de empleo",
+  "Search students by skill, major or school": "Busca estudiantes por habilidad, carrera o universidad",
+  "Switch account type": "Cambiar tipo de cuenta",
+  "Company page": "Página de la empresa",
+  "How students see your company": "Cómo ven los estudiantes a tu empresa",
+  "Use Beat the Pile as a student instead": "Usar Beat the Pile como estudiante"
  },
  "patterns": [
   [

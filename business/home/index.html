@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Home — Beat the Pile Business</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/business/biz.css">
+<style>
+  /* /business/home/ (Nov 2026): the employer's home. Every number is a live count (biz_home in lib/employer.js). */
+  .layout{display:grid;grid-template-columns:260px minmax(0,1fr) 300px;gap:20px;align-items:start}
+  @media (max-width:1100px){.layout{grid-template-columns:240px minmax(0,1fr)}.right{grid-column:1/-1}}
+  @media (max-width:760px){.layout{grid-template-columns:1fr}}
+  .me{padding:0;overflow:hidden}.me .ban{height:58px;background:var(--navy);border-bottom:3px solid var(--lime)}
+  .me .bd{padding:0 16px 16px}.me .clogo{margin-top:-28px;border:3px solid #fff}
+  .me .co{font-weight:650;font-size:16px;margin-top:8px}.me .who{font-size:13px;color:var(--muted)}
+  .me .st{display:flex;justify-content:space-between;font-size:13px;padding:8px 0;border-top:1px solid #EEF1F6;color:var(--muted)}.me .st b{color:var(--ink)}
+  .bars .b{display:grid;grid-template-columns:minmax(0,1fr) 44px;gap:10px;align-items:center;margin:8px 0;font-size:14px}
+  .bars .b i{display:block;height:8px;border-radius:999px;background:var(--green);margin-top:4px}
+  .bars .b span{font-variant-numeric:tabular-nums;color:var(--muted);text-align:right}
+  .acts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .act{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:14px;text-decoration:none;color:var(--ink);background:#fff}
+  .act:hover{border-color:var(--green)}.act b{display:block;font-size:14px}.act span{font-size:12.5px;color:var(--muted)}
+  .act .ic{width:38px;height:38px;border-radius:10px;background:var(--tint);color:var(--green);display:grid;place-items:center;flex-shrink:0}
+  .todo li{list-style:none;display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid #EEF1F6;font-size:14px}.todo li:first-child{border-top:0}
+  .todo{margin:0;padding:0}.todo i{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex-shrink:0;margin-top:1px}
+  .todo li.done i{background:var(--green);border-color:var(--green)}.todo li.done a{color:var(--muted);text-decoration:line-through}
+  @media (max-width:560px){.acts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main"><div class="card center">Loading…</div></main>
+<script src="/business/biz.js"></script>
+<script>
+(() => {
+  const { esc, $ } = biz;
+  const IC = {
+    talent: '<circle cx="9" cy="8.5" r="3.25"/><path d="M3 19.5c.6-3.1 3-5 6-5s5.4 1.9 6 5"/><circle cx="17" cy="9.5" r="2.5"/><path d="M16 14.6c2.6-.3 4.6 1.3 5 4.9"/>',
+    orbit: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5S9.7 5.9 12 3.5z"/>',
+    fair: '<path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M5.5 12v8h13v-8"/><path d="M10 20v-4.5h4V20"/>',
+    co: '<path d="M4 20.5V6.5L12 3.5v17"/><path d="M12 9.5h8v11"/><path d="M3 20.5h18"/>',
+  };
+  const ic = (k) => `<span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[k]}</svg></span>`;
+  const fmt = (n) => Number(n || 0).toLocaleString();
+
+  function render(d, fairs){
+    const p = d.profile || {}, s = d.stats || {}, v = d.status === "verified";
+    const mine = (fairs || []).filter((f) => (d.fairs || []).includes(f.id));
+    const todo = [
+      ["Add your company and confirm your work email", !!p.company && d.emailVerified, "/business/setup/"],
+      ["Add a logo and an About section", !!p.logo && (p.about || "").length > 80, "/business/company/"],
+      ["Say who you hire (majors, internships or new grads)", (p.hiring?.majors || []).length > 0 && (p.hiring?.types || []).length > 0, "/business/company/#hiring"],
+      ["Pick the career fairs you'll attend", (d.fairs || []).length > 0, "/business/fairs/"],
+      ["Search students and add someone to your orbit", false, "/business/talent/"],
+    ];
+    const max = Math.max(1, ...(s.topMajors || []).map((m) => m.n));
+    $("main").innerHTML = `${biz.statusBanner(d)}
+      <div class="layout">
+        <aside><section class="card me"><div class="ban"></div><div class="bd">${biz.logo(p, 64)}
+          <div class="co">${esc(p.company || "Your company")}</div><div class="who">${esc([p.name, p.title].filter(Boolean).join(" · ") || "Add your name and title")}</div>
+          <div style="margin:12px 0 4px"><span class="chip ${v ? "on" : ""}">${v ? "Verified company" : d.status === "pending" ? "Verification pending" : d.status === "rejected" ? "Not verified" : "Setup not finished"}</span></div>
+          <div class="st"><span>Your team on Beat the Pile</span><b>${fmt(s.team + 1)}</b></div>
+          <div class="st"><span>Your open roles we track</span><b>${fmt(s.liveJobs)}</b></div>
+          <div class="st"><span>Unread messages</span><b>${fmt(s.unread)}</b></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px">${d.slug && v ? `<a class="btn" href="/co/${encodeURIComponent(d.slug)}">View company page</a>` : ""}<a class="btn" href="/business/company/">Edit page</a></div>
+        </div></section></aside>
+        <div>
+          <div class="tiles">
+            <a class="tile" href="/business/talent/"><b>${fmt(s.openStudents)}</b><span>Students open to employers</span></a>
+            <a class="tile" href="/orbit/"><b>${fmt(s.following)}</b><span>Following ${esc(p.company || "your company")}</span></a>
+            <a class="tile" href="/orbit/"><b>${fmt(s.alumni)}</b><span>Former interns of yours</span></a>
+            <a class="tile" href="/orbit/#messages"><b>${fmt(s.unread)}</b><span>Unread messages</span></a>
+          </div>
+          <section class="card"><h2>Quick actions</h2><p class="sub">Everything here only reaches students who chose to be found by employers.</p>
+            <div class="acts">
+              <a class="act" href="/business/talent/">${ic("talent")}<div><b>Find talent</b><span>Search by major, school, skills and grad year</span></div></a>
+              <a class="act" href="/orbit/">${ic("orbit")}<div><b>Your orbit</b><span>Your team, interested students, former interns</span></div></a>
+              <a class="act" href="/business/fairs/">${ic("fair")}<div><b>Career fairs</b><span>Say where you'll be and see who's going</span></div></a>
+              <a class="act" href="/business/company/">${ic("co")}<div><b>Company page</b><span>How students see you</span></div></a>
+            </div></section>
+          <section class="card"><h2>Majors open to employers</h2><p class="sub">Students with a public profile who turned on "Let employers find me", by major. Live count.</p>
+            ${(s.topMajors || []).length ? `<div class="bars">${s.topMajors.map((m) => `<a class="b" href="/business/talent/?major=${encodeURIComponent(m.major)}" style="text-decoration:none;color:inherit"><div><span style="float:none;color:var(--ink)">${esc(m.major)}</span><i style="width:${Math.max(4, (m.n / max) * 100)}%"></i></div><span>${fmt(m.n)}</span></a>`).join("")}</div>`
+              : `<p class="empty">No students have opened their profile to employers yet. This fills in as students join.</p>`}</section>
+        </div>
+        <aside class="right">
+          <section class="card"><h2>Get set up</h2><ul class="todo">${todo.map(([t, ok, h]) => `<li class="${ok ? "done" : ""}"><i></i><a href="${h}">${esc(t)}</a></li>`).join("")}</ul></section>
+          <section class="card"><h2>Your career fairs</h2>${mine.length ? `<div class="list">${mine.map((f) => `<div class="it"><div><b style="font-size:14px">${esc(f.name)}</b><div class="small muted">${esc([f.when, f.where].filter(Boolean).join(" · "))}</div></div></div>`).join("")}</div>`
+            : `<p class="empty">None picked yet. <a href="/business/fairs/">Choose fairs</a></p>`}</section>
+        </aside>
+      </div>`;
+  }
+
+  biz.start(async (u) => {
+    if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; return; }
+    if (!u) { $("main").innerHTML = biz.signInCard("Beat the Pile for Business", "Sign in to your company account."); return; }
+    try {
+      const [d, fj] = await Promise.all([biz.api({ action: "biz_home" }), fetch("/fair/fairs.json").then((r) => r.json()).catch(() => ({ fairs: [] }))]);
+      if (!d.profile?.company && d.status === "none") { location.replace("/business/setup/"); return; }
+      render(d, fj.fairs || []);
+    } catch (e) { $("main").innerHTML = `<div class="card center">${esc(e.message)}</div>`; }
+  });
+})();
+</script>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

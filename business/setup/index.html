@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Set up your company — Beat the Pile Business</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/business/biz.css">
+<style>
+  /* /business/setup/ (Nov 2026): 1 company → 2 confirm work email (6-digit code) → 3 waiting for our check. lib/employer.js */
+  main{max-width:760px}
+  .logo-row{display:flex;gap:14px;align-items:center;margin-top:12px}
+  .code{font-size:26px;letter-spacing:8px;text-align:center;font-variant-numeric:tabular-nums;max-width:220px}
+  .next li{margin:6px 0}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main"><div class="card center">Loading…</div></main>
+<script src="/business/biz.js"></script>
+<script>
+(() => {
+  const { esc, $ } = biz;
+  const SIZES = ["1–10", "11–50", "51–200", "201–1,000", "1,001–5,000", "5,001–10,000", "10,000+"];
+  const INDUSTRIES = ["Aerospace & Defense", "Automotive", "Banking & Financial Services", "Biotech & Pharma", "Construction & Real Estate", "Consulting",
+    "Consumer Goods & Retail", "Education", "Energy & Utilities", "Engineering Services", "Government & Public Sector", "Healthcare", "Insurance",
+    "Manufacturing", "Media & Entertainment", "Nonprofit", "Software & Internet", "Telecommunications", "Transportation & Logistics", "Other"];
+  let B = null;
+
+  function steps(n){ return `<div class="steps">${["Your company", "Work email", "Verification"].map((t, i) => `<span class="${i + 1 === n ? "on" : i + 1 < n ? "done" : ""}">${i + 1} · ${t}</span>`).join("")}</div>`; }
+  function render(){
+    const p = B.profile || {};
+    const step = !p.company ? 1 : !B.emailVerified ? 2 : 3;
+    if (step === 1 || S.edit) return company(p);
+    if (step === 2) return email();
+    done();
+  }
+  const S = { edit: false, sentTo: null };
+
+  function company(p){
+    $("main").innerHTML = `${steps(1)}<section class="card"><h1>Tell us about your company</h1>
+      <p class="sub">This becomes your company page. Students see it when you message them or when they look you up.</p>
+      <label for="c">Company name</label><input id="c" value="${esc(p.company || "")}" placeholder="Acme Aerospace" maxlength="100" autocomplete="organization">
+      <div class="row"><div><label for="w">Website</label><input id="w" value="${esc(p.website || "")}" placeholder="acme.com" maxlength="200" inputmode="url"></div>
+        <div><label for="ind">Industry</label><select id="ind"><option value="">Choose</option>${INDUSTRIES.map((x) => `<option ${p.industry === x ? "selected" : ""}>${esc(x)}</option>`).join("")}</select></div></div>
+      <div class="row"><div><label for="sz">Company size</label><select id="sz"><option value="">Choose</option>${SIZES.map((x) => `<option ${p.size === x ? "selected" : ""}>${esc(x)} employees</option>`).join("")}</select></div>
+        <div><label for="hq">Headquarters</label><input id="hq" value="${esc(p.hq || "")}" placeholder="Arlington, VA" maxlength="80"></div></div>
+      <div class="row"><div><label for="nm">Your name</label><input id="nm" value="${esc(p.name || "")}" placeholder="Jane Smith" maxlength="80" autocomplete="name"></div>
+        <div><label for="ti">Your title</label><input id="ti" value="${esc(p.title || "")}" placeholder="University Recruiter" maxlength="80" autocomplete="organization-title"></div></div>
+      <div class="logo-row">${biz.logo(p, 56)}<div><b style="font-size:14px">Company logo</b> <span class="small muted">(optional, square works best)</span><br>
+        <label class="btn" style="margin:6px 0 0;display:inline-flex;cursor:pointer;font-size:13px;padding:6px 14px">Upload logo<input type="file" id="lg" accept="image/png,image/jpeg,image/webp" style="position:absolute;left:-9999px"></label></div></div>
+      <div style="margin-top:18px"><button class="btn pri" id="go">Continue</button><span class="msg" id="msg" role="status"></span></div></section>`;
+    $("#lg").onchange = async (e) => { const f = e.target.files[0]; if (!f) return; try { p.logo = await squash(f); company(p); } catch (er) { $("#msg").className = "msg err"; $("#msg").textContent = er.message; } };
+    $("#go").onclick = async () => {
+      const b = $("#go"); b.disabled = true; $("#msg").className = "msg"; $("#msg").textContent = "Saving…";
+      const prof = { ...p, company: $("#c").value, website: $("#w").value, industry: $("#ind").value, size: ($("#sz").value || "").replace(/ employees$/, ""), hq: $("#hq").value, name: $("#nm").value, title: $("#ti").value };
+      try { B = await biz.api({ action: "biz_save", profile: prof }); S.edit = false; render(); window.scrollTo(0, 0); }
+      catch (e) { b.disabled = false; $("#msg").className = "msg err"; $("#msg").textContent = e.message; }
+    };
+  }
+  // logo → 256px square PNG/JPEG data URL (fits inside, white background)
+  function squash(file){
+    return new Promise((ok, bad) => {
+      if (file.size > 8e6) return bad(new Error("That image is over 8 MB."));
+      const url = URL.createObjectURL(file), img = new Image();
+      img.onload = () => { const N = 256, c = document.createElement("canvas"); c.width = c.height = N; const x = c.getContext("2d");
+        x.fillStyle = "#fff"; x.fillRect(0, 0, N, N); const k = Math.min(N / img.naturalWidth, N / img.naturalHeight) * 0.9;
+        const w = img.naturalWidth * k, h = img.naturalHeight * k; x.drawImage(img, (N - w) / 2, (N - h) / 2, w, h); URL.revokeObjectURL(url);
+        let q = 0.9, out = c.toDataURL("image/jpeg", q); while (out.length > 85000 && q > 0.4) { q -= 0.1; out = c.toDataURL("image/jpeg", q); }
+        out.length > 85000 ? bad(new Error("Couldn't shrink that logo enough. Try a simpler image.")) : ok(out); };
+      img.onerror = () => { URL.revokeObjectURL(url); bad(new Error("Couldn't read that image. Try a PNG or JPG.")); };
+      img.src = url;
+    });
+  }
+
+  function email(){
+    const p = B.profile || {};
+    const guess = B.workEmail || "";
+    $("main").innerHTML = `${steps(2)}<section class="card"><h1>Confirm your work email</h1>
+      <p class="sub">We'll send a 6-digit code to your email at ${esc(p.company)}. Personal Gmail, Outlook or Yahoo addresses can't be used. This is how we know you really work there.</p>
+      <label for="em">Work email</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><input id="em" type="email" value="${esc(guess)}" placeholder="you@${esc(hostOf(p.website) || "company.com")}" autocomplete="email" style="flex:1;min-width:220px">
+        <button class="btn pri" id="send">${S.sentTo ? "Send a new code" : "Send code"}</button></div>
+      <div id="codebox" ${S.sentTo ? "" : "hidden"}><label for="cd">Code sent to <span id="to">${esc(S.sentTo || "")}</span></label>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input id="cd" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000"><button class="btn pri" id="ok">Confirm</button></div>
+        <p class="small muted">It can take a minute. Check spam too. The code works for 15 minutes.</p></div>
+      <p style="margin:16px 0 0"><span class="msg" id="msg" role="status" style="margin:0"></span></p>
+      <p class="small" style="margin:14px 0 0"><button class="btn" id="back" style="font-size:13px;padding:5px 12px">← Edit company details</button></p></section>`;
+    const say = (t, err) => { $("#msg").className = "msg" + (err ? " err" : ""); $("#msg").textContent = t; };
+    $("#back").onclick = () => { S.edit = true; render(); };
+    $("#send").onclick = async () => {
+      const b = $("#send"); b.disabled = true; say("Sending…");
+      try { const r = await biz.api({ action: "biz_email_start", email: $("#em").value }); S.sentTo = r.to; $("#to").textContent = r.to; $("#codebox").hidden = false; $("#cd").focus(); say("Code sent."); b.textContent = "Send a new code"; }
+      catch (e) { say(e.message, true); } finally { b.disabled = false; }
+    };
+    const confirm = async () => {
+      const b = $("#ok"); b.disabled = true; say("Checking…");
+      try { B = await biz.api({ action: "biz_email_confirm", code: $("#cd").value }); render(); window.scrollTo(0, 0); }
+      catch (e) { b.disabled = false; say(e.message, true); }
+    };
+    $("#ok").onclick = confirm;
+    $("#cd").oninput = (e) => { e.target.value = e.target.value.replace(/\D/g, "").slice(0, 6); if (e.target.value.length === 6) confirm(); };
+  }
+  const hostOf = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } };
+
+  function done(){
+    const p = B.profile || {};
+    const verified = B.status === "verified";
+    $("main").innerHTML = `${steps(3)}<section class="card">
+      <div style="display:flex;gap:14px;align-items:center;margin-bottom:12px">${biz.logo(p, 56)}<div><h1 style="margin:0">${esc(p.company)}</h1><span class="small muted">Work email confirmed · ${esc(B.domain || "")}</span></div></div>
+      ${verified ? `<div class="banner ok"><b>You're verified.</b> You can search students, add them to your orbit and message them.</div>`
+        : B.status === "rejected" ? `<div class="banner bad"><b>We couldn't verify your company.</b> ${esc(B.reviewNote || "Use Report a problem if you think this is a mistake.")}</div>`
+        : `<div class="banner"><b>We're checking your company.</b> We look at every company before it can contact students, usually within a day.</div>`}
+      <h2 style="margin-top:8px">While you wait</h2>
+      <ul class="next"><li><a href="/business/company/">Build your company page</a>: about, what you hire for, perks. Students see it when you reach out.</li>
+        <li><a href="/business/fairs/">Pick the career fairs you'll be at</a>.</li>
+        <li><a href="/business/home/">Go to your home</a> to see how many students are open to employers right now.</li></ul>
+      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn pri" href="/business/company/">Build your company page</a><a class="btn" href="/business/home/">Go to home</a></div></section>`;
+  }
+
+  biz.start(async (u) => {
+    if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; return; }
+    if (!u) { $("main").innerHTML = biz.signInCard("Set up your company", "Sign in or create an account to set up your company on Beat the Pile."); return; }
+    try { B = await biz.api({ action: "biz_get" }); render(); }
+    catch (e) { $("main").innerHTML = `<div class="card center">${esc(e.message)}</div>`; }
+  });
+})();
+</script>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

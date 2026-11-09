@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Company — Beat the Pile</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/business/biz.css">
+<style>
+  /* Company pages (Nov 2026). /co/<slug> = public page of a VERIFIED company (GET /api/me?co=); /business/company/ = the employer edits it.
+     Jobs = live listings we already pull from the company's own board (company_id match). "Interned here" = students who are public AND open to employers. */
+  .hero{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
+  .hero .ban{height:110px;background:var(--navy);border-bottom:4px solid var(--lime)}
+  .hero .bd{padding:0 24px 18px;display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap}
+  .hero .clogo{margin-top:-46px;border:4px solid #fff;border-radius:16px}
+  .hero h1{font-size:28px;margin:12px 0 2px}.hero .tl{color:var(--muted);font-size:15px}
+  .hero .facts{font-size:13.5px;color:var(--muted);margin-top:6px}
+  .hero .btns{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;padding-bottom:4px}
+  .tabs{display:flex;gap:4px;border-top:1px solid var(--line);padding:0 16px;overflow-x:auto}
+  .tabs button{font:inherit;font-size:14px;font-weight:600;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:12px 12px 10px;cursor:pointer;white-space:nowrap}
+  .tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--green)}
+  .about{white-space:pre-wrap;overflow-wrap:anywhere}
+  .kv{display:grid;grid-template-columns:140px minmax(0,1fr);gap:8px 14px;font-size:14px}.kv dt{color:var(--muted)}.kv dd{margin:0}
+  .job{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-top:1px solid #EEF1F6}.job:first-child{border-top:0}
+  .job a{font-weight:600;color:var(--ink);text-decoration:none}.job a:hover{text-decoration:underline}
+  .team .it{display:flex;gap:10px;align-items:center;padding:8px 0}.team .av{width:38px;height:38px;font-size:13px}
+  .edbar{position:sticky;bottom:0;background:rgba(238,241,246,.96);padding:12px 0;display:flex;gap:8px;align-items:center;border-top:1px solid var(--line);margin-top:8px}
+  .check{display:flex;gap:8px;align-items:center;font-weight:500;margin:6px 0}.check input{width:auto}
+  @media (max-width:640px){.hero .bd{padding:0 16px 16px}.hero h1{font-size:23px}.kv{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main"><div class="card center">Loading…</div></main>
+<script src="/business/biz.js"></script>
+<script>
+(() => {
+  const { esc, $ } = biz;
+  const slug = (location.pathname.match(/^\/co\/([a-z0-9-]{1,60})\/?$/) || [])[1] || null;
+  let FAIRS = [];
+  const fairsP = fetch("/fair/fairs.json").then((r) => r.json()).then((d) => (FAIRS = d.fairs || [])).catch(() => []);
+  const TYPE = { intern: "Internships", fulltime: "New-grad / full-time" };
+  const host = (u) => { try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } };
+
+  // ── the page itself (public view and the owner's preview use the same code) ──
+  function page(c, tab, preview){
+    const p = c.company || {}, h = p.hiring || {};
+    const facts = [p.industry, p.size ? p.size + " employees" : "", p.hq, p.founded ? "Founded " + p.founded : ""].filter(Boolean).join(" · ");
+    const fairs = FAIRS.filter((f) => (c.fairs || []).includes(f.id));
+    const T = [["about", "About"], ["jobs", `Jobs${c.jobs?.length ? " (" + c.jobs.length + ")" : ""}`], ["people", "People"], ["fairs", "Career fairs"]];
+    let body = "";
+    if (tab === "about") body = `<div class="grid"><div>
+        <section class="card"><h2>About</h2>${p.about ? `<p class="about">${esc(p.about)}</p>` : `<p class="empty">${preview ? "Add an About section so students know who you are." : "No description yet."}</p>`}</section>
+        <section class="card" id="hiringc"><h2>Who we hire</h2>
+          ${(h.types || []).length || (h.majors || []).length || h.roles || h.locations ? `<dl class="kv">
+            ${(h.types || []).length ? `<dt>Hiring for</dt><dd>${h.types.map((x) => esc(TYPE[x])).join(" · ")}</dd>` : ""}
+            ${(h.majors || []).length ? `<dt>Majors</dt><dd class="chips">${h.majors.map((m) => `<span>${esc(m)}</span>`).join("")}</dd>` : ""}
+            ${h.locations ? `<dt>Locations</dt><dd>${esc(h.locations)}</dd>` : ""}
+            ${h.when ? `<dt>When we recruit</dt><dd>${esc(h.when)}</dd>` : ""}
+            ${h.roles ? `<dt>Roles</dt><dd class="about">${esc(h.roles)}</dd>` : ""}</dl>` : `<p class="empty">Not listed yet.</p>`}</section>
+        ${(p.perks || []).length ? `<section class="card"><h2>Perks</h2><div class="chips">${p.perks.map((x) => `<span>${esc(x)}</span>`).join("")}</div></section>` : ""}
+      </div><aside>
+        <section class="card"><h2>At a glance</h2><dl class="kv" style="grid-template-columns:110px 1fr">
+          ${p.website ? `<dt>Website</dt><dd><a href="${esc(p.website)}" target="_blank" rel="noopener nofollow">${esc(host(p.website))}</a></dd>` : ""}
+          ${p.industry ? `<dt>Industry</dt><dd>${esc(p.industry)}</dd>` : ""}${p.size ? `<dt>Size</dt><dd>${esc(p.size)} employees</dd>` : ""}
+          ${p.hq ? `<dt>Headquarters</dt><dd>${esc(p.hq)}</dd>` : ""}${p.founded ? `<dt>Founded</dt><dd>${esc(p.founded)}</dd>` : ""}
+          <dt>Open roles</dt><dd>${(c.jobs || []).length ? `${c.jobs.length} we track` : "None we track right now"}</dd></dl></section>
+        ${c.domain ? `<section class="card"><h2>Verified</h2><p class="small muted" style="margin:0">Recruiters here confirmed a work email at <b>${esc(c.domain)}</b> and Beat the Pile checked the company.</p></section>` : ""}
+      </aside></div>`;
+    else if (tab === "jobs") body = `<section class="card"><h2>Open roles</h2><p class="sub">Pulled straight from ${esc(p.company)}'s own job board and checked for dead links. Apply on their site.</p>
+        ${(c.jobs || []).length ? c.jobs.map((j) => `<div class="job"><div><a href="${esc(j.url)}" target="_blank" rel="noopener" data-noi18n>${esc(j.title)}</a><div class="small muted" data-noi18n>${esc(j.location || "")}</div></div><span class="small muted">${esc(biz.when(j.first_seen))}</span></div>`).join("")
+          : `<p class="empty">${preview ? "We don't track an open role for your company right now. When your job board posts internships or new-grad roles, they show up here." : "No open roles we track right now."}</p>`}</section>`;
+    else if (tab === "people") body = `<div class="grid"><section class="card"><h2>Interned here</h2><p class="sub">Students who list ${esc(p.company)} on their profile and are open to employers.</p>
+        ${(c.alumni || []).length ? `<div class="people">${c.alumni.map((s) => `<a class="p" href="/u/${encodeURIComponent(s.handle)}" style="text-decoration:none;color:inherit"><div class="av">${s.photo ? `<img alt="" src="${esc(s.photo)}">` : esc(biz.initials(s.name))}</div><div class="nm">${esc(s.name)}</div><div class="hl">${esc([s.major, s.school].filter(Boolean).join(" · "))}</div>${s.role ? `<div class="at">${esc(s.role)}${s.when ? " · " + esc(s.when) : ""}</div>` : ""}</a>`).join("")}</div>` : `<p class="empty">No one yet.</p>`}</section>
+      <aside><section class="card team"><h2>Recruiters on Beat the Pile</h2>${(c.team || []).length ? c.team.map((m) => `<div class="it"><div class="av">${esc(biz.initials(m.name))}</div><div><b style="font-size:14px">${esc(m.name)}</b><div class="small muted">${esc(m.title || "")}</div></div></div>`).join("") : `<p class="empty">No one yet.</p>`}</section></aside></div>`;
+    else body = `<section class="card"><h2>Career fairs</h2><p class="sub">Where ${esc(p.company)} says it will be.</p>
+        ${fairs.length ? `<div class="list">${fairs.map((f) => `<div class="it"><div><b>${esc(f.name)}</b>${f.term ? ` <span class="small muted">· ${esc(f.term)}</span>` : ""}<div class="small muted">${esc([f.when, f.where, f.school].filter(Boolean).join(" · "))}</div></div></div>`).join("")}</div>`
+          : `<p class="empty">${preview ? `None yet. <a href="/business/fairs/">Pick your fairs</a>` : "None listed yet."}</p>`}</section>`;
+    return `<section class="hero"><div class="ban"></div><div class="bd">${biz.logo(p, 96)}
+        <div style="min-width:0"><h1>${esc(p.company || "Your company")}</h1>${p.tagline ? `<div class="tl">${esc(p.tagline)}</div>` : ""}<div class="facts">${esc(facts)}</div></div>
+        <div class="btns">${p.careers ? `<a class="btn pri" href="${esc(p.careers)}" target="_blank" rel="noopener nofollow">Careers site</a>` : ""}${p.website ? `<a class="btn" href="${esc(p.website)}" target="_blank" rel="noopener nofollow">Website</a>` : ""}${p.linkedin ? `<a class="btn" href="${esc(p.linkedin)}" target="_blank" rel="noopener nofollow">LinkedIn</a>` : ""}</div></div>
+      <div class="tabs" role="tablist">${T.map(([k, l]) => `<button role="tab" data-ctab="${k}" aria-selected="${k === tab}">${esc(l)}</button>`).join("")}</div></section>${body}`;
+  }
+
+  // ── public: /co/<slug> ──
+  async function publicView(){
+    try {
+      const r = await fetch("/api/me?co=" + encodeURIComponent(slug)); const c = await r.json().catch(() => ({}));
+      if (r.status === 404) { $("main").innerHTML = `<div class="card center"><h1>No company page here</h1><p class="sub">This company hasn't set up a verified page on Beat the Pile yet.</p><a class="btn pri" href="/jobs/">Browse internships</a></div>`; return; }
+      if (!r.ok) throw new Error(c.error || "Couldn't load this company");
+      await fairsP; document.title = `${c.company.company} — Beat the Pile`;
+      let tab = "about"; const draw = () => { $("main").innerHTML = page(c, tab, false); document.querySelectorAll("[data-ctab]").forEach((b) => b.onclick = () => { tab = b.dataset.ctab; draw(); }); };
+      draw();
+    } catch (e) { $("main").innerHTML = `<div class="card center">${esc(e.message)}</div>`; }
+  }
+
+  // ── owner: edit + preview ──
+  let B = null, mode = "edit", ptab = "about";
+  const csv = (v) => String(v || "").split(/[,\n]/).map((x) => x.trim()).filter(Boolean);
+  function editor(){
+    const p = B.profile, h = p.hiring || {}, v = B.status === "verified";
+    $("main").innerHTML = `${biz.statusBanner(B)}
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap"><h1 style="margin:0;flex:1">Company page</h1>
+        <button class="btn ${mode === "edit" ? "pri" : ""}" data-mode="edit">Edit</button><button class="btn ${mode === "preview" ? "pri" : ""}" data-mode="preview">Preview</button>
+        ${v && B.slug ? `<a class="btn" href="/co/${encodeURIComponent(B.slug)}" target="_blank" rel="noopener">Open public page</a>` : ""}</div>
+      ${mode === "preview" ? `<div id="pv"></div>` : `
+      <section class="card"><h2>Basics</h2>
+        <div style="display:flex;gap:14px;align-items:center">${biz.logo(p, 64)}<label class="btn" style="cursor:pointer;margin:0">Upload logo<input type="file" id="lg" accept="image/png,image/jpeg,image/webp" style="position:absolute;left:-9999px"></label>${p.logo ? `<button class="btn" id="rmlg">Remove</button>` : ""}</div>
+        <div class="row"><div><label for="c">Company name ${v ? `<span class="hint">· verified, contact us to change</span>` : ""}</label><input id="c" value="${esc(p.company)}" ${v ? "readonly" : ""} maxlength="100"></div>
+          <div><label for="tg">Tagline <span class="hint">· one line</span></label><input id="tg" value="${esc(p.tagline)}" maxlength="140" placeholder="We build the satellites that keep you connected"></div></div>
+        <div class="row"><div><label for="w">Website</label><input id="w" value="${esc(p.website)}" placeholder="acme.com"></div><div><label for="cr">Careers site</label><input id="cr" value="${esc(p.careers)}" placeholder="acme.com/careers"></div></div>
+        <div class="row"><div><label for="li">LinkedIn page</label><input id="li" value="${esc(p.linkedin)}" placeholder="linkedin.com/company/acme"></div><div><label for="ind">Industry</label><input id="ind" value="${esc(p.industry)}" maxlength="80"></div></div>
+        <div class="row"><div><label for="sz">Company size</label><select id="sz"><option value="">Choose</option>${["1–10", "11–50", "51–200", "201–1,000", "1,001–5,000", "5,001–10,000", "10,000+"].map((x) => `<option value="${x}" ${p.size === x ? "selected" : ""}>${x} employees</option>`).join("")}</select></div>
+          <div class="row" style="gap:0 10px"><div><label for="hq">Headquarters</label><input id="hq" value="${esc(p.hq)}" maxlength="80"></div><div><label for="fd">Founded</label><input id="fd" value="${esc(p.founded || "")}" inputmode="numeric" maxlength="4"></div></div></div>
+        <label for="ab">About <span class="hint">· what you do, and what an intern or new grad would work on</span></label><textarea id="ab" maxlength="2500" style="min-height:150px">${esc(p.about)}</textarea></section>
+      <section class="card" id="hiring"><h2>Who you hire</h2><p class="sub">Shown on your page. Students see whether they fit before you reach out.</p>
+        <div style="display:flex;gap:18px;flex-wrap:wrap"><label class="check"><input type="checkbox" id="ti" ${(h.types || []).includes("intern") ? "checked" : ""}> Internships and co-ops</label>
+          <label class="check"><input type="checkbox" id="tf" ${(h.types || []).includes("fulltime") ? "checked" : ""}> New-grad / full-time</label></div>
+        <label for="mj">Majors <span class="hint">· separate with commas</span></label><input id="mj" value="${esc((h.majors || []).join(", "))}" placeholder="Mechanical Engineering, Computer Science, Finance">
+        <div class="row"><div><label for="lc">Locations</label><input id="lc" value="${esc(h.locations)}" maxlength="200" placeholder="Arlington, VA · Seattle, WA · Remote"></div>
+          <div><label for="wh">When you recruit</label><input id="wh" value="${esc(h.when)}" maxlength="80" placeholder="Summer internships: Sept–Dec"></div></div>
+        <label for="rl">Typical roles</label><textarea id="rl" maxlength="600" placeholder="Design, test and manufacturing internships on aircraft structures…">${esc(h.roles)}</textarea>
+        <label for="pk">Perks <span class="hint">· separate with commas</span></label><input id="pk" value="${esc((p.perks || []).join(", "))}" placeholder="Paid internships, Housing stipend, Mentorship program"></section>
+      <section class="card"><h2>You</h2><p class="sub">Students see your name and title when you message them. It isn't company data.</p>
+        <div class="row"><div><label for="nm">Your name</label><input id="nm" value="${esc(p.name)}" maxlength="80"></div><div><label for="tt">Your title</label><input id="tt" value="${esc(p.title)}" maxlength="80"></div></div></section>
+      <div class="edbar"><button class="btn pri" id="save">Save company page</button><span class="msg" id="msg" role="status"></span></div>`}`;
+    document.querySelectorAll("[data-mode]").forEach((b) => b.onclick = () => { if (mode === "edit") collect(); mode = b.dataset.mode; editor(); });
+    if (mode === "preview") {
+      const c = { company: B.profile, jobs: B._jobs || [], alumni: [], team: [], fairs: B.fairs, domain: B.domain };
+      const draw = () => { $("#pv").innerHTML = page(c, ptab, true); document.querySelectorAll("[data-ctab]").forEach((b) => b.onclick = () => { ptab = b.dataset.ctab; draw(); }); };
+      draw(); return;
+    }
+    $("#lg").onchange = async (e) => { const f = e.target.files[0]; if (!f) return; collect(); try { B.profile.logo = await squash(f); editor(); } catch (er) { $("#msg").className = "msg err"; $("#msg").textContent = er.message; } };
+    const rm = $("#rmlg"); if (rm) rm.onclick = () => { collect(); B.profile.logo = null; editor(); };
+    $("#save").onclick = save;
+    if (location.hash === "#hiring") setTimeout(() => $("#hiring")?.scrollIntoView(), 50);
+  }
+  function collect(){
+    if (!$("#c")) return;
+    const p = B.profile;
+    Object.assign(p, { company: $("#c").value, tagline: $("#tg").value, website: $("#w").value, careers: $("#cr").value, linkedin: $("#li").value, industry: $("#ind").value,
+      size: $("#sz").value, hq: $("#hq").value, founded: $("#fd").value, about: $("#ab").value, name: $("#nm").value, title: $("#tt").value, perks: csv($("#pk").value) });
+    p.hiring = { types: [$("#ti").checked && "intern", $("#tf").checked && "fulltime"].filter(Boolean), majors: csv($("#mj").value), locations: $("#lc").value, when: $("#wh").value, roles: $("#rl").value };
+  }
+  async function save(){
+    collect(); const b = $("#save"); b.disabled = true; $("#msg").className = "msg"; $("#msg").textContent = "Saving…";
+    try { const keep = B._jobs; B = await biz.api({ action: "biz_save", profile: B.profile }); B._jobs = keep; editor(); $("#msg").className = "msg"; $("#msg").textContent = "Saved."; }
+    catch (e) { b.disabled = false; $("#msg").className = "msg err"; $("#msg").textContent = e.message; }
+  }
+  function squash(file){
+    return new Promise((ok, bad) => {
+      if (file.size > 8e6) return bad(new Error("That image is over 8 MB."));
+      const url = URL.createObjectURL(file), img = new Image();
+      img.onload = () => { const N = 256, c = document.createElement("canvas"); c.width = c.height = N; const x = c.getContext("2d");
+        x.fillStyle = "#fff"; x.fillRect(0, 0, N, N); const k = Math.min(N / img.naturalWidth, N / img.naturalHeight) * 0.9;
+        const w = img.naturalWidth * k, h = img.naturalHeight * k; x.drawImage(img, (N - w) / 2, (N - h) / 2, w, h); URL.revokeObjectURL(url);
+        let q = 0.9, out = c.toDataURL("image/jpeg", q); while (out.length > 85000 && q > 0.4) { q -= 0.1; out = c.toDataURL("image/jpeg", q); }
+        out.length > 85000 ? bad(new Error("Couldn't shrink that logo enough. Try a simpler image.")) : ok(out); };
+      img.onerror = () => { URL.revokeObjectURL(url); bad(new Error("Couldn't read that image. Try a PNG or JPG.")); };
+      img.src = url;
+    });
+  }
+
+  if (slug) { publicView(); return; }
+  biz.start(async (u) => {
+    if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; return; }
+    if (!u) { $("main").innerHTML = biz.signInCard("Your company page", "Sign in to your company account to edit your page."); return; }
+    try {
+      B = await biz.api({ action: "biz_get" }); await fairsP;
+      if (!B.profile.company) { location.replace("/business/setup/"); return; }
+      if (B.companyId) fetch("/api/listings?companies=" + encodeURIComponent(B.companyId) + "&field=all&kind=all&limit=60&offset=0").then((r) => r.json()).then((d) => { B._jobs = (d.listings || []).slice(0, 60); }).catch(() => {});
+      editor();
+    } catch (e) { $("main").innerHTML = `<div class="card center">${esc(e.message)}</div>`; }
+  });
+})();
+</script>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

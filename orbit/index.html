@@ -117,6 +117,7 @@
   const to = (p) => p.key || p.handle;
   const first = (n) => String(n || "Someone").split(/\s+/)[0];
   function linkBtns(p){
+    if (p.employer && p.link === "none") return "";
     const t = esc(to(p));
     if (p.link === "connected") return `<button class="btn pri" data-msg="${t}">Message</button>`;
     if (p.link === "incoming") return `<button class="btn pri" data-accept="${t}">Accept</button><button class="btn" data-remove="${t}">Ignore</button>`;
@@ -137,25 +138,23 @@
     ["insiders", "Insiders", "Interned where you're aiming", "#FFB86B"],
     ["conn", "In orbit", "People who joined your orbit", "#FFFFFF"],
   ];
-  function sky(o){
-    const sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets };
-    const R = { inner: 92, campus: 150, insiders: 205 }, C = 230;
+  function sky(o, sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets }, rings3 = RINGS.slice(0, 3), center = { text: initials(o.me.name) || "You", label: "You" }){
+    const RAD = [92, 150, 205], C = 230;
     let nodes = "", rings = "";
-    RINGS.slice(0, 3).forEach(([k, , , col], ri) => {
-      rings += `<circle cx="${C}" cy="${C}" r="${R[k]}" fill="none" stroke="${col}" stroke-opacity=".35" stroke-dasharray="${ri === 2 ? "3 6" : "none"}"/>`;
-      const list = sets[k].slice(0, ri === 0 ? 8 : 12), n = list.length;
+    rings3.forEach(([k, , , col], ri) => {
+      rings += `<circle cx="${C}" cy="${C}" r="${RAD[ri]}" fill="none" stroke="${col}" stroke-opacity=".35" stroke-dasharray="${ri === 2 ? "3 6" : "none"}"/>`;
+      const list = (sets[k] || []).slice(0, ri === 0 ? 8 : 12), n = list.length, R = { [k]: RAD[ri] };
       list.forEach((p, i) => {
         const a = (i / Math.max(n, 1)) * Math.PI * 2 - Math.PI / 2 + ri * 0.45;
         const x = C + R[k] * Math.cos(a), y = C + R[k] * Math.sin(a);
-        nodes += `<a class="node" href="/u/${encodeURIComponent(p.handle)}" tabindex="0" aria-label="${esc(p.name)}"><title>${esc(p.name)}${p.at ? " · " + esc(p.at) : ""}</title>
+        nodes += `<${p.handle ? `a class="node" href="/u/${encodeURIComponent(p.handle)}" tabindex="0"` : `g class="node"`} aria-label="${esc(p.name)}"><title>${esc(p.name)}${p.at ? " · " + esc(p.at) : ""}</title>
           <circle cx="${x}" cy="${y}" r="19" fill="${p.link === "connected" ? "#26345F" : "#0E1440"}" stroke="${col}" stroke-width="${p.link === "connected" ? 4 : 2}"/>
-          <text x="${x}" y="${y + 4.5}" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">${esc(initials(p.name))}</text></a>`;
+          <text x="${x}" y="${y + 4.5}" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">${esc(initials(p.name))}</text></${p.handle ? "a" : "g"}>`;
       });
     });
-    const me = o.me;
-    return `<svg viewBox="0 0 460 460" role="img" aria-label="Your orbit: ${o.classmates.length} in your major, ${o.schoolmates.length} on campus, ${o.atTargets.length} insiders">
-      ${rings}<circle cx="${C}" cy="${C}" r="34" fill="#B0F701"/><text x="${C}" y="${C + 6}" text-anchor="middle" font-size="16" font-weight="700" fill="#060A2C">${esc(initials(me.name) || "You")}</text>
-      <text x="${C}" y="${C + 52}" text-anchor="middle" font-size="11" fill="#8D9AB3">You</text>${nodes}</svg>`;
+    return `<svg viewBox="0 0 460 460" role="img" aria-label="Your orbit: ${rings3.map(([k, t]) => `${(sets[k] || []).length} ${t}`).join(", ")}">
+      ${rings}<circle cx="${C}" cy="${C}" r="34" fill="#B0F701"/><text x="${C}" y="${C + 6}" text-anchor="middle" font-size="16" font-weight="700" fill="#060A2C">${esc(center.text)}</text>
+      <text x="${C}" y="${C + 52}" text-anchor="middle" font-size="11" fill="#8D9AB3">${esc(center.label)}</text>${nodes}</svg>`;
   }
   function render(o){
     S.o = o; const m = o.me, ring = S.ring || "inner";
@@ -190,6 +189,44 @@
     try { window.btpOrbitBadge && window.btpOrbitBadge((o.unread || 0) + (o.requests || []).length); } catch {}
   }
 
+  async function refresh(){ if (S.biz) renderBiz(await api({ action: "biz_orbit" })); else render(await api({ action: "orbit" })); }
+
+  // ── Business Orbit (employer accounts): your team · interested students · former interns · at your fairs · in orbit ──
+  const BRINGS = [
+    ["interested", "Interested students", "Follow your company and are open to employers", "#B0F701"],
+    ["alumni", "Former interns", "Interned with you and are open to employers", "#7FB2FF"],
+    ["team", "Your team", "Recruiters from your company", "#FFB86B"],
+    ["fairs", "At your fairs", "Going to a fair you're attending", "#C9A7FF"],
+    ["conn", "In orbit", "Students who joined your orbit", "#FFFFFF"],
+  ];
+  function renderBiz(o){
+    S.o = o; const ring = BRINGS.some((r) => r[0] === S.ring) ? S.ring : "interested", m = o.me;
+    const sets = { interested: o.interested || [], alumni: o.alumni || [], team: o.team || [], fairs: o.atFairs || [], conn: o.connections || [] };
+    const empty = { interested: "No students who follow your company have opened their profile to employers yet.",
+      alumni: "No former interns of yours have opened their profile to employers yet.",
+      team: "No one else from your company is on Beat the Pile yet. Colleagues join by signing up with their work email.",
+      fairs: `No students yet. <a href="/business/fairs/">Pick the fairs you'll attend</a> to see who's going.`,
+      conn: `No one yet. <a href="/business/talent/">Find talent</a> and tap Join orbit.` };
+    const [, title, desc] = BRINGS.find((r) => r[0] === ring);
+    const pend = m.status !== "verified" ? `<span>Your company is still being verified. You can view your orbit, and you can contact students once it's approved.</span>` : `<span>Only students who chose to be found by employers appear here.</span>`;
+    $("main").innerHTML = `
+      <div class="sky"><div><h1>${esc(m.company || "Your company")}'s orbit</h1><p class="sub">Students already close to your company, closest first.</p>
+        ${sky(o, sets, BRINGS.slice(0, 3), { text: initials(m.company) || "Co", label: m.company || "Your company" })}</div>
+        <div><div class="legend">${BRINGS.map(([k, t, d, col]) => `<button type="button" data-ring="${k}" aria-pressed="${k === ring}"><i style="border-color:${col}"></i><span>${t}<small>${d}</small></span><b>${sets[k].length}</b></button>`).join("")}</div>
+          <div class="gravity">${pend}</div></div></div>
+      <div class="grid grid2">
+        <div>${requests(o)}
+        <section class="card"><h2>${title}</h2><p class="sub">${desc}</p>${people(sets[ring], empty[ring])}</section></div>
+        <aside class="feedcol">
+          <section class="card" id="messages"><h2>Messages${o.unread ? `<span class="count">${o.unread}</span>` : ""}</h2><p class="sub">Students you've written to, and students in your orbit.</p><div id="threads"><p class="empty">Loading…</p></div></section>
+          <section class="card"><h2>Grow your orbit</h2><p class="sub">Students land in your orbit when they follow your company, list you as an internship, or go to the same fair.</p>
+            <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn pri" href="/business/talent/">Find talent</a><a class="btn" href="/business/fairs/">Career fairs</a><a class="btn" href="/business/company/">Company page</a></div></section></aside>
+      </div>`;
+    document.querySelectorAll("[data-ring]").forEach((b) => b.onclick = () => { S.ring = b.dataset.ring; renderBiz(S.o); });
+    wire($("main")); loadThreads();
+    try { window.btpOrbitBadge && window.btpOrbitBadge((o.unread || 0) + (o.requests || []).length); } catch {}
+  }
+
   // ── Part 2: requests, connect buttons, messages, same fair ──
   function requests(o){
     const r = o.requests || [];
@@ -201,7 +238,7 @@
   function wire(root){
     const act = async (b, action, t) => {
       b.disabled = true;
-      try { await api({ action, to: t }); render(await api({ action: "orbit" })); }
+      try { await api({ action, to: t }); await refresh(); }
       catch (e) { b.disabled = false; alertBox(e.message); }
     };
     root.querySelectorAll("[data-connect]").forEach((b) => b.onclick = () => act(b, "orbit_connect", b.dataset.connect));
@@ -289,7 +326,7 @@
     } catch {}
     $("#fairSave").onclick = async () => {
       const b = $("#fairSave"); b.disabled = true;
-      try { await api({ action: "orbit_fair", fair: sel.value, on: $("#fairOn").checked }); render(await api({ action: "orbit" })); }
+      try { await api({ action: "orbit_fair", fair: sel.value, on: $("#fairOn").checked }); await refresh(); }
       catch (e) { b.disabled = false; alertBox(e.message); }
     };
   }
@@ -301,7 +338,8 @@
         <button class="btn pri" id="si">Sign in to see your Orbit</button></div>`;
       $("#si").onclick = () => S.clerk.openSignIn({}); return;
     }
-    try { render(await api({ action: "orbit" })); }
+    S.biz = (u.unsafeMetadata && u.unsafeMetadata.role) === "employer" || (() => { try { return localStorage.getItem("btp_role") === "employer"; } catch { return false; } })();
+    try { await refresh(); }
     catch (e) { $("main").innerHTML = `<div class="card center">Couldn't load Orbit right now (${esc(e.message)}). Refresh in a minute.</div>`; }
   }
   async function loadClerk(){

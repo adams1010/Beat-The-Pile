@@ -46,6 +46,7 @@ import { dueFollowUps } from "../lib/followups.js";
 import { botOn, logRun } from "../lib/bots.js";
 import { orbitFor } from "../lib/orbit.js";
 import { orbitExtras, orbitAction, deleteOrbitData } from "../lib/orbitnet.js";
+import { bizAction, publicCompany, isVerifiedEmployer } from "../lib/employer.js";
 import { talentFor, roleOf } from "../lib/talent.js";
 
 const LISTS = ["saved", "applied"];
@@ -207,6 +208,11 @@ function cleanProfile(p) {
     photo: cleanPhoto(p.photo),
   };
 }
+async function clerkUser(uid) {
+  if (!process.env.CLERK_SECRET_KEY) return null;
+  const r = await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(uid)}`, { headers: { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` } });
+  return r.ok ? r.json() : null;
+}
 async function publicProfile(req, res) {
   const h = String(req.query.u || "").toLowerCase();
   if (!HANDLE_OK.test(h)) return res.status(404).json({ error: "No profile here" });
@@ -253,6 +259,13 @@ export default async function handler(req, res) {
   res.setHeader("Cache-Control", "no-store");
   if (req.method === "GET" && req.query?.r !== undefined) {
     try { return await resumeRedirect(req, res); } catch { return res.status(503).send("Resume temporarily unavailable"); }
+  }
+  // Public company page data (/co/<slug>): verified companies only
+  if (req.method === "GET" && req.query?.co !== undefined) {
+    try { const c = await publicCompany(String(req.query.co || ""));
+      if (!c) return res.status(404).json({ error: "No company page here" });
+      res.setHeader("Cache-Control", "public, max-age=120"); return res.status(200).json(c);
+    } catch { return res.status(503).json({ error: "Company pages are temporarily unavailable" }); }
   }
   if (req.method === "GET" && req.query?.u !== undefined) {
     try { return await publicProfile(req, res); } catch { return res.status(503).json({ error: "Profiles are temporarily unavailable" }); }
@@ -346,9 +359,17 @@ export default async function handler(req, res) {
       return res.status(out.status).json(out.body);
     }
 
-    // ── Find talent (/business/talent/): employer accounts only; students who opted in only ──
+    // ── Business side (lib/employer.js): company setup, work-email code, owner review, dashboard, business Orbit ──
+    if (typeof action === "string" && /^biz_(get|save|email_start|email_confirm|fairs|fair_counts|home|orbit|admin_list|admin_review)$/.test(action)) {
+      if (!(await rateOk(`biz:${uid}`, 60, 60))) return res.status(429).json({ error: "Slow down a little and try again" });
+      const out = await bizAction(uid, action, body || {}, { rateOk, sendEmail, clerkUser });
+      return res.status(out.status).json(out.body);
+    }
+
+    // ── Find talent (/business/talent/): VERIFIED employer accounts only; students who opted in only ──
     if (action === "talent") {
-      if ((await roleOf(uid)) !== "employer") return res.status(403).json({ error: "Find talent is for employer accounts. Choose \"I'm hiring\" on /start/ to switch." });
+      if ((await roleOf(uid)) !== "employer") return res.status(403).json({ error: "Find talent is for employer accounts." });
+      if (!(await isVerifiedEmployer(uid))) return res.status(403).json({ error: "Your company is still being verified. You can search students once it's approved.", pending: true });
       if (!(await rateOk(`talent:${uid}`, 3600, 120))) return res.status(429).json({ error: "That's a lot of searches — try again in a bit" });
       const t = (v, n) => String(v ?? "").slice(0, n);
       return res.status(200).json(await talentFor({ q: t(body.q, 120), major: t(body.major, 80), school: t(body.school, 100), gradYear: Number(body.gradYear) || null }));

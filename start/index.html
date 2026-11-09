@@ -37,17 +37,20 @@
   const $ = (s) => document.querySelector(s);
   const qs = new URLSearchParams(location.search);
   const pre = ["student", "employer"].includes(qs.get("role")) ? qs.get("role") : null;
+  if (pre === "employer") { const s2 = document.getElementById("s2"); if (s2) s2.textContent = "2 · Your company"; }
   const next = /^\/[a-z0-9/_#?=&-]*$/i.test(qs.get("next") || "") ? qs.get("next") : null;
   function stepEmail(C){
     $("#s1").className = "on"; $("#s2").className = "";
     $("#view").innerHTML = `<h1>Beat the pile. <em>Start here.</em></h1>
-      <p class="lead">${pre === "employer" ? "Create a free account to find interns and new grads from every major." : "Enter your email to sign in or create a free account. Students and companies both start here."}</p>
+      <p class="lead">${pre === "employer" ? "Sign in or create your company account. Next you'll set up your company and confirm your work email." : "Enter your email to sign in or create a free account. Students and companies both start here."}</p>
       <div class="panel"><div id="signin"></div></div>`;
     try { C.mountSignIn($("#signin"), { forceRedirectUrl: location.href, signUpForceRedirectUrl: location.href, withSignUp: true }); }
     catch { $("#signin").innerHTML = `<button class="btn" id="si" style="font:inherit;font-weight:600;background:#4A7000;color:#fff;border:0;border-radius:999px;padding:12px 24px;cursor:pointer">Continue with email</button>`; $("#si").onclick = () => C.openSignIn({}); }
   }
   function stepRole(C){
     $("#s1").className = ""; $("#s2").className = "on";
+    // Came from "Find interns" on /business/: no "looking or hiring?" question — straight to company setup.
+    if (pre === "employer") { $("#view").innerHTML = `<div class="panel center">Setting up your company account…</div>`; window.btpSaveRole("employer", next || "/business/setup/"); return; }
     const has = C.user.unsafeMetadata && C.user.unsafeMetadata.role;
     $("#view").innerHTML = `<h1>What brings you to <em>Beat the Pile</em>?</h1>
       <p class="lead">${has ? "You can switch any time. This changes your top bar and home screen." : "Pick one to set up your home screen. You can switch later."}</p>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Verify employers — Beat the Pile</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/business/biz.css">
+<style>
+  /* /business/admin/ (Nov 2026): owners (ADMIN_EMAILS) approve companies before they can contact students. biz_admin_list / biz_admin_review. */
+  .ok{color:var(--green);font-weight:600}.no{color:#A3261A;font-weight:600}
+  td .btn{padding:5px 12px;font-size:13px;margin:2px 4px 2px 0}
+  .filters{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+  .filters button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;cursor:pointer}
+  .filters button[aria-pressed=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .wrapt{overflow-x:auto}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main"><div class="card center">Loading…</div></main>
+<script src="/business/biz.js"></script>
+<script>
+(() => {
+  const { esc, $ } = biz;
+  let L = [], show = "pending";
+  function render(){
+    const rows = L.filter((r) => show === "all" || r.status === show);
+    const n = (s) => L.filter((r) => r.status === s).length;
+    $("main").innerHTML = `<section class="card"><h1>Verify employers</h1>
+      <p class="sub">Approve a company only when the person clearly works there. Strong signs: work email confirmed at the company's own domain, and that domain matches the website they gave.</p>
+      <div class="filters">${[["pending", `Waiting (${n("pending")})`], ["new", `Not finished (${n("new")})`], ["verified", `Verified (${n("verified")})`], ["rejected", `Rejected (${n("rejected")})`], ["all", "All"]]
+        .map(([k, l]) => `<button data-show="${k}" aria-pressed="${k === show}">${esc(l)}</button>`).join("")}</div>
+      ${rows.length ? `<div class="wrapt"><table><tr><th>Company</th><th>Person</th><th>Work email</th><th>Checks</th><th>Status</th><th></th></tr>
+        ${rows.map((r) => `<tr><td><b>${esc(r.company || "—")}</b><br>${r.website ? `<a href="${esc(r.website)}" target="_blank" rel="noopener nofollow" class="small">${esc(r.website.replace(/^https:\/\//, ""))}</a>` : `<span class="small muted">no website</span>`}</td>
+          <td>${esc(r.name || "—")}<br><span class="small muted">${esc(r.title || "")}</span></td>
+          <td>${esc(r.workEmail || "—")}</td>
+          <td class="small">${r.emailVerified ? `<span class="ok">Email confirmed</span>` : `<span class="no">Email not confirmed</span>`}<br>${r.domainMatchesWebsite ? `<span class="ok">Domain matches website</span>` : `<span class="no">Domain ≠ website</span>`}</td>
+          <td>${esc(r.status)}${r.reviewNote ? `<br><span class="small muted">${esc(r.reviewNote)}</span>` : ""}</td>
+          <td style="white-space:nowrap">${r.status !== "verified" ? `<button class="btn pri" data-k="${esc(r.key)}" data-s="verified" ${r.emailVerified ? "" : "disabled title='Their work email isn&#39;t confirmed yet'"}>Verify</button>` : ""}
+            ${r.status !== "rejected" ? `<button class="btn" data-k="${esc(r.key)}" data-s="rejected">Reject</button>` : ""}</td></tr>`).join("")}</table></div>`
+        : `<p class="empty">Nothing here.</p>`}</section>`;
+    document.querySelectorAll("[data-show]").forEach((b) => b.onclick = () => { show = b.dataset.show; render(); });
+    document.querySelectorAll("[data-k]").forEach((b) => b.onclick = async () => {
+      let note = "";
+      if (b.dataset.s === "rejected") { note = prompt("Reason (the employer sees this):", "We couldn't confirm you work at this company.") ?? null; if (note === null) return; }
+      b.disabled = true;
+      try { await biz.api({ action: "biz_admin_review", key: b.dataset.k, status: b.dataset.s, note }); await load(); }
+      catch (e) { b.disabled = false; alert(e.message); }
+    });
+  }
+  async function load(){ L = (await biz.api({ action: "biz_admin_list" })).employers; render(); }
+  biz.start(async (u) => {
+    if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable.</div>'; return; }
+    if (!u) { $("main").innerHTML = biz.signInCard("Owners only", "Sign in with an owner account."); return; }
+    try { await load(); } catch (e) { $("main").innerHTML = `<div class="card center">${esc(e.message)}</div>`; }
+  });
+})();
+</script>
+</body>
+</html>

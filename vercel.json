@@ -215,6 +215,10 @@
       "destination": "/u/index.html"
     },
     {
+      "source": "/co/:slug",
+      "destination": "/business/company/index.html"
+    },
+    {
       "source": "/api/remind",
       "destination": "/api/me?cron=remind"
     },

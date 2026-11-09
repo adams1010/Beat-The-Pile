@@ -24,7 +24,7 @@ const DEFAULTS = {
   orbit_messages: () => ({ created_at: new Date(Date.now() + (++tick)).toISOString(), read_at: null }),
 };
 let tick = 0;
-const KEY = { user_jobs: "clerk_user_id", user_home: "clerk_user_id", bot_settings: "bot", company_briefs: "company_id" };
+const KEY = { user_jobs: "clerk_user_id", user_home: "clerk_user_id", employers: "clerk_user_id", bot_settings: "bot", company_briefs: "company_id" };
 
 function parseVal(v) { if (v === "null") return null; if (v === "true") return true; if (v === "false") return false; return v; }
 function test(row, col, expr) {

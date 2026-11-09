@@ -69,10 +69,11 @@ assert.equal((await call("u_cal", { action: "orbit_thread", to: peerKey("u_ana")
 console.log("✓ orbit messages: connected only, inbox + unread, thread order, strangers blocked");
 
 // employers: only to opted-in students; students reply, can't cold-message employers
+f.T("employers").push({ clerk_user_id: "u_emp", status: "verified", profile: { company: "Boeing", name: "Jane Recruiter", title: "University Recruiting" }, fairs: [] });
 assert.equal((await call("u_emp", { action: "orbit_send", to: "ana", body: "Hi Ana" })).code, 403, "ana didn't opt in");
 assert.equal((await call("u_emp", { action: "orbit_send", to: "cal", body: "Hi Cal, we're hiring interns" })).code, 200);
 r = await call("u_cal", { action: "orbit_inbox" });
-assert.equal(r.body.threads[0].name, "Jane Recruiter"); assert.match(r.body.threads[0].headline, /Employer · boeing\.com/);
+assert.equal(r.body.threads[0].name, "Jane Recruiter"); assert.match(r.body.threads[0].headline, /University Recruiting at Boeing/);
 assert.ok(!JSON.stringify(r.body).includes("jane@"), "employer email address never shown");
 assert.equal((await call("u_cal", { action: "orbit_send", to: r.body.threads[0].key, body: "Thanks!" })).code, 200, "student replies");
 r = await call("u_emp", { action: "orbit_thread", to: "cal" }); assert.equal(r.body.messages.length, 2);

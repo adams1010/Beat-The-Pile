@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Career fairs — Beat the Pile Business</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/business/biz.css">
+<style>
+  /* /business/fairs/ (Nov 2026): employers say which fairs they'll attend (employers.fairs). Student numbers are counts only —
+     students who are going AND open to employers show up by name in the employer's Orbit ("At your fairs"). */
+  .fair{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:14px;align-items:center;padding:16px 0;border-top:1px solid #EEF1F6}.fair:first-child{border-top:0}
+  .date{width:64px;border:1px solid var(--line);border-radius:10px;text-align:center;padding:6px 0;line-height:1.1}
+  .date b{display:block;font-size:22px;font-variant-numeric:tabular-nums}.date span{font-size:11.5px;color:var(--muted);font-weight:600}
+  .fair h3{margin:0}.fair .m{font-size:13px;color:var(--muted)}
+  .nums{font-size:13px;margin-top:4px}.nums b{font-variant-numeric:tabular-nums}
+  .go{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;background:#fff;white-space:nowrap}
+  .go input{width:auto;margin:0;accent-color:var(--green)}.go.on{background:var(--tint);border-color:var(--tint2);color:var(--green)}
+  @media (max-width:600px){.fair{grid-template-columns:56px minmax(0,1fr)}.fair .go{grid-column:2}}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main"><div class="card center">Loading…</div></main>
+<script src="/business/biz.js"></script>
+<script>
+(() => {
+  const { esc, $ } = biz;
+  let FAIRS = [], C = { students: {}, companies: {}, mine: [] }, B = null;
+  const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  function render(){
+    const today = new Date().toISOString().slice(0, 10);
+    const up = FAIRS.filter((f) => !f.date || f.date >= today).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+    const past = FAIRS.filter((f) => f.date && f.date < today && C.mine.includes(f.id));
+    const row = (f) => { const d = f.date ? new Date(f.date + "T12:00:00") : null, on = C.mine.includes(f.id), s = C.students[f.id] || 0, co = (C.companies[f.id] || 0) - (on ? 1 : 0);
+      return `<div class="fair"><div class="date">${d ? `<span>${MON[d.getMonth()]}</span><b>${d.getDate()}</b>` : "<span>TBA</span>"}</div>
+        <div><h3>${esc(f.name)}${f.term ? ` <span class="small muted" style="font-weight:500">· ${esc(f.term)}</span>` : ""}</h3><div class="m">${esc([f.school, f.where, f.when].filter(Boolean).join(" · "))}</div>
+          <div class="nums"><b>${s.toLocaleString()}</b> student${s === 1 ? "" : "s"} on Beat the Pile going · <b>${Math.max(0, co).toLocaleString()}</b> other compan${co === 1 ? "y" : "ies"}</div></div>
+        <label class="go ${on ? "on" : ""}"><input type="checkbox" data-fair="${esc(f.id)}" ${on ? "checked" : ""}> We'll be there</label></div>`; };
+    $("main").innerHTML = `${B ? biz.statusBanner(B) : ""}<div class="grid"><div>
+      <section class="card"><h1>Career fairs</h1><p class="sub">Tell students where you'll be. Fairs you pick show on your company page, and students who are going and open to employers appear in your Orbit.</p>
+        ${up.length ? up.map(row).join("") : `<p class="empty">No upcoming fairs listed yet.</p>`}</section>
+      ${past.length ? `<section class="card"><h2>Past fairs you went to</h2>${past.map(row).join("")}</section>` : ""}
+      </div><aside><section class="card"><h2>How it works</h2><ul style="padding-left:18px;margin:0;font-size:14px;line-height:1.6">
+        <li>Student counts are students who said they're going in their Orbit.</li><li>You only see names of students who are going <b>and</b> chose to be found by employers.</li>
+        <li>Missing a fair? Use Report a problem and we'll add it.</li></ul></section></aside></div>`;
+    document.querySelectorAll("[data-fair]").forEach((cb) => cb.onchange = async () => {
+      const set = new Set(C.mine); cb.checked ? set.add(cb.dataset.fair) : set.delete(cb.dataset.fair);
+      cb.disabled = true;
+      try { const r = await biz.api({ action: "biz_fairs", fairs: [...set] }); C.mine = r.fairs; B = r; render(); }
+      catch (e) { cb.checked = !cb.checked; cb.disabled = false; alert(e.message); }
+    });
+  }
+  biz.start(async (u) => {
+    if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; return; }
+    if (!u) { $("main").innerHTML = biz.signInCard("Career fairs", "Sign in to your company account to pick your fairs."); return; }
+    try {
+      const [fj, c, b] = await Promise.all([fetch("/fair/fairs.json").then((r) => r.json()), biz.api({ action: "biz_fair_counts" }), biz.api({ action: "biz_get" })]);
+      FAIRS = fj.fairs || []; C = c; B = b; render();
+    } catch (e) { $("main").innerHTML = `<div class="card center">${esc(e.message)}</div>`; }
+  });
+})();
+</script>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

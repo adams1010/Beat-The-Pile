@@ -66,11 +66,21 @@ covers later renders. Employer data (titles, companies, places) is never in the 
 `i18n/es.json`** (`tests/i18n-test.mjs`). Wrap anything that must not change in `data-noi18n`.
 **Two sides (Nov 8): students + employers.** After sign-in everyone picks a role once — `/start/` (step 1 Clerk email box, step 2
 "I'm looking for an internship" / "I'm hiring interns") or the welcome sheet `nav.js` shows to a signed-in account with no role.
-Saved in Clerk `unsafeMetadata.role` (`student`|`employer`) + localStorage `btp_role`; `nav.js` shows employers Talent · Career
-Fair · Jobs · Business, everyone else gets a "For business" item. `/business/` = employer landing (live numbers only, the talent
-mock is labeled Example, free during beta, no testimonials). `/business/talent/` = **Find talent**: `POST /api/me {action:"talent"}`
-→ `lib/talent.js`, employer accounts only (role read from Clerk server-side), and **only students with a public profile AND
-`profile.openToEmployers` ("Let employers find me" on /u/, off by default)**. Cards = public-page fields only.
+Saved in Clerk `unsafeMetadata.role` (`student`|`employer`) + localStorage `btp_role`. **The business side is its own site (Nov 8):**
+employers' bar = Home (`/business/home/`) · Talent · Orbit · Career Fairs (`/business/fairs/`) · Company (`/business/company/`), a
+"Business" tag on the logo, a student search box; student-only pages (`/`, `/jobs`, `/season`, `/fair`, `/radar`, `/demo`, `/u/`,
+the `/business/` sales page) redirect employers to `/business/home/`. Students (and signed-out visitors) see "For business".
+`/business/` = sales landing (live numbers only, talent mock labeled Example, **no "free"/price wording**, no testimonials);
+"Find interns" → `/start/?role=employer` skips the looking/hiring question → `/business/setup/`.
+**Employer trust (table `employers`, `supabase/business.sql`, `lib/employer.js`, actions `biz_*` in `api/me.js`):** setup = company →
+6-digit code to a WORK email (free-mail refused; code stored hashed, 15 min, 5 tries; sent via Resend) → status `pending` → an owner
+approves on **`/business/admin/`** (ADMIN_EMAILS; shows "email confirmed" + "domain matches website"). **Only `verified` employers**
+can use Find talent, send messages, or ask students to join their orbit — and only to students with a public profile AND
+`profile.openToEmployers` ("Let employers find me", off by default). Public company page **`/co/<slug>`** (verified only; `GET
+/api/me?co=`): about, who we hire, perks, live jobs (our listings via `company_id` name match), recruiters, "Interned here" (opted-in
+students only), fairs. Business Orbit (`biz_orbit`): Interested students (follow your company) · Former interns · Your team (verified
+employers, same email domain) · At your fairs · In orbit. Business home (`biz_home`): live counts only. Fair counts are numbers only.
+`/business/biz.js` + `biz.css` = shared employer-page helpers. Tests: `tests/business-test.mjs`.
 **Brand (Nov 8):** logo in `brand/` (`logo-white.png` in the navy top bar, `logo.png` on light, `mark.png`), icons in `icons/`.
 Colors from the logo: navy `#060A2C`, lime `#B0F701` (on dark only — 1.3:1 on white), dark lime `#4A7000` for buttons/links
 on white, tints `#F2FADF`/`#DDF3A8`.
