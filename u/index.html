@@ -240,6 +240,7 @@
 
   const seenMe = () => { try { return !!localStorage.getItem("btp_me"); } catch { return false; } };
   // ── Public view (anyone, no sign-in) ──
+  const STAFF_ROLES = ["Professor", "Lecturer or instructor", "Academic advisor", "Career center", "Department staff", "Other school staff"];
   function profileHtml(p, resume, isPreview, founding){
     const where = [p.school, p.major, gradLabel(p)].filter(Boolean).join(" · ");
     const edu = [{ school: p.school, degree: "", major: p.major, when: gradLabel(p) }, ...(p.education || [])].filter((x) => x.school)
@@ -256,6 +257,7 @@
         ${isPreview ? `<div class="own"><button type="button" data-tab="edit">Edit profile</button>${S.me && S.me.handle && S.me.profilePublic ? `<button type="button" id="shareP">Share</button><button type="button" id="qrP" title="A QR code recruiters can scan at a career fair">QR</button>` : ""}</div>` : ""}</div>
         <h1>${esc(p.name || "Your name")}</h1>
         ${founding ? `<p class="founding" title="One of the first 150 students on Beat the Pile">Founding member #${+founding}</p>` : ""}
+        ${p.staff ? `<p class="founding">Faculty &amp; staff · ${esc(p.staff)}</p>` : ""}
         ${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
         <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}</div>
         ${(p.openTo || []).length ? `<div class="opento">${p.openTo.map((k) => `<span>Open to ${esc(OPEN_TO[k] || k)}</span>`).join("")}</div>` : ""}
@@ -322,7 +324,8 @@
         <label for="f_handle">Profile address</label>
         <div class="handle"><span>beatthepile.com/u/</span><input id="f_handle" value="${esc(d.handle)}" placeholder="jordan-lee" autocomplete="off" spellcheck="false"></div>
         <label class="switch"><input type="checkbox" id="f_public" ${d.pub ? "checked" : ""}><span><b>Public profile</b><br><span class="muted small">Off = only you can see it. On = anyone with the link (recruiters, friends) can view it, and students at your school can find you in Orbit. It's never in search engines.</span></span></label>
-        <label class="switch"><input type="checkbox" id="f_employers" ${d.p.openToEmployers ? "checked" : ""}><span><b>Let employers find me</b><br><span class="muted small">Companies hiring interns can find your public profile in Find talent by major, school and skills. Needs a public profile. Off unless you turn it on.</span></span></label>
+        ${d.p.staff ? `<div><label for="f_staff">Your role at school</label><select id="f_staff">${STAFF_ROLES.map((r) => `<option${d.p.staff === r ? " selected" : ""}>${r}</option>`).join("")}</select>
+          <p class="muted small">Shown as a Faculty &amp; staff tag. School staff aren't listed in employers' Find talent.</p></div>` : `<label class="switch"><input type="checkbox" id="f_employers" ${d.p.openToEmployers ? "checked" : ""}><span><b>Let employers find me</b><br><span class="muted small">Companies hiring interns can find your public profile in Find talent by major, school and skills. Needs a public profile. Off unless you turn it on.</span></span></label>`}
         ${me.handle && me.profilePublic ? `<p class="small" style="margin:10px 0 0">Live at <a href="/u/${esc(me.handle)}" style="color:var(--green-dark)">beatthepile.com/u/${esc(me.handle)}</a></p>` : ""}
       </section>
       <section class="card"><h2>Basics</h2>
@@ -459,6 +462,7 @@
     const h = $("#f_handle"); if (h) h.oninput = () => { h.value = h.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").slice(0, 30); d.handle = h.value; };
     const pub = $("#f_public"); if (pub) pub.onchange = () => { d.pub = pub.checked; };
     const rs = $("#f_resume"); if (rs) rs.onchange = () => { d.p.showResume = rs.checked; };
+    const sf = $("#f_staff"); if (sf) sf.onchange = () => { d.p.staff = sf.value; };
     const oe = $("#f_employers"); if (oe) oe.onchange = () => { d.p.openToEmployers = oe.checked; };
     main.querySelectorAll("[data-opento]").forEach((el) => el.onchange = () => { const k = el.dataset.opento; d.p.openTo = (d.p.openTo || []).filter((x) => x !== k); if (el.checked) d.p.openTo.push(k); });
     const ph = $("#f_photo"); if (ph) ph.onchange = async () => { const f = ph.files && ph.files[0]; if (!f) return;

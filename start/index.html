@@ -14,7 +14,8 @@
   :root{--navy:#060A2C;--lime:#B0F701;--green:#4A7000;--ink:#060A2C;--muted:#55627A;--line:#DCE2EC;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
   *{box-sizing:border-box}
   body{margin:0;min-height:100vh;background:var(--navy);color:#fff;font-family:var(--font);font-size:16px;line-height:1.5}
-  main{max-width:980px;margin:0 auto;padding:48px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
+  .panel.f{max-width:760px;margin-left:auto;margin-right:auto}
+  main{max-width:1180px;margin:0 auto;padding:48px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
   .steps{display:flex;gap:8px;justify-content:center;margin-bottom:22px;font-size:13px;color:#9FAAC0}
   .steps span{padding:4px 12px;border-radius:999px;border:1px solid #22304D}.steps span.on{background:var(--lime);color:var(--navy);border-color:var(--lime);font-weight:600}
   h1{font-size:clamp(28px,4.5vw,40px);line-height:1.1;letter-spacing:-.025em;text-align:center;margin:0 0 10px}
@@ -43,7 +44,7 @@
 <script src="/nav.js"></script>
 <script src="/pick.js"></script>
 <main id="main">
-  <div class="steps" aria-hidden="true"><span id="s1" class="on">1 · Your email</span><span id="s2">2 · Student or hiring</span><span id="s3">3 · Your school</span></div>
+  <div class="steps" aria-hidden="true"><span id="s1" class="on">1 · Your email</span><span id="s2">2 · About you</span><span id="s3">3 · Your school</span></div>
   <div id="view"><p class="center">Loading…</p></div>
 </main>
 <script>
@@ -77,43 +78,47 @@
       <div class="panel">${window.btpRoleCards(pre || has || null)}</div>
       <p class="switch">Signed in as ${String(C.user.primaryEmailAddress?.emailAddress || "").replace(/[<>&"]/g, "")} · <a href="#" id="out">Use a different account</a></p>`;
     document.querySelectorAll(".btprole-card").forEach((b) => b.addEventListener("click", async (e) => { e.stopPropagation(); b.disabled = true;
-      if (b.dataset.role === "student") {           // students: one more short step so classmates can find them in Orbit
-        try { await C.user.update({ unsafeMetadata: { ...(C.user.unsafeMetadata || {}), role: "student" } }); } catch {}
-        try { localStorage.setItem("btp_role", "student"); } catch {}
-        return stepSchool(C);
+      if (b.dataset.role === "student" || b.dataset.role === "educator") {   // students (and school staff): one more short step so classmates can find them in Orbit
+        const role = b.dataset.role;
+        try { await C.user.update({ unsafeMetadata: { ...(C.user.unsafeMetadata || {}), role } }); } catch {}
+        try { localStorage.setItem("btp_role", role); } catch {}
+        return stepSchool(C, role === "educator");
       }
       window.btpSaveRole(b.dataset.role, window.btpRoleDest ? window.btpRoleDest(b, next) : next); }, true));
     $("#out").onclick = async (e) => { e.preventDefault(); await C.signOut(); location.reload(); };
   }
   // Step 3 (students, Nov 9): school, major, graduation → classmates at the same school see each other in Orbit right away.
-  async function stepSchool(C){
+  async function stepSchool(C, staff){
     const api = async (body) => { const t = await C.session?.getToken?.(); const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + t }, body: JSON.stringify(body) });
       const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Couldn't save. Try again."); return j; };
     let mine = {}; try { const t = await C.session?.getToken?.(); const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + t } }); if (r.ok) mine = (await r.json()).profile || {}; } catch {}
     const go = () => { location.href = next || "/jobs/"; };
-    if (mine.school && mine.major) return go();           // already set up
+    if (mine.school && (staff ? mine.staff : mine.major)) return go();           // already set up
     const nm = mine.name || [C.user.firstName, C.user.lastName].filter(Boolean).join(" ");
     const P = window.btpPick, Y = new Date().getFullYear(), st = { school: mine.school || "", schoolId: mine.schoolId || null, major: mine.major || "" };
     $("#s1").className = ""; $("#s2").className = ""; const s3 = $("#s3"); if (s3) s3.className = "on";
-    $("#view").innerHTML = `<h1>Where do you go to <em>school</em>?</h1>
-      <p class="lead">We use this to show you classmates in Orbit and internships for your major.</p>
+    const ROLES = ["Professor", "Lecturer or instructor", "Academic advisor", "Career center", "Department staff", "Other school staff"];
+    $("#view").innerHTML = `${staff ? `<h1>Where do you <em>work</em>?</h1>
+      <p class="lead">We use this to put you in your school's orbit, with a Faculty &amp; staff tag on your profile.</p>` : `<h1>Where do you go to <em>school</em>?</h1>
+      <p class="lead">We use this to show you classmates in Orbit and internships for your major.</p>`}
       <div class="panel f">
         <label for="o_nm">Your name</label><input id="o_nm" value="${esc(nm)}" autocomplete="name" placeholder="Jordan Lee">
         <label for="o_sc">School</label><input id="o_sc" value="${esc(st.school)}" placeholder="Start typing, e.g. Virginia Tech">
-        <div id="o_mjw"><label for="o_mj">Major</label><input id="o_mj" value="${esc(st.major)}" placeholder="Pick your school first"></div>
-        <div class="two"><div><label for="o_gt">Graduation</label><select id="o_gt"><option value="">Term</option>${["Spring", "Summer", "Fall", "Winter"].map((t) => `<option${mine.gradTerm === t ? " selected" : ""}>${t}</option>`).join("")}</select></div>
+        ${staff ? `<label for="o_rl">Your role</label><select id="o_rl"><option value="">Pick one</option>${ROLES.map((r) => `<option${mine.staff === r ? " selected" : ""}>${r}</option>`).join("")}</select>` : ""}
+        <div id="o_mjw"><label for="o_mj">${staff ? "Department (optional)" : "Major"}</label><input id="o_mj" value="${esc(st.major)}" placeholder="Pick your school first"></div>
+        <div class="two"${staff ? ' style="display:none"' : ""}><div><label for="o_gt">Graduation</label><select id="o_gt"><option value="">Term</option>${["Spring", "Summer", "Fall", "Winter"].map((t) => `<option${mine.gradTerm === t ? " selected" : ""}>${t}</option>`).join("")}</select></div>
           <div><label for="o_gy">Year</label><select id="o_gy"><option value="">Year</option>${Array.from({ length: 8 }, (_, i) => Y + i - 1).map((y) => `<option${+mine.gradYear === y ? " selected" : ""}>${y}</option>`).join("")}</select></div></div>
-        <label class="chk"><input type="checkbox" id="o_show" checked> <span>Show me to students at my school in Orbit (your name, school, major and photo). You can turn this off any time on your profile.</span></label>
+        <label class="chk"><input type="checkbox" id="o_show" checked> <span>${staff ? "Show me to students at my school in Orbit (your name, school, role and photo). You can turn this off any time on your profile." : "Show me to students at my school in Orbit (your name, school, major and photo). You can turn this off any time on your profile."}</span></label>
         <div class="go"><button id="o_go">Continue</button><a href="#" id="o_skip">Skip for now</a><span class="msg" id="o_msg" role="status"></span></div>
       </div>`;
     const majorBox = async () => {
       const progs = st.schoolId ? (await P.majors(st.schoolId)).map((x) => x.label) : [];
       if (progs.length) {
-        $("#o_mjw").innerHTML = `<label for="o_mjs">Major</label><select id="o_mjs"><option value="">Pick your major</option>${progs.map((m) => `<option${m === st.major ? " selected" : ""}>${esc(m)}</option>`).join("")}<option value="__o">Not listed — type it</option></select><input id="o_mj" hidden placeholder="Your major" style="margin-top:6px">`;
+        $("#o_mjw").innerHTML = `<label for="o_mjs">${staff ? "Department (optional)" : "Major"}</label><select id="o_mjs"><option value="">${staff ? "Pick your department" : "Pick your major"}</option>${progs.map((m) => `<option${m === st.major ? " selected" : ""}>${esc(m)}</option>`).join("")}<option value="__o">Not listed — type it</option></select><input id="o_mj" hidden placeholder="Your major" style="margin-top:6px">`;
         $("#o_mjs").onchange = (e) => { const v = e.target.value; $("#o_mj").hidden = v !== "__o"; st.major = v === "__o" ? "" : v; if (v === "__o") $("#o_mj").focus(); };
         $("#o_mj").oninput = (e) => { st.major = e.target.value; };
       } else {
-        $("#o_mjw").innerHTML = `<label for="o_mj">Major</label><input id="o_mj" value="${esc(st.major)}" placeholder="Start typing, e.g. Finance">`;
+        $("#o_mjw").innerHTML = `<label for="o_mj">${staff ? "Department (optional)" : "Major"}</label><input id="o_mj" value="${esc(st.major)}" placeholder="Start typing, e.g. Finance">`;
         P.attach($("#o_mj"), { load: () => P.majors(null), other: true, onPick: (it) => { st.major = it ? it.label : ""; } });
         $("#o_mj").oninput = (e) => { st.major = e.target.value; };
       }
@@ -122,9 +127,11 @@
     majorBox();
     $("#o_skip").onclick = (e) => { e.preventDefault(); go(); };
     $("#o_go").onclick = async () => {
-      const b = $("#o_go"); b.disabled = true; $("#o_msg").textContent = "";
+      const b = $("#o_go"); $("#o_msg").textContent = "";
+      if (staff && !$("#o_rl").value) { $("#o_msg").textContent = "Pick your role."; return; }
+      b.disabled = true;
       try { await api({ action: "onboard", name: $("#o_nm").value, school: st.school || $("#o_sc").value, schoolId: st.schoolId, major: st.major || ($("#o_mj") && $("#o_mj").value) || "",
-          gradTerm: $("#o_gt").value, gradYear: $("#o_gy").value ? +$("#o_gy").value : null, show: $("#o_show").checked }); go(); }
+          gradTerm: $("#o_gt").value, gradYear: $("#o_gy").value ? +$("#o_gy").value : null, show: $("#o_show").checked, ...(staff ? { staff: $("#o_rl").value } : {}) }); go(); }
       catch (e) { b.disabled = false; $("#o_msg").textContent = e.message; }
     };
   }

@@ -1437,7 +1437,26 @@
   "Recruiter profile": "Perfil de reclutador",
   "3 · Your school": "3 · Tu universidad",
   "1 · You": "1 · Tú",
-  "(optional)": "(opcional)"
+  "(optional)": "(opcional)",
+  "I work at a school": "Trabajo en una universidad",
+  "Professors, advisors and career center staff. Browse real internships for your students, see career fairs, and join your school's orbit.": "Profesores, asesores y personal del centro de carreras. Explora prácticas reales para tus estudiantes, consulta ferias de empleo y únete a la órbita de tu universidad.",
+  "Set up my school profile →": "Crear mi perfil de universidad →",
+  "We use this to put you in your school's orbit, with a Faculty & staff tag on your profile.": "Lo usamos para ponerte en la órbita de tu universidad, con una etiqueta de Profesorado y personal en tu perfil.",
+  "Your role": "Tu cargo",
+  "Pick one": "Elige uno",
+  "Professor": "Profesor",
+  "Lecturer or instructor": "Profesor asociado o instructor",
+  "Academic advisor": "Asesor académico",
+  "Career center": "Centro de carreras",
+  "Department staff": "Personal del departamento",
+  "Other school staff": "Otro personal de la universidad",
+  "Department (optional)": "Departamento (opcional)",
+  "Pick your department": "Elige tu departamento",
+  "Pick your role.": "Elige tu cargo.",
+  "Show me to students at my school in Orbit (your name, school, role and photo). You can turn this off any time on your profile.": "Mostrarme a estudiantes de mi universidad en Orbit (tu nombre, universidad, cargo y foto). Puedes desactivarlo cuando quieras en tu perfil.",
+  "Your role at school": "Tu cargo en la universidad",
+  "Shown as a Faculty & staff tag. School staff aren't listed in employers' Find talent.": "Se muestra como etiqueta de Profesorado y personal. El personal universitario no aparece en la búsqueda de talento de las empresas.",
+  "2 · About you": "2 · Sobre ti"
  },
  "patterns": [
   [
@@ -1739,6 +1758,10 @@
   [
    "^Not listed — use “(.+)”$",
    "No está en la lista — usar “$1”"
+  ],
+  [
+   "^Faculty & staff · (.+)$",
+   "Profesorado y personal · $1"
   ]
  ]
 }

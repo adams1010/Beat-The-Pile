@@ -1437,7 +1437,26 @@
   "Recruiter profile": "Recruiter-Profil",
   "3 · Your school": "3 · Deine Hochschule",
   "1 · You": "1 · Du",
-  "(optional)": "(optional)"
+  "(optional)": "(optional)",
+  "I work at a school": "Ich arbeite an einer Hochschule",
+  "Professors, advisors and career center staff. Browse real internships for your students, see career fairs, and join your school's orbit.": "Professor:innen, Berater:innen und Career Center. Durchsuche echte Praktika für deine Studierenden, sieh Karrieremessen und tritt dem Orbit deiner Hochschule bei.",
+  "Set up my school profile →": "Mein Hochschulprofil einrichten →",
+  "We use this to put you in your school's orbit, with a Faculty & staff tag on your profile.": "Damit kommst du in den Orbit deiner Hochschule, mit dem Tag „Lehrende & Mitarbeitende“ in deinem Profil.",
+  "Your role": "Deine Rolle",
+  "Pick one": "Wähle eine aus",
+  "Professor": "Professor:in",
+  "Lecturer or instructor": "Lehrbeauftragte:r oder Dozent:in",
+  "Academic advisor": "Studienberater:in",
+  "Career center": "Career Center",
+  "Department staff": "Mitarbeitende im Fachbereich",
+  "Other school staff": "Andere Mitarbeitende",
+  "Department (optional)": "Fachbereich (optional)",
+  "Pick your department": "Wähle deinen Fachbereich",
+  "Pick your role.": "Wähle deine Rolle.",
+  "Show me to students at my school in Orbit (your name, school, role and photo). You can turn this off any time on your profile.": "Mich Studierenden meiner Hochschule in Orbit zeigen (Name, Hochschule, Rolle und Foto). Du kannst das jederzeit in deinem Profil ausschalten.",
+  "Your role at school": "Deine Rolle an der Hochschule",
+  "Shown as a Faculty & staff tag. School staff aren't listed in employers' Find talent.": "Wird als Tag „Lehrende & Mitarbeitende“ angezeigt. Hochschulpersonal erscheint nicht in der Talentsuche von Arbeitgebern.",
+  "2 · About you": "2 · Über dich"
  },
  "patterns": [
   [
@@ -1739,6 +1758,10 @@
   [
    "^Not listed — use “(.+)”$",
    "Nicht dabei — „$1“ verwenden"
+  ],
+  [
+   "^Faculty & staff · (.+)$",
+   "Lehrende & Mitarbeitende · $1"
   ]
  ]
 }

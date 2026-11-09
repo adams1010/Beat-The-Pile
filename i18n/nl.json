@@ -1437,7 +1437,26 @@
   "Recruiter profile": "Recruiterprofiel",
   "3 · Your school": "3 · Je school",
   "1 · You": "1 · Jij",
-  "(optional)": "(optioneel)"
+  "(optional)": "(optioneel)",
+  "I work at a school": "Ik werk op een school",
+  "Professors, advisors and career center staff. Browse real internships for your students, see career fairs, and join your school's orbit.": "Docenten, studieadviseurs en loopbaancentra. Bekijk echte stages voor je studenten, zie carrièrebeurzen en sluit je aan bij de baan van je school.",
+  "Set up my school profile →": "Mijn schoolprofiel opzetten →",
+  "We use this to put you in your school's orbit, with a Faculty & staff tag on your profile.": "Hiermee zetten we je in de baan van je school, met een label Docenten & medewerkers op je profiel.",
+  "Your role": "Je rol",
+  "Pick one": "Kies er een",
+  "Professor": "Docent",
+  "Lecturer or instructor": "Lector of instructeur",
+  "Academic advisor": "Studieadviseur",
+  "Career center": "Loopbaancentrum",
+  "Department staff": "Medewerker van de afdeling",
+  "Other school staff": "Ander schoolpersoneel",
+  "Department (optional)": "Afdeling (optioneel)",
+  "Pick your department": "Kies je afdeling",
+  "Pick your role.": "Kies je rol.",
+  "Show me to students at my school in Orbit (your name, school, role and photo). You can turn this off any time on your profile.": "Laat me zien aan studenten van mijn school in Orbit (naam, school, rol en foto). Je kunt dit altijd uitzetten op je profiel.",
+  "Your role at school": "Je rol op school",
+  "Shown as a Faculty & staff tag. School staff aren't listed in employers' Find talent.": "Getoond als label Docenten & medewerkers. Schoolpersoneel staat niet in Talent zoeken van werkgevers.",
+  "2 · About you": "2 · Over jou"
  },
  "patterns": [
   [
@@ -1739,6 +1758,10 @@
   [
    "^Not listed — use “(.+)”$",
    "Staat er niet bij — gebruik “$1”"
+  ],
+  [
+   "^Faculty & staff · (.+)$",
+   "Docenten & medewerkers · $1"
   ]
  ]
 }

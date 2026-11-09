@@ -225,7 +225,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);
 
   // ── Welcome sheet: right after someone signs in for the first time, ask "looking" or "hiring" (saved on their Clerk account) ──
-  const DEST = { student: "/jobs/", employer: "/business/setup/" };
+  const DEST = { student: "/jobs/", employer: "/business/setup/", educator: "/u/" };
   async function saveRole(role, go){
     const u = window.Clerk && window.Clerk.user;
     try { if (u) await u.update({ unsafeMetadata: { ...(u.unsafeMetadata || {}), role } }); } catch {}
@@ -240,15 +240,17 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
       <button class="btprole-card${pre === "employer" ? " on" : ""}" data-role="employer" data-kind="recruiter"><span class="btprole-ic">${svg("orbit")}</span><b>I'm a recruiter</b>
         <small>Your own profile and orbit, under your company. Find students by major and school, message them, meet them at fairs.</small><span class="btprole-go">Set up my recruiter profile →</span></button>
       <button class="btprole-card" data-role="employer" data-kind="company"><span class="btprole-ic">${svg("talent")}</span><b>I'm setting up our company page</b>
-        <small>Your company's page: about, who you hire, perks, live jobs. Your recruiters link to it from their own profiles.</small><span class="btprole-go">Set up the company page →</span></button></div>`;
+        <small>Your company's page: about, who you hire, perks, live jobs. Your recruiters link to it from their own profiles.</small><span class="btprole-go">Set up the company page →</span></button>
+      <button class="btprole-card${pre === "educator" ? " on" : ""}" data-role="educator"><span class="btprole-ic">${svg("fair")}</span><b>I work at a school</b>
+        <small>Professors, advisors and career center staff. Browse real internships for your students, see career fairs, and join your school's orbit.</small><span class="btprole-go">Set up my school profile →</span></button></div>`;
   // Nov 9: three ways in — student, recruiter (a person, own orbit), company page. Both business kinds are role "employer";
   // the kind decides which setup they see.
   const roleDest = (c, next) => c.dataset.kind ? `/business/setup/?kind=${c.dataset.kind}` + (next ? `&next=${encodeURIComponent(next)}` : "") : next;
   window.btpRoleDest = roleDest;
   const sheetCss = `.btprole{position:fixed;inset:0;z-index:200;background:rgba(6,10,44,.72);display:grid;place-items:center;padding:16px;font-family:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-.btprole .box{background:#fff;border-radius:16px;max-width:980px;width:100%;padding:28px;box-shadow:0 24px 60px rgba(6,10,44,.4)}
+.btprole .box{background:#fff;border-radius:16px;max-width:1180px;width:100%;padding:28px;box-shadow:0 24px 60px rgba(6,10,44,.4)}
 .btprole h2{margin:0 0 4px;font-size:24px;color:#060A2C;letter-spacing:-.01em}.btprole p{margin:0 0 18px;color:#55627A}
-.btprole-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.btprole-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}@media (max-width:1020px){.btprole-cards{grid-template-columns:repeat(2,1fr)}}
 .btprole-card{font:inherit;text-align:left;cursor:pointer;background:#fff;border:2px solid #DCE2EC;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:8px;color:#060A2C;transition:border-color .12s,box-shadow .12s}
 .btprole-card:hover,.btprole-card:focus-visible,.btprole-card.on{border-color:#4A7000;box-shadow:0 0 0 4px #F2FADF;outline:0}
 .btprole-card b{font-size:18px}.btprole-card small{color:#55627A;font-size:14px;line-height:1.45}

@@ -193,6 +193,7 @@ export function cleanPhoto(v) {
     webp: b.slice(0, 4).toString("ascii") === "RIFF" && b.slice(8, 12).toString("ascii") === "WEBP" };
   return magic[m[1]] ? v : null;
 }
+const STAFF_ROLES = ["Professor", "Lecturer or instructor", "Academic advisor", "Career center", "Department staff", "Other school staff"];
 function cleanProfile(p) {
   p = p && typeof p === "object" ? p : {};
   const arr = (a, n) => (Array.isArray(a) ? a : []).slice(0, n);
@@ -212,6 +213,7 @@ function cleanProfile(p) {
     openToEmployers: p.openToEmployers === true,
     openTo: (Array.isArray(p.openTo) ? p.openTo : []).filter((x) => x === "intern" || x === "fulltime").slice(0, 2),   // "Open to" badges          // "Let employers find me" (Find talent); off unless the student turns it on
     photo: cleanPhoto(p.photo),
+    staff: STAFF_ROLES.includes(p.staff) ? p.staff : null,   // Nov 9: faculty & staff (professor, advisor, career center…) — shown as a tag, never in Find talent
   };
 }
 async function clerkUser(uid) {
@@ -423,12 +425,12 @@ export default async function handler(req, res) {
       const base = cur?.profile && typeof cur.profile === "object" ? cur.profile : {};
       const pick = (k) => (body[k] !== undefined && body[k] !== null && body[k] !== "" ? body[k] : base[k]);
       const profile = cleanProfile({ ...base, name: pick("name"), school: pick("school"), schoolId: body.school !== undefined ? body.schoolId : base.schoolId,
-        major: pick("major"), gradYear: pick("gradYear"), gradTerm: pick("gradTerm") });
+        major: pick("major"), gradYear: body.staff ? null : pick("gradYear"), gradTerm: body.staff ? null : pick("gradTerm"), staff: body.staff !== undefined ? body.staff : base.staff });
       if (!profile.name) return res.status(400).json({ error: "Add your name" });
       if (!profile.school) return res.status(400).json({ error: "Pick your school" });
       let handle = cur?.handle || null;
       if (!handle) {
-        const stem = (profile.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 24) || "student").padEnd(3, "0");
+        const stem = (profile.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 24) || (profile.staff ? "staff" : "student")).padEnd(3, "0");
         for (let i = 0; i < 40 && !handle; i++) {
           const h = i ? `${stem}-${i + 1}` : stem;
           if (!HANDLE_OK.test(h) || RESERVED.has(h)) continue;

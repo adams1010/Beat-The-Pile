@@ -129,6 +129,7 @@
   }
   const person = (p) => `<div class="p">${av(p)}<div class="nm" title="${esc(p.name)}">${esc(p.name)}</div>
     <div class="hl">${esc(p.headline || [p.major, p.school].filter(Boolean).join(" · ") + yr(p.gradYear))}</div>
+    ${p.staff ? `<div class="at">Faculty &amp; staff · ${esc(p.staff)}</div>` : ""}
     ${p.at ? `<div class="at">${esc(p.role ? p.role + " at " : "Worked at ")}${esc(p.at)}</div>` : ""}
     ${p.link === "connected" ? `<div class="tag">In orbit</div>` : p.link === "incoming" ? `<div class="tag">${esc(first(p.name))} wants to join your orbit</div>` : ""}
     <div class="acts">${linkBtns(p)}</div>
