@@ -37,6 +37,15 @@
   .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:32px;text-align:center;max-width:640px;margin:20px auto}
   .card p{color:var(--muted)}
   @media (max-width:860px){form.f{grid-template-columns:1fr 1fr}form.f .q{grid-column:1/-1}}
+  .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto}.acts .btn{margin-top:0;padding:8px 16px}
+  .btn.pri{background:var(--green);color:#fff}
+  .inbox{display:flex;justify-content:flex-end;margin:-4px 0 10px}.inbox a{color:var(--green);font-weight:600;font-size:14px}
+  dialog.compose{border:0;border-radius:14px;padding:20px;width:min(520px,94vw);box-shadow:0 20px 60px rgba(6,10,44,.3)}
+  dialog.compose::backdrop{background:rgba(6,10,44,.45)}
+  dialog.compose h2{margin:0 0 4px;font-size:18px}dialog.compose p{color:var(--muted);font-size:13.5px;margin:0 0 12px}
+  dialog.compose textarea{width:100%;height:140px;font:inherit;font-size:14px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;resize:vertical;box-sizing:border-box}
+  dialog.compose .row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+  dialog.compose .err{color:#A3261A;font-size:13px;margin-top:8px}
 </style>
 </head>
 <body>
@@ -63,7 +72,7 @@
   async function token(){ try { return await S.clerk?.session?.getToken(); } catch { return null; } }
   function render(d){
     if (!d.results.length) { $("#out").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">No students match yet</h2><p>Try fewer filters. Students only appear here after they turn on "Let employers find me" on their profile, so the directory grows as more students join.</p></div>`; return; }
-    $("#out").innerHTML = `<p class="meta">${d.total} student${d.total === 1 ? "" : "s"} found${d.total > d.results.length ? `, showing the top ${d.results.length}` : ""}</p>
+    $("#out").innerHTML = `<div class="inbox"><a href="/orbit/#messages">Your messages</a></div><p class="meta">${d.total} student${d.total === 1 ? "" : "s"} found${d.total > d.results.length ? `, showing the top ${d.results.length}` : ""}</p>
       <div class="res">${d.results.map((p) => `<div class="c">
         <div class="top"><div class="av">${p.photo ? `<img alt="" src="${esc(p.photo)}">` : esc(initials(p.name))}</div>
           <div><div class="nm">${esc(p.name)}</div><div class="sub">${esc([p.major, p.school].filter(Boolean).join(" · "))}${p.gradYear ? ` · Class of ${p.gradYear}` : ""}</div></div></div>
@@ -71,7 +80,32 @@
         ${p.latest && (p.latest.title || p.latest.org) ? `<div class="exp">${esc([p.latest.title, p.latest.org].filter(Boolean).join(" at "))}</div>` : ""}
         ${p.lookingFor ? `<div class="sub">Looking for: ${esc(p.lookingFor)}</div>` : ""}
         ${p.skills.length ? `<div class="sk">${p.skills.map((s) => `<span>${esc(s)}</span>`).join("")}</div>` : ""}
-        <a class="btn out" href="/u/${encodeURIComponent(p.handle)}" target="_blank" rel="noopener">View profile</a></div>`).join("")}</div>`;
+        <div class="acts"><button class="btn pri" type="button" data-msg="${esc(p.handle)}" data-name="${esc(p.name)}">Message</button>
+          <a class="btn out" href="/u/${encodeURIComponent(p.handle)}" target="_blank" rel="noopener">View profile</a></div></div>`).join("")}</div>`;
+    document.querySelectorAll("[data-msg]").forEach((b) => b.onclick = () => compose(b.dataset.msg, b.dataset.name));
+  }
+  // Messages go to the student's Orbit inbox; replies show up in yours at /orbit/#messages (lib/orbitnet.js).
+  function compose(handle, name){
+    let d = $("#compose");
+    if (!d) { d = document.createElement("dialog"); d.id = "compose"; d.className = "compose"; document.body.appendChild(d); }
+    d.innerHTML = `<h2></h2><p>They'll see your name and company in their Orbit inbox and can reply. Keep it short and specific: the role, why them, and a next step.</p>
+      <form><textarea maxlength="2000" aria-label="Message" placeholder="Hi! I saw your profile on Beat the Pile. We're hiring summer interns for…"></textarea>
+      <div class="err" hidden></div><div class="row"><button type="button" class="btn out" data-x>Cancel</button><button class="btn pri">Send</button></div></form>`;
+    d.querySelector("h2").textContent = "Message " + name;
+    d.querySelector("[data-x]").onclick = () => d.close();
+    const f = d.querySelector("form"), err = d.querySelector(".err");
+    f.onsubmit = async (e) => {
+      e.preventDefault(); const body = f.querySelector("textarea").value.trim(); if (!body) return;
+      const btn = f.querySelector(".pri"); btn.disabled = true; err.hidden = true;
+      try {
+        const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) },
+          body: JSON.stringify({ action: "orbit_send", to: handle, body }) });
+        const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Couldn't send");
+        d.innerHTML = `<h2>Sent</h2><p>Replies show up in <a href="/orbit/#messages">your messages</a>.</p><div class="row"><button class="btn pri" type="button" data-x>Done</button></div>`;
+        d.querySelector("[data-x]").onclick = () => d.close();
+      } catch (ex) { btn.disabled = false; err.textContent = ex.message; err.hidden = false; }
+    };
+    d.showModal(); f.querySelector("textarea").focus();
   }
   async function search(){
     $("#out").innerHTML = `<div class="card">Searching…</div>`;

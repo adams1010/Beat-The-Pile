@@ -9,8 +9,8 @@
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="theme-color" content="#060A2C">
 <style>
-  /* Orbit, part 1 (Nov 2026): POST /api/me {action:"orbit"} → lib/orbit.js. Public profiles only.
-     Part 2 (needs supabase/orbit.sql): Connect (two-way) + "Going to the same fair". */
+  /* Orbit (Nov 2026): POST /api/me {action:"orbit"} → lib/orbit.js (public profiles only).
+     Part 2 (Nov 8): Connect (two-way), messages, "going to the same fair" → orbit_* actions in lib/orbitnet.js. */
   :root{--green:#4A7000;--green-l:#F2FADF;--ink:#060A2C;--muted:#55627A;--line:#DCE2EC;--bg:#EEF1F6;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5}
@@ -57,6 +57,36 @@
   .gravity a{color:#B0F701}
   .feed h2::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#4A7000;margin-right:8px;vertical-align:middle}
   .grid2{grid-template-columns:minmax(0,1fr) 340px}
+  .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:10px}.acts .btn{margin-top:0}
+  .lnk{font-size:12.5px;color:var(--muted);margin-top:8px;text-decoration:none}.lnk:hover{text-decoration:underline;color:var(--ink)}
+  .btn[disabled]{opacity:.6;cursor:default;background:#fff}
+  .tag{font-size:11.5px;color:var(--green);background:var(--green-l);border-radius:999px;padding:1px 8px;margin-top:6px;font-weight:600}
+  .reqs{border-left:3px solid var(--green)} .reqs .row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #EEF1F6}.reqs .row:first-of-type{border-top:0}
+  .reqs .av{width:40px;height:40px;font-size:14px}.reqs .who{flex:1;min-width:0}.reqs .who b{display:block}.reqs .who span{color:var(--muted);font-size:12.5px}
+  .reqs .row .btn{margin-top:0}
+  .thr{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #EEF1F6;cursor:pointer;width:100%;background:none;border-left:0;border-right:0;border-bottom:0;font:inherit;text-align:left;color:inherit}
+  .thr:first-of-type{border-top:0}.thr:hover .who b{text-decoration:underline}
+  .thr .av{width:38px;height:38px;font-size:13px}.thr .who{flex:1;min-width:0}.thr .who b{display:block;font-size:13.5px}
+  .thr .who span{display:block;color:var(--muted);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--green);flex-shrink:0}
+  .count{display:inline-block;min-width:20px;text-align:center;background:var(--green);color:#fff;border-radius:999px;font-size:12px;padding:0 6px;margin-left:6px;font-variant-numeric:tabular-nums;vertical-align:2px}
+  .fairbox select{width:100%;font:inherit;font-size:13.5px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:#fff;margin:4px 0 8px}
+  .fairbox label.sw{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin-bottom:8px}
+  .mini{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.mini a{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:3px 10px 3px 3px}
+  .mini .av{width:24px;height:24px;font-size:10px}
+  dialog.chat{border:0;border-radius:14px;padding:0;width:min(560px,94vw);max-height:86vh;box-shadow:0 20px 60px rgba(6,10,44,.3)}
+  dialog.chat::backdrop{background:rgba(6,10,44,.45)}
+  .chat .hd{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}.chat .hd .av{width:38px;height:38px;font-size:13px}
+  .chat .hd .who{flex:1;min-width:0}.chat .hd .who b{display:block}.chat .hd .who span{color:var(--muted);font-size:12.5px}
+  .chat .x{font:inherit;font-size:20px;background:none;border:0;cursor:pointer;color:var(--muted);padding:4px 8px}
+  .chat .msgs{padding:14px 16px;overflow:auto;height:min(52vh,440px);background:#F7F9FC;display:flex;flex-direction:column;gap:8px}
+  .chat .m{max-width:78%;padding:8px 12px;border-radius:14px;background:#fff;border:1px solid var(--line);white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+  .chat .m.mine{align-self:flex-end;background:var(--green);color:#fff;border-color:var(--green)}
+  .chat .m small{display:block;font-size:11px;opacity:.7;margin-top:2px}
+  .chat form{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+  .chat textarea{flex:1;font:inherit;font-size:14px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;resize:none;height:44px}
+  .chat .why{padding:12px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+  .chat .note{font-size:11.5px;color:var(--muted);padding:0 16px 10px}
   @media (max-width:1060px){.grid.grid2{grid-template-columns:1fr}}
   @media (max-width:860px){.sky{grid-template-columns:1fr}}
   @media (max-width:1060px){.grid{grid-template-columns:240px minmax(0,1fr)}.feedcol{grid-column:1/-1}}
@@ -84,29 +114,40 @@
     const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Couldn't load Orbit"); return j;
   }
 
+  const to = (p) => p.key || p.handle;
+  function linkBtns(p){
+    const t = esc(to(p));
+    if (p.link === "connected") return `<button class="btn pri" data-msg="${t}">Message</button>`;
+    if (p.link === "incoming") return `<button class="btn pri" data-accept="${t}">Accept</button><button class="btn" data-remove="${t}">Ignore</button>`;
+    if (p.link === "requested") return `<button class="btn" data-remove="${t}" data-confirm="1" title="Tap to cancel the request">Requested</button>`;
+    return `<button class="btn pri" data-connect="${t}">Connect</button>`;
+  }
   const person = (p) => `<div class="p">${av(p)}<div class="nm" title="${esc(p.name)}">${esc(p.name)}</div>
     <div class="hl">${esc(p.headline || [p.major, p.school].filter(Boolean).join(" · ") + yr(p.gradYear))}</div>
     ${p.at ? `<div class="at">${esc(p.role ? p.role + " at " : "Worked at ")}${esc(p.at)}</div>` : ""}
-    <a class="btn" href="/u/${encodeURIComponent(p.handle)}">View profile</a></div>`;
+    ${p.link === "connected" ? `<div class="tag">Connected</div>` : ""}
+    <div class="acts">${linkBtns(p)}</div>
+    ${p.handle ? `<a class="lnk" href="/u/${encodeURIComponent(p.handle)}">View profile</a>` : ""}</div>`;
   const people = (list, none) => list.length ? `<div class="people">${list.map(person).join("")}</div>` : `<p class="empty">${none}</p>`;
 
   const RINGS = [
     ["inner", "Inner orbit", "Your major, your school", "#B0F701"],
     ["campus", "Campus", "Other majors at your school", "#7FB2FF"],
     ["insiders", "Insiders", "Interned where you're aiming", "#FFB86B"],
+    ["conn", "Connections", "People you're connected with", "#FFFFFF"],
   ];
   function sky(o){
     const sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets };
     const R = { inner: 92, campus: 150, insiders: 205 }, C = 230;
     let nodes = "", rings = "";
-    RINGS.forEach(([k, , , col], ri) => {
+    RINGS.slice(0, 3).forEach(([k, , , col], ri) => {
       rings += `<circle cx="${C}" cy="${C}" r="${R[k]}" fill="none" stroke="${col}" stroke-opacity=".35" stroke-dasharray="${ri === 2 ? "3 6" : "none"}"/>`;
       const list = sets[k].slice(0, ri === 0 ? 8 : 12), n = list.length;
       list.forEach((p, i) => {
         const a = (i / Math.max(n, 1)) * Math.PI * 2 - Math.PI / 2 + ri * 0.45;
         const x = C + R[k] * Math.cos(a), y = C + R[k] * Math.sin(a);
         nodes += `<a class="node" href="/u/${encodeURIComponent(p.handle)}" tabindex="0" aria-label="${esc(p.name)}"><title>${esc(p.name)}${p.at ? " · " + esc(p.at) : ""}</title>
-          <circle cx="${x}" cy="${y}" r="19" fill="#0E1440" stroke="${col}" stroke-width="2"/>
+          <circle cx="${x}" cy="${y}" r="19" fill="${p.link === "connected" ? "#26345F" : "#0E1440"}" stroke="${col}" stroke-width="${p.link === "connected" ? 4 : 2}"/>
           <text x="${x}" y="${y + 4.5}" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">${esc(initials(p.name))}</text></a>`;
       });
     });
@@ -117,13 +158,14 @@
   }
   function render(o){
     S.o = o; const m = o.me, ring = S.ring || "inner";
-    const sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets };
+    const sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets, conn: o.connections || [] };
     const gravity = !m.hasSchool || !m.hasMajor ? `<span>Add your school and major to <a href="/u/">your profile</a> to fill your orbit.</span>`
       : !m.isPublic ? `<span>You're invisible to others. <a href="/u/">Make your profile public</a> to show up in their orbits.</span>`
       : `<span>You're visible in other students' orbits.</span>`;
     const empty = { inner: m.hasSchool ? "No one in your major has a public profile yet. Invite a classmate." : `<a href="/u/">Add your school and major</a> first.`,
       campus: m.hasSchool ? "No one else at your school has a public profile yet." : `<a href="/u/">Add your school</a> first.`,
-      insiders: m.following ? "No public profiles list the companies you follow yet." : `Follow companies with ☆ on <a href="/jobs/">Jobs</a> to find insiders.` };
+      insiders: m.following ? "No public profiles list the companies you follow yet." : `Follow companies with ☆ on <a href="/jobs/">Jobs</a> to find insiders.`,
+      conn: "No connections yet. Tap Connect on anyone in your orbit." };
     const [, title, desc] = RINGS.find((r) => r[0] === ring);
     const feed = o.feed.length ? o.feed.map((f) => f.kind === "job"
       ? `<div class="it"><div class="k">New opening · ${esc(ago(f.at))}</div><a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.title)}</a><div>${esc(f.company)}${f.location ? " · " + esc(f.location) : ""}</div></div>`
@@ -133,12 +175,120 @@
       <div class="sky"><div><h1>Your orbit</h1><p class="sub">The people around your search, closest first. Tap anyone to see their profile.</p>${sky(o)}</div>
         <div><div class="legend">${RINGS.map(([k, t, d, col]) => `<button type="button" data-ring="${k}" aria-pressed="${k === ring}"><i style="border-color:${col}"></i><span>${t}<small>${d}</small></span><b>${sets[k].length}</b></button>`).join("")}</div>
           <div class="gravity">${gravity}</div>
-          <div class="soon" style="color:#8D9AB3">Connections and "going to the same fair" are coming soon.</div></div></div>
+          </div></div>
       <div class="grid grid2">
-        <section class="card"><h2>${title}</h2><p class="sub">${desc}${ring === "inner" && m.hasSchool ? ` · ${esc(m.major || "")} at ${esc(m.school)}` : ""}</p>${people(sets[ring], empty[ring])}</section>
-        <aside class="feedcol"><section class="card feed"><h2>Signals</h2><p class="sub">New openings at companies you follow, and posts from students.</p>${feed}</section></aside>
+        <div>${requests(o)}
+        <section class="card"><h2>${title}</h2><p class="sub">${desc}${ring === "inner" && m.hasSchool ? ` · ${esc(m.major || "")} at ${esc(m.school)}` : ""}</p>${people(sets[ring], empty[ring])}</section></div>
+        <aside class="feedcol">
+          <section class="card" id="messages"><h2>Messages${o.unread ? `<span class="count">${o.unread}</span>` : ""}</h2><p class="sub">Students you're connected with, plus employers if you turned on “Let employers find me”.</p><div id="threads"><p class="empty">Loading…</p></div></section>
+          ${fairBox(o)}
+          <section class="card feed"><h2>Signals</h2><p class="sub">New openings at companies you follow, and posts from students.</p>${feed}</section></aside>
       </div>`;
     document.querySelectorAll("[data-ring]").forEach((b) => b.onclick = () => { S.ring = b.dataset.ring; render(S.o); });
+    wire($("main")); loadThreads(); loadFairs();
+  }
+
+  // ── Part 2: requests, connect buttons, messages, same fair ──
+  function requests(o){
+    const r = o.requests || [];
+    if (!r.length) return "";
+    return `<section class="card reqs"><h2>Connection requests<span class="count">${r.length}</span></h2><p class="sub">Accept to message each other.</p>
+      ${r.map((p) => `<div class="row">${av(p)}<div class="who"><b>${esc(p.name)}</b><span>${esc(p.headline || [p.major, p.school].filter(Boolean).join(" · "))}</span></div>
+        <button class="btn pri" data-accept="${esc(to(p))}">Accept</button><button class="btn" data-remove="${esc(to(p))}">Ignore</button></div>`).join("")}</section>`;
+  }
+  function wire(root){
+    const act = async (b, action, t) => {
+      b.disabled = true;
+      try { await api({ action, to: t }); render(await api({ action: "orbit" })); }
+      catch (e) { b.disabled = false; alertBox(e.message); }
+    };
+    root.querySelectorAll("[data-connect]").forEach((b) => b.onclick = () => act(b, "orbit_connect", b.dataset.connect));
+    root.querySelectorAll("[data-accept]").forEach((b) => b.onclick = () => act(b, "orbit_accept", b.dataset.accept));
+    root.querySelectorAll("[data-remove]").forEach((b) => b.onclick = () => {
+      if (b.dataset.confirm && !confirm("Cancel your connection request?")) return;
+      act(b, "orbit_remove", b.dataset.remove); });
+    root.querySelectorAll("[data-msg]").forEach((b) => b.onclick = () => openChat(b.dataset.msg));
+  }
+  function alertBox(msg){ const d = document.createElement("div"); d.className = "nudge"; d.style.cssText = "position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:50;max-width:90vw";
+    d.textContent = msg; document.body.appendChild(d); setTimeout(() => d.remove(), 4500); }
+
+  async function loadThreads(){
+    const el = $("#threads"); if (!el) return;
+    try {
+      const d = await api({ action: "orbit_inbox" });
+      el.innerHTML = d.threads.length ? d.threads.map((t) => `<button type="button" class="thr" data-msg="${esc(t.key)}">${av(t)}
+        <span class="who"><b>${esc(t.name)}</b><span>${t.last.mine ? "You: " : ""}${esc(t.last.body)}</span></span>${t.unread ? '<i class="dot" aria-label="Unread"></i>' : ""}</button>`).join("")
+        : `<p class="empty">No messages yet. Connect with someone, then say hi.</p>`;
+      wire(el);
+    } catch { el.innerHTML = `<p class="empty">Couldn't load messages. Refresh in a minute.</p>`; }
+  }
+
+  let chatTo = null, chatTimer = null;
+  const when = (iso) => new Date(iso).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+  async function openChat(t){
+    chatTo = t;
+    let d = $("#chat");
+    if (!d) { d = document.createElement("dialog"); d.id = "chat"; d.className = "chat"; document.body.appendChild(d);
+      d.addEventListener("close", () => { clearInterval(chatTimer); chatTo = null; loadThreads(); }); }
+    d.innerHTML = `<div class="msgs"><p class="empty">Loading…</p></div>`;
+    if (!d.open) d.showModal();
+    await drawChat(true);
+    clearInterval(chatTimer); chatTimer = setInterval(() => drawChat(false), 15000);
+  }
+  async function drawChat(first){
+    const d = $("#chat"); if (!d || !chatTo) return;
+    let c;
+    try { c = await api({ action: "orbit_thread", to: chatTo }); }
+    catch (e) { d.innerHTML = `<div class="hd"><div class="who"><b>Messages</b></div><button class="x" aria-label="Close">×</button></div><div class="why">${esc(e.message)}</div>`;
+      d.querySelector(".x").onclick = () => d.close(); return; }
+    const draft = d.querySelector("textarea")?.value || "";
+    const p = c.peer;
+    d.innerHTML = `<div class="hd">${av(p)}<div class="who"><b>${esc(p.name)}</b><span>${esc(p.headline || [p.major, p.school].filter(Boolean).join(" · "))}</span></div>
+        ${p.handle ? `<a class="btn" href="/u/${encodeURIComponent(p.handle)}" style="margin-top:0">Profile</a>` : ""}<button class="x" aria-label="Close">×</button></div>
+      <div class="msgs">${c.messages.length ? c.messages.map((m) => `<div class="m${m.mine ? " mine" : ""}">${esc(m.body)}<small>${esc(when(m.at))}</small></div>`).join("")
+        : `<p class="empty">No messages yet. Say hi.</p>`}</div>
+      ${c.canSend ? `<form><textarea maxlength="2000" placeholder="Write a message" aria-label="Message"></textarea><button class="btn pri" style="margin-top:0">Send</button></form>
+        <div class="note">Be kind and professional. Never share passwords or payment details here.</div>` : `<div class="why">${esc(c.why || "You can't message this person.")}</div>`}`;
+    d.querySelector(".x").onclick = () => d.close();
+    const box = d.querySelector(".msgs"); box.scrollTop = box.scrollHeight;
+    const f = d.querySelector("form");
+    if (f) {
+      const ta = f.querySelector("textarea"); ta.value = draft; if (first) ta.focus();
+      ta.onkeydown = (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); f.requestSubmit(); } };
+      f.onsubmit = async (e) => {
+        e.preventDefault(); const body = ta.value.trim(); if (!body) return;
+        const btn = f.querySelector("button"); btn.disabled = true;
+        try { await api({ action: "orbit_send", to: chatTo, body }); ta.value = ""; await drawChat(false); }
+        catch (err) { btn.disabled = false; alertBox(err.message); }
+      };
+    }
+  }
+
+  function fairBox(o){
+    const f = o.fair || { id: null, on: false, people: [] };
+    return `<section class="card fairbox"><h2>Going to a career fair?</h2>
+      <p class="sub">Pick your fair and see which students are going too. Only students who turn this on for the same fair see each other.</p>
+      <select id="fairSel" aria-label="Career fair"><option value="">Choose a fair</option></select>
+      <label class="sw"><input type="checkbox" id="fairOn" ${f.on ? "checked" : ""}> <span>Show me to other students going</span></label>
+      <button class="btn pri" id="fairSave" style="margin-top:0">Save</button>
+      ${f.on ? (f.people.length ? `<div class="sub" style="margin:12px 0 0">${f.people.length} going</div><div class="mini">${f.people.map((p) =>
+        `<a href="/u/${encodeURIComponent(p.handle)}">${av(p)}${esc(p.name)}</a>`).join("")}</div>`
+        : `<p class="empty" style="margin-top:10px">No one else has turned this on for that fair yet.</p>`) : ""}</section>`;
+  }
+  async function loadFairs(){
+    const sel = $("#fairSel"); if (!sel) return;
+    const cur = S.o?.fair?.id || "";
+    try {
+      S.fairs = S.fairs || (await fetch("/fair/fairs.json").then((r) => r.json())).fairs || [];
+      const today = new Date().toISOString().slice(0, 10);
+      const list = S.fairs.filter((x) => !x.date || x.date >= today || x.id === cur).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+      sel.insertAdjacentHTML("beforeend", list.map((x) => `<option value="${esc(x.id)}" ${x.id === cur ? "selected" : ""} data-noi18n>${esc(x.name)}${x.term ? " — " + esc(x.term) : ""}</option>`).join(""));
+    } catch {}
+    $("#fairSave").onclick = async () => {
+      const b = $("#fairSave"); b.disabled = true;
+      try { await api({ action: "orbit_fair", fair: sel.value, on: $("#fairOn").checked }); render(await api({ action: "orbit" })); }
+      catch (e) { b.disabled = false; alertBox(e.message); }
+    };
   }
 
   async function onUser(u){
@@ -167,6 +317,7 @@
     } catch { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; }
   }
   window.__orbitRender = render;   // used by the offline preview test
+  if (location.hash === "#messages") addEventListener("load", () => setTimeout(() => $("#messages")?.scrollIntoView(), 1200));
   loadClerk();
 })();
 </script>

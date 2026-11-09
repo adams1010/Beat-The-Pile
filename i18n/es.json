@@ -520,7 +520,6 @@
   "Companies you follow": "Empresas que sigues",
   "Visible in Orbit": "Visible en Orbit",
   "Set up profile": "Configurar perfil",
-  "Connections and \"going to the same fair\" are coming soon.": "Las conexiones y \"voy a la misma feria\" llegan pronto.",
   "Add your school to your profile to see them.": "Agrega tu universidad a tu perfil para verlos.",
   "No one in your major has a public profile yet. Share Orbit with a classmate.": "Aún nadie de tu carrera tiene un perfil público. Comparte Orbit con un compañero.",
   "Other majors at your school.": "Otras carreras en tu universidad.",
@@ -696,7 +695,37 @@
   "Built for internships and first jobs, not everything": "Hecho para prácticas y primeros empleos, no para todo",
   "Your career profile": "Tu perfil profesional",
   "Your internship and job search, organized": "Tu búsqueda de prácticas y empleo, organizada",
-  "Create a free account to find interns and new grads from every major.": "Crea una cuenta gratis para encontrar practicantes y recién graduados de todas las carreras."
+  "Create a free account to find interns and new grads from every major.": "Crea una cuenta gratis para encontrar practicantes y recién graduados de todas las carreras.",
+  "Connections": "Conexiones",
+  "People you're connected with": "Personas con las que estás conectado",
+  "No connections yet. Tap Connect on anyone in your orbit.": "Aún no tienes conexiones. Toca Conectar en cualquier persona de tu órbita.",
+  "Connect": "Conectar",
+  "Requested": "Solicitado",
+  "Accept": "Aceptar",
+  "Ignore": "Ignorar",
+  "Message": "Mensaje",
+  "Connected": "Conectado",
+  "Connection requests": "Solicitudes de conexión",
+  "Accept to message each other.": "Acepta para poder enviarse mensajes.",
+  "Messages": "Mensajes",
+  "Students you're connected with, plus employers if you turned on “Let employers find me”.": "Estudiantes con los que estás conectado, y empleadores si activaste “Dejar que los empleadores me encuentren”.",
+  "No messages yet. Connect with someone, then say hi.": "Aún no hay mensajes. Conéctate con alguien y salúdalo.",
+  "Couldn't load messages. Refresh in a minute.": "No se pudieron cargar los mensajes. Actualiza en un minuto.",
+  "Going to a career fair?": "¿Vas a una feria de empleo?",
+  "Pick your fair and see which students are going too. Only students who turn this on for the same fair see each other.": "Elige tu feria y mira qué estudiantes también van. Solo se ven entre sí los estudiantes que activan esto para la misma feria.",
+  "Choose a fair": "Elige una feria",
+  "Show me to other students going": "Mostrarme a otros estudiantes que van",
+  "No one else has turned this on for that fair yet.": "Nadie más lo ha activado para esa feria todavía.",
+  "No messages yet. Say hi.": "Aún no hay mensajes. Saluda.",
+  "Write a message": "Escribe un mensaje",
+  "Be kind and professional. Never share passwords or payment details here.": "Sé amable y profesional. Nunca compartas contraseñas ni datos de pago aquí.",
+  "Your messages": "Tus mensajes",
+  "Sent": "Enviado",
+  "Tap to cancel the request": "Toca para cancelar la solicitud",
+  "Career fair": "Feria de empleo",
+  "Unread": "No leído",
+  "They'll see your name and company in their Orbit inbox and can reply. Keep it short and specific: the role, why them, and a next step.": "Verán tu nombre y empresa en su bandeja de Orbit y podrán responder. Sé breve y concreto: el puesto, por qué ellos y un siguiente paso.",
+  "Hi! I saw your profile on Beat the Pile. We're hiring summer interns for…": "¡Hola! Vi tu perfil en Beat the Pile. Estamos contratando pasantes de verano para…"
  },
  "patterns": [
   [
@@ -846,6 +875,10 @@
   [
    "^New opening · (.+)$",
    "Nueva vacante · $1"
+  ],
+  [
+   "^([\\d,]+) going$",
+   "$1 van"
   ]
  ]
 }

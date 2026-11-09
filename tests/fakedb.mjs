@@ -20,7 +20,10 @@ const DEFAULTS = {
   community_replies: () => ({ status: "pending", reports: 0, created_at: new Date().toISOString(), review_note: null }),
   ai_usage: () => ({ at: new Date().toISOString(), input_tokens: 0, output_tokens: 0, cost_usd: 0, reserved: false }),
   listings: () => ({ closed_at: null, link_ok: null, link_fails: 0 }),
+  orbit_links: () => ({ created_at: new Date().toISOString(), updated_at: new Date().toISOString() }),
+  orbit_messages: () => ({ created_at: new Date(Date.now() + (++tick)).toISOString(), read_at: null }),
 };
+let tick = 0;
 const KEY = { user_jobs: "clerk_user_id", user_home: "clerk_user_id", bot_settings: "bot", company_briefs: "company_id" };
 
 function parseVal(v) { if (v === "null") return null; if (v === "true") return true; if (v === "false") return false; return v; }
@@ -84,6 +87,8 @@ export function installFake({ jwk, anthropic, clerkUsers = {} } = {}) {
     u = String(u); const m = (o.method || "GET").toUpperCase();
     if (u.startsWith("https://api.clerk.com/v1/jwks")) return resp(200, { keys: jwk ? [jwk] : [] });
     if (u.startsWith("https://api.clerk.com/v1/users/")) { const id = decodeURIComponent(u.split("/").pop()); const em = clerkUsers[id];
+      if (em && typeof em === "object") return resp(200, { id, first_name: em.first_name || null, last_name: em.last_name || null, unsafe_metadata: em.role ? { role: em.role } : {},
+        email_addresses: [{ email_address: em.email, verification: { status: "verified" } }] });
       return em ? resp(200, { email_addresses: [{ email_address: em, verification: { status: "verified" } }] }) : resp(404, {}); }
     if (u.startsWith("https://api.resend.com/emails")) { calls.emails = calls.emails || []; const b = JSON.parse(o.body); calls.emails.push(b);
       return calls.resendFail ? resp(500, {}) : resp(200, { id: "em_" + calls.emails.length }); }
@@ -146,7 +151,7 @@ export function installFake({ jwk, anthropic, clerkUsers = {} } = {}) {
         if (ex) { if (prefer.includes("ignore-duplicates")) continue; if (prefer.includes("merge-duplicates")) { Object.assign(ex, it); out.push(ex); continue; }
           return resp(409, { code: "23505", message: "duplicate" }); }
         const row = { ...(DEFAULTS[name]?.() || {}), ...it };
-        if (row.id == null && ["community_posts", "community_replies", "ai_usage", "feedback"].includes(name)) { const id = (seq.get(name) || 0) + 1; seq.set(name, id); row.id = id; }
+        if (row.id == null && ["community_posts", "community_replies", "ai_usage", "feedback", "orbit_messages"].includes(name)) { const id = (seq.get(name) || 0) + 1; seq.set(name, id); row.id = id; }
         rows.push(row); out.push(row);
       }
       return resp(201, prefer.includes("return=representation") ? out.map((r) => ({ ...r })) : undefined);

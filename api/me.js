@@ -22,6 +22,10 @@
 //   POST /api/me { action:"alerts", on, major, states } → weekly email of new internships for that major/places (+ followed companies)
 //   POST /api/me { action:"alerts_test" }          → send yourself this week's alert now (3 a day)
 //   POST /api/me { action:"orbit" }               → Orbit: classmates, people at companies you follow, activity (public profiles only)
+//                                                   + your connections, requests, same-fair people, unread count
+//   POST /api/me { action:"orbit_connect"|"orbit_accept"|"orbit_remove", to }  → two-way Connect (to = /u/ handle or peer key)
+//   POST /api/me { action:"orbit_inbox" } / { action:"orbit_thread", to } / { action:"orbit_send", to, body }  → messages
+//   POST /api/me { action:"orbit_fair", fair, on }  → "going to the same fair" (opt-in)
 //   POST /api/me { action:"talent", q, major, school, gradYear } → employers only: opted-in student profiles
 //   GET  /api/me?u=<handle>  (no sign-in)          → a PUBLIC profile (404 unless the student turned it on)
 //   GET  /api/me?unsub=<token> (no sign-in)        → one-click unsubscribe from reminder emails
@@ -41,6 +45,7 @@ import { runAlerts, cleanMajor, cleanStates, buildAlert, freshListings, matchesF
 import { dueFollowUps } from "../lib/followups.js";
 import { botOn, logRun } from "../lib/bots.js";
 import { orbitFor } from "../lib/orbit.js";
+import { orbitExtras, orbitAction, deleteOrbitData } from "../lib/orbitnet.js";
 import { talentFor, roleOf } from "../lib/talent.js";
 
 const LISTS = ["saved", "applied"];
@@ -323,6 +328,7 @@ export default async function handler(req, res) {
       if (body.confirm !== "DELETE") return res.status(400).json({ error: "Confirm by sending confirm: \"DELETE\"" });
       const row = await loadRow(uid);
       if (row?.resume_path) await deletePdf(row.resume_path);
+      await deleteOrbitData(uid);
       await dbDelete(`user_jobs?clerk_user_id=eq.${encodeURIComponent(uid)}`);
       await dbDelete(`user_home?clerk_user_id=eq.${encodeURIComponent(uid)}`);
       return res.status(200).json({ ok: true, deleted: true });
@@ -331,7 +337,13 @@ export default async function handler(req, res) {
     // ── Orbit (/orbit/): read-only, public profiles only ──
     if (action === "orbit") {
       if (!(await rateOk(`orbit:${uid}`, 60, 30))) return res.status(429).json({ error: "Slow down a little and try again" });
-      return res.status(200).json(await orbitFor(uid, await loadRow(uid)));
+      return res.status(200).json(await orbitFor(uid, await loadRow(uid), orbitExtras));
+    }
+    // ── Orbit part 2: connect / accept / remove, messages, same fair (lib/orbitnet.js) ──
+    if (typeof action === "string" && /^orbit_(connect|accept|remove|thread|send|inbox|fair)$/.test(action)) {
+      if (!(await rateOk(`orbit-act:${uid}`, 60, 60))) return res.status(429).json({ error: "Slow down a little and try again" });
+      const out = await orbitAction(uid, action, body || {}, { roleOf, rateOk });
+      return res.status(out.status).json(out.body);
     }
 
     // ── Find talent (/business/talent/): employer accounts only; students who opted in only ──

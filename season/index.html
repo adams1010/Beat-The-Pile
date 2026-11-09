@@ -247,7 +247,7 @@
     const t = e.target.closest("[data-tab]"); if (t) { S.tab = t.dataset.tab; return render(); }
     if (e.target.closest("#addBtn")) return openAdd();
     if (e.target.closest("#delAll")) {
-      if (!confirm("Delete ALL your Beat the Pile data? This removes your resume file, saved jobs, notes, applications and synced homepage data. It can't be undone.")) return;
+      if (!confirm("Delete ALL your Beat the Pile data? This removes your resume file, saved jobs, notes, applications, Orbit connections and messages, and synced homepage data. It can't be undone.")) return;
       return api("POST", { action: "delete_all", confirm: "DELETE" }).then(() => { toast("All your data is deleted"); S.me = { apps: [], saved: [], applied: [], notes: [], starred: [] }; render(); })
         .catch((err) => toast(err.message));
     }
