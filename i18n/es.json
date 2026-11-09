@@ -1375,7 +1375,19 @@
   "Talk it out. Get a grade.": "Dilo en voz alta. Recibe una nota.",
   "Answer out loud against a timer, get scored on every answer and a letter grade at the end.": "Responde en voz alta contra reloj, recibe puntuación en cada respuesta y una calificación al final.",
   "Built for students": "Hecho para estudiantes",
-  "across the US": "en todo EE. UU."
+  "across the US": "en todo EE. UU.",
+  "Find people": "Buscar personas",
+  "Find students": "Buscar estudiantes",
+  "Name, @handle, school, major or company": "Nombre, @usuario, universidad, carrera o empresa",
+  "Name, school, major or skill": "Nombre, universidad, carrera o habilidad",
+  "Search people": "Buscar personas",
+  "You can search students once your company is verified.": "Podrás buscar estudiantes cuando tu empresa esté verificada.",
+  "No students open to employers match that yet.": "Aún no hay estudiantes abiertos a empresas que coincidan.",
+  "No one with a public profile matches that yet. Try a first name, a school or a major.": "Nadie con perfil público coincide todavía. Prueba con un nombre, una universidad o una carrera.",
+  "Showing the 30 closest matches. Add a school or major to narrow it down.": "Mostrando las 30 coincidencias más cercanas. Agrega una universidad o carrera para afinar.",
+  "Search jobs, companies or people": "Busca empleos, empresas o personas",
+  "Jobs and internships": "Empleos y prácticas",
+  "Every dot is a real job or internship": "Cada punto es un empleo o práctica real"
  },
  "patterns": [
   [
@@ -1649,6 +1661,22 @@
   [
    "^([\\d,]+) company job boards$",
    "$1 bolsas de empleo de empresas"
+  ],
+  [
+   "^Showing results for “(.+)”$",
+   "Resultados para “$1”"
+  ],
+  [
+   "^You typed “(.+)”\\.$",
+   "Escribiste “$1”."
+  ],
+  [
+   "^Searched every major — (.+) had only a few matches\\.$",
+   "Buscamos en todas las carreras: $1 tenía pocas coincidencias."
+  ],
+  [
+   "^([\\d,]+) jobs and internships on the map$",
+   "$1 empleos y prácticas en el mapa"
   ]
  ]
 }

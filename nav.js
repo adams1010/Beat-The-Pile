@@ -57,6 +57,11 @@
 .btpnav .q input{flex:1;min-width:0;background:transparent;border:0;color:var(--n-fg);font:inherit;font-size:14px;outline:0}
 .btpnav .q input::placeholder{color:#8D9AB3}
 .btpnav .q:focus-within{border-color:var(--n-acc)}
+.btpnav .q{position:relative}
+.btpnav .qs{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#fff;color:#060A2C;border:1px solid #DCE2EC;border-radius:10px;box-shadow:0 12px 30px rgba(6,10,44,.18);padding:6px;z-index:60}
+.btpnav .qs a{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:8px;color:#060A2C;text-decoration:none;font-size:14px}
+.btpnav .qs a:hover,.btpnav .qs a[aria-selected=true]{background:#F2FADF}
+.btpnav .qs small{color:#55627A;font-size:12px;margin-left:auto}
 .btpnav .q kbd{font:500 11px "Geist",sans-serif;color:#8D9AB3;border:1px solid #263452;border-radius:4px;padding:1px 6px}
 .btpnav .links{display:flex;align-items:center;gap:2px;flex:0 1 auto;margin-left:auto;min-width:0;overflow-x:auto;scrollbar-width:none}
 .btpnav .links::-webkit-scrollbar{display:none}
@@ -134,7 +139,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   nav.innerHTML = `<a class="btpskip" href="#main">Skip to content</a><div class="in">
     <a class="logo" href="${BIZ ? "/business/home/" : "/"}" aria-label="Beat the Pile ${BIZ ? "Business home" : "home"}"><picture><source media="(max-width:640px)" srcset="/brand/mark-white.png"><img src="/brand/logo-white.png" alt="Beat the Pile" width="95" height="38"></picture>${BIZ ? '<span class="btpbiz">Business</span>' : ""}</a>
     ${BIZ ? `<form class="q" role="search" action="/business/talent/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search students" placeholder="Search students by skill, major or school"><kbd>/</kbd></form>`
-      : `<form class="q" role="search" action="/jobs/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search internships" placeholder="Search internships, jobs, companies"><input type="hidden" name="state" value="all"><kbd>/</kbd></form>`}
+      : `<form class="q" role="search" action="/jobs/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search jobs, companies or people" placeholder="Search jobs, companies or people" autocomplete="off"><input type="hidden" name="state" value="all"><kbd>/</kbd><div class="qs" role="listbox" hidden></div></form>`}
     <div class="links">${MAIN.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${k === "orbit" ? `<span class="btpbw">${svg(k)}<i class="btpbadge" data-noi18n hidden></i></span>` : svg(k)}<span>${t}</span></a>`).join("")}
       ${TOOLS.length ? `<details><summary>${svg("tools")}<span class="lbl">Tools</span></summary><div class="menu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}</div></details>` : ""}</div>
     <details class="mob"><summary>Menu<i class="btpbadge" data-noi18n hidden></i></summary><div class="menu" role="menu">${MAIN.map(([h, t, k]) => `<a role="menuitem" href="${h}"><b>${t}</b>${k === "orbit" ? '<i class="btpbadge" data-noi18n hidden></i>' : ""}</a>`).join("")}${TOOLS.length ? `<div class="sep"></div>${TOOLS.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}` : ""}</div></details>
@@ -151,6 +156,23 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
           <div class="sep"></div>
           <a role="menuitem" href="#" data-btp-signout>Sign out</a>
         </div></details></div></div>`;
+  // Top-bar search (students): jobs by default; a small menu offers "People" too (→ Orbit's Find people). "@name" = people.
+  (() => {
+    const f = nav.querySelector("form.q[action='/jobs/']"); if (!f) return;
+    const i = f.querySelector("input[name=q]"), box = f.querySelector(".qs"); let sel = 0;
+    const esc2 = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+    const opts = (v) => [["/jobs/?state=all&q=" + encodeURIComponent(v), "Jobs and internships", v], ["/orbit/?q=" + encodeURIComponent(v.replace(/^@/, "")), "People", v]];
+    const paint = () => { const v = i.value.trim(); if (!v) { box.hidden = true; return; }
+      if (v.startsWith("@")) sel = 1;
+      box.innerHTML = opts(v).map(([h, t, q], k) => `<a role="option" href="${h}" aria-selected="${k === sel}"><span>${t}</span><small data-noi18n>“${esc2(q.slice(0, 40))}”</small></a>`).join(""); box.hidden = false; };
+    i.addEventListener("input", () => { sel = 0; paint(); });
+    i.addEventListener("focus", paint);
+    i.addEventListener("keydown", (e) => { if (box.hidden) return;
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); sel = sel ? 0 : 1; paint(); }
+      else if (e.key === "Escape") box.hidden = true; });
+    f.addEventListener("submit", (e) => { const v = i.value.trim(); if (!v) return; e.preventDefault(); location.href = opts(v)[sel][0]; });
+    document.addEventListener("click", (e) => { if (!f.contains(e.target)) box.hidden = true; });
+  })();
   addEventListener("keydown", (e) => { const t = e.target.tagName; if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(t) && !e.target.isContentEditable) { const i = nav.querySelector(".q input"); if (i && i.offsetParent) { e.preventDefault(); i.focus(); } } });
   // your photo/initials (saved by the profile page or the homepage after sign-in) → links to your profile
   // signed in (or this browser was) → your picture; signed out → "Sign in" (goes to /start/: email first, then student or business)

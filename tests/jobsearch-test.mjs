@@ -41,4 +41,15 @@ r = rank(jobs.concat(live), "medical sales", { minExact: 50 });
 assert.deepEqual(t(r.exact).slice(0, 2).sort(), ["Acme Ortho", "Zeta"], "titles that say both words come first");
 assert.ok(t(r.exact).indexOf("Stryker") > 1, "then medical companies' sales roles");
 assert.ok(rank([J("Behavioral Health Intern", "X")], "psychology").exact.length, "psychology finds behavioral health");
+// misspellings → the closest real word, and a search with no word match still lands on the closest job area
+r = rank(jobs.concat([J("Psychology Research Intern", "Duke"), J("HR Intern", "Acme", "Austin, TX", "people_hr")]), "phycoology");
+assert.equal(r.fixed, "psychology", "phycoology → psychology");
+assert.equal(t(r.exact)[0], "Duke", "the exact word first, then cousins (clinical research)");
+assert.ok(t(r.similar).includes("Acme"), "the closest area (HR / people) comes next");
+r = rank(jobs, "softwear enginer");
+assert.ok(t(r.exact).includes("Capital One"), "two typos fixed");
+r = rank(jobs, "stryker");
+assert.equal(r.fixed, null, "real company names are never 'fixed'");
+r = rank(jobs, "zoology");
+assert.ok(r.similar.length && r.similar.every((j) => j.field === "science_health"), "a major with no matching title → its closest area");
 console.log("✓ job search: words, cousins, medical companies, typos, places, similar roles, nothing unrelated");

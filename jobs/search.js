@@ -79,6 +79,14 @@
     film: ["video", "video production", "film production", "entertainment", "editing", "media"],
     device: ["medical device", "medtech", "instrument", "implant"],
     art: ["arts", "creative", "design", "museum", "gallery"],
+    zoology: ["animal", "wildlife", "zoo", "aquarium", "marine", "ecology", "conservation", "veterinary", "biology"],
+    ecology: ["environmental", "conservation", "wildlife", "field", "biology"],
+    biomedical: ["biomedical engineering", "medical device", "medtech", "bioengineering", "clinical engineering", "biomechanical"],
+    nursing: ["nurse", "rn", "patient care", "clinical", "healthcare", "hospital"],
+    astronaut: ["space", "aerospace", "flight", "spacecraft", "launch"],
+    space: ["aerospace", "spacecraft", "satellite", "launch", "propulsion"],
+    pilot: ["aviation", "flight", "airline", "aircraft"],
+    veterinary: ["animal", "vet", "veterinarian", "animal health"],
     environmental: ["environment", "sustainability", "energy", "ehs", "climate"],
     sustainability: ["environmental", "esg", "energy", "climate"],
     energy: ["power", "renewable", "utility", "solar", "wind", "oil", "gas"],
@@ -107,6 +115,42 @@
     "astrazeneca", "sanofi", "gsk", "regeneron", "vertex", "biogen", "takeda", "bayer", "novo nordisk", "johnson johnson", "zoetis", "organon",
     "teva", "viatris", "genentech", "roche", "moderna", "boehringer", "otsuka", "daiichi", "astellas", "insmed", "jazz", "alkermes"];
 
+  // A word → the job areas it belongs to (same rules as lib/geo.js fieldsForMajor), so a search always has a "closest
+  // area" to fall back on: "zoology" → Science & Health, "psychology" → HR / Education / Science, "engineer" → engineering.
+  const AREA = [
+    [/^(mechanic|aerospace|aero|robotic|mechatronic|astronaut|space|satellite|aviation|pilot|flight)/, ["mechanical", "engineering"]], [/^(material|metallurg)/, ["chemical", "mechanical"]],
+    [/^(electric|electronic|ee$|hardware|semiconductor|embedded)/, ["electrical", "engineering"]], [/^(civil|construct|structur|architect|surve|urban|transport)/, ["civil"]],
+    [/^(chemical|process)/, ["chemical", "engineering"]], [/^(biomedical|bioengineer)/, ["mechanical", "electrical", "science_health"]],
+    [/^(industrial|manufactur|production|quality|plant)/, ["industrial", "supply_chain"]], [/^(engineer)/, ["engineering", "mechanical", "electrical", "civil", "software"]],
+    [/^(operation|supply|logistic|procure|purchas|warehouse)/, ["supply_chain", "industrial"]], [/^(computer|software|develop|program|cod|web|app|game)/, ["software", "data"]],
+    [/^(data|statistic|analytic|math|actuar|quant|machine|ai$|ml$)/, ["data"]], [/^(cyber|security|it$|network|information|tech)/, ["cyber_it", "data"]],
+    [/^(financ|account|econom|bank|invest|real$|estate|tax|audit|insur)/, ["finance", "consulting"]],
+    [/^(market|advertis|brand|public|communica|journal|film|media|english|literat|linguist|writ|content|social)/, ["marketing"]],
+    [/^(business|manage|entrepreneur|hospitality|sport|consult|strateg)/, ["consulting", "sales", "marketing", "supply_chain", "finance"]],
+    [/^(sale|sell|account)/, ["sales"]], [/^(human|hr$|recruit|talent|people)/, ["people_hr"]],
+    [/^(design|animat|art|photo|interior|fashion|graphic|ux|ui$|creative|product)/, ["product_design"]],
+    [/^(bio|chemist|physic|astronom|health|nurs|pharm|medic|neuro|micro|nutrit|therap|veterin|dental|kinesio|exercis|athlet|physician|food|environment|sustainab|geolog|geograph|agricultur|forensic|cognitiv|zoolog|ecolog|clinic|lab|research|scien|marine|wildlife|animal)/, ["science_health"]],
+    [/^(psych|sociolog|social|anthropolog|counsel|behavior)/, ["people_hr", "education_social", "science_health"]],
+    [/^(educat|teach|tutor|school|childhood|nonprofit|communit)/, ["education_social"]],
+    [/^(law|legal|politic|policy|government|international|criminal|philosoph|history|religio|classic|gender|spanish|liberal)/, ["legal_policy", "education_social"]],
+    [/^(culinar|theat|danc|music)/, ["marketing", "education_social"]],
+  ];
+  const areasOf = (w) => { const out = new Set(); for (const [re, f] of AREA) if (re.test(w)) f.forEach((x) => out.add(x)); return [...out]; };
+  function dist(a, b, max){   // edit distance with swaps (Damerau), stops early past `max`
+    if (Math.abs(a.length - b.length) > max) return max + 1;
+    let p2 = null, p = Array.from({ length: b.length + 1 }, (_, i) => i);
+    for (let i = 1; i <= a.length; i++) {
+      const c = [i]; let best = i;
+      for (let j = 1; j <= b.length; j++) {
+        let v = Math.min(p[j] + 1, c[j - 1] + 1, p[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+        if (p2 && i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) v = Math.min(v, p2[j - 2] + 1);
+        c.push(v); if (v < best) best = v;
+      }
+      if (best > max) return max + 1;
+      p2 = p; p = c;
+    }
+    return p[b.length];
+  }
   const norm = (s) => String(s || "").toLowerCase().replace(/&/g, " ").replace(/[^a-z0-9]+/g, " ").trim();
   const stem = (w) => w.length > 4 && w.endsWith("ies") ? w.slice(0, -3) + "y" : w.length > 3 && w.endsWith("s") && !w.endsWith("ss") ? w.slice(0, -1) : w;
   const words = (s) => norm(s).split(" ").filter(Boolean).map(stem);
@@ -129,17 +173,45 @@
     l: " " + words(j.location || "").join(" ") + " ",
   });
 
+  // Words people actually see in job titles (built from the jobs on the page) + every word we know a cousin for.
+  let VOCAB = { key: "", freq: new Map() };
+  function vocab(jobs){
+    const key = jobs.length + ":" + (jobs[0]?.id || "") + ":" + (jobs[jobs.length - 1]?.id || "");
+    if (VOCAB.key === key) return VOCAB.freq;
+    const freq = new Map();
+    for (const w of Object.keys(SYN)) freq.set(w, 50);
+    for (const w of Object.keys(CO_SYN)) freq.set(w, 50);
+    for (const v of Object.values(SYN)) for (const p of v) for (const w of words(p)) if (!freq.has(w)) freq.set(w, 5);
+    for (const j of jobs) { const s = prep(j);   // title words count most; company and place words are real words too (never "fix" them)
+      for (const w of s.tw) if (w.length >= 3 && !/\d/.test(w)) freq.set(w, (freq.get(w) || 0) + 1);
+      for (const w of s.cw.concat(s.l.trim().split(" "))) if (w.length >= 3 && !/\d/.test(w) && !freq.has(w)) freq.set(w, 0); }
+    VOCAB = { key, freq };
+    return freq;
+  }
+  /** A misspelled word → the closest real word (1 typo for 5–7 letters, 2 for longer). null = it's fine as typed. */
+  function correct(w, freq){
+    if (w.length < 5 || freq.has(w) || STOP.has(w)) return null;
+    for (const k of freq.keys()) if (k.length >= w.length + 3 && k.startsWith(w)) return null;   // a fragment ("mech")
+    const max = w.length >= 8 ? 2 : 1;
+    let best = null, bd = max + 1, bf = 0;
+    for (const [k, f] of freq) {
+      if (Math.abs(k.length - w.length) > max || k[0] !== w[0] && max < 2) continue;
+      const d = dist(w, k, max);
+      if (d < bd || (d === bd && f > bf)) { best = k; bd = d; bf = f; }
+    }
+    return bd <= max ? best : null;
+  }
   /** Parse a search box value into terms (each with its cousins). Empty → null. */
-  function parse(q){
-    const raw = words(q);
+  function parse(q, freq){
+    const raw = words(q).map((w) => (freq && correct(w, freq)) || w);
     const ts = raw.filter((w) => !STOP.has(w));
     const use = ts.length ? ts : raw;
     if (!use.length) return null;
     const own = new Set(use);   // a cousin that is another word you typed can't stand in for this one ("biology research")
-    return use.slice(0, 8).map((w) => ({ w, syn: (SYN[w] || []).map(phrase).filter((p) => p && !p.split(" ").some((x) => own.has(x))), co: (CO_SYN[w] || []).map(phrase) }));
+    return use.slice(0, 8).map((w) => ({ w, syn: (SYN[w] || []).map(phrase).filter((p) => p && !p.split(" ").some((x) => own.has(x))), co: (CO_SYN[w] || []).map(phrase), areas: areasOf(w) }));
   }
   /** How well one job fits one term: 3 = the word itself, 2 = a cousin / company / typo, 1.5 = place, 0 = no. */
-  function termScore(s, term, fieldLabel){
+  function termScore(s, term, fieldLabel, fieldKey){
     const w = term.w;
     if (hasPhrase(s.t, w)) return 3;
     // a word start counts only when it's clearly a fragment of a longer word: "mech" → mechanical, never "sales" → Salem
@@ -151,26 +223,31 @@
     if (w.length >= 5 && s.tw.some((x) => x.length >= 5 && near1(x, w))) return 2;  // one typo
     if (hasPhrase(s.l, w) || (w.length === 2 && s.l.includes(" " + w + " "))) return 1.5;
     if (fieldLabel && w.length >= 4 && norm(fieldLabel).includes(w)) return 1;
+    if (fieldKey && term.areas.includes(fieldKey)) return 0.8;                     // same job area: the closest thing we have
     return 0;
   }
   /**
    * Rank jobs for a query. Returns { exact, similar, terms }: exact = fits every word (original order kept);
    * similar = fits some words (best first). similar is only filled when exact has fewer than `minExact` jobs.
    */
-  function rank(jobs, q, { field = () => "", minExact = 12, maxSimilar = 300 } = {}){
-    const terms = parse(q);
-    if (!terms) return { exact: jobs.slice(), similar: [], terms: null };
+  function rank(jobs, q, { field = () => "", fieldKey = (j) => j.field || "", minExact = 12, maxSimilar = 300 } = {}){
+    const freq = vocab(jobs);
+    const typed = words(q).filter((w) => !STOP.has(w));
+    const terms = parse(q, freq);
+    if (!terms) return { exact: jobs.slice(), similar: [], terms: null, fixed: null };
+    // "Did you mean": the words we corrected (shown on the page so the change is never silent)
+    const fixedWords = terms.map((t) => t.w), fixed = typed.length && typed.join(" ") !== fixedWords.join(" ") ? fixedWords.join(" ") : null;
     const exact = [], part = [];
     for (const j of jobs) {
       const s = prep(j); let all = true, sum = 0, hits = 0;
-      for (const t of terms) { const v = termScore(s, t, field(j)); if (v < 1.5) all = false; if (v > 0) { sum += v; hits++; } }
+      for (const t of terms) { const v = termScore(s, t, field(j), fieldKey(j)); if (v < 1.5) all = false; if (v > 0) { sum += v; hits++; } }
       if (all) exact.push([j, sum]); else if (hits) part.push([j, sum + hits * 2]);   // more words matched beats one strong word
     }
     // Closest fits first: your exact words, then close cousins ("Medical Sales Intern" before "Sales Intern" at a medical
     // company; "Economics" before "Analyst"). Ties keep the page's order (newest / nearest) — sort is stable.
     exact.sort((a, b) => b[1] - a[1]);
     const similar = exact.length >= minExact ? [] : part.sort((a, b) => b[1] - a[1]).slice(0, maxSimilar).map((x) => x[0]);
-    return { exact: exact.map((x) => x[0]), similar, terms };
+    return { exact: exact.map((x) => x[0]), similar, terms, fixed };
   }
   globalThis.btpJobSearch = { rank, parse, norm };
 })();

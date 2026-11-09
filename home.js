@@ -1,4 +1,4 @@
-/* built from src/home.jsx 38983571d23dc6ff — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 9e01569e6e5a91df — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -801,7 +801,7 @@ function HeroMap({
       if (!r.ok) throw 0;
       return r.json();
     });
-    Promise.all([get("/map/us.json"), get("/api/listings?dots=1&field=all")]).then(([g, d]) => {
+    Promise.all([get("/map/us.json"), get("/api/listings?dots=1&field=all&kind=all")]).then(([g, d]) => {
       setGeo(g);
       setPts(d);
     }).catch(() => setErr(true));
@@ -834,12 +834,12 @@ function HeroMap({
       fontWeight: 600,
       color: "#fff"
     }
-  }, "Every dot is a real internship"), React.createElement("span", {
+  }, "Every dot is a real job or internship"), React.createElement("span", {
     style: {
       fontSize: 12,
       color: "#8D9AB3"
     }
-  }, pts ? `${fmt(pts.placed)} on the map` : "")), React.createElement("div", {
+  }, pts ? `${fmt(pts.placed)} jobs and internships on the map` : "")), React.createElement("div", {
     style: {
       position: "relative",
       marginTop: 8
@@ -860,7 +860,7 @@ function HeroMap({
   }, "See the internships \u2192")) : React.createElement("svg", {
     viewBox: "0 0 975 610",
     role: "img",
-    "aria-label": pts ? `Map of the US with ${fmt(pts.placed)} open internships, one dot per city` : "Loading map",
+    "aria-label": pts ? `Map of the US with ${fmt(pts.placed)} open jobs and internships, one dot per city` : "Loading map",
     style: {
       width: "100%",
       height: "auto",

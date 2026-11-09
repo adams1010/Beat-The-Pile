@@ -1375,7 +1375,19 @@
   "Talk it out. Get a grade.": "Zeg het hardop. Krijg een cijfer.",
   "Answer out loud against a timer, get scored on every answer and a letter grade at the end.": "Antwoord hardop tegen de klok, krijg een score per antwoord en aan het eind een cijfer.",
   "Built for students": "Gemaakt voor studenten",
-  "across the US": "in heel de VS"
+  "across the US": "in heel de VS",
+  "Find people": "Mensen zoeken",
+  "Find students": "Studenten zoeken",
+  "Name, @handle, school, major or company": "Naam, @handle, school, studie of bedrijf",
+  "Name, school, major or skill": "Naam, school, studie of vaardigheid",
+  "Search people": "Mensen zoeken",
+  "You can search students once your company is verified.": "Je kunt studenten zoeken zodra je bedrijf is geverifieerd.",
+  "No students open to employers match that yet.": "Nog geen studenten die openstaan voor werkgevers komen overeen.",
+  "No one with a public profile matches that yet. Try a first name, a school or a major.": "Nog niemand met een openbaar profiel komt overeen. Probeer een voornaam, een school of een studie.",
+  "Showing the 30 closest matches. Add a school or major to narrow it down.": "De 30 beste resultaten. Voeg een school of studie toe om te verfijnen.",
+  "Search jobs, companies or people": "Zoek vacatures, bedrijven of mensen",
+  "Jobs and internships": "Vacatures en stages",
+  "Every dot is a real job or internship": "Elke stip is een echte baan of stage"
  },
  "patterns": [
   [
@@ -1649,6 +1661,22 @@
   [
    "^([\\d,]+) company job boards$",
    "$1 vacaturesites van bedrijven"
+  ],
+  [
+   "^Showing results for “(.+)”$",
+   "Resultaten voor ‘$1’"
+  ],
+  [
+   "^You typed “(.+)”\\.$",
+   "Je typte ‘$1’."
+  ],
+  [
+   "^Searched every major — (.+) had only a few matches\\.$",
+   "In alle studies gezocht: $1 had maar weinig resultaten."
+  ],
+  [
+   "^([\\d,]+) jobs and internships on the map$",
+   "$1 vacatures en stages op de kaart"
   ]
  ]
 }

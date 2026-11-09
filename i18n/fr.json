@@ -1375,7 +1375,19 @@
   "Talk it out. Get a grade.": "Parlez. Obtenez une note.",
   "Answer out loud against a timer, get scored on every answer and a letter grade at the end.": "Répondez à voix haute contre la montre, obtenez un score à chaque réponse et une note finale.",
   "Built for students": "Conçu pour les étudiants",
-  "across the US": "partout aux États-Unis"
+  "across the US": "partout aux États-Unis",
+  "Find people": "Trouver des personnes",
+  "Find students": "Trouver des étudiants",
+  "Name, @handle, school, major or company": "Nom, @pseudo, école, filière ou entreprise",
+  "Name, school, major or skill": "Nom, école, filière ou compétence",
+  "Search people": "Chercher des personnes",
+  "You can search students once your company is verified.": "Vous pourrez chercher des étudiants une fois votre entreprise vérifiée.",
+  "No students open to employers match that yet.": "Aucun étudiant ouvert aux employeurs ne correspond pour l'instant.",
+  "No one with a public profile matches that yet. Try a first name, a school or a major.": "Personne avec un profil public ne correspond pour l'instant. Essayez un prénom, une école ou une filière.",
+  "Showing the 30 closest matches. Add a school or major to narrow it down.": "Voici les 30 résultats les plus proches. Ajoutez une école ou une filière pour affiner.",
+  "Search jobs, companies or people": "Cherchez des offres, entreprises ou personnes",
+  "Jobs and internships": "Offres et stages",
+  "Every dot is a real job or internship": "Chaque point est une vraie offre ou un vrai stage"
  },
  "patterns": [
   [
@@ -1649,6 +1661,22 @@
   [
    "^([\\d,]+) company job boards$",
    "$1 sites carrières d'entreprises"
+  ],
+  [
+   "^Showing results for “(.+)”$",
+   "Résultats pour « $1 »"
+  ],
+  [
+   "^You typed “(.+)”\\.$",
+   "Vous avez tapé « $1 »."
+  ],
+  [
+   "^Searched every major — (.+) had only a few matches\\.$",
+   "Recherche dans toutes les filières : $1 avait peu de résultats."
+  ],
+  [
+   "^([\\d,]+) jobs and internships on the map$",
+   "$1 offres et stages sur la carte"
   ]
  ]
 }
