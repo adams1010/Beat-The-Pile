@@ -115,17 +115,18 @@
   }
 
   const to = (p) => p.key || p.handle;
+  const first = (n) => String(n || "Someone").split(/\s+/)[0];
   function linkBtns(p){
     const t = esc(to(p));
     if (p.link === "connected") return `<button class="btn pri" data-msg="${t}">Message</button>`;
     if (p.link === "incoming") return `<button class="btn pri" data-accept="${t}">Accept</button><button class="btn" data-remove="${t}">Ignore</button>`;
-    if (p.link === "requested") return `<button class="btn" data-remove="${t}" data-confirm="1" title="Tap to cancel the request">Requested</button>`;
-    return `<button class="btn pri" data-connect="${t}">Connect</button>`;
+    if (p.link === "requested") return `<button class="btn" data-remove="${t}" data-confirm="1" title="Tap to cancel the request">Orbit requested</button>`;
+    return `<button class="btn pri" data-connect="${t}">Join orbit</button>`;
   }
   const person = (p) => `<div class="p">${av(p)}<div class="nm" title="${esc(p.name)}">${esc(p.name)}</div>
     <div class="hl">${esc(p.headline || [p.major, p.school].filter(Boolean).join(" · ") + yr(p.gradYear))}</div>
     ${p.at ? `<div class="at">${esc(p.role ? p.role + " at " : "Worked at ")}${esc(p.at)}</div>` : ""}
-    ${p.link === "connected" ? `<div class="tag">Connected</div>` : ""}
+    ${p.link === "connected" ? `<div class="tag">In orbit</div>` : p.link === "incoming" ? `<div class="tag">${esc(first(p.name))} wants to join your orbit</div>` : ""}
     <div class="acts">${linkBtns(p)}</div>
     ${p.handle ? `<a class="lnk" href="/u/${encodeURIComponent(p.handle)}">View profile</a>` : ""}</div>`;
   const people = (list, none) => list.length ? `<div class="people">${list.map(person).join("")}</div>` : `<p class="empty">${none}</p>`;
@@ -134,7 +135,7 @@
     ["inner", "Inner orbit", "Your major, your school", "#B0F701"],
     ["campus", "Campus", "Other majors at your school", "#7FB2FF"],
     ["insiders", "Insiders", "Interned where you're aiming", "#FFB86B"],
-    ["conn", "Connections", "People you're connected with", "#FFFFFF"],
+    ["conn", "In orbit", "People who joined your orbit", "#FFFFFF"],
   ];
   function sky(o){
     const sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets };
@@ -165,7 +166,7 @@
     const empty = { inner: m.hasSchool ? "No one in your major has a public profile yet. Invite a classmate." : `<a href="/u/">Add your school and major</a> first.`,
       campus: m.hasSchool ? "No one else at your school has a public profile yet." : `<a href="/u/">Add your school</a> first.`,
       insiders: m.following ? "No public profiles list the companies you follow yet." : `Follow companies with ☆ on <a href="/jobs/">Jobs</a> to find insiders.`,
-      conn: "No connections yet. Tap Connect on anyone in your orbit." };
+      conn: "No one's in your orbit yet. Tap Join orbit on anyone above." };
     const [, title, desc] = RINGS.find((r) => r[0] === ring);
     const feed = o.feed.length ? o.feed.map((f) => f.kind === "job"
       ? `<div class="it"><div class="k">New opening · ${esc(ago(f.at))}</div><a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.title)}</a><div>${esc(f.company)}${f.location ? " · " + esc(f.location) : ""}</div></div>`
@@ -180,20 +181,21 @@
         <div>${requests(o)}
         <section class="card"><h2>${title}</h2><p class="sub">${desc}${ring === "inner" && m.hasSchool ? ` · ${esc(m.major || "")} at ${esc(m.school)}` : ""}</p>${people(sets[ring], empty[ring])}</section></div>
         <aside class="feedcol">
-          <section class="card" id="messages"><h2>Messages${o.unread ? `<span class="count">${o.unread}</span>` : ""}</h2><p class="sub">Students you're connected with, plus employers if you turned on “Let employers find me”.</p><div id="threads"><p class="empty">Loading…</p></div></section>
+          <section class="card" id="messages"><h2>Messages${o.unread ? `<span class="count">${o.unread}</span>` : ""}</h2><p class="sub">Students in your orbit, plus employers if you turned on “Let employers find me”.</p><div id="threads"><p class="empty">Loading…</p></div></section>
           ${fairBox(o)}
           <section class="card feed"><h2>Signals</h2><p class="sub">New openings at companies you follow, and posts from students.</p>${feed}</section></aside>
       </div>`;
     document.querySelectorAll("[data-ring]").forEach((b) => b.onclick = () => { S.ring = b.dataset.ring; render(S.o); });
     wire($("main")); loadThreads(); loadFairs();
+    try { window.btpOrbitBadge && window.btpOrbitBadge((o.unread || 0) + (o.requests || []).length); } catch {}
   }
 
   // ── Part 2: requests, connect buttons, messages, same fair ──
   function requests(o){
     const r = o.requests || [];
     if (!r.length) return "";
-    return `<section class="card reqs"><h2>Connection requests<span class="count">${r.length}</span></h2><p class="sub">Accept to message each other.</p>
-      ${r.map((p) => `<div class="row">${av(p)}<div class="who"><b>${esc(p.name)}</b><span>${esc(p.headline || [p.major, p.school].filter(Boolean).join(" · "))}</span></div>
+    return `<section class="card reqs"><h2>Orbit requests<span class="count">${r.length}</span></h2><p class="sub">Accept to message each other.</p>
+      ${r.map((p) => `<div class="row">${av(p)}<div class="who"><b>${esc(p.name)} wants to join your orbit</b><span>${esc(p.headline || [p.major, p.school].filter(Boolean).join(" · "))}</span></div>
         <button class="btn pri" data-accept="${esc(to(p))}">Accept</button><button class="btn" data-remove="${esc(to(p))}">Ignore</button></div>`).join("")}</section>`;
   }
   function wire(root){
@@ -205,7 +207,7 @@
     root.querySelectorAll("[data-connect]").forEach((b) => b.onclick = () => act(b, "orbit_connect", b.dataset.connect));
     root.querySelectorAll("[data-accept]").forEach((b) => b.onclick = () => act(b, "orbit_accept", b.dataset.accept));
     root.querySelectorAll("[data-remove]").forEach((b) => b.onclick = () => {
-      if (b.dataset.confirm && !confirm("Cancel your connection request?")) return;
+      if (b.dataset.confirm && !confirm("Cancel your orbit request?")) return;
       act(b, "orbit_remove", b.dataset.remove); });
     root.querySelectorAll("[data-msg]").forEach((b) => b.onclick = () => openChat(b.dataset.msg));
   }
@@ -218,7 +220,7 @@
       const d = await api({ action: "orbit_inbox" });
       el.innerHTML = d.threads.length ? d.threads.map((t) => `<button type="button" class="thr" data-msg="${esc(t.key)}">${av(t)}
         <span class="who"><b>${esc(t.name)}</b><span>${t.last.mine ? "You: " : ""}${esc(t.last.body)}</span></span>${t.unread ? '<i class="dot" aria-label="Unread"></i>' : ""}</button>`).join("")
-        : `<p class="empty">No messages yet. Connect with someone, then say hi.</p>`;
+        : `<p class="empty">No messages yet. Bring someone into your orbit, then say hi.</p>`;
       wire(el);
     } catch { el.innerHTML = `<p class="empty">Couldn't load messages. Refresh in a minute.</p>`; }
   }
@@ -229,7 +231,8 @@
     chatTo = t;
     let d = $("#chat");
     if (!d) { d = document.createElement("dialog"); d.id = "chat"; d.className = "chat"; document.body.appendChild(d);
-      d.addEventListener("close", () => { clearInterval(chatTimer); chatTo = null; loadThreads(); }); }
+      d.addEventListener("close", async () => { clearInterval(chatTimer); chatTo = null; loadThreads();
+        try { window.btpOrbitBadge && window.btpOrbitBadge((await api({ action: "orbit_count" })).n); } catch {} }); }
     d.innerHTML = `<div class="msgs"><p class="empty">Loading…</p></div>`;
     if (!d.open) d.showModal();
     await drawChat(true);

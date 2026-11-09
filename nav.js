@@ -51,6 +51,12 @@
 .btpnav .links a,.btpnav summary{color:var(--n-dim);text-decoration:none;font-size:13px;padding:8px 12px;border-radius:6px;white-space:nowrap;cursor:pointer}
 .btpnav .links>a,.btpnav .links>details>summary{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 12px 5px;font-size:12px;line-height:1;min-width:64px;border-bottom:2px solid transparent;border-radius:6px 6px 0 0}
 .btpnav .links .btpic{display:block;flex-shrink:0}
+.btpnav .btpbw{position:relative;display:block}
+.btpnav .btpbadge{font:700 10.5px/16px "Geist",sans-serif;font-style:normal;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#B0F701;color:#060A2C;
+  text-align:center;font-variant-numeric:tabular-nums;box-shadow:0 0 0 2px #060A2C;box-sizing:border-box}
+.btpnav .btpbw .btpbadge{position:absolute;top:-5px;left:13px}
+.btpnav .mob summary .btpbadge,.btpnav .menu .btpbadge{display:inline-block;margin-left:6px;vertical-align:1px}
+.btpnav .btpbadge[hidden]{display:none!important}
 .btpnav .links>a[aria-current=page]{background:transparent;border-bottom-color:var(--n-acc)}
 .btpnav .links a:hover,.btpnav summary:hover{color:#fff}
 .btpnav .links a[aria-current=page]{color:#fff;background:#16223A}
@@ -98,9 +104,9 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   nav.innerHTML = `<a class="btpskip" href="#main">Skip to content</a><div class="in">
     <a class="logo" href="/" aria-label="Beat the Pile home"><picture><source media="(max-width:640px)" srcset="/brand/mark-white.png"><img src="/brand/logo-white.png" alt="Beat the Pile" width="95" height="38"></picture></a>
     <form class="q" role="search" action="/jobs/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search internships" placeholder="Search internships, jobs, companies"><input type="hidden" name="state" value="all"><kbd>/</kbd></form>
-    <div class="links">${MAIN.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${svg(k)}<span>${t}</span></a>`).join("")}
+    <div class="links">${MAIN.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${k === "orbit" ? `<span class="btpbw">${svg(k)}<i class="btpbadge" data-noi18n hidden></i></span>` : svg(k)}<span>${t}</span></a>`).join("")}
       <details><summary>${svg("tools")}<span class="lbl">Tools</span></summary><div class="menu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}<div class="sep"></div>${langItem(true)}</div></details></div>
-    <details class="mob"><summary>Menu</summary><div class="menu" role="menu">${MAIN.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div>${TOOLS.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div>${langItem(false)}</div></details>
+    <details class="mob"><summary>Menu<i class="btpbadge" data-noi18n hidden></i></summary><div class="menu" role="menu">${MAIN.map(([h, t, k]) => `<a role="menuitem" href="${h}"><b>${t}</b>${k === "orbit" ? '<i class="btpbadge" data-noi18n hidden></i>' : ""}</a>`).join("")}<div class="sep"></div>${TOOLS.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div>${langItem(false)}</div></details>
     <div class="right" id="btpRight"><a class="me" id="btpMe" href="/u/" hidden></a></div></div>`;
   addEventListener("keydown", (e) => { const t = e.target.tagName; if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(t) && !e.target.isContentEditable) { const i = nav.querySelector(".q input"); if (i && i.offsetParent) { e.preventDefault(); i.focus(); } } });
   // your photo/initials (saved by the profile page or the homepage after sign-in) → links to your profile
@@ -157,6 +163,22 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
 @media (max-width:620px){.btprole-cards{grid-template-columns:1fr}.btprole .box{padding:20px}}`;
   const sc = document.createElement("style"); sc.textContent = sheetCss; document.head.appendChild(sc);
   document.addEventListener("click", (e) => { const c = e.target.closest && e.target.closest(".btprole-card"); if (c) { c.disabled = true; saveRole(c.dataset.role); } });
+  // Orbit tab badge: unread messages + people asking to join your orbit ("10+" past 9).
+  const paintBadge = (n) => { n = Number(n) || 0;
+    nav.querySelectorAll(".btpbadge").forEach((b) => { b.hidden = n <= 0; b.textContent = n >= 10 ? "10+" : String(n); });
+    const a = nav.querySelector('.links a[href="/orbit/"]'); if (a) a.setAttribute("aria-label", n > 0 ? `Orbit, ${n >= 10 ? "10 or more" : n} new` : "Orbit"); };
+  window.btpOrbitBadge = (n) => { try { sessionStorage.setItem("btp_orbit_n", JSON.stringify({ n, at: Date.now() })); } catch {} paintBadge(n); };
+  async function orbitBadge(C){
+    if (ROLE === "employer" || !C.user) return paintBadge(0);
+    let c = null; try { c = JSON.parse(sessionStorage.getItem("btp_orbit_n") || "null"); } catch {}
+    if (c) paintBadge(c.n);
+    if (c && Date.now() - c.at < 60000) return;
+    try {
+      const t = await C.session.getToken();
+      const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + t }, body: JSON.stringify({ action: "orbit_count" }) });
+      if (r.ok) window.btpOrbitBadge((await r.json()).n);
+    } catch {}
+  }
   function sheet(){
     if (document.querySelector(".btprole") || path.startsWith("/start")) return;
     const d = document.createElement("div"); d.className = "btprole"; d.setAttribute("role", "dialog"); d.setAttribute("aria-modal", "true"); d.setAttribute("aria-label", "Welcome");
@@ -171,5 +193,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     const role = C.user && C.user.unsafeMetadata && C.user.unsafeMetadata.role;
     if (role && role !== ROLE) { try { localStorage.setItem("btp_role", role); } catch {} if (role === "employer" || ROLE === "employer") location.reload(); }
     else if (C.user && !role) sheet();
+    orbitBadge(C);
+    C.addListener && C.addListener(({ user }) => { if (!user) { try { sessionStorage.removeItem("btp_orbit_n"); } catch {} paintBadge(0); } });
   }, 500);
 })();

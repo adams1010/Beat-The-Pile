@@ -40,6 +40,8 @@ let r = await call("u_ana", { action: "orbit_connect", to: "ben" }); assert.deep
 r = await call("u_ana", { action: "orbit_connect", to: "ben" }); assert.deepEqual(r.body, { link: "requested" }, "twice is a no-op");
 assert.equal(f.T("orbit_links").length, 1);
 assert.equal((await call("u_ana", { action: "orbit_send", to: "ben", body: "hey" })).code, 403, "no messages before accept");
+assert.deepEqual((await call("u_ben", { action: "orbit_count" })).body, { n: 1 }, "badge counts the request");
+assert.deepEqual((await call("u_ana", { action: "orbit_count" })).body, { n: 0 }, "your own request isn't a notification");
 r = await call("u_ben", { action: "orbit" });
 assert.equal(r.body.requests.length, 1); assert.equal(r.body.requests[0].handle, "ana");
 assert.equal(r.body.classmates.find((c) => c.handle === "ana").link, "incoming");
@@ -53,6 +55,7 @@ console.log("✓ orbit connect: public profiles only, request → accept, idempo
 assert.equal((await call("u_ana", { action: "orbit_send", to: "ben", body: "   " })).code, 400);
 assert.equal((await call("u_ana", { action: "orbit_send", to: "ben", body: "Going to the CAMEO fair?" })).code, 200);
 assert.equal((await call("u_ben", { action: "orbit" })).body.unread, 1);
+assert.deepEqual((await call("u_ben", { action: "orbit_count" })).body, { n: 1 }, "badge = unread message (request already accepted)");
 r = await call("u_ben", { action: "orbit_inbox" });
 assert.equal(r.body.threads.length, 1); assert.equal(r.body.threads[0].unread, 1); assert.equal(r.body.threads[0].handle, "ana");
 r = await call("u_ben", { action: "orbit_thread", to: r.body.threads[0].key });

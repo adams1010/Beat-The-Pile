@@ -340,7 +340,7 @@ export default async function handler(req, res) {
       return res.status(200).json(await orbitFor(uid, await loadRow(uid), orbitExtras));
     }
     // ── Orbit part 2: connect / accept / remove, messages, same fair (lib/orbitnet.js) ──
-    if (typeof action === "string" && /^orbit_(connect|accept|remove|thread|send|inbox|fair)$/.test(action)) {
+    if (typeof action === "string" && /^orbit_(connect|accept|remove|thread|send|inbox|fair|count)$/.test(action)) {
       if (!(await rateOk(`orbit-act:${uid}`, 60, 60))) return res.status(429).json({ error: "Slow down a little and try again" });
       const out = await orbitAction(uid, action, body || {}, { roleOf, rateOk });
       return res.status(out.status).json(out.body);
