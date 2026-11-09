@@ -142,6 +142,7 @@
     ["insiders", "Insiders", "Interned where you're aiming", "#FFB86B"],
     ["conn", "In orbit", "People who joined your orbit", "#FFFFFF"],
   ];
+  const LEGEND = [RINGS[3], RINGS[0], RINGS[1], RINGS[2]];   // Nov 9: the people already in your orbit come first
   const photoOk = (u) => typeof u === "string" && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(u);   // only real image data, never a link
   function sky(o, sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets }, rings3 = RINGS.slice(0, 3), center = { text: initials(o.me.name) || "You", label: "You", photo: o.me.photo }){
     const RAD = [92, 150, 205], C = 230;
@@ -193,7 +194,7 @@
     if (S.findQ && !S.findHtml) { go(); if (!S.findScrolled) { S.findScrolled = true; setTimeout(() => $(".find")?.scrollIntoView({ block: "start", behavior: "smooth" }), 60); } }   // came from the top-bar search
   }
   function render(o){
-    S.o = o; const m = o.me, ring = S.ring || "inner";
+    S.o = o; const m = o.me, ring = S.ring || ((o.connections || []).length ? "conn" : "inner");
     const sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets, conn: o.connections || [] };
     const gravity = !m.hasSchool || !m.hasMajor ? `<span>Add your school and major to <a href="/u/">your profile</a> to fill your orbit.</span>`
       : !m.isPublic ? `<span>You're invisible to others. <a href="/u/">Make your profile public</a> to show up in their orbits.</span>`
@@ -209,7 +210,7 @@
       : `<p class="empty">Quiet for now. Follow companies with ☆ on <a href="/jobs/">Jobs</a> and their new openings land here.</p>`;
     $("main").innerHTML = `
       <div class="sky"><div><h1>Your orbit</h1><p class="sub">The people around your search, closest first. Tap anyone to see their profile.</p>${sky(o)}</div>
-        <div><div class="legend">${RINGS.map(([k, t, d, col]) => `<button type="button" data-ring="${k}" aria-pressed="${k === ring}"><i style="border-color:${col}"></i><span>${t}<small>${d}</small></span><b>${sets[k].length}</b></button>`).join("")}</div>
+        <div><div class="legend">${LEGEND.map(([k, t, d, col]) => `<button type="button" data-ring="${k}" aria-pressed="${k === ring}"><i style="border-color:${col}"></i><span>${t}<small>${d}</small></span><b>${sets[k].length}</b></button>`).join("")}</div>
           <div class="gravity">${gravity}</div>
           </div></div>
       <div class="grid grid2">

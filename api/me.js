@@ -44,9 +44,9 @@ import { runReminders, emailFor, sendEmail, buildEmail } from "../lib/remind.js"
 import { runAlerts, cleanMajor, cleanStates, buildAlert, freshListings, matchesFor } from "../lib/alerts.js";
 import { dueFollowUps } from "../lib/followups.js";
 import { botOn, logRun } from "../lib/bots.js";
-import { orbitFor } from "../lib/orbit.js";
+import { orbitFor, schoolKey, majorKey, sameSchool, sameMajor } from "../lib/orbit.js";
 import { orbitExtras, orbitAction, deleteOrbitData } from "../lib/orbitnet.js";
-import { bizAction, publicCompany, isVerifiedEmployer } from "../lib/employer.js";
+import { bizAction, publicCompany, isVerifiedEmployer, isAdmin } from "../lib/employer.js";
 import { cleanInternship, internPeers } from "../lib/internship.js";
 import { foundingCount, foundingFor } from "../lib/founding.js";
 import { schoolIdFor } from "../lib/schools.js";
@@ -420,6 +420,19 @@ export default async function handler(req, res) {
     }
     // Sign-up step 3 (Nov 9): name, school, major, graduation — and "show me to students at my school" (checked by default,
     // in plain words on the screen). Keeps everything else already on the profile; picks a link name if there isn't one.
+    if (action === "admin_orbit_why") {       // owners only (Nov 9): why isn't <name> in my orbit? Facts only — no ids, no emails
+      if (!(await isAdmin(uid, { clerkUser }))) return res.status(403).json({ error: "Owners only" });
+      const q = String(body.q || "").trim().toLowerCase(); if (q.length < 2) return res.status(400).json({ error: "Type a name" });
+      const mine = (await loadRow(uid))?.profile || {};
+      const rows = await db.selectAllAsAdmin("user_jobs?select=clerk_user_id,handle,profile,profile_public&profile=not.is.null");
+      const hits = rows.filter((r) => r.clerk_user_id !== uid && [r.profile?.name, r.handle].some((x) => String(x || "").toLowerCase().includes(q))).slice(0, 10)
+        .map((r) => { const p = r.profile || {}; return { name: p.name || null, handle: r.handle || null, isPublic: r.profile_public === true, school: p.school || null, schoolId: p.schoolId || null,
+          schoolKey: schoolKey(p.school) || null, major: p.major || null, majorKey: majorKey(p.major) || null, sameSchool: sameSchool(mine, p), sameMajor: sameMajor(mine.major, p.major) }; });
+      const have = new Set(rows.filter((r) => [r.profile?.name, r.handle].some((x) => String(x || "").toLowerCase().includes(q))).map((r) => r.clerk_user_id));
+      let kitOnly = 0;
+      try { kitOnly = (await db.selectAllAsAdmin("user_home?select=clerk_user_id,profile")).filter((r) => !have.has(r.clerk_user_id) && String(r.profile?.name || "").toLowerCase().includes(q)).length; } catch {}
+      return res.status(200).json({ kitOnly, me: { school: mine.school || null, schoolId: mine.schoolId || null, schoolKey: schoolKey(mine.school) || null, major: mine.major || null, majorKey: majorKey(mine.major) || null }, hits });
+    }
     if (action === "onboard") {
       const cur = await loadRow(uid);
       const base = cur?.profile && typeof cur.profile === "object" ? cur.profile : {};
