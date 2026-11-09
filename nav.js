@@ -28,12 +28,11 @@
     if (["/", "/jobs/", "/jobs", "/season/", "/season", "/fair/", "/fair", "/radar/", "/radar", "/demo/", "/demo", "/u/", "/u", "/business/", "/business"].includes(p0)) { location.replace("/business/home/"); return; }
   }
   const MAIN = BIZ
-    ? [["/business/home/", "Home", "home"], ["/business/talent/", "Talent", "talent"], ["/orbit/", "Orbit", "orbit"], ["/business/fairs/", "Career Fairs", "fair"], ["/business/company/", "Company", "business"]]
-    : [["/jobs/", "Jobs", "jobs"], ["/fair/", "Career Fair", "fair"], ["/orbit/", "Orbit", "orbit"], ["/season/", "My Season", "season"], ["/u/", "Profile", "profile"], ["/business/", "For business", "business"]];
-  const TOOLS = BIZ ? [
-    ["/business/company/", "Company page", "How students see your company"],
-    ["/start/", "Switch account type", "Use Beat the Pile as a student instead"],
-  ] : [
+    ? [["/business/home/", "Home", "home"], ["/business/talent/", "Talent", "talent"], ["/orbit/", "Orbit", "orbit"], ["/business/fairs/", "Career Fairs", "fair"]]
+    : [["/jobs/", "Jobs", "jobs"], ["/fair/", "Career Fair", "fair"], ["/orbit/", "Orbit", "orbit"], ["/season/", "My Season", "season"]];
+  // Your profile (or company page), switching between student and business, language and sign-out all live in the
+  // menu behind your picture on the right — like Instagram's "switch to professional account".
+  const TOOLS = BIZ ? [] : [
     ["/radar/", "Opening Radar", "When each company usually opens internships"],
     ["/#quiz", "Match quiz", "Real openings matched to your major"],
     ["/#interview", "Interview practice", "Talk it out against a timer, get graded"],
@@ -87,7 +86,25 @@
 .btpnav .me{width:32px;height:32px;border-radius:50%;background:#4A7000;color:#fff;display:grid;place-items:center;font:600 12px "Geist",sans-serif;text-decoration:none;overflow:hidden;flex-shrink:0;border:2px solid #1A2640}
 .btpnav .me[hidden]{display:none}.btpnav .me img{width:100%;height:100%;object-fit:cover}
 .btpnav .me:hover,.btpnav .me[aria-current=page]{border-color:var(--n-acc)}
-.btpnav #acct{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--n-dim)}
+.btpnav #acct{display:none!important}
+.btpnav details.acct summary.me{list-style:none;cursor:pointer;padding:0;border-radius:50%;min-width:0}
+.btpnav details.acct summary.me::-webkit-details-marker{display:none}
+.btpnav .me.cur,.btpnav details.acct[open] summary.me{border-color:var(--n-acc)}
+.btpnav details.acct{position:relative}
+.btpnav details.acct.hiring summary.me{border-color:#B0F701}
+.btpnav details.acct.hiring::after{content:"Hiring";position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);font:700 9px/1.3 "Geist",sans-serif;color:#060A2C;background:#B0F701;border:2px solid #060A2C;border-radius:999px;padding:0 5px;pointer-events:none;white-space:nowrap}
+.btpnav .btpsignin{font:600 13px "Geist",sans-serif;background:var(--n-acc);color:#060A2C;border-radius:999px;padding:8px 16px;text-decoration:none;white-space:nowrap}
+.btpnav .btpsignin[hidden],.btpnav details.acct[hidden]{display:none}
+.btpnav .acctmenu{min-width:280px;max-width:calc(100vw - 16px)}
+.btpnav .acchead{display:flex;gap:10px;align-items:center;padding:10px 10px 12px}
+.btpnav .acchead b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.btpnav .acchead small{display:block;color:#5B6675;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.btpnav .me.big{width:44px;height:44px;font-size:15px;border:0}
+.btpnav .acctmenu a.pri{display:block;text-align:center;border:1px solid #4A7000;color:#4A7000;border-radius:999px;font-weight:600;margin:0 8px 6px;padding:7px 12px}
+.btpnav .acctmenu a.pri:hover{background:#F2FADF}
+.btpnav .langs{padding:8px 10px}.btpnav .langs b{font-size:13px}
+.btpnav .langrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.btpnav .langrow button{font:500 12.5px "Geist",sans-serif;border:1px solid #DCE2EC;background:#fff;color:#060A2C;border-radius:999px;padding:4px 10px;cursor:pointer}
+.btpnav .langrow button[aria-pressed=true]{background:#060A2C;color:#fff;border-color:#060A2C}
 .btpnav #acct span,.btpnav #acct .who{max-width:170px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--n-dim)}
 .btpnav #acct button{font:inherit;font-size:13px;font-weight:600;border-radius:7px;padding:6px 12px;cursor:pointer;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.18)}
 .btpnav #acct .signin,.btpnav #acct #si{background:var(--n-acc);color:#060A2C;border-color:var(--n-acc);border-radius:999px;padding:7px 16px}
@@ -106,8 +123,8 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
   // Site language (English / Español): /i18n.js translates the page when Spanish is picked.
   if (!document.querySelector('script[src="/i18n.js"]')) { const i = document.createElement("script"); i.src = "/i18n.js"; document.head.appendChild(i); }
-  let LANG = "en"; try { LANG = localStorage.getItem("btp_lang") === "es" ? "es" : "en"; } catch {}
-  const langItem = (rich) => `<a role="menuitem" href="#" data-btp-lang="${LANG === "es" ? "en" : "es"}">${rich ? `<b>Language</b><small>${LANG === "es" ? "Switch to English" : "Cambiar a español"}</small>` : `<b>${LANG === "es" ? "English" : "Español"}</b>`}</a>`;
+  const LANGS = [["en", "English"], ["es", "Español"], ["fr", "Français"], ["de", "Deutsch"], ["nl", "Nederlands"]];
+  let LANG = "en"; try { const l = localStorage.getItem("btp_lang"); if (LANGS.some(([k]) => k === l)) LANG = l; } catch {}
   if (!document.querySelector('link[href*="family=Geist"]')) {
     const f = document.createElement("link"); f.rel = "stylesheet";
     f.href = "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap"; document.head.appendChild(f);
@@ -118,15 +135,42 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     ${BIZ ? `<form class="q" role="search" action="/business/talent/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search students" placeholder="Search students by skill, major or school"><kbd>/</kbd></form>`
       : `<form class="q" role="search" action="/jobs/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search internships" placeholder="Search internships, jobs, companies"><input type="hidden" name="state" value="all"><kbd>/</kbd></form>`}
     <div class="links">${MAIN.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${k === "orbit" ? `<span class="btpbw">${svg(k)}<i class="btpbadge" data-noi18n hidden></i></span>` : svg(k)}<span>${t}</span></a>`).join("")}
-      <details><summary>${svg("tools")}<span class="lbl">Tools</span></summary><div class="menu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}<div class="sep"></div>${langItem(true)}</div></details></div>
-    <details class="mob"><summary>Menu<i class="btpbadge" data-noi18n hidden></i></summary><div class="menu" role="menu">${MAIN.map(([h, t, k]) => `<a role="menuitem" href="${h}"><b>${t}</b>${k === "orbit" ? '<i class="btpbadge" data-noi18n hidden></i>' : ""}</a>`).join("")}<div class="sep"></div>${TOOLS.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div>${langItem(false)}</div></details>
-    <div class="right" id="btpRight"><a class="me" id="btpMe" href="/u/" hidden></a></div></div>`;
+      ${TOOLS.length ? `<details><summary>${svg("tools")}<span class="lbl">Tools</span></summary><div class="menu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}</div></details>` : ""}</div>
+    <details class="mob"><summary>Menu<i class="btpbadge" data-noi18n hidden></i></summary><div class="menu" role="menu">${MAIN.map(([h, t, k]) => `<a role="menuitem" href="${h}"><b>${t}</b>${k === "orbit" ? '<i class="btpbadge" data-noi18n hidden></i>' : ""}</a>`).join("")}${TOOLS.length ? `<div class="sep"></div>${TOOLS.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}` : ""}</div></details>
+    <div class="right" id="btpRight">
+      <a class="btpsignin" id="btpSignIn" href="/start/?next=${encodeURIComponent(location.pathname + location.search)}" hidden>Sign in</a>
+      <details class="acct" id="btpAcct" hidden><summary class="me" id="btpMe" aria-label="Your account menu"></summary>
+        <div class="menu acctmenu" role="menu">
+          <div class="acchead"><span class="me big" id="btpMe2" aria-hidden="true"></span><div style="min-width:0"><b id="btpAName" data-noi18n></b><small id="btpAEmail" data-noi18n></small></div></div>
+          <a role="menuitem" class="pri" href="${BIZ ? "/business/company/" : "/u/"}">${BIZ ? "View company page" : "View profile"}</a>
+          <div class="sep"></div>
+          <a role="menuitem" href="#" data-btp-switch="${BIZ ? "student" : "employer"}"><b>${BIZ ? "Switch to student account" : "Switch to business account"}</b><small>${BIZ ? "Look for internships and jobs" : "Hire interns and new grads"}</small></a>
+          <div class="sep"></div>
+          <div class="langs"><b>Language</b><div class="langrow">${LANGS.map(([k, n]) => `<button type="button" data-btp-lang="${k}" aria-pressed="${k === LANG}" data-noi18n>${n}</button>`).join("")}</div></div>
+          <div class="sep"></div>
+          <a role="menuitem" href="#" data-btp-signout>Sign out</a>
+        </div></details></div></div>`;
   addEventListener("keydown", (e) => { const t = e.target.tagName; if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(t) && !e.target.isContentEditable) { const i = nav.querySelector(".q input"); if (i && i.offsetParent) { e.preventDefault(); i.focus(); } } });
   // your photo/initials (saved by the profile page or the homepage after sign-in) → links to your profile
-  window.btpNavMe = () => { const a = nav.querySelector("#btpMe"); if (!a) return; let me = null; try { me = JSON.parse(localStorage.getItem("btp_me") || "null"); } catch {}
-    if (!me) { a.hidden = true; return; }
-    a.hidden = false; a.title = "Your profile"; a.setAttribute("aria-label", "Your profile"); if (path.startsWith("/u/")) a.setAttribute("aria-current", "page");
-    a.innerHTML = me.photo && /^data:image\/(jpeg|png|webp);base64,/.test(me.photo) ? `<img alt="" src="${me.photo.replace(/"/g, "")}">` : String(me.i || "").replace(/[^A-Z0-9]/gi, "").slice(0, 2) || "Me"; };
+  // signed in (or this browser was) → your picture; signed out → "Sign in" (goes to /start/: email first, then student or business)
+  let ACCT = { user: undefined };
+  window.btpNavMe = () => {
+    const box = nav.querySelector("#btpAcct"), si = nav.querySelector("#btpSignIn"); if (!box) return;
+    let me = null; try { me = JSON.parse(localStorage.getItem("btp_me") || "null"); } catch {}
+    const u = ACCT.user, signedIn = u ? true : u === null ? false : !!me;
+    box.hidden = !signedIn; si.hidden = signedIn || (u === undefined && seenSignIn());
+    if (!signedIn) return;
+    const email = u?.primaryEmailAddress?.emailAddress || "";
+    const name = [u?.firstName, u?.lastName].filter(Boolean).join(" ") || (me && me.n) || email.split("@")[0] || "Your account";
+    const ini = (me && me.i) || name.split(/[\s._-]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "Me";
+    const pic = me && me.photo && /^data:image\/(jpeg|png|webp);base64,/.test(me.photo) ? `<img alt="" src="${me.photo.replace(/"/g, "")}">` : String(ini).replace(/[^A-Z0-9]/gi, "").slice(0, 2) || "Me";
+    nav.querySelector("#btpMe").innerHTML = pic; nav.querySelector("#btpMe2").innerHTML = pic;
+    let hiring = false; try { hiring = BIZ && localStorage.getItem("btp_hiring") === "1"; } catch {}
+    box.classList.toggle("hiring", hiring); nav.querySelector("#btpMe").title = hiring ? "Your account · Hiring" : "Your account";
+    nav.querySelector("#btpAName").textContent = name; nav.querySelector("#btpAEmail").textContent = email;
+    if (path.startsWith("/u/") || path.startsWith("/business/company/")) nav.querySelector("#btpMe").classList.add("cur");
+  };
+  const seenSignIn = () => { try { return !!(localStorage.getItem("btp_me") || localStorage.getItem("btp_role")); } catch { return false; } };
   window.btpNavMe();
   const later = () => {     // the rest of the page exists now
     const main = document.querySelector("main"); if (main && !main.id) main.id = "main";
@@ -138,7 +182,9 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", later); else later();
     for (const det of nav.querySelectorAll("details")) {
       const place = () => { const r = det.querySelector("summary").getBoundingClientRect(), m = det.querySelector(".menu");
-        m.style.top = r.bottom + "px"; if (!det.classList.contains("mob")) m.style.left = Math.max(8, Math.min(r.left, innerWidth - m.offsetWidth - 8)) + "px"; };
+        m.style.top = r.bottom + "px";
+        if (det.classList.contains("acct")) m.style.left = Math.max(8, Math.min(r.right - m.offsetWidth, innerWidth - m.offsetWidth - 8)) + "px";
+        else if (!det.classList.contains("mob")) m.style.left = Math.max(8, Math.min(r.left, innerWidth - m.offsetWidth - 8)) + "px"; };
       det.addEventListener("toggle", () => det.open && place());
       document.addEventListener("click", (e) => { if (det.open && !det.contains(e.target)) det.open = false; });
       document.addEventListener("keydown", (e) => { if (e.key === "Escape") det.open = false; });
@@ -146,6 +192,11 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
       det.querySelectorAll(".menu a").forEach((a) => a.addEventListener("click", () => { det.open = false; }));
       det.querySelectorAll("[data-btp-lang]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault();
         const l = a.dataset.btpLang; if (window.btpI18n) window.btpI18n.set(l); else { try { localStorage.setItem("btp_lang", l); } catch {} location.reload(); } }));
+      det.querySelectorAll("[data-btp-switch]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); det.open = false;
+        saveRole(a.dataset.btpSwitch, a.dataset.btpSwitch === "employer" ? "/business/home/" : "/jobs/"); }));
+      det.querySelectorAll("[data-btp-signout]").forEach((a) => a.addEventListener("click", async (e) => { e.preventDefault();
+        try { localStorage.removeItem("btp_me"); sessionStorage.removeItem("btp_orbit_n"); } catch {}
+        try { if (window.Clerk) await window.Clerk.signOut(); } catch {} location.href = "/"; }));
     }
   };
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);
@@ -199,14 +250,16 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   }
   function startBadge(C){
     orbitBadge(C);
-    setInterval(() => { if (document.visibilityState === "visible") orbitBadge(C, true); }, 30000);
+    setInterval(() => { if (document.visibilityState === "visible") orbitBadge(C, true); }, 15000);
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") orbitBadge(C); });
     addEventListener("focus", () => orbitBadge(C));
   }
   // Pages that never load sign-in themselves (Radar, Privacy, Business…): if this browser has been signed in before,
   // load Clerk here so the badge still works everywhere.
-  const seenSignIn = () => { try { return !!(localStorage.getItem("btp_me") || localStorage.getItem("btp_role")); } catch { return false; } };
-  async function loadClerkHere(){
+  let clerkLoading = null;
+  window.btpLoadClerk = () => loadClerkHere();
+  function loadClerkHere(){ return (clerkLoading ||= loadClerkOnce()); }
+  async function loadClerkOnce(){
     try {
       const pk = (await fetch("/api/config").then((r) => r.json())).clerkPublishableKey; if (!pk || window.Clerk) return;
       const host = atob(pk.replace(/^pk_(test|live)_/, "")).replace(/\$$/, "").trim(); if (!/clerk/.test(host)) return;
@@ -230,9 +283,10 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     const role = C.user && C.user.unsafeMetadata && C.user.unsafeMetadata.role;
     if (role && role !== ROLE) { try { localStorage.setItem("btp_role", role); } catch {} if (role === "employer" || ROLE === "employer") location.reload(); }
     else if (C.user && !role) sheet();
+    ACCT.user = C.user || null; window.btpNavMe();
     startBadge(C);
     let lastU = C.user?.id || null;
-    C.addListener && C.addListener(({ user }) => { const id = user?.id || null; if (id === lastU) return; lastU = id;
+    C.addListener && C.addListener(({ user }) => { ACCT.user = user || null; window.btpNavMe(); const id = user?.id || null; if (id === lastU) return; lastU = id;
       try { sessionStorage.removeItem("btp_orbit_n"); } catch {} if (!user) paintBadge(0); else setTimeout(() => orbitBadge(C, true), 300); });
   }, 500);
 })();

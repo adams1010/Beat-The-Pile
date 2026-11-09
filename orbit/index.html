@@ -30,6 +30,8 @@
   .p{border:1px solid var(--line);border-radius:12px;padding:16px 12px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;min-width:0}
   .av{width:56px;height:56px;border-radius:50%;background:#4A7000;color:#fff;display:grid;place-items:center;font-weight:600;overflow:hidden;flex-shrink:0}
   .av img{width:100%;height:100%;object-fit:cover}
+  .avw{position:relative;display:inline-flex;flex-direction:column;align-items:center;flex-shrink:0}
+  .hiring{margin-top:-9px;position:relative;font-size:10.5px;font-weight:700;color:#060A2C;background:#B0F701;border:2px solid #fff;border-radius:999px;padding:1px 7px;line-height:1.3}
   .p .nm{font-weight:600;margin-top:8px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .p .hl{color:var(--muted);font-size:12.5px;margin-top:2px;min-height:36px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .p .at{font-size:12.5px;margin-top:6px;color:var(--green);font-weight:600}
@@ -104,7 +106,7 @@
   const S = { clerk: null };
   const GLOBE = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5S9.7 5.9 12 3.5z"/></svg>';
   const initials = (n) => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";
-  const av = (p) => `<div class="av">${p.photo ? `<img alt="" src="${esc(p.photo)}">` : esc(initials(p.name))}</div>`;
+  const av = (p) => `<div class="avw"><div class="av">${p.photo ? `<img alt="" src="${esc(p.photo)}">` : esc(initials(p.name))}</div>${p.hiring ? '<span class="hiring">Hiring</span>' : ""}</div>`;
   const yr = (y) => y ? ` '${String(y).slice(2)}` : "";
   const ago = (iso) => { const d = Math.floor((Date.now() - Date.parse(iso)) / 864e5); return d <= 0 ? "today" : d === 1 ? "yesterday" : `${d} days ago`; };
 
@@ -342,7 +344,10 @@
       $("#si").onclick = () => S.clerk.openSignIn({}); return;
     }
     S.biz = (u.unsafeMetadata && u.unsafeMetadata.role) === "employer" || (() => { try { return localStorage.getItem("btp_role") === "employer"; } catch { return false; } })();
-    try { await refresh(); }
+    try { await refresh();
+      const chat = new URLSearchParams(location.search).get("chat");
+      if (chat && /^[A-Za-z0-9_-]{3,40}$/.test(chat)) { history.replaceState(null, "", location.pathname); openChat(chat); }
+    }
     catch (e) { $("main").innerHTML = `<div class="card center">Couldn't load Orbit right now (${esc(e.message)}). Refresh in a minute.</div>`; }
   }
   async function loadClerk(){

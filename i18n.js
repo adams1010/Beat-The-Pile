@@ -1,24 +1,26 @@
-// /i18n.js — site language (English / Español). Loaded by /nav.js on every page.
-//   Choice lives in localStorage "btp_lang" ("en" default | "es"); pick it from Tools ▾ → Language, or on /u/ (Profile).
-//   How it works: when Spanish is on, it loads /i18n/es.json and swaps any text node, placeholder, aria-label or title whose
+// /i18n.js — site language. Loaded by /nav.js on every page.
+//   English (default) · Español · Français · Deutsch · Nederlands. Choice lives in localStorage "btp_lang"; pick it from the
+//   menu behind your picture (top right) → Language, or on /u/ (Profile).
+//   How it works: for any language but English it loads /i18n/<lang>.json and swaps any text node, placeholder, aria-label or title whose
 //   whole text matches an English key (whitespace collapsed), plus a few number patterns ("12 open" → "12 abiertas").
 //   A MutationObserver catches everything pages render later. Job titles, company names and places are employer data and
 //   are never in the dictionary, so they stay as written. Mark anything that must never change with data-noi18n.
 (function () {
   if (window.btpI18n) return;
-  const get = () => { try { return localStorage.getItem("btp_lang") === "es" ? "es" : "en"; } catch { return "en"; } };
+  const LANGS = { en: "English", es: "Español", fr: "Français", de: "Deutsch", nl: "Nederlands" };
+  const get = () => { try { const l = localStorage.getItem("btp_lang"); return LANGS[l] ? l : "en"; } catch { return "en"; } };
   const lang = get();
   const api = window.btpI18n = {
-    lang,
-    set(l) { try { localStorage.setItem("btp_lang", l === "es" ? "es" : "en"); } catch {} location.reload(); },
+    lang, langs: LANGS,
+    set(l) { try { localStorage.setItem("btp_lang", LANGS[l] ? l : "en"); } catch {} location.reload(); },
     picker() {   // a small labeled select; used on /u/
-      return `<label class="btp-lang" style="display:flex;align-items:center;gap:10px;font-size:14px"><span>${lang === "es" ? "Idioma del sitio" : "Language for the site"}</span>
-        <select onchange="btpI18n.set(this.value)" style="font:inherit;border:1px solid #DCE2EC;border-radius:8px;padding:6px 10px;background:#fff">
-        <option value="en"${lang === "en" ? " selected" : ""}>English</option><option value="es"${lang === "es" ? " selected" : ""}>Español</option></select></label>`;
+      return `<label class="btp-lang" style="display:flex;align-items:center;gap:10px;font-size:14px"><span>Language for the site</span>
+        <select onchange="btpI18n.set(this.value)" style="font:inherit;border:1px solid #DCE2EC;border-radius:8px;padding:6px 10px;background:#fff" data-noi18n>
+        ${Object.entries(LANGS).map(([k, n]) => `<option value="${k}"${lang === k ? " selected" : ""}>${n}</option>`).join("")}</select></label>`;
     },
   };
-  if (lang !== "es") return;
-  document.documentElement.lang = "es";
+  if (lang === "en") return;
+  document.documentElement.lang = lang;
   // hide the page for a moment so it doesn't flash English (never longer than 900 ms)
   const hide = document.createElement("style"); hide.textContent = "body{opacity:0}"; document.head.appendChild(hide);
   const show = () => hide.remove(); setTimeout(show, 900);
@@ -66,7 +68,7 @@
       }
     }).observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["placeholder", "aria-label", "title"] });
   }
-  fetch("/i18n/es.json").then((r) => r.json()).then((d) => {
+  fetch(`/i18n/${lang}.json`).then((r) => r.json()).then((d) => {
     dict = d.strings || {}; pats = (d.patterns || []).map(([re, to]) => [new RegExp(re), to]);
     if (document.body) start(); else document.addEventListener("DOMContentLoaded", start);
   }).catch(show);

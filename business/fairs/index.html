@@ -58,7 +58,7 @@
     if (!u) { $("main").innerHTML = biz.signInCard("Career fairs", "Sign in to your company account to pick your fairs."); return; }
     try {
       const [fj, c, b] = await Promise.all([fetch("/fair/fairs.json").then((r) => r.json()), biz.api({ action: "biz_fair_counts" }), biz.api({ action: "biz_get" })]);
-      FAIRS = fj.fairs || []; C = c; B = b; render();
+      FAIRS = fj.fairs || []; C = { students: {}, companies: {}, mine: [], ...c }; C.mine = Array.isArray(C.mine) ? C.mine : []; B = b; render();
     } catch (e) { $("main").innerHTML = `<div class="card center">${esc(e.message)}</div>`; }
   });
 })();

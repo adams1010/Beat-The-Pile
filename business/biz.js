@@ -14,6 +14,9 @@
     const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) }, body: JSON.stringify(body) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) { const e = new Error(j.error || "Something went wrong. Try again in a minute."); e.status = r.status; e.data = j; throw e; }
+    if (j && typeof j.status === "string" && j.profile) {   // remember verification so the top bar can show "Hiring" under your picture
+      try { const was = localStorage.getItem("btp_hiring") === "1", now = j.status === "verified"; localStorage.setItem("btp_hiring", now ? "1" : "0"); if (was !== now) window.btpNavMe && window.btpNavMe(); } catch {}
+    }
     return j;
   }
   async function start(onUser) {

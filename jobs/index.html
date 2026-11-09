@@ -785,7 +785,7 @@
     state.user = user || null;
     if (state.user) { try { const d = await api("GET"); setMine(d); state.profile = d.profile || null; state.alerts = d.alerts || null; state.emailReady = !!d.emailReady;
         try { const n = d.profile?.name || [user.firstName, user.lastName].filter(Boolean).join(" ") || user.primaryEmailAddress?.emailAddress || "";
-          localStorage.setItem("btp_me", JSON.stringify({ i: initials(n), photo: d.profile?.photo || null })); window.btpNavMe && window.btpNavMe(); } catch {}
+          localStorage.setItem("btp_me", JSON.stringify({ i: initials(n), n: String(n || "").slice(0, 80), photo: d.profile?.photo || null })); window.btpNavMe && window.btpNavMe(); } catch {}
         const moved = await guestMerge(); if (moved) toast(`Moved ${moved} saved item${moved === 1 ? "" : "s"} from this device into your account`);
         markSeenSoon(); loadSaved(); loadFollowed(); } catch { toast("Couldn't load your saved list"); } }
     else { try { localStorage.removeItem("btp_me"); window.btpNavMe && window.btpNavMe(); } catch {} state.profile = null; state.alerts = null; guestLoad(); state.savedRows = []; state.followRows = []; loadSaved(); loadFollowed(); }

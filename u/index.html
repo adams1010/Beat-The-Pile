@@ -98,6 +98,10 @@
   .qrbox svg{width:220px;height:220px}
   /* Nov 8 engagement pass: open-to badges, season strip, strength ring, visibility panel, highlights */
   .opento{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .orbitact{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}.orbitact:empty{display:none}
+  .orbitact .btn{margin:0}
+  .tagio{font-size:13px;font-weight:600;color:#4A7000;background:#F2FADF;border:1px solid #DDF3A8;border-radius:999px;padding:6px 12px}
+  .tagio.on::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#4A7000;margin-right:6px;vertical-align:1px}
   .opento span{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:999px;padding:5px 12px;background:#060A2C;color:#B0F701}
   .opento span::before{content:"";width:7px;height:7px;border-radius:50%;background:#B0F701}
   .hl{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line);margin:18px -24px -22px;}
@@ -203,6 +207,36 @@
         <button class="btn" type="button" data-tab="edit" data-jump="kit" style="margin-top:12px">Edit application kit</button></section>`;
   }
 
+  // Nov 8: the same orbit state as in Orbit — "In orbit" + Message, "Orbit requested", "<name> wants to join your orbit", or Join orbit.
+  async function orbitButtons(handle, name){
+    const box = $("#orbitAct"); if (!box) return;
+    const first = String(name || "They").split(/\s+/)[0];
+    const signIn = () => { box.innerHTML = `<a class="btn pri" href="/start/?next=${encodeURIComponent("/u/" + handle)}">Join orbit</a>`; };
+    let C = null, seen = false; try { seen = !!(localStorage.getItem("btp_me") || localStorage.getItem("btp_role")); } catch {}
+    if (!window.Clerk && !seen) return signIn();
+    if (!window.Clerk) window.btpLoadClerk && window.btpLoadClerk();
+    for (let i = 0; i < 60 && !(window.Clerk && window.Clerk.loaded); i++) await new Promise((r) => setTimeout(r, 200));
+    C = window.Clerk && window.Clerk.loaded ? window.Clerk : null;
+    if (!C || !C.user) return signIn();
+    const call = async (body) => { const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await C.session.getToken()) }, body: JSON.stringify(body) });
+      const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Couldn't do that right now"); return j; };
+    const paint = async () => {
+      let st; try { st = await call({ action: "orbit_state", to: handle }); } catch { box.innerHTML = ""; return; }
+      if (st.self) { box.innerHTML = `<span class="tagio">This is you</span><a class="btn" href="/u/">Edit profile</a>`; return; }
+      const msg = `<a class="btn" href="/orbit/?chat=${encodeURIComponent(handle)}">Message</a>`;
+      box.innerHTML = st.link === "connected" ? `<span class="tagio on">In orbit</span>${msg}`
+        : st.link === "requested" ? `<button class="btn" data-o="orbit_remove" data-confirm="1" title="Tap to cancel the request">Orbit requested</button>`
+        : st.link === "incoming" ? `<span class="tagio">${esc(first)} wants to join your orbit</span><button class="btn pri" data-o="orbit_accept">Accept</button><button class="btn" data-o="orbit_remove">Ignore</button>`
+        : `<button class="btn pri" data-o="orbit_connect">Join orbit</button>`;
+      box.querySelectorAll("[data-o]").forEach((b) => b.onclick = async () => {
+        if (b.dataset.confirm && !confirm("Cancel your orbit request?")) return;
+        b.disabled = true; try { await call({ action: b.dataset.o, to: handle }); await paint(); } catch (e) { b.disabled = false; alert(e.message); }
+      });
+    };
+    paint();
+  }
+
+  const seenMe = () => { try { return !!localStorage.getItem("btp_me"); } catch { return false; } };
   // ── Public view (anyone, no sign-in) ──
   function profileHtml(p, resume, isPreview){
     const where = [p.school, p.major, p.gradYear ? "Class of " + p.gradYear : ""].filter(Boolean).join(" · ");
@@ -221,6 +255,7 @@
         <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}</div>
         ${(p.openTo || []).length ? `<div class="opento">${p.openTo.map((k) => `<span>Open to ${esc(OPEN_TO[k] || k)}</span>`).join("")}</div>` : ""}
         ${p.lookingFor ? `<div class="looking">Looking for: ${esc(p.lookingFor)}</div>` : ""}
+        ${isPreview ? "" : `<div class="orbitact" id="orbitAct"></div>`}
         <div class="btns">${resume ? `<a class="btn pri" href="${esc(resume)}" target="_blank" rel="noopener">View resume</a>` : isPreview && p.showResume ? `<span class="btn pri" title="Shows when your resume QR link is on">View resume</span>` : ""}${links}</div>
         ${isPreview && S.me ? `<div class="vis"><span class="dotv${S.me.profilePublic && S.me.handle ? " on" : ""}" aria-hidden="true"></span>${S.me.profilePublic && S.me.handle ? `Public · <a href="/u/${esc(S.me.handle)}" target="_blank" style="color:var(--muted)">beatthepile.com/u/${esc(S.me.handle)}</a>` : "Private · only you can see this"}</div>` : ""}
         ${((p.experience || []).length + (p.projects || []).length + (p.skills || []).length) ? `<div class="hl"><div><b>${(p.experience || []).length}</b><span>Experience</span></div><div><b>${(p.projects || []).length}</b><span>Projects</span></div><div><b>${(p.skills || []).length}</b><span>Skills</span></div></div>` : ""}
@@ -231,7 +266,7 @@
       ${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}
       ${(p.skills || []).length ? `<section class="card"><h2>Skills</h2><div class="chips">${p.skills.map((s, i) => `<span class="chip${i < 3 ? " top" : ""}">${esc(s)}</span>`).join("")}</div>${p.skills.length > 3 ? `<p class="small muted" style="margin:8px 0 0">Top skills first.</p>` : ""}</section>` : ""}
       ${isPreview ? kitCard(p) : ""}
-      ${isPreview ? "" : `<section class="card cta"><h2>Make your own profile</h2><p class="small" style="margin:0 0 12px">One page for your experience, projects and skills, plus a QR code for career fairs. Free.</p><a class="btn pri" href="/start/" style="background:#B0F701;border-color:#B0F701;color:#060A2C">Get started</a></section>`}
+      ${isPreview || seenMe() ? "" : `<section class="card cta"><h2>Make your own profile</h2><p class="small" style="margin:0 0 12px">One page for your experience, projects and skills, plus a QR code for career fairs. Free.</p><a class="btn pri" href="/start/" style="background:#B0F701;border-color:#B0F701;color:#060A2C">Get started</a></section>`}
       <p class="small muted" style="text-align:center">Profile on <a href="/" style="color:var(--green-dark)">Beat the Pile</a>${isPreview ? "" : ` · <a href="#" id="rep" style="color:var(--muted)">Report this profile</a>`}</p>`;
   }
   async function showPublic(h){
@@ -242,6 +277,7 @@
     const d = await r.json();
     document.title = (d.profile.name || "Profile") + " — Beat the Pile";
     document.querySelector("main").innerHTML = profileHtml(d.profile, d.resume, false);
+    orbitButtons(d.handle, d.profile.name);
     $("#rep")?.addEventListener("click", (e) => { e.preventDefault(); window.iqReport ? window.iqReport({ message: "Report profile /u/" + d.handle + "\n" }) : alert("Use the Feedback button to report."); });
   }
 
@@ -494,7 +530,7 @@
   window.__cropPhoto = cropPhoto;   // offline preview test
   // the top bar shows your photo/initials and links here
   function remember(){ try { const p = S.me?.profile || {}; const n = p.name || [S.user?.firstName, S.user?.lastName].filter(Boolean).join(" ");
-    localStorage.setItem("btp_me", JSON.stringify({ i: initials(n), photo: p.photo || null })); window.btpNavMe && window.btpNavMe(); } catch {} }
+    localStorage.setItem("btp_me", JSON.stringify({ i: initials(n), n: String(n || "").slice(0, 80), photo: p.photo || null })); window.btpNavMe && window.btpNavMe(); } catch {} }
   async function save(){
     const btn = $("#save"), msg = $("#msg"); btn.disabled = true; msg.className = "msg"; msg.textContent = "Saving…";
     const bad = [...Object.values(S.draft.p.links), ...S.draft.p.projects.map((x) => x.link)].filter((u) => u && !/^https:\/\/[^\s]+\.[^\s]+/i.test(u));
