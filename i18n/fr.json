@@ -1456,7 +1456,9 @@
   "Show me to students at my school in Orbit (your name, school, role and photo). You can turn this off any time on your profile.": "Me montrer aux étudiants de mon école dans Orbit (nom, école, rôle et photo). Vous pouvez le désactiver à tout moment sur votre profil.",
   "Your role at school": "Votre rôle dans l'établissement",
   "Shown as a Faculty & staff tag. School staff aren't listed in employers' Find talent.": "Affiché comme mention Enseignants et personnel. Le personnel n'apparaît pas dans la recherche de talents des employeurs.",
-  "2 · About you": "2 · Vous"
+  "2 · About you": "2 · Vous",
+  "You're hidden, so classmates can't see you or join your orbit.": "Vous êtes masqué : vos camarades ne peuvent pas vous voir ni rejoindre votre orbite.",
+  "Show me in Orbit": "Me montrer dans Orbit"
  },
  "patterns": [
   [

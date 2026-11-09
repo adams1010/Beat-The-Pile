@@ -197,7 +197,7 @@
     S.o = o; const m = o.me, ring = S.ring || ((o.connections || []).length ? "conn" : "inner");
     const sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets, conn: o.connections || [] };
     const gravity = !m.hasSchool || !m.hasMajor ? `<span>Add your school and major to <a href="/u/">your profile</a> to fill your orbit.</span>`
-      : !m.isPublic ? `<span>You're invisible to others. <a href="/u/">Make your profile public</a> to show up in their orbits.</span>`
+      : !m.isPublic ? `<span>You're hidden, so classmates can't see you or join your orbit.</span><button type="button" class="btn pri" id="goPublic">Show me in Orbit</button>`
       : `<span>You're visible in other students' orbits.</span>`;
     const empty = { inner: m.hasSchool ? "No one in your major has a public profile yet. Invite a classmate." : `<a href="/u/">Add your school and major</a> first.`,
       campus: m.hasSchool ? "No one else at your school has a public profile yet." : `<a href="/u/">Add your school</a> first.`,
@@ -222,6 +222,10 @@
           <section class="card feed"><h2>Signals</h2><p class="sub">New openings at companies you follow, and posts from students.</p>${feed}</section></aside>
       </div>`;
     document.querySelectorAll("[data-ring]").forEach((b) => b.onclick = () => { S.ring = b.dataset.ring; render(S.o); });
+    const gp = $("#goPublic"); if (gp) gp.onclick = async () => {   // Nov 9: one tap — gives you a link name and a public profile (name, school, major, photo)
+      gp.disabled = true;
+      try { await api({ action: "onboard", show: true }); await refresh(); }
+      catch { location.href = "/u/#visibility"; } };
     wire($("main")); wireFind(); loadThreads(); loadFairs();
     try { window.btpOrbitBadge && window.btpOrbitBadge((o.unread || 0) + (o.requests || []).length); } catch {}
   }

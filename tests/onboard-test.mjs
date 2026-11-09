@@ -20,6 +20,10 @@ assert.deepEqual(r.body.classmates.map((x) => x.handle), ["ana-lopez-2"], "same 
 await call("u_a", { action: "profile", handle: "ana-lopez", public: true, profile: { name: "Ana Lopez", school: "Virginia Tech", schoolId: 233921, major: "Mechanical Engineering", skills: ["CAD"] } });
 r = await call("u_a", { action: "onboard", name: "Ana Lopez", school: "Virginia Tech", schoolId: 233921, major: "Mechanical Engineering" });
 assert.deepEqual(r.body.profile.skills, ["CAD"]); assert.equal(r.body.profilePublic, true, "no show flag → keeps current visibility");
+// Orbit's "Show me in Orbit" button: onboard with only show:true → link name + public, nothing else changes
+await call("u_c", { action: "profile", handle: null, public: false, profile: { name: "Cal Reed", school: "VT", major: "Mechanical Engineering" } });
+r = await call("u_c", { action: "onboard", show: true });
+assert.equal(r.code, 200); assert.equal(r.body.profilePublic, true); assert.equal(r.body.handle, "cal-reed"); assert.equal(r.body.profile.major, "Mechanical Engineering");
 // school staff (Nov 9): a professor gets a role tag, no graduation, and shows up on campus — never as a classmate's grad year
 r = await call("u_p", { action: "onboard", name: "Dr. Kim", school: "Virginia Tech", major: "Mechanical Engineering", staff: "Professor", gradYear: 2027, show: true });
 assert.equal(r.body.profile.staff, "Professor"); assert.equal(r.body.profile.gradYear, null); assert.equal(r.body.handle, "dr-kim");
