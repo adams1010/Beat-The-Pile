@@ -5,6 +5,8 @@
 // Writes schools/index.json  [[unitid, name, aliases, city, state], …]   (degree-granting schools with programs)
 //        schools/cip.json    { "14.1901": "Mechanical Engineering", … }
 //        schools/p/<n>.json  { unitid: ["14.1901", …] }   n = unitid % 64 (so a page loads one small file)
+//        schools/world.json  [[name, country], …]  universities outside the US, from the open "university-domains-list"
+//                            (github.com/Hipo/university-domains-list, MIT) when world_universities_and_domains.json is in <dir>
 import fs from "node:fs";
 const dir = process.argv[2];
 if (!dir) { console.error("usage: node scripts/build-schools.mjs <dir>"); process.exit(1); }
@@ -65,4 +67,17 @@ fs.mkdirSync("schools/p", { recursive: true });
 fs.writeFileSync("schools/index.json", JSON.stringify(index));
 fs.writeFileSync("schools/cip.json", JSON.stringify(Object.fromEntries([...used].sort().map((c) => [c, cip[c]]))));
 shards.forEach((s, i) => fs.writeFileSync(`schools/p/${i}.json`, JSON.stringify(s)));
+// 4) the rest of the world (no program lists — the major picker falls back to every program name)
+const wf = fs.readdirSync(dir).find((n) => /^world_universities_and_domains\.json$/i.test(n));
+if (wf) {
+  const seenW = new Set(), world = [];
+  for (const u of JSON.parse(fs.readFileSync(dir + "/" + wf, "utf8"))) {
+    const nm = String(u?.name || "").trim(), co = String(u?.country || "").trim();
+    if (!nm || !co || /^united states/i.test(co) || u.alpha_two_code === "US") continue;
+    const k = nm.toLowerCase() + "|" + co; if (seenW.has(k)) continue; seenW.add(k); world.push([nm, co]);
+  }
+  world.sort((a, b) => a[0].localeCompare(b[0]));
+  fs.writeFileSync("schools/world.json", JSON.stringify(world));
+  console.log(`world: ${world.length} universities outside the US`);
+}
 console.log(`schools: ${index.length}, programs: ${used.size}, index ${(fs.statSync("schools/index.json").size / 1024).toFixed(0)} KB`);

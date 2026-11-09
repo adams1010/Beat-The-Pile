@@ -1,4 +1,4 @@
-# On demand (Actions → schools → Run workflow): rebuild /schools/ — every US college and the programs it awards degrees in,
+# On demand (Actions → schools → Run workflow): rebuild /schools/ — every US college and the programs it awards degrees in, plus universities worldwide,
 # from the US Department of Education's IPEDS files (public domain). Used by the /u/ school + major pickers. Once a year is plenty.
 name: schools
 on:
@@ -20,6 +20,7 @@ jobs:
           curl -sfL --retry 3 -o hd.zip "https://nces.ed.gov/ipeds/datacenter/data/HD${Y}.zip"
           curl -sfL --retry 3 -o c.zip "https://nces.ed.gov/ipeds/datacenter/data/C${Y}_A.zip"
           curl -sfL --retry 3 -o CIPCode2020.csv "https://nces.ed.gov/ipeds/cipcode/Files/CIPCode2020.csv"
+          curl -sfL --retry 3 -o world_universities_and_domains.json "https://raw.githubusercontent.com/Hipo/university-domains-list/master/world_universities_and_domains.json" || echo "world list unavailable"
           unzip -o -q hd.zip && unzip -o -q c.zip && ls -la
       - name: Build
         run: node scripts/build-schools.mjs /tmp/ipeds
