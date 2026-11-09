@@ -104,9 +104,9 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   nav.innerHTML = `<a class="btpskip" href="#main">Skip to content</a><div class="in">
     <a class="logo" href="/" aria-label="Beat the Pile home"><picture><source media="(max-width:640px)" srcset="/brand/mark-white.png"><img src="/brand/logo-white.png" alt="Beat the Pile" width="95" height="38"></picture></a>
     <form class="q" role="search" action="/jobs/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search internships" placeholder="Search internships, jobs, companies"><input type="hidden" name="state" value="all"><kbd>/</kbd></form>
-    <div class="links">${MAIN.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${k === "orbit" ? `<span class="btpbw">${svg(k)}<i class="btpbadge" data-noi18n hidden></i></span>` : svg(k)}<span>${t}</span></a>`).join("")}
+    <div class="links">${MAIN.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${k === "orbit" || k === "talent" ? `<span class="btpbw">${svg(k)}<i class="btpbadge" data-noi18n hidden></i></span>` : svg(k)}<span>${t}</span></a>`).join("")}
       <details><summary>${svg("tools")}<span class="lbl">Tools</span></summary><div class="menu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}<div class="sep"></div>${langItem(true)}</div></details></div>
-    <details class="mob"><summary>Menu<i class="btpbadge" data-noi18n hidden></i></summary><div class="menu" role="menu">${MAIN.map(([h, t, k]) => `<a role="menuitem" href="${h}"><b>${t}</b>${k === "orbit" ? '<i class="btpbadge" data-noi18n hidden></i>' : ""}</a>`).join("")}<div class="sep"></div>${TOOLS.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div>${langItem(false)}</div></details>
+    <details class="mob"><summary>Menu<i class="btpbadge" data-noi18n hidden></i></summary><div class="menu" role="menu">${MAIN.map(([h, t, k]) => `<a role="menuitem" href="${h}"><b>${t}</b>${k === "orbit" || k === "talent" ? '<i class="btpbadge" data-noi18n hidden></i>' : ""}</a>`).join("")}<div class="sep"></div>${TOOLS.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div>${langItem(false)}</div></details>
     <div class="right" id="btpRight"><a class="me" id="btpMe" href="/u/" hidden></a></div></div>`;
   addEventListener("keydown", (e) => { const t = e.target.tagName; if (e.key === "/" && !/INPUT|TEXTAREA|SELECT/.test(t) && !e.target.isContentEditable) { const i = nav.querySelector(".q input"); if (i && i.offsetParent) { e.preventDefault(); i.focus(); } } });
   // your photo/initials (saved by the profile page or the homepage after sign-in) → links to your profile
@@ -163,13 +163,14 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
 @media (max-width:620px){.btprole-cards{grid-template-columns:1fr}.btprole .box{padding:20px}}`;
   const sc = document.createElement("style"); sc.textContent = sheetCss; document.head.appendChild(sc);
   document.addEventListener("click", (e) => { const c = e.target.closest && e.target.closest(".btprole-card"); if (c) { c.disabled = true; saveRole(c.dataset.role); } });
-  // Orbit tab badge: unread messages + people asking to join your orbit ("10+" past 9).
+  // Orbit tab badge (Talent tab for employers): unread messages + people asking to join your orbit ("10+" past 9).
   const paintBadge = (n) => { n = Number(n) || 0;
     nav.querySelectorAll(".btpbadge").forEach((b) => { b.hidden = n <= 0; b.textContent = n >= 10 ? "10+" : String(n); });
-    const a = nav.querySelector('.links a[href="/orbit/"]'); if (a) a.setAttribute("aria-label", n > 0 ? `Orbit, ${n >= 10 ? "10 or more" : n} new` : "Orbit"); };
+    const a = nav.querySelector('.links a[href="/orbit/"],.links a[href="/business/talent/"]');
+    if (a) { const t = a.textContent.trim(); a.setAttribute("aria-label", n > 0 ? `${t}, ${n >= 10 ? "10 or more" : n} new` : t); } };
   window.btpOrbitBadge = (n) => { try { sessionStorage.setItem("btp_orbit_n", JSON.stringify({ n, at: Date.now() })); } catch {} paintBadge(n); };
   async function orbitBadge(C){
-    if (ROLE === "employer" || !C.user) return paintBadge(0);
+    if (!C.user) return paintBadge(0);
     let c = null; try { c = JSON.parse(sessionStorage.getItem("btp_orbit_n") || "null"); } catch {}
     if (c) paintBadge(c.n);
     if (c && Date.now() - c.at < 60000) return;
