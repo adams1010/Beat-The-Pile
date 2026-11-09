@@ -12,7 +12,8 @@ const find = (re) => { const f = fs.readdirSync(dir).find((n) => re.test(n)); if
 
 // tiny CSV reader (quoted fields, commas inside quotes)
 function* rows(file) {
-  const text = fs.readFileSync(file, "latin1").replace(/^﻿/, "");
+  const buf = fs.readFileSync(file); let text = buf.toString("utf8");
+  if (text.includes("\uFFFD")) text = buf.toString("latin1");   // older IPEDS files are Windows-1252
   let i = 0, row = [], f = "", q = false;
   for (; i < text.length; i++) {
     const c = text[i];
@@ -24,7 +25,7 @@ function* rows(file) {
   if (f || row.length) { row.push(f); yield row; }
 }
 function table(file) {
-  const it = rows(file); const head = it.next().value.map((h) => h.trim().toUpperCase());
+  const it = rows(file); const head = it.next().value.map((h) => h.replace(/[^A-Za-z0-9_]/g, "").toUpperCase());   // drops a byte-order mark ("ï»¿") and quotes
   const ix = (n) => head.indexOf(n);
   return { ix, it };
 }
