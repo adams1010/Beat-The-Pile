@@ -424,13 +424,13 @@ export default async function handler(req, res) {
       if (!(await isAdmin(uid, { clerkUser }))) return res.status(403).json({ error: "Owners only" });
       const q = String(body.q || "").trim().toLowerCase(); if (q.length < 2) return res.status(400).json({ error: "Type a name" });
       const mine = (await loadRow(uid))?.profile || {};
-      const rows = await db.selectAllAsAdmin("user_jobs?select=clerk_user_id,handle,profile,profile_public&profile=not.is.null");
+      const rows = await db.selectAllAsAdmin("user_jobs?select=clerk_user_id,handle,profile,profile_public&profile=not.is.null&order=clerk_user_id.asc");
       const hits = rows.filter((r) => r.clerk_user_id !== uid && [r.profile?.name, r.handle].some((x) => String(x || "").toLowerCase().includes(q))).slice(0, 10)
         .map((r) => { const p = r.profile || {}; return { name: p.name || null, handle: r.handle || null, isPublic: r.profile_public === true, school: p.school || null, schoolId: p.schoolId || null,
           schoolKey: schoolKey(p.school) || null, major: p.major || null, majorKey: majorKey(p.major) || null, sameSchool: sameSchool(mine, p), sameMajor: sameMajor(mine.major, p.major) }; });
       const have = new Set(rows.filter((r) => [r.profile?.name, r.handle].some((x) => String(x || "").toLowerCase().includes(q))).map((r) => r.clerk_user_id));
       let kitOnly = 0;
-      try { kitOnly = (await db.selectAllAsAdmin("user_home?select=clerk_user_id,profile")).filter((r) => !have.has(r.clerk_user_id) && String(r.profile?.name || "").toLowerCase().includes(q)).length; } catch {}
+      try { kitOnly = (await db.selectAllAsAdmin("user_home?select=clerk_user_id,profile&order=clerk_user_id.asc")).filter((r) => !have.has(r.clerk_user_id) && String(r.profile?.name || "").toLowerCase().includes(q)).length; } catch {}
       return res.status(200).json({ kitOnly, me: { school: mine.school || null, schoolId: mine.schoolId || null, schoolKey: schoolKey(mine.school) || null, major: mine.major || null, majorKey: majorKey(mine.major) || null }, hits });
     }
     if (action === "onboard") {
