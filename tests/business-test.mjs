@@ -85,3 +85,21 @@ assert.equal(r.body.company.company, "Boeing"); assert.ok(!("name" in r.body.com
 assert.equal(r.body.team.length, 2); assert.deepEqual(r.body.alumni.map((x) => x.handle), ["ana"]);
 assert.ok(!JSON.stringify(r.body).match(/u_emp|jane@|work_email/), "nothing private on the public page");
 console.log("✓ business orbit + company page: team, interested students, former interns; public page shows nothing private");
+
+// students can ask a verified company's recruiter to join their orbit (from the company page key)
+{
+  const page = (await get({ co: "boeing" })).body;
+  assert.match(page.ownerKey, /^p_/); assert.ok(page.team.every((m) => /^p_/.test(m.key)), "recruiters carry keys, not ids");
+  const r1 = await call("u_ben", { action: "orbit_connect", to: page.ownerKey });
+  assert.equal(r1.body.link, "requested", "ben (not open to employers) can still reach OUT to a company");
+  const req = (await call("u_emp", { action: "biz_orbit" })).body.requests;
+  assert.deepEqual(req.map((x) => x.handle), ["ben"]);
+  assert.equal((await call("u_emp", { action: "orbit_accept", to: req[0].key })).body.link, "connected");
+  assert.equal((await call("u_emp", { action: "orbit_send", to: req[0].key, body: "Thanks for reaching out!" })).code, 200, "connected → messages both ways");
+  assert.equal((await call("u_ben", { action: "orbit_send", to: page.ownerKey, body: "Hi!" })).code, 200);
+  // an unverified company's key never resolves
+  f.T("employers").find((e) => e.clerk_user_id === "u_emp2").status = "pending";
+  const k2 = page.team.find((m) => m.name === "Raj P").key;
+  assert.equal((await call("u_ana", { action: "orbit_connect", to: k2 })).code, 404, "only verified recruiters can be joined");
+  console.log("✓ students join a company's orbit from its page; employer accepts; unverified recruiters can't be reached");
+}

@@ -78,7 +78,9 @@ approves on **`/business/admin/`** (ADMIN_EMAILS; shows "email confirmed" + "dom
 can use Find talent, send messages, or ask students to join their orbit — and only to students with a public profile AND
 `profile.openToEmployers` ("Let employers find me", off by default). Public company page **`/co/<slug>`** (verified only; `GET
 /api/me?co=`): about, who we hire, perks, live jobs (our listings via `company_id` name match), recruiters, "Interned here" (opted-in
-students only), fairs. Business Orbit (`biz_orbit`): Interested students (follow your company) · Former interns · Your team (verified
+students only), fairs. Students can **join a company's orbit** too: `/co/<slug>` shows "Join orbit" (page owner + each recruiter carry an HMAC peer key;
+`resolve()` in lib/orbitnet.js accepts keys of VERIFIED employers only), and message threads show Join orbit / Accept; once the
+employer accepts, both can message. Business Orbit (`biz_orbit`): Interested students (follow your company) · Former interns · Your team (verified
 employers, same email domain) · At your fairs · In orbit. Business home (`biz_home`): live counts only. Fair counts are numbers only.
 `/business/biz.js` + `biz.css` = shared employer-page helpers. Tests: `tests/business-test.mjs`.
 **Brand (Nov 8):** logo in `brand/` (`logo-white.png` in the navy top bar, `logo.png` on light, `mark.png`), icons in `icons/`.

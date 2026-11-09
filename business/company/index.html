@@ -74,14 +74,33 @@
           : `<p class="empty">${preview ? "We don't track an open role for your company right now. When your job board posts internships or new-grad roles, they show up here." : "No open roles we track right now."}</p>`}</section>`;
     else if (tab === "people") body = `<div class="grid"><section class="card"><h2>Interned here</h2><p class="sub">Students who list ${esc(p.company)} on their profile and are open to employers.</p>
         ${(c.alumni || []).length ? `<div class="people">${c.alumni.map((s) => `<a class="p" href="/u/${encodeURIComponent(s.handle)}" style="text-decoration:none;color:inherit"><div class="av">${s.photo ? `<img alt="" src="${esc(s.photo)}">` : esc(biz.initials(s.name))}</div><div class="nm">${esc(s.name)}</div><div class="hl">${esc([s.major, s.school].filter(Boolean).join(" · "))}</div>${s.role ? `<div class="at">${esc(s.role)}${s.when ? " · " + esc(s.when) : ""}</div>` : ""}</a>`).join("")}</div>` : `<p class="empty">No one yet.</p>`}</section>
-      <aside><section class="card team"><h2>Recruiters on Beat the Pile</h2>${(c.team || []).length ? c.team.map((m) => `<div class="it"><div class="av">${esc(biz.initials(m.name))}</div><div><b style="font-size:14px">${esc(m.name)}</b><div class="small muted">${esc(m.title || "")}</div></div></div>`).join("") : `<p class="empty">No one yet.</p>`}</section></aside></div>`;
+      <aside><section class="card team"><h2>Recruiters on Beat the Pile</h2>${(c.team || []).length ? c.team.map((m) => `<div class="it"><div class="av">${esc(biz.initials(m.name))}</div><div style="flex:1;min-width:0"><b style="font-size:14px">${esc(m.name)}</b><div class="small muted">${esc(m.title || "")}</div></div>${!preview && m.key && !isBiz() ? `<button class="btn" data-join="${esc(m.key)}" style="padding:5px 12px;font-size:13px">Join orbit</button>` : ""}</div>`).join("") : `<p class="empty">No one yet.</p>`}</section></aside></div>`;
     else body = `<section class="card"><h2>Career fairs</h2><p class="sub">Where ${esc(p.company)} says it will be.</p>
         ${fairs.length ? `<div class="list">${fairs.map((f) => `<div class="it"><div><b>${esc(f.name)}</b>${f.term ? ` <span class="small muted">· ${esc(f.term)}</span>` : ""}<div class="small muted">${esc([f.when, f.where, f.school].filter(Boolean).join(" · "))}</div></div></div>`).join("")}</div>`
           : `<p class="empty">${preview ? `None yet. <a href="/business/fairs/">Pick your fairs</a>` : "None listed yet."}</p>`}</section>`;
     return `<section class="hero"><div class="ban"></div><div class="bd">${biz.logo(p, 96)}
         <div style="min-width:0"><h1>${esc(p.company || "Your company")}</h1>${p.tagline ? `<div class="tl">${esc(p.tagline)}</div>` : ""}<div class="facts">${esc(facts)}</div></div>
-        <div class="btns">${p.careers ? `<a class="btn pri" href="${esc(p.careers)}" target="_blank" rel="noopener nofollow">Careers site</a>` : ""}${p.website ? `<a class="btn" href="${esc(p.website)}" target="_blank" rel="noopener nofollow">Website</a>` : ""}${p.linkedin ? `<a class="btn" href="${esc(p.linkedin)}" target="_blank" rel="noopener nofollow">LinkedIn</a>` : ""}</div></div>
+        <div class="btns">${!preview && c.ownerKey && !isBiz() ? `<button class="btn pri" data-join="${esc(c.ownerKey)}">Join orbit</button>` : ""}${p.careers ? `<a class="btn pri" href="${esc(p.careers)}" target="_blank" rel="noopener nofollow">Careers site</a>` : ""}${p.website ? `<a class="btn" href="${esc(p.website)}" target="_blank" rel="noopener nofollow">Website</a>` : ""}${p.linkedin ? `<a class="btn" href="${esc(p.linkedin)}" target="_blank" rel="noopener nofollow">LinkedIn</a>` : ""}</div></div>
       <div class="tabs" role="tablist">${T.map(([k, l]) => `<button role="tab" data-ctab="${k}" aria-selected="${k === tab}">${esc(l)}</button>`).join("")}</div></section>${body}`;
+  }
+
+  // Students can ask a verified company's recruiters to join their orbit (orbit_connect with the recruiter's key).
+  const isBiz = () => { try { return localStorage.getItem("btp_role") === "employer"; } catch { return false; } };
+  const JOINED = {};
+  let clerkP = null;
+  const signedIn = () => (clerkP ||= new Promise((ok) => biz.start((u) => ok(u))));
+  function wireJoin(){
+    document.querySelectorAll("[data-join]").forEach((b) => {
+      const k = b.dataset.join; if (JOINED[k]) { b.textContent = JOINED[k]; b.disabled = true; b.classList.remove("pri"); }
+      b.onclick = async () => {
+        b.disabled = true;
+        const u = await signedIn();
+        if (!u) { b.disabled = false; window.Clerk ? window.Clerk.openSignIn({}) : (location.href = "/start/?next=" + encodeURIComponent(location.pathname)); return; }
+        try { const r = await biz.api({ action: "orbit_connect", to: k });
+          JOINED[k] = r.link === "connected" ? "In orbit" : "Orbit requested"; document.querySelectorAll(`[data-join="${k}"]`).forEach((x) => { x.textContent = JOINED[k]; x.disabled = true; x.classList.remove("pri"); });
+        } catch (e) { b.disabled = false; alert(e.message); }
+      };
+    });
   }
 
   // ── public: /co/<slug> ──
@@ -91,7 +110,7 @@
       if (r.status === 404) { $("main").innerHTML = `<div class="card center"><h1>No company page here</h1><p class="sub">This company hasn't set up a verified page on Beat the Pile yet.</p><a class="btn pri" href="/jobs/">Browse internships</a></div>`; return; }
       if (!r.ok) throw new Error(c.error || "Couldn't load this company");
       await fairsP; document.title = `${c.company.company} — Beat the Pile`;
-      let tab = "about"; const draw = () => { $("main").innerHTML = page(c, tab, false); document.querySelectorAll("[data-ctab]").forEach((b) => b.onclick = () => { tab = b.dataset.ctab; draw(); }); };
+      let tab = "about"; const draw = () => { $("main").innerHTML = page(c, tab, false); document.querySelectorAll("[data-ctab]").forEach((b) => b.onclick = () => { tab = b.dataset.ctab; draw(); }); wireJoin(); };
       draw();
     } catch (e) { $("main").innerHTML = `<div class="card center">${esc(e.message)}</div>`; }
   }

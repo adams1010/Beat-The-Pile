@@ -284,12 +284,15 @@
     const draft = d.querySelector("textarea")?.value || "";
     const p = c.peer;
     d.innerHTML = `<div class="hd">${av(p)}<div class="who"><b>${esc(p.name)}</b><span>${esc(p.headline || [p.major, p.school].filter(Boolean).join(" · "))}</span></div>
-        ${p.handle ? `<a class="btn" href="/u/${encodeURIComponent(p.handle)}" style="margin-top:0">Profile</a>` : ""}<button class="x" aria-label="Close">×</button></div>
+        ${p.link === "none" ? `<button class="btn pri" id="chatJoin" style="margin-top:0">Join orbit</button>` : p.link === "requested" ? `<span class="tag" style="margin:0">Orbit requested</span>` : p.link === "incoming" ? `<button class="btn pri" id="chatAccept" style="margin-top:0">Accept</button>` : `<span class="tag" style="margin:0">In orbit</span>`}
+        ${p.handle ? `<a class="btn" href="/u/${encodeURIComponent(p.handle)}" style="margin-top:0">Profile</a>` : p.companySlug ? `<a class="btn" href="/co/${encodeURIComponent(p.companySlug)}" style="margin-top:0">Company</a>` : ""}<button class="x" aria-label="Close">×</button></div>
       <div class="msgs">${c.messages.length ? c.messages.map((m) => `<div class="m${m.mine ? " mine" : ""}">${esc(m.body)}<small>${esc(when(m.at))}</small></div>`).join("")
         : `<p class="empty">No messages yet. Say hi.</p>`}</div>
       ${c.canSend ? `<form><textarea maxlength="2000" placeholder="Write a message" aria-label="Message"></textarea><button class="btn pri" style="margin-top:0">Send</button></form>
         <div class="note">Be kind and professional. Never share passwords or payment details here.</div>` : `<div class="why">${esc(c.why || "You can't message this person.")}</div>`}`;
     d.querySelector(".x").onclick = () => d.close();
+    for (const [id, action] of [["#chatJoin", "orbit_connect"], ["#chatAccept", "orbit_accept"]]) { const b = d.querySelector(id);
+      if (b) b.onclick = async () => { b.disabled = true; try { await api({ action, to: chatTo }); await drawChat(false); refresh().catch(() => {}); } catch (e) { b.disabled = false; alertBox(e.message); } }; }
     const box = d.querySelector(".msgs"); box.scrollTop = box.scrollHeight;
     const f = d.querySelector("form");
     if (f) {
