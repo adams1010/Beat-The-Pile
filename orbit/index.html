@@ -241,7 +241,7 @@
     ["conn", "In orbit", "Students who joined your orbit", "#FFFFFF"],
   ];
   function renderBiz(o){
-    S.o = o; const ring = BRINGS.some((r) => r[0] === S.ring) ? S.ring : "interested", m = o.me;
+    S.o = o; const ring = BRINGS.some((r) => r[0] === S.ring) ? S.ring : ((o.connections || []).length ? "conn" : "interested"), m = o.me;
     const sets = { interested: o.interested || [], alumni: o.alumni || [], team: o.team || [], fairs: o.atFairs || [], conn: o.connections || [] };
     const empty = { interested: "No students who follow your company have opened their profile to employers yet.",
       alumni: "No former interns of yours have opened their profile to employers yet.",
@@ -253,7 +253,7 @@
     $("main").innerHTML = `
       <div class="sky"><div><h1>${m.kind === "recruiter" ? `${esc(m.name || "Your")}'s orbit` : `${esc(m.company || "Your company")}'s orbit`}</h1><p class="sub">${m.kind === "recruiter" ? `You, at ${esc(m.company || "your company")}. Students close to your company, closest first.` : "Students already close to your company, closest first."}</p>
         ${sky(o, sets, BRINGS.slice(0, 3), m.kind === "recruiter" ? { text: initials(m.name) || "You", label: "You", photo: m.photo } : { text: initials(m.company) || "Co", label: m.company || "Your company", photo: m.logo })}</div>
-        <div><div class="legend">${BRINGS.map(([k, t, d, col]) => `<button type="button" data-ring="${k}" aria-pressed="${k === ring}"><i style="border-color:${col}"></i><span>${t}<small>${d}</small></span><b>${sets[k].length}</b></button>`).join("")}</div>
+        <div><div class="legend">${[BRINGS[4], ...BRINGS.slice(0, 4)].map(([k, t, d, col]) => `<button type="button" data-ring="${k}" aria-pressed="${k === ring}"><i style="border-color:${col}"></i><span>${t}<small>${d}</small></span><b>${sets[k].length}</b></button>`).join("")}</div>
           <div class="gravity">${pend}</div></div></div>
       <div class="grid grid2">
         <div>${findBox()}${requests(o)}
