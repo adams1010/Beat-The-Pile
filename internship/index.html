@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>My Internship — Beat the Pile</title>
+<meta name="description" content="Got the offer? Prepare for your internship, do great work, and turn it into a return offer: a dated checklist, company prep, the people who've been there, and a weekly log that becomes resume bullets.">
+<link rel="canonical" href="https://www.beatthepile.com/internship/">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/business/biz.css">
+<style>
+  /* /internship/ (Nov 2026): "My Internship" — for students who already have an offer. user_jobs.internship (supabase/internship.sql),
+     actions intern_save / intern_peers in api/me.js (lib/internship.js); AI resume bullets = /api/generate feature intern_bullets. */
+  .hero{background:var(--navy);color:#fff;border-radius:16px;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;margin-bottom:16px}
+  .hero h1{color:#fff;font-size:26px;margin:0}.hero .sub{color:#C9D2E3;margin:4px 0 0}
+  .hero .co{display:flex;gap:14px;align-items:center}
+  .lg{width:58px;height:58px;border-radius:12px;background:#fff;color:var(--navy);display:grid;place-items:center;font-weight:700;font-size:19px;flex-shrink:0;overflow:hidden;border:0}
+  .lg img{width:100%;height:100%;object-fit:contain}
+  .count{text-align:right}.count b{display:block;font-size:40px;line-height:1;color:var(--lime);font-variant-numeric:tabular-nums;letter-spacing:-.02em}.count span{color:#C9D2E3;font-size:14px}
+  .bar{height:8px;border-radius:999px;background:#1E2A5C;overflow:hidden;margin-top:14px;grid-column:1/-1}.bar i{display:block;height:100%;background:var(--lime)}
+  .phases{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+  .phases button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 12px;cursor:pointer;color:var(--muted)}
+  .phases button[aria-pressed=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .phases button.now::after{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--lime);margin-left:6px;vertical-align:1px}
+  .ck{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid #EEF1F6;cursor:pointer}.ck:first-of-type{border-top:0}
+  .ck input{width:20px;height:20px;margin:1px 0 0;accent-color:var(--green);flex-shrink:0;cursor:pointer}
+  .ck b{display:block;font-size:14.5px;font-weight:600}.ck span{display:block;font-size:13px;color:var(--muted)}
+  .ck.done b{color:var(--muted);text-decoration:line-through}
+  .progress{font-size:13px;color:var(--muted);margin:-6px 0 10px}
+  .entry{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px}
+  .entry .w{font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+  .entry p{margin:6px 0 0;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}.entry p b{font-weight:600}
+  .entry button{font:inherit;font-size:12.5px;background:none;border:0;color:var(--muted);cursor:pointer;padding:0}
+  .bul li{margin:6px 0}
+  .peers .it{display:flex;gap:10px;align-items:center;padding:8px 0;border-top:1px solid #EEF1F6;text-decoration:none;color:inherit}.peers .it:first-child{border-top:0}
+  .peers .av{width:38px;height:38px;font-size:13px}.peers b{display:block;font-size:14px}.peers span{font-size:12.5px;color:var(--muted)}
+  .sw{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;margin-top:12px}.sw input{width:auto;margin-top:3px;accent-color:var(--green)}
+  .offer{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 14px}
+  .offer button{font:inherit;text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;cursor:pointer}
+  .offer button:hover{border-color:var(--green)}.offer button b{display:block;font-size:14px}.offer button span{font-size:12.5px;color:var(--muted)}
+  .intro{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px;text-align:left}
+  .intro div{background:#F7F9FC;border:1px solid var(--line);border-radius:12px;padding:14px}.intro b{display:block;font-size:14px;margin-bottom:2px}.intro span{font-size:13px;color:var(--muted)}
+  .brief p{margin:6px 0;font-size:14px}.brief h3{margin:12px 0 2px;font-size:14px}
+  .note{font-size:12.5px;color:var(--muted);margin-top:8px}
+  @media (max-width:720px){.hero{grid-template-columns:1fr}.count{text-align:left}.intro{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main"><div class="card center">Loading…</div></main>
+<script src="/business/biz.js"></script>
+<script>
+(() => {
+  const { esc, $ } = biz;
+  // The checklist (ids are stored; keep them stable). Phases follow your dates: lib/internship.js phaseOf mirrors this.
+  const PHASES = [
+    ["after-offer", "After the offer", [
+      ["accept", "Accept the offer in writing", "Save the offer letter somewhere you can find it."],
+      ["terms", "Confirm the details in writing", "Start date, hours, location, pay, and whether it's remote, hybrid or in person."],
+      ["paperwork", "Finish onboarding paperwork", "Tax forms, I-9, direct deposit, and a background check or drug test if they ask."],
+      ["housing", "Sort out housing and your commute", "Ask HR if they offer housing help or a stipend, and how other interns found places."],
+      ["thanks", "Thank the recruiter and anyone who referred you", "One short email. People remember it."],
+      ["profile", "Add your incoming role to your profile", "Update your Beat the Pile profile and LinkedIn."],
+    ]],
+    ["before-start", "2 weeks before", [
+      ["ask", "Email your manager or recruiter", "Ask what you could read, install or learn before day one."],
+      ["research", "Learn the company", "What it sells, who its customers are, recent news, and what your team works on."],
+      ["skills", "Brush up on your role's tools", "The software, languages or methods in your job description."],
+      ["dress", "Ask about dress code", "Plan a few outfits for the first week."],
+      ["route", "Plan your first day", "Test the commute, know where to go, what to bring (ID, documents), and who to ask for."],
+    ]],
+    ["first-week", "First week", [
+      ["goals", "Agree on 2–3 goals with your manager", "Ask what a great summer looks like for an intern on this team."],
+      ["meet", "Meet your team", "Ask each person what they work on and how you can help."],
+      ["doc", "Start a running notes doc", "Names, acronyms, how things work, questions to ask later."],
+      ["log1", "Write your first weekly log entry", "Below on this page. Two minutes every Friday."],
+    ]],
+    ["middle", "Middle of the internship", [
+      ["checkin", "Ask for a midpoint check-in", "What's going well, and what to do better in the second half."],
+      ["coffee", "Have coffee chats with 3+ people outside your team", "Ask about their path and what they'd do in your shoes."],
+      ["win", "Share an early win with your manager", "A short update on something you finished or learned."],
+      ["logmid", "Keep your weekly log going", "Specific things you did, numbers if you have them."],
+    ]],
+    ["wrap-up", "Last 2 weeks", [
+      ["present", "Prepare your final presentation or wrap-up", "What you did, what you learned, what's next for the project."],
+      ["return", "Ask about a return offer", "Tell your manager you'd like to come back, and ask what it would take."],
+      ["contacts", "Collect contacts", "Connect with your team and mentors before your access ends."],
+      ["bullets", "Turn your log into resume bullets", "Use the button in the weekly log."],
+      ["thanks2", "Send thank-you notes", "To your manager, mentor and anyone who helped."],
+    ]],
+  ];
+  const ALL = PHASES.flatMap(([, , items]) => items.map(([id]) => id));
+  let ME = null, IX = null, PEERS = null, VIEW = null, LOCAL = false;
+  const DAY = 864e5;
+  const today = () => new Date().toISOString().slice(0, 10);
+  function phaseOf(ix){
+    if (!ix?.start) return "after-offer";
+    const now = Date.now(), s = Date.parse(ix.start), e = ix.end ? Date.parse(ix.end) : s + 70 * DAY;
+    if (now < s - 14 * DAY) return "after-offer"; if (now < s) return "before-start"; if (now < s + 7 * DAY) return "first-week"; if (now < e - 14 * DAY) return "middle"; return "wrap-up";
+  }
+  const fmt = (d) => d ? new Date(d + "T12:00:00").toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" }) : "";
+  const initials = (n) => String(n || "?").replace(/[^A-Za-z0-9 ]/g, " ").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";
+
+  async function save(next){
+    IX = next;
+    try { localStorage.setItem("btp_internship", JSON.stringify(IX)); } catch {}
+    if (LOCAL) return;
+    try { const r = await biz.api({ action: "intern_save", internship: IX }); IX = r.internship || IX; }
+    catch (e) { if (e.data?.setup) { LOCAL = true; } else alert(e.message); }
+  }
+
+  // ── signed out ──
+  function intro(){
+    $("main").innerHTML = `<div class="card center"><h1>My Internship</h1>
+      <p class="sub">Got the offer? Nice. This is where you get ready, do great work, and turn the summer into a return offer.</p>
+      <a class="btn pri" href="/start/?next=/internship/">Sign in to set it up</a>
+      <div class="intro"><div><b>A dated checklist</b><span>From accepting the offer to your last-week thank-yous, timed to your start date.</span></div>
+        <div><b>Know the company and the people</b><span>A company brief, and students who interned there before.</span></div>
+        <div><b>A weekly log</b><span>Two minutes on Fridays. At the end, turn it into resume bullets.</span></div></div></div>`;
+  }
+
+  // ── setup ──
+  function setup(edit){
+    const x = edit ? IX : {};
+    const offers = (ME?.apps || []).filter((a) => a.stage === "offer");
+    $("main").innerHTML = `<section class="card" style="max-width:760px;margin:0 auto">
+      <h1>${edit ? "Edit your internship" : "Set up your internship"}</h1>
+      <p class="sub">${edit ? "Change any detail. Your checklist and log stay." : "Got an offer? Add it here and we'll build your plan around your start date."}</p>
+      ${!edit && offers.length ? `<b style="font-size:14px">From your offers in My Season</b><div class="offer">${offers.map((a, i) => `<button type="button" data-offer="${i}"><b data-noi18n>${esc(a.company)}</b><span data-noi18n>${esc(a.title || "")}</span></button>`).join("")}</div>` : ""}
+      <div class="row"><div><label for="c">Company</label><input id="c" value="${esc(x.company || "")}" placeholder="Hensel Phelps" maxlength="100"></div>
+        <div><label for="r">Role</label><input id="r" value="${esc(x.role || "")}" placeholder="Project Engineering Intern" maxlength="120"></div></div>
+      <div class="row"><div><label for="t">Team <span class="hint">· optional</span></label><input id="t" value="${esc(x.team || "")}" maxlength="100"></div>
+        <div><label for="l">Location</label><input id="l" value="${esc(x.location || "")}" placeholder="Richmond, VA" maxlength="100"></div></div>
+      <div class="row"><div><label for="s">Start date</label><input id="s" type="date" value="${esc(x.start || "")}"></div>
+        <div><label for="e">End date <span class="hint">· optional</span></label><input id="e" type="date" value="${esc(x.end || "")}"></div></div>
+      <label for="m">Manager or recruiter <span class="hint">· optional</span></label><input id="m" value="${esc(x.manager || "")}" maxlength="80">
+      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" id="go">${edit ? "Save" : "Build my plan"}</button>${edit ? `<button class="btn" id="cancel">Cancel</button><button class="btn" id="del" style="margin-left:auto">Remove internship</button>` : ""}<span class="msg" id="msg"></span></div></section>`;
+    document.querySelectorAll("[data-offer]").forEach((b) => b.onclick = () => { const a = offers[+b.dataset.offer]; $("#c").value = a.company || ""; $("#r").value = a.title || ""; });
+    $("#go").onclick = async () => {
+      const c = $("#c").value.trim(); if (!c) { $("#msg").className = "msg err"; $("#msg").textContent = "Add the company"; return; }
+      $("#go").disabled = true;
+      await save({ ...(IX || {}), company: c, companyId: (IX && IX.company === c ? IX.companyId : null) || await companyIdFor(c),
+        role: $("#r").value.trim(), team: $("#t").value.trim(), location: $("#l").value.trim(), start: $("#s").value || null, end: $("#e").value || null, manager: $("#m").value.trim(),
+        checks: IX?.checks || {}, log: IX?.log || [], visible: IX?.visible === true, notes: IX?.notes || "" });
+      PEERS = null; VIEW = null; render();
+    };
+    if (edit) { $("#cancel").onclick = render; $("#del").onclick = async () => { if (!confirm("Remove this internship and its checklist and log?")) return; IX = null; try { localStorage.removeItem("btp_internship"); } catch {}
+      if (!LOCAL) await biz.api({ action: "intern_save", internship: null }).catch(() => {}); render(); }; }
+  }
+  // match the company to one we track (exact name), so we can show its brief, logo and open roles
+  async function companyIdFor(name){
+    try { const d = await fetch("/api/listings?names=1").then((r) => r.json()); const k = name.toLowerCase().replace(/[^a-z0-9]/g, "");
+      const hit = (d.companies || []).find((c) => String(c.company || "").toLowerCase().replace(/[^a-z0-9]/g, "") === k); return hit ? hit.id : null; } catch { return null; }
+  }
+
+  // ── the plan ──
+  function render(){
+    if (!IX) return setup(false);
+    const now = phaseOf(IX), view = VIEW || now;
+    const s = IX.start ? Date.parse(IX.start) : null, e = IX.end ? Date.parse(IX.end) : s ? s + 70 * DAY : null;
+    const days = s ? Math.ceil((s - Date.now()) / DAY) : null;
+    const count = !s ? `<b>—</b><span>Add your start date</span>` : days > 0 ? `<b>${days}</b><span>${days === 1 ? "day to go" : "days to go"}</span>`
+      : Date.now() < e ? `<b>${Math.floor((Date.now() - s) / (7 * DAY)) + 1}</b><span>${"week of " + Math.max(1, Math.round((e - s) / (7 * DAY)))}</span>` : `<b>Done</b><span>Internship finished</span>`;
+    const pct = s && e ? Math.max(0, Math.min(100, ((Date.now() - s) / (e - s)) * 100)) : 0;
+    const done = ALL.filter((id) => IX.checks?.[id]).length;
+    const ph = PHASES.find((p) => p[0] === view);
+    $("main").innerHTML = `
+      <div class="hero"><div class="co"><span class="lg" ${IX.companyId ? `data-logo-id="${esc(IX.companyId)}"` : ""}>${esc(initials(IX.company))}</span>
+        <div><h1 data-noi18n>${esc(IX.company)}</h1><p class="sub"><span data-noi18n>${esc([IX.role, IX.team, IX.location].filter(Boolean).join(" · "))}</span>${IX.start ? ` · ${esc(fmt(IX.start))}${IX.end ? " – " + esc(fmt(IX.end)) : ""}` : ""}</p></div></div>
+        <div class="count">${count}</div>${s && Date.now() >= s ? `<div class="bar"><i style="width:${pct}%"></i></div>` : ""}</div>
+      ${LOCAL ? `<div class="banner">My Internship is still being set up on our side, so this is saved on this device for now.</div>` : ""}
+      <div class="grid"><div>
+        <section class="card"><h2>Your checklist</h2><p class="progress">${done} of ${ALL.length} done · the dot marks where you are now</p>
+          <div class="phases">${PHASES.map(([k, l]) => `<button type="button" data-ph="${k}" aria-pressed="${k === view}" class="${k === now ? "now" : ""}">${esc(l)}</button>`).join("")}</div>
+          ${ph[2].map(([id, t, d]) => `<label class="ck ${IX.checks?.[id] ? "done" : ""}"><input type="checkbox" data-ck="${id}" ${IX.checks?.[id] ? "checked" : ""}><div><b>${esc(t)}</b><span>${esc(d)}</span></div></label>`).join("")}</section>
+        <section class="card" id="log"><h2>Weekly log</h2><p class="sub">Two minutes every Friday: what you did, what you learned, one win. At the end, it becomes your resume bullets.</p>
+          <label for="did">What you did this week</label><textarea id="did" maxlength="800" placeholder="Built a cost tracker for the parking deck job in Excel; walked the site with the superintendent…"></textarea>
+          <div class="row"><div><label for="lea">What you learned</label><input id="lea" maxlength="500"></div><div><label for="win">One win <span class="hint">· numbers help</span></label><input id="win" maxlength="400"></div></div>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" id="addlog">Add this week</button>${(IX.log || []).length >= 2 ? `<button class="btn" id="bul">Turn my log into resume bullets</button>` : ""}</div>
+          <div id="bullets"></div>
+          ${(IX.log || []).slice().reverse().map((x) => `<div class="entry"><div class="w"><span>Week of ${esc(fmt(x.week))}</span><button type="button" data-rmlog="${esc(x.id)}">Remove</button></div>
+            ${x.did ? `<p><b>Did:</b> ${esc(x.did)}</p>` : ""}${x.learned ? `<p><b>Learned:</b> ${esc(x.learned)}</p>` : ""}${x.win ? `<p><b>Win:</b> ${esc(x.win)}</p>` : ""}</div>`).join("")}</section>
+      </div><aside>
+        <section class="card"><h2>Know the company</h2>
+          ${IX.companyId ? `<p class="sub">From ${esc(IX.company)}'s own job board and website.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" id="brief">Company brief</button><a class="btn" href="/c/${encodeURIComponent(IX.companyId)}">Their open roles</a></div><div class="brief" id="briefbox"></div>`
+            : `<p class="sub">We don't track ${esc(IX.company)}'s job board yet, so we can't write a brief. Check their website and news, and ask your manager what to read.</p>`}</section>
+        <section class="card peers"><h2>Your people</h2><div id="peers"><p class="empty">Loading…</p></div>
+          <label class="sw"><input type="checkbox" id="vis" ${IX.visible ? "checked" : ""}><span>Show me to other incoming interns at <b data-noi18n>${esc(IX.company)}</b> (needs a public profile)</span></label></section>
+        <section class="card"><h2>Details</h2><p class="small muted" style="margin:0 0 10px">${IX.manager ? `Manager or recruiter: <span data-noi18n>${esc(IX.manager)}</span>` : "Add your start date and manager to time your checklist."}</p><button class="btn" id="edit">Edit details</button></section>
+      </aside></div>`;
+    document.querySelectorAll("[data-ph]").forEach((b) => b.onclick = () => { VIEW = b.dataset.ph; render(); });
+    document.querySelectorAll("[data-ck]").forEach((c) => c.onchange = () => { const checks = { ...(IX.checks || {}) }; if (c.checked) checks[c.dataset.ck] = true; else delete checks[c.dataset.ck];
+      c.closest(".ck").classList.toggle("done", c.checked); save({ ...IX, checks }).then(() => { const n = ALL.filter((id) => IX.checks?.[id]).length; const pg = document.querySelector(".progress"); if (pg) pg.textContent = `${n} of ${ALL.length} done · the dot marks where you are now`; }); });
+    $("#addlog").onclick = async () => {
+      const did = $("#did").value.trim(), learned = $("#lea").value.trim(), win = $("#win").value.trim(); if (!did && !learned && !win) return;
+      $("#addlog").disabled = true; await save({ ...IX, log: [...(IX.log || []), { id: "w-" + Date.now().toString(36), week: today(), did, learned, win }].slice(-30) }); render(); setTimeout(() => $("#log")?.scrollIntoView(), 30);
+    };
+    document.querySelectorAll("[data-rmlog]").forEach((b) => b.onclick = async () => { if (!confirm("Remove this week?")) return; await save({ ...IX, log: (IX.log || []).filter((x) => x.id !== b.dataset.rmlog) }); render(); });
+    const bul = $("#bul"); if (bul) bul.onclick = bullets;
+    const br = $("#brief"); if (br) br.onclick = brief;
+    $("#edit").onclick = () => setup(true);
+    $("#vis").onchange = async (ev) => { await save({ ...IX, visible: ev.target.checked }); PEERS = null; loadPeers(); };
+    loadPeers();
+  }
+  async function bullets(){
+    const box = $("#bullets"), b = $("#bul"); b.disabled = true; box.innerHTML = `<p class="note">Writing your bullets… (about 10 seconds)</p>`;
+    try {
+      const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ feature: "intern_bullets", input: { role: IX.role, company: IX.company, entries: IX.log } }) });
+      const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Couldn't write bullets right now");
+      const m = String(j.text || "").match(/\[[\s\S]*\]/); const list = m ? JSON.parse(m[0]) : [];
+      if (!list.length) throw new Error("Couldn't write bullets right now");
+      box.innerHTML = `<div class="entry"><b style="font-size:14px">Resume bullets</b><ul class="bul">${list.map((x) => `<li>${esc(String(x))}</li>`).join("")}</ul>
+        <p class="note" style="margin-top:0">Written by AI from your log only. Fill in any [number] with a real one, and read every line before you use it.</p><button class="btn" id="cpb" style="margin-top:6px">Copy all</button></div>`;
+      $("#cpb").onclick = () => { navigator.clipboard?.writeText(list.map((x) => "• " + x).join("\n")); $("#cpb").textContent = "Copied"; };
+    } catch (e) { box.innerHTML = `<p class="note">${esc(e.message)}</p>`; }
+    finally { b.disabled = false; }
+  }
+  async function brief(){
+    const box = $("#briefbox"), b = $("#brief"); b.disabled = true; box.innerHTML = `<p class="note">Writing the brief…</p>`;
+    try {
+      const r = await biz.api({ action: "brief", companyId: IX.companyId }); const d = r.brief || {};
+      const list = (a) => (Array.isArray(a) ? a : []).map((x) => `<li>${esc(String(x))}</li>`).join("");
+      box.innerHTML = `${d.about ? `<h3>What they do</h3><p>${esc(d.about)}</p>` : ""}${d.engineers ? `<h3>What interns work on</h3><p>${esc(d.engineers)}</p>` : ""}
+        ${(d.ask || []).length ? `<h3>Good questions to ask</h3><ul>${list(d.ask)}</ul>` : ""}<p class="note">AI summary from public info. Double-check anything important.</p>`;
+    } catch (e) { box.innerHTML = `<p class="note">${esc(e.message)}</p>`; b.disabled = false; }
+  }
+  async function loadPeers(){
+    const el = $("#peers"); if (!el) return;
+    if (LOCAL) { el.innerHTML = `<p class="empty">Available once My Internship is fully set up.</p>`; return; }
+    try { PEERS = PEERS || await biz.api({ action: "intern_peers" }); }
+    catch { el.innerHTML = `<p class="empty">Couldn't load right now.</p>`; return; }
+    const row = (p, sub) => `<a class="it" href="/u/${encodeURIComponent(p.handle)}"><div class="av">${p.photo ? `<img alt="" src="${esc(p.photo)}">` : esc(initials(p.name))}</div><div><b>${esc(p.name)}</b><span>${esc(sub)}</span></div></a>`;
+    el.innerHTML = `<h3 style="font-size:13.5px;margin:4px 0">Interned there before</h3>${PEERS.alumni.length ? PEERS.alumni.map((p) => row(p, [p.role, p.when].filter(Boolean).join(" · "))).join("") : `<p class="empty">No one with a public profile yet.</p>`}
+      <h3 style="font-size:13.5px;margin:12px 0 4px">Other incoming interns</h3>${PEERS.incoming.length ? PEERS.incoming.map((p) => row(p, [p.role, p.location].filter(Boolean).join(" · "))).join("") : `<p class="empty">No one yet. Turn on the switch below so others can find you too.</p>`}`;
+  }
+
+  biz.start(async (u) => {
+    if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; return; }
+    if (!u) return intro();
+    try {
+      const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + (await biz.clerk().session.getToken()) } }); ME = await r.json();
+      LOCAL = ME.internshipReady === false;
+      let local = null; try { local = JSON.parse(localStorage.getItem("btp_internship") || "null"); } catch {}
+      IX = ME.internship || local || null;
+      if (!LOCAL && !ME.internship && local) save(local);   // the server is ready now: move this device's copy up
+      render();
+    } catch { $("main").innerHTML = `<div class="card center">Couldn't load your internship right now. Refresh in a minute.</div>`; }
+  });
+})();
+</script>
+<script src="/logos.js" defer></script>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

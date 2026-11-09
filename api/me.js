@@ -47,6 +47,7 @@ import { botOn, logRun } from "../lib/bots.js";
 import { orbitFor } from "../lib/orbit.js";
 import { orbitExtras, orbitAction, deleteOrbitData } from "../lib/orbitnet.js";
 import { bizAction, publicCompany, isVerifiedEmployer } from "../lib/employer.js";
+import { cleanInternship, internPeers } from "../lib/internship.js";
 import { talentFor, roleOf } from "../lib/talent.js";
 
 const LISTS = ["saved", "applied"];
@@ -295,7 +296,8 @@ export default async function handler(req, res) {
                             starred: row?.starred || [], seenAt: row?.seen_at || null, apps: row?.apps || [], goal: row?.weekly_goal ?? null,
                             profile: row?.profile || null, handle: row?.handle || null, profilePublic: row?.profile_public === true,
                             remindEmail: row?.remind_email === true,
-                            alerts: row?.alert_on === true ? { major: row.alert_major || "all", states: row.alert_states || "" } : null, emailReady: !!process.env.RESEND_API_KEY });
+                            alerts: row?.alert_on === true ? { major: row.alert_major || "all", states: row.alert_states || "" } : null, emailReady: !!process.env.RESEND_API_KEY,
+                            internship: row?.internship || null, internshipReady: row ? "internship" in row : true });
   const send = (out) => out.error ? res.status(out.status || 400).json({ error: out.error }) : res.status(200).json(view(out.row));
   const stop = (error, status = 400) => ({ error, status });
 
@@ -357,6 +359,19 @@ export default async function handler(req, res) {
       if (!(await rateOk(`orbit-act:${uid}`, 60, 60))) return res.status(429).json({ error: "Slow down a little and try again" });
       const out = await orbitAction(uid, action, body || {}, { roleOf, rateOk });
       return res.status(out.status).json(out.body);
+    }
+
+    // ── My Internship (/internship/, lib/internship.js): for students who already have an offer ──
+    if (action === "intern_save") {
+      const ix = body.internship === null ? null : cleanInternship(body.internship);
+      if (body.internship !== null && !ix) return res.status(400).json({ error: "Add the company first" });
+      try { return send(await mutate(uid, () => ({ internship: ix }))); }
+      catch (e) { if (/internship/i.test(String(e?.message))) return res.status(503).json({ error: "My Internship is still being set up. Your changes are kept on this device for now.", setup: true }); throw e; }
+    }
+    if (action === "intern_peers") {
+      if (!(await rateOk(`intern-peers:${uid}`, 60, 20))) return res.status(429).json({ error: "Slow down a little and try again" });
+      const row = await loadRow(uid);
+      return res.status(200).json(await internPeers(uid, row?.internship).catch(() => ({ alumni: [], incoming: [] })));
     }
 
     // ── Business side (lib/employer.js): company setup, work-email code, owner review, dashboard, business Orbit ──

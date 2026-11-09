@@ -234,6 +234,7 @@
               <div class="acts">${l.open === false ? "" : `<a class="btn go" href="${esc(l.url)}" target="_blank" rel="noopener">Apply →</a>`}<button class="btn" data-applied>✓ I applied</button></div></div>`).join("")
           : list.map(appCard).join(""))
         : `<div class="empty">${{ applied: "No applications yet. Tap <b>Mark applied</b> on any internship, or add one you applied to elsewhere.", interview: "No interviews yet. When you get one, tap on the application.", offer: "No offers yet. You've got this.", saved: savedLoading ? "Loading your saved jobs…" : S.listingsErr ? "Couldn't load your saved jobs right now — refresh in a minute." : "Nothing saved that you haven't applied to.", rejected: "None. " }[S.tab]}</div>`}</div>
+      ${S.tab === "offer" ? `<a class="btn go" href="/internship/" style="display:inline-block;margin:0 0 10px">Got an offer? Plan your internship →</a>` : ""}
       <button class="btn add" id="addBtn">＋ Add an application from somewhere else</button>
       <p style="font-size:12.5px;color:var(--muted);margin:22px 0 0">Your data: <a href="/privacy/">what we store</a> · <button class="btn ghost" id="delAll" style="font-size:12.5px;padding:4px 8px">Delete all my data</button></p>`;
   }

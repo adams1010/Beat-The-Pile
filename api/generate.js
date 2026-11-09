@@ -3,7 +3,7 @@
 // So nobody can use this endpoint as a free general-purpose Claude.
 //
 //   POST /api/generate { feature, input }   → { text }
-//   features: reasons · resume_builder · cover_letter · followup · score · interview_prep · interview_turn · intel · profile_fill
+//   features: reasons · resume_builder · cover_letter · followup · score · interview_prep · interview_turn · intel · profile_fill · intern_bullets
 //
 // Controls (all shared across every server, stored in Postgres):
 //   - Origin/Referer must be our own site. That only stops other websites' browsers — it is NOT authentication.
@@ -25,6 +25,22 @@ function student(s) {
 
 /** Each feature: (input) → { prompt, maxTokens, temperature } or throws a 400 message. */
 export const FEATURES = {
+  // /internship/ weekly log → resume bullets. Copy, never invent.
+  intern_bullets(i) {
+    const role = str(i?.role, 120), company = str(i?.company, 100);
+    const entries = (Array.isArray(i?.entries) ? i.entries : []).slice(0, 20)
+      .map((e, n) => `Week ${n + 1}: did: ${str(e?.did, 600)} | learned: ${str(e?.learned, 300)} | win: ${str(e?.win, 300)}`).join("\n");
+    if (entries.length < 40) throw new AIError("Add a few weekly log entries first", 400);
+    return { maxTokens: 900, temperature: 0.2, prompt: `A student wrote a weekly log during their internship as ${role || "an intern"} at ${company || "a company"}. Turn it into 4-6 strong resume bullet points.
+
+Rules: use ONLY facts in the log — never invent numbers, tools, results or scope. Start each bullet with a strong past-tense verb. If a number would help but isn't in the log, write [number] as a placeholder for the student to fill in. Keep each bullet under 25 words.
+
+LOG:
+${entries}
+
+Return ONLY a JSON array of strings. No other text.` };
+  },
+
   // /u/ "Fill my profile from my resume": resume text → profile fields as JSON. Copy, never invent.
   profile_fill(i) {
     const resume = str(i?.resume, 12000);

@@ -25,7 +25,7 @@
   const BIZ = ROLE === "employer";
   if (BIZ) {
     const p0 = location.pathname.replace(/index\.html$/, "");
-    if (["/", "/jobs/", "/jobs", "/season/", "/season", "/fair/", "/fair", "/radar/", "/radar", "/demo/", "/demo", "/u/", "/u", "/business/", "/business"].includes(p0)) { location.replace("/business/home/"); return; }
+    if (["/", "/jobs/", "/jobs", "/season/", "/season", "/fair/", "/fair", "/radar/", "/radar", "/demo/", "/demo", "/u/", "/u", "/business/", "/business", "/internship/", "/internship"].includes(p0)) { location.replace("/business/home/"); return; }
   }
   const MAIN = BIZ
     ? [["/business/home/", "Home", "home"], ["/business/talent/", "Talent", "talent"], ["/orbit/", "Orbit", "orbit"], ["/business/fairs/", "Career Fairs", "fair"]]
@@ -33,6 +33,7 @@
   // Your profile (or company page), switching between student and business, language and sign-out all live in the
   // menu behind your picture on the right — like Instagram's "switch to professional account".
   const TOOLS = BIZ ? [] : [
+    ["/internship/", "My Internship", "Got an offer? Prep, first weeks, wrap-up"],
     ["/radar/", "Opening Radar", "When each company usually opens internships"],
     ["/#quiz", "Match quiz", "Real openings matched to your major"],
     ["/#interview", "Interview practice", "Talk it out against a timer, get graded"],
