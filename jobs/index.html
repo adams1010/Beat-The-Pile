@@ -156,6 +156,10 @@
   .tl .x{border:0;background:none;font-size:22px;line-height:1;color:var(--faint);cursor:pointer;padding:2px 6px}
   .tl .bd{padding:16px 20px 20px;display:flex;flex-direction:column;gap:12px;overflow:auto}
   .tl label{font-size:13px;font-weight:600}.tl .hint{font-size:12.5px;color:var(--muted);font-weight:400}
+  .tl .rfile{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1px dashed #C9D1DE;border-radius:10px;padding:10px 12px;background:#F8FAFC}
+  .tl .rfile b{font-size:14px;overflow-wrap:anywhere}.tl .rfile.busy{opacity:.6;pointer-events:none}
+  .tl .rfile .pick{margin-left:auto;font-size:13px;font-weight:600;color:var(--green);border:1px solid var(--green);border-radius:999px;padding:5px 12px;cursor:pointer;background:#fff}
+  .tl .rfile .pick input{position:absolute;left:-9999px}
   .tl textarea{width:100%;box-sizing:border-box;font:14px/1.45 inherit;font-family:inherit;padding:10px;border:1px solid #C9D1DE;border-radius:10px;min-height:110px;resize:vertical}
   .tl .go{align-self:flex-start;font:600 14px inherit;font-family:inherit;padding:10px 20px;border-radius:999px;border:0;background:var(--green);color:#fff;cursor:pointer}
   .tl .go[disabled]{opacity:.6;cursor:default}
@@ -193,6 +197,7 @@
 </head>
 <body>
 <script src="/nav.js"></script>
+<script src="/resume-file.js"></script>
 <header>
   <div class="wrap">
     <div class="topbar"><span class="brand">Internships</span><div class="acct" id="acct"></div></div>
@@ -223,9 +228,7 @@
     <div class="kindseg" role="group" aria-label="Job type"><button type="button" data-kind="intern" aria-pressed="true">Internships</button><button type="button" data-kind="fulltime" aria-pressed="false">Full-time</button><button type="button" data-kind="all" aria-pressed="false">Both</button></div>
     <div class="row">
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">All US states</option></select>
-      <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Within</span>
-        <select id="miSel" aria-label="Distance in miles"><option value="25">25 mi</option><option value="50" selected>50 mi</option><option value="100">100 mi</option><option value="200">200 mi</option></select>
-        <span>of</span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
+      <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
       <select class="statesel" id="majorSel" aria-label="Major">
         <option value="all">All majors</option>
         <optgroup label="Engineering"><option value="eng">All engineering</option><option value="mechanical">Mechanical &amp; Aerospace</option><option value="electrical">Electrical &amp; Computer Eng.</option><option value="civil">Civil, Construction &amp; Architecture</option><option value="chemical">Chemical &amp; Materials</option><option value="industrial">Industrial &amp; Manufacturing</option></optgroup>
@@ -454,7 +457,8 @@
     const has = (list, j) => j.ids.some((id) => state.mine[list].has(id));
     $("savedN").textContent = state.mine.saved.size ? `(${state.mine.saved.size})` : "";
     const nm = state.near && !state.savedOnly && !state.followOnly ? state.nearMeta : null;
-    const nearNote = nm ? `Nearest first. Distances are city center to city center. ${nm.unplacedInState ? `${nm.unplacedInState} more in ${esc(NAMES[nm.near.state] || nm.near.state)} ${nm.unplacedInState === 1 ? "doesn't" : "don't"} say which city. <button class="linkbtn" data-near-st="${esc(nm.near.state)}">See all of ${esc(NAMES[nm.near.state] || nm.near.state)}</button> ` : ""}${nm.remote ? `${nm.remote} remote not counted. ` : ""}` : "";
+    const wider = state.near ? { 25: 50, 50: 100, 100: 200 }[state.near.mi] : null;
+    const nearNote = nm ? `Within ${state.near.mi} mi, nearest first.${wider ? ` <button class="linkbtn" data-widen="${wider}">Show within ${wider} mi</button>` : ""} Distances are city center to city center. ${nm.unplacedInState ? `${nm.unplacedInState} more in ${esc(NAMES[nm.near.state] || nm.near.state)} ${nm.unplacedInState === 1 ? "doesn't" : "don't"} say which city. <button class="linkbtn" data-near-st="${esc(nm.near.state)}">See all of ${esc(NAMES[nm.near.state] || nm.near.state)}</button> ` : ""}${nm.remote ? `${nm.remote} remote not counted. ` : ""}` : "";
     $("note").innerHTML = nearNote + (state.st !== "ALL" && !state.savedOnly && !state.followOnly
         ? `Showing ${esc(state.st.map((x) => NAMES[x] || x).join(" & "))}. <button class="linkbtn" id="goAll">See all US</button> `
         : "") + (state.company ? `One company, every major. <button class="linkbtn" id="allCos">Show all companies</button> ` : "") + (state.savedOnly || state.followOnly ? "Every major and state." : strict ? "Showing roles that say mechanical (or close, like manufacturing)." : `Major: <b>${esc(MAJOR_LABEL())}</b> (change it above).`)
@@ -582,29 +586,34 @@
   // ── "Within N mi of a city" (api/listings?near=; lib/geocode.js). Picking a state turns it off, and the other way round. ──
   // The box asks for "City, state or ZIP" (24060 → distance search too): "Blacksburg, VA" → distance search; "Virginia" / "VA" → that state's filter.
   // A 5-digit ZIP still works (old links, people who type one anyway).
-  function nearOk(q){ return /^\d{5}$/.test(q) || /^[A-Za-z .'-]{2,30},\s*[A-Za-z]{2}$/.test(q); }
+  // Nov 8: a city on its own works too ("Blacksburg"); if several states have one, the API asks which (data.choices).
+  function nearOk(q){ return /^\d{5}$/.test(q) || /^[A-Za-z .'-]{2,30}(,\s*[A-Za-z]{2})?$/.test(q); }
   function stateFrom(q){ const t = q.trim().replace(/\.$/, "").toLowerCase(); if (!t) return null;
     for (const [ab, nm] of Object.entries(NAMES)) if (t === ab.toLowerCase() || t === nm.toLowerCase()) return ab;
     return null; }
   function paintNear(){
     const on = !!state.near; $("nearBox").classList.toggle("on", on); $("nearX").hidden = !on;
-    if (on) { $("nearIn").value = state.near.q; $("miSel").value = String(state.near.mi); }
+    if (on) $("nearIn").value = state.near.q;
   }
   function setNear(q, mi){
     q = (q || "").trim();
     if (!q) return clearNear();
     const st = stateFrom(q);
     if (st) { $("nearIn").value = ""; $("stateSel").value = st; return setView([st], null); }   // setView turns distance off
-    if (!nearOk(q)) { toast("Type a city and state, like Blacksburg, VA — or just a state, like Virginia"); return; }
+    if (!nearOk(q)) { toast("Type a city, a ZIP code or a state — like Blacksburg, 24060 or Virginia"); return; }
     state.near = { q, mi: +mi || 50 }; state.st = "ALL"; $("stateSel").value = ""; $("stateSel").classList.remove("on");
     try { localStorage.setItem("btp_near", q); } catch {}
     track("near_search", { mi: state.near.mi }); paintNear(); loadScope();
   }
   function clearNear(){ if (!state.near) return; state.near = null; state.nearMeta = null; $("nearIn").value = ""; paintNear(); loadScope(); }
-  $("nearBox").addEventListener("submit", (e) => { e.preventDefault(); setNear($("nearIn").value, $("miSel").value); });
-  $("nearIn").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); setNear($("nearIn").value, $("miSel").value); } });
-  $("nearIn").addEventListener("change", () => { const v = $("nearIn").value.trim(); if ((nearOk(v) || stateFrom(v)) && (!state.near || state.near.q !== v)) setNear(v, $("miSel").value); });
-  $("miSel").addEventListener("change", () => { if (state.near) setNear(state.near.q, $("miSel").value); else $("nearIn").focus(); });
+  const MI = () => state.near?.mi || 50;
+  $("nearBox").addEventListener("submit", (e) => { e.preventDefault(); setNear($("nearIn").value, 50); });
+  $("nearIn").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); setNear($("nearIn").value, 50); } });
+  $("nearIn").addEventListener("change", () => { const v = $("nearIn").value.trim(); if ((nearOk(v) || stateFrom(v)) && (!state.near || state.near.q !== v)) setNear(v, 50); });
+  document.addEventListener("click", (e) => {
+    const w = e.target.closest("[data-widen]"); if (w && state.near) { setNear(state.near.q, +w.dataset.widen); return; }
+    const c = e.target.closest("[data-near-pick]"); if (c) setNear(c.dataset.nearPick, MI());
+  });
   $("nearX").addEventListener("click", clearNear);
   try { const last = localStorage.getItem("btp_near"); if (last && !$("nearIn").value) $("nearIn").placeholder = last; } catch {}
 
@@ -656,6 +665,8 @@
   });
   // ── "Tailor resume" for one job (AI suggestions, /api/generate feature "tailor"). Resume text stays in this browser. ──
   const TL = { job: null };
+  // The resume is a FILE (PDF/Word/txt, read in the browser by /resume-file.js); we remember the text + file name on this device.
+  function myResumeName(){ try { return localStorage.getItem("btp_tailor_resume_name") || ""; } catch { return ""; } }
   function myResume(){
     try { const r = localStorage.getItem("btp_tailor_resume"); if (r) return r; } catch {}
     try { const p = JSON.parse(localStorage.getItem("iq_profile") || "{}"); const list = (p.resumes || []).filter((x) => x && x.text && x.text.length > 80);
@@ -665,18 +676,28 @@
     const j = TL.job;
     $("tlJob").textContent = `${j.t} · ${j.c}`;
     $("tlBody").innerHTML = `
-      <div><label for="tlRes">Your resume <span class="hint">· paste the text (stays on this device)</span></label>
-        <textarea id="tlRes" placeholder="Paste your resume text here">${esc(myResume())}</textarea></div>
+      <div><label>Your resume <span class="hint">· PDF or Word file (read on this device)</span></label>
+        <div class="rfile" id="tlFile"></div></div>
       <div><label for="tlPost">The job posting <span class="hint">· optional, but much better results. <a href="${esc(j.u)}" target="_blank" rel="noopener">Open it ↗</a> and copy the description</span></label>
         <textarea id="tlPost" placeholder="Paste the job description (what they want, responsibilities, skills)"></textarea></div>
       <button class="go" type="button" id="tlGo">Get suggestions</button>
       <div class="est">AI suggestions, not a guarantee. It only rephrases what's already on your resume. Never add things you didn't do.</div>`;
     $("tlGo").onclick = runTailor;
+    TL.resume = myResume(); paintTlFile();
+  }
+  function paintTlFile(){
+    const has = (TL.resume || "").length >= 80, nm = myResumeName() || (has ? "Your saved resume" : "");
+    $("tlFile").innerHTML = `${has ? `<b>${esc(nm)}</b><span class="hint">${TL.resume.split(/\s+/).filter(Boolean).length.toLocaleString()} words read</span>` : `<span class="hint">No resume yet</span>`}
+      <label class="pick">${has ? "Change file" : "Upload resume"}<input type="file" id="tlPick" accept="${window.btpResumeFile ? btpResumeFile.accept : ".pdf,.docx,.txt"}"></label>`;
+    $("tlPick").onchange = async (e) => { const f = e.target.files && e.target.files[0]; e.target.value = ""; if (!f) return;
+      $("tlFile").classList.add("busy");
+      try { const r = await btpResumeFile.read(f); TL.resume = r.text;
+        try { localStorage.setItem("btp_tailor_resume", r.text); localStorage.setItem("btp_tailor_resume_name", r.name); } catch {}
+        paintTlFile(); } catch (err) { toast(err.message); } finally { $("tlFile").classList.remove("busy"); } };
   }
   async function runTailor(){
-    const resume = $("tlRes").value.trim(), posting = $("tlPost").value.trim(), go = $("tlGo");
-    if (resume.length < 80) { toast("Paste your resume first (at least a few lines)"); $("tlRes").focus(); return; }
-    try { localStorage.setItem("btp_tailor_resume", resume); } catch {}
+    const resume = (TL.resume || "").trim(), posting = $("tlPost").value.trim(), go = $("tlGo");
+    if (resume.length < 80) { toast("Upload your resume first (PDF or Word)"); $("tlPick")?.click(); return; }
     go.disabled = true; go.textContent = "Reading the job…";
     try {
       const r = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" },
@@ -856,8 +877,9 @@
   async function getAll(qs, onFirst){
     const page = async (off) => {
       const r = await fetch(`/api/listings?${qs}${qs ? "&" : ""}limit=1000&offset=${off}`);
-      if (!r.ok) { const e = new Error(r.status); e.status = r.status; throw e; }
-      const d = await r.json(); if (d.meta?.lastSync) state.lastSync = d.meta.lastSync; if (d.meta?.near && off === 0) state.nearMeta = d.meta; return d;
+      if (!r.ok) { const e = new Error(r.status); e.status = r.status; try { e.data = await r.json(); } catch {} throw e; }
+      const d = await r.json(); if (d.meta?.lastSync) state.lastSync = d.meta.lastSync; if (d.meta?.near && off === 0) { state.nearMeta = d.meta;
+        if (state.near && d.meta.near.q && d.meta.near.q !== state.near.q) { state.near.q = d.meta.near.q; $("nearIn").value = d.meta.near.q; } } return d;
     };
     const first = await page(0);
     const rows = [...(first.listings || [])];
@@ -896,7 +918,9 @@
     } catch (e) {
       if (seq !== loadSeq) return;
       if (!(e.status === 400 && state.near)) console.error("[jobs] load/render failed", e);
-      if (e.status === 400 && state.near) { $("list").innerHTML = `<div class="empty">We couldn't find “${esc(state.near.q)}”. Try a city and state, like Blacksburg, VA.</div>`; $("count").textContent = ""; return; }
+      if (e.status === 400 && state.near && e.data?.choices?.length) { $("count").textContent = "";
+        $("list").innerHTML = `<div class="empty"><b>${esc(e.data.error)}</b><div class="wchips" style="justify-content:center;margin-top:12px">${e.data.choices.map((c) => `<button type="button" data-near-pick="${esc(c)}" data-noi18n>${esc(c)}</button>`).join("")}</div></div>`; return; }
+      if (e.status === 400 && state.near) { $("list").innerHTML = `<div class="empty">We couldn't find “${esc(state.near.q)}”. Try a city and state (Blacksburg, VA) or a 5-digit ZIP code.</div>`; $("count").textContent = ""; return; }
       $("list").innerHTML = '<div class="err" role="alert">Couldn’t load internships right now — that’s a problem on our side or your connection, not a sign there are no jobs. Refresh in a minute.</div>';
     }
   }

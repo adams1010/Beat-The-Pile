@@ -92,3 +92,15 @@ const z = fk.T("listings").filter((x) => x.company_id === "z");
 assert.ok(z.every((x) => x.geo_kind === "place" && x.geo_n === 1)); near([z[0].geo_lat, z[0].geo_lng], [33.05, -96.75]);
 console.log("✓ backfill fills old listings, grouped by location text");
 console.log("\nGEO RADIUS TESTS PASSED");
+
+// Nov 8: a city typed without a state
+{
+  const { cityMatches } = await import("../lib/geocode.js");
+  const bb = cityMatches("blacksburg").map((x) => x.q).sort();
+  assert.deepEqual(bb, ["Blacksburg, SC", "Blacksburg, VA"], "two Blacksburgs → ask which");
+  assert.ok(cityMatches("Springfield").length > 10);
+  const one = cityMatches("Christiansburg"); assert.ok(one.length >= 1 && one.some((x) => x.state === "VA"));
+  assert.deepEqual(cityMatches("24060"), [], "ZIPs aren't city names");
+  assert.deepEqual(cityMatches("Notarealplaceville"), []);
+  console.log("✓ bare city names: one match is used, several ask which state");
+}

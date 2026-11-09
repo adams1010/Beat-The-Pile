@@ -173,8 +173,10 @@ function HeroMap({near,fresh,sum}){
     </div>
   </aside>);
 }
-// The hero's "City, state or ZIP" box: "Blacksburg, VA" or a 5-digit ZIP = distance search; a state name/code = state filter.
-const D_NEAR=(v)=>/^\d{5}$/.test(v)||/^[A-Za-z .'-]{2,30},\s*[A-Za-z]{2}$/.test(v);
+// The hero's "City, state or ZIP" box: a state name/code = state filter; "Blacksburg, VA", "Blacksburg" or a 5-digit ZIP
+// = distance search (a city in several states → /jobs asks which one).
+const D_ISSTATE=(v)=>{const w=String(v).trim().toLowerCase();return (/^[a-z]{2}$/.test(w)&&Object.values(D_STATES).includes(w.toUpperCase()))||!!D_STATES[w];};
+const D_NEAR=(v)=>/^\d{5}$/.test(v)||/^[A-Za-z .'-]{2,30},\s*[A-Za-z]{2}$/.test(v)||(/^[A-Za-z .'-]{3,30}$/.test(v)&&!D_ISSTATE(v)&&!/^remote$/i.test(v.trim()));
 function LandingD({onQuiz,onPage}){
   const [sum,setSum]=React.useState(null),[sumErr,setSumErr]=React.useState(false),[fresh,setFresh]=React.useState(null);
   const [q,setQ]=React.useState(""),[where,setWhere]=React.useState(""),[near,setNear]=React.useState(null);
@@ -191,7 +193,7 @@ function LandingD({onQuiz,onPage}){
   },[]);
   const go=(e)=>{e.preventDefault();analytics.track("home_search",{has_query:!!q.trim(),has_state:!!where.trim()});const p=new URLSearchParams();if(q.trim())p.set("q",q.trim());
     const w=where.trim().toLowerCase();
-    if(D_NEAR(w)){p.set("near",where.trim());p.set("mi","50");p.set("major","all");analytics.track("home_search_zip");location.href="/jobs/?"+p.toString();return;}
+    if(!D_ISSTATE(w)&&D_NEAR(w)){p.set("near",where.trim());p.set("mi","50");p.set("major","all");analytics.track("home_search_zip");location.href="/jobs/?"+p.toString();return;}
     const code=/^[a-z]{2}$/.test(w)?w.toUpperCase():(D_STATES[w]||null);
     p.set("state",code&&Object.values(D_STATES).includes(code)?code:"all");if(w==="remote"&&!q.trim())p.set("q","remote");
     location.href="/jobs/?"+p.toString();};
@@ -1383,7 +1385,7 @@ function App(){
   const [profileSaved,setProfileSaved]=useState(false);
   const [applyModal,setApplyModal]=useState(null); // company object or null
   // Score-a-Job state — paste a resume + JD, get a transparent breakdown
-  const [scoreResume,setScoreResume]=useState("");
+  const [scoreResume,setScoreResume]=useState(""),[scoreResumeName,setScoreResumeName]=useState(""),[scoreReading,setScoreReading]=useState(""); 
   const [scoreJD,setScoreJD]=useState("");
   const [scoreResult,setScoreResult]=useState(null);
   const [scoreLoading,setScoreLoading]=useState(false);
@@ -2184,6 +2186,7 @@ function App(){
     }
   }
   async function extractTextFromFile(file){
+    if(window.btpResumeFile)return (await window.btpResumeFile.read(file)).text;   // /resume-file.js: PDF, real .docx unzip, txt
     const name=(file.name||"").toLowerCase();
     if(name.endsWith(".txt")||file.type==="text/plain"){
       return await file.text();
@@ -2240,12 +2243,12 @@ function App(){
     setResumeUploadErr("");
     const file=fileList&&fileList[0];
     if(!file)return;
-    if(file.size>4*1024*1024){setResumeUploadErr("File is larger than 4MB. Try pasting the text instead.");return;}
+    if(file.size>5*1024*1024){setResumeUploadErr("That file is over 5 MB. Try a smaller PDF.");return;}
     setResumeUploading(true);
     try{
       const text=await extractTextFromFile(file);
-      if(!text||text.length<40){throw new Error("Couldn't read much text from that file — try pasting instead.");}
-      setA("resume",text);
+      if(!text||text.length<40){throw new Error("Couldn't read much text from that file. Try a PDF exported from Word or Google Docs.");}
+      setA("resume",text);setA("resumeName",file.name);
       analytics.track("resume_uploaded",{type:file.name.split(".").pop().toLowerCase(),chars:text.length,where:"quiz"});
     }catch(e){
       setResumeUploadErr(String(e.message||e));
@@ -3283,12 +3286,12 @@ function App(){
             {resumeUploading&&<p style={{fontSize:12,color:GD,fontWeight:600,marginBottom:8}}>Reading file…</p>}
             {resumeUploadErr&&<p style={{fontSize:12,color:CR,marginBottom:8}}>{resumeUploadErr}</p>}
 
-            <p style={{fontSize:12,color:"#6B7280",margin:"10px 0",textAlign:"center"}}>— or paste it below —</p>
-
-            <textarea value={ans.resume||""} onChange={e=>setA("resume",e.target.value)} placeholder="Paste your resume text here…"
-              style={{width:"100%",minHeight:170,padding:"12px 14px",borderRadius:var_rl,border:`1.5px solid ${(ans.resume||"").length>40?G:"#E2E8F0"}`,background:"#FBFBFC",color:"#060A2C",fontFamily:"var(--font)",fontSize:13.5,lineHeight:1.5,outline:"none",resize:"vertical",transition:"border-color 0.2s"}}/>
-
-            {(ans.resume||"").length>40&&<p style={{fontSize:13,color:GD,fontWeight:700,marginTop:8}}>✓ Got your resume ({(ans.resume||"").length.toLocaleString()} chars) — we'll use it to tailor your matches</p>}
+            {(ans.resume||"").length>40&&(
+              <div style={{display:"flex",alignItems:"center",gap:10,padding:"12px 14px",border:`1.5px solid ${G}`,borderRadius:var_rl,background:"#F2FADF",marginTop:4}}>
+                <span style={{fontWeight:700,color:"#060A2C",fontSize:14,flex:1,minWidth:0,overflowWrap:"anywhere"}}>{ans.resumeName||"Your saved resume"}</span>
+                <button onClick={()=>{setA("resume","");setA("resumeName","");}} style={{background:"#fff",border:"1.5px solid #E2E8F0",color:"#4A5568",padding:"6px 12px",borderRadius:999,cursor:"pointer",fontFamily:"var(--font)",fontSize:12.5,fontWeight:600}}>Remove</button>
+              </div>)}
+            {(ans.resume||"").length>40&&<p style={{fontSize:13,color:GD,fontWeight:700,marginTop:8}}>Got it. We'll use your resume to explain why each match fits.</p>}
 
             {/* Subtle 'no resume yet' path — sets a flag so we offer the builder after the quiz, then advances */}
             {(ans.resume||"").length<=40&&(
@@ -4326,16 +4329,21 @@ Thank you for your time,
         <div style={{maxWidth:760,margin:"0 auto",padding:"1.5rem 1rem 4rem"}}>
           <p style={{fontSize:12,fontWeight:600,color:G,marginBottom:6}}>Score a job</p>
           <h1 style={{fontSize:32,fontWeight:700,letterSpacing:"-1px",color:"#060A2C",marginBottom:10}}>See what the screener sees.</h1>
-          <p style={{color:"#4A5568",fontSize:15,lineHeight:1.55,marginBottom:24}}>Before a recruiter ever looks at you, software often does. Paste your resume, the job description, or both and our AI gives you an honest breakdown and real fixes. <strong>This is coaching: the scores are our AI's estimate, not a number from Workday, Greenhouse or any employer.</strong> What you paste is sent to our AI provider (Anthropic) to write the breakdown.</p>
+          <p style={{color:"#4A5568",fontSize:15,lineHeight:1.55,marginBottom:24}}>Before a recruiter ever looks at you, software often does. Upload your resume, paste the job description, or both, and our AI gives you an honest breakdown and real fixes. <strong>This is coaching: the scores are our AI's estimate, not a number from Workday, Greenhouse or any employer.</strong> What you add is sent to our AI provider (Anthropic) to write the breakdown.</p>
 
           {!scoreResult&&(
             <>
               <div style={{display:"flex",flexDirection:"column",gap:18,marginBottom:20}}>
                 <div>
-                  <label style={{fontSize:13,fontWeight:700,color:"#060A2C",marginBottom:6,display:"block"}}>Your resume <span style={{color:"#6B7280",fontWeight:500}}>(paste the text, optional but helps)</span></label>
-                  <textarea value={scoreResume} onChange={e=>setScoreResume(e.target.value)} placeholder="Paste your resume text here..."
-                    style={{width:"100%",minHeight:160,padding:"12px",borderRadius:var_r,border:`1.5px solid #E2E8F0`,background:"#FBFBFC",fontFamily:"var(--font)",fontSize:13.5,lineHeight:1.5,color:"#060A2C",resize:"vertical",outline:"none"}}/>
-                  {(profile.resumes||[]).length>0&&<button onClick={()=>{const r=(profile.resumes||[]).find(x=>x.id===chosenResumeId)||(profile.resumes||[])[0];if(r&&r.text)setScoreResume(r.text);}} style={{marginTop:6,background:"transparent",border:"none",color:GD,fontSize:12,fontWeight:700,cursor:"pointer",padding:0,fontFamily:"var(--font)"}}>↳ Use my saved resume</button>}
+                  <label style={{fontSize:13,fontWeight:700,color:"#060A2C",marginBottom:6,display:"block"}}>Your resume <span style={{color:"#6B7280",fontWeight:500}}>(optional but helps)</span></label>
+                  <div style={{display:"flex",alignItems:"center",gap:10,flexWrap:"wrap",padding:"12px 14px",border:`1.5px ${scoreResume?"solid":"dashed"} ${scoreResume?G:"#CBD5E1"}`,borderRadius:var_r,background:scoreResume?"#F2FADF":"#FBFBFC"}}>
+                    <span style={{flex:1,minWidth:0,fontSize:14,fontWeight:scoreResume?700:500,color:scoreResume?"#060A2C":"#6B7280",overflowWrap:"anywhere"}}>{scoreReading||(scoreResume?(scoreResumeName||"Your saved resume"):"PDF or Word file")}</span>
+                    <label style={{background:"#fff",border:`1.5px solid ${G}`,color:GD,padding:"7px 14px",borderRadius:999,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>{scoreResume?"Change file":"Upload resume"}
+                      <input type="file" accept=".pdf,.docx,.txt" style={{display:"none"}} onChange={async e=>{const f=e.target.files&&e.target.files[0];e.target.value="";if(!f)return;setScoreReading("Reading file…");
+                        try{const t=await extractTextFromFile(f);setScoreResume(t);setScoreResumeName(f.name);setScoreReading("");}catch(err){setScoreReading(String(err.message||err));}}}/></label>
+                    {scoreResume&&<button onClick={()=>{setScoreResume("");setScoreResumeName("");}} style={{background:"transparent",border:"none",color:"#4A5568",fontSize:12.5,fontWeight:600,cursor:"pointer",fontFamily:"var(--font)"}}>Remove</button>}
+                  </div>
+                  {(profile.resumes||[]).length>0&&<button onClick={()=>{const r=(profile.resumes||[]).find(x=>x.id===chosenResumeId)||(profile.resumes||[])[0];if(r&&r.text){setScoreResume(r.text);setScoreResumeName(r.file?.name||r.name||"Saved resume");}}} style={{marginTop:6,background:"transparent",border:"none",color:GD,fontSize:12,fontWeight:700,cursor:"pointer",padding:0,fontFamily:"var(--font)"}}>↳ Use my saved resume</button>}
                 </div>
                 <div>
                   <label style={{fontSize:13,fontWeight:700,color:"#060A2C",marginBottom:6,display:"block"}}>Job description <span style={{color:"#6B7280",fontWeight:500}}>(paste from the posting, optional but helps)</span></label>

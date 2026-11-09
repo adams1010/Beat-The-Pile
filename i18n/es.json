@@ -731,7 +731,27 @@
   "Orbit requests": "Solicitudes de órbita",
   "No one's in your orbit yet. Tap Join orbit on anyone above.": "Aún no hay nadie en tu órbita. Toca Unirse a la órbita en cualquier persona.",
   "Students in your orbit, plus employers if you turned on “Let employers find me”.": "Estudiantes en tu órbita, y empleadores si activaste “Dejar que los empleadores me encuentren”.",
-  "No messages yet. Bring someone into your orbit, then say hi.": "Aún no hay mensajes. Suma a alguien a tu órbita y salúdalo."
+  "No messages yet. Bring someone into your orbit, then say hi.": "Aún no hay mensajes. Suma a alguien a tu órbita y salúdalo.",
+  "Fill your profile from your resume": "Llena tu perfil con tu currículum",
+  "Upload your resume (PDF or Word) and we'll fill in your school, major, experience, projects, skills and links. Nothing is saved until you check it and tap Save profile.": "Sube tu currículum (PDF o Word) y completaremos tu universidad, carrera, experiencia, proyectos, habilidades y enlaces. No se guarda nada hasta que lo revises y toques Guardar perfil.",
+  "Upload resume": "Subir currículum",
+  "Replace": "Reemplazar",
+  "+ Add resume file": "+ Agregar archivo de currículum",
+  "Keep a version per kind of role (e.g. \"Finance\", \"Engineering\"). Upload a PDF or Word file; cover letters and auto-fill use it.": "Guarda una versión por tipo de puesto (p. ej. \"Finanzas\", \"Ingeniería\"). Sube un PDF o Word; las cartas de presentación y el autocompletado lo usan.",
+  "No resumes yet.": "Aún no hay currículums.",
+  "Change file": "Cambiar archivo",
+  "No resume yet": "Aún no hay currículum",
+  "· PDF or Word file (read on this device)": "· archivo PDF o Word (se lee en este dispositivo)",
+  "Saved earlier": "Guardado antes",
+  "Near": "Cerca de",
+  "Crop your photo": "Recorta tu foto",
+  "Drag to move. Zoom to fit your face in the circle.": "Arrastra para mover. Acerca para que tu cara quepa en el círculo.",
+  "Use photo": "Usar foto",
+  "Zoom": "Zoom",
+  "Zoom in": "Acercar",
+  "Zoom out": "Alejar",
+  "Filling in your profile… (about 10 seconds)": "Completando tu perfil… (unos 10 segundos)",
+  "Reading your resume…": "Leyendo tu currículum…"
  },
  "patterns": [
   [
@@ -893,6 +913,14 @@
   [
    "^(.+) wants to join your orbit$",
    "$1 quiere unirse a tu órbita"
+  ],
+  [
+   "^([\\d,]+) words read$",
+   "$1 palabras leídas"
+  ],
+  [
+   "^Show within (\\d+) mi$",
+   "Ver a $1 mi"
   ]
  ]
 }

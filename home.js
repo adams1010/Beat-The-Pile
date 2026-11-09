@@ -1,4 +1,4 @@
-/* built from src/home.jsx 3116cd1052b2c624 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 1d0ee88293297f05 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -976,7 +976,11 @@ function HeroMap({
     }
   }, dAgo(j.first_seen))))));
 }
-const D_NEAR = v => /^\d{5}$/.test(v) || /^[A-Za-z .'-]{2,30},\s*[A-Za-z]{2}$/.test(v);
+const D_ISSTATE = v => {
+  const w = String(v).trim().toLowerCase();
+  return /^[a-z]{2}$/.test(w) && Object.values(D_STATES).includes(w.toUpperCase()) || !!D_STATES[w];
+};
+const D_NEAR = v => /^\d{5}$/.test(v) || /^[A-Za-z .'-]{2,30},\s*[A-Za-z]{2}$/.test(v) || /^[A-Za-z .'-]{3,30}$/.test(v) && !D_ISSTATE(v) && !/^remote$/i.test(v.trim());
 function LandingD({
   onQuiz,
   onPage
@@ -1039,7 +1043,7 @@ function LandingD({
     const p = new URLSearchParams();
     if (q.trim()) p.set("q", q.trim());
     const w = where.trim().toLowerCase();
-    if (D_NEAR(w)) {
+    if (!D_ISSTATE(w) && D_NEAR(w)) {
       p.set("near", where.trim());
       p.set("mi", "50");
       p.set("major", "all");
@@ -4362,7 +4366,9 @@ function App() {
   const [profile, setProfile] = useState(EMPTY_PROFILE);
   const [profileSaved, setProfileSaved] = useState(false);
   const [applyModal, setApplyModal] = useState(null);
-  const [scoreResume, setScoreResume] = useState("");
+  const [scoreResume, setScoreResume] = useState(""),
+    [scoreResumeName, setScoreResumeName] = useState(""),
+    [scoreReading, setScoreReading] = useState("");
   const [scoreJD, setScoreJD] = useState("");
   const [scoreResult, setScoreResult] = useState(null);
   const [scoreLoading, setScoreLoading] = useState(false);
@@ -5594,6 +5600,7 @@ function App() {
     }
   }
   async function extractTextFromFile(file) {
+    if (window.btpResumeFile) return (await window.btpResumeFile.read(file)).text;
     const name = (file.name || "").toLowerCase();
     if (name.endsWith(".txt") || file.type === "text/plain") {
       return await file.text();
@@ -5657,17 +5664,18 @@ function App() {
     setResumeUploadErr("");
     const file = fileList && fileList[0];
     if (!file) return;
-    if (file.size > 4 * 1024 * 1024) {
-      setResumeUploadErr("File is larger than 4MB. Try pasting the text instead.");
+    if (file.size > 5 * 1024 * 1024) {
+      setResumeUploadErr("That file is over 5 MB. Try a smaller PDF.");
       return;
     }
     setResumeUploading(true);
     try {
       const text = await extractTextFromFile(file);
       if (!text || text.length < 40) {
-        throw new Error("Couldn't read much text from that file — try pasting instead.");
+        throw new Error("Couldn't read much text from that file. Try a PDF exported from Word or Google Docs.");
       }
       setA("resume", text);
+      setA("resumeName", file.name);
       analytics.track("resume_uploaded", {
         type: file.name.split(".").pop().toLowerCase(),
         chars: text.length,
@@ -8602,40 +8610,50 @@ function App() {
         color: CR,
         marginBottom: 8
       }
-    }, resumeUploadErr), React.createElement("p", {
+    }, resumeUploadErr), (ans.resume || "").length > 40 && React.createElement("div", {
       style: {
-        fontSize: 12,
-        color: "#6B7280",
-        margin: "10px 0",
-        textAlign: "center"
-      }
-    }, "\u2014 or paste it below \u2014"), React.createElement("textarea", {
-      value: ans.resume || "",
-      onChange: e => setA("resume", e.target.value),
-      placeholder: "Paste your resume text here\u2026",
-      style: {
-        width: "100%",
-        minHeight: 170,
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
         padding: "12px 14px",
+        border: `1.5px solid ${G}`,
         borderRadius: var_rl,
-        border: `1.5px solid ${(ans.resume || "").length > 40 ? G : "#E2E8F0"}`,
-        background: "#FBFBFC",
-        color: "#060A2C",
-        fontFamily: "var(--font)",
-        fontSize: 13.5,
-        lineHeight: 1.5,
-        outline: "none",
-        resize: "vertical",
-        transition: "border-color 0.2s"
+        background: "#F2FADF",
+        marginTop: 4
       }
-    }), (ans.resume || "").length > 40 && React.createElement("p", {
+    }, React.createElement("span", {
+      style: {
+        fontWeight: 700,
+        color: "#060A2C",
+        fontSize: 14,
+        flex: 1,
+        minWidth: 0,
+        overflowWrap: "anywhere"
+      }
+    }, ans.resumeName || "Your saved resume"), React.createElement("button", {
+      onClick: () => {
+        setA("resume", "");
+        setA("resumeName", "");
+      },
+      style: {
+        background: "#fff",
+        border: "1.5px solid #E2E8F0",
+        color: "#4A5568",
+        padding: "6px 12px",
+        borderRadius: 999,
+        cursor: "pointer",
+        fontFamily: "var(--font)",
+        fontSize: 12.5,
+        fontWeight: 600
+      }
+    }, "Remove")), (ans.resume || "").length > 40 && React.createElement("p", {
       style: {
         fontSize: 13,
         color: GD,
         fontWeight: 700,
         marginTop: 8
       }
-    }, "\u2713 Got your resume (", (ans.resume || "").length.toLocaleString(), " chars) \u2014 we'll use it to tailor your matches"), (ans.resume || "").length <= 40 && React.createElement("div", {
+    }, "Got it. We'll use your resume to explain why each match fits."), (ans.resume || "").length <= 40 && React.createElement("div", {
       style: {
         marginTop: 18,
         padding: "14px 16px",
@@ -12232,7 +12250,7 @@ Thank you for your time,
         lineHeight: 1.55,
         marginBottom: 24
       }
-    }, "Before a recruiter ever looks at you, software often does. Paste your resume, the job description, or both and our AI gives you an honest breakdown and real fixes. ", React.createElement("strong", null, "This is coaching: the scores are our AI's estimate, not a number from Workday, Greenhouse or any employer."), " What you paste is sent to our AI provider (Anthropic) to write the breakdown."), !scoreResult && React.createElement(React.Fragment, null, React.createElement("div", {
+    }, "Before a recruiter ever looks at you, software often does. Upload your resume, paste the job description, or both, and our AI gives you an honest breakdown and real fixes. ", React.createElement("strong", null, "This is coaching: the scores are our AI's estimate, not a number from Workday, Greenhouse or any employer."), " What you add is sent to our AI provider (Anthropic) to write the breakdown."), !scoreResult && React.createElement(React.Fragment, null, React.createElement("div", {
       style: {
         display: "flex",
         flexDirection: "column",
@@ -12252,28 +12270,79 @@ Thank you for your time,
         color: "#6B7280",
         fontWeight: 500
       }
-    }, "(paste the text, optional but helps)")), React.createElement("textarea", {
-      value: scoreResume,
-      onChange: e => setScoreResume(e.target.value),
-      placeholder: "Paste your resume text here...",
+    }, "(optional but helps)")), React.createElement("div", {
       style: {
-        width: "100%",
-        minHeight: 160,
-        padding: "12px",
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        flexWrap: "wrap",
+        padding: "12px 14px",
+        border: `1.5px ${scoreResume ? "solid" : "dashed"} ${scoreResume ? G : "#CBD5E1"}`,
         borderRadius: var_r,
-        border: `1.5px solid #E2E8F0`,
-        background: "#FBFBFC",
-        fontFamily: "var(--font)",
-        fontSize: 13.5,
-        lineHeight: 1.5,
-        color: "#060A2C",
-        resize: "vertical",
-        outline: "none"
+        background: scoreResume ? "#F2FADF" : "#FBFBFC"
       }
-    }), (profile.resumes || []).length > 0 && React.createElement("button", {
+    }, React.createElement("span", {
+      style: {
+        flex: 1,
+        minWidth: 0,
+        fontSize: 14,
+        fontWeight: scoreResume ? 700 : 500,
+        color: scoreResume ? "#060A2C" : "#6B7280",
+        overflowWrap: "anywhere"
+      }
+    }, scoreReading || (scoreResume ? scoreResumeName || "Your saved resume" : "PDF or Word file")), React.createElement("label", {
+      style: {
+        background: "#fff",
+        border: `1.5px solid ${G}`,
+        color: GD,
+        padding: "7px 14px",
+        borderRadius: 999,
+        cursor: "pointer",
+        fontFamily: "var(--font)",
+        fontSize: 13,
+        fontWeight: 700
+      }
+    }, scoreResume ? "Change file" : "Upload resume", React.createElement("input", {
+      type: "file",
+      accept: ".pdf,.docx,.txt",
+      style: {
+        display: "none"
+      },
+      onChange: async e => {
+        const f = e.target.files && e.target.files[0];
+        e.target.value = "";
+        if (!f) return;
+        setScoreReading("Reading file…");
+        try {
+          const t = await extractTextFromFile(f);
+          setScoreResume(t);
+          setScoreResumeName(f.name);
+          setScoreReading("");
+        } catch (err) {
+          setScoreReading(String(err.message || err));
+        }
+      }
+    })), scoreResume && React.createElement("button", {
+      onClick: () => {
+        setScoreResume("");
+        setScoreResumeName("");
+      },
+      style: {
+        background: "transparent",
+        border: "none",
+        color: "#4A5568",
+        fontSize: 12.5,
+        fontWeight: 600,
+        cursor: "pointer",
+        fontFamily: "var(--font)"
+      }
+    }, "Remove")), (profile.resumes || []).length > 0 && React.createElement("button", {
       onClick: () => {
         const r = (profile.resumes || []).find(x => x.id === chosenResumeId) || (profile.resumes || [])[0];
-        if (r && r.text) setScoreResume(r.text);
+        if (r && r.text) {
+          setScoreResume(r.text);
+          setScoreResumeName(r.file?.name || r.name || "Saved resume");
+        }
       },
       style: {
         marginTop: 6,

@@ -120,12 +120,20 @@
   .chip.top{background:#060A2C;color:#fff;border-color:#060A2C}
   .cta{background:#060A2C;color:#fff;border:0}.cta h2{color:#fff}.cta p{color:#C9D2E3}
   @media(max-width:600px){.season{grid-template-columns:repeat(2,1fr)}.hl{margin:16px -18px -18px}.strong{flex-direction:column;align-items:flex-start}}
+  .fill{display:flex;gap:14px;align-items:center;flex-wrap:wrap;border-left:3px solid var(--green)}
+  .fill.busy{opacity:.6;pointer-events:none}
+  .fi{width:44px;height:44px;border-radius:10px;background:#F2FADF;color:#4A7000;display:grid;place-items:center;flex-shrink:0}
+  .rfile{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:10px;background:#fff}
+  .rfile .rmeta{flex:1;min-width:180px;display:flex;flex-direction:column;gap:2px}
+  .rfile .rmeta input{font:inherit;font-weight:600;border:1px solid transparent;border-radius:6px;padding:4px 6px;margin-left:-6px;background:transparent}
+  .rfile .rmeta input:hover,.rfile .rmeta input:focus{border-color:var(--line);background:#fff}
   .res{border:1px solid var(--line);border-radius:10px;padding:8px 12px 12px;margin-top:10px;position:relative;background:#fff}
 </style>
 <link rel="stylesheet" href="/d.css">
 </head>
 <body>
 <script src="/nav.js"></script>
+<script src="/resume-file.js"></script>
 <main id="main"><div class="card center muted" id="app">Loading…</div></main>
 <script>
 (function(){
@@ -136,6 +144,7 @@
   const handleFromPath = () => { const m = location.pathname.match(/^\/u\/([a-z0-9-]{3,30})\/?$/i); return m && m[1].toLowerCase() !== "edit" ? m[1].toLowerCase() : null; };
   const SKILLS = ["SolidWorks","AutoCAD","CATIA","Creo","Fusion 360","Inventor","NX","ANSYS","Abaqus","COMSOL","MATLAB","Simulink","Python","C++","Java","JavaScript","SQL","Excel","LabVIEW","Arduino","Raspberry Pi","3D printing","CNC machining","GD&T","FEA","CFD","Thermodynamics","Heat transfer","Fluid mechanics","Statics","Dynamics","Materials","Manufacturing processes","Lean / Six Sigma","Soldering","PCB design","Revit","Civil 3D","Project management","Technical writing","Public speaking","Leadership","Spanish"];
   const S = { clerk: null, user: null, me: null, draft: null, tab: "preview", kit: {}, resumes: [], kitOk: false };
+  const FILE_IC = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h4"/></svg>';
   const app = $("#app");
 
   // ── Owner-only cards: profile strength + the private application kit (never shown on the public page) ──
@@ -251,6 +260,9 @@
     document.querySelector("main").innerHTML = `
       ${S.tab === "preview" ? "" : `<div class="edhead"><button type="button" class="linkbtn" data-tab="preview">← Back to profile</button><b>Edit profile</b><span style="width:110px"></span></div>`}
       ${S.tab === "preview" ? profileHtml(d.p, resumeOn && d.p.showResume ? "/r/" + me.resume.token : null, true) : `
+      <section class="card fill" id="fill"><div class="fi">${FILE_IC}</div><div style="flex:1;min-width:0"><h2 style="margin:0 0 2px">Fill your profile from your resume</h2>
+        <p class="small muted" style="margin:0">Upload your resume (PDF or Word) and we'll fill in your school, major, experience, projects, skills and links. Nothing is saved until you check it and tap Save profile.</p></div>
+        <label class="btn pri" style="cursor:pointer;margin:0;flex-shrink:0">Upload resume<input type="file" id="fillRes" accept="${btpResumeFile.accept}" style="position:absolute;left:-9999px"></label></section>
       <section class="card" id="visibility"><h2>Your link</h2>
         <label for="f_handle">Profile address</label>
         <div class="handle"><span>beatthepile.com/u/</span><input id="f_handle" value="${esc(d.handle)}" placeholder="jordan-lee" autocomplete="off" spellcheck="false"></div>
@@ -308,12 +320,13 @@
         <div><label for="k_rel">Willing to relocate?</label><select id="k_rel" data-kit="relocate">${["", "Yes", "No"].map((v) => `<option value="${v}" ${d.kit.relocate === v ? "selected" : ""}>${v || "Choose"}</option>`).join("")}</select></div></div>
         <label for="k_why">What makes you stand out? (used in cover letters)</label><textarea id="k_why" data-kit="whyMe" maxlength="600" placeholder="A sentence or two about your standout experience, project, or drive.">${esc(d.kit.whyMe || "")}</textarea>
         <h2 style="margin-top:18px">Resumes</h2>
-        <p class="small muted" style="margin:-4px 0 0">Keep a version per kind of role (e.g. "Finance", "Engineering"). Paste the text or upload a PDF, Word or text file.</p>
-        <div>${d.resumes.map((r, i) => `<div class="res"><button class="rm" data-rmres="${i}">Remove</button>
-          <label>Name</label><input data-res="${i}" data-f="name" value="${esc(r.name || "")}" placeholder="Resume ${i + 1}" style="max-width:320px">
-          <label>Text</label><textarea data-res="${i}" data-f="text" style="min-height:110px" placeholder="Paste this resume's text here">${esc(r.text || "")}</textarea>
-          <label class="btn" style="margin-top:8px;cursor:pointer;width:auto">Upload file<input type="file" data-upres="${i}" accept=".pdf,.docx,.txt" style="position:absolute;left:-9999px"></label></div>`).join("")}</div>
-        ${d.resumes.length < 6 ? `<button class="btn" type="button" id="addRes" style="margin-top:12px">+ Add resume</button>` : ""}
+        <p class="small muted" style="margin:-4px 0 0">Keep a version per kind of role (e.g. "Finance", "Engineering"). Upload a PDF or Word file; cover letters and auto-fill use it.</p>
+        <div>${d.resumes.map((r, i) => `<div class="rfile"><div class="fi">${FILE_IC}</div>
+          <div class="rmeta"><input data-res="${i}" data-f="name" value="${esc(r.name || "")}" placeholder="Resume ${i + 1}" aria-label="Resume name">
+            <span class="small muted">${esc(r.file ? btpResumeFile.label(r.file) : "Saved earlier")} · ${(String(r.text || "").split(/\s+/).filter(Boolean).length).toLocaleString()} words read</span></div>
+          <label class="btn" style="cursor:pointer;margin:0">Replace<input type="file" data-upres="${i}" accept="${btpResumeFile.accept}" style="position:absolute;left:-9999px"></label>
+          <button class="btn" type="button" data-rmres="${i}">Remove</button></div>`).join("") || `<p class="small muted" style="margin:10px 0 0">No resumes yet.</p>`}</div>
+        ${d.resumes.length < 6 ? `<label class="btn" style="margin-top:12px;cursor:pointer;width:auto">+ Add resume file<input type="file" id="addResF" accept="${btpResumeFile.accept}" style="position:absolute;left:-9999px"></label>` : ""}
       </section>`}`}
       ${S.tab === "preview" ? `<span class="msg" id="msg" role="status" hidden></span>` : `<div class="bar"><button class="btn pri" id="save">Save profile</button><button class="btn" type="button" data-tab="preview">Cancel</button><span class="msg" id="msg" role="status"></span></div>`}`;
     wire();
@@ -346,26 +359,59 @@
     main.querySelectorAll("[data-kit]").forEach((el) => el.oninput = el.onchange = () => { d.kit[el.dataset.kit] = el.value; });
     main.querySelectorAll("[data-res]").forEach((el) => el.oninput = () => { d.resumes[+el.dataset.res][el.dataset.f] = el.value; });
     main.querySelectorAll("[data-rmres]").forEach((b) => b.onclick = () => { d.resumes.splice(+b.dataset.rmres, 1); editor(); jump("kit"); });
-    const ar = $("#addRes"); if (ar) ar.onclick = () => { d.resumes.push({ id: Date.now(), name: `Resume ${d.resumes.length + 1}`, text: "" }); editor(); jump("kit"); };
-    main.querySelectorAll("[data-upres]").forEach((inp) => inp.onchange = async () => { const f = inp.files && inp.files[0]; if (!f) return; const m = $("#msg");
-      try { m.className = "msg"; m.textContent = "Reading file…"; const t = await fileText(f); if (!t || t.length < 40) throw new Error("Couldn't read much text from that file — paste it instead.");
-        const r = d.resumes[+inp.dataset.upres]; r.text = t; if (/^Resume \d+$/.test(r.name || "")) r.name = (f.name || "").replace(/\.[^.]+$/, "").slice(0, 40); editor(); jump("kit"); const m2 = $("#msg"); m2.className = "msg"; m2.textContent = "Resume read — tap Save profile."; }
-      catch (e) { m.className = "msg err"; m.textContent = e.message; } });
+    const readInto = async (inp, i) => { const f = inp.files && inp.files[0]; inp.value = ""; if (!f) return; const m = $("#msg");
+      try { m.className = "msg"; m.textContent = "Reading file…"; const r = await btpResumeFile.read(f);
+        const file = { name: r.name, size: r.size, pages: r.pages, kind: r.kind }, nm = r.name.replace(/\.[^.]+$/, "").slice(0, 40);
+        if (i == null) d.resumes.push({ id: Date.now(), name: nm, text: r.text, file });
+        else { const x = d.resumes[i]; x.text = r.text; x.file = file; if (!x.name || /^Resume \d+$/.test(x.name)) x.name = nm; }
+        editor(); jump("kit"); const m2 = $("#msg"); m2.className = "msg"; m2.textContent = "Resume added — tap Save profile."; }
+      catch (e) { m.className = "msg err"; m.textContent = e.message; } };
+    const ar = $("#addResF"); if (ar) ar.onchange = () => readInto(ar, null);
+    main.querySelectorAll("[data-upres]").forEach((inp) => inp.onchange = () => readInto(inp, +inp.dataset.upres));
+    const fr = $("#fillRes"); if (fr) fr.onchange = () => fillFromResume(fr);
     const qr = $("#qrP"); if (qr) qr.onclick = showQr;
   }
-  function jump(id){ const el = document.getElementById(id); if (el) el.scrollIntoView({ block: "start" }); }
-  async function loadPdf(){ if (window.pdfjsLib) return window.pdfjsLib;
-    await new Promise((ok, bad) => { const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
-    window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; return window.pdfjsLib; }
-  async function fileText(file){
-    const n = (file.name || "").toLowerCase();
-    if (file.size > 4 * 1024 * 1024) throw new Error("That file is over 4 MB — paste the text instead.");
-    if (n.endsWith(".txt") || file.type === "text/plain") return (await file.text()).trim();
-    if (n.endsWith(".pdf") || file.type === "application/pdf") { const pdf = await (await loadPdf()).getDocument({ data: await file.arrayBuffer() }).promise; let out = "";
-      for (let i = 1; i <= pdf.numPages; i++) out += (await (await pdf.getPage(i)).getTextContent()).items.map((x) => x.str).join(" ") + "\n\n"; return out.trim(); }
-    if (n.endsWith(".docx")) { const m = new TextDecoder().decode(await file.arrayBuffer()).match(/<w:t[^>]*>([^<]*)<\/w:t>/g); if (m) return m.map((x) => x.replace(/<[^>]+>/g, "")).join(" ").replace(/\s+/g, " ").trim(); throw new Error("Couldn't read this .docx — paste the text instead."); }
-    throw new Error("Use a .pdf, .docx or .txt file — or paste the text.");
+  // "Fill your profile from your resume": read the file here, AI turns it into fields (/api/generate profile_fill),
+  // then we only fill what's EMPTY (never overwrite what you typed) and add experience/projects/skills you don't have yet.
+  async function fillFromResume(inp){
+    const f = inp.files && inp.files[0]; inp.value = ""; if (!f) return;
+    const d = S.draft, m = $("#msg"), box = $("#fill");
+    const say = (t, err) => { const el = $("#msg"); if (el) { el.className = "msg" + (err ? " err" : ""); el.textContent = t; } };
+    try {
+      box?.classList.add("busy"); say("Reading your resume…");
+      const r = await btpResumeFile.read(f);
+      say("Filling in your profile… (about 10 seconds)");
+      const res = await fetch("/api/generate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ feature: "profile_fill", input: { resume: r.text } }) });
+      const j = await res.json().catch(() => ({})); if (!res.ok) throw new Error(j.error || "Couldn't fill your profile right now. Try again in a minute.");
+      let x; try { x = JSON.parse(String(j.text || "").replace(/^[^{]*/, "").replace(/[^}]*$/, "")); } catch { throw new Error("Couldn't read that resume well enough. Try a PDF exported from Word or Google Docs."); }
+      const p = d.p, got = [];
+      const t = (v, n) => String(v ?? "").trim().slice(0, n);
+      const https = (v) => { v = t(v, 300); if (/^(www\.)?(linkedin|github)\.com\//i.test(v)) v = "https://" + v; return /^https:\/\/[^\s]+\.[^\s]+$/.test(v) ? v : ""; };
+      for (const [k, n, label] of [["name", 80, "name"], ["headline", 140, "headline"], ["school", 100, "school"], ["major", 80, "major"], ["location", 80, "location"], ["about", 1200, "about"]])
+        if (!t(p[k], n) && t(x[k], n)) { p[k] = t(x[k], n); got.push(label); }
+      const yr = Number(x.gradYear); if (!p.gradYear && Number.isInteger(yr) && yr >= 2020 && yr <= 2040) { p.gradYear = yr; got.push("graduation year"); }
+      const key = (a) => String(a || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+      const haveS = new Set((p.skills || []).map(key)), addS = (Array.isArray(x.skills) ? x.skills : []).map((s) => t(s, 40)).filter((s) => s && !haveS.has(key(s)));
+      if (addS.length) { p.skills = [...(p.skills || []), ...addS].slice(0, 30); got.push(`${addS.length} skill${addS.length === 1 ? "" : "s"}`); }
+      const haveE = new Set((p.experience || []).map((e) => key(e.title) + "|" + key(e.org)));
+      const addE = (Array.isArray(x.experience) ? x.experience : []).map((e) => ({ title: t(e?.title, 100), org: t(e?.org, 100), when: t(e?.when, 40), desc: t(e?.desc, 600) }))
+        .filter((e) => (e.title || e.org) && !haveE.has(key(e.title) + "|" + key(e.org)));
+      if (addE.length) { p.experience = [...(p.experience || []), ...addE].slice(0, 10); got.push(`${addE.length} experience${addE.length === 1 ? "" : "s"}`); }
+      const haveP = new Set((p.projects || []).map((e) => key(e.name)));
+      const addP = (Array.isArray(x.projects) ? x.projects : []).map((e) => ({ name: t(e?.name, 100), desc: t(e?.desc, 600), link: https(e?.link) })).filter((e) => e.name && !haveP.has(key(e.name)));
+      if (addP.length) { p.projects = [...(p.projects || []), ...addP].slice(0, 8); got.push(`${addP.length} project${addP.length === 1 ? "" : "s"}`); }
+      p.links = p.links || {};
+      for (const k of ["linkedin", "github", "portfolio"]) { const v = https(x.links?.[k]); if (!p.links[k] && v) { p.links[k] = v; got.push(k === "linkedin" ? "LinkedIn" : k === "github" ? "GitHub" : "portfolio link"); } }
+      // keep the file in your application kit too (cover letters + auto-fill use it)
+      const nm = r.name.replace(/\.[^.]+$/, "").slice(0, 40);
+      if (!d.resumes.some((z) => z.file && z.file.name === r.name) && d.resumes.length < 6) d.resumes.push({ id: Date.now(), name: nm, text: r.text, file: { name: r.name, size: r.size, pages: r.pages, kind: r.kind } });
+      editor();
+      say(got.length ? `Filled in ${got.join(", ")}. Check it over, then tap Save profile.` : "Your profile already has everything we found in that resume. Your resume was added to your kit — tap Save profile.");
+      jump("fill");
+    } catch (e) { say(e.message, true); }
+    finally { $("#fill")?.classList.remove("busy"); }
   }
+  function jump(id){ const el = document.getElementById(id); if (el) el.scrollIntoView({ block: "start" }); }
   async function showQr(){
     const url = location.origin + "/u/" + S.me.handle;
     if (!window.qrcode) await new Promise((ok, bad) => { const s = document.createElement("script"); s.src = "/fair/qrcode.js"; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
@@ -457,7 +503,7 @@
       const p = { ...S.draft.p, gradYear: S.draft.p.gradYear ? Number(S.draft.p.gradYear) : null };
       S.me = await api("POST", { action: "profile", profile: p, handle: S.draft.handle.replace(/^-+|-+$/g, "") || null, public: S.draft.pub });
       // One profile: the shared fields also go into the application kit the homepage uses (name, school, links, skills)
-      const resumes = S.draft.resumes.filter((r) => (r.text || "").trim()).slice(0, 6).map((r, i) => ({ id: r.id || Date.now() + i, name: (r.name || `Resume ${i + 1}`).slice(0, 60), text: String(r.text || "").slice(0, 30000) }));
+      const resumes = S.draft.resumes.filter((r) => (r.text || "").trim()).slice(0, 6).map((r, i) => ({ id: r.id || Date.now() + i, name: (r.name || `Resume ${i + 1}`).slice(0, 60), text: String(r.text || "").slice(0, 30000), ...(r.file ? { file: { name: String(r.file.name || "").slice(0, 120), size: +r.file.size || 0, pages: +r.file.pages || null, kind: String(r.file.kind || "").slice(0, 10) } } : {}) }));
       const kit = { ...S.kit, ...S.draft.kit, fullName: p.name || "", school: p.school || "", major: p.major || "", linkedin: p.links.linkedin || S.kit.linkedin || "",
         portfolio: p.links.portfolio || S.kit.portfolio || "", topSkills: (p.skills || []).join(", "), gradDate: S.draft.kit.gradDate || (p.gradYear ? `May ${p.gradYear}` : ""), resumes };
       if (S.kitOk) try { await sync({ action: "set", kind: "profile", data: kit }); await sync({ action: "set", kind: "resumes", data: { list: resumes } }); S.kit = kit; S.resumes = resumes; S.kitOk = true; }

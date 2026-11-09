@@ -3,7 +3,7 @@
 // So nobody can use this endpoint as a free general-purpose Claude.
 //
 //   POST /api/generate { feature, input }   → { text }
-//   features: reasons · resume_builder · cover_letter · followup · score · interview_prep · interview_turn · intel
+//   features: reasons · resume_builder · cover_letter · followup · score · interview_prep · interview_turn · intel · profile_fill
 //
 // Controls (all shared across every server, stored in Postgres):
 //   - Origin/Referer must be our own site. That only stops other websites' browsers — it is NOT authentication.
@@ -25,6 +25,20 @@ function student(s) {
 
 /** Each feature: (input) → { prompt, maxTokens, temperature } or throws a 400 message. */
 export const FEATURES = {
+  // /u/ "Fill my profile from my resume": resume text → profile fields as JSON. Copy, never invent.
+  profile_fill(i) {
+    const resume = str(i?.resume, 12000);
+    if (resume.length < 80) throw new AIError("We couldn't read enough of that resume", 400);
+    return { maxTokens: 2500, temperature: 0, prompt: `Turn this resume into profile fields for a student's career profile page. COPY what the resume says — do not invent, guess or embellish anything. If something isn't in the resume, use "" (or [] for lists). Keep the student's own wording for bullet points; join a role's bullets into one or two plain sentences.
+
+RESUME:
+${resume}
+
+Return ONLY this JSON (no other text):
+{"name":"full name","headline":"short line like 'Mechanical Engineering student at Virginia Tech' built only from facts in the resume","school":"current college/university (not high school)","major":"major only, e.g. Mechanical Engineering","gradYear":2028,"location":"City, ST if listed","about":"2-3 sentences summarizing ONLY what the resume shows (objective/summary if present)","skills":["up to 20 skills, tools, languages listed"],"experience":[{"title":"role","org":"employer or organization","when":"dates as written, e.g. May 2025 – Aug 2025","desc":"what they did, from the bullets"}],"projects":[{"name":"project name","desc":"from the resume","link":"https link only if written in the resume"}],"links":{"linkedin":"https URL if listed","github":"https URL if listed","portfolio":"https URL if listed"}}
+Rules: gradYear is the expected graduation year as a number, or null. Experience = jobs, internships, research, leadership roles (most recent first, at most 8). Projects at most 6. Links must start with https:// — add https:// to a bare linkedin.com/github.com address from the resume; otherwise "".` };
+  },
+
   reasons(i) {
     const resume = str(i?.resume, 3000);
     const cos = (Array.isArray(i?.companies) ? i.companies : []).slice(0, 30)

@@ -169,15 +169,37 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     const a = nav.querySelector('.links a[href="/orbit/"],.links a[href="/business/talent/"]');
     if (a) { const t = a.textContent.trim(); a.setAttribute("aria-label", n > 0 ? `${t}, ${n >= 10 ? "10 or more" : n} new` : t); } };
   window.btpOrbitBadge = (n) => { try { sessionStorage.setItem("btp_orbit_n", JSON.stringify({ n, at: Date.now() })); } catch {} paintBadge(n); };
-  async function orbitBadge(C){
-    if (!C.user) return paintBadge(0);
+  // Checked on every page load (cached 15 s so quick page hops don't re-ask), then every 30 s while the tab is open
+  // and visible, and again whenever you come back to the tab — so it shows up without visiting Orbit or refreshing.
+  let badgeBusy = false;
+  async function orbitBadge(C, force){
+    if (!C || !C.user || !C.session) return paintBadge(0);
     let c = null; try { c = JSON.parse(sessionStorage.getItem("btp_orbit_n") || "null"); } catch {}
     if (c) paintBadge(c.n);
-    if (c && Date.now() - c.at < 60000) return;
+    if (!force && c && Date.now() - c.at < 15000) return;
+    if (badgeBusy) return; badgeBusy = true;
     try {
-      const t = await C.session.getToken();
+      const t = await C.session.getToken(); if (!t) return;
       const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + t }, body: JSON.stringify({ action: "orbit_count" }) });
       if (r.ok) window.btpOrbitBadge((await r.json()).n);
+    } catch {} finally { badgeBusy = false; }
+  }
+  function startBadge(C){
+    orbitBadge(C);
+    setInterval(() => { if (document.visibilityState === "visible") orbitBadge(C, true); }, 30000);
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") orbitBadge(C); });
+    addEventListener("focus", () => orbitBadge(C));
+  }
+  // Pages that never load sign-in themselves (Radar, Privacy, Business…): if this browser has been signed in before,
+  // load Clerk here so the badge still works everywhere.
+  const seenSignIn = () => { try { return !!(localStorage.getItem("btp_me") || localStorage.getItem("btp_role")); } catch { return false; } };
+  async function loadClerkHere(){
+    try {
+      const pk = (await fetch("/api/config").then((r) => r.json())).clerkPublishableKey; if (!pk || window.Clerk) return;
+      const host = atob(pk.replace(/^pk_(test|live)_/, "")).replace(/\$$/, "").trim(); if (!/clerk/.test(host)) return;
+      await new Promise((ok, bad) => { const s = document.createElement("script"); s.src = `https://${host}/npm/@clerk/clerk-js@5/dist/clerk.browser.js`;
+        s.setAttribute("data-clerk-publishable-key", pk); s.async = true; s.crossOrigin = "anonymous"; s.onload = ok; s.onerror = bad; document.head.appendChild(s); });
+      if (window.Clerk && !window.Clerk.loaded) await window.Clerk.load({});
     } catch {}
   }
   function sheet(){
@@ -189,12 +211,15 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   let tries = 0;
   const watch = setInterval(() => {      // pages load Clerk themselves; once it's ready, sync the role or ask for it
     const C = window.Clerk; if (++tries > 60) return clearInterval(watch);
+    if (!C && tries === 8 && seenSignIn()) loadClerkHere();      // ~4 s and still no sign-in on this page
     if (!C || !C.loaded) return;
     clearInterval(watch);
     const role = C.user && C.user.unsafeMetadata && C.user.unsafeMetadata.role;
     if (role && role !== ROLE) { try { localStorage.setItem("btp_role", role); } catch {} if (role === "employer" || ROLE === "employer") location.reload(); }
     else if (C.user && !role) sheet();
-    orbitBadge(C);
-    C.addListener && C.addListener(({ user }) => { if (!user) { try { sessionStorage.removeItem("btp_orbit_n"); } catch {} paintBadge(0); } });
+    startBadge(C);
+    let lastU = C.user?.id || null;
+    C.addListener && C.addListener(({ user }) => { const id = user?.id || null; if (id === lastU) return; lastU = id;
+      try { sessionStorage.removeItem("btp_orbit_n"); } catch {} if (!user) paintBadge(0); else setTimeout(() => orbitBadge(C, true), 300); });
   }, 500);
 })();
