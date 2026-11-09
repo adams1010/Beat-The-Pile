@@ -11,7 +11,7 @@
   // Cousins of a word. Phrases are fine. Company names only ever match the company line.
   const SYN = {
     sale: ["business development", "account", "accounts", "commercial", "territory", "inside sales", "customer success", "revenue", "selling", "bdr", "sdr"],
-    medical: ["med", "medtech", "health", "healthcare", "clinical", "device", "devices", "surgical", "hospital", "patient", "pharma", "pharmaceutical", "biotech", "life sciences", "diagnostics"],
+    medical: ["med", "medtech", "healthcare", "clinical", "medical device", "surgical", "health", "hospital", "patient", "pharma", "pharmaceutical", "biotech", "life sciences", "diagnostics"],
     health: ["healthcare", "medical", "clinical", "hospital", "wellness", "patient"],
     healthcare: ["health", "medical", "clinical", "hospital", "patient"],
     pharma: ["pharmaceutical", "pharmacy", "drug", "biotech", "life sciences"],
