@@ -237,6 +237,9 @@
     },
     "api/sync.js": {
       "includeFiles": "data/us-places.json"
+    },
+    "api/me.js": {
+      "includeFiles": "schools/index.json"
     }
   }
 }

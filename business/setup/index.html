@@ -29,11 +29,13 @@
     "Manufacturing", "Media & Entertainment", "Nonprofit", "Software & Internet", "Telecommunications", "Transportation & Logistics", "Other"];
   let B = null;
 
-  function steps(n){ return `<div class="steps">${["Your company", "Work email", "Verification"].map((t, i) => `<span class="${i + 1 === n ? "on" : i + 1 < n ? "done" : ""}">${i + 1} · ${t}</span>`).join("")}</div>`; }
+  // Nov 9: recruiter (a person, own profile + orbit) or company page — picked at sign-up (?kind=), saved as profile.kind
+  const KIND = () => B?.profile?.kind === "recruiter" || (!B?.profile?.company && new URLSearchParams(location.search).get("kind") === "recruiter") ? "recruiter" : "company";
+  function steps(n){ return `<div class="steps">${[KIND() === "recruiter" ? "You" : "Your company", "Work email", "Verification"].map((t, i) => `<span class="${i + 1 === n ? "on" : i + 1 < n ? "done" : ""}">${i + 1} · ${t}</span>`).join("")}</div>`; }
   function render(){
     const p = B.profile || {};
     const step = !p.company ? 1 : !B.emailVerified ? 2 : 3;
-    if (step === 1 || S.edit) return company(p);
+    if (step === 1 || S.edit) return KIND() === "recruiter" ? recruiter(p) : company(p);
     if (step === 2) return email();
     done();
   }
@@ -55,18 +57,40 @@
     $("#lg").onchange = async (e) => { const f = e.target.files[0]; if (!f) return; try { p.logo = await squash(f); company(p); } catch (er) { $("#msg").className = "msg err"; $("#msg").textContent = er.message; } };
     $("#go").onclick = async () => {
       const b = $("#go"); b.disabled = true; $("#msg").className = "msg"; $("#msg").textContent = "Saving…";
-      const prof = { ...p, company: $("#c").value, website: $("#w").value, industry: $("#ind").value, size: ($("#sz").value || "").replace(/ employees$/, ""), hq: $("#hq").value, name: $("#nm").value, title: $("#ti").value };
+      const prof = { ...p, kind: "company", company: $("#c").value, website: $("#w").value, industry: $("#ind").value, size: ($("#sz").value || "").replace(/ employees$/, ""), hq: $("#hq").value, name: $("#nm").value, title: $("#ti").value };
       try { B = await biz.api({ action: "biz_save", profile: prof }); S.edit = false; render(); window.scrollTo(0, 0); }
       catch (e) { b.disabled = false; $("#msg").className = "msg err"; $("#msg").textContent = e.message; }
     };
   }
-  // logo → 256px square PNG/JPEG data URL (fits inside, white background)
-  function squash(file){
+  // Recruiter: you first (name, title, photo), then the company you recruit for.
+  function recruiter(p){
+    $("main").innerHTML = `${steps(1)}<section class="card"><h1>Set up your recruiter profile</h1>
+      <p class="sub">This is you on Beat the Pile: your own profile and orbit. Students see your name, title and photo when you message them, and it links to your company's page.</p>
+      <div class="logo-row">${p.photo ? `<img src="${esc(p.photo)}" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover">` : `<div class="av" style="width:64px;height:64px;border-radius:50%;display:grid;place-items:center;background:#060A2C;color:#B0F701;font-weight:700">${esc(biz.initials(p.name || "You"))}</div>`}
+        <div><b style="font-size:14px">Your photo</b> <span class="small muted">(optional)</span><br>
+        <label class="btn" style="margin:6px 0 0;display:inline-flex;cursor:pointer;font-size:13px;padding:6px 14px">Upload photo<input type="file" id="ph" accept="image/png,image/jpeg,image/webp" style="position:absolute;left:-9999px"></label></div></div>
+      <div class="row"><div><label for="nm">Your name</label><input id="nm" value="${esc(p.name || "")}" placeholder="Jane Smith" maxlength="80" autocomplete="name"></div>
+        <div><label for="ti">Your title</label><input id="ti" value="${esc(p.title || "")}" placeholder="University Recruiter" maxlength="80" autocomplete="organization-title"></div></div>
+      <div class="row"><div><label for="c">Company you recruit for</label><input id="c" value="${esc(p.company || "")}" placeholder="Acme Aerospace" maxlength="100" autocomplete="organization"></div>
+        <div><label for="w">Company website</label><input id="w" value="${esc(p.website || "")}" placeholder="acme.com" maxlength="200" inputmode="url"></div></div>
+      <label for="bio">About you <span class="small muted">(optional)</span></label><textarea id="bio" rows="3" maxlength="600" placeholder="I hire engineering interns for our Arlington and Huntsville sites.">${esc(p.bio || "")}</textarea>
+      <div style="margin-top:18px"><button class="btn pri" id="go">Continue</button><span class="msg" id="msg" role="status"></span></div></section>`;
+    $("#ph").onchange = async (e) => { const f = e.target.files[0]; if (!f) return; try { p.photo = await squash(f, true); p.name = $("#nm").value; p.title = $("#ti").value; p.company = $("#c").value; p.website = $("#w").value; p.bio = $("#bio").value; recruiter(p); } catch (er) { $("#msg").className = "msg err"; $("#msg").textContent = er.message; } };
+    $("#go").onclick = async () => {
+      const b = $("#go"); b.disabled = true; $("#msg").className = "msg"; $("#msg").textContent = "Saving…";
+      if (!$("#nm").value.trim()) { b.disabled = false; $("#msg").className = "msg err"; $("#msg").textContent = "Add your name."; return; }
+      const prof = { ...p, kind: "recruiter", name: $("#nm").value, title: $("#ti").value, company: $("#c").value, website: $("#w").value, bio: $("#bio").value };
+      try { B = await biz.api({ action: "biz_save", profile: prof }); S.edit = false; render(); window.scrollTo(0, 0); }
+      catch (e) { b.disabled = false; $("#msg").className = "msg err"; $("#msg").textContent = e.message; }
+    };
+  }
+  // logo → 256px square PNG/JPEG data URL (fits inside, white background); photo (cover = true) → fills the square
+  function squash(file, cover){
     return new Promise((ok, bad) => {
       if (file.size > 8e6) return bad(new Error("That image is over 8 MB."));
       const url = URL.createObjectURL(file), img = new Image();
       img.onload = () => { const N = 256, c = document.createElement("canvas"); c.width = c.height = N; const x = c.getContext("2d");
-        x.fillStyle = "#fff"; x.fillRect(0, 0, N, N); const k = Math.min(N / img.naturalWidth, N / img.naturalHeight) * 0.9;
+        x.fillStyle = "#fff"; x.fillRect(0, 0, N, N); const k = cover ? Math.max(N / img.naturalWidth, N / img.naturalHeight) : Math.min(N / img.naturalWidth, N / img.naturalHeight) * 0.9;
         const w = img.naturalWidth * k, h = img.naturalHeight * k; x.drawImage(img, (N - w) / 2, (N - h) / 2, w, h); URL.revokeObjectURL(url);
         let q = 0.9, out = c.toDataURL("image/jpeg", q); while (out.length > 85000 && q > 0.4) { q -= 0.1; out = c.toDataURL("image/jpeg", q); }
         out.length > 85000 ? bad(new Error("Couldn't shrink that logo enough. Try a simpler image.")) : ok(out); };
@@ -109,15 +133,15 @@
     const p = B.profile || {};
     const verified = B.status === "verified";
     $("main").innerHTML = `${steps(3)}<section class="card">
-      <div style="display:flex;gap:14px;align-items:center;margin-bottom:12px">${biz.logo(p, 56)}<div><h1 style="margin:0">${esc(p.company)}</h1><span class="small muted">Work email confirmed · ${esc(B.domain || "")}</span></div></div>
+      <div style="display:flex;gap:14px;align-items:center;margin-bottom:12px">${p.kind === "recruiter" && p.photo ? `<img src="${esc(p.photo)}" alt="" style="width:56px;height:56px;border-radius:50%;object-fit:cover">` : biz.logo(p, 56)}<div><h1 style="margin:0">${esc(p.kind === "recruiter" ? (p.name || p.company) : p.company)}</h1>${p.kind === "recruiter" ? `<span class="small muted">${esc([p.title, p.company].filter(Boolean).join(" at "))}</span><br>` : ""}<span class="small muted">Work email confirmed · ${esc(B.domain || "")}</span></div></div>
       ${verified ? `<div class="banner ok"><b>You're verified.</b> You can search students, add them to your orbit and message them.</div>`
         : B.status === "rejected" ? `<div class="banner bad"><b>We couldn't verify your company.</b> ${esc(B.reviewNote || "Use Report a problem if you think this is a mistake.")}</div>`
         : `<div class="banner"><b>We're checking your company.</b> We look at every company before it can contact students, usually within a day.</div>`}
       <h2 style="margin-top:8px">While you wait</h2>
-      <ul class="next"><li><a href="/business/company/">Build your company page</a>: about, what you hire for, perks. Students see it when you reach out.</li>
+      <ul class="next">${KIND() === "recruiter" ? `<li><a href="/business/company/">Finish your profile</a>: what you hire for, where. Students see it when you reach out.</li><li><a href="/orbit/">Open your orbit</a>: students close to your company, and your messages.</li>` : `<li><a href="/business/company/">Build your company page</a>: about, what you hire for, perks. Students see it when you reach out.</li>`}
         <li><a href="/business/fairs/">Pick the career fairs you'll be at</a>.</li>
         <li><a href="/business/home/">Go to your home</a> to see how many students are open to employers right now.</li></ul>
-      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn pri" href="/business/company/">Build your company page</a><a class="btn" href="/business/home/">Go to home</a></div></section>`;
+      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn pri" href="/business/company/">${KIND() === "recruiter" ? "Finish your profile" : "Build your company page"}</a><a class="btn" href="/business/home/">Go to home</a></div></section>`;
   }
 
   biz.start(async (u) => {

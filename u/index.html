@@ -139,6 +139,7 @@
 <body>
 <script src="/nav.js"></script>
 <script src="/resume-file.js"></script>
+<script src="/pick.js"></script>
 <main id="main"><div class="card center muted" id="app">Loading…</div></main>
 <script>
 (function(){
@@ -332,7 +333,7 @@
             <input type="file" id="f_photo" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="position:absolute;left:-9999px"></div>
         </div>
         <div class="row">${field("name", "Name", "Jordan Lee")}${field("headline", "Headline", "Finance student · investment club treasurer")}</div>
-        ${field("location", "Location", "Richmond, VA")}
+        ${field("location", "Location", "Start typing a city, e.g. Blacksburg")}
         ${field("lookingFor", "Looking for", "Summer 2027 internship")}
         <div><label>Open to</label><div style="display:flex;gap:16px;flex-wrap:wrap">${Object.entries(OPEN_TO).map(([k, t]) => `<label class="switch" style="margin:0;font-weight:500"><input type="checkbox" data-opento="${k}" ${(d.p.openTo || []).includes(k) ? "checked" : ""}><span>${t}</span></label>`).join("")}</div></div>
         <label for="f_about">About</label><textarea id="f_about" data-k="about" maxlength="1200" placeholder="A few sentences about what you build and what you want to learn.">${esc(d.p.about)}</textarea>
@@ -402,19 +403,20 @@
     wire();
   }
   // School → that school's real majors as a dropdown (so everyone at a school picks the same name → inner orbit)
+  // School / major / location come from real lists (/pick.js): every US college (US Dept. of Education) + universities
+  // worldwide, the majors that school awards, every US city. Picking from the list is what puts classmates together.
   function wireEducation(d){
-    const si = $("#f_school"); if (!si) return;
-    let filled = false;
-    const fill = async () => { if (filled) return; filled = true; const [list, names] = await Promise.all([schools(), cipNames()]);
-      const dl = $("#schoollist"); if (dl) dl.innerHTML = list.map((x) => `<option value="${esc(x[1])}">${esc(x[3])}, ${esc(x[4])}</option>`).join("")
-        + list.filter((x) => x[2]).flatMap((x) => String(x[2]).split("|").filter((a) => a.length >= 4 && !/^[A-Z]{2,4}$/.test(a)).map((a) => `<option value="${esc(a)}">${esc(x[1])}</option>`)).join("");
-      const ml = $("#majorlist"); if (ml) ml.innerHTML = [...new Set(Object.values(names))].sort().map((m) => `<option value="${esc(m)}">`).join(""); };
-    main_focus(fill);
+    const si = $("#f_school"); if (!si || !window.btpPick) return;
+    const P = window.btpPick;
     const note = (t) => { const n = $("#schoolNote"); if (n) n.textContent = t; };
     const renderMajor = async () => {
       const box = $("#majorBox"); if (!box) return;
-      const progs = d.p.schoolId ? await programsOf(d.p.schoolId) : [];
-      if (!progs.length) { if (!$("#f_major")) { box.innerHTML = `<label for="f_major">Major</label><input id="f_major" data-k="major" list="majorlist" value="${esc(d.p.major)}" placeholder="Finance">`; $("#f_major").oninput = (e) => { d.p.major = e.target.value; }; } return; }
+      const progs = d.p.schoolId ? (await P.majors(d.p.schoolId)).map((x) => x.label) : [];
+      if (!progs.length || !d.p.schoolId) {
+        box.innerHTML = `<label for="f_major">Major</label><input id="f_major" value="${esc(d.p.major)}" placeholder="Start typing, e.g. Finance">`;
+        P.attach($("#f_major"), { load: () => P.majors(null), other: true, onPick: (it) => { d.p.major = it ? it.label : ""; } });
+        note(d.p.school && !d.p.schoolId ? "" : ""); return;
+      }
       const other = d.p.major && !progs.includes(d.p.major);
       box.innerHTML = `<label for="f_majorSel">Major</label><select id="f_majorSel"><option value="">Pick your major</option>${progs.map((m) => `<option${m === d.p.major ? " selected" : ""}>${esc(m)}</option>`).join("")}<option value="__other"${other ? " selected" : ""}>Not listed — type it</option></select>
         <input id="f_major" value="${esc(d.p.major)}" placeholder="Your major" ${other ? "" : "hidden"} style="margin-top:6px">`;
@@ -423,15 +425,19 @@
       inp.oninput = () => { d.p.major = inp.value; };
       note(`${progs.length} majors offered there (US Dept. of Education data).`);
     };
-    let t = 0;
-    si.oninput = () => { d.p.school = si.value; clearTimeout(t); t = setTimeout(async () => {
-      const hit = await findSchool(si.value); const was = d.p.schoolId; d.p.schoolId = hit ? hit[0] : null;
-      if (!hit) note(si.value.trim().length >= 3 ? "Pick your school from the list to get its majors." : "");
-      if (was !== d.p.schoolId) renderMajor(); }, 250); };
+    si.removeAttribute("list");
+    P.attach(si, { load: P.schools, other: true, otherLabel: "Not listed — use", onPick: (it) => {
+      const was = d.p.schoolId; d.p.school = it ? it.label : ""; d.p.schoolId = it && it.id ? it.id : null;
+      if (it && it.custom) note("Not on our list, so we'll match classmates by the name you typed.");
+      if (was !== d.p.schoolId || !it) renderMajor(); } });
+    si.oninput = null;
+    const loc = $("#f_location"); if (loc) P.attach(loc, { load: P.places, other: true, onPick: (it) => { d.p.location = it ? it.label : ""; } });
+    document.querySelectorAll('[data-list="education"][data-f="school"]').forEach((el) => { el.removeAttribute("list");
+      P.attach(el, { load: P.schools, other: true, onPick: (it) => { d.p.education[+el.dataset.i].school = it ? it.label : ""; } }); });
+    document.querySelectorAll('[data-list="education"][data-f="major"]').forEach((el) => { el.removeAttribute("list");
+      P.attach(el, { load: () => P.majors(null), other: true, onPick: (it) => { d.p.education[+el.dataset.i].major = it ? it.label : ""; } }); });
     const gt = $("#f_gradTerm"); if (gt) gt.onchange = () => { d.p.gradTerm = gt.value; };
-    (async () => { if (!d.p.schoolId && d.p.school) { const hit = await findSchool(d.p.school); if (hit) d.p.schoolId = hit[0]; } renderMajor(); })();
-    function main_focus(fn){ ["#f_school"].forEach((q) => { const el = $(q); if (el) el.addEventListener("focus", fn, { once: true }); });
-      document.querySelectorAll('[data-list="education"]').forEach((el) => el.addEventListener("focus", fn, { once: true })); }
+    (async () => { if (!d.p.schoolId && d.p.school) { const hit = (await P.schools()).find((x) => P.norm(x.label) === P.norm(d.p.school) || (x.aliases || []).some((a) => P.norm(a) === P.norm(d.p.school))); if (hit && hit.id) d.p.schoolId = hit.id; } renderMajor(); })();
   }
   function wire(){
     const d = S.draft, main = document.querySelector("main");

@@ -49,6 +49,7 @@ import { orbitExtras, orbitAction, deleteOrbitData } from "../lib/orbitnet.js";
 import { bizAction, publicCompany, isVerifiedEmployer } from "../lib/employer.js";
 import { cleanInternship, internPeers } from "../lib/internship.js";
 import { foundingCount, foundingFor } from "../lib/founding.js";
+import { schoolIdFor } from "../lib/schools.js";
 import { talentFor, roleOf } from "../lib/talent.js";
 
 const LISTS = ["saved", "applied"];
@@ -200,7 +201,7 @@ function cleanProfile(p) {
     name: txt(p.name, 80), headline: txt(p.headline, 140), school: txt(p.school, 100), major: txt(p.major, 80),
     gradYear: Number.isInteger(year) && year >= 2020 && year <= 2040 ? year : null,
     gradTerm: ["Spring", "Summer", "Fall", "Winter"].includes(p.gradTerm) ? p.gradTerm : null,    // Nov 9: December grads pick Winter/Fall
-    schoolId: Number.isInteger(+p.schoolId) && +p.schoolId >= 100000 && +p.schoolId <= 999999 ? +p.schoolId : null,   // IPEDS id (schools/index.json)
+    schoolId: Number.isInteger(+p.schoolId) && +p.schoolId >= 100000 && +p.schoolId <= 999999 ? +p.schoolId : schoolIdFor(p.school),   // IPEDS id (schools/index.json); typed names/aliases resolve too
     education: arr(p.education, 20).map((x) => ({ school: txt(x?.school, 100), degree: txt(x?.degree, 60), major: txt(x?.major, 80), when: txt(x?.when, 40) })).filter((x) => x.school).slice(0, 5),
     location: txt(p.location, 80), lookingFor: txt(p.lookingFor, 140), about: txt(p.about, 1200),
     skills: [...new Set(arr(p.skills, 30).map((x) => txt(x, 40)).filter(Boolean))],
@@ -414,6 +415,31 @@ export default async function handler(req, res) {
       }
       try { return send(await mutate(uid, () => ({ profile, handle, profile_public: pub }))); }
       catch (e) { if (/23505|duplicate key/i.test(String(e?.message))) return res.status(409).json({ error: "That link name is taken — try another" }); throw e; }
+    }
+    // Sign-up step 3 (Nov 9): name, school, major, graduation — and "show me to students at my school" (checked by default,
+    // in plain words on the screen). Keeps everything else already on the profile; picks a link name if there isn't one.
+    if (action === "onboard") {
+      const cur = await loadRow(uid);
+      const base = cur?.profile && typeof cur.profile === "object" ? cur.profile : {};
+      const pick = (k) => (body[k] !== undefined && body[k] !== null && body[k] !== "" ? body[k] : base[k]);
+      const profile = cleanProfile({ ...base, name: pick("name"), school: pick("school"), schoolId: body.school !== undefined ? body.schoolId : base.schoolId,
+        major: pick("major"), gradYear: pick("gradYear"), gradTerm: pick("gradTerm") });
+      if (!profile.name) return res.status(400).json({ error: "Add your name" });
+      if (!profile.school) return res.status(400).json({ error: "Pick your school" });
+      let handle = cur?.handle || null;
+      if (!handle) {
+        const stem = (profile.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 24) || "student").padEnd(3, "0");
+        for (let i = 0; i < 40 && !handle; i++) {
+          const h = i ? `${stem}-${i + 1}` : stem;
+          if (!HANDLE_OK.test(h) || RESERVED.has(h)) continue;
+          const taken = await db.selectAsAdmin(`user_jobs?select=clerk_user_id&handle=eq.${encodeURIComponent(h)}&limit=1`);
+          if (!taken[0] || taken[0].clerk_user_id === uid) handle = h;
+        }
+        handle ||= `student-${crypto.randomBytes(3).toString("hex")}`;
+      }
+      const pub = body.show === true ? true : body.show === false ? false : cur?.profile_public === true;
+      try { return send(await mutate(uid, () => ({ profile, handle, profile_public: pub }))); }
+      catch (e) { if (/23505|duplicate key/i.test(String(e?.message))) return res.status(409).json({ error: "Try again in a moment" }); throw e; }
     }
     if (action === "remind_test") {            // send yourself one sample reminder (3 a day)
       if (!process.env.RESEND_API_KEY) return res.status(400).json({ error: "Email reminders aren't switched on yet" });

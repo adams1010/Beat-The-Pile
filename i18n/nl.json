@@ -1400,7 +1400,44 @@
   "Major or field": "Studie of vakgebied",
   "+ Add another school": "+ Nog een school toevoegen",
   "Not listed — type it": "Staat er niet bij: typ het",
-  "Pick your school from the list to get its majors.": "Kies je school uit de lijst om de studies te zien."
+  "Pick your school from the list to get its majors.": "Kies je school uit de lijst om de studies te zien.",
+  "Add a line about what you hire for.": "Voeg een regel toe over wie je aanneemt.",
+  "Add your name.": "Vul je naam in.",
+  "Couldn't save. Try again.": "Opslaan mislukt. Probeer het opnieuw.",
+  "Not on our list, so we'll match classmates by the name you typed.": "Niet in onze lijst, dus we zoeken medestudenten op de naam die je typte.",
+  "Pick your school first": "Kies eerst je school",
+  "Recruiter": "Recruiter",
+  "Start typing a city, e.g. Blacksburg": "Typ een stad, bijv. Blacksburg",
+  "Start typing, e.g. Finance": "Begin te typen, bijv. Finance",
+  "Verification": "Verificatie",
+  "View your profile": "Je profiel bekijken",
+  "Your company": "Je bedrijf",
+  "About you": "Over jou",
+  "Also recruiting here": "Werven hier ook",
+  "Company website": "Website van het bedrijf",
+  "Company you recruit for": "Bedrijf waarvoor je werft",
+  "I'm a recruiter": "Ik ben recruiter",
+  "I'm setting up our company page": "Ik zet onze bedrijfspagina op",
+  "No one else yet.": "Nog niemand anders.",
+  "Open your orbit": "Je baan openen",
+  "Set up my recruiter profile →": "Mijn recruiterprofiel opzetten →",
+  "Set up the company page →": "Bedrijfspagina opzetten →",
+  "Set up your recruiter profile": "Zet je recruiterprofiel op",
+  "Show me to students at my school in Orbit (your name, school, major and photo). You can turn this off any time on your profile.": "Laat me zien aan studenten van mijn school in Orbit (naam, school, studie en foto). Je kunt dit altijd uitzetten op je profiel.",
+  "Skip for now": "Nu overslaan",
+  "This is you on Beat the Pile: your own profile and orbit. Students see your name, title and photo when you message them, and it links to your company's page.": "Dit ben jij op Beat the Pile: je eigen profiel en baan. Studenten zien je naam, functie en foto als je ze een bericht stuurt, met een link naar de pagina van je bedrijf.",
+  "We use this to show you classmates in Orbit and internships for your major.": "Hiermee tonen we je medestudenten in Orbit en stages voor je studie.",
+  "Year": "Jaar",
+  "Your company's page: about, who you hire, perks, live jobs. Your recruiters link to it from their own profiles.": "De pagina van je bedrijf: over ons, wie jullie aannemen, extra's, actuele vacatures. Je recruiters linken ernaar vanaf hun eigen profiel.",
+  "Your own profile and orbit, under your company. Find students by major and school, message them, meet them at fairs.": "Je eigen profiel en baan, onder je bedrijf. Vind studenten op studie en school, stuur ze berichten, ontmoet ze op beurzen.",
+  "Your photo": "Je foto",
+  "Your recruiter profile": "Je recruiterprofiel",
+  "Nothing matches. Try fewer letters.": "Niets gevonden. Probeer minder letters.",
+  "Start typing to see the list.": "Begin te typen om de lijst te zien.",
+  "Recruiter profile": "Recruiterprofiel",
+  "3 · Your school": "3 · Je school",
+  "1 · You": "1 · Jij",
+  "(optional)": "(optioneel)"
  },
  "patterns": [
   [
@@ -1698,6 +1735,10 @@
   [
    "^(Spring|Summer|Fall|Winter) (\\d{4})$",
    "$1 $2"
+  ],
+  [
+   "^Not listed — use “(.+)”$",
+   "Staat er niet bij — gebruik “$1”"
   ]
  ]
 }

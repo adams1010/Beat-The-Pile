@@ -76,7 +76,7 @@
           : `<p class="empty">${preview ? "We don't track an open role for your company right now. When your job board posts internships or new-grad roles, they show up here." : "No open roles we track right now."}</p>`}</section>`;
     else if (tab === "people") body = `<div class="grid"><section class="card"><h2>Interned here</h2><p class="sub">Students who list ${esc(p.company)} on their profile and are open to employers.</p>
         ${(c.alumni || []).length ? `<div class="people">${c.alumni.map((s) => `<a class="p" href="/u/${encodeURIComponent(s.handle)}" style="text-decoration:none;color:inherit"><div class="av">${s.photo ? `<img alt="" src="${esc(s.photo)}">` : esc(biz.initials(s.name))}</div><div class="nm">${esc(s.name)}</div><div class="hl">${esc([s.major, s.school].filter(Boolean).join(" · "))}</div>${s.role ? `<div class="at">${esc(s.role)}${s.when ? " · " + esc(s.when) : ""}</div>` : ""}</a>`).join("")}</div>` : `<p class="empty">No one yet.</p>`}</section>
-      <aside><section class="card team"><h2>Recruiters on Beat the Pile</h2>${(c.team || []).length ? c.team.map((m) => `<div class="it"><div class="av">${esc(biz.initials(m.name))}</div><div style="flex:1;min-width:0"><b style="font-size:14px">${esc(m.name)}</b><div class="small muted">${esc(m.title || "")}</div></div>${!preview && m.key && !isBiz() ? `<button class="btn" data-join="${esc(m.key)}" style="padding:5px 12px;font-size:13px">Join orbit</button>` : ""}</div>`).join("") : `<p class="empty">No one yet.</p>`}</section></aside></div>`;
+      <aside><section class="card team"><h2>Recruiters on Beat the Pile</h2>${(c.team || []).length ? c.team.map((m) => `<div class="it"><div class="av">${m.photo ? `<img alt="" src="${esc(m.photo)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">` : esc(biz.initials(m.name))}</div><div style="flex:1;min-width:0">${m.slug ? `<a href="/co/${encodeURIComponent(m.slug)}"><b style="font-size:14px">${esc(m.name)}</b></a>` : `<b style="font-size:14px">${esc(m.name)}</b>`}<div class="small muted">${esc(m.title || "")}</div></div>${!preview && m.key && !isBiz() ? `<button class="btn" data-join="${esc(m.key)}" style="padding:5px 12px;font-size:13px">Join orbit</button>` : ""}</div>`).join("") : `<p class="empty">No one yet.</p>`}</section></aside></div>`;
     else body = `<section class="card"><h2>Career fairs</h2><p class="sub">Where ${esc(p.company)} says it will be.</p>
         ${fairs.length ? `<div class="list">${fairs.map((f) => `<div class="it"><div><b>${esc(f.name)}</b>${f.term ? ` <span class="small muted">· ${esc(f.term)}</span>` : ""}<div class="small muted">${esc([f.when, f.where, f.school].filter(Boolean).join(" · "))}</div></div></div>`).join("")}</div>`
           : `<p class="empty">${preview ? `None yet. <a href="/business/fairs/">Pick your fairs</a>` : "None listed yet."}</p>`}</section>`;
@@ -85,6 +85,26 @@
         <div style="min-width:0"><h1>${esc(p.company || "Your company")}</h1>${p.tagline ? `<div class="tl">${esc(p.tagline)}</div>` : ""}<div class="facts">${esc(facts)}</div></div>
         <div class="btns">${!preview && c.ownerKey && !isBiz() ? `<button class="btn pri" data-join="${esc(c.ownerKey)}">Join orbit</button>` : ""}${p.careers ? `<a class="btn pri" href="${esc(p.careers)}" target="_blank" rel="noopener nofollow">Careers site</a>` : ""}${p.website ? `<a class="btn" href="${esc(p.website)}" target="_blank" rel="noopener nofollow">Website</a>` : ""}${p.linkedin ? `<a class="btn" href="${esc(p.linkedin)}" target="_blank" rel="noopener nofollow">LinkedIn</a>` : ""}</div></div>
       <div class="tabs" role="tablist">${T.map(([k, l]) => `<button role="tab" data-ctab="${k}" aria-selected="${k === tab}">${esc(l)}</button>`).join("")}</div></section>${body}`;
+  }
+
+  // Recruiter's own page (Nov 9): the person first, then their company (linked to the company's page when it has one)
+  function personPage(c, preview){
+    const me = c.person || {}, p = c.company || {}, h = p.hiring || {};
+    const pic = me.photo ? `<img src="${esc(me.photo)}" alt="" style="width:96px;height:96px;border-radius:50%;object-fit:cover;border:4px solid #fff">` : `<div style="width:96px;height:96px;border-radius:50%;background:#060A2C;color:#B0F701;display:grid;place-items:center;font-size:30px;font-weight:700;border:4px solid #fff">${esc(biz.initials(me.name || "R"))}</div>`;
+    const coLink = c.companySlug ? `<a href="/co/${encodeURIComponent(c.companySlug)}">${esc(p.company)}</a>` : esc(p.company || "");
+    return `<section class="hero"><div class="ban"></div><div class="bd"><div class="lgw">${pic}${c.domain ? '<span class="hiring">Hiring</span>' : ""}</div>
+        <div style="min-width:0"><h1>${esc(me.name || "Recruiter")}</h1><div class="tl">${esc(me.title || "Recruiter")}${p.company ? " at " : ""}${coLink}</div>
+          <div class="facts">${c.domain ? `Work email confirmed at ${esc(c.domain)}` : ""}</div></div>
+        <div class="btns">${!preview && c.ownerKey && !isBiz() ? `<button class="btn pri" data-join="${esc(c.ownerKey)}">Join orbit</button>` : ""}${c.companySlug ? `<a class="btn" href="/co/${encodeURIComponent(c.companySlug)}">Company page</a>` : p.website ? `<a class="btn" href="${esc(p.website)}" target="_blank" rel="noopener nofollow">${esc(host(p.website))}</a>` : ""}</div></div></section>
+      <div class="grid"><div>
+        <section class="card"><h2>About</h2>${me.bio ? `<p class="about">${esc(me.bio)}</p>` : `<p class="empty">${preview ? "Add a line about what you hire for." : "No description yet."}</p>`}</section>
+        <section class="card"><h2>Hiring for</h2>${(h.types || []).length || (h.majors || []).length || h.locations ? `<dl class="kv">
+            ${(h.types || []).length ? `<dt>Roles</dt><dd>${h.types.map((x) => esc(TYPE[x])).join(" · ")}</dd>` : ""}
+            ${(h.majors || []).length ? `<dt>Majors</dt><dd class="chips">${h.majors.map((m) => `<span>${esc(m)}</span>`).join("")}</dd>` : ""}
+            ${h.locations ? `<dt>Locations</dt><dd>${esc(h.locations)}</dd>` : ""}${h.when ? `<dt>When</dt><dd>${esc(h.when)}</dd>` : ""}</dl>` : `<p class="empty">Not listed yet.</p>`}</section>
+        <section class="card"><h2>Open roles at ${esc(p.company || "this company")}</h2>
+          ${(c.jobs || []).length ? c.jobs.slice(0, 12).map((j) => `<div class="job"><div><a href="${esc(j.url)}" target="_blank" rel="noopener" data-noi18n>${esc(j.title)}</a><div class="small muted" data-noi18n>${esc(j.location || "")}</div></div><span class="small muted">${esc(biz.when(j.first_seen))}</span></div>`).join("") : `<p class="empty">No open roles we track right now.</p>`}</section>
+      </div><aside><section class="card team"><h2>Also recruiting here</h2>${(c.team || []).filter((m) => m.key !== c.ownerKey).length ? c.team.filter((m) => m.key !== c.ownerKey).map((m) => `<div class="it"><div class="av">${m.photo ? `<img alt="" src="${esc(m.photo)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover">` : esc(biz.initials(m.name))}</div><div style="flex:1;min-width:0">${m.slug ? `<a href="/co/${encodeURIComponent(m.slug)}"><b style="font-size:14px">${esc(m.name)}</b></a>` : `<b style="font-size:14px">${esc(m.name)}</b>`}<div class="small muted">${esc(m.title || "")}</div></div></div>`).join("") : `<p class="empty">No one else yet.</p>`}</section></aside></div>`;
   }
 
   // Students can ask a verified company's recruiters to join their orbit (orbit_connect with the recruiter's key).
@@ -112,7 +132,9 @@
       const r = await fetch("/api/me?co=" + encodeURIComponent(slug)); const c = await r.json().catch(() => ({}));
       if (r.status === 404) { $("main").innerHTML = `<div class="card center"><h1>No company page here</h1><p class="sub">This company hasn't set up a verified page on Beat the Pile yet.</p><a class="btn pri" href="/jobs/">Browse internships</a></div>`; return; }
       if (!r.ok) throw new Error(c.error || "Couldn't load this company");
-      await fairsP; document.title = `${c.company.company} — Beat the Pile`;
+      await fairsP;
+      if (c.kind === "recruiter") { document.title = `${c.person?.name || "Recruiter"} — Beat the Pile`; $("main").innerHTML = personPage(c, false); wireJoin(); return; }
+      document.title = `${c.company.company} — Beat the Pile`;
       let tab = "about"; const draw = () => { $("main").innerHTML = page(c, tab, false); document.querySelectorAll("[data-ctab]").forEach((b) => b.onclick = () => { tab = b.dataset.ctab; draw(); }); wireJoin(); };
       draw();
     } catch (e) { $("main").innerHTML = `<div class="card center">${esc(e.message)}</div>`; }
@@ -122,6 +144,7 @@
   let B = null, mode = "edit", ptab = "about";
   const csv = (v) => String(v || "").split(/[,\n]/).map((x) => x.trim()).filter(Boolean);
   function editor(){
+    if (B.profile.kind === "recruiter") return recEditor();
     const p = B.profile, h = p.hiring || {}, v = B.status === "verified";
     $("main").innerHTML = `${biz.statusBanner(B)}
       <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap"><h1 style="margin:0;flex:1">Company page</h1>
@@ -159,6 +182,35 @@
     $("#save").onclick = save;
     if (location.hash === "#hiring") setTimeout(() => $("#hiring")?.scrollIntoView(), 50);
   }
+  // Recruiter: edit your own profile (the company page is the company account's job)
+  function recEditor(){
+    const p = B.profile, h = p.hiring || {}, v = B.status === "verified";
+    $("main").innerHTML = `${biz.statusBanner(B)}
+      <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;flex-wrap:wrap"><h1 style="margin:0;flex:1">Your recruiter profile</h1>
+        <button class="btn ${mode === "edit" ? "pri" : ""}" data-mode="edit">Edit</button><button class="btn ${mode === "preview" ? "pri" : ""}" data-mode="preview">Preview</button>
+        ${v && B.slug ? `<a class="btn" href="/co/${encodeURIComponent(B.slug)}" target="_blank" rel="noopener">Open public page</a>` : ""}</div>
+      ${mode === "preview" ? `<div id="pv"></div>` : `
+      <section class="card"><h2>You</h2>
+        <div style="display:flex;gap:14px;align-items:center">${p.photo ? `<img src="${esc(p.photo)}" alt="" style="width:64px;height:64px;border-radius:50%;object-fit:cover">` : ""}<label class="btn" style="cursor:pointer;margin:0">Upload photo<input type="file" id="ph" accept="image/png,image/jpeg,image/webp" style="position:absolute;left:-9999px"></label>${p.photo ? `<button class="btn" id="rmph">Remove</button>` : ""}</div>
+        <div class="row"><div><label for="nm">Your name</label><input id="nm" value="${esc(p.name)}" maxlength="80"></div><div><label for="tt">Your title</label><input id="tt" value="${esc(p.title)}" maxlength="80"></div></div>
+        <div class="row"><div><label for="c">Company ${v ? `<span class="hint">· verified, contact us to change</span>` : ""}</label><input id="c" value="${esc(p.company)}" ${v ? "readonly" : ""} maxlength="100"></div><div><label for="w">Company website</label><input id="w" value="${esc(p.website)}"></div></div>
+        <label for="bio">About you</label><textarea id="bio" maxlength="600" placeholder="I hire engineering interns for our Arlington and Huntsville sites.">${esc(p.bio)}</textarea></section>
+      <section class="card"><h2>Who you hire</h2>
+        <div style="display:flex;gap:18px;flex-wrap:wrap"><label class="check"><input type="checkbox" id="ti" ${(h.types || []).includes("intern") ? "checked" : ""}> Internships and co-ops</label>
+          <label class="check"><input type="checkbox" id="tf" ${(h.types || []).includes("fulltime") ? "checked" : ""}> New-grad / full-time</label></div>
+        <label for="mj">Majors <span class="hint">· separate with commas</span></label><input id="mj" value="${esc((h.majors || []).join(", "))}" placeholder="Mechanical Engineering, Finance">
+        <div class="row"><div><label for="lc">Locations</label><input id="lc" value="${esc(h.locations)}" maxlength="200" placeholder="Arlington, VA · Remote"></div><div><label for="wh">When you recruit</label><input id="wh" value="${esc(h.when)}" maxlength="80"></div></div></section>
+      <div class="edbar"><button class="btn pri" id="save">Save profile</button><span class="msg" id="msg" role="status"></span></div>`}`;
+    const grab = () => { if (!$("#nm")) return; Object.assign(p, { name: $("#nm").value, title: $("#tt").value, company: $("#c").value, website: $("#w").value, bio: $("#bio").value });
+      p.hiring = { ...h, types: [$("#ti").checked && "intern", $("#tf").checked && "fulltime"].filter(Boolean), majors: csv($("#mj").value), locations: $("#lc").value, when: $("#wh").value }; };
+    document.querySelectorAll("[data-mode]").forEach((b) => b.onclick = () => { grab(); mode = b.dataset.mode; recEditor(); });
+    if (mode === "preview") { $("#pv").innerHTML = personPage({ person: p, company: p, jobs: B._jobs || [], team: [], domain: B.domain }, true); return; }
+    $("#ph").onchange = async (e) => { const f = e.target.files[0]; if (!f) return; grab(); try { p.photo = await squash(f, true); recEditor(); } catch (er) { $("#msg").className = "msg err"; $("#msg").textContent = er.message; } };
+    const rm = $("#rmph"); if (rm) rm.onclick = () => { grab(); p.photo = null; recEditor(); };
+    $("#save").onclick = async () => { grab(); const b = $("#save"); b.disabled = true; $("#msg").className = "msg"; $("#msg").textContent = "Saving…";
+      try { const keep = B._jobs; B = await biz.api({ action: "biz_save", profile: p }); B._jobs = keep; recEditor(); $("#msg").className = "msg"; $("#msg").textContent = "Saved."; }
+      catch (e) { b.disabled = false; $("#msg").className = "msg err"; $("#msg").textContent = e.message; } };
+  }
   function collect(){
     if (!$("#c")) return;
     const p = B.profile;
@@ -171,12 +223,12 @@
     try { const keep = B._jobs; B = await biz.api({ action: "biz_save", profile: B.profile }); B._jobs = keep; editor(); $("#msg").className = "msg"; $("#msg").textContent = "Saved."; }
     catch (e) { b.disabled = false; $("#msg").className = "msg err"; $("#msg").textContent = e.message; }
   }
-  function squash(file){
+  function squash(file, cover){
     return new Promise((ok, bad) => {
       if (file.size > 8e6) return bad(new Error("That image is over 8 MB."));
       const url = URL.createObjectURL(file), img = new Image();
       img.onload = () => { const N = 256, c = document.createElement("canvas"); c.width = c.height = N; const x = c.getContext("2d");
-        x.fillStyle = "#fff"; x.fillRect(0, 0, N, N); const k = Math.min(N / img.naturalWidth, N / img.naturalHeight) * 0.9;
+        x.fillStyle = "#fff"; x.fillRect(0, 0, N, N); const k = cover ? Math.max(N / img.naturalWidth, N / img.naturalHeight) : Math.min(N / img.naturalWidth, N / img.naturalHeight) * 0.9;
         const w = img.naturalWidth * k, h = img.naturalHeight * k; x.drawImage(img, (N - w) / 2, (N - h) / 2, w, h); URL.revokeObjectURL(url);
         let q = 0.9, out = c.toDataURL("image/jpeg", q); while (out.length > 85000 && q > 0.4) { q -= 0.1; out = c.toDataURL("image/jpeg", q); }
         out.length > 85000 ? bad(new Error("Couldn't shrink that logo enough. Try a simpler image.")) : ok(out); };

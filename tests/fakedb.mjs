@@ -155,6 +155,9 @@ export function installFake({ jwk, anthropic, clerkUsers = {} } = {}) {
         const ex = it[key] != null ? rows.find((r) => String(r[key]) === String(it[key])) : null;
         if (ex) { if (prefer.includes("ignore-duplicates")) continue; if (prefer.includes("merge-duplicates")) { Object.assign(ex, it); out.push(ex); continue; }
           return resp(409, { code: "23505", message: "duplicate" }); }
+        // like the real table: user_a < user_b, judged by the DATABASE's text order (case-insensitive first, like en_US)
+        if (name === "orbit_links" && !(String(it.user_a).localeCompare(String(it.user_b), "en") < 0)) return resp(400, { code: "23514", message: 'new row for relation "orbit_links" violates check constraint "orbit_links_check"' });
+        if (name === "orbit_links" && rows.some((r) => (r.user_a === it.user_a && r.user_b === it.user_b) || (r.user_a === it.user_b && r.user_b === it.user_a))) return resp(409, { code: "23505", message: "duplicate" });
         const row = { ...(DEFAULTS[name]?.() || {}), ...it };
         if (row.id == null && ["community_posts", "community_replies", "ai_usage", "feedback", "orbit_messages"].includes(name)) { const id = (seq.get(name) || 0) + 1; seq.set(name, id); row.id = id; }
         rows.push(row); out.push(row);

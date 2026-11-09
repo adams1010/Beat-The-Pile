@@ -245,8 +245,8 @@
     const [, title, desc] = BRINGS.find((r) => r[0] === ring);
     const pend = m.status !== "verified" ? `<span>Your company is still being verified. You can view your orbit, and you can contact students once it's approved.</span>` : `<span>Only students who chose to be found by employers appear here.</span>`;
     $("main").innerHTML = `
-      <div class="sky"><div><h1>${esc(m.company || "Your company")}'s orbit</h1><p class="sub">Students already close to your company, closest first.</p>
-        ${sky(o, sets, BRINGS.slice(0, 3), { text: initials(m.company) || "Co", label: m.company || "Your company" })}</div>
+      <div class="sky"><div><h1>${m.kind === "recruiter" ? `${esc(m.name || "Your")}'s orbit` : `${esc(m.company || "Your company")}'s orbit`}</h1><p class="sub">${m.kind === "recruiter" ? `You, at ${esc(m.company || "your company")}. Students close to your company, closest first.` : "Students already close to your company, closest first."}</p>
+        ${sky(o, sets, BRINGS.slice(0, 3), m.kind === "recruiter" ? { text: initials(m.name) || "You", label: "You", photo: m.photo } : { text: initials(m.company) || "Co", label: m.company || "Your company", photo: m.logo })}</div>
         <div><div class="legend">${BRINGS.map(([k, t, d, col]) => `<button type="button" data-ring="${k}" aria-pressed="${k === ring}"><i style="border-color:${col}"></i><span>${t}<small>${d}</small></span><b>${sets[k].length}</b></button>`).join("")}</div>
           <div class="gravity">${pend}</div></div></div>
       <div class="grid grid2">

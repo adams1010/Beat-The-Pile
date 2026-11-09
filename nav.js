@@ -148,7 +148,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
       <details class="acct" id="btpAcct" hidden><summary class="me" id="btpMe" aria-label="Your account menu"></summary>
         <div class="menu acctmenu" role="menu">
           <div class="acchead"><span class="me big" id="btpMe2" aria-hidden="true"></span><div style="min-width:0"><b id="btpAName" data-noi18n></b><small id="btpAEmail" data-noi18n></small></div></div>
-          <a role="menuitem" class="pri" href="${BIZ ? "/business/company/" : "/u/"}">${BIZ ? "View company page" : "View profile"}</a>
+          <a role="menuitem" class="pri" href="${BIZ ? "/business/company/" : "/u/"}">${BIZ ? (bizKind() === "recruiter" ? "View your profile" : "View company page") : "View profile"}</a>
           <div class="sep"></div>
           <a role="menuitem" href="#" data-btp-switch="${BIZ ? "student" : "employer"}"><b>${BIZ ? "Switch to student account" : "Switch to business account"}</b><small>${BIZ ? "Look for internships and jobs" : "Hire interns and new grads"}</small></a>
           <div class="sep"></div>
@@ -233,15 +233,22 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     location.href = go || DEST[role];
   }
   window.btpSaveRole = saveRole;
+  function bizKind(){ try { return localStorage.getItem("btp_bizkind") || "company"; } catch { return "company"; } }
   window.btpRoleCards = (pre) => `<div class="btprole-cards">
       <button class="btprole-card${pre === "student" ? " on" : ""}" data-role="student"><span class="btprole-ic">${svg("jobs")}</span><b>I'm looking for an internship or job</b>
         <small>Internships first, plus new-grad jobs, from company job boards. Every major. Career Fair Mode, My Season, Orbit.</small><span class="btprole-go">Find internships and jobs →</span></button>
-      <button class="btprole-card${pre === "employer" ? " on" : ""}" data-role="employer"><span class="btprole-ic">${svg("talent")}</span><b>I'm hiring interns or new grads</b>
-        <small>Find students and recent grads by major, school and skills, and meet them at career fairs.</small><span class="btprole-go">Find interns →</span></button></div>`;
+      <button class="btprole-card${pre === "employer" ? " on" : ""}" data-role="employer" data-kind="recruiter"><span class="btprole-ic">${svg("orbit")}</span><b>I'm a recruiter</b>
+        <small>Your own profile and orbit, under your company. Find students by major and school, message them, meet them at fairs.</small><span class="btprole-go">Set up my recruiter profile →</span></button>
+      <button class="btprole-card" data-role="employer" data-kind="company"><span class="btprole-ic">${svg("talent")}</span><b>I'm setting up our company page</b>
+        <small>Your company's page: about, who you hire, perks, live jobs. Your recruiters link to it from their own profiles.</small><span class="btprole-go">Set up the company page →</span></button></div>`;
+  // Nov 9: three ways in — student, recruiter (a person, own orbit), company page. Both business kinds are role "employer";
+  // the kind decides which setup they see.
+  const roleDest = (c, next) => c.dataset.kind ? `/business/setup/?kind=${c.dataset.kind}` + (next ? `&next=${encodeURIComponent(next)}` : "") : next;
+  window.btpRoleDest = roleDest;
   const sheetCss = `.btprole{position:fixed;inset:0;z-index:200;background:rgba(6,10,44,.72);display:grid;place-items:center;padding:16px;font-family:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-.btprole .box{background:#fff;border-radius:16px;max-width:760px;width:100%;padding:28px;box-shadow:0 24px 60px rgba(6,10,44,.4)}
+.btprole .box{background:#fff;border-radius:16px;max-width:980px;width:100%;padding:28px;box-shadow:0 24px 60px rgba(6,10,44,.4)}
 .btprole h2{margin:0 0 4px;font-size:24px;color:#060A2C;letter-spacing:-.01em}.btprole p{margin:0 0 18px;color:#55627A}
-.btprole-cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btprole-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .btprole-card{font:inherit;text-align:left;cursor:pointer;background:#fff;border:2px solid #DCE2EC;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:8px;color:#060A2C;transition:border-color .12s,box-shadow .12s}
 .btprole-card:hover,.btprole-card:focus-visible,.btprole-card.on{border-color:#4A7000;box-shadow:0 0 0 4px #F2FADF;outline:0}
 .btprole-card b{font-size:18px}.btprole-card small{color:#55627A;font-size:14px;line-height:1.45}
@@ -249,7 +256,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
 .btprole-go{margin-top:auto;color:#4A7000;font-weight:600;font-size:14px;padding-top:6px}
 @media (max-width:620px){.btprole-cards{grid-template-columns:1fr}.btprole .box{padding:20px}}`;
   const sc = document.createElement("style"); sc.textContent = sheetCss; document.head.appendChild(sc);
-  document.addEventListener("click", (e) => { const c = e.target.closest && e.target.closest(".btprole-card"); if (c) { c.disabled = true; saveRole(c.dataset.role); } });
+  document.addEventListener("click", (e) => { const c = e.target.closest && e.target.closest(".btprole-card"); if (c) { c.disabled = true; saveRole(c.dataset.role, roleDest(c)); } });
   // Orbit tab badge (Talent tab for employers): unread messages + people asking to join your orbit ("10+" past 9).
   const paintBadge = (n) => { n = Number(n) || 0;
     nav.querySelectorAll(".btpbadge").forEach((b) => { b.hidden = n <= 0; b.textContent = n >= 10 ? "10+" : String(n); });

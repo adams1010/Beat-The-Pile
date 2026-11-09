@@ -1400,7 +1400,44 @@
   "Major or field": "Filière ou domaine",
   "+ Add another school": "+ Ajouter un autre établissement",
   "Not listed — type it": "Pas dans la liste : tapez-la",
-  "Pick your school from the list to get its majors.": "Choisissez votre établissement dans la liste pour voir ses filières."
+  "Pick your school from the list to get its majors.": "Choisissez votre établissement dans la liste pour voir ses filières.",
+  "Add a line about what you hire for.": "Ajoutez une ligne sur les profils que vous recrutez.",
+  "Add your name.": "Ajoutez votre nom.",
+  "Couldn't save. Try again.": "Enregistrement impossible. Réessayez.",
+  "Not on our list, so we'll match classmates by the name you typed.": "Absent de notre liste : nous trouverons vos camarades d'après le nom saisi.",
+  "Pick your school first": "Choisissez d'abord votre établissement",
+  "Recruiter": "Recruteur",
+  "Start typing a city, e.g. Blacksburg": "Tapez une ville, p. ex. Blacksburg",
+  "Start typing, e.g. Finance": "Commencez à taper, p. ex. Finance",
+  "Verification": "Vérification",
+  "View your profile": "Voir votre profil",
+  "Your company": "Votre entreprise",
+  "About you": "À propos de vous",
+  "Also recruiting here": "Recrutent aussi ici",
+  "Company website": "Site web de l'entreprise",
+  "Company you recruit for": "Entreprise pour laquelle vous recrutez",
+  "I'm a recruiter": "Je suis recruteur",
+  "I'm setting up our company page": "Je crée la page de notre entreprise",
+  "No one else yet.": "Personne d'autre pour l'instant.",
+  "Open your orbit": "Ouvrir votre orbite",
+  "Set up my recruiter profile →": "Créer mon profil de recruteur →",
+  "Set up the company page →": "Créer la page de l'entreprise →",
+  "Set up your recruiter profile": "Créez votre profil de recruteur",
+  "Show me to students at my school in Orbit (your name, school, major and photo). You can turn this off any time on your profile.": "Me montrer aux étudiants de mon école dans Orbit (nom, école, filière et photo). Vous pouvez le désactiver à tout moment sur votre profil.",
+  "Skip for now": "Passer pour l'instant",
+  "This is you on Beat the Pile: your own profile and orbit. Students see your name, title and photo when you message them, and it links to your company's page.": "C'est vous sur Beat the Pile : votre propre profil et orbite. Les étudiants voient votre nom, votre poste et votre photo quand vous leur écrivez, avec un lien vers la page de votre entreprise.",
+  "We use this to show you classmates in Orbit and internships for your major.": "Cela nous sert à vous montrer vos camarades dans Orbit et des stages pour votre filière.",
+  "Year": "Année",
+  "Your company's page: about, who you hire, perks, live jobs. Your recruiters link to it from their own profiles.": "La page de votre entreprise : présentation, profils recrutés, avantages, offres en ligne. Vos recruteurs y renvoient depuis leur propre profil.",
+  "Your own profile and orbit, under your company. Find students by major and school, message them, meet them at fairs.": "Votre propre profil et orbite, rattachés à votre entreprise. Trouvez des étudiants par filière et école, écrivez-leur, rencontrez-les aux salons.",
+  "Your photo": "Votre photo",
+  "Your recruiter profile": "Votre profil de recruteur",
+  "Nothing matches. Try fewer letters.": "Aucun résultat. Essayez moins de lettres.",
+  "Start typing to see the list.": "Commencez à taper pour voir la liste.",
+  "Recruiter profile": "Profil de recruteur",
+  "3 · Your school": "3 · Votre école",
+  "1 · You": "1 · Vous",
+  "(optional)": "(facultatif)"
  },
  "patterns": [
   [
@@ -1698,6 +1735,10 @@
   [
    "^(Spring|Summer|Fall|Winter) (\\d{4})$",
    "$1 $2"
+  ],
+  [
+   "^Not listed — use “(.+)”$",
+   "Absent de la liste — utiliser « $1 »"
   ]
  ]
 }

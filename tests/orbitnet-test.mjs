@@ -99,3 +99,4 @@ assert.equal(f.T("orbit_links").length, 0);
 assert.ok(!f.T("orbit_messages").some((m) => m.sender === "u_ana" || m.recipient === "u_ana"));
 assert.equal(f.T("orbit_messages").length, 2, "other people's conversations stay");
 console.log("✓ orbit cleanup: withdraw works, delete-all removes your links and messages");
+
