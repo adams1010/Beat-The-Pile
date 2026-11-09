@@ -141,7 +141,8 @@
     ["insiders", "Insiders", "Interned where you're aiming", "#FFB86B"],
     ["conn", "In orbit", "People who joined your orbit", "#FFFFFF"],
   ];
-  function sky(o, sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets }, rings3 = RINGS.slice(0, 3), center = { text: initials(o.me.name) || "You", label: "You" }){
+  const photoOk = (u) => typeof u === "string" && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(u);   // only real image data, never a link
+  function sky(o, sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets }, rings3 = RINGS.slice(0, 3), center = { text: initials(o.me.name) || "You", label: "You", photo: o.me.photo }){
     const RAD = [92, 150, 205], C = 230;
     let nodes = "", rings = "";
     rings3.forEach(([k, , , col], ri) => {
@@ -151,12 +152,16 @@
         const a = (i / Math.max(n, 1)) * Math.PI * 2 - Math.PI / 2 + ri * 0.45;
         const x = C + R[k] * Math.cos(a), y = C + R[k] * Math.sin(a);
         nodes += `<${p.handle ? `a class="node" href="/u/${encodeURIComponent(p.handle)}" tabindex="0"` : `g class="node"`} aria-label="${esc(p.name)}"><title>${esc(p.name)}${p.at ? " · " + esc(p.at) : ""}</title>
-          <circle cx="${x}" cy="${y}" r="19" fill="${p.link === "connected" ? "#26345F" : "#0E1440"}" stroke="${col}" stroke-width="${p.link === "connected" ? 4 : 2}"/>
-          <text x="${x}" y="${y + 4.5}" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">${esc(initials(p.name))}</text></${p.handle ? "a" : "g"}>`;
+          ${photoOk(p.photo) ? `<clipPath id="oc${ri}_${i}"><circle cx="${x}" cy="${y}" r="19"/></clipPath><circle cx="${x}" cy="${y}" r="19" fill="#0E1440"/>
+            <image href="${esc(p.photo)}" x="${x - 19}" y="${y - 19}" width="38" height="38" preserveAspectRatio="xMidYMid slice" clip-path="url(#oc${ri}_${i})"/>
+            <circle cx="${x}" cy="${y}" r="19" fill="none" stroke="${col}" stroke-width="${p.link === "connected" ? 4 : 2}"/>`
+          : `<circle cx="${x}" cy="${y}" r="19" fill="${p.link === "connected" ? "#26345F" : "#0E1440"}" stroke="${col}" stroke-width="${p.link === "connected" ? 4 : 2}"/>
+          <text x="${x}" y="${y + 4.5}" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">${esc(initials(p.name))}</text>`}</${p.handle ? "a" : "g"}>`;
       });
     });
     return `<svg viewBox="0 0 460 460" role="img" aria-label="Your orbit: ${rings3.map(([k, t]) => `${(sets[k] || []).length} ${t}`).join(", ")}">
-      ${rings}<circle cx="${C}" cy="${C}" r="34" fill="#B0F701"/><text x="${C}" y="${C + 6}" text-anchor="middle" font-size="16" font-weight="700" fill="#060A2C">${esc(center.text)}</text>
+      ${rings}${photoOk(center.photo) ? `<clipPath id="ocme"><circle cx="${C}" cy="${C}" r="34"/></clipPath><image href="${esc(center.photo)}" x="${C - 34}" y="${C - 34}" width="68" height="68" preserveAspectRatio="xMidYMid slice" clip-path="url(#ocme)"/><circle cx="${C}" cy="${C}" r="34" fill="none" stroke="#B0F701" stroke-width="3"/>`
+        : `<circle cx="${C}" cy="${C}" r="34" fill="#B0F701"/><text x="${C}" y="${C + 6}" text-anchor="middle" font-size="16" font-weight="700" fill="#060A2C">${esc(center.text)}</text>`}
       <text x="${C}" y="${C + 52}" text-anchor="middle" font-size="11" fill="#8D9AB3">${esc(center.label)}</text>${nodes}</svg>`;
   }
   // ── Find people (Nov 9): search public profiles by name, @handle, school, major, skills or company (orbit_search) ──
