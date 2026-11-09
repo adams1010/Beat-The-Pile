@@ -84,7 +84,7 @@ export default async function handler(req, res) {
 
   if (mark("hints")) return res.status(200).json({ marks });
   // 1c) A job system we just learned to read → re-test every company parked as "unsupported" on it
-  const NOW_READABLE = /\b(iCIMS|Oracle|Ashby|Eightfold|SmartRecruiters|Paylocity|ADP|Jibe|Taleo|UKG|BambooHR)\b/;   // add a system here when a new reader ships
+  const NOW_READABLE = /\b(iCIMS|Oracle|Ashby|Eightfold|SmartRecruiters|Paylocity|ADP|Jibe|Taleo|UKG|BambooHR|Workable)\b/;   // add a system here when a new reader ships
   // Only companies parked BEFORE the latest readers shipped — otherwise ones that are still unreadable loop forever
   const parked = await db.selectAllAsAdmin(`company_candidates?select=id,detail&status=eq.unsupported&checked_at=lt.${READERS_UPDATED_AT}`);
   const unpark = parked.filter((r) => NOW_READABLE.test(r.detail || "")).map((r) => r.id);

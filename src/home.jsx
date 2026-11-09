@@ -146,17 +146,17 @@ function HeroMap({near,fresh,sum}){
   const [geo,setGeo]=React.useState(null),[pts,setPts]=React.useState(null),[err,setErr]=React.useState(false);
   React.useEffect(()=>{
     const get=(u)=>fetch(u).then(r=>{if(!r.ok)throw 0;return r.json();});
-    Promise.all([get("/map/us.json"),get("/api/listings?dots=1&field=all")]).then(([g,d])=>{setGeo(g);setPts(d);}).catch(()=>setErr(true));
+    Promise.all([get("/map/us.json"),get("/api/listings?dots=1&field=all&kind=all")]).then(([g,d])=>{setGeo(g);setPts(d);}).catch(()=>setErr(true));
   },[]);
   const fmt=(n)=>n==null?"—":Number(n).toLocaleString();
   const xy=near?.meta?.near?.xy, r=near?.meta?near.meta.near.mi*MILES_PX:0;
   return(<aside style={{position:"relative",boxSizing:"border-box",background:"#0E1440",border:"1px solid #2A3B5C",borderRadius:16,padding:"18px 18px 14px",boxShadow:"0 24px 60px rgba(0,0,0,.45)",...DM}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:12,fontFamily:"Geist,sans-serif"}}>
-      <span style={{fontSize:14,fontWeight:600,color:"#fff"}}>Every dot is a real internship</span>
-      <span style={{fontSize:12,color:"#8D9AB3"}}>{pts?`${fmt(pts.placed)} on the map`:""}</span></div>
+      <span style={{fontSize:14,fontWeight:600,color:"#fff"}}>Every dot is a real job or internship</span>
+      <span style={{fontSize:12,color:"#8D9AB3"}}>{pts?`${fmt(pts.placed)} jobs and internships on the map`:""}</span></div>
     <div style={{position:"relative",marginTop:8}}>
       {err?<p style={{fontSize:13,color:"#8D9AB3",padding:"40px 0",textAlign:"center",fontFamily:"Geist,sans-serif"}}>Map didn't load. <a href="/jobs/" style={{color:"#B0F701"}}>See the internships →</a></p>:
-      <svg viewBox="0 0 975 610" role="img" aria-label={pts?`Map of the US with ${fmt(pts.placed)} open internships, one dot per city`:"Loading map"} style={{width:"100%",height:"auto",display:"block"}}>
+      <svg viewBox="0 0 975 610" role="img" aria-label={pts?`Map of the US with ${fmt(pts.placed)} open jobs and internships, one dot per city`:"Loading map"} style={{width:"100%",height:"auto",display:"block"}}>
         {geo&&<path d={geo.nation} fill="#11203A" stroke="#2A3B5C" strokeWidth="1"/>}
         {geo&&<path d={geo.borders} fill="none" stroke="#1C2C48" strokeWidth=".8"/>}
         {pts&&pts.dots.map(([x,y,n],i)=><circle key={i} cx={x} cy={y} r={1.6+Math.sqrt(n)*1.05} fill="#B0F701" fillOpacity={n>20?.8:.55}/>)}

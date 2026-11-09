@@ -38,6 +38,7 @@
   .btn{display:inline-block;margin-top:10px;font:inherit;font-size:13px;font-weight:600;border-radius:999px;padding:6px 16px;text-decoration:none;cursor:pointer;border:1px solid var(--green);color:var(--green);background:#fff}
   .btn:hover{background:var(--green-l)} .btn.pri{background:var(--green);color:#fff} .btn.pri:hover{background:#3A5A00}
   .empty{color:var(--muted);font-size:13.5px;padding:6px 0}
+  .findf{display:flex;gap:8px;margin:0 0 12px}.findf input{flex:1;min-width:0;font:inherit;font-size:15px;padding:10px 14px;border:1px solid var(--line);border-radius:999px;background:#fff}
   .empty a{color:var(--green);font-weight:600}
   .feed .it{padding:12px 0;border-top:1px solid #EEF1F6;font-size:13.5px} .feed .it:first-of-type{border-top:0}
   .feed .k{font-size:12px;color:var(--muted)} .feed a{color:var(--ink);font-weight:600;text-decoration:none} .feed a:hover{text-decoration:underline}
@@ -103,7 +104,7 @@
 (() => {
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-  const S = { clerk: null };
+  const S = { clerk: null, findQ: (new URLSearchParams(location.search).get("q") || "").slice(0, 80) };
   const GLOBE = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5S9.7 5.9 12 3.5z"/></svg>';
   const initials = (n) => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";
   const av = (p) => `<div class="avw"><div class="av">${p.photo ? `<img alt="" src="${esc(p.photo)}">` : esc(initials(p.name))}</div>${p.hiring ? '<span class="hiring">Hiring</span>' : ""}</div>`;
@@ -158,6 +159,33 @@
       ${rings}<circle cx="${C}" cy="${C}" r="34" fill="#B0F701"/><text x="${C}" y="${C + 6}" text-anchor="middle" font-size="16" font-weight="700" fill="#060A2C">${esc(center.text)}</text>
       <text x="${C}" y="${C + 52}" text-anchor="middle" font-size="11" fill="#8D9AB3">${esc(center.label)}</text>${nodes}</svg>`;
   }
+  // ── Find people (Nov 9): search public profiles by name, @handle, school, major, skills or company (orbit_search) ──
+  function findBox(){
+    return `<section class="card find"><h2>${S.biz ? "Find students" : "Find people"}</h2>
+      <form id="findF" role="search" class="findf"><input id="findQ" type="search" value="${esc(S.findQ || "")}" placeholder="${S.biz ? "Name, school, major or skill" : "Name, @handle, school, major or company"}" aria-label="Search people" autocomplete="off" maxlength="80"><button class="btn pri" type="submit">Search</button></form>
+      <div id="findR">${S.findHtml || ""}</div></section>`;
+  }
+  function wireFind(){
+    const f = $("#findF"); if (!f) return;
+    let t = 0;
+    const go = async () => {
+      const q = $("#findQ").value.trim(); S.findQ = q;
+      const u = new URL(location.href); if (q) u.searchParams.set("q", q); else u.searchParams.delete("q"); history.replaceState(null, "", u);
+      if (q.replace(/^@/, "").length < 2) { S.findHtml = ""; $("#findR").innerHTML = ""; return; }
+      $("#findR").innerHTML = `<p class="empty">Searching…</p>`;
+      try {
+        const r = await api({ action: "orbit_search", q });
+        if ($("#findQ").value.trim() !== q) return;
+        S.findHtml = r.employerPending ? `<p class="empty">You can search students once your company is verified.</p>`
+          : people(r.people || [], S.biz ? "No students open to employers match that yet." : "No one with a public profile matches that yet. Try a first name, a school or a major.")
+            + (r.more ? `<p class="empty">Showing the 30 closest matches. Add a school or major to narrow it down.</p>` : "");
+      } catch (e) { S.findHtml = `<p class="empty">${esc(e.message)}</p>`; }
+      $("#findR").innerHTML = S.findHtml; wire($("#findR"));
+    };
+    f.onsubmit = (e) => { e.preventDefault(); clearTimeout(t); go(); };
+    $("#findQ").oninput = () => { clearTimeout(t); t = setTimeout(go, 350); };
+    if (S.findQ && !S.findHtml) go();
+  }
   function render(o){
     S.o = o; const m = o.me, ring = S.ring || "inner";
     const sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets, conn: o.connections || [] };
@@ -179,7 +207,7 @@
           <div class="gravity">${gravity}</div>
           </div></div>
       <div class="grid grid2">
-        <div>${requests(o)}
+        <div>${findBox()}${requests(o)}
         <section class="card"><h2>${title}</h2><p class="sub">${desc}${ring === "inner" && m.hasSchool ? ` · ${esc(m.major || "")} at ${esc(m.school)}` : ""}</p>${people(sets[ring], empty[ring])}</section></div>
         <aside class="feedcol">
           <section class="card" id="messages"><h2>Messages${o.unread ? `<span class="count">${o.unread}</span>` : ""}</h2><p class="sub">Students in your orbit, plus employers if you turned on “Let employers find me”.</p><div id="threads"><p class="empty">Loading…</p></div></section>
@@ -187,7 +215,7 @@
           <section class="card feed"><h2>Signals</h2><p class="sub">New openings at companies you follow, and posts from students.</p>${feed}</section></aside>
       </div>`;
     document.querySelectorAll("[data-ring]").forEach((b) => b.onclick = () => { S.ring = b.dataset.ring; render(S.o); });
-    wire($("main")); loadThreads(); loadFairs();
+    wire($("main")); wireFind(); loadThreads(); loadFairs();
     try { window.btpOrbitBadge && window.btpOrbitBadge((o.unread || 0) + (o.requests || []).length); } catch {}
   }
 
@@ -217,7 +245,7 @@
         <div><div class="legend">${BRINGS.map(([k, t, d, col]) => `<button type="button" data-ring="${k}" aria-pressed="${k === ring}"><i style="border-color:${col}"></i><span>${t}<small>${d}</small></span><b>${sets[k].length}</b></button>`).join("")}</div>
           <div class="gravity">${pend}</div></div></div>
       <div class="grid grid2">
-        <div>${requests(o)}
+        <div>${findBox()}${requests(o)}
         <section class="card"><h2>${title}</h2><p class="sub">${desc}</p>${people(sets[ring], empty[ring])}</section></div>
         <aside class="feedcol">
           <section class="card" id="messages"><h2>Messages${o.unread ? `<span class="count">${o.unread}</span>` : ""}</h2><p class="sub">Students you've written to, and students in your orbit.</p><div id="threads"><p class="empty">Loading…</p></div></section>
@@ -225,7 +253,7 @@
             <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn pri" href="/business/talent/">Find talent</a><a class="btn" href="/business/fairs/">Career fairs</a><a class="btn" href="/business/company/">Company page</a></div></section></aside>
       </div>`;
     document.querySelectorAll("[data-ring]").forEach((b) => b.onclick = () => { S.ring = b.dataset.ring; renderBiz(S.o); });
-    wire($("main")); loadThreads();
+    wireFind(); wire($("main")); loadThreads();
     try { window.btpOrbitBadge && window.btpOrbitBadge((o.unread || 0) + (o.requests || []).length); } catch {}
   }
 

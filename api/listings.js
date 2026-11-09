@@ -56,21 +56,27 @@ export function parse(q) {
   return { errs, kind, near: near || null, mi, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, summary: raw("summary") === "1", names: raw("names") === "1" };
 }
 
-/** Homepage map: every open internship with a real city, as dots on the US map (grouped into 6-px cells so nearby
- *  postings share one dot). Counts are real; nothing is placed that the geocoder couldn't place (lib/geocode.js). */
+/** Homepage map: every open job (internships + early-career full-time with ?kind=all) with a real city, as dots on the
+ *  US map (grouped into 6-px cells so nearby postings share one dot). A posting open in several cities is a dot in each
+ *  (Nov 9). `placed` counts postings, not dots. Nothing is placed that the geocoder couldn't place (lib/geocode.js). */
 async function dots(p, res) {
-  const rows = await db.selectAllAsAdmin(`listings?select=geo_lat,geo_lng&${LIVE}${majorFilter(p)}&geo_lat=not.is.null`);
+  const rows = await db.selectAllAsAdmin(`listings?select=geo_lat,geo_lng,geo_pts&${LIVE}${majorFilter(p)}&geo_lat=not.is.null`);
   const cells = new Map(); let placed = 0;
   for (const r of rows) {
-    const xy = project(r.geo_lat, r.geo_lng); if (!xy) continue;
-    placed++;
-    const k = `${Math.round(xy[0] / 6)},${Math.round(xy[1] / 6)}`;
-    const c = cells.get(k); if (c) { c[0] += xy[0]; c[1] += xy[1]; c[2]++; } else cells.set(k, [xy[0], xy[1], 1]);
+    const pts = Array.isArray(r.geo_pts) && r.geo_pts.length ? r.geo_pts.slice(0, 25) : [[r.geo_lat, r.geo_lng]];
+    let any = false;
+    for (const pt of pts) {
+      const xy = Array.isArray(pt) ? project(pt[0], pt[1]) : null; if (!xy) continue;
+      any = true;
+      const k = `${Math.round(xy[0] / 6)},${Math.round(xy[1] / 6)}`;
+      const c = cells.get(k); if (c) { c[0] += xy[0]; c[1] += xy[1]; c[2]++; } else cells.set(k, [xy[0], xy[1], 1]);
+    }
+    if (any) placed++;
   }
   const out = [...cells.values()].map(([x, y, n]) => [Math.round((x / n) * 10) / 10, Math.round((y / n) * 10) / 10, n]).sort((a, b) => a[2] - b[2]);
   const total = await db.count(`listings?${LIVE}${majorFilter(p)}`);
   res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
-  return res.status(200).json({ w: 975, h: 610, dots: out, placed, total });
+  return res.status(200).json({ w: 975, h: 610, dots: out, placed, spots: out.reduce((n, d) => n + d[2], 0), total });
 }
 
 /** Same major filters as the main list (field / strict ME / companies), as a PostgREST query string tail. */
