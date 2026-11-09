@@ -173,7 +173,7 @@ function HeroMap({near,fresh,sum}){
     </div>
   </aside>);
 }
-// The hero's "City or state" box: "Blacksburg, VA" or a 5-digit ZIP = distance search; a state name/code = state filter.
+// The hero's "City, state or ZIP" box: "Blacksburg, VA" or a 5-digit ZIP = distance search; a state name/code = state filter.
 const D_NEAR=(v)=>/^\d{5}$/.test(v)||/^[A-Za-z .'-]{2,30},\s*[A-Za-z]{2}$/.test(v);
 function LandingD({onQuiz,onPage}){
   const [sum,setSum]=React.useState(null),[sumErr,setSumErr]=React.useState(false),[fresh,setFresh]=React.useState(null);
@@ -215,7 +215,7 @@ function LandingD({onQuiz,onPage}){
             <span className="d-sep" style={{width:1,background:"#DCE2EC",margin:"10px 0"}}/>
             <label style={{flex:"2 1 0",display:"flex",alignItems:"center",gap:10,padding:"0 14px",minWidth:0}}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55627A" strokeWidth="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-              <input value={where} onChange={e=>setWhere(e.target.value)} aria-label="City or state" placeholder="City or state" inputMode="text" autoComplete="address-level2" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#060A2C",height:48,background:"transparent",outline:"none"}}/></label>
+              <input value={where} onChange={e=>setWhere(e.target.value)} aria-label="City, state or ZIP code" placeholder="City, state or ZIP" inputMode="text" autoComplete="address-level2" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#060A2C",height:48,background:"transparent",outline:"none"}}/></label>
             <button type="submit" style={{font:"inherit",fontSize:16,fontWeight:600,background:"#4A7000",color:"#fff",border:0,padding:"0 28px",borderRadius:10,cursor:"pointer",minHeight:48}}>Search</button>
           </form>
           <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:16,alignItems:"center"}}>

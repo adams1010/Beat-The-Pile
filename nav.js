@@ -79,7 +79,8 @@
 body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
 .btpnav .mob{display:none}
 @media (max-width:900px){.btpnav .q{display:none}}
-@media (max-width:640px){.btpnav #acct span,.btpnav #acct .who{display:none}
+@media (max-width:640px){.btpnav .logo img{height:34px;width:auto}.btpnav .logo{margin-right:6px}
+  .btpnav #acct span,.btpnav #acct .who{display:none}
   .btpnav .links{display:none}.btpnav .mob{display:block;margin-left:auto}.btpnav .mob summary{color:#fff;border:1px solid rgba(255,255,255,.18);padding:7px 10px}
   .btpnav .mob .menu{left:8px!important;right:8px;min-width:0}}
 .btpnav .menu .sep{height:1px;background:#E3E7ED;margin:6px 4px}
@@ -95,7 +96,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   }
   const nav = document.createElement("nav"); nav.className = "btpnav"; nav.setAttribute("aria-label", "Main");
   nav.innerHTML = `<a class="btpskip" href="#main">Skip to content</a><div class="in">
-    <a class="logo" href="/" aria-label="Beat the Pile home"><img src="/brand/logo-white.png" alt="Beat the Pile" width="95" height="38"></a>
+    <a class="logo" href="/" aria-label="Beat the Pile home"><picture><source media="(max-width:640px)" srcset="/brand/mark-white.png"><img src="/brand/logo-white.png" alt="Beat the Pile" width="95" height="38"></picture></a>
     <form class="q" role="search" action="/jobs/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search internships" placeholder="Search internships, jobs, companies"><input type="hidden" name="state" value="all"><kbd>/</kbd></form>
     <div class="links">${MAIN.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${svg(k)}<span>${t}</span></a>`).join("")}
       <details><summary>${svg("tools")}<span class="lbl">Tools</span></summary><div class="menu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}<div class="sep"></div>${langItem(true)}</div></details></div>

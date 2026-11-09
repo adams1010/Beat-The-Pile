@@ -1,4 +1,4 @@
-/* built from src/home.jsx 3e2303164320eb69 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 3116cd1052b2c624 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -1211,8 +1211,8 @@ function LandingD({
   })), React.createElement("input", {
     value: where,
     onChange: e => setWhere(e.target.value),
-    "aria-label": "City or state",
-    placeholder: "City or state",
+    "aria-label": "City, state or ZIP code",
+    placeholder: "City, state or ZIP",
     inputMode: "text",
     autoComplete: "address-level2",
     style: {

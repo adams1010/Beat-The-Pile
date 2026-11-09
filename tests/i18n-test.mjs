@@ -5,7 +5,7 @@ const d = JSON.parse(fs.readFileSync(new URL("../i18n/es.json", import.meta.url)
 const S = d.strings, P = d.patterns.map(([re, to]) => [new RegExp(re), to]);
 assert.ok(Object.keys(S).length > 400, "dictionary is filled");
 for (const [k, v] of Object.entries(S)) { assert.equal(typeof v, "string", k); assert.ok(v.trim(), "empty translation for " + k); }
-for (const k of ["Jobs", "Career Fair", "Orbit", "My Season", "Profile", "Tools", "Opening Radar", "Language", "City or state", "Sign in", "Save profile"])
+for (const k of ["Jobs", "Career Fair", "Orbit", "My Season", "Profile", "Tools", "Opening Radar", "Language", "City, state or ZIP", "Sign in", "Save profile"])
   assert.ok(S[k], "missing: " + k);
 const one = (t) => { if (S[t] != null) return S[t]; for (const [re, to] of P) { const m = t.match(re); if (m) return to.replace(/\$(\d)/g, (_, i) => S[m[+i]] ?? m[+i]); } return null; };
 assert.equal(one("12 open"), "12 abiertas");

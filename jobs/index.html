@@ -37,8 +37,19 @@
   .dot{width:7px;height:7px;border-radius:50%;background:var(--mint)}
   @keyframes blink{50%{opacity:.25}}
 
-  .controls{position:sticky;top:60px;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
-  @media (max-width:640px){.controls{position:static}}   /* on phones a sticky filter box covered half the screen */
+  /* Nov 8: the filter box no longer sticks (it covered a third of the screen while scrolling); "Filters ↑" brings you back */
+  .controls{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px;scroll-margin-top:72px}
+  .more{display:flex;justify-content:center;padding:8px 0 4px}
+  .moreb{font:inherit;font-size:14px;font-weight:600;color:var(--green);background:#fff;border:1px solid var(--green);border-radius:999px;padding:9px 20px;cursor:pointer}
+  .moreb:hover{background:var(--green-light)}
+  .totop{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));z-index:15;font:inherit;font-size:14px;font-weight:600;
+    background:#060A2C;color:#fff;border:0;border-radius:999px;padding:10px 16px;cursor:pointer;box-shadow:0 6px 20px rgba(6,10,44,.25);opacity:0;transform:translate(-50%,10px);pointer-events:none;transition:opacity .2s,transform .2s}
+  .totop.on{opacity:1;transform:translate(-50%,0);pointer-events:auto}
+  .sform{display:flex;flex:1 1 240px;min-width:0;gap:6px}
+  .sbtn{font:inherit;font-size:14px;font-weight:600;color:#fff;background:var(--green);border:0;border-radius:999px;padding:8px 18px;cursor:pointer;flex-shrink:0}
+  .sbtn:hover{background:#3A5A00}
+  html{scroll-behavior:smooth}
+  @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.totop{transition:none}}
   .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
   .seg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:10px;padding:3px}
   .seg button{border:0;background:none;font:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:6px 12px;border-radius:7px;cursor:pointer}
@@ -75,7 +86,7 @@
   .wchips button:hover,.wchips button:focus-visible{border-color:var(--green);color:var(--green);outline:none}
   .wchips button.all{border-style:dashed;color:var(--muted)}
   .wx{position:absolute;top:10px;right:12px;border:0;background:none;font-size:22px;line-height:1;color:var(--faint);cursor:pointer;padding:4px}
-  .rail{display:flex;flex-direction:column;gap:12px;position:sticky;top:84px}
+  .rail{display:flex;flex-direction:column;gap:12px;position:sticky;top:76px;max-height:calc(100vh - 92px);overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin}
   .panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px}
   .panel h3{font-size:14px;font-weight:600;color:var(--ink);margin:0 0 12px}
   .panel .est{font-size:12px;color:var(--faint);margin:-8px 0 8px}
@@ -92,6 +103,7 @@
   .list{display:flex;flex-direction:column;gap:10px}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:6px 14px;align-items:start;transition:border-color .15s}
   .card:hover{border-color:#B9C3D3}
+  .list>.card{content-visibility:auto;contain-intrinsic-size:auto 150px}
   .lg{width:48px;height:48px;border-radius:10px;background:#F1F4F9;border:1px solid var(--line);display:grid;place-items:center;font-weight:600;font-size:15px;color:var(--ink);flex-shrink:0;text-decoration:none}
   .co{font-size:14px;font-weight:500;color:var(--ink);margin-top:2px}.co .cn{color:var(--ink);text-decoration:none}.co .cn:hover{color:var(--green);text-decoration:underline}.co .loc{color:var(--muted);font-weight:400}
   .title{font-size:17px;font-weight:600;color:var(--navy);margin:0;line-height:1.3;letter-spacing:-.01em}
@@ -211,9 +223,9 @@
     <div class="kindseg" role="group" aria-label="Job type"><button type="button" data-kind="intern" aria-pressed="true">Internships</button><button type="button" data-kind="fulltime" aria-pressed="false">Full-time</button><button type="button" data-kind="all" aria-pressed="false">Both</button></div>
     <div class="row">
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">All US states</option></select>
-      <form class="near" id="nearBox" role="search" aria-label="Internships near a place"><span>Within</span>
+      <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Within</span>
         <select id="miSel" aria-label="Distance in miles"><option value="25">25 mi</option><option value="50" selected>50 mi</option><option value="100">100 mi</option><option value="200">200 mi</option></select>
-        <span>of</span><input id="nearIn" placeholder="City or state" autocomplete="address-level2" maxlength="40" aria-label="City or state, like Blacksburg, VA or Virginia"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
+        <span>of</span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
       <select class="statesel" id="majorSel" aria-label="Major">
         <option value="all">All majors</option>
         <optgroup label="Engineering"><option value="eng">All engineering</option><option value="mechanical">Mechanical &amp; Aerospace</option><option value="electrical">Electrical &amp; Computer Eng.</option><option value="civil">Civil, Construction &amp; Architecture</option><option value="chemical">Chemical &amp; Materials</option><option value="industrial">Industrial &amp; Manufacturing</option></optgroup>
@@ -224,7 +236,7 @@
       <label class="toggle" id="meWrap" title="Only roles that say mechanical (or a close match like manufacturing)."><input type="checkbox" id="meOnly"> Strictly mechanical</label>
       <button class="chip" id="savedOnly" aria-pressed="false" title="Jobs you saved with ♡">♡ Saved <span id="savedN"></span></button>
       <button class="chip" id="followOnly" aria-pressed="false" title="Companies you follow with ☆ — you get flagged when they post">Following <span id="followN"></span></button>
-      <input class="search" id="q" type="search" placeholder="Search company or role" aria-label="Search company or role">
+      <form class="sform" id="qForm" role="search"><input class="search" id="q" type="search" enterkeyhint="search" placeholder="Search company or role" aria-label="Search company or role"><button class="sbtn" type="submit">Search</button></form>
     </div>
     <div class="count" id="count" aria-live="polite"></div>
     <div class="note" id="note"></div>
@@ -473,7 +485,7 @@
         : `<div class="empty">No matches ${where}${state.all.length ? " for these filters" : " right now"}. ${state.all.length ? `<button class="linkbtn" id="resetF">Reset filters</button>` : "New postings are pulled from company boards every few hours."}</div>`;
       return;
     }
-    $("list").innerHTML = companyHeader(rows) + rows.map((j) => `
+    const tpl = (j) => `
       <article class="card${has("applied", j) ? " applied" : ""}${j.closed ? " closed" : ""}">
         <a class="lg" href="${coHref(j)}" aria-hidden="true" tabindex="-1" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</a>
         <div style="min-width:0">
@@ -492,7 +504,30 @@
           ${j.company_id ? `<button class="follow lite" data-co="${esc(j.company_id)}" data-name="${esc(j.company)}" aria-pressed="${followed(j)}">${followed(j) ? "★ Following" : "☆ Follow " + esc(j.company.length > 18 ? "company" : j.company)}</button>` : ""}
           <a href="#" class="rep lite" data-rep="${esc(j.id)}" data-what="${esc(j.company + " — " + j.title)}">Report</a>
         </div>
-      </article>`).join("");
+      </article>`;
+    // Nov 8: paint the list in pages of 40 and add more as you scroll (thousands of cards at once made scrolling choppy).
+    // A filter change starts over at the top page; re-renders from Save/Apply clicks keep what you've already scrolled through.
+    const sig = [state.kind, state.major, state.q, state.st === "ALL" ? "ALL" : state.st.join(","), state.near?.q, state.near?.mi, state.meOnly, state.savedOnly, state.followOnly, state.company].join("|");
+    if (sig !== LIST.sig) { LIST.sig = sig; LIST.shown = PAGE; }
+    LIST.rows = rows; LIST.tpl = tpl;
+    $("list").innerHTML = companyHeader(rows) + rows.slice(0, LIST.shown).map(tpl).join("") + moreHtml();
+    watchMore();
+  }
+  const PAGE = 40, LIST = { sig: null, shown: PAGE, rows: [], tpl: null, io: null };
+  const moreHtml = () => LIST.rows.length > LIST.shown
+    ? `<div class="more" id="moreBox"><button type="button" class="moreb" id="moreBtn">Show more (${(LIST.rows.length - LIST.shown).toLocaleString()} left)</button></div>` : "";
+  function showMore(){
+    const box = $("moreBox"); if (!box || !LIST.tpl) return;
+    const from = LIST.shown; LIST.shown = Math.min(LIST.rows.length, from + PAGE);
+    box.insertAdjacentHTML("beforebegin", LIST.rows.slice(from, LIST.shown).map(LIST.tpl).join(""));
+    if (LIST.shown >= LIST.rows.length) box.remove(); else $("moreBtn").textContent = `Show more (${(LIST.rows.length - LIST.shown).toLocaleString()} left)`;
+    try { window.btpLogos && window.btpLogos(); } catch {}
+  }
+  function watchMore(){
+    LIST.io?.disconnect();
+    const box = $("moreBox"); if (!box) return;
+    $("moreBtn").onclick = showMore;
+    if ("IntersectionObserver" in window) { LIST.io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) showMore(); }, { rootMargin: "900px 0px" }); LIST.io.observe(box); }
   }
 
   // Filters live in the address bar so a view can be shared, bookmarked, refreshed, or reached with Back.
@@ -545,7 +580,7 @@
     if (e.target.closest("#allCos")) { state.company = null; state.q = ""; $("q").value = ""; loadScope(); }
   });
   // ── "Within N mi of a city" (api/listings?near=; lib/geocode.js). Picking a state turns it off, and the other way round. ──
-  // The box asks for "City or state": "Blacksburg, VA" → distance search; "Virginia" / "VA" → that state's filter.
+  // The box asks for "City, state or ZIP" (24060 → distance search too): "Blacksburg, VA" → distance search; "Virginia" / "VA" → that state's filter.
   // A 5-digit ZIP still works (old links, people who type one anyway).
   function nearOk(q){ return /^\d{5}$/.test(q) || /^[A-Za-z .'-]{2,30},\s*[A-Za-z]{2}$/.test(q); }
   function stateFrom(q){ const t = q.trim().replace(/\.$/, "").toLowerCase(); if (!t) return null;
@@ -801,6 +836,16 @@
 
   $("meOnly").addEventListener("change", (e) => { state.meOnly = e.target.checked; render(); });
   $("q").addEventListener("input", (e) => { state.q = e.target.value.trim(); render(); });
+  // Search button / Enter: apply now, close the phone keyboard, and jump to the results.
+  $("qForm").addEventListener("submit", (e) => {
+    e.preventDefault(); state.q = $("q").value.trim(); render(); $("q").blur();
+    const c = $("count"); if (c && c.getBoundingClientRect().top < 60) c.scrollIntoView({ block: "start" });
+  });
+  // "Filters ↑" after you've scrolled past the filter box.
+  { const b = document.createElement("button"); b.type = "button"; b.className = "totop"; b.textContent = "Filters ↑"; b.setAttribute("aria-label", "Back to filters");
+    b.onclick = () => document.querySelector(".controls")?.scrollIntoView({ block: "start" }); document.body.appendChild(b);
+    let tick = false; addEventListener("scroll", () => { if (tick) return; tick = true; requestAnimationFrame(() => { tick = false;
+      const c = document.querySelector(".controls"); b.classList.toggle("on", !!c && c.getBoundingClientRect().bottom < 0); }); }, { passive: true }); }
   readUrl();
 
   // ── Loading: one major + one place at a time, in pages of 1,000 (the full all-majors list is too big for one response) ──

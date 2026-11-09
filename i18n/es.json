@@ -725,7 +725,12 @@
   "Career fair": "Feria de empleo",
   "Unread": "No leído",
   "They'll see your name and company in their Orbit inbox and can reply. Keep it short and specific: the role, why them, and a next step.": "Verán tu nombre y empresa en su bandeja de Orbit y podrán responder. Sé breve y concreto: el puesto, por qué ellos y un siguiente paso.",
-  "Hi! I saw your profile on Beat the Pile. We're hiring summer interns for…": "¡Hola! Vi tu perfil en Beat the Pile. Estamos contratando pasantes de verano para…"
+  "Hi! I saw your profile on Beat the Pile. We're hiring summer interns for…": "¡Hola! Vi tu perfil en Beat the Pile. Estamos contratando pasantes de verano para…",
+  "City, state or ZIP": "Ciudad, estado o código postal",
+  "City, state or ZIP code, like Blacksburg, VA, Virginia or 24060": "Ciudad, estado o código postal, por ejemplo Blacksburg, VA, Virginia o 24060",
+  "Jobs near a city, state or ZIP code": "Empleos cerca de una ciudad, estado o código postal",
+  "Filters ↑": "Filtros ↑",
+  "Back to filters": "Volver a los filtros"
  },
  "patterns": [
   [
@@ -879,6 +884,10 @@
   [
    "^([\\d,]+) going$",
    "$1 van"
+  ],
+  [
+   "^Show more \\(([\\d,]+) left\\)$",
+   "Ver más ($1 restantes)"
   ]
  ]
 }
