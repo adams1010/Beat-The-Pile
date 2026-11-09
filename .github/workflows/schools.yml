@@ -1,0 +1,31 @@
+# On demand (Actions → schools → Run workflow): rebuild /schools/ — every US college and the programs it awards degrees in,
+# from the US Department of Education's IPEDS files (public domain). Used by the /u/ school + major pickers. Once a year is plenty.
+name: schools
+on:
+  workflow_dispatch:
+    inputs:
+      year: { description: "IPEDS year (e.g. 2024)", required: false, default: "2024" }
+permissions: { contents: write }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Download IPEDS
+        run: |
+          Y="${{ inputs.year || '2024' }}"; mkdir -p /tmp/ipeds && cd /tmp/ipeds
+          curl -sfL --retry 3 -o hd.zip "https://nces.ed.gov/ipeds/datacenter/data/HD${Y}.zip"
+          curl -sfL --retry 3 -o c.zip "https://nces.ed.gov/ipeds/datacenter/data/C${Y}_A.zip"
+          curl -sfL --retry 3 -o CIPCode2020.csv "https://nces.ed.gov/ipeds/cipcode/Files/CIPCode2020.csv"
+          unzip -o -q hd.zip && unzip -o -q c.zip && ls -la
+      - name: Build
+        run: node scripts/build-schools.mjs /tmp/ipeds
+      - name: Commit if changed
+        run: |
+          git add schools/
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git config user.name "btp-schools"; git config user.email "schools@users.noreply.github.com"
+          git commit -m "Schools: rebuild from IPEDS" && git push
