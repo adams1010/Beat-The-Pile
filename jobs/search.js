@@ -54,7 +54,30 @@
     policy: ["government", "public policy", "legislative", "public affairs"],
     research: ["researcher", "r d", "laboratory", "lab", "scientist"],
     lab: ["laboratory", "research", "scientist", "technician"],
-    biology: ["biological", "biotech", "life sciences", "lab", "research"],
+    biology: ["biological", "biotech", "life sciences", "lab", "laboratory", "microbiology", "molecular"],
+    psychology: ["psychological", "behavioral", "mental health", "counseling", "counselor", "human factors", "clinical research", "user research", "therapy"],
+    sociology: ["social", "community", "social services", "research", "nonprofit"],
+    social: ["social media", "community", "social services", "social work", "nonprofit"],
+    therapy: ["therapist", "rehab", "rehabilitation", "physical therapy", "occupational therapy", "clinical"],
+    physical: ["physical therapy", "rehab", "rehabilitation", "physiotherapy"],
+    kinesiology: ["exercise", "athletic", "physical therapy", "sports", "fitness", "rehab"],
+    nutrition: ["dietetic", "dietitian", "food", "wellness"],
+    english: ["writing", "writer", "editorial", "content", "communications", "copywriting"],
+    writing: ["writer", "editorial", "content", "copywriter", "communications"],
+    history: ["museum", "archive", "archival", "research", "education"],
+    political: ["policy", "government", "public affairs", "legislative", "campaign"],
+    economic: ["economics", "economist", "finance", "analyst", "policy"],
+    economics: ["economist", "economic", "finance", "analyst"],
+    math: ["mathematics", "quantitative", "actuarial", "statistics", "analyst"],
+    mathematics: ["math", "quantitative", "actuarial", "statistics"],
+    statistic: ["statistics", "statistical", "data", "analytics", "quantitative"],
+    physic: ["physics", "optics", "research", "engineering"],
+    chemistry: ["chemical", "chemist", "lab", "laboratory"],
+    architecture: ["architectural", "design", "building", "construction"],
+    hospitality: ["hotel", "events", "guest", "food beverage", "tourism"],
+    fashion: ["apparel", "retail", "merchandising", "design"],
+    film: ["video", "production", "media", "entertainment", "editing"],
+    art: ["arts", "creative", "design", "museum", "gallery"],
     environmental: ["environment", "sustainability", "energy", "ehs", "climate"],
     sustainability: ["environmental", "esg", "energy", "climate"],
     energy: ["power", "renewable", "utility", "solar", "wind", "oil", "gas"],
@@ -108,14 +131,16 @@
     const ts = raw.filter((w) => !STOP.has(w));
     const use = ts.length ? ts : raw;
     if (!use.length) return null;
-    return use.slice(0, 8).map((w) => ({ w, syn: (SYN[w] || []).map(phrase).filter(Boolean), co: (CO_SYN[w] || []).map(phrase) }));
+    const own = new Set(use);   // a cousin that is another word you typed can't stand in for this one ("biology research")
+    return use.slice(0, 8).map((w) => ({ w, syn: (SYN[w] || []).map(phrase).filter((p) => p && !p.split(" ").some((x) => own.has(x))), co: (CO_SYN[w] || []).map(phrase) }));
   }
   /** How well one job fits one term: 3 = the word itself, 2 = a cousin / company / typo, 1.5 = place, 0 = no. */
   function termScore(s, term, fieldLabel){
     const w = term.w;
     if (hasPhrase(s.t, w)) return 3;
-    if (hasPhrase(s.c, w) || (w.length >= 3 && s.cw.some((x) => x.startsWith(w)))) return 2.5;
-    if (w.length >= 4 && s.tw.some((x) => x.startsWith(w))) return 2.5;          // "mech" → mechanical
+    // a word start counts only when it's clearly a fragment of a longer word: "mech" → mechanical, never "sales" → Salem
+    if (hasPhrase(s.c, w) || (w.length >= 3 && s.cw.some((x) => x.length >= w.length + 3 && x.startsWith(w)))) return 2.5;
+    if (w.length >= 4 && s.tw.some((x) => x.length >= w.length + 3 && x.startsWith(w))) return 2.5;
     if (term.syn.some((p) => hasPhrase(s.t, p))) return 2;
     if (term.co.some((p) => hasPhrase(s.c, p))) return 2;
     if (w.length >= 5 && s.tw.some((x) => x.length >= 5 && near1(x, w))) return 2;  // one typo
@@ -134,10 +159,13 @@
     for (const j of jobs) {
       const s = prep(j); let all = true, sum = 0, hits = 0;
       for (const t of terms) { const v = termScore(s, t, field(j)); if (v < 1.5) all = false; if (v > 0) { sum += v; hits++; } }
-      if (all) exact.push(j); else if (hits) part.push([j, sum + hits * 2]);   // more words matched beats one strong word
+      if (all) exact.push([j, sum]); else if (hits) part.push([j, sum + hits * 2]);   // more words matched beats one strong word
     }
+    // one word: keep the page's order (newest / nearest). Several words: the closest fits first ("Medical Sales Intern"
+    // before "Sales Intern" at a medical company); ties keep the page's order (sort is stable).
+    if (terms.length > 1) exact.sort((a, b) => b[1] - a[1]);
     const similar = exact.length >= minExact ? [] : part.sort((a, b) => b[1] - a[1]).slice(0, maxSimilar).map((x) => x[0]);
-    return { exact, similar, terms };
+    return { exact: exact.map((x) => x[0]), similar, terms };
   }
   globalThis.btpJobSearch = { rank, parse, norm };
 })();
