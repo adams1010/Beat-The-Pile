@@ -427,7 +427,7 @@ function fieldForMajor(major){
 }
 function skillsForMajor(major){return SKILLS_BY_FIELD[fieldForMajor(major)]||SKILLS_BY_FIELD.default;}
 
-const GRAD_YEARS=["May 2025","Dec 2025","May 2026","Dec 2026","May 2027","Dec 2027","May 2028","Dec 2028","May 2029","Dec 2029","May 2030","Dec 2030","Graduate Student"];
+const GRAD_YEARS=["May 2026","Dec 2026","May 2027","Dec 2027","May 2028","Dec 2028","May 2029","Dec 2029","May 2030","Dec 2030","Graduate Student"];
 const GPA_OPTS=["4.0","3.7–3.9","3.5–3.6","3.0–3.4","2.5–2.9","Below 2.5"];
 const TYPE_OPTS=["Any","Hybrid","In-person","Remote"];
 const TERM_OPTS=["Summer 2026","Fall 2026","Spring 2027","Summer 2027"];
@@ -3066,17 +3066,9 @@ function App(){
   // NAV: the shared top bar comes from /nav.js (same on every page). The homepage only adds its account button
   // into the bar's right side, plus the "saved" note.
   const Nav=()=>{
-    const slot=typeof document!=="undefined"?document.getElementById("btpRight"):null;
-    const acct=(clerkUser?(
-      <button onClick={()=>{window.location.href="/u/";}} title={clerkUser.primaryEmailAddress?.emailAddress||"Account"} aria-label="Your profile"
-        style={{background:"#B0F701",border:"none",color:"#060A2C",width:30,height:30,borderRadius:8,cursor:"pointer",fontSize:13,fontWeight:700,fontFamily:"inherit"}}>
-        {(clerkUser.firstName||clerkUser.primaryEmailAddress?.emailAddress||"U").charAt(0).toUpperCase()}
-      </button>
-    ):(
-      <button onClick={openSignIn} style={{background:"#B0F701",border:"1px solid #B0F701",color:"#060A2C",padding:"6px 12px",borderRadius:7,cursor:"pointer",fontSize:13,fontWeight:600,fontFamily:"inherit",whiteSpace:"nowrap"}}>Sign in</button>
-    ));
+    // Nov 9: the account button lives only in /nav.js now (your picture / "Sign in"). The homepage used to add its own,
+    // which on phones showed a second "Sign in" next to your picture while sign-in was still loading.
     return (<>
-      {slot?ReactDOM.createPortal(acct,slot):null}
       {saveNote&&<div role="status" style={{position:"fixed",left:"50%",bottom:22,transform:"translateX(-50%)",background:"#060A2C",color:"#fff",padding:"10px 16px",borderRadius:10,fontSize:13.5,fontWeight:500,zIndex:2000,maxWidth:"90vw",boxShadow:"0 6px 20px rgba(0,0,0,.25)"}}>{saveNote}</div>}
     </>);
   };

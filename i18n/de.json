@@ -1387,7 +1387,20 @@
   "Showing the 30 closest matches. Add a school or major to narrow it down.": "Die 30 besten Treffer. Füg Hochschule oder Fach hinzu, um einzugrenzen.",
   "Search jobs, companies or people": "Jobs, Unternehmen oder Personen suchen",
   "Jobs and internships": "Jobs und Praktika",
-  "Every dot is a real job or internship": "Jeder Punkt ist ein echter Job oder ein echtes Praktikum"
+  "Every dot is a real job or internship": "Jeder Punkt ist ein echter Job oder ein echtes Praktikum",
+  "Your main school. Students at the same school and major are your inner orbit.": "Deine Haupthochschule. Studierende an derselben Hochschule im selben Fach sind dein innerer Orbit.",
+  "Start typing, e.g. Virginia Tech": "Tipp los, z. B. Virginia Tech",
+  "Term": "Semester",
+  "Graduation term": "Abschlusssemester",
+  "Spring": "Frühling",
+  "Summer": "Sommer",
+  "Fall": "Herbst",
+  "Winter": "Winter",
+  "Degree": "Abschlussart",
+  "Major or field": "Fach oder Bereich",
+  "+ Add another school": "+ Weitere Hochschule hinzufügen",
+  "Not listed — type it": "Nicht dabei – eintippen",
+  "Pick your school from the list to get its majors.": "Wähle deine Hochschule aus der Liste, um ihre Fächer zu sehen."
  },
  "patterns": [
   [
@@ -1677,6 +1690,14 @@
   [
    "^([\\d,]+) jobs and internships on the map$",
    "$1 Jobs und Praktika auf der Karte"
+  ],
+  [
+   "^([\\d,]+) majors offered there \\(US Dept\\. of Education data\\)\\.$",
+   "$1 Studienfächer dort (Daten des US-Bildungsministeriums)."
+  ],
+  [
+   "^(Spring|Summer|Fall|Winter) (\\d{4})$",
+   "$1 $2"
   ]
  ]
 }

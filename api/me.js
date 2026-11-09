@@ -199,6 +199,9 @@ function cleanProfile(p) {
   return {
     name: txt(p.name, 80), headline: txt(p.headline, 140), school: txt(p.school, 100), major: txt(p.major, 80),
     gradYear: Number.isInteger(year) && year >= 2020 && year <= 2040 ? year : null,
+    gradTerm: ["Spring", "Summer", "Fall", "Winter"].includes(p.gradTerm) ? p.gradTerm : null,    // Nov 9: December grads pick Winter/Fall
+    schoolId: Number.isInteger(+p.schoolId) && +p.schoolId >= 100000 && +p.schoolId <= 999999 ? +p.schoolId : null,   // IPEDS id (schools/index.json)
+    education: arr(p.education, 20).map((x) => ({ school: txt(x?.school, 100), degree: txt(x?.degree, 60), major: txt(x?.major, 80), when: txt(x?.when, 40) })).filter((x) => x.school).slice(0, 5),
     location: txt(p.location, 80), lookingFor: txt(p.lookingFor, 140), about: txt(p.about, 1200),
     skills: [...new Set(arr(p.skills, 30).map((x) => txt(x, 40)).filter(Boolean))],
     experience: arr(p.experience, 10).map((x) => ({ title: txt(x?.title, 100), org: txt(x?.org, 100), when: txt(x?.when, 40), desc: txt(x?.desc, 600) })).filter((x) => x.title || x.org),

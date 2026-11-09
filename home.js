@@ -1,4 +1,4 @@
-/* built from src/home.jsx 9e01569e6e5a91df — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx c4a8d75fc0436cbd — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -1842,7 +1842,7 @@ function fieldForMajor(major) {
 function skillsForMajor(major) {
   return SKILLS_BY_FIELD[fieldForMajor(major)] || SKILLS_BY_FIELD.default;
 }
-const GRAD_YEARS = ["May 2025", "Dec 2025", "May 2026", "Dec 2026", "May 2027", "Dec 2027", "May 2028", "Dec 2028", "May 2029", "Dec 2029", "May 2030", "Dec 2030", "Graduate Student"];
+const GRAD_YEARS = ["May 2026", "Dec 2026", "May 2027", "Dec 2027", "May 2028", "Dec 2028", "May 2029", "Dec 2029", "May 2030", "Dec 2030", "Graduate Student"];
 const GPA_OPTS = ["4.0", "3.7–3.9", "3.5–3.6", "3.0–3.4", "2.5–2.9", "Below 2.5"];
 const TYPE_OPTS = ["Any", "Hybrid", "In-person", "Remote"];
 const TERM_OPTS = ["Summer 2026", "Fall 2026", "Spring 2027", "Summer 2027"];
@@ -7915,41 +7915,7 @@ function App() {
     }, "I sent it \u2014 mark as followed up \u2713")) : null));
   };
   const Nav = () => {
-    const slot = typeof document !== "undefined" ? document.getElementById("btpRight") : null;
-    const acct = clerkUser ? React.createElement("button", {
-      onClick: () => {
-        window.location.href = "/u/";
-      },
-      title: clerkUser.primaryEmailAddress?.emailAddress || "Account",
-      "aria-label": "Your profile",
-      style: {
-        background: "#B0F701",
-        border: "none",
-        color: "#060A2C",
-        width: 30,
-        height: 30,
-        borderRadius: 8,
-        cursor: "pointer",
-        fontSize: 13,
-        fontWeight: 700,
-        fontFamily: "inherit"
-      }
-    }, (clerkUser.firstName || clerkUser.primaryEmailAddress?.emailAddress || "U").charAt(0).toUpperCase()) : React.createElement("button", {
-      onClick: openSignIn,
-      style: {
-        background: "#B0F701",
-        border: "1px solid #B0F701",
-        color: "#060A2C",
-        padding: "6px 12px",
-        borderRadius: 7,
-        cursor: "pointer",
-        fontSize: 13,
-        fontWeight: 600,
-        fontFamily: "inherit",
-        whiteSpace: "nowrap"
-      }
-    }, "Sign in");
-    return React.createElement(React.Fragment, null, slot ? ReactDOM.createPortal(acct, slot) : null, saveNote && React.createElement("div", {
+    return React.createElement(React.Fragment, null, saveNote && React.createElement("div", {
       role: "status",
       style: {
         position: "fixed",

@@ -1387,7 +1387,20 @@
   "Showing the 30 closest matches. Add a school or major to narrow it down.": "De 30 beste resultaten. Voeg een school of studie toe om te verfijnen.",
   "Search jobs, companies or people": "Zoek vacatures, bedrijven of mensen",
   "Jobs and internships": "Vacatures en stages",
-  "Every dot is a real job or internship": "Elke stip is een echte baan of stage"
+  "Every dot is a real job or internship": "Elke stip is een echte baan of stage",
+  "Your main school. Students at the same school and major are your inner orbit.": "Je hoofdschool. Studenten op dezelfde school met dezelfde studie vormen je binnenste baan.",
+  "Start typing, e.g. Virginia Tech": "Begin te typen, bijv. Virginia Tech",
+  "Term": "Periode",
+  "Graduation term": "Afstudeerperiode",
+  "Spring": "Voorjaar",
+  "Summer": "Zomer",
+  "Fall": "Najaar",
+  "Winter": "Winter",
+  "Degree": "Graad",
+  "Major or field": "Studie of vakgebied",
+  "+ Add another school": "+ Nog een school toevoegen",
+  "Not listed — type it": "Staat er niet bij: typ het",
+  "Pick your school from the list to get its majors.": "Kies je school uit de lijst om de studies te zien."
  },
  "patterns": [
   [
@@ -1677,6 +1690,14 @@
   [
    "^([\\d,]+) jobs and internships on the map$",
    "$1 vacatures en stages op de kaart"
+  ],
+  [
+   "^([\\d,]+) majors offered there \\(US Dept\\. of Education data\\)\\.$",
+   "$1 studies aangeboden (gegevens van het Amerikaanse ministerie van Onderwijs)."
+  ],
+  [
+   "^(Spring|Summer|Fall|Winter) (\\d{4})$",
+   "$1 $2"
   ]
  ]
 }
