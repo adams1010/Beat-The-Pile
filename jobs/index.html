@@ -285,7 +285,7 @@
   // Majors (keys from lib/fields.js; "eng" = the engineering view, "all" = everything). tests/fields-test.mjs checks this list.
   const MAJOR_KEYS = [...document.querySelectorAll("#majorSel option")].map((o) => o.value);
   const MAJOR_LABEL = () => state.major === "all" ? "every major" : (document.querySelector(`#majorSel option[value="${state.major}"]`)?.textContent || "");
-  const STRICT_OK = () => state.major === "eng" || state.major === "mechanical";
+  const STRICT_OK = () => state.major === "mechanical";   // Nov 10: not under general Engineering — only Mechanical
   const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k, v){ try { localStorage.setItem(k, v); } catch {} } };
   function defaultMajor(){
     const saved = store.get("btp_major"); if (saved && MAJOR_KEYS.includes(saved)) return saved;
