@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Beat the Pile Tour</title>
-<meta name="description" content="A guided, hands-on tour of every Beat the Pile feature: live internships for every major, company pages, weekly alerts, resume tailoring, Career Fair Mode, My Season, Opening Radar, interview practice and your profile.">
+<meta name="description" content="A hands-on tour of Beat the Pile: internships and entry-level jobs for every major, jobs near your school, company pages, weekly alerts, resume tailoring, Career Fair Mode, My Season, interview practice for any company, Orbit, My Internship, Opening Radar and your profile.">
 <link rel="canonical" href="https://www.beatthepile.com/demo/">
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#060A2C">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
-<link rel="icon" href="/icons/icon-192.png">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{--green:#4A7000;--green-dark:#3A5A00;--green-light:#F2FADF;--mint:#B0F701;--navy:#060A2C;--navy2:#0E1440;--line2:#22304D;
@@ -160,6 +160,16 @@
   @media (max-width:600px){.finale{grid-template-columns:repeat(2,minmax(0,1fr))}}
   .fz{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 11px;font-size:12.5px;color:var(--muted);text-decoration:none;display:block;transition:border-color .2s}
   .fz:hover{border-color:var(--green)}.fz b{display:block;color:var(--ink);font-size:13.5px;margin-bottom:2px}.fz b::before{content:"✓ ";color:var(--green)}
+  .kd{display:flex;gap:0;border:1px solid #C9D1DE;border-radius:999px;overflow:hidden;width:max-content;margin:0 0 12px}.kd button{border:0;background:#fff;font:inherit;font-size:13px;font-weight:500;padding:6px 12px;cursor:pointer;color:var(--ink)}.kd button[aria-pressed="true"]{background:var(--navy);color:#fff}
+  .ft{font-size:11px;font-weight:600;color:var(--green-dark);background:var(--green-light);border-radius:999px;padding:1px 8px;margin-left:6px}
+  .mi{font-size:12px;font-weight:600;color:var(--green-dark)}
+  .inp{width:100%;font:inherit;font-size:14px;border:1px solid #C9D1DE;border-radius:10px;padding:9px 11px;color:var(--ink);background:#fff}
+  .dd{border:1px solid var(--line);border-radius:10px;background:#fff;margin-top:4px;overflow:hidden;box-shadow:0 10px 24px rgba(6,10,44,.08)}.dd div{padding:8px 11px;font-size:13.5px;cursor:pointer}.dd div:first-child{background:var(--green-light)}.dd small{display:block;color:var(--muted);font-size:11.5px}
+  .prac{margin-top:8px;border:1px solid #DDD6FE;border-radius:10px;background:#F7F5FF;padding:8px 10px;font-size:12px}.prac b{color:#4C1D95;display:block;margin-bottom:6px}
+  .orb{width:100%;max-width:330px;display:block;margin:0 auto}.orb .p{cursor:pointer}
+  .leg{display:grid;gap:6px;font-size:12.5px}.leg div{display:flex;align-items:center;gap:8px}.leg i{width:10px;height:10px;border-radius:50%;border:2px solid}
+  .chk{display:flex;gap:8px;align-items:flex-start;font-size:13px;padding:6px 0;border-top:1px solid #EEF1F6}.chk i{flex:none;width:16px;height:16px;border-radius:5px;border:1.5px solid #B9C3D3;margin-top:1px}.chk.ok i{background:var(--green);border-color:var(--green)}.chk.ok span{color:var(--muted);text-decoration:line-through}
+  .phase{font-size:11.5px;font-weight:600;color:var(--muted);margin:8px 0 2px}
   @media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 </style>
 </head>
@@ -196,9 +206,9 @@
   const LABEL = Object.fromEntries(MAJORS);
 
   // ── shared state (live data where it exists) ──
-  const D = { major: "mechanical", jobs: [], byField: {}, radar: null, job: null, followed: false, alerts: false, route: [], rec: "Jordan", tailored: null };
+  const D = { kind: "intern", major: "mechanical", jobs: [], byField: {}, radar: null, job: null, followed: false, alerts: false, route: [], rec: "Jordan", tailored: null };
   async function loadJobs() {
-    try { const r = await fetch(`/api/listings?field=${D.major}&limit=60`); const d = await r.json(); D.jobs = (d.listings || d || []).filter((j) => !j.closed_at).sort((a, b) => Date.parse(b.first_seen) - Date.parse(a.first_seen)); } catch { D.jobs = []; }
+    try { const r = await fetch(`/api/listings?field=${D.major}&kind=${D.kind === "fulltime" ? "fulltime" : "intern"}&limit=60`); const d = await r.json(); D.jobs = (d.listings || d || []).filter((j) => !j.closed_at).sort((a, b) => Date.parse(b.first_seen) - Date.parse(a.first_seen)); } catch { D.jobs = []; }
   }
   fetch("/api/listings?summary=1").then((r) => r.json()).then((d) => { D.byField = d.byField || {}; D.boards = d.companies || d.boards; }).catch(() => {});
   const jobsReady = loadJobs();
@@ -211,16 +221,17 @@
   const ch = (o) => CH.push(o);
 
   ch({ key: "find", label: "Find", url: "/jobs", title: "Every internship, straight from the source.",
-    line: "Real, open internships for every major, pulled from 3,000+ companies' own job boards. No reposts, no recruiters.",
-    real: "Live data", steps: [["[data-m]", "Pick a major", "below"], [".job", "Tap an internship"], ["#save", "Save it"]],
+    line: "Real, open internships and entry-level jobs for every major, pulled from thousands of companies' own job boards. No reposts, no recruiters.",
+    real: "Live data", steps: [["[data-m]", "Pick a major", "below"], ["[data-kind='fulltime']", "See full-time jobs too", "below"], [".job", "Tap a job"], ["#save", "Save it"]],
     async mount(v) {
-      v.innerHTML = `<p class="h">Internships</p><p class="sub" id="cnt">Loading live listings…</p>
+      v.innerHTML = `<p class="h">Jobs</p><p class="sub" id="cnt">Loading live listings…</p>
+        <div class="kd" role="group" aria-label="Kind"><button data-kind="intern" aria-pressed="${D.kind !== "fulltime"}">Internships</button><button data-kind="fulltime" aria-pressed="${D.kind === "fulltime"}">Full-time</button></div>
         <div class="pills">${MAJORS.map(([k, l]) => `<button class="pill" data-m="${k}" aria-pressed="${k === D.major}">${l}</button>`).join("")}</div>
         <div class="stack" id="list">${'<div class="skel"></div>'.repeat(3)}</div>`;
       const draw = () => {
-        const n = D.byField[D.major]; $("cnt").textContent = `${n ? n.toLocaleString() + " live " : ""}${LABEL[D.major]} internships · newest first`;
+        const n = D.kind === "fulltime" ? null : D.byField[D.major]; $("cnt").textContent = `${n ? n.toLocaleString() + " live " : ""}${LABEL[D.major]} ${D.kind === "fulltime" ? "entry-level jobs" : "internships"} · newest first${D.boards ? ` · from ${Number(D.boards).toLocaleString()} companies' own boards` : ""}`;
         $("list").innerHTML = D.jobs.slice(0, 5).map((j, i) => `<div class="card job fade" style="animation-delay:${i * 60}ms" data-id="${esc(j.id)}">
-          <div class="t">${esc(nice(j.title))}</div><div class="co"><span class="lg" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</span>${esc(j.company)} · ${esc(j.location || "US")}</div>
+          <div class="t">${esc(nice(j.title))}${D.kind === "fulltime" ? '<span class="ft">Full-time</span>' : ""}</div><div class="co"><span class="lg" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</span>${esc(j.company)} · ${esc(j.location || "US")}</div>
           <div class="found">Found ${esc(ago(j.first_seen))} on ${esc(j.company)}'s own job board</div></div>`).join("") || `<div class="card">Live jobs didn't load. <a href="/jobs/">Open the jobs page</a></div>`;
         v.querySelectorAll(".job").forEach((el) => el.onclick = () => {
           if (el.querySelector(".acts")) return;
@@ -230,7 +241,23 @@
         });
       };
       await jobsReady; draw();
+      v.querySelectorAll("[data-kind]").forEach((b) => b.onclick = async () => { D.kind = b.dataset.kind; v.querySelectorAll("[data-kind]").forEach((x) => x.setAttribute("aria-pressed", x === b)); $("list").innerHTML = '<div class="skel"></div>'.repeat(3); await loadJobs(); D.job = null; draw(); });
       v.querySelectorAll("[data-m]").forEach((b) => b.onclick = async () => { D.major = b.dataset.m; v.querySelectorAll("[data-m]").forEach((x) => x.setAttribute("aria-pressed", x === b)); $("list").innerHTML = '<div class="skel"></div>'.repeat(3); await loadJobs(); D.job = null; draw(); });
+    } });
+
+  ch({ key: "near", label: "Near you", url: "/jobs/?near=Blacksburg, VA", title: "Only jobs you can actually get to.",
+    line: "Type your school's city or ZIP. You get openings within 50 miles, nearest first, measured city to city. Remote roles are counted separately.",
+    real: "Live data", steps: [["#nearGo", "Search near Blacksburg"]],
+    mount(v) {
+      v.innerHTML = `<p class="h">Near you</p><p class="sub">Every major · within 50 miles</p>
+        <div class="row" style="flex-wrap:nowrap"><input class="inp" id="nearQ" value="Blacksburg, VA" aria-label="City, state or ZIP"><button class="b go" id="nearGo">Search</button></div><div class="stack" id="nearL" style="margin-top:10px"></div>`;
+      $("nearGo").onclick = async () => {
+        $("nearL").innerHTML = '<div class="skel"></div>'.repeat(3);
+        let d = null; try { d = await (await fetch(`/api/listings?near=${encodeURIComponent($("nearQ").value)}&mi=50&field=all&limit=5&offset=0`)).json(); } catch {}
+        const L = (d && d.listings) || [];
+        $("nearL").innerHTML = L.length ? `<div class="sub" style="margin:0">${(d.meta && d.meta.count || L.length).toLocaleString()} open within 50 mi · nearest first</div>` + L.map((j, i) => `<div class="card fade" style="animation-delay:${i * 60}ms"><div class="t" style="font-weight:600;font-size:14px">${esc(nice(j.title))}</div><div class="co"><span class="lg" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</span>${esc(j.company)} · ${esc(j.location || "")}</div><div class="mi">${j.mi <= 1 ? "In town" : j.mi + " mi away"}</div></div>`).join("")
+          : `<div class="card">Nearby jobs didn't load. <a href="/jobs/">Open the jobs page</a></div>`;
+      };
     } });
 
   ch({ key: "company", label: "Company pages", url: () => `/c/${theJob().company_id || "company"}`, title: "Know a company before you apply.",
@@ -356,18 +383,79 @@ Thanks again,
 
   ch({ key: "season", label: "My Season", url: "/season", title: "Your whole season, organized.",
     line: "Every job you save and apply to, in one place. A weekly goal keeps you moving, and it tracks how fast you apply.",
-    real: "Your saved job + example entries", steps: [["#applied", "Mark it applied"]],
+    real: "Your saved job + example entries", steps: [["#applied", "Mark it applied"], ["#gotint", "Got an interview? Tap it"]],
     mount(v) {
       const j = theJob();
       v.innerHTML = `<div class="row" style="justify-content:space-between;margin-bottom:10px"><div><p class="h" style="margin:0">My Season</p><div class="sub" style="margin:2px 0 0">This week's goal</div></div><div class="ring" id="ring" style="--p:40"><i id="ringn">2/5</i></div></div>
         <div class="kan"><div class="col"><h4>Saved <span>1</span></h4><div class="kc fade" id="kj"><b>${esc(nice(j.title))}</b>${esc(j.company)}<br><button class="b go" id="applied">Mark applied</button></div></div>
         <div class="col" id="colA"><h4>Applied <span id="na">2</span></h4><div class="kc"><b>Design Intern</b>Example Co <span class="ex">Example</span></div><div class="kc"><b>Field Engineering Co-op</b>Example Inc <span class="ex">Example</span></div></div>
-        <div class="col"><h4>Interview <span>1</span></h4><div class="kc"><b>Project Intern</b>Example Group <span class="ex">Example</span></div></div></div>`;
+        <div class="col" id="colI"><h4>Interview <span id="ni">1</span></h4><div class="kc"><b>Project Intern</b>Example Group <span class="ex">Example</span></div></div></div>`;
       $("applied").onclick = () => {
         const k = $("kj"); k.querySelector("button").remove(); k.insertAdjacentHTML("beforeend", `<div style="color:var(--green-dark);font-weight:600;margin-top:4px">Early bird: applied fast</div>`);
         $("colA").insertBefore(k, $("colA").children[1]); k.classList.remove("fade"); void k.offsetWidth; k.classList.add("fade");
         $("na").textContent = "3"; $("ring").style.setProperty("--p", 60); $("ringn").textContent = "3/5";
+        k.insertAdjacentHTML("beforeend", `<button class="b" id="gotint" style="margin-top:6px">Got an interview</button>`);
+        $("gotint").onclick = () => {
+          $("gotint").remove(); $("colI").insertBefore(k, $("colI").children[1]); $("na").textContent = "2"; $("ni").textContent = "2";
+          k.insertAdjacentHTML("beforeend", `<div class="prac fade"><b>Practice this interview</b>Type: Mixed ▾<br><a class="b go" href="/?company=${encodeURIComponent(j.company)}&role=${encodeURIComponent(nice(j.title))}#interview" style="min-height:28px;padding:4px 10px;font-size:12px;margin-top:6px">Start practice with ${esc(j.company)} →</a></div>`);
+        };
       };
+    } });
+
+  ch({ key: "interview", label: "Interview practice", url: "/#interview", title: "Practice for the company you're interviewing with.",
+    line: "Type any company, even by its nickname or ticker. You get a quick brief, then questions about that company, a timer, and a grade on every answer.",
+    real: "Real company list · example round", steps: [["#coQ", "Type a company"], ["[data-co]", "Pick it"], ["#ans", "Start answering"]],
+    mount(v) {
+      v.innerHTML = `<div class="card fade"><label for="coQ" style="font-size:12.5px;color:var(--muted)">Company</label><input class="inp" id="coQ" placeholder="Start typing, e.g. SAP or Lockheed Martin" autocomplete="off"><div id="coL"></div><div id="ivB"></div></div><div id="ivQ"></div><div id="gr"></div>`;
+      let names = null; const loadN = async () => { if (!names) { try { names = await (await fetch("/companies/names.json")).json(); } catch { names = [["SAP", "SAP SE", "Systems, Applications and Products in Data Processing"]]; } } return names; };
+      $("coQ").onclick = $("coQ").onfocus = async () => {
+        if ($("coQ").value) return; await typeInto($("coQ"), "sap");
+        const n = await loadN(), q = "sap", hits = n.filter((r) => r.some((x) => x.toLowerCase() === q)).concat(n.filter((r) => r[0].toLowerCase().startsWith(q) && r[0].toLowerCase() !== q)).slice(0, 4);
+        $("coL").innerHTML = `<div class="dd fade">${hits.map((r, i) => `<div data-co="${i}">${esc(r[0])}${r.length > 1 ? `<small>${esc(r.slice(1, 3).join(" · "))}</small>` : ""}</div>`).join("")}</div>`;
+        $("coL").querySelectorAll("[data-co]").forEach((d) => d.onclick = () => {
+          const r = hits[+d.dataset.co]; $("coQ").value = r[0]; $("coL").innerHTML = "";
+          $("ivB").innerHTML = r[0] === "SAP" ? `<div class="card fade" style="margin-top:10px;background:#F7F9FC"><b style="font-size:13.5px">About SAP</b><div style="font-size:13px;margin-top:4px">SAP makes business software companies use to run finance, supply chain, HR and sales.</div><div style="font-size:11.5px;color:var(--muted);margin-top:6px">AI summary to help you prep <span class="ex">Example</span></div></div>` : "";
+          $("ivQ").innerHTML = `<div class="card fade" style="margin-top:10px"><div style="font-size:12px;color:var(--muted)">Question 1 of 5 · ${esc(r[0])} <span class="ex">Example</span></div><div style="font-weight:600;font-size:15.5px;margin:6px 0 12px">"Why ${esc(r[0])}? Which part of what ${esc(r[0])} does would you most want to work on?"</div>
+            <div class="row" style="gap:16px"><div class="timer" id="tm" style="--p:0"><span id="tt">1:30</span></div><div style="flex:1;min-width:150px;font-size:13px;color:var(--muted)">You answer out loud. It listens and transcribes.</div></div><div class="acts"><button class="b go" id="ans">Start answering</button></div></div>`;
+          $("ans").onclick = async () => {
+            $("ans").className = "b on"; $("ans").textContent = "Listening…";
+            for (let s2 = 0; s2 <= 72; s2 += 6) { $("tm").style.setProperty("--p", s2 / 90 * 100); const l = 90 - s2; $("tt").textContent = `${Math.floor(l / 60)}:${String(l % 60).padStart(2, "0")}`; await sleep(reduce ? 0 : 90); }
+            $("ans").textContent = "✓ Answer done";
+            $("gr").innerHTML = `<div class="card fade" style="margin-top:10px"><div class="gr"><div class="grade">B+</div><div class="bars">${[["Relevance", 4], ["Structure", 4], ["Specifics", 3], ["Delivery", 4]].map(([k, n2]) => `<div><span>${k}</span><s><i data-w="${n2 * 20}"></i></s><span>${n2}/5</span></div>`).join("")}</div></div>
+              <div style="font-size:12.5px;color:var(--muted);margin-top:8px">Tip: name the product or team you mean, and one thing you've done that fits it. <span class="ex">Example</span></div></div>`;
+            await sleep(30); $("gr").querySelectorAll("[data-w]").forEach((i) => i.style.width = i.dataset.w + "%");
+          };
+        });
+      };
+    } });
+
+  ch({ key: "orbit", label: "Orbit", url: "/orbit", title: "Your people, around your search.",
+    line: "You're in the middle. Classmates in your major, others at your school, and students who interned where you're aiming. Join each other's orbit and message.",
+    real: "Example people", steps: [["[data-pp='0']", "Tap a classmate"], ["#joinO", "Join their orbit"]],
+    mount(v) {
+      const P = [["JL", 150, 70, "Jordan Lee", "Mechanical Engineering · Virginia Tech · 2027", "#B0F701"], ["SP", 228, 168, "Sam Patel", "Mechanical Engineering · Virginia Tech · 2026", "#B0F701"], ["MR", 62, 210, "Maya Ross", "Finance · Virginia Tech · 2027", "#7FB2FF"], ["DK", 268, 92, "Dev Kim", "Interned at Example Aerospace", "#FFB86B"]];
+      v.innerHTML = `<div class="row" style="align-items:flex-start;gap:14px"><div style="flex:1;min-width:230px;background:var(--navy);border-radius:12px;padding:10px">
+        <svg class="orb" viewBox="0 0 330 290" aria-label="Your orbit"><circle cx="165" cy="145" r="60" fill="none" stroke="#B0F701" stroke-opacity=".5"/><circle cx="165" cy="145" r="95" fill="none" stroke="#7FB2FF" stroke-opacity=".4"/><circle cx="165" cy="145" r="130" fill="none" stroke="#FFB86B" stroke-opacity=".35"/>
+          <circle cx="165" cy="145" r="22" fill="#B0F701"/><text x="165" y="150" text-anchor="middle" font-size="13" font-weight="700" fill="#060A2C">You</text>
+          ${P.map(([i, x, y, , , c], k) => `<g class="p" data-pp="${k}"><circle cx="${x}" cy="${y}" r="17" fill="#13223B" stroke="${c}" stroke-width="2"/><text x="${x}" y="${y + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${i}</text></g>`).join("")}</svg></div>
+        <div style="flex:1;min-width:200px"><div class="leg"><div><i style="border-color:#fff"></i>In orbit · people who joined yours</div><div><i style="border-color:#B0F701"></i>Inner orbit · your major, your school</div><div><i style="border-color:#7FB2FF"></i>Campus · other majors at your school</div><div><i style="border-color:#FFB86B"></i>Insiders · interned where you're aiming</div></div><div id="pc" style="margin-top:10px"></div></div></div>`;
+      v.querySelectorAll("[data-pp]").forEach((g) => g.onclick = () => { const p = P[+g.dataset.pp];
+        $("pc").innerHTML = `<div class="card fade"><b>${esc(p[3])}</b> <span class="ex">Example</span><div style="font-size:12.5px;color:var(--muted);margin-top:2px">${esc(p[4])}</div><div class="acts"><button class="b go" id="joinO">Join orbit</button></div></div>`;
+        $("joinO").onclick = () => { $("joinO").className = "b on"; $("joinO").textContent = "✓ Orbit requested"; $("joinO").insertAdjacentHTML("afterend", `<span style="font-size:12px;color:var(--muted);align-self:center">Once they accept, you can message.</span>`); };
+      });
+    } });
+
+  ch({ key: "internship", label: "My Internship", url: "/internship", title: "Got the offer? Here's what to do next.",
+    line: "A dated checklist from offer to last day, a countdown to your start, and a weekly log that turns into resume bullets.",
+    real: "Example internship", steps: [["#logW", "Log your week"]],
+    mount(v) {
+      const j = theJob();
+      v.innerHTML = `<div class="card fade"><div class="row" style="justify-content:space-between"><div><b>${esc(nice(j.title))}</b><div class="sub" style="margin:2px 0 0">${esc(j.company)} <span class="ex">Example</span></div></div><div style="text-align:right"><b style="font-size:22px">41</b><div style="font-size:11.5px;color:var(--muted)">days to start</div></div></div>
+        <div class="phase">After the offer</div><div class="chk ok"><i></i><span>Accept the offer in writing</span></div><div class="chk ok"><i></i><span>Finish the background check and paperwork</span></div>
+        <div class="phase">2 weeks before</div><div class="chk"><i></i><span>Plan your commute and first-day outfit</span></div><div class="chk"><i></i><span>Message your manager to say hi</span></div></div>
+        <div class="card fade" style="margin-top:10px"><b style="font-size:13.5px">Weekly log</b><div style="font-size:13px;color:var(--muted);margin:4px 0 8px">Week 3: built a test fixture in SolidWorks, ran 40 load tests, wrote up results for the team.</div><button class="b go" id="logW">Turn it into resume bullets</button><div id="bul"></div></div>`;
+      $("logW").onclick = () => { $("logW").className = "b on"; $("logW").textContent = "✓ Bullets ready";
+        $("bul").innerHTML = `<div class="fade" style="font-size:13px;margin-top:8px;display:grid;gap:4px"><div>• Designed a load-test fixture in SolidWorks used for 40 tests</div><div>• Wrote up test results that the team used to choose a design</div><div style="font-size:11.5px;color:var(--faint)">AI suggestion <span class="ex">Example</span> · check every line is true</div></div>`; };
     } });
 
   ch({ key: "radar", label: "Opening Radar", url: "/radar", title: "Know when applications open.",
@@ -382,42 +470,33 @@ Thanks again,
       v.querySelectorAll("[data-rm]").forEach((b) => b.onclick = () => { b.className = "b on"; b.textContent = "✓ A week before"; });
     } });
 
-  ch({ key: "interview", label: "Interview practice", url: "/#interview", title: "Practice the interview out loud.",
-    line: "Real interview questions, a timer like the real thing, and a grade on every answer: relevance, structure, specifics, delivery.",
-    real: "Example round", steps: [["#ans", "Start answering"]],
+  ch({ key: "profile", label: "Profile", url: "/start", title: "Sign up in a minute. Your classmates find you.",
+    line: "Pick your school from the list, not a blank box, so \"Virginia Tech\" and \"Virginia Polytechnic\" land in the same orbit. Your profile is public from day one, and you can switch it to private anytime.",
+    real: "Real school list · example profile", steps: [["#sch", "Type your school"], ["[data-sc]", "Pick it"], ["#share", "Share your profile"]],
     mount(v) {
-      const j = theJob();
-      v.innerHTML = `<div class="card fade"><div style="font-size:12px;color:var(--muted)">Question 2 of 5 · ${esc(j.company)}</div><div style="font-weight:600;font-size:16px;margin:6px 0 12px">"Tell me about a time something you built didn't work the first time."</div>
-        <div class="row" style="gap:16px"><div class="timer" id="tm" style="--p:0"><span id="tt">1:30</span></div><div style="flex:1;min-width:160px;font-size:13px;color:var(--muted)">You answer out loud. It listens and transcribes.</div></div><div class="acts"><button class="b go" id="ans">Start answering</button></div></div><div id="gr"></div>`;
-      $("ans").onclick = async () => {
-        $("ans").className = "b on"; $("ans").textContent = "Listening…";
-        for (let s = 0; s <= 72; s += 6) { $("tm").style.setProperty("--p", s / 90 * 100); const l = 90 - s; $("tt").textContent = `${Math.floor(l / 60)}:${String(l % 60).padStart(2, "0")}`; await sleep(reduce ? 0 : 90); }
-        $("ans").textContent = "✓ Answer done";
-        $("gr").innerHTML = `<div class="card fade" style="margin-top:10px"><div class="gr"><div class="grade">B+</div><div class="bars">${[["Relevance", 4], ["Structure", 4], ["Specifics", 3], ["Delivery", 4]].map(([k, n]) => `<div><span>${k}</span><s><i data-w="${n * 20}"></i></s><span>${n}/5</span></div>`).join("")}</div></div>
-          <div style="font-size:12.5px;color:var(--muted);margin-top:8px">Tip: name the number. How much lighter, faster or cheaper did the fix make it? <span class="ex">Example</span></div></div>`;
-        await sleep(30); $("gr").querySelectorAll("[data-w]").forEach((i) => i.style.width = i.dataset.w + "%");
+      v.innerHTML = `<div class="card fade"><label for="sch" style="font-size:12.5px;color:var(--muted)">School</label><input class="inp" id="sch" placeholder="Start typing, e.g. Virginia Tech" autocomplete="off"><div id="scL"></div></div><div id="pf"></div>`;
+      $("sch").onclick = $("sch").onfocus = async () => {
+        if ($("sch").value) return; await typeInto($("sch"), "virginia tech");
+        $("scL").innerHTML = `<div class="dd fade"><div data-sc="1">Virginia Polytechnic Institute and State University<small>Blacksburg, VA · also known as Virginia Tech</small></div></div>`;
+        $("scL").querySelector("[data-sc]").onclick = () => {
+          $("sch").value = "Virginia Polytechnic Institute and State University"; $("scL").innerHTML = "";
+          $("pf").innerHTML = `<div class="card prof fade" style="margin-top:10px"><div class="band"></div><div class="row" style="justify-content:space-between;align-items:flex-end"><div class="av">AR</div><div class="row"><button class="b" id="share">Share</button></div></div>
+            <div style="font-weight:700;font-size:17px;margin-top:6px">Alex Rivera <span class="ex">Example</span></div><div style="font-size:13px;color:var(--muted)">${esc(LABEL[D.major])} · Virginia Tech · Spring 2028</div>
+            <div class="chips" style="margin-top:10px"><span>SolidWorks</span><span>MATLAB</span><span>Excel</span></div>
+            <div id="sh" style="font-size:12.5px;margin-top:10px;color:var(--green-dark);font-weight:600">Public · shown to classmates in Orbit</div></div>`;
+          $("share").onclick = () => { $("share").className = "b on"; $("share").textContent = "✓ Link copied"; $("sh").textContent = "Public · beatthepile.com/u/alex-rivera"; };
+        };
       };
     } });
 
-  ch({ key: "profile", label: "Profile", url: "/u/you", title: "A profile recruiters can actually find.",
-    line: "Your photo, experience, projects and skills on one clean page. Private until you turn it on, then share it with one tap.",
-    real: "Example profile", steps: [["#share", "Share your profile"]],
-    mount(v) {
-      v.innerHTML = `<div class="card prof fade"><div class="band"></div><div class="row" style="justify-content:space-between;align-items:flex-end"><div class="av">AR</div><div class="row"><button class="b" id="share">Share</button></div></div>
-        <div style="font-weight:700;font-size:17px;margin-top:6px">Alex Rivera <span class="ex">Example</span></div><div style="font-size:13px;color:var(--muted)">${esc(LABEL[D.major])} · Virginia Tech · 2028</div>
-        <div style="font-size:13px;margin-top:10px"><b>Experience</b><br>Formula SAE · chassis team<br>Machine shop assistant</div>
-        <div class="chips" style="margin-top:10px"><span>SolidWorks</span><span>MATLAB</span><span>Excel</span></div>
-        <div id="sh" style="font-size:12.5px;color:var(--muted);margin-top:10px">Private · only you can see this</div></div>`;
-      $("share").onclick = () => { $("share").className = "b on"; $("share").textContent = "✓ Link copied"; $("sh").innerHTML = `<span style="color:var(--green-dark);font-weight:600">Public · beatthepile.com/u/alex-rivera</span>`; };
-    } });
-
   ch({ key: "finale", label: "Start", url: "/", title: "That's Beat the Pile.",
-    line: "Everything you just tried is free on the real site. Start with your major, or open any feature below.",
+    line: "Everything you just tried is on the real site. Start with your major, or open any feature below.",
     real: "", steps: [],
     mount(v) {
-      const F = [["Live internships", "/jobs/?major=" + D.major, "Every major, from company job boards"], ["Company pages", "/jobs/", "Roles, locations, opening dates"], ["Weekly email", "/jobs/", "New jobs, once a week"],
-        ["Tailor resume", "/jobs/", "On every job card"], ["Career Fair Mode", "/fair/", "Route, briefs, QR, notes"], ["Follow-ups", "/fair/", "Reminders + drafts"],
-        ["My Season", "/season/", "Pipeline + weekly goal"], ["Opening Radar", "/radar/", "When companies open"], ["Interview practice", "/#interview", "Out loud, graded"], ["Profile", "/u/", "Share one link"]];
+      const F = [["Internships + full-time", "/jobs/?major=" + D.major, "Every major, from company job boards"], ["Near you", "/jobs/?near=Blacksburg, VA", "Within 50 miles of your school"], ["Company pages", "/jobs/", "Roles, locations, opening dates"],
+        ["Weekly email", "/jobs/", "New jobs, once a week"], ["Tailor resume", "/jobs/", "On every job card"], ["Career Fair Mode", "/fair/", "Route, briefs, QR, notes, follow-ups"],
+        ["My Season", "/season/", "Pipeline, weekly goal, interview prep"], ["Interview practice", "/#interview", "Any company, out loud, graded"], ["Orbit", "/orbit/", "Classmates, insiders, messages"],
+        ["My Internship", "/internship/", "Checklist + resume bullets"], ["Opening Radar", "/radar/", "When companies open"], ["Profile", "/u/", "Your school, your link"]];
       v.innerHTML = `<div class="finale">${F.map(([t, h, s], i) => `<a class="fz fade" style="animation-delay:${i * 45}ms" href="${h}"><b>${t}</b>${s}</a>`).join("")}</div>
         <div class="acts" style="margin-top:14px;justify-content:center"><a class="b go" href="/jobs/?major=${D.major}" style="padding:12px 22px;font-size:15px">Start free →</a><button class="b" id="again">Replay the tour</button></div>`;
       $("again").onclick = () => engine.go(0);
@@ -492,7 +571,7 @@ Thanks again,
     cur.classList.add("on"); cur.style.left = r.left - w.left + Math.min(r.width / 2, 60) + "px"; cur.style.top = r.top - w.top + r.height / 2 + "px";
     await sleep(800); if (!engine.auto || t !== engine.token) return;
     const rp = document.createElement("div"); rp.className = "ripple"; rp.style.left = cur.style.left; rp.style.top = cur.style.top; win.append(rp); setTimeout(() => rp.remove(), 600);
-    el.click();
+    if (typeof el.click === "function") el.click(); else el.dispatchEvent(new MouseEvent("click", { bubbles: true }));   // SVG nodes (Orbit) have no .click()
   }
   engine.go = async (k) => {
     engine.token++; const t = engine.token;
