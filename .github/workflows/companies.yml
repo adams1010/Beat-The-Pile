@@ -1,0 +1,23 @@
+# On demand (Actions → companies → Run workflow): rebuild /companies/names.json — the Interview practice company lookup.
+# Every company listed with the SEC (public list of names + tickers) + every company we track + data/company-aliases.json.
+name: companies
+on: { workflow_dispatch: {} }
+permissions: { contents: write }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Download the SEC company list
+        run: curl -sfL --retry 3 -A "BeatThePile research reminders@beatthepile.com" -o /tmp/sec.json "https://www.sec.gov/files/company_tickers_exchange.json" || echo "SEC list unavailable"
+      - name: Build
+        run: node scripts/build-company-names.mjs /tmp/sec.json
+      - name: Commit if changed
+        run: |
+          git add companies/
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git config user.name "btp-companies"; git config user.email "companies@users.noreply.github.com"
+          git commit -m "Companies: rebuild lookup list" && git push
