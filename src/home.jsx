@@ -1024,9 +1024,12 @@ function InterviewSim({major,defaultCompany,defaultRole}){
   const SR=typeof window!=="undefined"?(window.SpeechRecognition||window.webkitSpeechRecognition):null;
   const canTalk=!!SR, canSpeak=typeof window!=="undefined"&&"speechSynthesis" in window;
   const ls={get(k){try{return localStorage.getItem(k);}catch(x){return null;}},set(k,v){try{localStorage.setItem(k,v);}catch(x){}}};
-  const [setup,setSetup]=React.useState({company:defaultCompany||"",role:defaultRole||(major?`${major.split(",")[0]} Intern`:"Summer Intern"),kind:"mixed",total:5,limit:90,mode:canTalk?"talk":"type",readAloud:canSpeak,
+  const [setup,setSetup]=React.useState({company:defaultCompany||"",role:defaultRole||(major?`${major.split(",")[0]} Intern`:"Summer Intern"),kind:(()=>{try{const k=new URLSearchParams(location.search).get("kind");return ["mixed","behavioral","technical"].includes(k)?k:"mixed";}catch(e){return "mixed";}})(),total:5,limit:90,mode:canTalk?"talk":"type",readAloud:canSpeak,
     voice:ls.get("btp_iv_voice")||"",rate:Number(ls.get("btp_iv_rate"))||1.15});
   const [voices,setVoices]=React.useState([]);
+  // Nov 10: the Company box suggests real companies hiring on Beat the Pile right now (type a few letters, pick one)
+  const [coNames,setCoNames]=React.useState([]);
+  React.useEffect(()=>{let on=true;fetch("/api/listings?names=1").then(r=>r.ok?r.json():null).then(j=>{if(on&&j&&Array.isArray(j.companies))setCoNames([...new Set(j.companies.map(c=>c.company).filter(Boolean))].sort((a,b)=>a.localeCompare(b)));}).catch(()=>{});return()=>{on=false;};},[]);
   React.useEffect(()=>{if(!canSpeak)return;const load=()=>setVoices(ivVoices());load();window.speechSynthesis.addEventListener?.("voiceschanged",load);
     return()=>window.speechSynthesis.removeEventListener?.("voiceschanged",load);},[]);
   const pickVoice=()=>{const all=voices.length?voices:ivVoices();return all.find(v=>v.voiceURI===setup.voice)||all[0]||null;};
@@ -1132,7 +1135,8 @@ function InterviewSim({major,defaultCompany,defaultRole}){
       {!started&&!busy?(
         <section style={{border:`1px solid ${IV.line}`,borderRadius:12,padding:"18px 18px 20px",background:"#fff"}}>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:"0 14px"}}>
-            <div><label style={label} htmlFor="ivCo">Company</label><input id="ivCo" style={field} value={setup.company} placeholder="e.g. Lockheed Martin" onChange={e=>setSetup(s=>({...s,company:e.target.value}))}/></div>
+            <div><label style={label} htmlFor="ivCo">Company</label><input id="ivCo" style={field} list="ivCos" autoComplete="off" value={setup.company} placeholder="Start typing, e.g. Lockheed Martin" onChange={e=>setSetup(s=>({...s,company:e.target.value}))}/>
+              <datalist id="ivCos">{coNames.map(n=><option key={n} value={n}/>)}</datalist></div>
             <div><label style={label} htmlFor="ivRole">Role</label><input id="ivRole" style={field} value={setup.role} onChange={e=>setSetup(s=>({...s,role:e.target.value}))}/></div>
             <div><label style={label} htmlFor="ivKind">Interview type</label>
               <select id="ivKind" style={field} value={setup.kind} onChange={e=>setSetup(s=>({...s,kind:e.target.value}))}>
@@ -3077,7 +3081,7 @@ function App(){
   if(page==="interview"){
     const lastApp=(tracked||[]).slice(-1)[0];
     return(<div style={{background:"#EEF1F6",minHeight:"100vh"}}><Nav/>
-      <InterviewSim major={ans.major||profile.major||""} defaultCompany={(()=>{try{return new URLSearchParams(location.search).get("company")||"";}catch(e){return "";}})().slice(0,100)||lastApp?.company||""} defaultRole={lastApp?.role||""}/></div>);
+      <InterviewSim major={ans.major||profile.major||""} defaultCompany={(()=>{try{return new URLSearchParams(location.search).get("company")||"";}catch(e){return "";}})().slice(0,100)||lastApp?.company||""} defaultRole={(()=>{try{return new URLSearchParams(location.search).get("role")||"";}catch(e){return "";}})().slice(0,100)||lastApp?.role||""}/></div>);
   }
   // LANDING (Direction D: search-first like Glassdoor, live "console" feel; every number is live data)
   if(page==="landing")return(

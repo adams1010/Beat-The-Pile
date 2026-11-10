@@ -1,4 +1,4 @@
-/* built from src/home.jsx a917400af4a49e0c — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 80a7cc69e534c6fc — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -3075,7 +3075,14 @@ function InterviewSim({
   const [setup, setSetup] = React.useState({
     company: defaultCompany || "",
     role: defaultRole || (major ? `${major.split(",")[0]} Intern` : "Summer Intern"),
-    kind: "mixed",
+    kind: (() => {
+      try {
+        const k = new URLSearchParams(location.search).get("kind");
+        return ["mixed", "behavioral", "technical"].includes(k) ? k : "mixed";
+      } catch (e) {
+        return "mixed";
+      }
+    })(),
     total: 5,
     limit: 90,
     mode: canTalk ? "talk" : "type",
@@ -3084,6 +3091,16 @@ function InterviewSim({
     rate: Number(ls.get("btp_iv_rate")) || 1.15
   });
   const [voices, setVoices] = React.useState([]);
+  const [coNames, setCoNames] = React.useState([]);
+  React.useEffect(() => {
+    let on = true;
+    fetch("/api/listings?names=1").then(r => r.ok ? r.json() : null).then(j => {
+      if (on && j && Array.isArray(j.companies)) setCoNames([...new Set(j.companies.map(c => c.company).filter(Boolean))].sort((a, b) => a.localeCompare(b)));
+    }).catch(() => {});
+    return () => {
+      on = false;
+    };
+  }, []);
   React.useEffect(() => {
     if (!canSpeak) return;
     const load = () => setVoices(ivVoices());
@@ -3437,13 +3454,20 @@ function InterviewSim({
   }, "Company"), React.createElement("input", {
     id: "ivCo",
     style: field,
+    list: "ivCos",
+    autoComplete: "off",
     value: setup.company,
-    placeholder: "e.g. Lockheed Martin",
+    placeholder: "Start typing, e.g. Lockheed Martin",
     onChange: e => setSetup(s => ({
       ...s,
       company: e.target.value
     }))
-  })), React.createElement("div", null, React.createElement("label", {
+  }), React.createElement("datalist", {
+    id: "ivCos"
+  }, coNames.map(n => React.createElement("option", {
+    key: n,
+    value: n
+  })))), React.createElement("div", null, React.createElement("label", {
     style: label,
     htmlFor: "ivRole"
   }, "Role"), React.createElement("input", {
@@ -7950,7 +7974,13 @@ function App() {
           return "";
         }
       })().slice(0, 100) || lastApp?.company || "",
-      defaultRole: lastApp?.role || ""
+      defaultRole: (() => {
+        try {
+          return new URLSearchParams(location.search).get("role") || "";
+        } catch (e) {
+          return "";
+        }
+      })().slice(0, 100) || lastApp?.role || ""
     }));
   }
   if (page === "landing") return React.createElement("div", {

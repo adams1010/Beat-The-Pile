@@ -1460,7 +1460,14 @@
   "You're hidden, so classmates can't see you or join your orbit.": "Je bent verborgen, dus medestudenten zien je niet en kunnen niet in je baan komen.",
   "Show me in Orbit": "Toon mij in Orbit",
   "Find your job": "Vind je baan",
-  "Type the first letters of your school, e.g. Virginia Tech": "Typ de eerste letters van je school, bijv. Virginia Tech"
+  "Type the first letters of your school, e.g. Virginia Tech": "Typ de eerste letters van je school, bijv. Virginia Tech",
+  "Practice this interview": "Dit sollicitatiegesprek oefenen",
+  "Type of interview": "Soort gesprek",
+  "Mixed (most first rounds)": "Gemengd (meeste eerste rondes)",
+  "Behavioral": "Gedragsgericht",
+  "Technical": "Technisch",
+  "Answer out loud against a timer and get scored on every answer.": "Antwoord hardop tegen een timer en krijg een score voor elk antwoord.",
+  "Start typing, e.g. Lockheed Martin": "Begin te typen, bijv. Lockheed Martin"
  },
  "patterns": [
   [
@@ -1766,6 +1773,10 @@
   [
    "^Faculty & staff · (.+)$",
    "Docenten & medewerkers · $1"
+  ],
+  [
+   "^Start practice with (.+) →$",
+   "Oefenen met $1 starten →"
   ]
  ]
 }

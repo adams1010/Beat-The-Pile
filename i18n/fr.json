@@ -1460,7 +1460,14 @@
   "You're hidden, so classmates can't see you or join your orbit.": "Vous êtes masqué : vos camarades ne peuvent pas vous voir ni rejoindre votre orbite.",
   "Show me in Orbit": "Me montrer dans Orbit",
   "Find your job": "Trouvez votre emploi",
-  "Type the first letters of your school, e.g. Virginia Tech": "Tapez les premières lettres de votre école, p. ex. Virginia Tech"
+  "Type the first letters of your school, e.g. Virginia Tech": "Tapez les premières lettres de votre école, p. ex. Virginia Tech",
+  "Practice this interview": "S'entraîner pour cet entretien",
+  "Type of interview": "Type d'entretien",
+  "Mixed (most first rounds)": "Mixte (la plupart des premiers tours)",
+  "Behavioral": "Comportemental",
+  "Technical": "Technique",
+  "Answer out loud against a timer and get scored on every answer.": "Répondez à voix haute avec un minuteur et obtenez une note pour chaque réponse.",
+  "Start typing, e.g. Lockheed Martin": "Commencez à taper, p. ex. Lockheed Martin"
  },
  "patterns": [
   [
@@ -1766,6 +1773,10 @@
   [
    "^Faculty & staff · (.+)$",
    "Enseignants et personnel · $1"
+  ],
+  [
+   "^Start practice with (.+) →$",
+   "Commencer l'entraînement avec $1 →"
   ]
  ]
 }

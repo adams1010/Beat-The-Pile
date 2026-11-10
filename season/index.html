@@ -54,6 +54,11 @@
   .tabs button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
   .tabs button i{font-style:normal;opacity:.7;margin-left:3px}
   .app{background:#fff;border:1px solid var(--line);border-left:4px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+  .prac{margin-top:10px;border:1px solid var(--line);border-radius:10px;background:#F7F5FF}
+  .prac summary{cursor:pointer;padding:10px 12px;font-weight:600;font-size:14px;color:#4C1D95}
+  .pracb{padding:0 12px 12px;display:grid;gap:8px}.pracb label{font-size:13px;color:var(--muted)}
+  .pracb select{font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff}
+  .pracb .btn{justify-self:start;text-decoration:none}.pracb p{margin:0;font-size:13px;color:var(--muted)}
   .app.applied{border-left-color:#93C5FD}.app.interview{border-left-color:#C4B5FD}.app.offer{border-left-color:var(--green)}.app.rejected{border-left-color:#E2E8F0;opacity:.7}.app.saved{border-left-color:#FCD34D}
   .co{font-size:12.5px;font-weight:800;color:var(--green-dark)}
   .ti{font-weight:750;color:var(--navy);line-height:1.3}
@@ -162,6 +167,8 @@
       <div class="c"><div><b>${v}/${goal}</b><small>this week</small></div></div></div>`;
   }
 
+  // Nov 10: "Got an interview" opens a practice dropdown under the card → Interview practice, set up for this company + role
+  const pracUrl = (a, kind) => "/?" + new URLSearchParams({ company: a.company || "", role: a.title || "", kind }).toString() + "#interview";
   function appCard(a){
     const d = daysAgo(a.appliedAt);
     const p = postedOf(a), f = foundOf(a), est = !!a.postedEstimate;
@@ -177,6 +184,11 @@
       <div class="co">${esc(a.company)}</div><div class="ti">${esc(a.title || "Internship")}</div>
       <div class="meta"><span>Applied ${esc(fmt(a.appliedAt))} · ${d === 0 ? "today" : d + "d ago"}</span>${speed != null ? `<span title="${est ? "Estimated from the board's “posted N days ago” text" : "From the employer's posting date"}">${speed <= 3 ? "" : ""}${est ? "~" : ""}${speed === 0 ? "same day it posted" : speed + "d after it posted"}</span>`
         : found != null ? `<span title="The employer didn't show a posting date, so this is from when our robot first saw it">${found === 0 ? "same day we found it" : found + "d after we found it"}</span>` : ""}</div>
+      ${a.stage === "interview" ? `<details class="prac"${S.openPrac === a.id ? " open" : ""}><summary>Practice this interview</summary>
+        <div class="pracb"><label for="pk-${esc(a.id)}">Type of interview</label>
+          <select id="pk-${esc(a.id)}" data-pkind><option value="mixed">Mixed (most first rounds)</option><option value="behavioral">Behavioral</option><option value="technical">Technical</option></select>
+          <a class="btn int" data-prac href="${esc(pracUrl(a, "mixed"))}">Start practice with ${esc(a.company)} →</a>
+          <p>Answer out loud against a timer and get scored on every answer.</p></div></details>` : ""}
       <div class="acts">${acts}${a.url ? `<a class="btn ghost" href="${esc(a.url)}" target="_blank" rel="noopener">Open ↗</a>` : ""}<button class="btn ghost" data-del>Remove</button></div></div>`;
   }
 
@@ -243,6 +255,11 @@
     if (e.target.id === "rtog") act({ action: "remind", on: e.target.checked }, e.target.checked ? "Reminders on. We'll email you when a follow-up is due" : "Reminder emails off");
   });
   async function act(body, msg){ try { S.me = await api("POST", body); if (msg) toast(msg); } catch (e) { toast(e.message); } render(); }
+  $("#app").addEventListener("change", (e) => {
+    const k = e.target.closest("[data-pkind]"); if (!k) return;
+    const card = k.closest(".app"), a = (S.me.apps || []).find((x) => x.id === card.dataset.id), l = card.querySelector("[data-prac]");
+    if (a && l) l.href = pracUrl(a, k.value);
+  });
   $("#app").addEventListener("click", (e) => {
     const g = e.target.closest("[data-goal]"); if (g) return act({ action: "goal", goal: +g.dataset.goal }, `Goal set: ${g.dataset.goal} a week`);
     const t = e.target.closest("[data-tab]"); if (t) { S.tab = t.dataset.tab; return render(); }
@@ -263,6 +280,7 @@
     }
     const a = (S.me.apps || []).find((x) => x.id === card.dataset.id); if (!a) return;
     const s = e.target.closest("[data-stage]");
+    if (s && s.dataset.stage === "interview") { S.tab = "interview"; S.openPrac = a.id; }
     if (s) return act({ action: "app", app: { ...a, stage: s.dataset.stage } }, { interview: "Interview! Nice work ", offer: "Offer! Huge ", rejected: "Moved to rejected. On to the next one", applied: "Moved back" }[s.dataset.stage]);
     if (e.target.closest("[data-del]") && confirm(`Remove ${a.company} from My Season?`)) return act({ action: "app_delete", id: a.id }, "Removed");
   });
