@@ -1,4 +1,4 @@
-/* built from src/home.jsx ea1824ece48d2a4e — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 0be03bb7209270a9 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -3096,15 +3096,103 @@ function InterviewSim({
     rate: Number(ls.get("btp_iv_rate")) || 1.15
   });
   const [voices, setVoices] = React.useState([]);
-  const [coNames, setCoNames] = React.useState([]);
+  const [coList, setCoList] = React.useState(null),
+    [coOpen, setCoOpen] = React.useState(false),
+    [coSel, setCoSel] = React.useState(0),
+    [brief, setBrief] = React.useState(null);
+  const coLoad = () => {
+    if (coList) return;
+    setCoList([]);
+    Promise.all([fetch("/companies/names.json").then(r => r.ok ? r.json() : []).catch(() => []), fetch("/api/listings?names=1").then(r => r.ok ? r.json() : null).catch(() => null)]).then(([a, b]) => {
+      const k = s => String(s || "").toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, ""),
+        seen = new Set(),
+        out = [];
+      for (const r of Array.isArray(a) ? a : []) {
+        out.push(r);
+        for (const n of r) seen.add(k(n));
+      }
+      for (const c of b && b.companies || []) {
+        const m = /^(.*?)\s*\((.*)\)\s*$/.exec(c.company || "");
+        const row = m ? [m[1], ...m[2].split(/\s*\/\s*/)] : [c.company];
+        if (row[0] && !row.some(n => seen.has(k(n)))) {
+          out.push(row);
+          row.forEach(n => seen.add(k(n)));
+        }
+      }
+      setCoList(out.map(r => ({
+        names: r,
+        keys: r.map(k)
+      })));
+    });
+  };
+  const coHits = React.useMemo(() => {
+    const q = String(setup.company || "").toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "");
+    if (!q || !coList || !coList.length) return [];
+    const sc = [];
+    for (const c of coList) {
+      let b = 9;
+      c.keys.forEach((x, i) => {
+        const v = x === q ? i ? 1 : 0 : x.startsWith(q) ? i ? 3 : 2 : x.includes(q) && q.length >= 3 ? 5 : 9;
+        if (v < b) b = v;
+      });
+      if (b < 9) sc.push([b, c.names[0].length, c]);
+      if (sc.length > 3000) break;
+    }
+    return sc.sort((a, b) => a[0] - b[0] || a[1] - b[1]).slice(0, 8).map(x => x[2]);
+  }, [setup.company, coList]);
+  const coPick = c => {
+    setSetup(s => ({
+      ...s,
+      company: c.names[0]
+    }));
+    setCoOpen(false);
+    loadBrief(c.names[0]);
+  };
+  const loadBrief = name => {
+    name = String(name || "").trim();
+    if (name.length < 2) {
+      setBrief(null);
+      return;
+    }
+    setBrief({
+      name,
+      loading: true
+    });
+    fetch("/api/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        feature: "intel",
+        input: {
+          name,
+          role: setup.role || "intern"
+        }
+      })
+    }).then(r => r.ok ? r.json() : Promise.reject()).then(d => {
+      let o = null;
+      const t = String(d.text || "").trim();
+      try {
+        o = JSON.parse(t);
+      } catch (e) {
+        const m = t.match(/\{[\s\S]*\}/);
+        if (m) try {
+          o = JSON.parse(m[0]);
+        } catch (e2) {}
+      }
+      if (!o || !o.description) throw 0;
+      setBrief(b => b && b.name === name ? {
+        name,
+        ...o
+      } : b);
+    }).catch(() => setBrief(b => b && b.name === name ? {
+      name,
+      err: true
+    } : b));
+  };
   React.useEffect(() => {
-    let on = true;
-    fetch("/api/listings?names=1").then(r => r.ok ? r.json() : null).then(j => {
-      if (on && j && Array.isArray(j.companies)) setCoNames([...new Set(j.companies.map(c => c.company).filter(Boolean))].sort((a, b) => a.localeCompare(b)));
-    }).catch(() => {});
-    return () => {
-      on = false;
-    };
+    if (setup.company && !brief) loadBrief(setup.company);
   }, []);
   React.useEffect(() => {
     if (!canSpeak) return;
@@ -3456,23 +3544,98 @@ function InterviewSim({
   }, React.createElement("div", null, React.createElement("label", {
     style: label,
     htmlFor: "ivCo"
-  }, "Company"), React.createElement("input", {
+  }, "Company"), React.createElement("div", {
+    style: {
+      position: "relative"
+    }
+  }, React.createElement("input", {
     id: "ivCo",
     style: field,
-    list: "ivCos",
     autoComplete: "off",
+    role: "combobox",
+    "aria-expanded": coOpen && coHits.length > 0,
+    "aria-autocomplete": "list",
     value: setup.company,
-    placeholder: "Start typing, e.g. Lockheed Martin",
-    onChange: e => setSetup(s => ({
-      ...s,
-      company: e.target.value
-    }))
-  }), React.createElement("datalist", {
-    id: "ivCos"
-  }, coNames.map(n => React.createElement("option", {
-    key: n,
-    value: n
-  })))), React.createElement("div", null, React.createElement("label", {
+    placeholder: "Start typing, e.g. SAP or Lockheed Martin",
+    onFocus: () => {
+      coLoad();
+      setCoOpen(true);
+    },
+    onBlur: () => setTimeout(() => {
+      setCoOpen(false);
+      if (setup.company && (!brief || brief.name !== setup.company.trim())) loadBrief(setup.company);
+    }, 150),
+    onChange: e => {
+      setSetup(s => ({
+        ...s,
+        company: e.target.value
+      }));
+      setCoOpen(true);
+      setCoSel(0);
+    },
+    onKeyDown: e => {
+      if (!coOpen || !coHits.length) return;
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setCoSel(i => Math.min(coHits.length - 1, i + 1));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setCoSel(i => Math.max(0, i - 1));
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        coPick(coHits[coSel] || coHits[0]);
+      } else if (e.key === "Escape") setCoOpen(false);
+    }
+  }), coOpen && coHits.length > 0 && React.createElement("div", {
+    role: "listbox",
+    style: {
+      position: "absolute",
+      left: 0,
+      right: 0,
+      top: "100%",
+      marginTop: 4,
+      background: "#fff",
+      border: "1px solid #DCE2EC",
+      borderRadius: 10,
+      boxShadow: "0 12px 30px rgba(6,10,44,.12)",
+      zIndex: 20,
+      maxHeight: 300,
+      overflowY: "auto"
+    }
+  }, coHits.map((c, i) => React.createElement("button", {
+    type: "button",
+    key: c.names[0] + i,
+    role: "option",
+    "aria-selected": i === coSel,
+    onMouseDown: e => {
+      e.preventDefault();
+      coPick(c);
+    },
+    style: {
+      display: "block",
+      width: "100%",
+      textAlign: "left",
+      border: 0,
+      background: i === coSel ? "#F2FADF" : "#fff",
+      padding: "9px 12px",
+      font: "inherit",
+      fontSize: 14,
+      color: "#060A2C",
+      cursor: "pointer"
+    }
+  }, React.createElement("span", {
+    "data-noi18n": true
+  }, c.names[0]), c.names.length > 1 && React.createElement("small", {
+    "data-noi18n": true,
+    style: {
+      display: "block",
+      color: "#55627A",
+      fontSize: 12,
+      whiteSpace: "nowrap",
+      overflow: "hidden",
+      textOverflow: "ellipsis"
+    }
+  }, c.names.slice(1, 4).join(" · "))))))), React.createElement("div", null, React.createElement("label", {
     style: label,
     htmlFor: "ivRole"
   }, "Role"), React.createElement("input", {
@@ -3569,7 +3732,54 @@ function InterviewSim({
       color: IV.dim,
       margin: "6px 0 0"
     }
-  }, "This browser can't turn speech into text \u2014 try Chrome, Edge or Safari, or type."))), canSpeak && React.createElement("label", {
+  }, "This browser can't turn speech into text \u2014 try Chrome, Edge or Safari, or type."))), brief && React.createElement("div", {
+    style: {
+      marginTop: 14,
+      background: "#F7F9FC",
+      border: "1px solid #E3E7ED",
+      borderRadius: 10,
+      padding: "12px 14px",
+      fontSize: 14,
+      lineHeight: 1.5
+    }
+  }, React.createElement("b", {
+    style: {
+      display: "block",
+      marginBottom: 4
+    }
+  }, "About ", React.createElement("span", {
+    "data-noi18n": true
+  }, brief.name)), brief.loading ? React.createElement("span", {
+    style: {
+      color: "#55627A"
+    }
+  }, "Looking it up\u2026") : brief.err ? React.createElement("span", {
+    style: {
+      color: "#55627A"
+    }
+  }, "Couldn't load a summary right now. You can still practice.") : React.createElement(React.Fragment, null, React.createElement("span", {
+    "data-noi18n": true
+  }, brief.description), brief.internTasks && React.createElement("span", {
+    "data-noi18n": true,
+    style: {
+      display: "block",
+      marginTop: 4
+    }
+  }, brief.internTasks), (brief.size && brief.size !== "Unknown" || brief.culture && brief.culture !== "Unknown") && React.createElement("span", {
+    "data-noi18n": true,
+    style: {
+      display: "block",
+      marginTop: 4,
+      color: "#55627A"
+    }
+  }, [brief.size !== "Unknown" && brief.size, brief.culture !== "Unknown" && brief.culture].filter(Boolean).join(" · ")), React.createElement("span", {
+    style: {
+      display: "block",
+      marginTop: 6,
+      fontSize: 12,
+      color: "#55627A"
+    }
+  }, "AI summary to help you prep. Check the company's own site before you quote it."))), canSpeak && React.createElement("label", {
     style: {
       display: "flex",
       alignItems: "center",

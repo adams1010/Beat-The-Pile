@@ -1471,7 +1471,11 @@
   "How far from your ZIP?": "Hoe ver van je postcode?",
   "We only show openings inside this distance, measured city to city.": "We tonen alleen vacatures binnen deze afstand, gemeten van stad tot stad.",
   "Remote = anywhere in the US. Hybrid/In-person = only within the distance you pick. Any = within your distance, plus remote roles.": "Op afstand = overal in de VS. Hybride/op locatie = alleen binnen de gekozen afstand. Maakt niet uit = binnen je afstand, plus banen op afstand.",
-  "In your area": "In jouw buurt"
+  "In your area": "In jouw buurt",
+  "Looking it up…": "Opzoeken…",
+  "Couldn't load a summary right now. You can still practice.": "Kon nu geen samenvatting laden. Je kunt toch oefenen.",
+  "AI summary to help you prep. Check the company's own site before you quote it.": "AI-samenvatting om je voor te bereiden. Check de site van het bedrijf voordat je het citeert.",
+  "Start typing, e.g. SAP or Lockheed Martin": "Begin te typen, bijv. SAP of Lockheed Martin"
  },
  "patterns": [
   [

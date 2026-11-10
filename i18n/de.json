@@ -1471,7 +1471,11 @@
   "How far from your ZIP?": "Wie weit von deiner PLZ?",
   "We only show openings inside this distance, measured city to city.": "Wir zeigen nur Stellen innerhalb dieser Entfernung, gemessen von Stadt zu Stadt.",
   "Remote = anywhere in the US. Hybrid/In-person = only within the distance you pick. Any = within your distance, plus remote roles.": "Remote = überall in den USA. Hybrid/vor Ort = nur innerhalb der gewählten Entfernung. Egal = innerhalb deiner Entfernung plus Remote-Stellen.",
-  "In your area": "In deiner Nähe"
+  "In your area": "In deiner Nähe",
+  "Looking it up…": "Wird nachgeschlagen…",
+  "Couldn't load a summary right now. You can still practice.": "Zusammenfassung gerade nicht verfügbar. Du kannst trotzdem üben.",
+  "AI summary to help you prep. Check the company's own site before you quote it.": "KI-Zusammenfassung zur Vorbereitung. Prüf die Website des Unternehmens, bevor du daraus zitierst.",
+  "Start typing, e.g. SAP or Lockheed Martin": "Tipp los, z. B. SAP oder Lockheed Martin"
  },
  "patterns": [
   [
