@@ -15,7 +15,8 @@ globalThis.fetch = async (url, o = {}) => {
     const x = new URL(u); const table = x.pathname.split("/").pop(); const m = o.method || "GET";
     if (table !== "company_candidates") return mk(200, []);
     if (m === "POST") { for (const r of JSON.parse(o.body)) T.set(r.id, { status: "pending", attempts: 0, enabled: false, checked_at: null, ...(T.get(r.id) || {}), ...r }); return mk(201); }
-    if (m === "PATCH") { const id = decodeURIComponent(x.searchParams.get("id").slice(3)); Object.assign(T.get(id), JSON.parse(o.body)); return mk(204); }
+    if (m === "PATCH") { const ids = x.searchParams.get("id").replace(/^in\.\(|\)$/g, "").replace(/^eq\./, "").split(",").map(decodeURIComponent); for (const id of ids) if (T.get(id)) Object.assign(T.get(id), JSON.parse(o.body)); return mk(204); }
+    if (x.searchParams.get("status") === "eq.identity_failed") return mk(200, []);
     if (x.searchParams.get("enabled") === "eq.true") return mk(200, [...T.values()].filter((r) => r.enabled));
     return mk(200, [...T.values()].filter((r) => r.status === "pending").slice(0, 16));
   }
