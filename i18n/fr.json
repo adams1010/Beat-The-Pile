@@ -1467,7 +1467,11 @@
   "Behavioral": "Comportemental",
   "Technical": "Technique",
   "Answer out loud against a timer and get scored on every answer.": "Répondez à voix haute avec un minuteur et obtenez une note pour chaque réponse.",
-  "Start typing, e.g. Lockheed Martin": "Commencez à taper, p. ex. Lockheed Martin"
+  "Start typing, e.g. Lockheed Martin": "Commencez à taper, p. ex. Lockheed Martin",
+  "How far from your ZIP?": "À quelle distance de votre code postal ?",
+  "We only show openings inside this distance, measured city to city.": "Nous ne montrons que les offres dans ce rayon, mesuré de ville à ville.",
+  "Remote = anywhere in the US. Hybrid/In-person = only within the distance you pick. Any = within your distance, plus remote roles.": "À distance = partout aux États-Unis. Hybride/sur site = uniquement dans le rayon choisi. Peu importe = dans votre rayon, plus les postes à distance.",
+  "In your area": "Dans votre secteur"
  },
  "patterns": [
   [
@@ -1777,6 +1781,14 @@
   [
    "^Start practice with (.+) →$",
    "Commencer l'entraînement avec $1 →"
+  ],
+  [
+   "^(\\d+) mi away$",
+   "à $1 mi"
+  ],
+  [
+   "^Search (\\d+) miles$",
+   "Chercher à $1 miles"
   ]
  ]
 }

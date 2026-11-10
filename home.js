@@ -1,4 +1,4 @@
-/* built from src/home.jsx 80a7cc69e534c6fc — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx ea1824ece48d2a4e — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -1901,13 +1901,18 @@ const STEPS = [{
 }, {
   key: "type",
   label: "What type of internship?",
-  subLabel: "Remote = nationwide search, no location filter. Hybrid/In-person = local to your ZIP. Any = mostly local, mixed in-person/hybrid.",
+  subLabel: "Remote = anywhere in the US. Hybrid/In-person = only within the distance you pick. Any = within your distance, plus remote roles.",
   type: "chips",
   options: TYPE_OPTS
 }, {
   key: "zip",
   label: "What's your zip code?",
   type: "zip"
+}, {
+  key: "radius",
+  label: "How far from your ZIP?",
+  subLabel: "We only show openings inside this distance, measured city to city.",
+  type: "slider"
 }];
 const TIPS = [{
   cat: "Timing",
@@ -4566,7 +4571,7 @@ function App() {
       extracurriculars: p.extracurriculars.filter(x => x !== actName)
     }));
   }
-  async function calcResults() {
+  async function calcResults(over) {
     analytics.track("quiz_completed", {
       major: ans.major,
       term: ans.targetTerm
@@ -4596,7 +4601,8 @@ function App() {
         body: JSON.stringify({
           zip: ans.zip,
           major: ans.major,
-          type: ans.type || "Any"
+          type: ans.type || "Any",
+          radius: over && over.radius || ans.radius || 50
         }),
         signal: ctrl.signal
       });
@@ -9000,7 +9006,11 @@ function App() {
     const pickScore = c => c.match + (c.tier === "national" ? 12 : 0);
     const topPicks = [...results].filter(c => c.match >= 42).sort((a, b) => pickScore(b) - pickScore(a)).slice(0, 3);
     const topNames = topPicks.map(c => c.name);
-    const bandLabel = b => ({
+    const bandLabel = (b, mi) => mi != null ? {
+      text: mi <= 1 ? "In your area" : `${mi} mi away`,
+      color: "#4A7000",
+      bg: "#F2FADF"
+    } : {
       "in-town": {
         text: "IN TOWN",
         color: "#0d9488",
@@ -9026,7 +9036,7 @@ function App() {
         color: "#7c3aed",
         bg: "#7c3aed15"
       }
-    })[b] || null;
+    }[b] || null;
     const bandOrder = {
       "in-town": 0,
       "nearby": 1,
@@ -9279,7 +9289,30 @@ function App() {
       const lines = [];
       lines.push({
         icon: "",
-        text: ans.type === "Remote" ? React.createElement(React.Fragment, null, "Real openings that say ", React.createElement("strong", null, "remote"), ", from companies' own job boards.") : React.createElement(React.Fragment, null, "Real openings from companies' own job boards", metaRef.current?.studentState ? React.createElement(React.Fragment, null, ", starting in ", React.createElement("strong", null, metaRef.current.studentState)) : "", ". Each one was open when our robot last checked.")
+        text: ans.type === "Remote" ? React.createElement(React.Fragment, null, "Real openings that say ", React.createElement("strong", null, "remote"), ", from companies' own job boards.") : React.createElement(React.Fragment, null, "Real openings within ", React.createElement("strong", null, metaRef.current?.radius || ans.radius || 50, " miles of ", ans.zip), ", from companies' own job boards", ans.type === "Any" ? ", plus remote roles (marked Remote)" : "", ". Each one was open when our robot last checked.")
+      });
+      if (ans.type !== "Remote" && metaRef.current && metaRef.current.nearby < 10 && (ans.radius || 50) < 200) lines.push({
+        icon: "",
+        text: React.createElement(React.Fragment, null, "Only ", React.createElement("strong", null, metaRef.current.nearby), " ", metaRef.current.nearby === 1 ? "opening" : "openings", " for your major within ", metaRef.current.radius || ans.radius || 50, " miles. ", React.createElement("button", {
+          onClick: () => {
+            const r2 = Math.min(200, (ans.radius || 50) * 2);
+            setA("radius", r2);
+            calcResults({
+              radius: r2
+            });
+          },
+          style: {
+            background: "none",
+            border: "none",
+            color: GD,
+            fontWeight: 700,
+            cursor: "pointer",
+            fontFamily: "var(--font)",
+            fontSize: 12.5,
+            textDecoration: "underline",
+            padding: 0
+          }
+        }, "Search ", Math.min(200, (ans.radius || 50) * 2), " miles"))
       });
       if (metaRef.current?.radiusExpanded) lines.push({
         icon: "",
@@ -9679,7 +9712,7 @@ function App() {
         letterSpacing: "0.3px"
       }
     }, "Personalized"), (() => {
-      const b = bandLabel(c.locationBand);
+      const b = bandLabel(c.locationBand, c.mi);
       return b ? React.createElement("span", {
         style: {
           flexShrink: 0,
@@ -9789,7 +9822,7 @@ function App() {
       const saved = isJobSaved(c.name);
       const isFlipped = expandedCard === i;
       const locationBadge = (() => {
-        const b = bandLabel(c.locationBand);
+        const b = bandLabel(c.locationBand, c.mi);
         return b ? React.createElement("span", {
           style: {
             fontSize: 9.5,

@@ -454,9 +454,9 @@ const STEPS=[
   {key:"gpa",label:"What's your GPA?",type:"chips",options:GPA_OPTS},
   {key:"extracurriculars",label:"What are you involved in?",type:"extracurricular"},
   {key:"skills",label:"What are your top skills?",type:"multi",options:SKILLS},
-  {key:"type",label:"What type of internship?",subLabel:"Remote = nationwide search, no location filter. Hybrid/In-person = local to your ZIP. Any = mostly local, mixed in-person/hybrid.",type:"chips",options:TYPE_OPTS},
+  {key:"type",label:"What type of internship?",subLabel:"Remote = anywhere in the US. Hybrid/In-person = only within the distance you pick. Any = within your distance, plus remote roles.",type:"chips",options:TYPE_OPTS},
   {key:"zip",label:"What's your zip code?",type:"zip"},
-  // (No distance question: listings give a city/state, not exact distance. Results start in your state, then widen to neighbors.)
+  {key:"radius",label:"How far from your ZIP?",subLabel:"We only show openings inside this distance, measured city to city.",type:"slider"},
 ];
 
 // Honest curated tips — no fake users, no fake engagement. Real, useful advice anyone can act on.
@@ -1526,7 +1526,7 @@ function App(){
     setAns(p=>({...p,extracurriculars:p.extracurriculars.filter(x=>x!==actName)}));
   }
 
-  async function calcResults(){
+  async function calcResults(over){
     analytics.track("quiz_completed",{major:ans.major,term:ans.targetTerm});
     setLoading(true);setPage("results");setShowConfetti(false);
     metaRef.current=null; // reset meta so stale radius-expansion messages don't carry over
@@ -1540,7 +1540,7 @@ function App(){
     // board. No AI-made company lists and no placeholder companies: if nothing matches, we say so.
     try{
       const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),20000);
-      const r=await fetch("/api/results",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({zip:ans.zip,major:ans.major,type:ans.type||"Any"}),signal:ctrl.signal});
+      const r=await fetch("/api/results",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({zip:ans.zip,major:ans.major,type:ans.type||"Any",radius:(over&&over.radius)||ans.radius||50}),signal:ctrl.signal});
       clearTimeout(timer);
       const d=await r.json().catch(()=>({}));
       if(!r.ok)throw new Error(d.error||"Couldn't load internships right now — try again in a minute");
@@ -3391,7 +3391,7 @@ function App(){
     // isLikelyNational + BIG_NAMES are defined in the outer App scope (above ApplyModal)
     // so both the result cards here and the ApplyModal closure resolve the same one.
     // Location band → friendly label + color. "remote" gets purple, "in-town" green, fading out as distance grows.
-    const bandLabel=b=>({
+    const bandLabel=(b,mi)=>mi!=null?{text:mi<=1?"In your area":`${mi} mi away`,color:"#4A7000",bg:"#F2FADF"}:({
       "in-town":{text:"IN TOWN",color:"#0d9488",bg:"#0d948815"},
       "nearby":{text:"NEARBY",color:"#0891b2",bg:"#0891b215"},
       "metro":{text:"METRO",color:"#4A5568",bg:"#4A556815"},
@@ -3486,7 +3486,9 @@ function App(){
                 // Build a short list of "insight" lines we'd want to show
                 const lines=[];
                 // Always: where these came from
-                lines.push({icon:"",text:ans.type==="Remote"?(<>Real openings that say <strong>remote</strong>, from companies' own job boards.</>):(<>Real openings from companies' own job boards{metaRef.current?.studentState?<>, starting in <strong>{metaRef.current.studentState}</strong></>:""}. Each one was open when our robot last checked.</>)});
+                lines.push({icon:"",text:ans.type==="Remote"?(<>Real openings that say <strong>remote</strong>, from companies' own job boards.</>):(<>Real openings within <strong>{metaRef.current?.radius||ans.radius||50} miles of {ans.zip}</strong>, from companies' own job boards{ans.type==="Any"?", plus remote roles (marked Remote)":""}. Each one was open when our robot last checked.</>)});
+                // Nov 10: few or no openings inside the radius → say so and offer a wider one (never fill with far-away jobs)
+                if(ans.type!=="Remote"&&metaRef.current&&metaRef.current.nearby<10&&(ans.radius||50)<200)lines.push({icon:"",text:<>Only <strong>{metaRef.current.nearby}</strong> {metaRef.current.nearby===1?"opening":"openings"} for your major within {metaRef.current.radius||ans.radius||50} miles. <button onClick={()=>{const r2=Math.min(200,(ans.radius||50)*2);setA("radius",r2);calcResults({radius:r2});}} style={{background:"none",border:"none",color:GD,fontWeight:700,cursor:"pointer",fontFamily:"var(--font)",fontSize:12.5,textDecoration:"underline",padding:0}}>Search {Math.min(200,(ans.radius||50)*2)} miles</button></>});
                 // Sparse-results: actionable
                 // (sparse note removed: the search widens to neighboring states automatically and says so below)
                 // Show expansion note when we auto-expanded the radius
@@ -3585,7 +3587,7 @@ function App(){
                             <p style={{fontWeight:600,fontSize:14,color:"#060A2C",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{c.role||"Internship"}</p>
                             {isLikelyNational(c)&&<span style={{flexShrink:0,fontSize:9.5,fontWeight:700,color:"#2563EB",background:"#2563EB15",padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>Big name</span>}
                             {c.personalized&&<span style={{flexShrink:0,fontSize:9.5,fontWeight:700,color:GD,background:GL,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>Personalized</span>}
-                            {(()=>{const b=bandLabel(c.locationBand);return b?<span style={{flexShrink:0,fontSize:9.5,fontWeight:700,color:b.color,background:b.bg,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>{b.text}</span>:null;})()}
+                            {(()=>{const b=bandLabel(c.locationBand,c.mi);return b?<span style={{flexShrink:0,fontSize:9.5,fontWeight:700,color:b.color,background:b.bg,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>{b.text}</span>:null;})()}
                           </div>
                           <p style={{fontSize:12,color:"#4A5568",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>at <b style={{fontWeight:600,color:"#060A2C"}}>{c.name}</b>{c.location?` · ${c.location}`:""}</p>
                         </div>
@@ -3619,7 +3621,7 @@ function App(){
                   const isTracked=trackedNames.includes(c.name);
                   const saved=isJobSaved(c.name);
                   const isFlipped=expandedCard===i;
-                  const locationBadge=(()=>{const b=bandLabel(c.locationBand);return b?<span style={{fontSize:9.5,fontWeight:700,color:b.color,background:b.bg,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>{b.text}</span>:null;})();
+                  const locationBadge=(()=>{const b=bandLabel(c.locationBand,c.mi);return b?<span style={{fontSize:9.5,fontWeight:700,color:b.color,background:b.bg,padding:"2px 7px",borderRadius:99,letterSpacing:"0.3px"}}>{b.text}</span>:null;})();
                   const verified=(c.source==="db"&&c.applyUrl)?{verified:true,applyUrl:c.applyUrl,realLocation:c.location}:(adzunaVerified[c.name]||null);
                   const isVerified=verified&&verified.verified&&verified.applyUrl;
                   const displayLocation=isVerified&&verified.realLocation?verified.realLocation:c.location;

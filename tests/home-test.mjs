@@ -41,28 +41,36 @@ assert.equal((await sync({ action: "get_all" }, "u2")).body.data.tracker, null, 
 assert.equal((await sync({ action: "set", kind: "admin", data: 1 })).code, 400);
 console.log("✓ usersync: merges devices, never wipes, mirrors tracker into My Season, isolated");
 
-// ── results: real listings only, honest widening ──
-const L = (id, company, state, field = "mechanical", extra = {}) => ({ id, company_id: id.split(":")[0], company, title: "ME Intern", location: `X, ${state}`, state, url: `https://${id}`, field, match: "me", first_seen: "2026-11-01", ...extra });
+// ── results: real listings only, inside the student's radius (Nov 10) ──
+const PT = { VA: [37.27, -79.94], NC: [35.23, -80.84], TX: [29.76, -95.37], RIC: [37.54, -77.44] };   // Roanoke (~27 mi from 24060), Charlotte, Houston, Richmond (~160 mi)
+const L = (id, company, state, field = "mechanical", extra = {}, pt = PT[state]) => ({ id, company_id: id.split(":")[0], company, title: "ME Intern", location: `X, ${state}`, state, url: `https://${id}`, field, match: "me", first_seen: "2026-11-01",
+  ...(pt ? { geo_lat: pt[0], geo_lng: pt[1], geo_pts: [pt], geo_n: 1, geo_kind: "place" } : {}), ...extra });
 f.T("listings").push(L("a:1", "Alpha", "VA"), L("b:1", "Beta", "NC"), L("c:1", "Gamma", "TX"), L("d:1", "Delta", "VA", "finance", { match: null }),
-  L("e:1", "Closed Co", "VA", "mechanical", { closed_at: "2026-11-02" }), L("r:1", "RemoteCo", "CA", "mechanical", { location: "Remote (US)" }));
+  L("e:1", "Closed Co", "VA", "mechanical", { closed_at: "2026-11-02" }), L("r:1", "RemoteCo", "CA", "mechanical", { location: "Remote (US)", geo_kind: "remote" }, null),
+  L("v:1", "Richmond Co", "VA", "mechanical", {}, PT.RIC));
 const res = (await import("../api/results.js")).default;
 r = await invoke(res, { method: "POST", body: { zip: "24060", major: "Mechanical Engineering" } });
 assert.equal(r.code, 200); assert.equal(r.body.meta.aiUsed, false);
 assert.ok(r.body.results.every((c) => c.source === "db" && c.verified && /^https:/.test(c.applyUrl)), "every card is a real listing with its apply link");
 assert.ok(!r.body.results.some((c) => c.name === "Closed Co" || c.name === "Delta"), "no closed jobs, no other majors");
-assert.equal(r.body.meta.expansionLabel, "all of the US", "too few nearby → widened, and says so");
-r = await invoke(res, { method: "POST", body: { zip: "24060", major: "Finance" } }); assert.deepEqual(r.body.results.map((c) => c.name), ["Delta"]);
+assert.deepEqual(r.body.results.filter((c) => !c.remote).map((c) => c.name), ["Alpha"], "only inside 50 mi — never Richmond, Charlotte or Houston");
+assert.ok(r.body.results.find((c) => c.name === "Alpha").mi <= 50); assert.equal(r.body.meta.radius, 50); assert.equal(r.body.meta.radiusExpanded, false);
+assert.ok(r.body.results.find((c) => c.name === "RemoteCo")?.remote, "Any = nearby + remote, remote labeled");
+r = await invoke(res, { method: "POST", body: { zip: "24060", major: "Mechanical Engineering", type: "In-person", radius: 200 } });
+assert.deepEqual(r.body.results.map((c) => c.name).sort(), ["Alpha", "Beta", "Richmond Co"], "200 mi → Charlotte + Richmond, no Houston, no remote for in-person");
+r = await invoke(res, { method: "POST", body: { zip: "24060", major: "Mechanical Engineering", type: "In-person", radius: 10 } }); assert.deepEqual(r.body.results, [], "nothing that close → empty, not far-away filler");
+r = await invoke(res, { method: "POST", body: { zip: "24060", major: "Finance", type: "In-person" } }); assert.deepEqual(r.body.results.map((c) => c.name), ["Delta"]);
 r = await invoke(res, { method: "POST", body: { major: "Mechanical Engineering", type: "Remote" } }); assert.deepEqual(r.body.results.map((c) => c.name), ["RemoteCo"]);
 assert.equal((await invoke(res, { method: "POST", body: { zip: "1", major: "x" } })).code, 400);
 f.failNext = () => true; r = await invoke(res, { method: "POST", body: { zip: "24060", major: "Mechanical Engineering" } }); assert.equal(r.code, 503, "DB down = error, not 'no results'");
-console.log("✓ results: real listings only, widening labeled, remote, error ≠ empty");
+console.log("✓ results: real listings only, inside the chosen radius only, remote labeled, error ≠ empty");
 
 // ── listings API ──
 const li = (await import("../api/listings.js")).default;
 const get = (query) => invoke(li, { method: "GET", query });
 assert.equal((await get({ state: "Virginia" })).code, 400); assert.equal((await get({ field: "astrology" })).code, 400); assert.equal((await get({ limit: "5000" })).code, 400);
 assert.match((await get({ state: "XX" })).body.error, /state/);
-r = await get({ state: "VA" }); assert.deepEqual(r.body.listings.map((l) => l.company), ["Alpha"]);
+r = await get({ state: "VA" }); assert.deepEqual(r.body.listings.map((l) => l.company).sort(), ["Alpha", "Richmond Co"]);
 r = await get({ limit: "2", offset: "0" }); assert.equal(r.body.listings.length, 2); assert.equal(r.body.meta.more, true);
 r = await get({ ids: "e:1,a:1" }); assert.equal(r.body.listings.length, 2); assert.equal(r.body.listings.find((l) => l.id === "e:1").open, false, "closed jobs kept in your history, marked closed");
 r = await get({ summary: "1" }); assert.equal(r.code, 200); assert.equal(typeof r.body.engineering, "number"); assert.ok(r.body.companies > 0);

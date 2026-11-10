@@ -1467,7 +1467,11 @@
   "Behavioral": "Gedragsgericht",
   "Technical": "Technisch",
   "Answer out loud against a timer and get scored on every answer.": "Antwoord hardop tegen een timer en krijg een score voor elk antwoord.",
-  "Start typing, e.g. Lockheed Martin": "Begin te typen, bijv. Lockheed Martin"
+  "Start typing, e.g. Lockheed Martin": "Begin te typen, bijv. Lockheed Martin",
+  "How far from your ZIP?": "Hoe ver van je postcode?",
+  "We only show openings inside this distance, measured city to city.": "We tonen alleen vacatures binnen deze afstand, gemeten van stad tot stad.",
+  "Remote = anywhere in the US. Hybrid/In-person = only within the distance you pick. Any = within your distance, plus remote roles.": "Op afstand = overal in de VS. Hybride/op locatie = alleen binnen de gekozen afstand. Maakt niet uit = binnen je afstand, plus banen op afstand.",
+  "In your area": "In jouw buurt"
  },
  "patterns": [
   [
@@ -1777,6 +1781,14 @@
   [
    "^Start practice with (.+) →$",
    "Oefenen met $1 starten →"
+  ],
+  [
+   "^(\\d+) mi away$",
+   "$1 mi verderop"
+  ],
+  [
+   "^Search (\\d+) miles$",
+   "Zoeken binnen $1 mijl"
   ]
  ]
 }
