@@ -42,6 +42,7 @@
 </head>
 <body>
 <script src="/nav.js"></script>
+<script src="/orbit-start.js" defer></script>
 <script src="/pick.js"></script>
 <main id="main">
   <div class="steps" aria-hidden="true"><span id="s1" class="on">1 · Your email</span><span id="s2">2 · About you</span><span id="s3">3 · Your school</span></div>
@@ -139,7 +140,10 @@
       if (staff && !$("#o_rl").value) { $("#o_msg").textContent = "Pick your role."; return; }
       b.disabled = true;
       try { await api({ action: "onboard", name: $("#o_nm").value, school: st.school || $("#o_sc").value, schoolId: st.schoolId, major: st.major || ($("#o_mj") && $("#o_mj").value) || "",
-          gradTerm: $("#o_gt").value, gradYear: $("#o_gy").value ? +$("#o_gy").value : null, show: $("#o_show").checked, ...(staff ? { staff: $("#o_rl").value } : {}) }); go(); }
+          gradTerm: $("#o_gt").value, gradYear: $("#o_gy").value ? +$("#o_gy").value : null, show: $("#o_show").checked, ...(staff ? { staff: $("#o_rl").value } : {}) });
+        // Nov 10: right after sign-up, the "build your orbit" checklist (join classmates' orbits) — then on to the site
+        if (window.btpOrbitStart) return window.btpOrbitStart.show({ getToken: () => C.session.getToken(), done: go, force: true });
+        go(); }
       catch (e) { b.disabled = false; $("#o_msg").textContent = e.message; }
     };
   }

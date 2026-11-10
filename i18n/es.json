@@ -1527,7 +1527,26 @@
   "Contact info is hidden from your profile.": "Tus datos de contacto están ocultos en tu perfil.",
   "Contact info is shown to signed-in Beat the Pile members, not to the public web.": "Tus datos de contacto son visibles para miembros con sesión iniciada en Beat the Pile, no para la web pública.",
   "Call": "Llamar",
-  "Send an email": "Enviar un correo"
+  "Send an email": "Enviar un correo",
+  "You're in. Now build your orbit.": "Ya estás dentro. Ahora arma tu órbita.",
+  "Join a few people's orbits so you can message classmates and see where they're interning.": "Únete a la órbita de algunas personas para escribir a tus compañeros y ver dónde hacen prácticas.",
+  "Profile saved": "Perfil guardado",
+  "Classmates can find you in Orbit": "Tus compañeros pueden encontrarte en Orbit",
+  "Show your profile in Orbit": "Muestra tu perfil en Orbit",
+  "Turn it on": "Actívalo",
+  "Following a company": "Sigues a una empresa",
+  "Follow a company you want": "Sigue a una empresa que te interese",
+  "Browse jobs": "Ver empleos",
+  "People at": "Personas en",
+  "People on Beat the Pile": "Personas en Beat the Pile",
+  "Your school": "Tu universidad",
+  "Insider": "Insider",
+  "✓ Requested": "✓ Solicitado",
+  "Joining…": "Uniéndote…",
+  "No one else from your school is on Beat the Pile yet. You're early. Share the link with classmates:": "Nadie más de tu universidad está aún en Beat the Pile. Llegaste pronto. Comparte el enlace con tus compañeros:",
+  "Add your school to your profile to see classmates here.": "Añade tu universidad a tu perfil para ver aquí a tus compañeros.",
+  "Open Orbit": "Abrir Orbit",
+  "Not now": "Ahora no"
  },
  "patterns": [
   [
@@ -1845,6 +1864,10 @@
   [
    "^Search (\\d+) miles$",
    "Buscar a $1 millas"
+  ],
+  [
+   "^Join (\\d+) people's orbits$",
+   "Únete a la órbita de $1 personas"
   ]
  ]
 }

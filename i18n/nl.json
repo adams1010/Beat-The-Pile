@@ -1527,7 +1527,26 @@
   "Contact info is hidden from your profile.": "Je contactgegevens zijn verborgen op je profiel.",
   "Contact info is shown to signed-in Beat the Pile members, not to the public web.": "Je contactgegevens zijn zichtbaar voor ingelogde Beat the Pile-leden, niet op het openbare web.",
   "Call": "Bellen",
-  "Send an email": "E-mail sturen"
+  "Send an email": "E-mail sturen",
+  "You're in. Now build your orbit.": "Je bent binnen. Bouw nu je baan op.",
+  "Join a few people's orbits so you can message classmates and see where they're interning.": "Sluit je aan bij de baan van een paar mensen, zodat je medestudenten berichten kunt sturen en ziet waar ze stage lopen.",
+  "Profile saved": "Profiel opgeslagen",
+  "Classmates can find you in Orbit": "Medestudenten kunnen je vinden in Orbit",
+  "Show your profile in Orbit": "Toon je profiel in Orbit",
+  "Turn it on": "Zet het aan",
+  "Following a company": "Je volgt een bedrijf",
+  "Follow a company you want": "Volg een bedrijf dat je wilt",
+  "Browse jobs": "Vacatures bekijken",
+  "People at": "Mensen bij",
+  "People on Beat the Pile": "Mensen op Beat the Pile",
+  "Your school": "Jouw school",
+  "Insider": "Insider",
+  "✓ Requested": "✓ Aangevraagd",
+  "Joining…": "Bezig…",
+  "No one else from your school is on Beat the Pile yet. You're early. Share the link with classmates:": "Nog niemand anders van je school zit op Beat the Pile. Je bent er vroeg bij. Deel de link met medestudenten:",
+  "Add your school to your profile to see classmates here.": "Voeg je school toe aan je profiel om hier medestudenten te zien.",
+  "Open Orbit": "Orbit openen",
+  "Not now": "Niet nu"
  },
  "patterns": [
   [
@@ -1845,6 +1864,10 @@
   [
    "^Search (\\d+) miles$",
    "Zoeken binnen $1 mijl"
+  ],
+  [
+   "^Join (\\d+) people's orbits$",
+   "Sluit je aan bij de baan van $1 mensen"
   ]
  ]
 }

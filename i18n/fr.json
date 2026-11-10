@@ -1527,7 +1527,26 @@
   "Contact info is hidden from your profile.": "Vos coordonnées sont masquées sur votre profil.",
   "Contact info is shown to signed-in Beat the Pile members, not to the public web.": "Vos coordonnées sont visibles par les membres connectés de Beat the Pile, pas sur le Web public.",
   "Call": "Appeler",
-  "Send an email": "Envoyer un e-mail"
+  "Send an email": "Envoyer un e-mail",
+  "You're in. Now build your orbit.": "C'est fait. Construisez maintenant votre orbite.",
+  "Join a few people's orbits so you can message classmates and see where they're interning.": "Rejoignez l'orbite de quelques personnes pour écrire à vos camarades et voir où ils font leur stage.",
+  "Profile saved": "Profil enregistré",
+  "Classmates can find you in Orbit": "Vos camarades peuvent vous trouver dans Orbit",
+  "Show your profile in Orbit": "Affichez votre profil dans Orbit",
+  "Turn it on": "Activer",
+  "Following a company": "Vous suivez une entreprise",
+  "Follow a company you want": "Suivez une entreprise qui vous intéresse",
+  "Browse jobs": "Parcourir les offres",
+  "People at": "Personnes à",
+  "People on Beat the Pile": "Personnes sur Beat the Pile",
+  "Your school": "Votre école",
+  "Insider": "Initié",
+  "✓ Requested": "✓ Demandé",
+  "Joining…": "Envoi…",
+  "No one else from your school is on Beat the Pile yet. You're early. Share the link with classmates:": "Personne d'autre de votre école n'est encore sur Beat the Pile. Vous êtes en avance. Partagez le lien avec vos camarades :",
+  "Add your school to your profile to see classmates here.": "Ajoutez votre école à votre profil pour voir vos camarades ici.",
+  "Open Orbit": "Ouvrir Orbit",
+  "Not now": "Pas maintenant"
  },
  "patterns": [
   [
@@ -1845,6 +1864,10 @@
   [
    "^Search (\\d+) miles$",
    "Chercher à $1 miles"
+  ],
+  [
+   "^Join (\\d+) people's orbits$",
+   "Rejoignez l'orbite de $1 personnes"
   ]
  ]
 }

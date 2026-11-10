@@ -140,6 +140,7 @@
 <script src="/nav.js"></script>
 <script src="/resume-file.js"></script>
 <script src="/pick.js"></script>
+<script src="/orbit-start.js" defer></script>
 <main id="main"><div class="card center muted" id="app">Loading…</div></main>
 <script>
 (function(){
@@ -635,6 +636,8 @@
       if (S.kitOk) try { await sync({ action: "set", kind: "profile", data: kit }); await sync({ action: "set", kind: "resumes", data: { list: resumes } }); S.kit = kit; S.resumes = resumes; S.kitOk = true; }
       catch (e) { msg.className = "msg err"; msg.textContent = "Profile saved, but the application kit didn't: " + e.message; btn.disabled = false; return; }
       load(); remember(); S.tab = "preview"; editor(); window.scrollTo(0, 0);
+      // Nov 10: after saving, nudge them to join a few orbits (until they've joined 3, or said "Not now" 3 times)
+      if (S.me.profilePublic && window.btpOrbitStart) window.btpOrbitStart.show({ getToken: token });
     } catch (e) { msg.className = "msg err"; msg.textContent = e.message; btn.disabled = false; }
   }
   function load(){
