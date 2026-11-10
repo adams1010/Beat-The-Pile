@@ -7,6 +7,7 @@
   if (window.__btpNav) return; window.__btpNav = true;
   // Line icons (24×24, stroke = currentColor) so they follow the link color and never look like emoji.
   const ICON = {
+    home: '<path d="M3.5 10.5 12 4l8.5 6.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-5.5h4V20"/>',
     jobs: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8.5 7V5.5A1.5 1.5 0 0 1 10 4h4a1.5 1.5 0 0 1 1.5 1.5V7"/><path d="M3 12.5h18"/>',
     fair: '<path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5c0 1.4 1.1 2.5 2.5 2.5S9 10.9 9 9.5c0 1.4 1.1 2.5 2.5 2.5h1c1.4 0 2.5-1.1 2.5-2.5 0 1.4 1.1 2.5 2.5 2.5S20 10.9 20 9.5"/><path d="M5.5 12v8h13v-8"/><path d="M10 20v-4.5h4V20"/>',
     orbit: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5S9.7 5.9 12 3.5z"/>',
@@ -29,7 +30,7 @@
   }
   const MAIN = BIZ
     ? [["/business/home/", "Home", "home"], ["/business/talent/", "Talent", "talent"], ["/orbit/", "Orbit", "orbit"], ["/business/fairs/", "Career Fairs", "fair"]]
-    : [["/jobs/", "Jobs", "jobs"], ["/fair/", "Career Fair", "fair"], ["/orbit/", "Orbit", "orbit"], ["/season/", "My Season", "season"]];
+    : [["/", "Home", "home"], ["/jobs/", "Jobs", "jobs"], ["/fair/", "Career Fair", "fair"], ["/orbit/", "Orbit", "orbit"], ["/season/", "My Season", "season"]];
   // Your profile (or company page), switching between student and business, language and sign-out all live in the
   // menu behind your picture on the right — like Instagram's "switch to professional account".
   const TOOLS = BIZ ? [] : [

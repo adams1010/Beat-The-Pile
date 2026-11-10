@@ -1516,7 +1516,14 @@
   "Any company, out loud, graded": "Jedes Unternehmen, laut, bewertet",
   "Classmates, insiders, messages": "Kommiliton:innen, Insider, Nachrichten",
   "Checklist + resume bullets": "Checkliste + Lebenslauf-Stichpunkte",
-  "Your school, your link": "Deine Hochschule, dein Link"
+  "Your school, your link": "Deine Hochschule, dein Link",
+  "Contact": "Kontakt",
+  "Contact email": "Kontakt-E-Mail",
+  "Phone (optional)": "Telefon (optional)",
+  "Show my contact info on my profile": "Meine Kontaktdaten im Profil zeigen",
+  "(only to signed-in Beat the Pile members, so people can email or call you in one tap)": "(nur für angemeldete Beat-the-Pile-Mitglieder, damit man dir mit einem Tipp schreiben oder dich anrufen kann)",
+  "Hidden from your profile.": "In deinem Profil ausgeblendet.",
+  "Shown to signed-in Beat the Pile members, not to the public web.": "Für angemeldete Beat-the-Pile-Mitglieder sichtbar, nicht im öffentlichen Web."
  },
  "patterns": [
   [

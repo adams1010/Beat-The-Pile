@@ -220,6 +220,10 @@ function cleanProfile(p) {
     experience: arr(p.experience, 10).map((x) => ({ title: txt(x?.title, 100), org: txt(x?.org, 100), when: txt(x?.when, 40), desc: txt(x?.desc, 600) })).filter((x) => x.title || x.org),
     projects: arr(p.projects, 8).map((x) => ({ name: txt(x?.name, 100), desc: txt(x?.desc, 600), link: httpsUrl(x?.link) })).filter((x) => x.name),
     links: { linkedin: httpsUrl(p.links?.linkedin), github: httpsUrl(p.links?.github), portfolio: httpsUrl(p.links?.portfolio) },
+    // Nov 10: contact on the profile — shown (clickable) to signed-in Beat the Pile users only, never to anonymous visitors
+    contact: (() => { const c = p.contact || {}; const email = /^[^\s@<>"]{1,64}@[^\s@<>"]{1,180}\.[a-z]{2,}$/i.test(String(c.email || "").trim()) ? String(c.email).trim().slice(0, 120) : null;
+      const phone = /^[+()\d][\d\s().+-]{6,22}$/.test(String(c.phone || "").trim()) ? String(c.phone).trim() : null;
+      return email || phone ? { email, phone, show: c.show !== false } : null; })(),
     showResume: p.showResume === true,
     openToEmployers: p.openToEmployers === true,
     openTo: (Array.isArray(p.openTo) ? p.openTo : []).filter((x) => x === "intern" || x === "fulltime").slice(0, 2),   // "Open to" badges          // "Let employers find me" (Find talent); off unless the student turns it on
@@ -241,7 +245,10 @@ async function publicProfile(req, res) {
   const p = cleanProfile(r.profile);          // re-cleaned on the way out, too
   const resume = p.showResume && r.resume_path && r.resume_share === true && r.resume_token ? `/r/${r.resume_token}` : null;
   delete p.showResume; delete p.openToEmployers;
-  res.setHeader("Cache-Control", "public, max-age=60");
+  // Contact info only for signed-in members (keeps emails/phones away from scrapers), and only if the student shows it
+  let member = false; if (p.contact && p.contact.show) { try { member = !!(await verifyClerkJWT(bearer(req))); } catch {} }
+  if (!member || !p.contact || !p.contact.show) delete p.contact; else delete p.contact.show;
+  res.setHeader("Cache-Control", member ? "private, no-store" : "public, max-age=60"); res.setHeader("Vary", "Authorization");
   const founding = await foundingFor(r.clerk_user_id).catch(() => null);
   return res.status(200).json({ handle: r.handle, profile: p, resume, founding });
 }

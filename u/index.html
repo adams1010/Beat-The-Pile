@@ -247,6 +247,11 @@
       .map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.school))}</div><div><b>${esc(x.school)}</b><div class="sm">${esc([x.degree, x.major, x.when].filter(Boolean).join(" · "))}</div></div></div>`).join("");
     const links = [["linkedin","LinkedIn"],["github","GitHub"],["portfolio","Portfolio"]].filter(([k]) => safeUrl(p.links?.[k]))
       .map(([k, t]) => `<a class="btn" href="${esc(p.links[k])}" target="_blank" rel="noopener nofollow ugc">${t} ↗</a>`).join("");
+    const tel = (x) => String(x || "").replace(/[^\d+]/g, "");
+    const contact = p.contact && (p.contact.email || p.contact.phone) ? `<section class="card"><h2>Contact</h2><div class="btns" style="margin-top:0">
+      ${p.contact.email ? `<a class="btn pri" href="mailto:${esc(p.contact.email)}" data-noi18n>Email ${esc(p.contact.email)}</a>` : ""}
+      ${p.contact.phone ? `<a class="btn" href="tel:${esc(tel(p.contact.phone))}" data-noi18n>Call ${esc(p.contact.phone)}</a>` : ""}
+      ${p.handle || !isPreview ? "" : ""}</div>${isPreview ? `<p class="small muted" style="margin:8px 0 0">${p.contact.show === false ? "Hidden from your profile." : "Shown to signed-in Beat the Pile members, not to the public web."}</p>` : ""}</section>` : "";
     const exp = (p.experience || []).map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.org || x.title))}</div><div><b>${esc(x.title)}</b>
       <div class="sm">${esc([x.org, x.when].filter(Boolean).join(" · "))}</div>${x.desc ? `<p>${esc(x.desc)}</p>` : ""}</div></div>`).join("");
     const proj = (p.projects || []).map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.name))}</div><div><b>${safeUrl(x.link) ? `<a href="${esc(x.link)}" target="_blank" rel="noopener nofollow ugc">${esc(x.name)} ↗</a>` : esc(x.name)}</b>
@@ -269,9 +274,10 @@
       </div></section>
       ${isPreview ? ownerCards(p) : ""}
       ${p.about ? `<section class="card"><h2>About</h2><p class="about">${esc(p.about)}</p></section>` : ""}
-      ${(p.education || []).length ? `<section class="card"><h2>Education</h2>${edu}</section>` : ""}
+      ${edu ? `<section class="card"><h2>Education</h2>${edu}</section>` : ""}
       ${exp ? `<section class="card"><h2>Experience</h2>${exp}</section>` : ""}
       ${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}
+      ${contact}
       ${(p.skills || []).length ? `<section class="card"><h2>Skills</h2><div class="chips">${p.skills.map((s, i) => `<span class="chip${i < 3 ? " top" : ""}">${esc(s)}</span>`).join("")}</div>${p.skills.length > 3 ? `<p class="small muted" style="margin:8px 0 0">Top skills first.</p>` : ""}</section>` : ""}
       ${isPreview ? kitCard(p) : ""}
       ${isPreview || seenMe() ? "" : `<section class="card cta"><h2>Make your own profile</h2><p class="small" style="margin:0 0 12px">One page for your experience, projects and skills, plus a QR code for career fairs. Free.</p><a class="btn pri" href="/start/" style="background:#B0F701;border-color:#B0F701;color:#060A2C">Get started</a></section>`}
@@ -279,7 +285,9 @@
   }
   async function showPublic(h){
     document.querySelector("main").innerHTML = '<div class="card center muted">Loading…</div>';
-    let r; try { r = await fetch("/api/me?u=" + encodeURIComponent(h)); } catch { r = null; }
+    // signed-in members also get the student's contact info (if they show it) — send the token when there is one
+    let tk = null; try { for (let i = 0; i < 20 && !(window.Clerk && window.Clerk.loaded); i++) await new Promise((ok) => setTimeout(ok, 150)); tk = window.Clerk && window.Clerk.session ? await window.Clerk.session.getToken() : null; } catch {}
+    let r; try { r = await fetch("/api/me?u=" + encodeURIComponent(h), tk ? { headers: { Authorization: "Bearer " + tk } } : undefined); } catch { r = null; }
     if (!r || r.status >= 500) { document.querySelector("main").innerHTML = '<div class="card center">Couldn’t load this profile right now. Try again in a minute.</div>'; return; }
     if (r.status === 404) { document.querySelector("main").innerHTML = `<div class="card center"><h1 style="font-size:22px">No public profile here</h1><p class="muted">This student hasn't made a profile public, or the link changed.</p><a class="btn pri" href="/u/">Make your own profile</a></div>`; return; }
     const d = await r.json();
@@ -382,6 +390,9 @@
         <div class="row"><div><label for="l_linkedin">LinkedIn</label><input id="l_linkedin" data-link="linkedin" value="${esc(d.p.links.linkedin || "")}" placeholder="https://linkedin.com/in/…"></div>
         <div><label for="l_github">GitHub</label><input id="l_github" data-link="github" value="${esc(d.p.links.github || "")}" placeholder="https://github.com/…"></div></div>
         <label for="l_portfolio">Portfolio / website</label><input id="l_portfolio" data-link="portfolio" value="${esc(d.p.links.portfolio || "")}" placeholder="https://">
+        <div class="row"><div><label for="c_email">Contact email</label><input id="c_email" type="email" data-contact="email" value="${esc((d.p.contact || {}).email || "")}" placeholder="you@school.edu"></div>
+        <div><label for="c_phone">Phone (optional)</label><input id="c_phone" type="tel" data-contact="phone" value="${esc((d.p.contact || {}).phone || "")}" placeholder="(555) 123-4567"></div></div>
+        <label class="switch"><input type="checkbox" id="c_show" ${(d.p.contact || {}).show === false ? "" : "checked"}><span>Show my contact info on my profile <small class="muted">(only to signed-in Beat the Pile members, so people can email or call you in one tap)</small></span></label>
         <label class="switch"><input type="checkbox" id="f_resume" ${d.p.showResume ? "checked" : ""}><span><b>Show a "View resume" button</b><br><span class="muted small">${me.resume ? (me.resume.share ? "Uses your Career Fair resume link (on)." : "Your resume link is off — turn it on in <a href='/fair/' style='color:var(--green-dark)'>Career Fair Mode</a> for this to show.") : "Upload a resume in <a href='/fair/' style='color:var(--green-dark)'>Career Fair Mode</a> first."}</span></span></label>
       </section>
       ${!S.kitOk ? `<section class="card private" id="kit"><div class="ptag">Private</div><h2>Application kit</h2><p class="small muted">Couldn't load your application kit right now, so it's hidden to keep it safe. Refresh in a minute.</p></section>` : `<section class="card private" id="kit"><div class="ptag">Private · only you see this</div><h2>Application kit</h2>
@@ -450,6 +461,8 @@
     main.querySelectorAll("[data-k]").forEach((el) => el.oninput = () => { d.p[el.dataset.k] = el.value; });
     main.querySelectorAll("[data-list]").forEach((el) => el.oninput = () => { d.p[el.dataset.list][+el.dataset.i][el.dataset.f] = el.value; });
     main.querySelectorAll("[data-link]").forEach((el) => el.oninput = () => { d.p.links[el.dataset.link] = el.value.trim(); });
+    main.querySelectorAll("[data-contact]").forEach((el) => el.oninput = () => { d.p.contact = { ...(d.p.contact || {}), [el.dataset.contact]: el.value.trim() }; });
+    const cs = $("#c_show"); if (cs) cs.onchange = () => { d.p.contact = { ...(d.p.contact || {}), show: cs.checked }; };
     const NEW = { experience: { title: "", org: "", when: "", desc: "" }, projects: { name: "", link: "", desc: "" }, education: { school: "", degree: "", major: "", when: "" } };
     main.querySelectorAll("[data-add]").forEach((b) => b.onclick = () => { (d.p[b.dataset.add] ||= []).push({ ...NEW[b.dataset.add] }); editor(); });
     wireEducation(d);
@@ -638,7 +651,9 @@
     if (!p.links.linkedin && k.linkedin) p.links.linkedin = https(k.linkedin); if (!p.links.portfolio && k.portfolio) p.links.portfolio = https(k.portfolio);
     if (!p.skills.length && k.topSkills) p.skills = String(k.topSkills).split(",").map((x) => x.trim()).filter(Boolean).slice(0, 30);
     p.gradYear = p.gradYear || "";
-    S.draft = { p, handle: S.me.handle || "", pub: S.me.handle ? S.me.profilePublic : true,   // Nov 10: new profiles start public; students switch it off to go private kit: { email: k.email || S.user?.primaryEmailAddress?.emailAddress || "", phone: k.phone || "", gpa: k.gpa || "", gradDate: k.gradDate || "", workAuth: k.workAuth || "", relocate: k.relocate || "", whyMe: k.whyMe || "" },
+    if (!p.contact && (k.email || S.user?.primaryEmailAddress?.emailAddress)) p.contact = { email: k.email || S.user.primaryEmailAddress.emailAddress, phone: k.phone || "", show: true };
+    // Nov 10: new profiles start public; students switch it off to go private
+    S.draft = { p, handle: S.me.handle || "", pub: S.me.handle ? S.me.profilePublic : true, kit: { email: k.email || S.user?.primaryEmailAddress?.emailAddress || "", phone: k.phone || "", gpa: k.gpa || "", gradDate: k.gradDate || "", workAuth: k.workAuth || "", relocate: k.relocate || "", whyMe: k.whyMe || "" },
       resumes: (S.resumes || []).map((r) => ({ ...r })) };
   }
   async function onUser(u){

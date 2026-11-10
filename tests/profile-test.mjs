@@ -11,11 +11,11 @@ const call = (method, sub, body, query = {}) => invoke(me, { method, query, body
 let r = await call("POST", "pa", { action: "profile", profile: { name: "Adam S", headline: "ME student", skills: ["SolidWorks", "SolidWorks", "MATLAB"] }, handle: "adam-s" });
 assert.equal(r.code, 200); assert.equal(r.body.profilePublic, false); assert.deepEqual(r.body.profile.skills, ["SolidWorks", "MATLAB"], "skills de-duplicated");
 assert.equal((await call("GET", null, null, { u: "adam-s" })).code, 404, "private profile is invisible");
-assert.equal((await call("POST", "pa", { action: "profile", profile: { name: "A" }, public: true })).code, 400, "public needs a link name");
+{ const z = await call("POST", "pz", { action: "profile", profile: { name: "Zoe Q" }, public: true }); assert.equal(z.code, 200); assert.equal(z.body.handle, "zoe-q", "Nov 10: no link name → one is made from the name"); }
 assert.equal((await call("POST", "pa", { action: "profile", profile: {}, handle: "adam-s", public: true })).code, 400, "public needs a name");
 assert.equal((await call("POST", "pa", { action: "profile", profile: { name: "A" }, handle: "admin" })).code, 400, "reserved handle");
 assert.equal((await call("POST", "pa", { action: "profile", profile: { name: "A" }, handle: "a b<script>" })).code, 400, "bad handle");
-console.log("✓ profile: private by default; public needs name + valid, non-reserved link");
+console.log("✓ profile: private unless asked; public needs a name; link name auto-made, never reserved or invalid");
 
 // public + cleaned output, unsafe links dropped
 r = await call("POST", "pa", { action: "profile", handle: "Adam-S", public: true, profile: {
@@ -68,4 +68,17 @@ console.log("PROFILE TESTS PASSED");
   r = await call("POST", "pa", { action: "profile", handle: "adam-s", public: true, profile: { name: "Adam S", photo: null } });
   assert.equal(r.body.profile.photo, null, "removable");
   console.log("✓ profile photo: real JPEG/PNG/WebP only, size-capped, shows publicly, removable");
+}
+
+// Nov 10: contact info — clickable on the profile, but only for signed-in members and only if the student shows it
+{
+  let r = await call("POST", "pa", { action: "profile", handle: "adam-s", public: true, profile: { name: "Adam S", contact: { email: "adam@vt.edu", phone: "(540) 555-0100", show: true } } });
+  assert.deepEqual(r.body.profile.contact, { email: "adam@vt.edu", phone: "(540) 555-0100", show: true });
+  r = await call("GET", null, null, { u: "adam-s" }); assert.equal(r.body.profile.contact, undefined, "anonymous visitors never see it");
+  r = await call("GET", "pb", null, { u: "adam-s" }); assert.deepEqual(r.body.profile.contact, { email: "adam@vt.edu", phone: "(540) 555-0100" }, "signed-in members do");
+  await call("POST", "pa", { action: "profile", handle: "adam-s", public: true, profile: { name: "Adam S", contact: { email: "adam@vt.edu", show: false } } });
+  r = await call("GET", "pb", null, { u: "adam-s" }); assert.equal(r.body.profile.contact, undefined, "hidden when switched off");
+  r = await call("POST", "pa", { action: "profile", handle: "adam-s", public: true, profile: { name: "Adam S", contact: { email: "javascript:alert(1)", phone: "<b>" } } });
+  assert.equal(r.body.profile.contact, null, "junk refused");
+  console.log("✓ profile contact: members only, opt-out respected, junk refused");
 }

@@ -1516,7 +1516,14 @@
   "Any company, out loud, graded": "Elk bedrijf, hardop, met score",
   "Classmates, insiders, messages": "Medestudenten, insiders, berichten",
   "Checklist + resume bullets": "Checklist + cv-punten",
-  "Your school, your link": "Jouw school, jouw link"
+  "Your school, your link": "Jouw school, jouw link",
+  "Contact": "Contact",
+  "Contact email": "Contactmail",
+  "Phone (optional)": "Telefoon (optioneel)",
+  "Show my contact info on my profile": "Mijn contactgegevens op mijn profiel tonen",
+  "(only to signed-in Beat the Pile members, so people can email or call you in one tap)": "(alleen voor ingelogde Beat the Pile-leden, zodat ze je met één tik kunnen mailen of bellen)",
+  "Hidden from your profile.": "Verborgen op je profiel.",
+  "Shown to signed-in Beat the Pile members, not to the public web.": "Zichtbaar voor ingelogde Beat the Pile-leden, niet op het openbare web."
  },
  "patterns": [
   [
