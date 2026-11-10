@@ -193,6 +193,17 @@ export function cleanPhoto(v) {
     webp: b.slice(0, 4).toString("ascii") === "RIFF" && b.slice(8, 12).toString("ascii") === "WEBP" };
   return magic[m[1]] ? v : null;
 }
+/** A free link name from the person's name: jordan-lee, jordan-lee-2, … (Nov 9/10). */
+async function autoHandle(uid, profile) {
+  const stem = (String(profile.name || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 24) || (profile.staff ? "staff" : "student")).padEnd(3, "0");
+  for (let i = 0; i < 40; i++) {
+    const h = i ? `${stem}-${i + 1}` : stem;
+    if (!HANDLE_OK.test(h) || RESERVED.has(h)) continue;
+    const taken = await db.selectAsAdmin(`user_jobs?select=clerk_user_id&handle=eq.${encodeURIComponent(h)}&limit=1`);
+    if (!taken[0] || taken[0].clerk_user_id === uid) return h;
+  }
+  return `student-${crypto.randomBytes(3).toString("hex")}`;
+}
 const STAFF_ROLES = ["Professor", "Lecturer or instructor", "Academic advisor", "Career center", "Department staff", "Other school staff"];
 function cleanProfile(p) {
   p = p && typeof p === "object" ? p : {};
@@ -407,10 +418,10 @@ export default async function handler(req, res) {
     if (action === "profile") {
       const profile = cleanProfile(body.profile);
       const pub = body.public === true;
-      const handle = body.handle == null || body.handle === "" ? null : String(body.handle).trim().toLowerCase();
+      let handle = body.handle == null || body.handle === "" ? null : String(body.handle).trim().toLowerCase();
       if (handle !== null && (!HANDLE_OK.test(handle) || RESERVED.has(handle))) return res.status(400).json({ error: "Pick a link name: 3–30 letters, numbers or dashes" });
-      if (pub && !handle) return res.status(400).json({ error: "Pick a link name before making your profile public" });
       if (pub && !profile.name) return res.status(400).json({ error: "Add your name before making your profile public" });
+      if (pub && !handle) handle = await autoHandle(uid, profile);   // Nov 10: no link name yet → make one from their name
       if (handle) {
         const taken = await db.selectAsAdmin(`user_jobs?select=clerk_user_id&handle=eq.${encodeURIComponent(handle)}&limit=1`);
         if (taken[0] && taken[0].clerk_user_id !== uid) return res.status(409).json({ error: "That link name is taken — try another" });
@@ -441,18 +452,9 @@ export default async function handler(req, res) {
         major: pick("major"), gradYear: body.staff ? null : pick("gradYear"), gradTerm: body.staff ? null : pick("gradTerm"), staff: body.staff !== undefined ? body.staff : base.staff });
       if (!profile.name) return res.status(400).json({ error: "Add your name" });
       if (!profile.school) return res.status(400).json({ error: "Pick your school" });
-      let handle = cur?.handle || null;
-      if (!handle) {
-        const stem = (profile.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 24) || (profile.staff ? "staff" : "student")).padEnd(3, "0");
-        for (let i = 0; i < 40 && !handle; i++) {
-          const h = i ? `${stem}-${i + 1}` : stem;
-          if (!HANDLE_OK.test(h) || RESERVED.has(h)) continue;
-          const taken = await db.selectAsAdmin(`user_jobs?select=clerk_user_id&handle=eq.${encodeURIComponent(h)}&limit=1`);
-          if (!taken[0] || taken[0].clerk_user_id === uid) handle = h;
-        }
-        handle ||= `student-${crypto.randomBytes(3).toString("hex")}`;
-      }
-      const pub = body.show === true ? true : body.show === false ? false : cur?.profile_public === true;
+      const handle = cur?.handle || (await autoHandle(uid, profile));
+      // Nov 10: public by default — only an explicit "no" (show:false) keeps a profile private
+      const pub = body.show === false ? false : body.show === true ? true : cur?.handle ? cur?.profile_public === true : true;
       try { return send(await mutate(uid, () => ({ profile, handle, profile_public: pub }))); }
       catch (e) { if (/23505|duplicate key/i.test(String(e?.message))) return res.status(409).json({ error: "Try again in a moment" }); throw e; }
     }

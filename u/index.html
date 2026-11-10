@@ -615,7 +615,7 @@
     if (bad.length) { msg.className = "msg err"; msg.textContent = "Links must start with https://"; btn.disabled = false; return; }
     try {
       const p = { ...S.draft.p, gradYear: S.draft.p.gradYear ? Number(S.draft.p.gradYear) : null };
-      S.me = await api("POST", { action: "profile", profile: p, handle: S.draft.handle.replace(/^-+|-+$/g, "") || null, public: S.draft.pub });
+      S.me = await api("POST", { action: "profile", profile: p, handle: S.draft.handle.replace(/^-+|-+$/g, "") || null, public: S.draft.pub && (!!S.me.handle || !!String(p.name || "").trim()) });
       // One profile: the shared fields also go into the application kit the homepage uses (name, school, links, skills)
       const resumes = S.draft.resumes.filter((r) => (r.text || "").trim()).slice(0, 6).map((r, i) => ({ id: r.id || Date.now() + i, name: (r.name || `Resume ${i + 1}`).slice(0, 60), text: String(r.text || "").slice(0, 30000), ...(r.file ? { file: { name: String(r.file.name || "").slice(0, 120), size: +r.file.size || 0, pages: +r.file.pages || null, kind: String(r.file.kind || "").slice(0, 10) } } : {}) }));
       const kit = { ...S.kit, ...S.draft.kit, fullName: p.name || "", school: p.school || "", major: p.major || "", linkedin: p.links.linkedin || S.kit.linkedin || "",
@@ -638,7 +638,7 @@
     if (!p.links.linkedin && k.linkedin) p.links.linkedin = https(k.linkedin); if (!p.links.portfolio && k.portfolio) p.links.portfolio = https(k.portfolio);
     if (!p.skills.length && k.topSkills) p.skills = String(k.topSkills).split(",").map((x) => x.trim()).filter(Boolean).slice(0, 30);
     p.gradYear = p.gradYear || "";
-    S.draft = { p, handle: S.me.handle || "", pub: S.me.profilePublic, kit: { email: k.email || S.user?.primaryEmailAddress?.emailAddress || "", phone: k.phone || "", gpa: k.gpa || "", gradDate: k.gradDate || "", workAuth: k.workAuth || "", relocate: k.relocate || "", whyMe: k.whyMe || "" },
+    S.draft = { p, handle: S.me.handle || "", pub: S.me.handle ? S.me.profilePublic : true,   // Nov 10: new profiles start public; students switch it off to go private kit: { email: k.email || S.user?.primaryEmailAddress?.emailAddress || "", phone: k.phone || "", gpa: k.gpa || "", gradDate: k.gradDate || "", workAuth: k.workAuth || "", relocate: k.relocate || "", whyMe: k.whyMe || "" },
       resumes: (S.resumes || []).map((r) => ({ ...r })) };
   }
   async function onUser(u){

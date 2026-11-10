@@ -54,6 +54,8 @@
   const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const pre = ["student", "employer"].includes(qs.get("role")) ? qs.get("role") : null;
   if (pre === "employer") { const s2 = document.getElementById("s2"); if (s2) s2.textContent = "2 · Your company"; }
+  const roleNow = () => { const u = window.Clerk && window.Clerk.user; return (u && u.unsafeMetadata && u.unsafeMetadata.role) || ""; };
+  const wantSchool = qs.get("school") === "1";   // sent here by the top bar / welcome sheet: no school on file yet
   const next = /^\/[a-z0-9/_#?=&-]*$/i.test(qs.get("next") || "") ? qs.get("next") : null;
   function stepEmail(C){
     $("#s1").className = "on"; $("#s2").className = "";
@@ -88,6 +90,11 @@
     $("#out").onclick = async (e) => { e.preventDefault(); await C.signOut(); location.reload(); };
   }
   // Step 3 (students, Nov 9): school, major, graduation → classmates at the same school see each other in Orbit right away.
+  async function stepSchoolOrRole(C){
+    let mine = {}; try { const t = await C.session?.getToken?.(); const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + t } }); if (r.ok) mine = (await r.json()).profile || {}; } catch {}
+    if (mine.school) return wantSchool ? (location.href = next || "/jobs/") : stepRole(C);   // already in their school's orbit
+    return stepSchool(C, roleNow() === "educator");
+  }
   async function stepSchool(C, staff){
     const api = async (body) => { const t = await C.session?.getToken?.(); const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + t }, body: JSON.stringify(body) });
       const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Couldn't save. Try again."); return j; };
@@ -123,9 +130,10 @@
         $("#o_mj").oninput = (e) => { st.major = e.target.value; };
       }
     };
-    P.attach($("#o_sc"), { load: P.schools, other: true, onPick: (it) => { st.school = it ? it.label : ""; st.schoolId = it && it.id ? it.id : null; majorBox(); } });
+    P.attach($("#o_sc"), { load: P.schools, other: true, hint: "Type the first letters of your school, e.g. Virginia Tech", onPick: (it) => { st.school = it ? it.label : ""; st.schoolId = it && it.id ? it.id : null; majorBox(); } });
     majorBox();
-    $("#o_skip").onclick = (e) => { e.preventDefault(); go(); };
+    if (nm) $("#o_sc").focus();
+    $("#o_skip").onclick = (e) => { e.preventDefault(); try { sessionStorage.setItem("btp_school_skip", "1"); } catch {} go(); };
     $("#o_go").onclick = async () => {
       const b = $("#o_go"); $("#o_msg").textContent = "";
       if (staff && !$("#o_rl").value) { $("#o_msg").textContent = "Pick your role."; return; }
@@ -145,7 +153,8 @@
       }
       if (typeof window.Clerk.load === "function" && !window.Clerk.loaded) await window.Clerk.load({});
       const C = window.Clerk;
-      const show = () => (C.user ? stepRole(C) : stepEmail(C));
+      // Nov 10: a student or school staff who already picked a role but has no school yet goes straight to the school step
+      const show = () => (!C.user ? stepEmail(C) : ["student", "educator"].includes(roleNow()) && pre !== "employer" ? stepSchoolOrRole(C) : stepRole(C));
       let last = C.user?.id || null; C.addListener?.(({ user }) => { const id = user?.id || null; if (id !== last) { last = id; show(); } });
       show();
     } catch { $("#view").innerHTML = '<div class="panel center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; }

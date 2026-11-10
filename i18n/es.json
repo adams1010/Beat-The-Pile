@@ -1458,7 +1458,9 @@
   "Shown as a Faculty & staff tag. School staff aren't listed in employers' Find talent.": "Se muestra como etiqueta de Profesorado y personal. El personal universitario no aparece en la búsqueda de talento de las empresas.",
   "2 · About you": "2 · Sobre ti",
   "You're hidden, so classmates can't see you or join your orbit.": "Estás oculto, así que tus compañeros no pueden verte ni unirse a tu órbita.",
-  "Show me in Orbit": "Mostrarme en Orbit"
+  "Show me in Orbit": "Mostrarme en Orbit",
+  "Find your job": "Encuentra tu trabajo",
+  "Type the first letters of your school, e.g. Virginia Tech": "Escribe las primeras letras de tu universidad, p. ej. Virginia Tech"
  },
  "patterns": [
   [

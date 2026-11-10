@@ -1458,7 +1458,9 @@
   "Shown as a Faculty & staff tag. School staff aren't listed in employers' Find talent.": "Getoond als label Docenten & medewerkers. Schoolpersoneel staat niet in Talent zoeken van werkgevers.",
   "2 · About you": "2 · Over jou",
   "You're hidden, so classmates can't see you or join your orbit.": "Je bent verborgen, dus medestudenten zien je niet en kunnen niet in je baan komen.",
-  "Show me in Orbit": "Toon mij in Orbit"
+  "Show me in Orbit": "Toon mij in Orbit",
+  "Find your job": "Vind je baan",
+  "Type the first letters of your school, e.g. Virginia Tech": "Typ de eerste letters van je school, bijv. Virginia Tech"
  },
  "patterns": [
   [

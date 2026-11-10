@@ -1,4 +1,4 @@
-/* built from src/home.jsx ca9df4d3444933dd — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx a917400af4a49e0c — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -1129,7 +1129,7 @@ function LandingD({
       margin: "0 0 16px",
       color: "#fff"
     }
-  }, "Find your internship", React.createElement("br", null), "before the ", React.createElement("span", {
+  }, "Find your job", React.createElement("br", null), "before the ", React.createElement("span", {
     style: {
       color: "#B0F701"
     }

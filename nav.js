@@ -225,7 +225,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);
 
   // ── Welcome sheet: right after someone signs in for the first time, ask "looking" or "hiring" (saved on their Clerk account) ──
-  const DEST = { student: "/jobs/", employer: "/business/setup/", educator: "/u/" };
+  const DEST = { student: "/start/?school=1", employer: "/business/setup/", educator: "/start/?school=1" };   // students + staff: the quick school step next
   async function saveRole(role, go){
     const u = window.Clerk && window.Clerk.user;
     try { if (u) await u.update({ unsafeMetadata: { ...(u.unsafeMetadata || {}), role } }); } catch {}
@@ -277,8 +277,16 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     try {
       const t = await C.session.getToken(); if (!t) return;
       const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + t }, body: JSON.stringify({ action: "orbit_count" }) });
-      if (r.ok) window.btpOrbitBadge((await r.json()).n);
+      if (r.ok) { const j = await r.json(); window.btpOrbitBadge(j.n); if (j.needsSchool) askSchool(C); }
     } catch {} finally { badgeBusy = false; }
+  }
+  // Nov 10: a student (or school staff) with no school on file goes to the quick school step once per visit,
+  // so they land in their school's orbit. "Skip for now" there stops it for this browser session.
+  function askSchool(C){
+    const role = (C.user && C.user.unsafeMetadata && C.user.unsafeMetadata.role) || "";
+    if (!["student", "educator"].includes(role) || /^\/(start|u|privacy|business|co)\b/.test(path)) return;
+    try { if (sessionStorage.getItem("btp_school_skip")) return; } catch {}
+    location.href = "/start/?school=1&next=" + encodeURIComponent(location.pathname + location.search + location.hash);
   }
   function startBadge(C){
     orbitBadge(C);

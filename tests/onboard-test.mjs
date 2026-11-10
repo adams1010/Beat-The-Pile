@@ -24,6 +24,12 @@ assert.deepEqual(r.body.profile.skills, ["CAD"]); assert.equal(r.body.profilePub
 await call("u_c", { action: "profile", handle: null, public: false, profile: { name: "Cal Reed", school: "VT", major: "Mechanical Engineering" } });
 r = await call("u_c", { action: "onboard", show: true });
 assert.equal(r.code, 200); assert.equal(r.body.profilePublic, true); assert.equal(r.body.handle, "cal-reed"); assert.equal(r.body.profile.major, "Mechanical Engineering");
+// Nov 10: public by default — a first save with public:true and no link name gets one from the name
+await call("u_c", { action: "profile", handle: null, public: false, profile: { name: "Cal Reed", school: "VT" } });
+r = await call("u_c", { action: "profile", handle: null, public: true, profile: { name: "Cal Reed", school: "VT" } });
+assert.equal(r.code, 200); assert.equal(r.body.profilePublic, true); assert.ok(/^cal-reed/.test(r.body.handle));
+// top bar: needsSchool for a student without a school
+r = await call("u_c", { action: "orbit_count" }); assert.equal(r.body.needsSchool, false);
 // school staff (Nov 9): a professor gets a role tag, no graduation, and shows up on campus — never as a classmate's grad year
 r = await call("u_p", { action: "onboard", name: "Dr. Kim", school: "Virginia Tech", major: "Mechanical Engineering", staff: "Professor", gradYear: 2027, show: true });
 assert.equal(r.body.profile.staff, "Professor"); assert.equal(r.body.profile.gradYear, null); assert.equal(r.body.handle, "dr-kim");

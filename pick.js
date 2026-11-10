@@ -46,12 +46,12 @@
       const other = o.other && q && !shown.some((x) => norm(x.label) === norm(q));
       box.innerHTML = shown.map((it, i) => `<button type="button" role="option" data-i="${i}" aria-selected="${i === sel}">${esc(it.label)}${it.sub ? `<small>${esc(it.sub)}</small>` : ""}</button>`).join("")
         + (other ? `<button type="button" class="bpk-o" data-other="1">${esc(o.otherLabel || "Not listed — use")} “${esc(q)}”</button>` : "")
-        + (!shown.length && !other ? `<p>${q ? "Nothing matches. Try fewer letters." : "Start typing to see the list."}</p>` : "");
-      place(); box.hidden = !q && !o.empty;
+        + (!shown.length && !other ? `<p>${q ? "Nothing matches. Try fewer letters." : esc(o.hint || "Start typing to see the list.")}</p>` : "");
+      place(); box.hidden = !q && !o.empty && !o.hint;
     };
     const choose = (it) => { input.value = it.label; picked = it.label; box.hidden = true; o.onPick && o.onPick(it); input.dispatchEvent(new Event("change", { bubbles: true })); };
     input.addEventListener("input", paint);
-    input.addEventListener("focus", () => { if (input.value.trim() || o.empty) paint(); });
+    input.addEventListener("focus", () => { if (input.value.trim() || o.empty || o.hint) paint(); });
     input.addEventListener("keydown", (e) => {
       if (box.hidden) return;
       const btns = [...box.querySelectorAll("button")];
