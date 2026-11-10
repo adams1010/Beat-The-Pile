@@ -42,3 +42,18 @@ assert.equal((await invoke(api, { method: "GET", query: { kind: "senior" } })).c
 const sum = await get({ summary: "1" });
 assert.equal(sum.allMajors, 4, "headline numbers stay internships"); assert.equal(sum.fulltime, 2);
 console.log("✓ full-time: early-career rules, Postgres pattern = JS rule, readers keep them, kind=intern default / fulltime / all, summary split");
+
+// Nov 10: more real first-job titles count as full-time; senior/trade/retail versions still don't
+{
+  const { isEarlyCareer: ec, kindOf: k2, FULLTIME_PG } = await import("../lib/fields.js");
+  for (const t of ["Staff Accountant", "Staff Auditor - Assurance", "Sales Development Representative", "Business Development Rep", "SDR - East",
+    "Management Trainee", "Marketing Coordinator", "Recruiting Coordinator", "Research Coordinator", "Assistant Buyer", "Assistant Media Planner",
+    "Account Coordinator", "Analyst Program 2027", "Leadership Development Program - Finance", "Post-Graduate Fellowship", "Software Engineer Level 1"])
+    assert.ok(ec(t), "should count: " + t);
+  for (const t of ["Senior Staff Accountant", "Staff Engineer", "Staff Software Engineer", "Senior Marketing Coordinator", "Project Coordinator III",
+    "Truck Driver Trainee", "Retail Sales Coordinator", "Store Coordinator", "Marketing Coordinator Intern", "Sales Development Manager", "Lead Recruiting Coordinator"])
+    assert.ok(!ec(t), "should NOT count: " + t);
+  assert.equal(k2("Recruiting Coordinator Intern"), "intern");
+  assert.doesNotThrow(() => new RegExp(FULLTIME_PG.replace(/\\y/g, "\\b"), "i"));
+  console.log("✓ full-time (Nov 10): staff accountant, SDR/BDR, trainees, coordinators, programs count; senior/trade/retail don't");
+}

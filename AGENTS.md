@@ -139,6 +139,7 @@ with the CRON_SECRET. To add a bot: add it to `BOTS` in `lib/bots.js`, check the
 2. **Backlog** (`data/backlog.json`, 3,000+ companies from 3 years of SimplifyJobs history; rebuild with
    `scripts/build-backlog.mjs`). The finder pulls 60 more whenever <120 are queued; it checks up to 60 per run, 12 at once.
 3. **Nightly SimplifyJobs import**, **career-fair lists** (`fair/fairs.json`, `lib/candidates.js`), **links pasted on /discovery**.
+**Rescue (Nov 10):** an `identity_failed` scouted board with no website on file → `guessDomain` (full name on the page) → live only if that site links to THIS exact board (`discoverOne`); every such row got one re-check (`RESCUE_AT` in api/discover.js). `board_error` retries after 2 days.
 4. The **Company Finder** retries failed checks after 14 days (7 in hiring season Aug–Feb), up to 6 tries; it takes the queue by `priority desc` (ME-heavy ~60–95, other engineering ~20–40, other majors
    <20), finds each company's board (or uses the hint), and **proves** it's theirs before enabling it.
 
@@ -183,7 +184,7 @@ entry level, early career, rotational / development programs, "Engineer I / Anal
 never senior/lead/manager/II+/"N+ years", never internships, years < 2026 dropped). Keyword readers add `EARLY_QUERIES`
 ("new grad", "entry level", "graduate", + "associate" since Nov 9 — probed on 26 Workday boards, it roughly doubles the new-grad roles found) capped at `EARLY_PAGES` (2) pages each, and a failed early search never costs the
 internships; Workday adds the same keyword searches after the intern facet; Greenhouse/Lever/Ashby/BambooHR/Paylocity/ADP/UKG
-already read every job. **No new column:** `/api/listings?kind=intern|fulltime|all` (default `intern`, so old pages are unchanged)
+already read every job. **Nov 10 widening:** EARLY also counts Staff Accountant/Auditor, SDR/BDR, trainees, coordinators (marketing, recruiting, research, project…), assistant buyer/planner, "… Development/Analyst Program", post-grad fellowships, "Level 1"; `EARLY_QUERIES` + early career/rotational/development program/trainee; `EARLY_PAGES` 4; Workday keeps paging (≤`EARLY_MAX_PAGES` 8) while a page still has early-career roles. Probed on 8 big boards: full-time 61 → 104, internships unchanged, ~15 s/company (was ~8). **No new column:** `/api/listings?kind=intern|fulltime|all` (default `intern`, so old pages are unchanged)
 filters with PostgREST `title=imatch.<INTERN_PG>`; every row comes back with `kind`; `summary` keeps `allMajors` = internships and
 adds `fulltime`. `/jobs` has an Internships · Full-time · Both switch (`?kind=`) and a "Full-time" badge. Probed Nov 8 on real
 boards (Boeing, Northrop, L3Harris, BWXT, Merck, Stripe, Palantir): 3–28 early-career roles each, ≤8 s per company.
