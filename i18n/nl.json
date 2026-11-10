@@ -1525,7 +1525,9 @@
   "Hidden from your profile.": "Verborgen op je profiel.",
   "Shown to signed-in Beat the Pile members, not to the public web.": "Zichtbaar voor ingelogde Beat the Pile-leden, niet op het openbare web.",
   "Contact info is hidden from your profile.": "Je contactgegevens zijn verborgen op je profiel.",
-  "Contact info is shown to signed-in Beat the Pile members, not to the public web.": "Je contactgegevens zijn zichtbaar voor ingelogde Beat the Pile-leden, niet op het openbare web."
+  "Contact info is shown to signed-in Beat the Pile members, not to the public web.": "Je contactgegevens zijn zichtbaar voor ingelogde Beat the Pile-leden, niet op het openbare web.",
+  "Call": "Bellen",
+  "Send an email": "E-mail sturen"
  },
  "patterns": [
   [

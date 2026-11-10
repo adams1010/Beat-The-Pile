@@ -1525,7 +1525,9 @@
   "Hidden from your profile.": "In deinem Profil ausgeblendet.",
   "Shown to signed-in Beat the Pile members, not to the public web.": "Für angemeldete Beat-the-Pile-Mitglieder sichtbar, nicht im öffentlichen Web.",
   "Contact info is hidden from your profile.": "Deine Kontaktdaten sind in deinem Profil ausgeblendet.",
-  "Contact info is shown to signed-in Beat the Pile members, not to the public web.": "Deine Kontaktdaten sind für angemeldete Beat-the-Pile-Mitglieder sichtbar, nicht im öffentlichen Web."
+  "Contact info is shown to signed-in Beat the Pile members, not to the public web.": "Deine Kontaktdaten sind für angemeldete Beat-the-Pile-Mitglieder sichtbar, nicht im öffentlichen Web.",
+  "Call": "Anrufen",
+  "Send an email": "E-Mail senden"
  },
  "patterns": [
   [

@@ -250,7 +250,7 @@
     const tel = (x) => String(x || "").replace(/[^\d+]/g, "");
     // Nov 10: contact sits at the top, in the profile header (email / call buttons)
     const hasC = p.contact && (p.contact.email || p.contact.phone);
-    const contactBtns = hasC ? `${p.contact.email ? `<a class="btn pri" href="mailto:${esc(p.contact.email)}" data-noi18n>Email ${esc(p.contact.email)}</a>` : ""}${p.contact.phone ? `<a class="btn" href="tel:${esc(tel(p.contact.phone))}" data-noi18n>Call ${esc(p.contact.phone)}</a>` : ""}` : "";
+    const contactBtns = hasC ? `${p.contact.email ? `<a class="btn pri" href="mailto:${esc(p.contact.email)}" title="Send an email">Email</a>` : ""}${p.contact.phone ? `<a class="btn" href="tel:${esc(tel(p.contact.phone))}" title="Call">Call</a>` : ""}` : "";
     const contactNote = hasC && isPreview ? `<p class="small muted" style="margin:6px 0 0">${p.contact.show === false ? "Contact info is hidden from your profile." : "Contact info is shown to signed-in Beat the Pile members, not to the public web."}</p>` : "";
     const exp = (p.experience || []).map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.org || x.title))}</div><div><b>${esc(x.title)}</b>
       <div class="sm">${esc([x.org, x.when].filter(Boolean).join(" · "))}</div>${x.desc ? `<p>${esc(x.desc)}</p>` : ""}</div></div>`).join("");
