@@ -48,3 +48,23 @@ console.log("discoverOne falls back to guess ✓\nALL GUESS TESTS PASSED");
   assert.equal(r.status, "identity_failed", "their site links to a DIFFERENT Paylocity board → held back");
   console.log("✓ Paylocity from Board Scout: live only when the likely website links to this exact board");
 }
+
+// Nov 10 rescue: a scouted Greenhouse board whose name doesn't prove the company, no website on file → guessed website
+// must carry the full name AND link to THIS exact board; a link to some other board keeps it held back.
+{
+  const H = (s, html, url) => ({ ok: s < 400, status: s, url, headers: { get: () => "text/html" }, text: async () => html, json: async () => ({}) });
+  const run = async (linksTo) => {
+    globalThis.fetch = async (u) => { u = String(u);
+      if (u === "https://www.brightlinehealth.com/") return H(200, "<title>Brightline Health | Care for families</title>", u);
+      if (/brightlinehealth\.com\/careers$/.test(u)) return H(200, `<a href="https://boards.greenhouse.io/${linksTo}">Open roles</a>`, u);
+      if (/boards-api\.greenhouse\.io\/v1\/boards\/(bhx|otherco)$/.test(u)) return J(200, { name: "BHX" });
+      if (/boards-api\.greenhouse\.io\/v1\/boards\/(bhx|otherco)\/jobs/.test(u)) return J(200, { jobs: [{ id: 1, title: "Data Analyst Intern", location: { name: "Denver, CO" } }] });
+      return { ok: false, status: 404, url: u, headers: { get: () => null }, text: async () => "", json: async () => ({}) }; };
+    return discoverOne({ company: "Brightline Health", key: "brightlinehealth", domain: null, hint: "https://boards.greenhouse.io/bhx" });
+  };
+  let r = await run("bhx");
+  assert.equal(r.status, "live", r.detail); assert.equal(r.domain, "brightlinehealth.com"); assert.match(r.detail, /links to this exact board/);
+  r = await run("otherco");
+  assert.notEqual(r.status, "live", "their site links to a different board → still held back");
+  console.log("✓ rescue: held-back board goes live only when the company's own (full-name) website links to that exact board");
+}

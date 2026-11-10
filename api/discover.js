@@ -20,6 +20,8 @@ const READERS_UPDATED_AT = "2026-11-07T06:00:00Z";   // bump when a new reader s
 const inSeason = (d = new Date()) => { const m = d.getUTCMonth(); return m >= 7 || m <= 1; };
 const RETRY_AFTER_DAYS = inSeason() ? 7 : 14;
 const MAX_TRIES = 6;
+const BOARD_ERROR_RETRY_DAYS = 2;    // Nov 10: a board that errored is usually a hiccup — try again in 2 days, not 1–2 weeks
+const RESCUE_AT = "2026-11-10T18:00:00Z";   // Nov 10: held-back boards with no website on file get one re-check with the website rescue
 
 export default async function handler(req, res) {
   if (!isAuthorizedCron(req)) return res.status(401).json({ error: "Unauthorized" });
@@ -92,6 +94,13 @@ export default async function handler(req, res) {
     await db.update(`company_candidates?id=in.(${unpark.map(encodeURIComponent).join(",")})`, { status: "pending", checked_at: null });
   }
 
+  // 1c') Rescue (once): boards held back before the website rescue shipped, with a board link but no website on file
+  const held = await db.selectAllAsAdmin(`company_candidates?select=id&status=eq.identity_failed&domain=is.null&hint=not.is.null&checked_at=lt.${RESCUE_AT}`);
+  for (let i = 0; i < held.length; i += 150) {
+    const ids = held.slice(i, i + 150).map((r) => r.id);
+    await db.update(`company_candidates?id=in.(${ids.map(encodeURIComponent).join(",")})`, { status: "pending", checked_at: null });
+  }
+  if (held.length) marks.push(`rescue:${held.length}`);
   if (mark("unpark")) return res.status(200).json({ marks });
   // 1d) Queue running low → pull the next companies from the backlog (data/backlog.json), so the finder never idles.
   //     Same proof rules: a backlog company only goes live if the robot proves the board is theirs.
@@ -105,8 +114,9 @@ export default async function handler(req, res) {
   if (mark("taken")) return res.status(200).json({ marks });
   // 3) Next batch: never-tried first; failures get retried after RETRY_AFTER_DAYS (max MAX_TRIES tries)
   const cutoff = new Date(Date.now() - RETRY_AFTER_DAYS * 86400000).toISOString();
+  const cutoffErr = new Date(Date.now() - BOARD_ERROR_RETRY_DAYS * 86400000).toISOString();
   const rows = await db.selectAsAdmin(
-    `company_candidates?select=*&or=(status.eq.pending,and(status.in.(error,blocked,no_board,board_error),checked_at.lt.${cutoff},attempts.lt.${MAX_TRIES}))` +
+    `company_candidates?select=*&or=(status.eq.pending,and(status.in.(error,blocked,no_board,board_error),checked_at.lt.${cutoff},attempts.lt.${MAX_TRIES}),and(status.eq.board_error,checked_at.lt.${cutoffErr},attempts.lt.${MAX_TRIES}))` +
     `&order=priority.desc,checked_at.asc.nullsfirst&limit=${Math.min(+req.query?.n || PER_RUN, PER_RUN)}`
   );
 
