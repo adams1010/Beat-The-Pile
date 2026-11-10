@@ -1523,7 +1523,9 @@
   "Show my contact info on my profile": "Meine Kontaktdaten im Profil zeigen",
   "(only to signed-in Beat the Pile members, so people can email or call you in one tap)": "(nur für angemeldete Beat-the-Pile-Mitglieder, damit man dir mit einem Tipp schreiben oder dich anrufen kann)",
   "Hidden from your profile.": "In deinem Profil ausgeblendet.",
-  "Shown to signed-in Beat the Pile members, not to the public web.": "Für angemeldete Beat-the-Pile-Mitglieder sichtbar, nicht im öffentlichen Web."
+  "Shown to signed-in Beat the Pile members, not to the public web.": "Für angemeldete Beat-the-Pile-Mitglieder sichtbar, nicht im öffentlichen Web.",
+  "Contact info is hidden from your profile.": "Deine Kontaktdaten sind in deinem Profil ausgeblendet.",
+  "Contact info is shown to signed-in Beat the Pile members, not to the public web.": "Deine Kontaktdaten sind für angemeldete Beat-the-Pile-Mitglieder sichtbar, nicht im öffentlichen Web."
  },
  "patterns": [
   [

@@ -248,10 +248,10 @@
     const links = [["linkedin","LinkedIn"],["github","GitHub"],["portfolio","Portfolio"]].filter(([k]) => safeUrl(p.links?.[k]))
       .map(([k, t]) => `<a class="btn" href="${esc(p.links[k])}" target="_blank" rel="noopener nofollow ugc">${t} ↗</a>`).join("");
     const tel = (x) => String(x || "").replace(/[^\d+]/g, "");
-    const contact = p.contact && (p.contact.email || p.contact.phone) ? `<section class="card"><h2>Contact</h2><div class="btns" style="margin-top:0">
-      ${p.contact.email ? `<a class="btn pri" href="mailto:${esc(p.contact.email)}" data-noi18n>Email ${esc(p.contact.email)}</a>` : ""}
-      ${p.contact.phone ? `<a class="btn" href="tel:${esc(tel(p.contact.phone))}" data-noi18n>Call ${esc(p.contact.phone)}</a>` : ""}
-      ${p.handle || !isPreview ? "" : ""}</div>${isPreview ? `<p class="small muted" style="margin:8px 0 0">${p.contact.show === false ? "Hidden from your profile." : "Shown to signed-in Beat the Pile members, not to the public web."}</p>` : ""}</section>` : "";
+    // Nov 10: contact sits at the top, in the profile header (email / call buttons)
+    const hasC = p.contact && (p.contact.email || p.contact.phone);
+    const contactBtns = hasC ? `${p.contact.email ? `<a class="btn pri" href="mailto:${esc(p.contact.email)}" data-noi18n>Email ${esc(p.contact.email)}</a>` : ""}${p.contact.phone ? `<a class="btn" href="tel:${esc(tel(p.contact.phone))}" data-noi18n>Call ${esc(p.contact.phone)}</a>` : ""}` : "";
+    const contactNote = hasC && isPreview ? `<p class="small muted" style="margin:6px 0 0">${p.contact.show === false ? "Contact info is hidden from your profile." : "Contact info is shown to signed-in Beat the Pile members, not to the public web."}</p>` : "";
     const exp = (p.experience || []).map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.org || x.title))}</div><div><b>${esc(x.title)}</b>
       <div class="sm">${esc([x.org, x.when].filter(Boolean).join(" · "))}</div>${x.desc ? `<p>${esc(x.desc)}</p>` : ""}</div></div>`).join("");
     const proj = (p.projects || []).map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.name))}</div><div><b>${safeUrl(x.link) ? `<a href="${esc(x.link)}" target="_blank" rel="noopener nofollow ugc">${esc(x.name)} ↗</a>` : esc(x.name)}</b>
@@ -268,7 +268,7 @@
         ${(p.openTo || []).length ? `<div class="opento">${p.openTo.map((k) => `<span>Open to ${esc(OPEN_TO[k] || k)}</span>`).join("")}</div>` : ""}
         ${p.lookingFor ? `<div class="looking">Looking for: ${esc(p.lookingFor)}</div>` : ""}
         ${isPreview ? "" : `<div class="orbitact" id="orbitAct"></div>`}
-        <div class="btns">${resume ? `<a class="btn pri" href="${esc(resume)}" target="_blank" rel="noopener">View resume</a>` : isPreview && p.showResume ? `<span class="btn pri" title="Shows when your resume QR link is on">View resume</span>` : ""}${links}</div>
+        <div class="btns">${contactBtns}${resume ? `<a class="btn pri" href="${esc(resume)}" target="_blank" rel="noopener">View resume</a>` : isPreview && p.showResume ? `<span class="btn pri" title="Shows when your resume QR link is on">View resume</span>` : ""}${links}</div>${contactNote}
         ${isPreview && S.me ? `<div class="vis"><span class="dotv${S.me.profilePublic && S.me.handle ? " on" : ""}" aria-hidden="true"></span>${S.me.profilePublic && S.me.handle ? `Public · <a href="/u/${esc(S.me.handle)}" target="_blank" style="color:var(--muted)">beatthepile.com/u/${esc(S.me.handle)}</a>` : "Private · only you can see this"}</div>` : ""}
         ${((p.experience || []).length + (p.projects || []).length + (p.skills || []).length) ? `<div class="hl"><div><b>${(p.experience || []).length}</b><span>Experience</span></div><div><b>${(p.projects || []).length}</b><span>Projects</span></div><div><b>${(p.skills || []).length}</b><span>Skills</span></div></div>` : ""}
       </div></section>
@@ -277,7 +277,6 @@
       ${edu ? `<section class="card"><h2>Education</h2>${edu}</section>` : ""}
       ${exp ? `<section class="card"><h2>Experience</h2>${exp}</section>` : ""}
       ${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}
-      ${contact}
       ${(p.skills || []).length ? `<section class="card"><h2>Skills</h2><div class="chips">${p.skills.map((s, i) => `<span class="chip${i < 3 ? " top" : ""}">${esc(s)}</span>`).join("")}</div>${p.skills.length > 3 ? `<p class="small muted" style="margin:8px 0 0">Top skills first.</p>` : ""}</section>` : ""}
       ${isPreview ? kitCard(p) : ""}
       ${isPreview || seenMe() ? "" : `<section class="card cta"><h2>Make your own profile</h2><p class="small" style="margin:0 0 12px">One page for your experience, projects and skills, plus a QR code for career fairs. Free.</p><a class="btn pri" href="/start/" style="background:#B0F701;border-color:#B0F701;color:#060A2C">Get started</a></section>`}
