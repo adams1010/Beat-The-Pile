@@ -121,7 +121,7 @@ export default async function handler(req, res) {
   );
 
   if (mark("select")) return res.status(200).json({ marks, rows: rows.length });
-  const results = await mapLimit(rows, 12, async (c) => {
+  const results = await mapLimit(rows, 6, async (c) => {   // Nov 12: 12 at once (with the wider Workday early-career paging) starved the DB connection — saves timed out; 6 at once saves fine
     if (Date.now() - t0 > START_BUDGET_MS) return { id: c.id, skipped: true };
     let r;
     // Each company gets ~25s of its own (never past the hard stop), so slow careers sites can't sink the whole run
