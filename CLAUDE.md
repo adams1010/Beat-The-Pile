@@ -177,6 +177,9 @@ fieldsForMajor` (tested for all 110 quiz majors). `/api/listings` default = engi
 would hit Vercel's 4.5 MB cap). Bots: finder/scout priority = number of internships (+ small engineering boost);
 nightly SimplifyJobs import takes every major; Radar keeps any company with 5+ postings and 2+ seasons (or tracked).
 
+## Student roles (Nov 12 2026) — health & education majors
+Hospitals/schools rarely say "intern": `lib/fields.js isStudentRole()` counts "Student Nurse", "Radiology Student Tech", "Physical Therapy Student", "Nurse Extern", "Student Teacher", practicum, fieldwork, clinical rotation/affiliation as internships (kind `intern`, field science_health / education_social via the `fieldOf` override); staff jobs that only mention students stay out ("Student Services…", "…for Radiology Students", instructor/manager). `EARLY_QUERIES` + "student", "extern", "practicum"; Workday keeps those hits; Board Scout's Workday probe retries with "student" when "intern" finds none. `INTERN_PG` includes the pattern. Probed on 4 hospital systems: 1 → 44 internships. Tests: `tests/student-roles-test.mjs`.
+
 ## Full-time (early-career) jobs (Nov 8 2026)
 Internships stay first, but the readers also keep **early-career full-time** roles: `lib/fields.js isEarlyCareer()` (new grad,
 entry level, early career, rotational / development programs, "Engineer I / Analyst 1", "Associate … Engineer/Analyst", junior …;
