@@ -8,9 +8,10 @@ const feed = { name: "Acme Robotics", jobs: [
   { title: "Software Engineer I", shortcode: "EF56", employment_type: "Full-time", locations: [{ city: "Boston", region: "Massachusetts", country: "United States" }] },
   { title: "Data Intern", shortcode: "GH78", locations: [{ city: "London", region: "England", country: "United Kingdom" }] },
   { title: "Senior Engineer", shortcode: "IJ90", locations: [{ city: "Denver", region: "Colorado", country: "United States" }] },
+  { title: "Mechanical Engineering Intern", shortcode: "AB12", locations: [{ city: "Erie", region: "Pennsylvania", country: "United States" }] },   // same posting listed twice (live feeds do this)
 ] };
 const jobs = parseWorkable(feed, "acmerobotics");
-assert.equal(jobs.length, 5);
+assert.equal(jobs.length, 6);
 assert.equal(jobs[0].url, "https://apply.workable.com/acmerobotics/j/AB12/");
 assert.equal(jobs[0].location, "Pittsburgh, Pennsylvania, United States");
 assert.equal(jobs[1].isIntern, true, "the board's own 'Internship' type counts");
