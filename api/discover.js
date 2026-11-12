@@ -139,7 +139,10 @@ export default async function handler(req, res) {
       else taken.set(k, c.id);
     }
     const now = new Date().toISOString();
-    await db.update(`company_candidates?id=eq.${encodeURIComponent(c.id)}`, {
+    // Nov 12: a DB connect timeout here used to throw out of mapLimit and crash the whole run (FUNCTION_INVOCATION_FAILED,
+    // no logRun, finder silent for 30+ h). Retry once; if it still fails, report this company as not saved and carry on.
+    const save = (patch) => db.update(`company_candidates?id=eq.${encodeURIComponent(c.id)}`, patch);
+    const patch = {
       status: r.status,
       ats: r.ats || null,
       // live: keep a name fix made earlier (config.listAs) unless this check found a better one
@@ -151,7 +154,13 @@ export default async function handler(req, res) {
       attempts: (c.attempts || 0) + 1,
       checked_at: now,
       ...(r.status === "live" ? { verified_at: now } : {}),
-    });
+    };
+    try { await save(patch); }
+    catch (e1) {
+      await new Promise((ok) => setTimeout(ok, 1500));
+      try { await save(patch); }
+      catch (e2) { console.error(`[discover] ${c.id}: couldn't save result: ${e2.message}`); return { company: c.company, status: "save_failed", detail: String(e2.message || e2).slice(0, 120) }; }
+    }
     return { company: c.company, status: r.status, detail: r.detail };
   });
 
