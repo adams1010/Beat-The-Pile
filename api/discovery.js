@@ -8,7 +8,7 @@ import { db, isAuthorizedCron } from "../lib/db.js";
 import { COMPANIES } from "../lib/companies.js";
 import { normName, keyFor } from "../lib/simplify.js";
 import { verifyClerkJWT, bearer } from "../lib/auth.js";
-import { BOTS, BOT_IDS, logRun } from "../lib/bots.js";
+import { BOTS, BOT_IDS, logRun, botHealth, STALE_MIN, RESTART } from "../lib/bots.js";
 import { aiSummary } from "../lib/aiusage.js";
 import BACKLOG from "../data/backlog.json" with { type: "json" };
 
@@ -152,6 +152,18 @@ export default async function handler(req, res) {
       }
       return res.status(200).json({ companies: rows.map((r) => ({ ...r, urls: [...(urls[r.id] || []), r.hint].filter(Boolean) })) });
     } catch (e) { console.error("[discovery logos]", e); return res.status(500).json({ error: "Couldn't load the list" }); }
+  }
+  if (req.query?.health !== undefined) {
+    // Watchdog (robot only): is every switched-on bot running and succeeding? Light query: last 3 days of run logs.
+    res.setHeader("Cache-Control", "no-store");
+    if (!isAuthorizedCron(req)) return res.status(403).json({ error: "Robot only" });
+    try {
+      const [settings, runs] = await Promise.all([db.selectAsAdmin("bot_settings?select=bot,enabled"),
+        db.selectAsAdmin(`bot_runs?select=bot,ran_at,ok,summary&ran_at=gt.${new Date(Date.now() - 6 * 864e5).toISOString()}&order=ran_at.desc&limit=3000`)]);
+      const off = new Set(settings.filter((s) => s.enabled === false).map((s) => s.bot));
+      const lastWatch = runs.find((r) => r.bot === "watchdog");
+      return res.status(200).json({ lastWatchdog: lastWatch ? { at: lastWatch.ran_at, summary: lastWatch.summary } : null, bots: BOTS.filter((b) => !off.has(b.id) && b.id !== "watchdog").map((b) => ({ ...botHealth(b.id, runs.filter((r) => r.bot === b.id)), name: b.name, staleMin: STALE_MIN[b.id], restart: RESTART[b.id] })) });
+    } catch (e) { console.error("[discovery health]", e); return res.status(503).json({ error: "Couldn't read bot health" }); }
   }
   if (req.query?.bots !== undefined) {
     // Control room. Public callers (GitHub bots reading their switch) get ONLY the on/off switches.
