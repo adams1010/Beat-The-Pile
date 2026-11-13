@@ -70,7 +70,7 @@
       <div class="panel"><div id="signin"></div></div>
       <p class="lead legal" style="font-size:13.5px;margin-top:12px">By continuing, you agree to our <a href="/terms/">Terms of Use</a> and <a href="/privacy/">Privacy Policy</a>, and confirm you're 16 or older.</p>`;
     if (pre !== "employer") fetch("/api/me?founding=1").then((r) => r.ok ? r.json() : null).then((d) => { const el = $("#found");   // real count (lib/founding.js)
-      if (el && d && d.left > 0) { el.innerHTML = `<b style="color:#4A7000">${+d.left} of ${+d.total} founding spots left.</b> The first ${+d.total} students keep every Pro feature free, for life.`; el.hidden = false; } }).catch(() => {});
+      if (el && d && d.left > 0) { el.innerHTML = `<b style="color:#B0F701">${+d.left} of ${+d.total} founding spots left.</b> The first ${+d.total} students keep every Pro feature free, for life.`; el.hidden = false; } }).catch(() => {});
     try { C.mountSignIn($("#signin"), { forceRedirectUrl: location.href, signUpForceRedirectUrl: location.href, withSignUp: true,
       appearance: { variables: { colorPrimary: "#4A7000", fontFamily: "Geist, system-ui, sans-serif", fontSize: "16px", borderRadius: "12px" }, elements: { rootBox: { width: "100%", maxWidth: "420px", margin: "0 auto" }, cardBox: { width: "100%", maxWidth: "420px", boxShadow: "none", border: "none" },
         card: { width: "100%", boxShadow: "none", border: "none", padding: "0", background: "transparent" }, footer: { background: "transparent" } } } }); }
