@@ -1674,7 +1674,14 @@
   "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "We lezen duizenden vacaturesites meerdere keren per dag. Plaats je stages of startersbanen op je carrièresite, dan zien studenten ze hier met een directe link naar je sollicitatiepagina. Je hoeft niets te plaatsen.",
   "Part-time & hourly": "Parttime & per uur",
   "All": "Alles",
-  "Hourly": "Per uur"
+  "Hourly": "Per uur",
+  "Remote, hybrid or in person": "Op afstand, hybride of op locatie",
+  "In person": "Op locatie",
+  "Retail & customer service": "Retail & klantenservice",
+  "Food, hotels & recreation": "Horeca, hotels & recreatie",
+  "Warehouse, delivery & supply chain": "Magazijn, bezorging & supply chain",
+  "Retail & Customer Service": "Retail & klantenservice",
+  "Food, Hotels & Recreation": "Horeca, hotels & recreatie"
  },
  "patterns": [
   [

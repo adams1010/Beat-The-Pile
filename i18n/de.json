@@ -1674,7 +1674,14 @@
   "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "Wir lesen täglich mehrmals Tausende Unternehmens-Jobbörsen. Veröffentlichst du Praktika oder Einstiegsjobs auf deiner Karriereseite, sehen Studierende sie hier mit direktem Link zur Bewerbungsseite. Sie müssen nichts veröffentlichen.",
   "Part-time & hourly": "Teilzeit & Stundenlohn",
   "All": "Alle",
-  "Hourly": "Stundenlohn"
+  "Hourly": "Stundenlohn",
+  "Remote, hybrid or in person": "Remote, hybrid oder vor Ort",
+  "In person": "Vor Ort",
+  "Retail & customer service": "Einzelhandel & Kundenservice",
+  "Food, hotels & recreation": "Gastronomie, Hotels & Freizeit",
+  "Warehouse, delivery & supply chain": "Lager, Lieferung & Lieferkette",
+  "Retail & Customer Service": "Einzelhandel & Kundenservice",
+  "Food, Hotels & Recreation": "Gastronomie, Hotels & Freizeit"
  },
  "patterns": [
   [

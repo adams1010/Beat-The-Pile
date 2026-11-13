@@ -30,3 +30,11 @@ console.log(bad?`${bad} bad`:`states: all ${cases.length} formats ✓`);
   eq("Paris, TX", ["TX"]); eq("Cairo, IL", ["IL"]); eq("Dublin, OH", ["OH"]); eq("Melbourne, FL", ["FL"]); eq("Londonderry, NH", ["NH"]);
   console.log("✓ foreign cities whose country code looks like a state are dropped; same-named US towns kept");
 }
+
+// Nov 13: Masco-style "CA - Quebec - …" is Canada, not California
+{
+  const { extractStates: xs } = await import("../lib/filter.js");
+  assert.deepEqual(xs("CA - Quebec - Mont-Royal"), []); assert.deepEqual(xs("CA - ON - Toronto"), []);
+  assert.deepEqual(xs("US - California - Camarillo"), ["CA"]); assert.deepEqual(xs("Ontario, CA"), ["CA"]);
+  console.log("✓ 'CA - Quebec - …' is Canada");
+}

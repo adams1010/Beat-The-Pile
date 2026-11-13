@@ -63,6 +63,8 @@
   @media (max-width:520px){.kindseg button{padding:7px 11px;font-size:13px}}
   .kindseg button{border:0;background:none;font:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:7px 16px;border-radius:999px;cursor:pointer}
   .kindseg button[aria-pressed="true"]{background:#060A2C;color:#fff}
+  .wtag{display:inline-block;font-size:11.5px;font-weight:600;border-radius:999px;padding:0 7px;margin-left:4px;border:1px solid #DCE2EC;color:#3D4A5C;background:#fff;white-space:nowrap}
+  .wtag.wt-remote{border-color:#C7D2F0;color:#1E3A8A;background:#EFF3FB}.wtag.wt-hybrid{border-color:#DDF3A8;color:#3A5A00;background:#F2FADF}
   .ftag{display:inline-block;font-size:11.5px;font-weight:700;color:#060A2C;background:#B0F701;border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:2px}
   .statesel{font:inherit;font-size:13px;font-weight:500;border-radius:999px!important;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:10px;padding:7px 10px;cursor:pointer}
   .statesel.on{border-color:var(--navy);box-shadow:inset 0 0 0 1px var(--navy)}
@@ -239,8 +241,10 @@
         <optgroup label="Engineering"><option value="eng">All engineering</option><option value="mechanical">Mechanical &amp; Aerospace</option><option value="electrical">Electrical &amp; Computer Eng.</option><option value="civil">Civil, Construction &amp; Architecture</option><option value="chemical">Chemical &amp; Materials</option><option value="industrial">Industrial &amp; Manufacturing</option></optgroup>
         <optgroup label="Tech"><option value="software">Software &amp; Computer Science</option><option value="data">Data &amp; AI</option><option value="cyber_it">Cybersecurity &amp; IT</option><option value="product_design">Product &amp; Design</option></optgroup>
         <optgroup label="Business"><option value="finance">Finance, Accounting &amp; Insurance</option><option value="consulting">Consulting &amp; Strategy</option><option value="marketing">Marketing, Media &amp; Communications</option><option value="sales">Sales &amp; Business Development</option><option value="supply_chain">Supply Chain, Operations &amp; Projects</option><option value="people_hr">HR &amp; People</option></optgroup>
+        <optgroup label="Part-time &amp; hourly"><option value="retail">Retail &amp; customer service</option><option value="hospitality">Food, hotels &amp; recreation</option><option value="supply_chain">Warehouse, delivery &amp; supply chain</option></optgroup>
         <optgroup label="Science, policy &amp; more"><option value="exercise_sport">Exercise Science, Sports &amp; Rehab</option><option value="science_health">Science, Health &amp; Environment</option><option value="legal_policy">Legal, Policy &amp; Government</option><option value="education_social">Education &amp; Social Impact</option><option value="other">Other / general</option></optgroup>
       </select>
+      <select class="statesel" id="workSel" aria-label="Where you work"><option value="any">Remote, hybrid or in person</option><option value="remote">Remote</option><option value="hybrid">Hybrid</option><option value="onsite">In person</option></select>
       <label class="toggle" id="meWrap" title="Only roles that say mechanical (or a close match like manufacturing)."><input type="checkbox" id="meOnly"> Strictly mechanical</label>
       <button class="chip" id="savedOnly" aria-pressed="false" title="Jobs you saved with ♡">♡ Saved <span id="savedN"></span></button>
       <button class="chip" id="followOnly" aria-pressed="false" title="Companies you follow with ☆, you get flagged when they post">Following <span id="followN"></span></button>
@@ -276,7 +280,10 @@
 
 <script>
 (function(){
-  const state = { kind: "intern", near: null, nearMeta: null, all: [], savedRows: [], followRows: [], major: "all", st: "ALL", meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
+  // Nov 13: where the work happens, read from the posting's title + location ("Remote", "Hybrid"); everything else is in person
+  const workOf = (j) => { const t = `${j.title} ${j.location || ""}`; return /\bhybrid\b/i.test(t) ? "hybrid" : (/\b(remote|work from home|wfh|telecommute|virtual)\b/i.test(t) || j.geo_kind === "remote") ? "remote" : "onsite"; };
+  const WORK_NAME = { remote: "Remote", hybrid: "Hybrid", onsite: "In person" };
+  const state = { work: "any", kind: "intern", near: null, nearMeta: null, all: [], savedRows: [], followRows: [], major: "all", st: "ALL", meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
                   user: null, clerk: null, mine: { saved: new Set(), applied: new Set(), starred: new Set(), seenAt: null } };
   const NAMES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"Washington DC",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
   const statesOf = (j) => String(j.state || "").split(",").filter(Boolean);
@@ -347,7 +354,7 @@
   }
   function initials(n){ const w = String(n || "").replace(/[^A-Za-z0-9& ]/g, " ").split(/\s+/).filter((x) => x && !/^(and|of|the|&|inc|llc|corp|co)$/i.test(x)); if (!w.length) return "·"; return (w.length === 1 ? w[0].slice(0, 2) : w[0][0] + w[1][0]).toUpperCase(); }
   const coHref = (j) => j.company_id ? `/c/${encodeURIComponent(j.company_id)}` : `/jobs/?q=${encodeURIComponent(j.company)}&state=all`;
-  const FIELD_NAME = { exercise_sport: "Exercise & sports", software: "Software", data: "Data & AI", cyber_it: "Cyber & IT", mechanical: "Mechanical", electrical: "Electrical", chemical: "Chemical", civil: "Civil & construction", product_design: "Product & design", industrial: "Industrial", finance: "Finance", legal_policy: "Legal & policy", people_hr: "People & HR", consulting: "Consulting", marketing: "Marketing", sales: "Sales", supply_chain: "Supply chain", science_health: "Science & health", education_social: "Education", engineering: "Engineering" };
+  const FIELD_NAME = { retail: "Retail & customer service", hospitality: "Food, hotels & recreation", exercise_sport: "Exercise & sports", software: "Software", data: "Data & AI", cyber_it: "Cyber & IT", mechanical: "Mechanical", electrical: "Electrical", chemical: "Chemical", civil: "Civil & construction", product_design: "Product & design", industrial: "Industrial", finance: "Finance", legal_policy: "Legal & policy", people_hr: "People & HR", consulting: "Consulting", marketing: "Marketing", sales: "Sales", supply_chain: "Supply chain", science_health: "Science & health", education_social: "Education", engineering: "Engineering" };
   function domain(u){ try { return new URL(u).hostname.replace(/^www\./, ""); } catch { return ""; } }
   function ago(ts){
     const d = Math.floor((Date.now() - new Date(ts).getTime()) / DAY);
@@ -435,7 +442,7 @@
     try { renderRails(); } catch (e) { console.error("[jobs] rails", e); }
     if (!state.loaded) return;
     const strict = state.meOnly && STRICT_OK();
-    const matches = (j) => !strict || j.match === "me";   // the search words are applied below (jobs/search.js)
+    const matches = (j) => (!strict || j.match === "me") && (state.work === "any" || workOf(j) === state.work);   // the search words are applied below (jobs/search.js)
     // "Saved" view shows everything you saved, in any state
     const followed = (j) => state.mine.starred.has(j.company_id);
     const newForMe = (j) => followed(j) && state.mine.seenAt && new Date(j.first_seen) > new Date(state.mine.seenAt);
@@ -519,7 +526,7 @@
         <a class="lg" href="${coHref(j)}" aria-hidden="true" tabindex="-1" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</a>
         <div style="min-width:0">
           <div class="title">${esc(niceTitle(j.title))}${j.kind === "fulltime" ? '<span class="ftag">Entry-level</span>' : j.kind === "hourly" ? '<span class="ftag">Hourly</span>' : ""}${isNew(j) ? '<span class="tag new">New</span>' : ""}${j.closed ? '<span class="tag closed">Closed by the company</span>' : ""}</div>
-          <div class="co"><a class="cn" href="${coHref(j)}">${esc(j.company)}</a> <span class="loc">· ${esc(j.sites[0].loc)}${j.sites.length > 1 ? ` +${j.sites.length - 1} more` : ""}</span></div>
+          <div class="co"><a class="cn" href="${coHref(j)}">${esc(j.company)}</a> <span class="loc">· ${esc(j.sites[0].loc)}${j.sites.length > 1 ? ` +${j.sites.length - 1} more` : ""}</span> <span class="wtag wt-${workOf(j)}">${WORK_NAME[workOf(j)]}</span></div>
           <div class="meta2">${[state.near && j.mi != null ? `<span class="dist">${j.mi < 1 ? "Under 1" : "~" + j.mi} mi away</span>` : "", esc(postedText(j)), j.sites.length > 1 ? `${j.sites.length} locations` : j.count > 1 ? `${j.count} openings` : "", seasonOf(j.title) ? esc(seasonOf(j.title)) : "", (state.major === "all" || !state.major) && FIELD_NAME[j.field] ? esc(FIELD_NAME[j.field]) : "", j.match === "me" && STRICT_OK() ? "Mechanical match" : "", needsClearance(j.title) ? "US citizens / clearance" : ""].filter(Boolean).join(" · ")}</div>
           ${j.sites.length > 1 ? `<details class="sites"><summary>All ${j.sites.length} locations</summary><ul>${j.sites.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.loc)}</a></li>`).join("")}</ul></details>` : ""}
         </div>
@@ -575,6 +582,7 @@
     if (state.company) p.set("company", state.company);
     if (state.major !== "all") p.set("major", state.major);
     if (state.kind !== "intern") p.set("kind", state.kind);
+    if (state.work !== "any") p.set("work", state.work);
     if (state.meOnly && STRICT_OK()) p.set("me", "1");
     if (state.q) p.set("q", state.q);
     if (state.savedOnly) p.set("view", "saved"); else if (state.followOnly) p.set("view", "following");
@@ -587,6 +595,7 @@
     state.st = st === "ALL" ? "ALL" : (st.split(",").filter((x) => /^[A-Z]{2}$/.test(x)).length ? st.split(",").filter((x) => /^[A-Z]{2}$/.test(x)) : "ALL");
     state.meOnly = p.get("me") === "1"; $("meOnly").checked = state.meOnly;
     state.kind = ["fulltime", "hourly", "all"].includes(p.get("kind")) ? p.get("kind") : "intern";
+    state.work = ["remote", "hybrid", "onsite"].includes(p.get("work")) ? p.get("work") : "any"; if ($("workSel")) $("workSel").value = state.work;
     document.querySelectorAll("[data-kind]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.kind === state.kind)));
     const co = (p.get("company") || "").toLowerCase(); state.company = /^[a-z0-9-]{2,80}$/.test(co) ? co : null;   // from the Radar: one company
     const mj = (p.get("major") || "").toLowerCase();
@@ -982,6 +991,7 @@
     state.kind = b.dataset.kind; document.querySelectorAll("[data-kind]").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
     track("kind_picked", { kind: state.kind }); syncUrl(); loadScope();
   }));
+  $("workSel").addEventListener("change", (e) => { state.work = e.target.value; track("work_picked", { work: state.work }); syncUrl(); render(); });
   $("majorSel").addEventListener("change", (e) => { state.company = null; state.major = e.target.value; store.set("btp_major", state.major); track("major_picked", { major: state.major, from: "picker" }); $("meWrap").hidden = !STRICT_OK(); loadScope(); });
   if (!MAJOR_KEYS.includes(state.major)) state.major = "all";
   $("majorSel").value = state.major; $("meWrap").hidden = !STRICT_OK();

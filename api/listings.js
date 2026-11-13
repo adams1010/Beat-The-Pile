@@ -29,7 +29,7 @@ import { zipToState } from "../lib/geo.js";
 const FIELD_KEYS = new Set([...FIELDS.map(([k]) => k), "other"]);
 const STATES = new Set("AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY PR".split(" "));
 const LIVE = "closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)";
-const COLS = "id,company_id,company,title,location,state,url,match,field,posted_on,first_seen,link_checked_at,kind";
+const COLS = "id,company_id,company,title,location,state,url,match,field,posted_on,first_seen,link_checked_at,kind,geo_kind";   // Nov 13: + geo_kind (Remote label)
 
 export function parse(q) {
   const errs = [];

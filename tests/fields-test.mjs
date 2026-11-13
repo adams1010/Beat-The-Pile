@@ -32,7 +32,8 @@ console.log(`✓ fields: all ${n} real titles tagged to the right major`);
 // every major is pickable on /jobs (and nothing there is a typo)
 const fs = await import("node:fs");
 const html = fs.readFileSync(new URL("../jobs/index.html", import.meta.url), "utf8");
-const opts = [...html.matchAll(/<option value="([a-z_]+)">/g)].map((m) => m[1]).filter((v) => v.length > 2 || v === "eng" || v === "all");
+const majorSel = html.slice(html.indexOf('id="majorSel"'), html.indexOf("</select>", html.indexOf('id="majorSel"')));   // the Major picker only (workSel has its own values)
+const opts = [...majorSel.matchAll(/<option value="([a-z_]+)">/g)].map((m) => m[1]).filter((v) => v.length > 2 || v === "eng" || v === "all");
 const keys = new Set([...FIELDS.map(([k]) => k), "other"]);
 for (const k of keys) if (k !== "engineering") assert.ok(opts.includes(k), `/jobs is missing major "${k}"`);
 for (const o of opts) if (!["eng", "all"].includes(o) && !/^[A-Z]{2}$/.test(o)) assert.ok(keys.has(o), `/jobs has unknown major "${o}"`);
