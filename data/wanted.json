@@ -1,8 +1,233 @@
 {
 "built": "2026-11-13",
-"why": "Big employers that hire for entry-level jobs (hospital systems, banks, insurers, schools, nonprofits) \u2014 the finder proves each board before anything goes live",
-"count": 365,
+"why": "Big employers that hire for entry-level jobs (hospital systems, banks, insurers, schools, nonprofits) \u2014 the finder proves each board before anything goes live; exercise science / sports / rehab employers added Nov 13 (PT clinics, gyms, sports performance)",
+"count": 410,
 "companies": [
+{
+"company": "Athletico Physical Therapy",
+"domain": "athletico.com",
+"priority": 70
+},
+{
+"company": "PT Solutions",
+"domain": "ptsolutions.com",
+"priority": 70
+},
+{
+"company": "BenchMark Physical Therapy",
+"domain": "benchmarkpt.com",
+"priority": 70
+},
+{
+"company": "Professional Physical Therapy",
+"domain": "professionalpt.com",
+"priority": 70
+},
+{
+"company": "U.S. Physical Therapy",
+"domain": "usph.com",
+"priority": 70
+},
+{
+"company": "Confluent Health",
+"domain": "confluenthealth.com",
+"priority": 70
+},
+{
+"company": "Pivot Physical Therapy",
+"domain": "pivotphysicaltherapy.com",
+"priority": 70
+},
+{
+"company": "FYZICAL Therapy & Balance Centers",
+"domain": "fyzical.com",
+"priority": 70
+},
+{
+"company": "CORA Physical Therapy",
+"domain": "coraphysicaltherapy.com",
+"priority": 70
+},
+{
+"company": "Twin Boro Physical Therapy",
+"domain": "twinboro.com",
+"priority": 70
+},
+{
+"company": "Shirley Ryan AbilityLab",
+"domain": "sralab.org",
+"priority": 70
+},
+{
+"company": "Aegis Therapies",
+"domain": "aegistherapies.com",
+"priority": 70
+},
+{
+"company": "Hospital for Special Surgery",
+"domain": "hss.edu",
+"priority": 70
+},
+{
+"company": "Rothman Orthopaedics",
+"domain": "rothmanortho.com",
+"priority": 70
+},
+{
+"company": "OrthoCarolina",
+"domain": "orthocarolina.com",
+"priority": 70
+},
+{
+"company": "OrthoVirginia",
+"domain": "orthovirginia.com",
+"priority": 70
+},
+{
+"company": "Hinge Health",
+"domain": "hingehealth.com",
+"priority": 70
+},
+{
+"company": "Sword Health",
+"domain": "swordhealth.com",
+"priority": 70
+},
+{
+"company": "Omada Health",
+"domain": "omadahealth.com",
+"priority": 70
+},
+{
+"company": "Noom",
+"domain": "noom.com",
+"priority": 70
+},
+{
+"company": "Life Time",
+"domain": "lifetime.life",
+"priority": 70
+},
+{
+"company": "Planet Fitness",
+"domain": "planetfitness.com",
+"priority": 70
+},
+{
+"company": "Orangetheory Fitness",
+"domain": "orangetheory.com",
+"priority": 70
+},
+{
+"company": "Crunch Fitness",
+"domain": "crunch.com",
+"priority": 70
+},
+{
+"company": "24 Hour Fitness",
+"domain": "24hourfitness.com",
+"priority": 70
+},
+{
+"company": "YMCA of the USA",
+"domain": "ymca.org",
+"priority": 70
+},
+{
+"company": "Anytime Fitness",
+"domain": "anytimefitness.com",
+"priority": 70
+},
+{
+"company": "EoS Fitness",
+"domain": "eosfitness.com",
+"priority": 70
+},
+{
+"company": "Chuze Fitness",
+"domain": "chuzefitness.com",
+"priority": 70
+},
+{
+"company": "Xponential Fitness",
+"domain": "xponential.com",
+"priority": 70
+},
+{
+"company": "F45 Training",
+"domain": "f45training.com",
+"priority": 70
+},
+{
+"company": "Barry's",
+"domain": "barrys.com",
+"priority": 70
+},
+{
+"company": "SoulCycle",
+"domain": "soul-cycle.com",
+"priority": 70
+},
+{
+"company": "Peloton",
+"domain": "onepeloton.com",
+"priority": 70
+},
+{
+"company": "Tonal",
+"domain": "tonal.com",
+"priority": 70
+},
+{
+"company": "Future",
+"domain": "future.co",
+"priority": 70
+},
+{
+"company": "EXOS",
+"domain": "teamexos.com",
+"priority": 70
+},
+{
+"company": "IMG Academy",
+"domain": "imgacademy.com",
+"priority": 70
+},
+{
+"company": "D1 Training",
+"domain": "d1training.com",
+"priority": 70
+},
+{
+"company": "Under Armour",
+"domain": "underarmour.com",
+"priority": 70
+},
+{
+"company": "Lululemon",
+"domain": "lululemon.com",
+"priority": 70
+},
+{
+"company": "Catapult Sports",
+"domain": "catapult.com",
+"priority": 70
+},
+{
+"company": "Zwift",
+"domain": "zwift.com",
+"priority": 70
+},
+{
+"company": "NovaCare Rehabilitation",
+"domain": "novacare.com",
+"priority": 70
+},
+{
+"company": "Kessler Rehabilitation Center",
+"domain": "kesslerrehab.com",
+"priority": 70
+},
 {
 "company": "MedStar Health",
 "domain": "medstarhealth.org",
