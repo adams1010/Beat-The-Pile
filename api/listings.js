@@ -46,7 +46,7 @@ export function parse(q) {
   if (ids.length > 200 || ids.some((x) => !/^[a-z0-9-]+:[^,()]{1,200}$/.test(x))) errs.push("ids must be up to 200 listing ids");
   const limit = raw("limit") ? Number(raw("limit")) : null, offset = raw("offset") ? Number(raw("offset")) : 0;
   if (limit != null && !(Number.isInteger(limit) && limit >= 1 && limit <= 1000)) errs.push("limit must be 1–1000");
-  if (!(Number.isInteger(offset) && offset >= 0 && offset <= 20000)) errs.push("offset must be 0–20000");
+  if (!(Number.isInteger(offset) && offset >= 0 && offset <= 60000)) errs.push("offset must be 0–60000");   // Nov 13: 20k → 60k (every job type is bigger)
   const near = raw("near").trim().slice(0, 60);
   if (near && !/^[A-Za-z0-9 .,'-]+$/.test(near)) errs.push("near must be a 5-digit ZIP or 'City, ST'");
   const mi = raw("mi") ? Number(raw("mi")) : 50;
@@ -257,6 +257,7 @@ export default async function handler(req, res) {
     else if (!p.field) q += "&match=not.is.null";                       // engineering view (default)
     if (p.field && p.field !== "all") q += `&field=eq.${p.field}`;
     if (p.companies.length) q += `&company_id=in.(${p.companies.join(",")})`;
+    if (p.words?.length && !p.states.length) q += `&and=(${wordGroups(p).join(",")})`;   // states: already merged above
 
     let listings = [];
     if (p.limit != null) listings = await db.select(`${q}&limit=${p.limit}&offset=${p.offset}`);
