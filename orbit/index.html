@@ -94,6 +94,7 @@
   @media (max-width:860px){.sky{grid-template-columns:1fr}}
   @media (max-width:1060px){.grid{grid-template-columns:240px minmax(0,1fr)}.feedcol{grid-column:1/-1}}
   @media (max-width:720px){.grid{grid-template-columns:1fr}.side{position:static}.people{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  #ringList,#bizRingList{scroll-margin-top:72px}#ringList.updating h2::after,#bizRingList.updating h2::after{content:" · updating";font-size:13px;font-weight:500;color:var(--muted,#55627A)}
 </style>
 </head>
 <body>
@@ -215,13 +216,13 @@
           </div></div>
       <div class="grid grid2">
         <div>${findBox()}${requests(o)}
-        <section class="card"><h2>${title}</h2><p class="sub">${desc}${ring === "inner" && m.hasSchool ? ` · ${esc(m.major || "")} at ${esc(m.school)}` : ""}</p>${people(sets[ring], empty[ring])}</section></div>
+        <section class="card" id="ringList"><h2>${title}</h2><p class="sub">${desc}${ring === "inner" && m.hasSchool ? ` · ${esc(m.major || "")} at ${esc(m.school)}` : ""}</p>${people(sets[ring], empty[ring])}</section></div>
         <aside class="feedcol">
           <section class="card" id="messages"><h2>Messages${o.unread ? `<span class="count">${o.unread}</span>` : ""}</h2><p class="sub">Students in your orbit, plus employers if you turned on “Let employers find me”.</p><div id="threads"><p class="empty">Loading…</p></div></section>
           ${fairBox(o)}
           <section class="card feed"><h2>Signals</h2><p class="sub">New openings at companies you follow, and posts from students.</p>${feed}</section></aside>
       </div>`;
-    document.querySelectorAll("[data-ring]").forEach((b) => b.onclick = () => { S.ring = b.dataset.ring; render(S.o); });
+    document.querySelectorAll("[data-ring]").forEach((b) => b.onclick = () => pickRing(b.dataset.ring, render));
     const gp = $("#goPublic"); if (gp) gp.onclick = async () => {   // Nov 9: one tap — gives you a link name and a public profile (name, school, major, photo)
       gp.disabled = true;
       try { await api({ action: "onboard", show: true }); await refresh(); }
@@ -231,6 +232,18 @@
   }
 
   async function refresh(){ if (S.biz) renderBiz(await api({ action: "biz_orbit" })); else render(await api({ action: "orbit" })); }
+  // Nov 13: tapping a ring shows it at once, then reloads fresh people for it (new classmates, new requests) and, on phones,
+  // scrolls down to the list. Coming back to the tab reloads too (at most every 20 s).
+  let lastLoad = Date.now(), loading = false;
+  async function pickRing(ring, draw){
+    S.ring = ring; draw(S.o);
+    const sec = document.getElementById("ringList");
+    if (sec) { sec.classList.add("updating"); if (innerWidth < 900) sec.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    if (loading) return; loading = true;
+    try { await refresh(); lastLoad = Date.now(); } catch {} finally { loading = false; }
+    const sec2 = document.getElementById("ringList"); if (sec2) sec2.classList.remove("updating");
+  }
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && S.o && !loading && Date.now() - lastLoad > 20000) { lastLoad = Date.now(); refresh().catch(() => {}); } });
 
   // ── Business Orbit (employer accounts): your team · interested students · former interns · at your fairs · in orbit ──
   const BRINGS = [
@@ -257,13 +270,13 @@
           <div class="gravity">${pend}</div></div></div>
       <div class="grid grid2">
         <div>${findBox()}${requests(o)}
-        <section class="card"><h2>${title}</h2><p class="sub">${desc}</p>${people(sets[ring], empty[ring])}</section></div>
+        <section class="card" id="ringList"><h2>${title}</h2><p class="sub">${desc}</p>${people(sets[ring], empty[ring])}</section></div>
         <aside class="feedcol">
           <section class="card" id="messages"><h2>Messages${o.unread ? `<span class="count">${o.unread}</span>` : ""}</h2><p class="sub">Students you've written to, and students in your orbit.</p><div id="threads"><p class="empty">Loading…</p></div></section>
           <section class="card"><h2>Grow your orbit</h2><p class="sub">Students land in your orbit when they follow your company, list you as an internship, or go to the same fair.</p>
             <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn pri" href="/business/talent/">Find talent</a><a class="btn" href="/business/fairs/">Career fairs</a><a class="btn" href="/business/company/">Company page</a></div></section></aside>
       </div>`;
-    document.querySelectorAll("[data-ring]").forEach((b) => b.onclick = () => { S.ring = b.dataset.ring; renderBiz(S.o); });
+    document.querySelectorAll("[data-ring]").forEach((b) => b.onclick = () => pickRing(b.dataset.ring, renderBiz));
     wireFind(); wire($("main")); loadThreads();
     try { window.btpOrbitBadge && window.btpOrbitBadge((o.unread || 0) + (o.requests || []).length); } catch {}
   }
