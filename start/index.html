@@ -39,6 +39,9 @@
   .center{text-align:center;color:var(--muted)}
   .switch{text-align:center;margin-top:18px;font-size:14px;color:#9FAAC0}.switch a{color:var(--lime)}
   .lead.legal a{color:#B0F701;text-decoration:underline}
+  .tourpick{display:grid;gap:10px;max-width:420px;margin:18px auto 0}
+  .tourgo,.tourskip{display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:999px;font-weight:700;font-size:17px;text-decoration:none}
+  .tourgo{background:#4A7000;color:#fff}.tourskip{color:#4A7000;border:1px solid #C9D2E0;background:#fff}
 </style>
 </head>
 <body>
@@ -104,6 +107,14 @@
     let mine = {}; try { const t = await C.session?.getToken?.(); const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + t } }); if (r.ok) mine = (await r.json()).profile || {}; } catch {}
     const go = () => { location.href = next || "/jobs/"; };
     if (mine.school && (staff ? mine.staff : mine.major)) return go();           // already set up
+    // Nov 13: brand-new students get one choice before the site: the 2-minute tour, or straight to jobs
+    const tour = () => {
+      if (next || staff) return go();
+      $("#view").innerHTML = `<h1>You're in. <em>Want the 2-minute tour?</em></h1>
+        <p class="lead">See every part of Beat the Pile with real data: jobs near you, your major, Career Fair Mode, My Season, Orbit and interview practice.</p>
+        <div class="panel center tourpick"><a class="tourgo" href="/demo/?from=signup">Take the 2-minute tour</a><a class="tourskip" href="/jobs/">Skip, show me jobs</a></div>`;
+      window.scrollTo(0, 0);
+    };
     const nm = mine.name || [C.user.firstName, C.user.lastName].filter(Boolean).join(" ");
     const P = window.btpPick, Y = new Date().getFullYear(), st = { school: mine.school || "", schoolId: mine.schoolId || null, major: mine.major || "" };
     $("#s1").className = ""; $("#s2").className = ""; const s3 = $("#s3"); if (s3) s3.className = "on";
@@ -136,7 +147,7 @@
     P.attach($("#o_sc"), { load: P.schools, other: true, hint: "Type the first letters of your school, e.g. Virginia Tech", onPick: (it) => { st.school = it ? it.label : ""; st.schoolId = it && it.id ? it.id : null; majorBox(); } });
     majorBox();
     if (nm) $("#o_sc").focus();
-    $("#o_skip").onclick = (e) => { e.preventDefault(); try { sessionStorage.setItem("btp_school_skip", "1"); } catch {} go(); };
+    $("#o_skip").onclick = (e) => { e.preventDefault(); try { sessionStorage.setItem("btp_school_skip", "1"); } catch {} tour(); };
     $("#o_go").onclick = async () => {
       const b = $("#o_go"); $("#o_msg").textContent = "";
       if (staff && !$("#o_rl").value) { $("#o_msg").textContent = "Pick your role."; return; }
@@ -144,8 +155,8 @@
       try { await api({ action: "onboard", name: $("#o_nm").value, school: st.school || $("#o_sc").value, schoolId: st.schoolId, major: st.major || ($("#o_mj") && $("#o_mj").value) || "",
           gradTerm: $("#o_gt").value, gradYear: $("#o_gy").value ? +$("#o_gy").value : null, show: $("#o_show").checked, ...(staff ? { staff: $("#o_rl").value } : {}) });
         // Nov 10: right after sign-up, the "build your orbit" checklist (join classmates' orbits) — then on to the site
-        if (window.btpOrbitStart) return window.btpOrbitStart.show({ getToken: () => C.session.getToken(), done: go, force: true });
-        go(); }
+        if (window.btpOrbitStart) return window.btpOrbitStart.show({ getToken: () => C.session.getToken(), done: tour, force: true });
+        tour(); }
       catch (e) { b.disabled = false; $("#o_msg").textContent = e.message; }
     };
   }

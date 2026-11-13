@@ -1327,6 +1327,12 @@
   "Exercise Science, Sports & Rehab": "Sciences de l'exercice, sport et rééducation",
   "Exercise & sports": "Exercice et sport",
   "Exercise Science & Sports": "Sciences de l'exercice et sport",
+  "You're in.": "C'est fait.",
+  "Want the 2-minute tour?": "Envie de la visite de 2 minutes ?",
+  "See every part of Beat the Pile with real data: jobs near you, your major, Career Fair Mode, My Season, Orbit and interview practice.": "Découvrez chaque partie de Beat the Pile avec de vraies données : offres près de chez vous, votre filière, le mode salon, Ma saison, Orbit et l'entraînement aux entretiens.",
+  "Skip, show me jobs": "Passer, montrez-moi les offres",
+  "Go to my jobs →": "Voir mes offres →",
+  "Until then, see who came last time:": "En attendant, voyez qui était là la dernière fois :",
   "Science, Health & Environment": "Sciences, santé et environnement",
   "Legal, Policy & Government": "Juridique, politiques publiques et gouvernement",
   "Education & Social Impact": "Éducation et impact social",
@@ -1668,6 +1674,7 @@
   "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "Nous lisons des milliers de pages carrières plusieurs fois par jour. Si vous publiez des stages ou postes débutants sur votre site carrières, les étudiants les voient ici avec un lien direct vers votre page de candidature. Vous n'avez rien à publier."
  },
  "patterns": [
+  ["^Show ([\\d,]+) more \\(([\\d,]+) left\\)$", "Afficher $1 de plus ($2 restants)"],
   [
    "^([\\d,]+) full-time jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
    "$1 emplois à temps plein dans $2 entreprises$3"

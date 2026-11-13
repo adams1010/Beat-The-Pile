@@ -1327,6 +1327,12 @@
   "Exercise Science, Sports & Rehab": "Bewegingswetenschappen, sport en revalidatie",
   "Exercise & sports": "Beweging en sport",
   "Exercise Science & Sports": "Bewegingswetenschappen en sport",
+  "You're in.": "Je bent binnen.",
+  "Want the 2-minute tour?": "Zin in de rondleiding van 2 minuten?",
+  "See every part of Beat the Pile with real data: jobs near you, your major, Career Fair Mode, My Season, Orbit and interview practice.": "Bekijk elk onderdeel van Beat the Pile met echte gegevens: banen bij jou in de buurt, je studie, de banenbeursmodus, Mijn seizoen, Orbit en sollicitatietraining.",
+  "Skip, show me jobs": "Overslaan, laat me banen zien",
+  "Go to my jobs →": "Naar mijn banen →",
+  "Until then, see who came last time:": "Tot die tijd: kijk wie er de vorige keer was:",
   "Science, Health & Environment": "Wetenschap, gezondheid en milieu",
   "Legal, Policy & Government": "Juridisch, beleid en overheid",
   "Education & Social Impact": "Onderwijs en maatschappelijke impact",
@@ -1668,6 +1674,7 @@
   "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "We lezen duizenden vacaturesites meerdere keren per dag. Plaats je stages of startersbanen op je carrièresite, dan zien studenten ze hier met een directe link naar je sollicitatiepagina. Je hoeft niets te plaatsen."
  },
  "patterns": [
+  ["^Show ([\\d,]+) more \\(([\\d,]+) left\\)$", "Nog $1 tonen ($2 over)"],
   [
    "^([\\d,]+) full-time jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
    "$1 fulltime banen bij $2 bedrijven$3"

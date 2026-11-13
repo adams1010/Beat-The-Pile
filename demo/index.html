@@ -36,8 +36,8 @@
   @media (max-width:900px){.scene{grid-template-columns:1fr;gap:16px;padding-top:14px;align-items:start}}
   .copy .num{font-size:13px;font-weight:600;color:var(--mint);letter-spacing:.02em}
   .copy h1{margin:8px 0 12px;font-size:clamp(30px,4.6vw,54px);line-height:1.02;font-weight:700;letter-spacing:-.035em;text-wrap:balance}
-  .copy h1 .w{display:inline-block;opacity:0;transform:translateY(18px);filter:blur(6px);transition:opacity .55s var(--ease),transform .55s var(--ease),filter .55s var(--ease)}
-  .copy h1.in .w{opacity:1;transform:none;filter:none}
+  .copy h1 .w{display:inline-block;opacity:0;transform:translateY(10px);transition:opacity .4s var(--ease),transform .4s var(--ease)}
+  .copy h1.in .w{opacity:1;transform:none}
   .copy p{margin:0;color:#A9B4C9;font-size:clamp(15px,1.6vw,18px);line-height:1.5;max-width:480px;opacity:0;transform:translateY(10px);transition:all .6s var(--ease) .25s}
   .copy.in p{opacity:1;transform:none}
   .todo{margin-top:20px;display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line2);background:rgba(13,26,47,.7);border-radius:999px;padding:8px 14px 8px 10px;font-size:14px;color:#DCE3EF;opacity:0;transition:opacity .5s var(--ease) .45s}
@@ -46,7 +46,7 @@
   .todo.ok .dot{animation:none;box-shadow:none}
   @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(176,247,1,.55)}70%{box-shadow:0 0 0 10px rgba(176,247,1,0)}100%{box-shadow:0 0 0 0 rgba(176,247,1,0)}}
   .real{margin-top:12px;font-size:12.5px;color:#7F8CA5}
-  @media (max-width:900px){.copy h1{font-size:clamp(26px,7.4vw,36px);margin:6px 0 8px}.copy p{font-size:15px}.todo{margin-top:12px;font-size:13.5px}.real{display:none}}
+  @media (max-width:900px){.copy h1{font-size:clamp(24px,6.8vw,34px);margin:4px 0 6px}.copy p{font-size:14.5px;line-height:1.45;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.todo{margin-top:12px;font-size:13.5px}.real{display:none}}
   /* app window */
   .stagewrap{position:relative;perspective:1600px}
   .win{position:relative;background:var(--bg);color:var(--ink);border-radius:10px;overflow:hidden;box-shadow:none;
@@ -498,11 +498,14 @@ Thanks again,
         ["My Season", "/season/", "Pipeline, weekly goal, interview prep"], ["Interview practice", "/#interview", "Any company, out loud, graded"], ["Orbit", "/orbit/", "Classmates, insiders, messages"],
         ["My Internship", "/internship/", "Checklist + resume bullets"], ["Opening Radar", "/radar/", "When companies open"], ["Profile", "/u/", "Your school, your link"]];
       v.innerHTML = `<div class="finale">${F.map(([t, h, s], i) => `<a class="fz fade" style="animation-delay:${i * 45}ms" href="${h}"><b>${t}</b>${s}</a>`).join("")}</div>
-        <div class="acts" style="margin-top:14px;justify-content:center"><a class="b go" href="/jobs/?major=${D.major}" style="padding:12px 22px;font-size:15px">Start free →</a><button class="b" id="again">Replay the tour</button></div>`;
+        <div class="acts" style="margin-top:14px;justify-content:center"><a class="b go" href="/jobs/?major=${D.major}" style="padding:12px 22px;font-size:15px">${END_LABEL}</a><button class="b" id="again">Replay the tour</button></div>`;
       $("again").onclick = () => engine.go(0);
     } });
 
   // ── engine: chapters, spotlight, autoplay ──
+  // Nov 13: arriving from sign-up (/start/ offers the tour), the last step says "Go to my jobs", not "Start free"
+  const FROM_SIGNUP = new URLSearchParams(location.search).get("from") === "signup";
+  const END_LABEL = FROM_SIGNUP ? "Go to my jobs →" : "Start free →";
   const engine = { i: 0, step: 0, auto: false, done: new Set(), token: 0 };
   const view = $("view"), win = $("win");
   const spot = document.createElement("div"); spot.className = "spot"; const tip = document.createElement("div"); tip.className = "tip";
@@ -580,7 +583,7 @@ Thanks again,
     win.classList.add("out"); await sleep(reduce ? 0 : 260); if (t !== engine.token) return;
     $("url").innerHTML = `beatthepile.com<b>${esc(typeof c.url === "function" ? c.url() : c.url)}</b>`;
     view.scrollTop = 0; copy(c); rail();
-    $("back").disabled = engine.i === 0; $("next").textContent = engine.i === CH.length - 1 ? "Start free →" : "Next →";
+    $("back").disabled = engine.i === 0; $("next").textContent = engine.i === CH.length - 1 ? END_LABEL : "Next →";
     $("next").classList.toggle("wait", c.steps.length > 0 && !engine.done.has(c.key));
     await c.mount(view); if (t !== engine.token) return;
     win.classList.remove("out");

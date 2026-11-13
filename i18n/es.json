@@ -1327,6 +1327,12 @@
   "Exercise Science, Sports & Rehab": "Ciencias del ejercicio, deporte y rehabilitación",
   "Exercise & sports": "Ejercicio y deporte",
   "Exercise Science & Sports": "Ciencias del ejercicio y deporte",
+  "You're in.": "Ya estás dentro.",
+  "Want the 2-minute tour?": "¿Quieres el recorrido de 2 minutos?",
+  "See every part of Beat the Pile with real data: jobs near you, your major, Career Fair Mode, My Season, Orbit and interview practice.": "Mira cada parte de Beat the Pile con datos reales: empleos cerca de ti, tu carrera, el modo feria de empleo, Mi temporada, Orbit y práctica de entrevistas.",
+  "Skip, show me jobs": "Omitir, muéstrame empleos",
+  "Go to my jobs →": "Ir a mis empleos →",
+  "Until then, see who came last time:": "Mientras tanto, mira quién vino la última vez:",
   "Science, Health & Environment": "Ciencia, salud y medio ambiente",
   "Legal, Policy & Government": "Legal, políticas y gobierno",
   "Education & Social Impact": "Educación e impacto social",
@@ -1668,6 +1674,7 @@
   "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "Leemos miles de bolsas de empleo varias veces al día. Si publicas prácticas o empleos de entrada en tu sitio de empleo, los estudiantes los ven aquí con un enlace directo a tu página de postulación. No tienes que publicar nada."
  },
  "patterns": [
+  ["^Show ([\\d,]+) more \\(([\\d,]+) left\\)$", "Mostrar $1 más (quedan $2)"],
   [
    "^([\\d,]+) full-time jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
    "$1 empleos de tiempo completo en $2 empresas$3"
