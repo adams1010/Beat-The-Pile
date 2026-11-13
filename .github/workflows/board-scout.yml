@@ -4,7 +4,7 @@
 name: board-scout
 on:
   schedule:
-    - cron: "0 7 * * 0,3"   # Sun + Wed (Nov 9: twice a week in hiring season)
+    - cron: "0 7 * * *"     # daily (Nov 13: was Sun + Wed)
   workflow_dispatch:
     inputs:
       args: { description: "e.g. --dry --limit=300", required: false, default: "" }

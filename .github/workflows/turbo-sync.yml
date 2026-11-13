@@ -1,0 +1,23 @@
+# ⚡ Turbo Sync (Nov 13 2026): reads every verified company's job board from GitHub's servers — 24 at once, no 60-second
+# limit, deeper searches (BTP_TURBO) — and hands the results to Vercel to store (/api/discovery "turbo_save").
+# Every 2 hours; GitHub sometimes fires schedules late, which is fine. Switch: "Turbo Sync" on /bots.
+name: turbo-sync
+on:
+  schedule:
+    - cron: "20 */2 * * *"
+  workflow_dispatch:
+    inputs:
+      args: { description: "e.g. --limit=40 --minutes=10", required: false, default: "" }
+concurrency: { group: turbo-sync, cancel-in-progress: false }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 110
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/turbo-sync.mjs ${{ inputs.args }}
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          BTP_TURBO: "1"

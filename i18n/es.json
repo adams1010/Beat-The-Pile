@@ -1600,7 +1600,8 @@
   ", and confirm you're 16 or older.": ", y confirmas que tienes 16 años o más.",
   "Email address (optional)": "Correo electrónico (opcional)",
   "By verifying, you agree to the": "Al verificar, aceptas los",
-  ", including the rules for employers in section 7, and our": ", incluidas las reglas para empleadores de la sección 7, y nuestra"
+  ", including the rules for employers in section 7, and our": ", incluidas las reglas para empleadores de la sección 7, y nuestra",
+  "Entry-level": "Primer empleo"
  },
  "patterns": [
   [
@@ -1926,6 +1927,10 @@
   [
    "^© (\\d{4}) CuzzoCore LLC\\. Beat the Pile is a service of CuzzoCore LLC\\. Job listings come from each employer's own job board\\. Company names and logos belong to their owners\\.$",
    "© $1 CuzzoCore LLC. Beat the Pile es un servicio de CuzzoCore LLC. Las ofertas vienen del portal de empleo de cada empleador. Los nombres y logotipos de las empresas pertenecen a sus dueños."
+  ],
+  [
+   "^([\\d,]+) entry-level jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
+   "$1 empleos de nivel inicial en $2 empresas$3"
   ]
  ]
 }

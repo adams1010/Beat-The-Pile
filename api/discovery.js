@@ -93,6 +93,38 @@ export default async function handler(req, res) {
       }
       return res.status(200).json({ ok: true, saved });
     }
+    // ⚡ Turbo Sync (Nov 13, GitHub turbo-sync.yml → scripts/turbo-sync.mjs): GitHub reads the job boards (no 60-second
+    // limit, many at once) and Vercel only stores the results. Robot only. Board configs aren't secret.
+    if (b?.action === "turbo_list") {
+      if (who !== "robot") return res.status(403).json({ error: "Robot only" });
+      const { syncOrder } = await import("./sync.js");
+      const list = await syncOrder();
+      return res.status(200).json({ runStart: new Date().toISOString(), companies: list.map(({ enabled, discovered, ...c }) => c) });
+    }
+    if (b?.action === "turbo_save") {
+      if (who !== "robot") return res.status(403).json({ error: "Robot only" });
+      const { saveResult } = await import("./sync.js");
+      const { loadCompanies } = await import("../lib/companies.js");
+      const runStart = typeof b.runStart === "string" && !Number.isNaN(Date.parse(b.runStart)) ? new Date(b.runStart).toISOString() : null;
+      if (!runStart || !Array.isArray(b.results)) return res.status(400).json({ error: "runStart and results needed" });
+      const byId = new Map((await loadCompanies()).filter((c) => c.enabled).map((c) => [c.id, c]));
+      const out = [];
+      for (const r of b.results.slice(0, 60)) {
+        const cfg = byId.get(r?.id);
+        if (!cfg) { out.push({ id: r?.id, skipped: "unknown or disabled company" }); continue; }
+        let got;
+        if (r.error) got = { error: Object.assign(new Error(String(r.error).slice(0, 500)), r.busy ? { busy: true } : {}) };
+        else {
+          // only rows for THIS company, with the company name from our own config (never from the payload)
+          const listings = (Array.isArray(r.listings) ? r.listings : []).filter((l) => l && typeof l.id === "string" && l.id.startsWith(cfg.id + ":") && typeof l.title === "string" && typeof l.url === "string")
+            .map((l) => ({ ...l, company_id: cfg.id, company: cfg.listAs || cfg.company }));
+          got = { raw: Math.max(0, +r.raw || 0), listings };
+        }
+        const e = await saveResult(cfg, runStart, got);
+        out.push({ id: cfg.id, ok: !!e.ok, kept: e.kept_count || 0, busy: !!e.busy, error: e.error || null });
+      }
+      return res.status(200).json({ saved: out.length, results: out });
+    }
     if (b?.action === "botlog") {                         // GitHub-run bots (browser pass, radar) report their runs
       if (who !== "robot" || !BOT_IDS.includes(b.bot)) return res.status(403).json({ error: "Robot only" });
       await logRun(b.bot, b.ok !== false, String(b.summary || "").slice(0, 300), b.stats && typeof b.stats === "object" ? b.stats : null);

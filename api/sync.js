@@ -40,9 +40,19 @@ async function closeIfGone(cfg, runStart, why) {
 const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(`timed out after ${Math.round(ms / 1000)}s`)), ms))]);
 
 async function syncOne(cfg, runStart, msLeft) {
+  let got;
+  try { got = await withTimeout(fetchCompany(cfg), msLeft); }
+  catch (e) { got = { error: e }; }
+  return saveResult(cfg, runStart, got);
+}
+
+/** Store one company's read: { raw, listings } or { error }. Shared by this function and ⚡ Turbo Sync (GitHub reads the
+ *  boards, then hands the results to /api/discovery action "turbo_save", which calls this). */
+export async function saveResult(cfg, runStart, got) {
   const entry = { company_id: cfg.id, ran_at: runStart, ok: false, raw_count: 0, kept_count: 0, closed_skipped: false, error: null };
   try {
-    const { raw, listings } = await withTimeout(fetchCompany(cfg), msLeft);
+    if (got.error) throw got.error;
+    const { raw, listings } = got;
     entry.raw_count = raw;
     entry.kept_count = listings.length;
 
@@ -97,12 +107,8 @@ export async function fillGeo(msBudget, now = Date.now) {
   return done;
 }
 
-export default async function handler(req, res) {
-  if (!isAuthorizedCron(req)) return res.status(401).json({ error: "Unauthorized" });
-  if (!(await botOn("sync"))) return res.status(200).json({ off: true, bot: "sync" });
-  const t0 = Date.now();
-  const runStart = new Date().toISOString();
-
+/** Enabled companies, least-recently-synced first (never-synced first; companies posting right now get a boost). */
+export async function syncOrder() {
   const companies = (await loadCompanies()).filter((c) => c.enabled);
   const last = {};
   try {
@@ -117,6 +123,15 @@ export default async function handler(req, res) {
     hot = new Set((await db.selectAllAsAdmin(`listings?select=company_id&first_seen=gte.${since}&closed_at=is.null&order=company_id.asc`)).map((r) => r.company_id));
   } catch { /* no boost this run */ }
   companies.sort((a, b) => syncKey(a.id, last, hot) - syncKey(b.id, last, hot));
+  return companies;
+}
+
+export default async function handler(req, res) {
+  if (!isAuthorizedCron(req)) return res.status(401).json({ error: "Unauthorized" });
+  if (!(await botOn("sync"))) return res.status(200).json({ off: true, bot: "sync" });
+  const t0 = Date.now();
+  const runStart = new Date().toISOString();
+  const companies = await syncOrder();
 
   const report = await mapLimit(companies, 14, async (cfg) => {   // mostly waiting on company sites, so more at once
     const elapsed = Date.now() - t0;

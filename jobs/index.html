@@ -228,7 +228,7 @@
         <div class="wchips" id="welcomeChips"></div>
       </section>
 <div class="controls">
-    <div class="kindseg" role="group" aria-label="Job type"><button type="button" data-kind="intern" aria-pressed="true">Internships</button><button type="button" data-kind="fulltime" aria-pressed="false">Full-time</button><button type="button" data-kind="all" aria-pressed="false">Both</button></div>
+    <div class="kindseg" role="group" aria-label="Job type"><button type="button" data-kind="intern" aria-pressed="true">Internships</button><button type="button" data-kind="fulltime" aria-pressed="false">Entry-level</button><button type="button" data-kind="all" aria-pressed="false">Both</button></div>
     <div class="row">
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">All US states</option></select>
       <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
@@ -486,7 +486,7 @@
     const companies = new Set(rows.map((j) => j.company)).size;
     const where = state.savedOnly ? "saved" : state.followOnly ? "you follow" : state.near && !state.company ? `within ${state.near.mi} mi of ${state.near.q}` : state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
     $("count").textContent = rows.length
-      ? `${rows.length} ${state.kind === "fulltime" ? "full-time job" : state.kind === "all" ? "job" : "internship"}${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"} ${where}` +
+      ? `${rows.length} ${state.kind === "fulltime" ? "entry-level job" : state.kind === "all" ? "job" : "internship"}${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"} ${where}` +
         (state.savedOnly || state.followOnly ? "" : ` · ${MAJOR_LABEL()}`) + (simRows.length ? ` · plus ${simRows.length} similar` : "") + (state.partial && !state.savedOnly && !state.followOnly ? " so far · loading the rest…" : "")
       : simRows.length ? `${simRows.length} similar ${state.kind === "fulltime" ? "job" : state.kind === "all" ? "job" : "internship"}${simRows.length === 1 ? "" : "s"} ${where}` : "";
 
@@ -509,7 +509,7 @@
       <article class="card${has("applied", j) ? " applied" : ""}${j.closed ? " closed" : ""}">
         <a class="lg" href="${coHref(j)}" aria-hidden="true" tabindex="-1" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</a>
         <div style="min-width:0">
-          <div class="title">${esc(niceTitle(j.title))}${j.kind === "fulltime" ? '<span class="ftag">Full-time</span>' : ""}${isNew(j) ? '<span class="tag new">New</span>' : ""}${j.closed ? '<span class="tag closed">Closed by the company</span>' : ""}</div>
+          <div class="title">${esc(niceTitle(j.title))}${j.kind === "fulltime" ? '<span class="ftag">Entry-level</span>' : ""}${isNew(j) ? '<span class="tag new">New</span>' : ""}${j.closed ? '<span class="tag closed">Closed by the company</span>' : ""}</div>
           <div class="co"><a class="cn" href="${coHref(j)}">${esc(j.company)}</a> <span class="loc">· ${esc(j.sites[0].loc)}${j.sites.length > 1 ? ` +${j.sites.length - 1} more` : ""}</span></div>
           <div class="meta2">${[state.near && j.mi != null ? `<span class="dist">${j.mi < 1 ? "Under 1" : "~" + j.mi} mi away</span>` : "", esc(postedText(j)), j.sites.length > 1 ? `${j.sites.length} locations` : j.count > 1 ? `${j.count} openings` : "", seasonOf(j.title) ? esc(seasonOf(j.title)) : "", (state.major === "all" || !state.major) && FIELD_NAME[j.field] ? esc(FIELD_NAME[j.field]) : "", j.match === "me" && STRICT_OK() ? "Mechanical match" : "", needsClearance(j.title) ? "US citizens / clearance" : ""].filter(Boolean).join(" · ")}</div>
           ${j.sites.length > 1 ? `<details class="sites"><summary>All ${j.sites.length} locations</summary><ul>${j.sites.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.loc)}</a></li>`).join("")}</ul></details>` : ""}
