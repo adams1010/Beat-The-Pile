@@ -1671,10 +1671,16 @@
   "Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board, no reposts, and jobs drop off when the company takes them down.": "Les stages d'abord, les postes jeunes diplômés aussi. Toutes les filières, tirés directement du site carrières de chaque entreprise : pas de republications, et les offres disparaissent quand l'entreprise les retire.",
   "Not listed, type it": "Pas dans la liste : tapez-la",
   "Every major": "Toutes les filières",
-  "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "Nous lisons des milliers de pages carrières plusieurs fois par jour. Si vous publiez des stages ou postes débutants sur votre site carrières, les étudiants les voient ici avec un lien direct vers votre page de candidature. Vous n'avez rien à publier."
+  "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "Nous lisons des milliers de pages carrières plusieurs fois par jour. Si vous publiez des stages ou postes débutants sur votre site carrières, les étudiants les voient ici avec un lien direct vers votre page de candidature. Vous n'avez rien à publier.",
+  "Part-time & hourly": "Temps partiel et horaire",
+  "All": "Tout",
+  "Hourly": "Horaire"
  },
  "patterns": [
-  ["^Show ([\\d,]+) more \\(([\\d,]+) left\\)$", "Afficher $1 de plus ($2 restants)"],
+  [
+   "^Show ([\\d,]+) more \\(([\\d,]+) left\\)$",
+   "Afficher $1 de plus ($2 restants)"
+  ],
   [
    "^([\\d,]+) full-time jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
    "$1 emplois à temps plein dans $2 entreprises$3"
@@ -2002,6 +2008,14 @@
   [
    "^([\\d,]+) entry-level jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
    "$1 emplois débutants dans $2 entreprises$3"
+  ],
+  [
+   "^([\\d,]+) part-time & hourly jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
+   "$1 emplois à temps partiel et horaires dans $2 entreprises$3"
+  ],
+  [
+   "^Searched every job type, (.+) had only a few matches\\.$",
+   "Recherche dans tous les types d'emploi, $1 avait peu de résultats."
   ]
  ]
 }

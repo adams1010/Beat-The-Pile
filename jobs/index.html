@@ -58,7 +58,9 @@
   .seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
   .seg{border-radius:999px}.seg button{border-radius:999px;font-weight:500}
   /* Nov 8: job type — internships first, early-career full-time too */
-  .kindseg{display:inline-flex;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px;margin-bottom:10px}
+  .kindseg{display:inline-flex;max-width:100%;overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px;margin-bottom:10px}
+  .kindseg button{white-space:nowrap}
+  @media (max-width:520px){.kindseg button{padding:7px 11px;font-size:13px}}
   .kindseg button{border:0;background:none;font:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:7px 16px;border-radius:999px;cursor:pointer}
   .kindseg button[aria-pressed="true"]{background:#060A2C;color:#fff}
   .ftag{display:inline-block;font-size:11.5px;font-weight:700;color:#060A2C;background:#B0F701;border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:2px}
@@ -228,7 +230,7 @@
         <div class="wchips" id="welcomeChips"></div>
       </section>
 <div class="controls">
-    <div class="kindseg" role="group" aria-label="Job type"><button type="button" data-kind="intern" aria-pressed="true">Internships</button><button type="button" data-kind="fulltime" aria-pressed="false">Entry-level</button><button type="button" data-kind="all" aria-pressed="false">Both</button></div>
+    <div class="kindseg" role="group" aria-label="Job type"><button type="button" data-kind="intern" aria-pressed="true">Internships</button><button type="button" data-kind="fulltime" aria-pressed="false">Entry-level</button><button type="button" data-kind="hourly" aria-pressed="false">Part-time &amp; hourly</button><button type="button" data-kind="all" aria-pressed="false">All</button></div>
     <div class="row">
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">All US states</option></select>
       <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
@@ -450,6 +452,12 @@
       state.widenedFor = state.q; state.widenedFrom = MAJOR_LABEL();
       state.major = "all"; $("majorSel").value = "all"; $("meWrap").hidden = true; loadScope(); return;   // not saved as their usual major
     }
+    // Nov 13: still only a few → every job type too (a "medical assistant" search on Internships finds the real jobs), once per search
+    if (state.q && state.qSubmitted === state.q && state.kind !== "all" && !state.partial && !state.savedOnly && !state.followOnly && !state.company && S.exact.length < 12 && state.kindWidenedFor !== state.q) {
+      state.kindWidenedFor = state.q; state.kindWidenedFrom = state.kind; state.kind = "all";
+      document.querySelectorAll("[data-kind]").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.kind === "all")));
+      syncUrl(); loadScope(); return;
+    }
     const fresh = state.followRows.filter(newForMe).length;
     $("followN").textContent = state.mine.starred.size ? `(${state.mine.starred.size})` : "";
     $("alert").innerHTML = fresh && !state.followOnly ? `<button class="alert" id="alertBtn"><span>${fresh} new internship${fresh > 1 ? "s" : ""} from companies you follow</span><span>See →</span></button>` : "";
@@ -487,9 +495,9 @@
     const companies = new Set(rows.map((j) => j.company)).size;
     const where = state.savedOnly ? "saved" : state.followOnly ? "you follow" : state.near && !state.company ? `within ${state.near.mi} mi of ${state.near.q}` : state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
     $("count").textContent = rows.length
-      ? `${rows.length} ${state.kind === "fulltime" ? "entry-level job" : state.kind === "all" ? "job" : "internship"}${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"} ${where}` +
+      ? `${rows.length} ${state.kind === "fulltime" ? "entry-level job" : state.kind === "hourly" ? "part-time & hourly job" : state.kind === "all" ? "job" : "internship"}${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"} ${where}` +
         (state.savedOnly || state.followOnly ? "" : ` · ${MAJOR_LABEL()}`) + (simRows.length ? ` · plus ${simRows.length} similar` : "") + (state.partial && !state.savedOnly && !state.followOnly ? " so far · loading the rest…" : "")
-      : simRows.length ? `${simRows.length} similar ${state.kind === "fulltime" ? "job" : state.kind === "all" ? "job" : "internship"}${simRows.length === 1 ? "" : "s"} ${where}` : "";
+      : simRows.length ? `${simRows.length} similar ${state.kind === "intern" ? "internship" : "job"}${simRows.length === 1 ? "" : "s"} ${where}` : "";
 
     renderMailme(rows.length);
     const allMaj = state.major !== "all" && !state.savedOnly && !state.followOnly && !state.company;
@@ -510,7 +518,7 @@
       <article class="card${has("applied", j) ? " applied" : ""}${j.closed ? " closed" : ""}">
         <a class="lg" href="${coHref(j)}" aria-hidden="true" tabindex="-1" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</a>
         <div style="min-width:0">
-          <div class="title">${esc(niceTitle(j.title))}${j.kind === "fulltime" ? '<span class="ftag">Entry-level</span>' : ""}${isNew(j) ? '<span class="tag new">New</span>' : ""}${j.closed ? '<span class="tag closed">Closed by the company</span>' : ""}</div>
+          <div class="title">${esc(niceTitle(j.title))}${j.kind === "fulltime" ? '<span class="ftag">Entry-level</span>' : j.kind === "hourly" ? '<span class="ftag">Hourly</span>' : ""}${isNew(j) ? '<span class="tag new">New</span>' : ""}${j.closed ? '<span class="tag closed">Closed by the company</span>' : ""}</div>
           <div class="co"><a class="cn" href="${coHref(j)}">${esc(j.company)}</a> <span class="loc">· ${esc(j.sites[0].loc)}${j.sites.length > 1 ? ` +${j.sites.length - 1} more` : ""}</span></div>
           <div class="meta2">${[state.near && j.mi != null ? `<span class="dist">${j.mi < 1 ? "Under 1" : "~" + j.mi} mi away</span>` : "", esc(postedText(j)), j.sites.length > 1 ? `${j.sites.length} locations` : j.count > 1 ? `${j.count} openings` : "", seasonOf(j.title) ? esc(seasonOf(j.title)) : "", (state.major === "all" || !state.major) && FIELD_NAME[j.field] ? esc(FIELD_NAME[j.field]) : "", j.match === "me" && STRICT_OK() ? "Mechanical match" : "", needsClearance(j.title) ? "US citizens / clearance" : ""].filter(Boolean).join(" · ")}</div>
           ${j.sites.length > 1 ? `<details class="sites"><summary>All ${j.sites.length} locations</summary><ul>${j.sites.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.loc)}</a></li>`).join("")}</ul></details>` : ""}
@@ -532,7 +540,9 @@
     if (sig !== LIST.sig) { LIST.sig = sig; LIST.shown = PAGE; }
     LIST.rows = rows.concat(simRows); LIST.tpl = tpl;
     const fixedNote = S.fixed ? `<div class="simhead"><b>Showing results for “${esc(S.fixed)}”</b><span>You typed “${esc(state.q)}”.</span></div>` : "";
-    const widenNote = state.widenedFrom && state.major === "all" && state.widenedFor === state.q ? `<div class="simhead"><span>Searched every major, ${esc(state.widenedFrom)} had only a few matches.</span></div>` : "";
+    const KNAME = { intern: "Internships", fulltime: "Entry-level", hourly: "Part-time & hourly" };
+    const widenNote = (state.widenedFrom && state.major === "all" && state.widenedFor === state.q ? `<div class="simhead"><span>Searched every major, ${esc(state.widenedFrom)} had only a few matches.</span></div>` : "")
+      + (state.kindWidenedFrom && state.kind === "all" && state.kindWidenedFor === state.q ? `<div class="simhead"><span>Searched every job type, ${esc(KNAME[state.kindWidenedFrom] || "")} had only a few matches.</span></div>` : "");
     $("list").innerHTML = fixedNote + widenNote + companyHeader(rows) + LIST.rows.slice(0, LIST.shown).map(tpl).join("") + moreHtml();
     watchMore();
   }
@@ -576,7 +586,7 @@
     const st = (p.get("state") || "").toUpperCase();
     state.st = st === "ALL" ? "ALL" : (st.split(",").filter((x) => /^[A-Z]{2}$/.test(x)).length ? st.split(",").filter((x) => /^[A-Z]{2}$/.test(x)) : "ALL");
     state.meOnly = p.get("me") === "1"; $("meOnly").checked = state.meOnly;
-    state.kind = ["fulltime", "all"].includes(p.get("kind")) ? p.get("kind") : "intern";
+    state.kind = ["fulltime", "hourly", "all"].includes(p.get("kind")) ? p.get("kind") : "intern";
     document.querySelectorAll("[data-kind]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.kind === state.kind)));
     const co = (p.get("company") || "").toLowerCase(); state.company = /^[a-z0-9-]{2,80}$/.test(co) ? co : null;   // from the Radar: one company
     const mj = (p.get("major") || "").toLowerCase();
@@ -879,7 +889,9 @@
   $("q").addEventListener("input", (e) => { state.q = e.target.value.trim(); render(); });
   // Search button / Enter: apply now, close the phone keyboard, and jump to the results.
   $("qForm").addEventListener("submit", (e) => {
-    e.preventDefault(); state.q = $("q").value.trim(); state.qSubmitted = state.q; render(); $("q").blur();
+    e.preventDefault(); state.q = $("q").value.trim(); state.qSubmitted = state.q;
+    if ((state.kind === "all" || state.kind === "hourly") && !state.near && state.st === "ALL" && !state.company) loadScope(); else render();   // big scopes search on the server
+    $("q").blur();
     const c = $("count"); if (c && c.getBoundingClientRect().top < 60) c.scrollIntoView({ block: "start" });
   });
   // "Filters ↑" after you've scrolled past the filter box.
@@ -915,7 +927,10 @@
   async function loadScope(){
     const where = state.near ? `near=${encodeURIComponent(state.near.q)}&mi=${state.near.mi}` : state.st === "ALL" ? "" : `state=${state.st.join(",")}`;
     const kindQ = state.kind === "intern" ? "" : `kind=${state.kind}`;      // internships = the API's default
-    const qs = state.company ? [`field=all&companies=${state.company}`, kindQ].filter(Boolean).join("&") : [majorParam(), where, kindQ].filter(Boolean).join("&");
+    // Nov 13: every job type (or every hourly job) across the whole country is too many to send, so the server does the word search
+    const bigScope = (state.kind === "all" || state.kind === "hourly") && !state.near && state.st === "ALL" && !state.company;
+    const serverQ = bigScope && state.q ? `q=${encodeURIComponent(state.q)}` : "";
+    const qs = state.company ? [`field=all&companies=${state.company}`, kindQ].filter(Boolean).join("&") : [majorParam(), where, kindQ, serverQ].filter(Boolean).join("&");
     const seq = ++loadSeq;
     if (!cache.has(qs)) { state.loaded = false; $("list").innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>'; $("count").textContent = ""; }
     try {
