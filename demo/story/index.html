@@ -400,7 +400,7 @@
     if (slides[i].querySelector("[data-live]")) enter(i);
   }).catch(() => {});
   const SHORT = { mechanical: "Mech", electrical: "EE", civil: "Civil", chemical: "ChemE", industrial: "Mfg", software: "CS", data: "Data", cyber_it: "IT", product_design: "Design",
-    finance: "Finance", consulting: "Consulting", marketing: "Marketing", sales: "Sales", supply_chain: "Ops", people_hr: "HR", science_health: "Science", legal_policy: "Policy", education_social: "Education", engineering: "Eng" };
+    finance: "Finance", consulting: "Consulting", marketing: "Marketing", sales: "Sales", supply_chain: "Ops", people_hr: "HR", science_health: "Science", legal_policy: "Policy", education_social: "Education", exercise_sport: "Exercise", engineering: "Eng" };
   fetch("/api/listings?field=all&limit=400").then(ok).then((l) => {
     const L = l.listings || [];
     if (!L.length) return fail();

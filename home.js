@@ -1,4 +1,4 @@
-/* built from src/home.jsx 67ef374fb911b6d1 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx f31d9a5bf020ed37 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -340,7 +340,8 @@ const D_FIELD = {
   sales: "Sales",
   supply_chain: "Supply Chain & Ops",
   science_health: "Science & Health",
-  education_social: "Education & Social Impact"
+  education_social: "Education & Social Impact",
+  exercise_sport: "Exercise Science & Sports"
 };
 const D_STATES = {
   alabama: "AL",
