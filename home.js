@@ -1,4 +1,4 @@
-/* built from src/home.jsx f6285ddb297e2f70 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx aca00e5f697ff0ad — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -460,7 +460,7 @@ function HeroMap({
       if (!r.ok) throw 0;
       return r.json();
     });
-    Promise.all([get("/map/us.json"), get("/api/listings?dots=1&field=all&kind=all")]).then(([g, d]) => {
+    Promise.all([get("/map/us.json"), get("/api/listings?dots=1&field=all&kind=career")]).then(([g, d]) => {
       setGeo(g);
       setPts(d);
     }).catch(() => setErr(true));
