@@ -42,7 +42,7 @@
 :root{
   --green:#4A7000;--green-dark:#3A5A00;--green-light:#F2FADF;--green-mid:#CFE6DA;
   --amber:#FF8C00;--amber-light:#FFF4E6;--coral:#FF5733;--coral-light:#FFF0ED;
-  --blue:#2563EB;--purple:#7C3AED;
+  --blue:#2563EB;--purple:#1E3A8A;
   --bg:#FBFBFC;--bg2:#FBFBFC;--bg3:#F4F6F8;
   --text1:#060A2C;--text2:#4A5568;--text3:#6B7280;
   --border:#E3E7ED;--border2:#CBD5E0;
@@ -59,7 +59,7 @@ body{min-height:100vh}
 @keyframes dblink{50%{opacity:.25}}
 @keyframes dtick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .d-blink{animation:dblink 1.6s infinite}.d-tick{animation:dtick 45s linear infinite}.d-tick:hover{animation-play-state:paused}
-.d-grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.d-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.d-feat{transition:transform .15s,box-shadow .15s}@media(max-width:600px){.d-mapbadge{position:static!important;display:inline-block;margin-top:8px}}.d-feat:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(10,20,38,.08)}
+.d-grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.d-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}@media(max-width:600px){.d-mapbadge{position:static!important;display:inline-block;margin-top:8px}}.d-feat:hover{border-color:#B9C3D3}
 @media (max-width:900px){.d-grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.d-grid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.d-search{flex-direction:column}.d-search .d-sep{width:auto!important;height:1px;margin:0 10px!important}.d-grid4{grid-template-columns:1fr}.d-grid3{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.d-blink,.d-tick{animation:none}}
@@ -69,8 +69,8 @@ body{min-height:100vh}
 @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
 @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(600px) rotate(720deg);opacity:0}}
 @keyframes countUp{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
-@keyframes nudgeRight{0%,100%{transform:translateX(0)}50%{transform:translateX(6px)}}
-@keyframes hintPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.92;transform:scale(1.02)}}
+
+
 .fade-up{animation:fadeUp 0.2s ease-out both}
 .card-hover{transition:all 0.2s ease}
 .card-hover:hover{border-color:#CBD5E0}

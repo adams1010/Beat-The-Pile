@@ -9,10 +9,10 @@
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Beat the Pile — Company Coverage</title>
+<title>Beat the Pile, Company Coverage</title>
 <meta name="robots" content="noindex">
 <style>
-  :root{--green:#4A7000;--green-dark:#3A5A00;--navy:#060A2C;--ink:#1A2230;--muted:#64748B;--bg:#FBFBFC;--line:#E3E7ED;--r:12px;
+  :root{--green:#4A7000;--green-dark:#3A5A00;--navy:#060A2C;--ink:#1A2230;--muted:#64748B;--bg:#FBFBFC;--line:#E3E7ED;--r:8px;
         --font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
   *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);line-height:1.5}
   .wrap{max-width:860px;margin:0 auto;padding:0 16px}
@@ -76,13 +76,13 @@
 <script>
 (function(){
   const GROUPS = [
-    ["live",            "Live — added automatically",            "#4A7000", "Board found and proven to be theirs. Listings appear after the next daily sync."],
-    ["unsupported",     "Needs a new scraper",                   "#7F77DD", "Their job system is one we don't read yet. Grouped by system — build the biggest one next."],
+    ["live",            "Live, added automatically",            "#4A7000", "Board found and proven to be theirs. Listings appear after the next daily sync."],
+    ["unsupported",     "Needs a new scraper",                   "#7F77DD", "Their job system is one we don't read yet. Grouped by system, build the biggest one next."],
     ["identity_failed", "Found a board, couldn't prove it's them","#EF9F27", "Held back on purpose. Never shown until checked by hand."],
     ["blocked",         "Site blocks robots",                    "#D85A30", "Their careers site refuses automated visits. Can be added by hand in the browser."],
     ["board_error",     "Board found but not working",           "#B4B2A9", "Usually a wrong guessed address. Retried in 2 weeks."],
     ["no_board",        "No job board found",                    "#888780", "Careers pages didn't link to any job system we recognize. Retried in 2 weeks."],
-    ["duplicate",       "Duplicate of a live company",           "#D3D1C7", "Same board as one already listed — skipped so jobs don't show twice."],
+    ["duplicate",       "Duplicate of a live company",           "#D3D1C7", "Same board as one already listed, skipped so jobs don't show twice."],
     ["no_domain",       "Missing website",                       "#D3D1C7", "Needs a website added to the candidate list."],
     ["error",           "Error",                                 "#E24B4A", "Something broke during the check. Retried automatically."],
     ["pending",         "Queued",                                "#CBD5E1", "Not tried yet. The robot checks ~24 companies every 15 minutes."],
@@ -148,8 +148,8 @@
         <td class="d">${esc(SHORT[r.status] || r.status)}${r.attempts ? ` · tried ${r.attempts}×` : ""}</td>
         <td><a href="${g(r)}" target="_blank" rel="noopener">Google ↗</a>${r.domain ? `<br><a href="https://${esc(r.domain)}" target="_blank" rel="noopener">${esc(r.domain)} ↗</a>` : ""}</td>
         <td>${S.admin ? `<div class="linkcell"><input type="url" placeholder="https://…" aria-label="Job board link for ${esc(r.company)}"><button class="go save">Save</button></div>` : ""}
-          ${r.hint ? `<div class="tried">Tried: ${esc(r.hint)}${r.detail ? " — " + esc(r.detail) : ""}</div>` : ""}
-          ${S.saved.has(r.id) ? `<div class="ok">Saved ✓ — robot checks it soon</div>` : ""}</td></tr>`).join("") +
+          ${r.hint ? `<div class="tried">Tried: ${esc(r.hint)}${r.detail ? " · " + esc(r.detail) : ""}</div>` : ""}
+          ${S.saved.has(r.id) ? `<div class="ok">Saved ✓, robot checks it soon</div>` : ""}</td></tr>`).join("") +
       `</tbody></table>` +
       (S.admin ? `<div class="addco"><input id="nc" placeholder="Add a company (name)"><input id="nd" placeholder="website (acme.com)"><input id="nh" placeholder="job board link (optional)"><button class="go" id="add">Add</button></div>` : "") +
       `</div>`;
@@ -184,7 +184,7 @@
       if (!list.length) continue;
       if (k === "unsupported") {
         const by = {};
-        list.forEach((r) => { const sys = (r.detail || "").replace(/^Uses /, "").replace(/ — .*$/, "") || "Unknown"; (by[sys] = by[sys] || []).push(r.company); });
+        list.forEach((r) => { const sys = (r.detail || "").replace(/^Uses /, "").replace(/(?:,| —) needs.*$/, "").replace(/ — .*$/, "") || "Unknown"; (by[sys] = by[sys] || []).push(r.company); });
         const ranked = Object.entries(by).sort((a, b) => b[1].length - a[1].length);
         html += `<section><details${k === "live" ? " open" : ""}><summary>${esc(label)} <span class="c">${list.length}</span></summary><div class="why">${esc(why)}</div>` +
           ranked.map(([sys, cos]) => `<div class="row"><div><b>${esc(sys)}</b><span class="pill">${cos.length}</span></div><div class="d">${esc(cos.join(", "))}</div></div>`).join("") + `</details></section>`;

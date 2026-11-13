@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Orbit — Beat the Pile</title>
+<title>Orbit | Beat the Pile</title>
 <meta name="description" content="Orbit: classmates in your major, students who interned where you're applying, and what's new at the companies you follow.">
 <link rel="canonical" href="https://www.beatthepile.com/orbit/">
 <link rel="icon" href="/icons/icon-192.png">
@@ -16,7 +16,7 @@
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5}
   main{max-width:1180px;margin:0 auto;padding:24px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
   .grid{display:grid;grid-template-columns:260px minmax(0,1fr) 320px;gap:20px;align-items:start}
-  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:18px}
   .side{position:sticky;top:80px}
   h1{font-size:22px;margin:0 0 2px;letter-spacing:-.01em} h2{font-size:16px;margin:0 0 2px}
   .sub{color:var(--muted);font-size:13.5px;margin:0 0 14px}
@@ -27,7 +27,7 @@
   .nudge a{color:#7A5200;font-weight:600}
   section.card{margin-bottom:16px}
   .people{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
-  .p{border:1px solid var(--line);border-radius:12px;padding:16px 12px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;min-width:0}
+  .p{border:1px solid var(--line);border-radius:10px;padding:16px 12px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;min-width:0}
   .av{width:56px;height:56px;border-radius:50%;background:#4A7000;color:#fff;display:grid;place-items:center;font-weight:600;overflow:hidden;flex-shrink:0}
   .av img{width:100%;height:100%;object-fit:cover}
   .avw{position:relative;display:inline-flex;flex-direction:column;align-items:center;flex-shrink:0}
@@ -44,15 +44,15 @@
   .feed .k{font-size:12px;color:var(--muted)} .feed a{color:var(--ink);font-weight:600;text-decoration:none} .feed a:hover{text-decoration:underline}
   .feed .tx{white-space:pre-wrap;overflow-wrap:anywhere}
   .center{text-align:center;padding:40px 24px}
-  .orb-ic{width:44px;height:44px;border-radius:12px;background:var(--green-l);color:var(--green);display:grid;place-items:center;margin:0 auto 12px}
+  .orb-ic{width:44px;height:44px;border-radius:10px;background:var(--green-l);color:var(--green);display:grid;place-items:center;margin:0 auto 12px}
   .soon{font-size:12px;color:var(--muted);margin-top:10px}
   /* Nov 8: Orbit is drawn as an orbit — you in the middle, three rings of people around you */
-  .sky{background:#060A2C;border-radius:16px;color:#fff;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:center;margin-bottom:16px}
+  .sky{background:#060A2C;border-radius:10px;color:#fff;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:18px;align-items:center;margin-bottom:16px}
   .sky h1{color:#fff;font-size:24px;margin:0 0 4px}.sky .sub{color:#C9D2E3;margin:0 0 12px}
   .sky svg{width:100%;height:auto;display:block;max-height:420px}
   .sky .node{cursor:pointer}.sky .node:focus{outline:none}.sky .node:focus circle,.sky .node:hover circle{stroke:#B0F701;stroke-width:3}
   .legend{display:grid;gap:10px}
-  .legend button{font:inherit;text-align:left;display:flex;align-items:center;gap:10px;background:#0E1440;border:1px solid #1E2A5C;color:#fff;border-radius:12px;padding:12px;cursor:pointer}
+  .legend button{font:inherit;text-align:left;display:flex;align-items:center;gap:10px;background:#0E1440;border:1px solid #1E2A5C;color:#fff;border-radius:10px;padding:12px;cursor:pointer}
   .legend button[aria-pressed=true]{border-color:#B0F701;background:#141B4D}
   .legend i{width:12px;height:12px;border-radius:50%;flex-shrink:0;border:2px solid}
   .legend b{font-variant-numeric:tabular-nums;font-size:18px;margin-left:auto}.legend small{display:block;color:#8D9AB3;font-size:12px}
@@ -77,17 +77,17 @@
   .fairbox label.sw{display:flex;gap:8px;align-items:flex-start;font-size:13px;margin-bottom:8px}
   .mini{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.mini a{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink);text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:3px 10px 3px 3px}
   .mini .av{width:24px;height:24px;font-size:10px}
-  dialog.chat{border:0;border-radius:14px;padding:0;width:min(560px,94vw);max-height:86vh;box-shadow:0 20px 60px rgba(6,10,44,.3)}
+  dialog.chat{border:0;border-radius:10px;padding:0;width:min(560px,94vw);max-height:86vh;box-shadow:none}
   dialog.chat::backdrop{background:rgba(6,10,44,.45)}
   .chat .hd{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}.chat .hd .av{width:38px;height:38px;font-size:13px}
   .chat .hd .who{flex:1;min-width:0}.chat .hd .who b{display:block}.chat .hd .who span{color:var(--muted);font-size:12.5px}
   .chat .x{font:inherit;font-size:20px;background:none;border:0;cursor:pointer;color:var(--muted);padding:4px 8px}
   .chat .msgs{padding:14px 16px;overflow:auto;height:min(52vh,440px);background:#F7F9FC;display:flex;flex-direction:column;gap:8px}
-  .chat .m{max-width:78%;padding:8px 12px;border-radius:14px;background:#fff;border:1px solid var(--line);white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
+  .chat .m{max-width:78%;padding:8px 12px;border-radius:10px;background:#fff;border:1px solid var(--line);white-space:pre-wrap;overflow-wrap:anywhere;font-size:14px}
   .chat .m.mine{align-self:flex-end;background:var(--green);color:#fff;border-color:var(--green)}
   .chat .m small{display:block;font-size:11px;opacity:.7;margin-top:2px}
   .chat form{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
-  .chat textarea{flex:1;font:inherit;font-size:14px;border:1px solid var(--line);border-radius:12px;padding:8px 12px;resize:none;height:44px}
+  .chat textarea{flex:1;font:inherit;font-size:14px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;resize:none;height:44px}
   .chat .why{padding:12px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
   .chat .note{font-size:11.5px;color:var(--muted);padding:0 16px 10px}
   @media (max-width:1060px){.grid.grid2{grid-template-columns:1fr}}
@@ -366,7 +366,7 @@
       S.fairs = S.fairs || (await fetch("/fair/fairs.json").then((r) => r.json())).fairs || [];
       const today = new Date().toISOString().slice(0, 10);
       const list = S.fairs.filter((x) => !x.date || x.date >= today || x.id === cur).sort((a, b) => String(a.date).localeCompare(String(b.date)));
-      sel.insertAdjacentHTML("beforeend", list.map((x) => `<option value="${esc(x.id)}" ${x.id === cur ? "selected" : ""} data-noi18n>${esc(x.name)}${x.term ? " — " + esc(x.term) : ""}</option>`).join(""));
+      sel.insertAdjacentHTML("beforeend", list.map((x) => `<option value="${esc(x.id)}" ${x.id === cur ? "selected" : ""} data-noi18n>${esc(x.name)}${x.term ? " · " + esc(x.term) : ""}</option>`).join(""));
     } catch {}
     $("#fairSave").onclick = async () => {
       const b = $("#fairSave"); b.disabled = true;

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Company — Beat the Pile</title>
+<title>Company | Beat the Pile</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="theme-color" content="#060A2C">
@@ -14,7 +14,7 @@
   .hero{background:#fff;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;margin-bottom:16px}
   .hero .ban{height:110px;background:var(--navy);border-bottom:4px solid var(--lime)}
   .hero .bd{padding:0 24px 18px;display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap}
-  .hero .clogo{margin-top:-46px;border:4px solid #fff;border-radius:16px}
+  .hero .clogo{margin-top:-46px;border:4px solid #fff;border-radius:10px}
   .lgw{display:flex;flex-direction:column;align-items:center}
   .hiring{margin-top:-12px;position:relative;font-size:12px;font-weight:700;color:#060A2C;background:#B0F701;border:3px solid #fff;border-radius:999px;padding:2px 10px}
   .hero h1{font-size:28px;margin:12px 0 2px}.hero .tl{color:var(--muted);font-size:15px}
@@ -133,8 +133,8 @@
       if (r.status === 404) { $("main").innerHTML = `<div class="card center"><h1>No company page here</h1><p class="sub">This company hasn't set up a verified page on Beat the Pile yet.</p><a class="btn pri" href="/jobs/">Browse internships</a></div>`; return; }
       if (!r.ok) throw new Error(c.error || "Couldn't load this company");
       await fairsP;
-      if (c.kind === "recruiter") { document.title = `${c.person?.name || "Recruiter"} — Beat the Pile`; $("main").innerHTML = personPage(c, false); wireJoin(); return; }
-      document.title = `${c.company.company} — Beat the Pile`;
+      if (c.kind === "recruiter") { document.title = `${c.person?.name || "Recruiter"} | Beat the Pile`; $("main").innerHTML = personPage(c, false); wireJoin(); return; }
+      document.title = `${c.company.company} | Beat the Pile`;
       let tab = "about"; const draw = () => { $("main").innerHTML = page(c, tab, false); document.querySelectorAll("[data-ctab]").forEach((b) => b.onclick = () => { tab = b.dataset.ctab; draw(); }); wireJoin(); };
       draw();
     } catch (e) { $("main").innerHTML = `<div class="card center">${esc(e.message)}</div>`; }

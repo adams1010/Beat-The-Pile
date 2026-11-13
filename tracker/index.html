@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Tracker — Beat the Pile</title>
+<title>Tracker | Beat the Pile</title>
 <meta name="description" content="Your application tracker: every company, role, pay, status and next step in one editable sheet.">
 <link rel="canonical" href="https://www.beatthepile.com/tracker/">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
@@ -14,10 +14,10 @@
      plus the tracker columns in cleanApp (kind, pay, payUnit, location, deadline, contact, notes, checks).
      Signed out → saved on this device (localStorage btp_tracker_local) and moved into the account at sign-in. */
   main{max-width:1320px}
-  .head{background:var(--navy);color:#fff;border-radius:16px;padding:20px 22px;margin-bottom:14px}
+  .head{background:var(--navy);color:#fff;border-radius:10px;padding:20px 22px;margin-bottom:14px}
   .head h1{color:#fff;margin:0;font-size:26px}.head .sub{color:#C9D2E3;margin:4px 0 0}
   .stats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-top:16px}
-  .stat{background:#0E1440;border:1px solid #22304D;border-radius:12px;padding:10px 12px}
+  .stat{background:#0E1440;border:1px solid #22304D;border-radius:10px;padding:10px 12px}
   .stat b{display:block;font-size:24px;line-height:1.1;color:var(--lime);font-variant-numeric:tabular-nums}
   .stat span{font-size:12.5px;color:#C9D2E3}
   @media (max-width:820px){.stats{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -28,7 +28,7 @@
   .tools .sp{flex:1}
   .note{font-size:13px;color:var(--muted);margin:0 0 10px}
   .note.warn{background:#FEF3E2;border:1px solid #F5D9A8;color:#6B3B05;border-radius:10px;padding:8px 12px}
-  .sheet{background:#fff;border:1px solid var(--line);border-radius:12px;overflow:auto;max-height:calc(100vh - 220px)}
+  .sheet{background:#fff;border:1px solid var(--line);border-radius:10px;overflow:auto;max-height:calc(100vh - 220px)}
   table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%;font-size:13.5px}
   th,td{border-bottom:1px solid #EEF1F6;border-right:1px solid #F2F4F8;padding:0;vertical-align:middle;background:#fff}
   th{position:sticky;top:0;z-index:2;background:#F7F9FC;font-weight:600;font-size:12.5px;color:var(--muted);text-align:left;white-space:nowrap}
@@ -46,7 +46,7 @@
   tr.off td{background:#FBF7F7}
   .pay{display:flex;align-items:center}.pay span{padding-left:10px;color:var(--muted)}.pay input{width:96px;text-align:right;padding-left:2px}.pay select{width:auto;padding-left:2px;color:var(--muted)}
   .st{font-weight:600}
-  .st[data-v=applied]{color:#1D4ED8}.st[data-v=interview]{color:#6D28D9}.st[data-v=offer]{color:var(--green)}.st[data-v=rejected]{color:#B91C1C}
+  .st[data-v=applied]{color:#1D4ED8}.st[data-v=interview]{color:#1E3A8A}.st[data-v=offer]{color:var(--green)}.st[data-v=rejected]{color:#B91C1C}
   .lnk{display:flex;align-items:center}.lnk a{padding:0 8px;color:var(--green);font-weight:600;text-decoration:none}
   .del{all:unset;cursor:pointer;color:var(--faint);padding:8px 10px;font-size:16px}.del:hover{color:#B91C1C}
   .saved{font-size:12.5px;color:var(--muted);min-width:70px}
@@ -174,7 +174,7 @@
     document.querySelectorAll("[data-sort]").forEach((b) => b.onclick = () => { const k = b.dataset.sort; S.sort = S.sort.key === k ? { key: k, dir: -S.sort.dir } : { key: k, dir: ["appliedAt", "pay", "deadline"].includes(k) ? -1 : 1 }; render(); });
     document.querySelectorAll("[data-del]").forEach((b) => b.onclick = async () => {
       const a = S.apps.find((x) => x.id === b.dataset.del); if (!a) return;
-      if (a.company && !confirm(`Delete ${a.company}${a.title ? " — " + a.title : ""} from your tracker?`)) return;
+      if (a.company && !confirm(`Delete ${a.company}${a.title ? " · " + a.title : ""} from your tracker?`)) return;
       S.apps = S.apps.filter((x) => x.id !== a.id); render();
       if (S.local) writeLocal(); else if (!a.fresh) biz.api({ action: "app_delete", id: a.id }).catch((e) => alert(e.message));
     });

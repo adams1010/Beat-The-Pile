@@ -201,7 +201,7 @@ export default async function handler(req, res) {
       const ids = [...(await hiringCompanies()).keys()].filter((id) => /^[a-z0-9-]{2,80}$/.test(id)).sort();
       res.setHeader("Content-Type", "application/xml; charset=utf-8"); res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
       return res.status(200).send(sitemap(ids));
-    } catch (e) { console.error("[sitemap]", e); return res.status(503).send("Sitemap unavailable — try again later"); }
+    } catch (e) { console.error("[sitemap]", e); return res.status(503).send("Sitemap unavailable, try again later"); }
   }
   const p = parse(q0);
   if (p.errs.length) return res.status(400).json({ error: p.errs.join("; ") });
@@ -265,6 +265,6 @@ export default async function handler(req, res) {
     console.error("[listings]", e);
     if (kindOk && /imatch|regular expression|PGRST|400/i.test(String(e?.message || e))) { kindOk = false; console.error("[listings] kind filter off"); return handler(req, res); }
     res.setHeader("Cache-Control", "no-store");
-    return res.status(503).json({ error: "Couldn't load internships right now — try again in a minute" });
+    return res.status(503).json({ error: "Couldn't load internships right now, try again in a minute" });
   }
 }

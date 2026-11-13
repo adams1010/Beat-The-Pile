@@ -94,8 +94,8 @@ const aiLimited = async (uid) => !(await rateOk(`me-ai:${uid}`, 3600, AI_PER_HOU
 const claude = (prompt, maxTokens = 700, feature = "other") => callClaude({ feature, prompt, maxTokens, temperature: 0.3 });
 function parseJson(text) {
   const m = String(text).match(/\{[\s\S]*\}/);
-  if (!m) throw new AIError("AI gave an unreadable answer — try again", 502);
-  try { return JSON.parse(m[0]); } catch { throw new AIError("AI gave an unreadable answer — try again", 502); }
+  if (!m) throw new AIError("AI gave an unreadable answer, try again", 502);
+  try { return JSON.parse(m[0]); } catch { throw new AIError("AI gave an unreadable answer, try again", 502); }
 }
 const strArr = (a, n, len) => (Array.isArray(a) ? a : []).map((x) => clean(x, len)).filter(Boolean).slice(0, n);
 
@@ -121,7 +121,7 @@ Reply with ONLY this JSON:
 Rules: be factual and plain. If you are not confident you know this specific company (common for small or local firms), set "known": false, keep "about" to what the website domain and job titles clearly show, and do not invent facts like size, revenue, or projects.`;
   const j = parseJson(await claude(prompt, 700, "brief"));
   const brief = { known: j.known !== false, about: clean(j.about, 400), engineers: clean(j.engineers, 400), ask: strArr(j.ask, 3, 200) };
-  if (!brief.about) throw new AIError("AI gave an empty answer — try again", 502);
+  if (!brief.about) throw new AIError("AI gave an empty answer, try again", 502);
   await db.upsert("company_briefs", [{ company_id: companyId, brief, created_at: new Date().toISOString() }], "company_id");
   return brief;
 }
@@ -425,7 +425,7 @@ export default async function handler(req, res) {
     if (action === "talent") {
       if ((await roleOf(uid)) !== "employer") return res.status(403).json({ error: "Find talent is for employer accounts." });
       if (!(await isVerifiedEmployer(uid))) return res.status(403).json({ error: "Your company is still being verified. You can search students once it's approved.", pending: true });
-      if (!(await rateOk(`talent:${uid}`, 3600, 120))) return res.status(429).json({ error: "That's a lot of searches — try again in a bit" });
+      if (!(await rateOk(`talent:${uid}`, 3600, 120))) return res.status(429).json({ error: "That's a lot of searches, try again in a bit" });
       const t = (v, n) => String(v ?? "").slice(0, n);
       return res.status(200).json(await talentFor({ q: t(body.q, 120), major: t(body.major, 80), school: t(body.school, 100), gradYear: Number(body.gradYear) || null }));
     }
@@ -440,10 +440,10 @@ export default async function handler(req, res) {
       if (pub && !handle) handle = await autoHandle(uid, profile);   // Nov 10: no link name yet → make one from their name
       if (handle) {
         const taken = await db.selectAsAdmin(`user_jobs?select=clerk_user_id&handle=eq.${encodeURIComponent(handle)}&limit=1`);
-        if (taken[0] && taken[0].clerk_user_id !== uid) return res.status(409).json({ error: "That link name is taken — try another" });
+        if (taken[0] && taken[0].clerk_user_id !== uid) return res.status(409).json({ error: "That link name is taken, try another" });
       }
       try { return send(await mutate(uid, () => ({ profile, handle, profile_public: pub }))); }
-      catch (e) { if (/23505|duplicate key/i.test(String(e?.message))) return res.status(409).json({ error: "That link name is taken — try another" }); throw e; }
+      catch (e) { if (/23505|duplicate key/i.test(String(e?.message))) return res.status(409).json({ error: "That link name is taken, try another" }); throw e; }
     }
     // Sign-up step 3 (Nov 9): name, school, major, graduation — and "show me to students at my school" (checked by default,
     // in plain words on the screen). Keeps everything else already on the profile; picks a link name if there isn't one.
@@ -481,7 +481,7 @@ export default async function handler(req, res) {
       const to = await emailFor(uid);
       if (!to) return res.status(400).json({ error: "Your account has no verified email address" });
       const due = dueFollowUps(row.row.apps);
-      const sample = due.length ? due : [{ company: "Example Company", title: "Example — Summer Intern", appliedAt: new Date(Date.now() - 6 * 864e5).toISOString() }];
+      const sample = due.length ? due : [{ company: "Example Company", title: "Example, Summer Intern", appliedAt: new Date(Date.now() - 6 * 864e5).toISOString() }];
       const mail = buildEmail(sample, row.row.remind_unsub);
       if (!due.length) mail.subject = "Test: this is what a follow-up reminder looks like";
       await sendEmail(to, mail);
@@ -489,7 +489,7 @@ export default async function handler(req, res) {
     }
     if (action === "alerts") {                  // weekly new-internship email for one major + places
       const on = body.on === true;
-      if (on && !process.env.RESEND_API_KEY) return res.status(400).json({ error: "Email alerts aren't switched on yet — check back soon" });
+      if (on && !process.env.RESEND_API_KEY) return res.status(400).json({ error: "Email alerts aren't switched on yet, check back soon" });
       return send(await mutate(uid, (row) => ({ alert_on: on, ...(on ? { alert_major: cleanMajor(body.major), alert_states: cleanStates(body.states) || null } : {}),
         remind_unsub: row.remind_unsub || crypto.randomBytes(18).toString("base64url") })));
     }
@@ -507,7 +507,7 @@ export default async function handler(req, res) {
     }
     if (action === "remind") {
       const on = body.on === true;
-      if (on && !process.env.RESEND_API_KEY) return res.status(400).json({ error: "Email reminders aren't switched on yet — check back soon" });
+      if (on && !process.env.RESEND_API_KEY) return res.status(400).json({ error: "Email reminders aren't switched on yet, check back soon" });
       return send(await mutate(uid, (row) => ({ remind_email: on, remind_unsub: row.remind_unsub || crypto.randomBytes(18).toString("base64url") })));
     }
 
@@ -562,7 +562,7 @@ export default async function handler(req, res) {
       if (!CO_OK.test(co)) return res.status(400).json({ error: "Bad company" });
       const cached = await db.selectAsAdmin(`company_briefs?select=brief&company_id=eq.${encodeURIComponent(co)}&created_at=gt.${new Date(Date.now() - BRIEF_DAYS * 864e5).toISOString()}&limit=1`);
       if (cached[0]) return res.status(200).json({ brief: cached[0].brief });
-      if (await aiLimited(uid)) return res.status(429).json({ error: "That's a lot of AI requests — try again in a bit" });
+      if (await aiLimited(uid)) return res.status(429).json({ error: "That's a lot of AI requests, try again in a bit" });
       const brief = await companyBrief(co);
       if (!brief) return res.status(404).json({ error: "We don't have that company yet" });
       return res.status(200).json({ brief });
@@ -570,7 +570,7 @@ export default async function handler(req, res) {
     if (action === "polish") {
       const n = cleanNote(body.note);
       if (!n.company) return res.status(400).json({ error: "Which company was it?" });
-      if (await aiLimited(uid)) return res.status(429).json({ error: "Too many requests — try again in a bit" });
+      if (await aiLimited(uid)) return res.status(429).json({ error: "Too many requests, try again in a bit" });
       const me = clean(body.name, 80) || "[Your name]", link = clean(body.resumeLink, 200);
       const prompt = `Write a short follow-up email from a college student to a recruiter they just met at a career fair.
 
@@ -632,6 +632,6 @@ Reply with ONLY this JSON: {"subject": "...", "body": "..."}`;
     if (e instanceof AIError) return res.status(e.status).json({ error: e.message });
     if (e instanceof Conflict) return res.status(409).json({ error: e.message });
     console.error("[me]", e);
-    return res.status(500).json({ error: "Couldn't update your account — try again" });
+    return res.status(500).json({ error: "Couldn't update your account, try again" });
   }
 }

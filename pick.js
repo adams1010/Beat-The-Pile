@@ -5,7 +5,7 @@
 //   btpPick.schools() / .majors(schoolId?) / .places()   ready-made sources
 (() => {
   if (window.btpPick) return;
-  const css = `.bpk{position:absolute;z-index:80;background:#fff;border:1px solid #DCE2EC;border-radius:10px;box-shadow:0 12px 30px rgba(6,10,44,.16);max-height:300px;overflow:auto;padding:4px;font-family:inherit}
+  const css = `.bpk{position:absolute;z-index:80;background:#fff;border:1px solid #DCE2EC;border-radius:10px;box-shadow:none;max-height:300px;overflow:auto;padding:4px;font-family:inherit}
 .bpk button{display:block;width:100%;text-align:left;font:inherit;font-size:14px;color:#060A2C;background:none;border:0;border-radius:8px;padding:8px 10px;cursor:pointer}
 .bpk button small{display:block;color:#55627A;font-size:12px}
 .bpk button[aria-selected=true],.bpk button:hover{background:#F2FADF}
@@ -45,7 +45,7 @@
       sel = 0;
       const other = o.other && q && !shown.some((x) => norm(x.label) === norm(q));
       box.innerHTML = shown.map((it, i) => `<button type="button" role="option" data-i="${i}" aria-selected="${i === sel}">${esc(it.label)}${it.sub ? `<small>${esc(it.sub)}</small>` : ""}</button>`).join("")
-        + (other ? `<button type="button" class="bpk-o" data-other="1">${esc(o.otherLabel || "Not listed — use")} “${esc(q)}”</button>` : "")
+        + (other ? `<button type="button" class="bpk-o" data-other="1">${esc(o.otherLabel || "Not listed, use")} “${esc(q)}”</button>` : "")
         + (!shown.length && !other ? `<p>${q ? "Nothing matches. Try fewer letters." : esc(o.hint || "Start typing to see the list.")}</p>` : "");
       place(); box.hidden = !q && !o.empty && !o.hint;
     };

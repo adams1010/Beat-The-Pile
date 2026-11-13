@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>My Internship — Beat the Pile</title>
+<title>My Internship | Beat the Pile</title>
 <meta name="description" content="Got the offer? Prepare for your internship, do great work, and turn it into a return offer: a dated checklist, company prep, the people who've been there, and a weekly log that becomes resume bullets.">
 <link rel="canonical" href="https://www.beatthepile.com/internship/">
 <link rel="icon" href="/icons/icon-192.png">
@@ -12,10 +12,10 @@
 <style>
   /* /internship/ (Nov 2026): "My Internship" — for students who already have an offer. user_jobs.internship (supabase/internship.sql),
      actions intern_save / intern_peers in api/me.js (lib/internship.js); AI resume bullets = /api/generate feature intern_bullets. */
-  .hero{background:var(--navy);color:#fff;border-radius:16px;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;margin-bottom:16px}
+  .hero{background:var(--navy);color:#fff;border-radius:10px;padding:22px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:center;margin-bottom:16px}
   .hero h1{color:#fff;font-size:26px;margin:0}.hero .sub{color:#C9D2E3;margin:4px 0 0}
   .hero .co{display:flex;gap:14px;align-items:center}
-  .lg{width:58px;height:58px;border-radius:12px;background:#fff;color:var(--navy);display:grid;place-items:center;font-weight:700;font-size:19px;flex-shrink:0;overflow:hidden;border:0}
+  .lg{width:58px;height:58px;border-radius:10px;background:#fff;color:var(--navy);display:grid;place-items:center;font-weight:700;font-size:19px;flex-shrink:0;overflow:hidden;border:0}
   .lg img{width:100%;height:100%;object-fit:contain}
   .count{text-align:right}.count b{display:block;font-size:40px;line-height:1;color:var(--lime);font-variant-numeric:tabular-nums;letter-spacing:-.02em}.count span{color:#C9D2E3;font-size:14px}
   .bar{height:8px;border-radius:999px;background:#1E2A5C;overflow:hidden;margin-top:14px;grid-column:1/-1}.bar i{display:block;height:100%;background:var(--lime)}
@@ -28,7 +28,7 @@
   .ck b{display:block;font-size:14.5px;font-weight:600}.ck span{display:block;font-size:13px;color:var(--muted)}
   .ck.done b{color:var(--muted);text-decoration:line-through}
   .progress{font-size:13px;color:var(--muted);margin:-6px 0 10px}
-  .entry{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-top:10px}
+  .entry{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:10px}
   .entry .w{font-size:12.5px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
   .entry p{margin:6px 0 0;font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere}.entry p b{font-weight:600}
   .entry button{font:inherit;font-size:12.5px;background:none;border:0;color:var(--muted);cursor:pointer;padding:0}
@@ -37,10 +37,10 @@
   .peers .av{width:38px;height:38px;font-size:13px}.peers b{display:block;font-size:14px}.peers span{font-size:12.5px;color:var(--muted)}
   .sw{font-weight:400;display:flex;gap:10px;align-items:flex-start;font-size:13.5px;margin-top:12px}.sw input{width:auto;margin-top:3px;accent-color:var(--green)}
   .offer{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 14px}
-  .offer button{font:inherit;text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;cursor:pointer}
+  .offer button{font:inherit;text-align:left;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 14px;cursor:pointer}
   .offer button:hover{border-color:var(--green)}.offer button b{display:block;font-size:14px}.offer button span{font-size:12.5px;color:var(--muted)}
   .intro{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:16px;text-align:left}
-  .intro div{background:#F7F9FC;border:1px solid var(--line);border-radius:12px;padding:14px}.intro b{display:block;font-size:14px;margin-bottom:2px}.intro span{font-size:13px;color:var(--muted)}
+  .intro div{background:#F7F9FC;border:1px solid var(--line);border-radius:10px;padding:14px}.intro b{display:block;font-size:14px;margin-bottom:2px}.intro span{font-size:13px;color:var(--muted)}
   .brief p{margin:6px 0;font-size:14px}.brief h3{margin:12px 0 2px;font-size:14px}
   .note{font-size:12.5px;color:var(--muted);margin-top:8px}
   @media (max-width:720px){.hero{grid-template-columns:1fr}.count{text-align:left}.intro{grid-template-columns:1fr}}

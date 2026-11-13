@@ -39,9 +39,12 @@ in UI. Homepage tokens: `G/GD/GL/GM` at the top of `src/home.jsx`; static pages:
 Homepage `/#interview` = Interview practice (`/api/generate` feature `interview_turn`). Pro is **free during beta**
 (no payment exists — never show prices or "secure checkout" until Stripe is wired).
 
+## Less-AI rules (Nov 13 2026, owner's list)
+No em dashes anywhere a person reads (UI copy, page titles use " | ", separators " · ", AI output: `callClaude` adds a plain-writing system prompt and turns any "—" into ", "). No drop shadows (focus rings and inset rules only), no gradients except the skeleton shimmer and chart rings, no backdrop blur, no purple (interview/saved = dark blue #1E3A8A), corner radius 8–10px (pills stay), no hover lifts or animated arrows, no checkmark bullets in marketing lists, no icon-in-a-square feature cards, no "not X, it's Y" copy, no "free"/"no fee" on the business side. Homepage "What we offer" is a plain two-column list. Keep: real terms/privacy/cookies pages, skeleton loaders, the line icons in the top bar.
+
 ## Homepage build step (important)
 The homepage app is **`src/home.jsx`** (edit this). Browsers load the built **`home.js`** with production React (no
-in-browser Babel). After editing `src/home.jsx`: `npm install && node scripts/build-home.mjs`, then commit both.
+in-browser Babel). After editing `src/home.jsx`: `npm install && node scripts/build-home.mjs`, then commit both. **No Babel where you are?** Push `src/home.jsx` alone: GitHub `build-home.yml` builds and commits `home.js` (Nov 13).
 `tests/home-build-test.mjs` fails if `home.js` is stale. `index.html` is just the shell (head, styles, script tags).
 Homepage screens have hash URLs (`/#quiz`, `/#dashboard`, `/#score`, …) so Back/refresh/sharing work.
 

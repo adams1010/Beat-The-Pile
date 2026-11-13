@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Beat the Pile — Opening Radar</title>
-<meta name="description" content="Know when companies open their summer internships — before everyone else. Based on the last three recruiting seasons.">
+<title>Beat the Pile, Opening Radar</title>
+<meta name="description" content="Know when companies open their summer internships, before everyone else. Based on the last three recruiting seasons.">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="theme-color" content="#060A2C">
 <style>
   :root{--green:#4A7000;--green-dark:#3A5A00;--green-light:#F2FADF;--navy:#060A2C;--ink:#1A2230;--muted:#64748B;--faint:#5E6A80;
-        --bg:#FBFBFC;--line:#E3E7ED;--amber:#B45309;--amber-light:#FFF4E6;--violet:#6D28D9;--violet-light:#F5F3FF;
+        --bg:#FBFBFC;--line:#E3E7ED;--amber:#B45309;--amber-light:#FFF4E6;--violet:#1E3A8A;--violet-light:#EFF3FB;
         --font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
@@ -23,18 +23,18 @@
   .top a.nav{font-size:13px;font-weight:700;color:#CBD5E1;text-decoration:none}
   h1{font-size:clamp(26px,6vw,34px);margin:14px 0 4px;letter-spacing:-.02em;line-height:1.1}
   .sub{color:#CBD5E1;margin:0;font-size:15px}
-  .trend{display:flex;gap:14px;align-items:center;background:#13233D;border-radius:14px;padding:14px 16px;margin-top:16px}
+  .trend{display:flex;gap:14px;align-items:center;background:#13233D;border-radius:10px;padding:14px 16px;margin-top:16px}
   .trend .n{font-size:34px;font-weight:900;color:var(--green);line-height:1;letter-spacing:-.03em}
   .trend .t{font-size:14px;color:#CBD5E1;line-height:1.35}
   .trend .t b{color:#fff}
-  .controls{position:sticky;top:0;z-index:5;background:rgba(248,255,254,.96);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:12px 0}
+  .controls{position:sticky;top:0;z-index:5;background:rgba(248,255,254,.96);;border-bottom:1px solid var(--line);padding:12px 0}
   .tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
   .tabs::-webkit-scrollbar{display:none}
   .tabs button{flex:0 0 auto;font:inherit;font-size:14px;font-weight:700;padding:8px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer}
   .tabs button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
   .search{width:100%;margin-top:10px;font:inherit;font-size:15px;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#fff}
   .hint{font-size:13.5px;color:var(--muted);margin:14px 0 10px}
-  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:10px}
   .row1{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
   .name{font-weight:800;color:var(--navy);font-size:17px;line-height:1.25}
   .pill{font-size:12px;font-weight:800;padding:3px 9px;border-radius:999px;white-space:nowrap}
@@ -166,7 +166,7 @@
         : card(c)).join("")
       : `<div class="empty">No companies match${q ? ` “${esc(S.q)}”` : ""}.</div>`;
     $("#fresh").innerHTML = `Opening history updated ${esc(new Date(S.d.built).toLocaleDateString())}. ` + (S.liveErr
-      ? `<b style="color:#B45309">We couldn't check which companies have jobs open right now</b> (our side or your connection), so “Open now” may be missing some. That doesn't mean they have none — refresh to try again.`
+      ? `<b style="color:#B45309">We couldn't check which companies have jobs open right now</b> (our side or your connection), so “Open now” may be missing some. That doesn't mean they have none, refresh to try again.`
       : S.lastSync ? `Current openings checked against company job boards (last re-read ${esc(new Date(S.lastSync).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))}).` : "");
   }
 

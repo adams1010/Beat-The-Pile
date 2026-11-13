@@ -9,7 +9,7 @@ const PALETTE=Array(12).fill("#060A2C");   // selected chips: one ink color (was
 // Mix of progress updates + real, useful tips — so the wait feels productive instead of repetitive.
 const LOAD_MSGS=[
   "Searching for internships near you...",
-  "Tip: Apply Tuesday–Thursday morning — recruiter inboxes are cleanest then.",
+  "Tip: Apply Tuesday–Thursday morning, recruiter inboxes are cleanest then.",
   "Matching roles to your major...",
   "Tip: Many postings close once enough people apply, so earlier is better.",
   "Finding opportunities others overlook...",
@@ -17,15 +17,15 @@ const LOAD_MSGS=[
   "Factoring in your timing and experience...",
   "Tip: Look past the big names. Smaller regional firms are easy to overlook, so fewer students may be applying.",
   "Estimating your match scores...",
-  "Tip: Don't filter by GPA cutoffs — many companies post them but rarely enforce them.",
+  "Tip: Don't filter by GPA cutoffs, many companies post them but rarely enforce them.",
   "Checking nearby states too...",
   "Tip: Customize your resume for each application. Even small tweaks beat a generic one.",
   "Reading company job boards...",
-  "Tip: Your school's alumni network on LinkedIn is a hidden cheat code — message 1 per week.",
+  "Tip: Your school's alumni network on LinkedIn is a hidden cheat code, message 1 per week.",
   "Ranking matches by realistic chance...",
   "Tip: Quality > quantity. 10 thoughtful applications beats 100 spray-and-pray every time.",
   "Polishing the list...",
-  "Tip: After every rejection, ask for feedback. Most won't reply — the ones who do are gold."
+  "Tip: After every rejection, ask for feedback. Most won't reply, the ones who do are gold."
 ];
 
 // Common college abbreviations → matching school name fragment (so "UMD", "PSU", "FAU" work in search)
@@ -63,7 +63,7 @@ const LiveStats=()=>{
   const items=[{v:d?.allMajors,l:"open internships right now, every major",c:"#060A2C"},{v:d?.hiringNow,l:"companies hiring interns right now",c:"#060A2C"},{v:d?.companies,l:"company job boards we read directly",c:G}];
   return (<div style={{maxWidth:760,margin:"0 auto"}}>
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:"1rem"}}>
-    {items.map((s,i)=>(<div key={i} style={{background:"#fff",border:"1px solid #F2FADF",borderRadius:14,padding:"1.75rem 1.25rem",textAlign:"center",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
+    {items.map((s,i)=>(<div key={i} style={{background:"#fff",border:"1px solid #F2FADF",borderRadius:10,padding:"1.75rem 1.25rem",textAlign:"center",boxShadow:"none"}}>
       <div style={{fontSize:38,fontWeight:700,color:s.c,lineHeight:1,marginBottom:"0.5rem",letterSpacing:"-1.5px"}}>{err?"—":fmt(s.v)}</div>
       <p style={{fontSize:12,color:"#4A5568",lineHeight:1.5,fontWeight:500}}>{s.l}</p></div>))}
     </div>
@@ -86,7 +86,7 @@ const JobPreview=()=>{
   if(!jobs.length)return null;
   return (<div style={{marginTop:26,textAlign:"left",display:"flex",flexDirection:"column",gap:8}}>
     <p style={{fontSize:12,fontWeight:600,color:"#6B7280",margin:"0 0 2px"}}>Open right now · real listings</p>
-    {jobs.map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"block",background:"#fff",border:"1px solid #E3E7ED",borderRadius:12,padding:"12px 14px",textDecoration:"none",color:"#060A2C"}}>
+    {jobs.map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"block",background:"#fff",border:"1px solid #E3E7ED",borderRadius:10,padding:"12px 14px",textDecoration:"none",color:"#060A2C"}}>
       <div style={{fontSize:12,fontWeight:700,color:"#3A5A00"}}>{j.company}</div>
       <div style={{fontSize:15,fontWeight:700,lineHeight:1.3,margin:"2px 0 3px"}}>{j.title}</div>
       <div style={{fontSize:12,color:"#6B7280"}}>{String(j.location||j.state||"").split("|")[0]} · from {host(j.url)} · found {ago(j.first_seen)}</div>
@@ -111,34 +111,6 @@ const FEATURES=[
   {k:"season",name:"My Season",t:"Every application, one board.",d:"Saved, applied, interviewing, offer. Plus a weekly goal and follow-up nudges.",h:"/season/"},
   {k:"interview",name:"Interview practice",t:"Talk it out. Get a grade.",d:"Answer out loud against a timer, get scored on every answer and a letter grade at the end.",h:"/#interview",pg:"interview"},
 ];
-function FeatViz({k}){
-  const box={background:"#fff",border:"1px solid #DCE2EC",borderRadius:10,boxShadow:"0 6px 18px rgba(10,20,38,.06)"};
-  const bar=(w,c="#DCE2EC",h=7)=><span style={{display:"block",height:h,width:w,background:c,borderRadius:99}}/>;
-  if(k==="tailor") return(<div style={{...box,width:"88%",padding:12,display:"grid",gap:8}}>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",fontSize:12,fontWeight:600}}><span>Fit for this role</span><span style={{color:"#4A7000",...DM}}>Strong</span></div>
-    <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{["SolidWorks","GD&T","testing"].map(x=><span key={x} style={{fontSize:11,background:"#F2FADF",color:"#4A7000",padding:"3px 8px",borderRadius:99}}>{x}</span>)}<span style={{fontSize:11,background:"#FBEFE6",color:"#9A4B12",padding:"3px 8px",borderRadius:99}}>gap: FEA</span></div>
-    <div style={{display:"grid",gap:5}}>{bar("100%")}{bar("72%","#DDF3A8")}</div></div>);
-  if(k==="alerts") return(<div style={{...box,width:"88%",padding:12,display:"grid",gap:8}}>
-    <div style={{display:"flex",gap:8,alignItems:"center"}}><img src="/brand/mark.png" alt="" width="26" height="26" style={{width:26,height:26,objectFit:"contain"}}/><span style={{fontSize:12,fontWeight:600}}>5 new internships this week</span></div>
-    {[["Mechanical Intern","Richmond, VA"],["Test Engineering Co-op","Arlington, VA"]].map(([a,b])=><div key={a} style={{display:"flex",justifyContent:"space-between",fontSize:11,borderTop:"1px solid #EEF1F6",paddingTop:6}}><span style={{fontWeight:500}}>{a}</span><span style={{color:"#55627A"}}>{b}</span></div>)}</div>);
-  if(k==="radar"){const m=["Jul","Aug","Sep","Oct","Nov"];return(<div style={{...box,width:"88%",padding:12}}>
-    <div style={{fontSize:12,fontWeight:600,marginBottom:10}}>Usually opens <span style={{color:"#4A7000"}}>~mid Aug</span></div>
-    <div style={{position:"relative",height:8,background:"#EEF1F6",borderRadius:99}}><span style={{position:"absolute",left:"22%",width:"18%",top:0,bottom:0,background:"#DDF3A8",borderRadius:99}}/><span style={{position:"absolute",left:"30%",top:-4,width:16,height:16,marginLeft:-8,borderRadius:"50%",background:"#4A7000",border:"3px solid #fff",boxShadow:"0 0 0 1px #4A7000"}}/></div>
-    <div style={{display:"flex",justifyContent:"space-between",fontSize:10,color:"#8D9AB3",marginTop:8}}>{m.map(x=><span key={x}>{x}</span>)}</div></div>);}
-  if(k==="fair") return(<div style={{display:"flex",gap:12,alignItems:"center",width:"88%"}}>
-    <svg viewBox="0 0 140 100" style={{flex:1,height:110}}><rect x="1" y="1" width="138" height="98" rx="10" fill="#fff" stroke="#DCE2EC"/>
-      {[[20,20],[60,20],[100,20],[20,55],[60,55],[100,55],[40,82],[80,82]].map(([x,y],i)=><rect key={i} x={x} y={y-6} width="22" height="12" rx="3" fill={[0,4,7].includes(i)?"#DDF3A8":"#EEF1F6"}/>)}
-      <path d="M31 20 C 50 40, 60 40, 71 55 S 90 80, 91 82" fill="none" stroke="#4A7000" strokeWidth="2" strokeDasharray="4 3"/>
-      {[[31,20,1],[71,55,2],[91,82,3]].map(([x,y,n])=><g key={n}><circle cx={x} cy={y} r="7" fill="#4A7000"/><text x={x} y={y+3.5} fontSize="9" textAnchor="middle" fill="#fff" fontWeight="700">{n}</text></g>)}</svg>
-    <svg viewBox="0 0 7 7" style={{width:56,height:56,background:"#fff",padding:5,border:"1px solid #DCE2EC",borderRadius:8}} shapeRendering="crispEdges">{"1110111101010111101111000000101101111010101110111".split("").map((b,i)=>b==="1"&&<rect key={i} x={i%7} y={Math.floor(i/7)} width="1" height="1" fill="#060A2C"/>)}</svg></div>);
-  if(k==="season") return(<div style={{display:"grid",gridTemplateColumns:"repeat(4,1fr)",gap:6,width:"92%"}}>
-    {[["Saved",3],["Applied",2],["Interview",1],["Offer",0]].map(([c,n])=><div key={c} style={{background:"#EEF1F6",borderRadius:8,padding:6,minHeight:96}}>
-      <div style={{fontSize:10,fontWeight:600,color:"#55627A",marginBottom:6}}>{c}</div>
-      {Array.from({length:n}).map((_,i)=><div key={i} style={{...box,boxShadow:"none",borderRadius:6,height:18,marginBottom:4,borderColor:c==="Interview"?"#4A7000":"#DCE2EC",background:c==="Interview"?"#F2FADF":"#fff"}}/>)}</div>)}</div>);
-  return(<div style={{...box,width:"88%",padding:12,display:"flex",gap:14,alignItems:"center"}}>
-    <span style={{width:56,height:56,borderRadius:12,background:"#060A2C",color:"#B0F701",fontSize:24,fontWeight:700,display:"grid",placeItems:"center",flexShrink:0}}>B+</span>
-    <div style={{flex:1,display:"grid",gap:6}}>{[["Q1",86],["Q2",74],["Q3",91]].map(([q,v])=><div key={q} style={{display:"flex",gap:8,alignItems:"center",fontSize:11}}><span style={{width:18,color:"#55627A"}}>{q}</span><span style={{flex:1,height:6,background:"#EEF1F6",borderRadius:99}}><span style={{display:"block",height:6,width:v+"%",background:"#4A7000",borderRadius:99}}/></span><span style={{...DM,width:20}}>{v}</span></div>)}</div></div>);
-}
 // The hero map: every dot is a real open internship whose location text names a real US city (api/listings ?dots=1).
 // Type a city ("Blacksburg, VA") or ZIP in the search and a circle shows how many are within 50 miles (the same numbers /jobs will show).
 const MILES_PX=1.609*1300/6371;   // Albers USA at scale 1300: ~0.33 px per mile (lower 48)
@@ -150,7 +122,7 @@ function HeroMap({near,fresh,sum}){
   },[]);
   const fmt=(n)=>n==null?"—":Number(n).toLocaleString();
   const xy=near?.meta?.near?.xy, r=near?.meta?near.meta.near.mi*MILES_PX:0;
-  return(<aside style={{position:"relative",boxSizing:"border-box",background:"#0E1440",border:"1px solid #2A3B5C",borderRadius:16,padding:"18px 18px 14px",boxShadow:"0 24px 60px rgba(0,0,0,.45)",...DM}}>
+  return(<aside style={{position:"relative",boxSizing:"border-box",background:"#0E1440",border:"1px solid #2A3B5C",borderRadius:10,padding:"18px 18px 14px",boxShadow:"none",...DM}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:12,fontFamily:"Geist,sans-serif"}}>
       <span style={{fontSize:14,fontWeight:600,color:"#fff"}}>Every dot is a real job or internship</span>
       <span style={{fontSize:12,color:"#8D9AB3"}}>{pts?`${fmt(pts.placed)} jobs and internships on the map`:""}</span></div>
@@ -202,7 +174,7 @@ function LandingD({onQuiz,onPage}){
   const fmt=(n)=>n==null?"—":Number(n).toLocaleString();
   const fields=sum?.byField?Object.entries(sum.byField).filter(([k])=>D_FIELD[k]).sort((a,b)=>b[1]-a[1]).slice(0,8):null;
   const pills=["finance","software","mechanical","marketing","civil","science_health"];
-  const card={background:"#fff",border:"1px solid #DCE2EC",borderRadius:14};
+  const card={background:"#fff",border:"1px solid #DCE2EC",borderRadius:10};
   const wrap={maxWidth:1240,margin:"0 auto",padding:"0 24px"};
   return(<>
     <section style={{position:"relative",overflow:"hidden",background:"#060A2C",color:"#E8EDF5"}}>
@@ -211,8 +183,8 @@ function LandingD({onQuiz,onPage}){
           <p style={{fontSize:14,fontWeight:500,color:"#D9F99A",margin:"0 0 18px"}}><span style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#B0F701",marginRight:8,verticalAlign:1}}/>
             {sum?`${fmt(sum.companies)} company job boards${sum.lastSync?`, last checked ${dAgoLong(sum.lastSync)}`:""}`:sumErr?"Live numbers unavailable right now":"Loading the latest numbers…"}</p>
           <h1 style={{fontSize:"clamp(2.3rem,5vw,3.6rem)",lineHeight:1.03,letterSpacing:"-0.035em",fontWeight:600,margin:"0 0 16px",color:"#fff"}}>Find your job<br/>before the <span style={{color:"#B0F701"}}>pile</span> does.</h1>
-          <p style={{fontSize:18,lineHeight:1.5,color:"#9FAAC0",margin:"0 0 28px",maxWidth:560}}>Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board — no reposts, and jobs drop off when the company takes them down.</p>
-          <form onSubmit={go} role="search" className="d-search" style={{display:"flex",alignItems:"stretch",background:"#fff",borderRadius:14,padding:6,boxShadow:"0 0 0 1px #2FD39A33, 0 20px 50px rgba(0,0,0,.35)",maxWidth:760}}>
+          <p style={{fontSize:18,lineHeight:1.5,color:"#9FAAC0",margin:"0 0 28px",maxWidth:560}}>Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board, no reposts, and jobs drop off when the company takes them down.</p>
+          <form onSubmit={go} role="search" className="d-search" style={{display:"flex",alignItems:"stretch",background:"#fff",borderRadius:10,padding:6,boxShadow:"0 0 0 1px #2FD39A33, 0 20px 50px rgba(0,0,0,.35)",maxWidth:760}}>
             <label style={{flex:"3 1 0",display:"flex",alignItems:"center",gap:10,padding:"0 14px",minWidth:0}}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55627A" strokeWidth="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
               <input value={q} onChange={e=>setQ(e.target.value)} aria-label="Role, company or major" placeholder="Role, company or major" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#060A2C",height:48,background:"transparent",outline:"none"}}/></label>
@@ -241,7 +213,7 @@ function LandingD({onQuiz,onPage}){
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#060A2C"}}>Explore by major</h2><a href="/majors/" style={{fontSize:14,color:"#4A7000",textDecoration:"none",fontWeight:500}}>Every major →</a></div>
         <div className="d-grid4">
           {(fields||Object.keys(D_FIELD).slice(0,8).map(k=>[k,null])).map(([k,n])=>(
-            <a key={k} href={`/jobs/?major=${k}&state=all`} style={{...card,borderRadius:12,textDecoration:"none",color:"#060A2C",padding:18,display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}><span style={{fontWeight:500}}>{D_FIELD[k]}</span><span style={{...DM,fontSize:13,color:"#55627A"}}>{n==null?"":fmt(n)}</span></a>))}
+            <a key={k} href={`/jobs/?major=${k}&state=all`} style={{...card,borderRadius:10,textDecoration:"none",color:"#060A2C",padding:18,display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}><span style={{fontWeight:500}}>{D_FIELD[k]}</span><span style={{...DM,fontSize:13,color:"#55627A"}}>{n==null?"":fmt(n)}</span></a>))}
         </div>
       </section>
 
@@ -259,17 +231,16 @@ function LandingD({onQuiz,onPage}){
 
       <section>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#060A2C"}}>What we offer</h2><a href="/demo/" style={{fontSize:14,color:"#4A7000",textDecoration:"none",fontWeight:500}}>See it in the 2-minute tour →</a></div>
-        <div className="d-grid3">
+        {/* Nov 13 (less AI): a plain two-column list, not a grid of illustrated feature cards */}
+        <div style={{...card,padding:"4px 20px"}}>
+          <ul className="d-offer" style={{listStyle:"none",margin:0,padding:0,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",columnGap:32}}>
           {FEATURES.map(f=>(
-            <a key={f.k} href={f.h} onClick={f.pg?(e)=>{e.preventDefault();onPage(f.pg);window.scrollTo(0,0);}:undefined} className="d-feat" style={{...card,textDecoration:"none",color:"#060A2C",display:"flex",flexDirection:"column",overflow:"hidden"}}>
-              <div aria-hidden="true" style={{background:"#F6F8FB",borderBottom:"1px solid #EEF1F6",height:150,position:"relative",display:"grid",placeItems:"center",padding:16}}>
-                <FeatViz k={f.k}/>
-              </div>
-              <div style={{padding:20}}>
-                <p style={{fontSize:13,fontWeight:600,color:"#4A7000",margin:"0 0 6px",display:"flex",justifyContent:"space-between"}}>{f.name}<span style={{fontSize:11,fontWeight:500,color:"#5E6A80"}}>Example preview</span></p>
-                <p style={{fontSize:17,fontWeight:600,margin:"0 0 6px"}}>{f.t}</p>
-                <p style={{fontSize:14,lineHeight:1.5,color:"#55627A",margin:0}}>{f.d}</p>
-              </div></a>))}
+            <li key={f.k} style={{borderBottom:"1px solid #EEF1F6",padding:"14px 0"}}>
+              <a href={f.h} onClick={f.pg?(e)=>{e.preventDefault();onPage(f.pg);window.scrollTo(0,0);}:undefined} style={{textDecoration:"none",color:"#060A2C",display:"block"}}>
+                <span style={{fontSize:15,fontWeight:600}}>{f.name}</span><span style={{color:"#4A7000",fontWeight:600}}> · {f.t}</span>
+                <span style={{display:"block",fontSize:14,lineHeight:1.5,color:"#55627A",marginTop:3}}>{f.d}</span>
+              </a></li>))}
+          </ul>
         </div>
       </section>
     </main>
@@ -299,7 +270,7 @@ const EXT_CATS=[
   },
   {
     id:"competitions",label:"Competitions & Challenges",icon:"",color:"#FF8C00",
-    why:"Competitions signal initiative and real-world problem-solving — recruiters love this.",
+    why:"Competitions signal initiative and real-world problem-solving, recruiters love this.",
     options:[
       {name:"Case Competition",roles:["Participated","Advanced to Finals","Regional Winner","National Winner"]},
       {name:"Hackathon",roles:["Participated","Top 10 Finish","Runner-up","1st Place / Winner"]},
@@ -312,7 +283,7 @@ const EXT_CATS=[
   },
   {
     id:"research",label:"Research & Innovation",icon:"",color:"#2563EB",
-    why:"Research experience proves analytical thinking — critical for technical and finance roles.",
+    why:"Research experience proves analytical thinking, critical for technical and finance roles.",
     options:[
       {name:"Professor Research Lab",roles:["Research Assistant","Co-author","Lead Researcher","Published Author"]},
       {name:"Independent Research Project",roles:["Completed","Presented","Award Winning","Published"]},
@@ -324,8 +295,8 @@ const EXT_CATS=[
     ]
   },
   {
-    id:"work",label:"Work & Entrepreneurship",icon:"",color:"#7C3AED",
-    why:"Paid work experience — especially with real responsibility — is often weighted higher than GPA.",
+    id:"work",label:"Work & Entrepreneurship",icon:"",color:"#1E3A8A",
+    why:"Paid work experience, especially with real responsibility, is often weighted higher than GPA.",
     options:[
       {name:"Prior Internship",roles:["Completed","Return Offer","Multiple Internships","Full-time Convert"]},
       {name:"Part-time / Campus Job",roles:["General","Team Lead","Supervisor","Manager"]},
@@ -338,7 +309,7 @@ const EXT_CATS=[
   },
   {
     id:"athletics",label:"Sports & Athletics",icon:"",color:"#059669",
-    why:"Sports show discipline, teamwork, and grit — qualities every employer wants.",
+    why:"Sports show discipline, teamwork, and grit, qualities every employer wants.",
     options:[
       {name:"Varsity Sport (D1/D2/D3)",roles:["Athlete","Starter","Captain (Nominated)","Team Captain"]},
       {name:"Club Sport",roles:["Player","Starter","Officer","Captain / President"]},
@@ -361,7 +332,7 @@ const EXT_CATS=[
   },
   {
     id:"service",label:"Community & Volunteering",icon:"",color:"#0EA5E9",
-    why:"Shows character — especially leadership in service roles, not just participation.",
+    why:"Shows character, especially when you led something, not only took part.",
     options:[
       {name:"Nonprofit Volunteer",roles:["Occasional","Regular (Monthly+)","Team Lead","Founded / Directed"]},
       {name:"Mentorship Program",roles:["Mentee","Peer Mentor","Program Officer","Program Director"]},
@@ -434,15 +405,15 @@ const TERM_OPTS=["Summer 2026","Fall 2026","Spring 2027","Summer 2027"];
 
 const STEP_HINTS={
   university:"Your school's reputation and alumni network directly affect which companies recruit you.",
-  gradYear:"Hiring timelines vary — we match you to companies currently recruiting for your graduation date.",
-  term:"Timing is huge. Most summer internships fill the prior fall — applying late sharply lowers your real odds, and we show that honestly.",
+  gradYear:"Hiring timelines vary, we match you to companies currently recruiting for your graduation date.",
+  term:"Timing is huge. Most summer internships fill the prior fall, applying late sharply lowers your real odds, and we show that honestly.",
   major:"The most important factor. We find companies that specifically hire your major.",
   gpa:"Honest answers give better matches. Many great firms don't require a 4.0.",
   extracurriculars:"Recruiters care more about leadership roles than participation. Be specific.",
   skills:"Technical skills get you past automated screening filters. Select what you actually know.",
   type:"Narrows results so you only see positions that actually fit your life.",
   zip:"This helps us factor location into your matches and tailor your search.",
-  radius:"Cast wider for more options — especially in rural areas.",
+  radius:"Cast wider for more options, especially in rural areas.",
 };
 
 const STEPS=[
@@ -461,24 +432,24 @@ const STEPS=[
 
 // Honest curated tips — no fake users, no fake engagement. Real, useful advice anyone can act on.
 const TIPS=[
-  {cat:"Timing",icon:"",title:"Apply the fall before, not the spring of",text:"The single biggest mistake students make: applying in spring for that same summer. Most competitive summer internships open August–October the year before. If you're applying late, apply anyway — but know the strongest roles are usually gone, and target companies with rolling or later deadlines."},
+  {cat:"Timing",icon:"",title:"Apply the fall before, not the spring of",text:"The single biggest mistake students make: applying in spring for that same summer. Most competitive summer internships open August–October the year before. If you're applying late, apply anyway, but know the strongest roles are usually gone, and target companies with rolling or later deadlines."},
   {cat:"Timing",icon:"",title:"Big tech opens earliest",text:"In software, the calendar roughly runs: Google and Microsoft open late summer, Meta in early fall, and Amazon reviews on a rolling basis. Apply to all of them at once rather than waiting to hear back from one before trying the next."},
-  {cat:"Resume",icon:"",title:"A solid application beats a perfect GPA",text:"A 3.2 with two relevant projects you can talk about for five minutes will often beat a 3.9 with nothing to show. Recruiters hire for evidence you can do the work — build something, then make it the center of your resume and interviews."},
-  {cat:"Resume",icon:"",title:"Mirror the job description's keywords",text:"Many companies screen resumes with software before a human sees them. Pull two or three exact phrases from the posting (tools, skills, responsibilities) and make sure they appear naturally in your resume. It's not gaming the system — it's speaking their language."},
+  {cat:"Resume",icon:"",title:"A solid application beats a perfect GPA",text:"A 3.2 with two relevant projects you can talk about for five minutes will often beat a 3.9 with nothing to show. Recruiters hire for evidence you can do the work, build something, then make it the center of your resume and interviews."},
+  {cat:"Resume",icon:"",title:"Mirror the job description's keywords",text:"Many companies screen resumes with software before a human sees them. Pull two or three exact phrases from the posting (tools, skills, responsibilities) and make sure they appear naturally in your resume. That's how you speak their language."},
   {cat:"Applications",icon:"",title:"Apply within 48 hours of a posting going live",text:"Early applicants get reviewed first, and many roles fill before the listed deadline. Set up alerts on the job boards and company pages for your target field so you catch postings while they're fresh."},
   {cat:"Applications",icon:"",title:"Don't just chase the famous names",text:"Everyone applies to the same ten brand-name companies, which makes them brutally competitive. The regional firms and mid-size companies most students overlook often have real openings and far less competition. Apply to your full list."},
-  {cat:"Follow-up",icon:"",title:"A polite follow-up genuinely works",text:"Send a short, courteous follow-up email five to seven business days after applying or interviewing. It's not annoying — it signals genuine interest and puts you back on top of the pile. Keep it to a few sentences and reference the specific role."},
+  {cat:"Follow-up",icon:"",title:"A polite follow-up genuinely works",text:"Send a short, courteous follow-up email five to seven business days after applying or interviewing. It's not annoying, it signals genuine interest and puts you back on top of the pile. Keep it to a few sentences and reference the specific role."},
   {cat:"Networking",icon:"",title:"Referrals beat cold applications",text:"A referral can move your application past the first filter entirely. Find one alum or connection at a target company on LinkedIn, send a brief, specific, respectful message, and ask if they'd be open to referring you. A few referrals are worth dozens of cold applies."},
   {cat:"Interviews",icon:"",title:"Have three stories ready",text:"Most behavioral interviews come down to a handful of questions about teamwork, challenge, and leadership. Prepare three concrete stories from your experience that you can adapt on the fly, structured as situation → what you did → result. Practice them out loud."},
-  {cat:"Mindset",icon:"",title:"Rejection is the default, not the exception",text:"Strong candidates routinely apply to 50+ roles to land a few. A rejection — or silence — usually means timing or volume, not that you're not good enough. Keep your pipeline full so no single 'no' carries too much weight."},
+  {cat:"Mindset",icon:"",title:"Rejection is the default, not the exception",text:"Strong candidates routinely apply to 50+ roles to land a few. A rejection, or silence, usually means timing or volume, not that you're not good enough. Keep your pipeline full so no single 'no' carries too much weight."},
   {cat:"Resume",icon:"",title:"Lead bullet points with results, not duties",text:"\"Increased club membership 40% by launching a referral drive\" beats \"Responsible for membership.\" Numbers and outcomes catch a recruiter's eye in the six seconds they spend scanning. Start each bullet with a strong verb and end with an impact."},
   {cat:"Applications",icon:"",title:"Keep a simple application tracker",text:"Once you're applying to dozens of roles, you'll lose track of where you stand. A simple list of company, date applied, status, and follow-up date saves you from missing deadlines or following up twice. Beat the Pile's dashboard does this for you."},
-  {cat:"Networking",icon:"",title:"Ask for advice, not a job",text:"\"Can you give me a job?\" puts people on the spot. \"Could I ask you two questions about how you got into this field?\" gets a yes far more often — and those conversations are where referrals quietly come from. Be genuinely curious, not transactional."},
-  {cat:"Interviews",icon:"",title:"Always have questions to ask them",text:"\"Do you have any questions for us?\" is not optional — having none signals low interest. Prepare three: one about the team, one about the work itself, one about growth. Avoid asking things easily found on their website."},
-  {cat:"Timing",icon:"",title:"Reapply — being early last year helps this year",text:"If you applied somewhere and didn't get it, applying again the next cycle isn't desperate, it's normal. Recruiters often view returning applicants favorably, especially if you've added skills or experience since. Persistence reads as genuine interest."},
-  {cat:"Resume",icon:"",title:"Tailor your resume per role type",text:"You don't need 50 versions, but having 2-3 — say one for technical roles and one for business roles — lets you front-load the most relevant experience for each. Beat the Pile lets you save multiple named resumes and pick one per application."},
-  {cat:"Mindset",icon:"",title:"Cast a wide net early, then focus",text:"Early on, apply broadly to learn what sticks and get interview reps. As you get callbacks, you'll see which roles fit — then concentrate your energy there. Don't over-optimize your first ten applications; treat them as practice."},
-  {cat:"Networking",icon:"",title:"Your career center is underused gold",text:"Campus career centers have employer connections, resume reviews, and often exclusive postings most students ignore. They're already paid for by your tuition. Book one appointment this week — it's the highest-leverage hour you're not using."},
+  {cat:"Networking",icon:"",title:"Ask for advice, not a job",text:"\"Can you give me a job?\" puts people on the spot. \"Could I ask you two questions about how you got into this field?\" gets a yes far more often, and those conversations are where referrals quietly come from. Be genuinely curious, not transactional."},
+  {cat:"Interviews",icon:"",title:"Always have questions to ask them",text:"\"Do you have any questions for us?\" is not optional, having none signals low interest. Prepare three: one about the team, one about the work itself, one about growth. Avoid asking things easily found on their website."},
+  {cat:"Timing",icon:"",title:"Reapply, being early last year helps this year",text:"If you applied somewhere and didn't get it, applying again the next cycle isn't desperate, it's normal. Recruiters often view returning applicants favorably, especially if you've added skills or experience since. Persistence reads as genuine interest."},
+  {cat:"Resume",icon:"",title:"Tailor your resume per role type",text:"You don't need 50 versions, but having 2-3, say one for technical roles and one for business roles, lets you front-load the most relevant experience for each. Beat the Pile lets you save multiple named resumes and pick one per application."},
+  {cat:"Mindset",icon:"",title:"Cast a wide net early, then focus",text:"Early on, apply broadly to learn what sticks and get interview reps. As you get callbacks, you'll see which roles fit, then concentrate your energy there. Don't over-optimize your first ten applications; treat them as practice."},
+  {cat:"Networking",icon:"",title:"Your career center is underused gold",text:"Campus career centers have employer connections, resume reviews, and often exclusive postings most students ignore. They're already paid for by your tuition. Book one appointment this week, it's the highest-leverage hour you're not using."},
 ];
 const TIP_CATS=["All","Timing","Resume","Applications","Follow-up","Networking","Interviews","Mindset"];
 
@@ -558,7 +529,7 @@ function BlurCard({company}){
         <div style={{fontSize:13,color:"#4A5568",lineHeight:1.5}}>{company?.reason||"Strong local fit for your major and profile."}</div>
       </div>
       <div style={{position:"absolute",inset:0,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",background:"rgba(255,255,255,0.5)"}}>
-        <div style={{textAlign:"center",padding:"20px 28px",background:"white",borderRadius:var_rl,border:`1.5px solid ${GL}`,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
+        <div style={{textAlign:"center",padding:"20px 28px",background:"white",borderRadius:var_rl,border:`1.5px solid ${GL}`,boxShadow:"none"}}>
           <div style={{fontSize:28,marginBottom:8}}></div>
           <div style={{fontWeight:700,fontSize:14,color:"#060A2C",marginBottom:4}}>Unlock with Pro</div>
           <div style={{fontSize:12,color:"#4A5568"}}>See this match + {" "}
@@ -575,7 +546,7 @@ const var_r="8px",var_rl="10px",var_rxl="14px";
 
 function experienceFromGrad(gradYear){
   if(!gradYear) return {factor:0.6,label:""};
-  if(/grad/i.test(gradYear)) return {factor:1.0,label:"As a graduate student, you bring the most experience — lean into that in applications."};
+  if(/grad/i.test(gradYear)) return {factor:1.0,label:"As a graduate student, you bring the most experience, lean into that in applications."};
   const now=new Date(2026,4,21);
   const m=gradYear.match(/(May|Dec)\s+(\d{4})/i);
   if(!m) return {factor:0.6,label:""};
@@ -584,11 +555,11 @@ function experienceFromGrad(gradYear){
   const monthsToGrad=(gradDate.getFullYear()-now.getFullYear())*12+(gradDate.getMonth()-now.getMonth());
   // monthsToGrad: ~ -? (already grad) up to ~48 (freshman). Fewer months left = more senior = stronger.
   let factor,label;
-  if(monthsToGrad<=2){factor=1.0;label="You're about to graduate — you have the most coursework and experience behind you, which strengthens your odds.";}
-  else if(monthsToGrad<=14){factor=0.9;label="As a rising senior, you're in the strongest position experience-wise — recruiters favor near-grads for internships.";}
-  else if(monthsToGrad<=26){factor=0.72;label="As a junior-level student, you've got solid coursework behind you — a competitive spot for most internships.";}
-  else if(monthsToGrad<=38){factor=0.55;label="As an underclassman, you're early — that's great for getting ahead, but expect more competition from older students for the same roles.";}
-  else {factor=0.42;label="As a first-year, you're applying early in your journey — focus on roles open to underclassmen, and know your odds reflect competing against more experienced students.";}
+  if(monthsToGrad<=2){factor=1.0;label="You're about to graduate, you have the most coursework and experience behind you, which strengthens your odds.";}
+  else if(monthsToGrad<=14){factor=0.9;label="As a rising senior, you're in the strongest position experience-wise, recruiters favor near-grads for internships.";}
+  else if(monthsToGrad<=26){factor=0.72;label="As a junior-level student, you've got solid coursework behind you, a competitive spot for most internships.";}
+  else if(monthsToGrad<=38){factor=0.55;label="As an underclassman, you're early, that's great for getting ahead, but expect more competition from older students for the same roles.";}
+  else {factor=0.42;label="As a first-year, you're applying early in your journey, focus on roles open to underclassmen, and know your odds reflect competing against more experienced students.";}
   return {factor,label};
 }
 function termTiming(targetTerm){
@@ -605,10 +576,10 @@ function termTiming(targetTerm){
 function timingNote(targetTerm){
   const {months}=termTiming(targetTerm);
   const t=targetTerm||"that term";
-  if(months<1) return `You're applying for ${t} after the window has basically closed — most of these roles were filled months ago. The estimates below are intentionally low.`;
-  if(months<3) return `Heads up: applying now for ${t} is very late. Most of these internships fill the prior fall, so your odds are lower — and that's reflected honestly below.`;
+  if(months<1) return `You're applying for ${t} after the window has basically closed, most of these roles were filled months ago. The estimates below are intentionally low.`;
+  if(months<3) return `Heads up: applying now for ${t} is very late. Most of these internships fill the prior fall, so your odds are lower, and that's reflected honestly below.`;
   if(months<6) return `You're a little behind the ideal window for ${t}. Some roles are still open, but the most competitive ones are likely gone.`;
-  if(months<=10) return `Good timing — you're applying in the sweet spot for ${t}. These estimates reflect a realistic, on-time application.`;
+  if(months<=10) return `Good timing, you're applying in the sweet spot for ${t}. These estimates reflect a realistic, on-time application.`;
   return `You're applying early for ${t}. That's smart, but many postings aren't open yet, so treat these as a forward-looking estimate.`;
 }
 // Detects exceptional leadership / standout achievement from the chosen extracurricular roles.
@@ -707,23 +678,23 @@ function generateReason(c,ans,extPicks){
     assessment=opts[seed%opts.length];
   } else if(pct>=50){
     const opts=[
-      `A solid shot — worth a strong application.`,
+      `A solid shot, worth a strong application.`,
       `Realistic if you put care into your application.`,
       `Within reach, though you'll be one of several qualified applicants.`
     ];
     assessment=opts[seed%opts.length];
   } else if(pct>=35){
     const opts=[
-      `Competitive — they get more applicants than spots, so make your application stand out.`,
+      `Competitive, they get more applicants than spots, so make your application stand out.`,
       `A reach, but reaches land when the application is sharp. Worth trying.`,
-      `Tougher odds here — apply, but don't count on it as your only option.`
+      `Tougher odds here, apply, but don't count on it as your only option.`
     ];
     assessment=opts[seed%opts.length];
   } else {
     const opts=[
-      `A long shot — popular employer with limited intern spots. Apply if it excites you.`,
+      `A long shot, popular employer with limited intern spots. Apply if it excites you.`,
       `Highly competitive; treat this as a reach and keep safer options in your list too.`,
-      `The odds are steep here, but someone gets in — a standout application is your best bet.`
+      `The odds are steep here, but someone gets in, a standout application is your best bet.`
     ];
     assessment=opts[seed%opts.length];
   }
@@ -779,7 +750,7 @@ const FREE_APPLICATIONS=3; // free assisted applications (distinct companies) be
 let memSession={};
 // DEV MODE — runs synchronously before React mounts so session restore never sees stale data
 if(new URLSearchParams(window.location.search).get("dev")==="1"){
-  console.log("[iq] DEV MODE active — clearing all cached sessions and results");
+  console.log("[iq] DEV MODE active, clearing all cached sessions and results");
   try{
     Object.keys(localStorage)
       .filter(k=>k.startsWith("iq_"))
@@ -891,9 +862,9 @@ function computeScoreFactors(profile, job){
     status:yearMatch?'pass':yearAdjacent?'partial':'fail',
     impact:yearMatch?+10:yearAdjacent?+4:-8,
     detail:!timingKnown?`Your graduation timing${gy?` (${gy})`:''} looks compatible with this role.`
-      :yearMatch?`This role targets ${targetYears.join('/')} — you're in the right year.`
-      :yearAdjacent?`This role targets ${targetYears.join('/')}. You're adjacent — mention your timeline in the cover letter.`
-      :`This role targets ${targetYears.join('/')}. You're a ${gy} — there's a timing mismatch.`,
+      :yearMatch?`This role targets ${targetYears.join('/')}, you're in the right year.`
+      :yearAdjacent?`This role targets ${targetYears.join('/')}. You're adjacent, mention your timeline in the cover letter.`
+      :`This role targets ${targetYears.join('/')}. You're a ${gy}, there's a timing mismatch.`,
     fix:(timingKnown&&!yearMatch)?`Apply anyway and briefly explain your timeline. Companies often flex for strong candidates.`:null,
     scoreGain:(timingKnown&&!yearMatch&&!yearAdjacent)?6:0,
   });
@@ -942,7 +913,7 @@ function ScoreExplainerCard({ job, profile, isPro, setShowProModal, isExpanded, 
     React.createElement('div',{style:{display:'flex',justifyContent:'space-between',alignItems:'center',cursor:'pointer'},onClick:(e)=>{if(e&&e.stopPropagation)e.stopPropagation();onToggle();}},
       React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8}},
         React.createElement('span',{style:{fontSize:13,fontWeight:600,color:'#1a1a1a'}},'Score Breakdown'),
-        React.createElement('span',{style:{fontSize:11,background:GL,color:GD,borderRadius:20,padding:'2px 8px',fontWeight:600}},`${passing} ✓  ${partial>0?partial+' ~  ':''}${failing} ✗`)
+        React.createElement('span',{style:{fontSize:11,background:GL,color:GD,borderRadius:10,padding:'2px 8px',fontWeight:600}},`${passing} ✓  ${partial>0?partial+' ~  ':''}${failing} ✗`)
       ),
       React.createElement('span',{style:{fontSize:12,color:'#888'}},isExpanded?'▲ Hide':'▼ Show')
     ),
@@ -961,8 +932,8 @@ function ScoreExplainerCard({ job, profile, isPro, setShowProModal, isExpanded, 
                 React.createElement('p',{style:{fontSize:12,color:'#555',margin:'6px 0 0 24px'}},f.detail),
                 f.fix&&React.createElement('div',{style:{marginTop:6,marginLeft:24,fontSize:11,color:GD,fontWeight:500,background:'#fff',borderRadius:6,padding:'4px 8px',border:`1px solid ${G}40`}},'Fix: ',f.fix),
                 (f.id==='skills'&&f.missingRequired&&f.missingRequired.length>0)&&React.createElement('div',{style:{marginTop:8,marginLeft:24,display:'flex',flexWrap:'wrap',gap:4}},
-                  ...f.missingRequired.map(s=>React.createElement('span',{key:'m'+s,style:{fontSize:11,background:CL,color:CR,border:`1px solid ${CR}30`,borderRadius:20,padding:'2px 8px'}},'✗ '+s)),
-                  ...(f.matchedSkills||[]).map(s=>React.createElement('span',{key:'g'+s,style:{fontSize:11,background:GL,color:GD,border:`1px solid ${G}30`,borderRadius:20,padding:'2px 8px'}},'✓ '+s))
+                  ...f.missingRequired.map(s=>React.createElement('span',{key:'m'+s,style:{fontSize:11,background:CL,color:CR,border:`1px solid ${CR}30`,borderRadius:10,padding:'2px 8px'}},'✗ '+s)),
+                  ...(f.matchedSkills||[]).map(s=>React.createElement('span',{key:'g'+s,style:{fontSize:11,background:GL,color:GD,border:`1px solid ${G}30`,borderRadius:10,padding:'2px 8px'}},'✓ '+s))
                 )
               )
             ),
@@ -982,10 +953,10 @@ function ScoreExplainerCard({ job, profile, isPro, setShowProModal, isExpanded, 
               )
             ),
             React.createElement('div',{style:{position:'absolute',inset:0,display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',background:'rgba(255,255,255,0.85)',borderRadius:var_r}},
-              React.createElement('div',{style:{textAlign:'center',padding:'16px 20px',background:'#fff',borderRadius:var_rl,boxShadow:'0 4px 20px rgba(0,0,0,0.08)',border:`1px solid ${G}30`}},
+              React.createElement('div',{style:{textAlign:'center',padding:'16px 20px',background:'#fff',borderRadius:var_rl,boxShadow:'none',border:`1px solid ${G}30`}},
                 React.createElement('div',{style:{fontSize:20,marginBottom:4}},''),
                 React.createElement('div',{style:{fontSize:14,fontWeight:700,color:'#1a1a1a',marginBottom:4}},downCount>0?`${downCount} factor${downCount!==1?'s':''} pulling your score down`:'See your full factor-by-factor breakdown'),
-                React.createElement('div',{style:{fontSize:12,color:'#666',marginBottom:12}},downCount>0?'Pro shows you exactly what they are — and how to fix them.':'Pro shows every factor behind your score — and how to push it higher.'),
+                React.createElement('div',{style:{fontSize:12,color:'#666',marginBottom:12}},downCount>0?'Pro shows you exactly what they are, and how to fix them.':'Pro shows every factor behind your score, and how to push it higher.'),
                 React.createElement('button',{onClick:()=>{analytics.track('score_explainer_upgrade_click',{jobId:job.id||job.name,failingFactors:failing});setShowProModal(true);},style:{background:G,color:'#fff',border:'none',borderRadius:var_r,padding:'8px 20px',fontSize:13,fontWeight:700,cursor:'pointer'}},'Unlock Breakdown')
               )
             )
@@ -1019,7 +990,7 @@ function ivVoiceLabel(v){const region={"en-US":"US","en-GB":"UK","en-AU":"Austra
   const nat=/natural|neural|premium|enhanced/i.test(v.name);
   const nm=v.name.replace(/^(Microsoft|Google|Apple)\s+/i,"").replace(/\s*Online\s*/i," ").replace(/\s*\((Natural|Neural|Premium|Enhanced)\)/ig,"").replace(/\s*-\s*English.*$/i,"").replace(/\s+/g," ").trim();
   return `${nm} · ${region}${nat?" · most natural":""}`;}
-const IV_LINE="Hi, thanks for coming in today. Let's start with you — tell me a little about yourself.";
+const IV_LINE="Hi, thanks for coming in today. Let's start with you, tell me a little about yourself.";
 function InterviewSim({major,defaultCompany,defaultRole}){
   const SR=typeof window!=="undefined"?(window.SpeechRecognition||window.webkitSpeechRecognition):null;
   const canTalk=!!SR, canSpeak=typeof window!=="undefined"&&"speechSynthesis" in window;
@@ -1081,10 +1052,10 @@ function InterviewSim({major,defaultCompany,defaultRole}){
       const rec=new SR();rec.continuous=true;rec.interimResults=true;rec.lang="en-US";
       rec.onresult=(e)=>{let fin="",tmp="";for(let i=e.resultIndex;i<e.results.length;i++){const t=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=t;else tmp+=t;}
         if(fin)setDraft(d=>(d+" "+fin).replace(/\s+/g," ").trim());setInterim(tmp);};
-      rec.onerror=(e)=>{if(e.error==="not-allowed"||e.error==="service-not-allowed"||e.error==="audio-capture"){wantRec.current=false;setMicErr("Your microphone is blocked or missing — type your answer instead (or allow the mic in your browser and tap Talk).");}};
+      rec.onerror=(e)=>{if(e.error==="not-allowed"||e.error==="service-not-allowed"||e.error==="audio-capture"){wantRec.current=false;setMicErr("Your microphone is blocked or missing, type your answer instead (or allow the mic in your browser and tap Talk).");}};
       rec.onend=()=>{if(wantRec.current){try{rec.start();return;}catch(x){}}setRecording(false);setInterim("");};
       recRef.current=rec;wantRec.current=true;rec.start();setRecording(true);
-    }catch(x){setMicErr("Couldn't start the microphone — type your answer instead.");}
+    }catch(x){setMicErr("Couldn't start the microphone, type your answer instead.");}
   }
   function stopRec(){wantRec.current=false;try{recRef.current&&recRef.current.stop();}catch(x){}setRecording(false);}
   function hush(){try{canSpeak&&window.speechSynthesis.cancel();}catch(x){}}
@@ -1112,13 +1083,13 @@ function InterviewSim({major,defaultCompany,defaultRole}){
         body:JSON.stringify({feature:"interview_turn",input:{company:setup.company,role:setup.role,kind:setup.kind,total:setup.total,limit:setup.limit,spoken:setup.mode==="talk",major,
           history:history.map(t=>({q:t.q,a:t.a,secs:t.secs,timedOut:!!t.timedOut}))}})});
       const d=await r.json().catch(()=>({}));
-      if(!r.ok)throw new Error(d.error||"The interviewer couldn't answer — try again.");
+      if(!r.ok)throw new Error(d.error||"The interviewer couldn't answer, try again.");
       const m=String(d.text||"").match(/\{[\s\S]*\}/);let j=null;try{j=m?JSON.parse(m[0]):null;}catch(x){}
-      if(!j)throw new Error("The interviewer gave an unreadable answer — try again.");
+      if(!j)throw new Error("The interviewer gave an unreadable answer, try again.");
       const next=history.map((t,i)=>i===history.length-1&&t.answered?{...t,feedback:j.feedback||"",scores:j.scores&&typeof j.scores==="object"?j.scores:null}:t);
       if(j.summary){setTurns(next);setSummary(j.summary);const g=ivGrade(next);analytics.track("interview_finished",{mode:setup.mode,kind:setup.kind,questions:setup.total,grade:g?g.letter:null,overall:g?g.overall:null,timed_out:next.filter(t=>t.timedOut).length});}
       else if(j.next)setTurns([...next,{q:String(j.next),a:"",feedback:"",answered:false}]);
-      else throw new Error("The interviewer gave an unreadable answer — try again.");
+      else throw new Error("The interviewer gave an unreadable answer, try again.");
     }catch(e){setErr(String(e.message||e));}
     finally{setBusy(false);}
   }
@@ -1146,16 +1117,16 @@ function InterviewSim({major,defaultCompany,defaultRole}){
     <main id="main" style={{maxWidth:780,margin:"0 auto",padding:"32px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))",fontFamily:IV.font,color:IV.ink}}>
       <p style={{fontSize:14,fontWeight:600,color:IV.acc,margin:0}}>Interview practice</p>
       <h1 style={{font:`600 clamp(26px,4vw,34px)/1.15 ${IV.font}`,letterSpacing:"-.02em",margin:"6px 0 8px"}}>Say it out loud. Beat the clock. Get a grade.</h1>
-      <p style={{color:IV.dim,fontSize:15.5,lineHeight:1.6,margin:"0 0 22px",maxWidth:"64ch"}}>An AI interviewer asks one question at a time. You get {IV_THINK} seconds to think, then the clock runs — talk (or type) your answer, and it sends itself when time's up. Every answer is scored, and you get a letter grade at the end. Grades are an AI estimate, not a hiring decision. Your answers go to our AI provider to write the feedback; nothing is saved{canTalk?" (speech is turned into text by your browser)":""}.</p>
+      <p style={{color:IV.dim,fontSize:15.5,lineHeight:1.6,margin:"0 0 22px",maxWidth:"64ch"}}>An AI interviewer asks one question at a time. You get {IV_THINK} seconds to think, then the clock runs, talk (or type) your answer, and it sends itself when time's up. Every answer is scored, and you get a letter grade at the end. Grades are an AI estimate, not a hiring decision. Your answers go to our AI provider to write the feedback; nothing is saved{canTalk?" (speech is turned into text by your browser)":""}.</p>
       {!started&&!busy?(
-        <section style={{border:`1px solid ${IV.line}`,borderRadius:12,padding:"18px 18px 20px",background:"#fff"}}>
+        <section style={{border:`1px solid ${IV.line}`,borderRadius:10,padding:"18px 18px 20px",background:"#fff"}}>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:"0 14px"}}>
             <div><label style={label} htmlFor="ivCo">Company</label><div style={{position:"relative"}}>
                 <input id="ivCo" style={field} autoComplete="off" role="combobox" aria-expanded={coOpen&&coHits.length>0} aria-autocomplete="list" value={setup.company} placeholder="Start typing, e.g. SAP or Lockheed Martin"
                   onFocus={()=>{coLoad();setCoOpen(true);}} onBlur={()=>setTimeout(()=>{setCoOpen(false);if(setup.company&&(!brief||brief.name!==setup.company.trim()))loadBrief(setup.company);},150)}
                   onChange={e=>{setSetup(s=>({...s,company:e.target.value}));setCoOpen(true);setCoSel(0);}}
                   onKeyDown={e=>{if(!coOpen||!coHits.length)return;if(e.key==="ArrowDown"){e.preventDefault();setCoSel(i=>Math.min(coHits.length-1,i+1));}else if(e.key==="ArrowUp"){e.preventDefault();setCoSel(i=>Math.max(0,i-1));}else if(e.key==="Enter"){e.preventDefault();coPick(coHits[coSel]||coHits[0]);}else if(e.key==="Escape")setCoOpen(false);}}/>
-                {coOpen&&coHits.length>0&&<div role="listbox" style={{position:"absolute",left:0,right:0,top:"100%",marginTop:4,background:"#fff",border:"1px solid #DCE2EC",borderRadius:10,boxShadow:"0 12px 30px rgba(6,10,44,.12)",zIndex:20,maxHeight:300,overflowY:"auto"}}>
+                {coOpen&&coHits.length>0&&<div role="listbox" style={{position:"absolute",left:0,right:0,top:"100%",marginTop:4,background:"#fff",border:"1px solid #DCE2EC",borderRadius:10,boxShadow:"none",zIndex:20,maxHeight:300,overflowY:"auto"}}>
                   {coHits.map((c,i)=><button type="button" key={c.names[0]+i} role="option" aria-selected={i===coSel} onMouseDown={e=>{e.preventDefault();coPick(c);}}
                     style={{display:"block",width:"100%",textAlign:"left",border:0,background:i===coSel?"#F2FADF":"#fff",padding:"9px 12px",font:"inherit",fontSize:14,color:"#060A2C",cursor:"pointer"}}>
                     <span data-noi18n>{c.names[0]}</span>{c.names.length>1&&<small data-noi18n style={{display:"block",color:"#55627A",fontSize:12,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{c.names.slice(1,4).join(" · ")}</small>}</button>)}
@@ -1168,7 +1139,7 @@ function InterviewSim({major,defaultCompany,defaultRole}){
               </select></div>
             <div><label style={label} htmlFor="ivN">Length</label>
               <select id="ivN" style={field} value={setup.total} onChange={e=>setSetup(s=>({...s,total:+e.target.value}))}>
-                <option value={3}>Quick — 3 questions</option><option value={5}>Standard — 5 questions</option><option value={8}>Full — 8 questions</option>
+                <option value={3}>Quick, 3 questions</option><option value={5}>Standard, 5 questions</option><option value={8}>Full, 8 questions</option>
               </select></div>
             <div><label style={label} htmlFor="ivT">Time per answer</label>
               <select id="ivT" style={field} value={setup.limit} onChange={e=>setSetup(s=>({...s,limit:+e.target.value}))}>
@@ -1179,7 +1150,7 @@ function InterviewSim({major,defaultCompany,defaultRole}){
                 <button type="button" style={seg(setup.mode==="talk")} aria-pressed={setup.mode==="talk"} disabled={!canTalk} onClick={()=>setSetup(s=>({...s,mode:"talk"}))}>Talk</button>
                 <button type="button" style={seg(setup.mode==="type")} aria-pressed={setup.mode==="type"} onClick={()=>setSetup(s=>({...s,mode:"type"}))}>Type</button>
               </div>
-              {!canTalk&&<p style={{fontSize:12.5,color:IV.dim,margin:"6px 0 0"}}>This browser can't turn speech into text — try Chrome, Edge or Safari, or type.</p>}</div>
+              {!canTalk&&<p style={{fontSize:12.5,color:IV.dim,margin:"6px 0 0"}}>This browser can't turn speech into text, try Chrome, Edge or Safari, or type.</p>}</div>
           </div>
           {brief&&<div style={{marginTop:14,background:"#F7F9FC",border:"1px solid #E3E7ED",borderRadius:10,padding:"12px 14px",fontSize:14,lineHeight:1.5}}>
               <b style={{display:"block",marginBottom:4}}>About <span data-noi18n>{brief.name}</span></b>
@@ -1201,7 +1172,7 @@ function InterviewSim({major,defaultCompany,defaultRole}){
               </select></div>
             <div><button type="button" style={{...btn(false),width:"100%",marginTop:14}} onClick={()=>say(IV_LINE)}>▶ Hear it</button></div>
           </div>}
-          {canSpeak&&setup.readAloud&&<p style={{fontSize:12.5,color:IV.dim,margin:"8px 0 0"}}>Voices come from your device. The ones marked "most natural" sound the most human — on a Mac or iPhone you can download better ones in Settings → Accessibility → Spoken Content → Voices.</p>}
+          {canSpeak&&setup.readAloud&&<p style={{fontSize:12.5,color:IV.dim,margin:"8px 0 0"}}>Voices come from your device. The ones marked "most natural" sound the most human, on a Mac or iPhone you can download better ones in Settings → Accessibility → Spoken Content → Voices.</p>}
           <button style={{...btn(true),marginTop:18,padding:"12px 22px"}} onClick={start}>Start the interview</button>
           {err&&<p role="alert" style={{color:"#B42318",fontSize:14,marginTop:12}}>{err}</p>}
         </section>
@@ -1229,9 +1200,9 @@ function InterviewSim({major,defaultCompany,defaultRole}){
           {busy&&<div style={{color:IV.dim,fontSize:14}}>{turns.length&&turns[turns.length-1].answered?"Grading your answer…":"Interviewer is thinking…"}</div>}
           {err&&<div role="alert" style={{color:"#B42318",fontSize:14}}>{err} <button style={{...btn(false),padding:"4px 12px",fontSize:13}} onClick={()=>ask(turns)}>Retry</button></div>}
           {summary?(
-            <div style={{border:`1px solid ${IV.line}`,borderRadius:14,padding:20,background:"#fff"}}>
+            <div style={{border:`1px solid ${IV.line}`,borderRadius:10,padding:20,background:"#fff"}}>
               <div style={{display:"flex",gap:20,alignItems:"center",flexWrap:"wrap"}}>
-                <div style={{width:96,height:96,borderRadius:16,background:"#060A2C",color:"#B0F701",display:"grid",placeItems:"center",...mono,fontSize:40,fontWeight:500}} aria-label={`Grade ${grade?grade.letter:"not available"}`}>{grade?grade.letter:"—"}</div>
+                <div style={{width:96,height:96,borderRadius:10,background:"#060A2C",color:"#B0F701",display:"grid",placeItems:"center",...mono,fontSize:40,fontWeight:500}} aria-label={`Grade ${grade?grade.letter:"not available"}`}>{grade?grade.letter:"—"}</div>
                 <div style={{flex:1,minWidth:200}}>
                   <h2 style={{font:`600 22px ${IV.font}`,margin:"0 0 4px"}}>{grade?`${grade.overall}% overall`:"How it went"}</h2>
                   <p style={{fontSize:12.5,color:IV.dim,margin:"0 0 8px"}}>AI estimate from {grade?grade.n:0} graded answer{grade&&grade.n===1?"":"s"} · not a hiring decision</p>
@@ -1249,12 +1220,12 @@ function InterviewSim({major,defaultCompany,defaultRole}){
               <button style={{...btn(true),marginTop:16}} onClick={quit}>Practice again</button>
             </div>
           ):waiting?(
-            <div style={{position:"sticky",bottom:12,background:"#fff",border:`1px solid ${lowTime?"#F4B4AE":IV.line}`,borderRadius:14,padding:12,boxShadow:"0 6px 20px rgba(6,10,44,.08)"}}>
+            <div style={{position:"sticky",bottom:12,background:"#fff",border:`1px solid ${lowTime?"#F4B4AE":IV.line}`,borderRadius:10,padding:12,boxShadow:"none"}}>
               {/* the clock */}
               <div style={{display:"flex",alignItems:"center",gap:12,marginBottom:10}}>
                 <span style={{...mono,fontSize:22,minWidth:64,color:phase==="think"?"#B45309":lowTime?"#B42318":IV.ink}} aria-live="off">{phase==="reading"?"··":ivClock(left)}</span>
                 <div style={{flex:1}}>
-                  <div style={{fontSize:12.5,color:IV.dim,marginBottom:5}} aria-live="polite">{phase==="reading"?"Listen to the question…":phase==="think"?"Think time — answer starts automatically":lowTime?"Wrap it up — sends when the clock hits 0:00":"Answer now"}</div>
+                  <div style={{fontSize:12.5,color:IV.dim,marginBottom:5}} aria-live="polite">{phase==="reading"?"Listen to the question…":phase==="think"?"Think time, answer starts automatically":lowTime?"Wrap it up, sends when the clock hits 0:00":"Answer now"}</div>
                   <div style={{height:6,background:"#EEF1F6",borderRadius:3,overflow:"hidden"}}><div style={{height:6,borderRadius:3,transition:"width .2s linear",background:phase==="think"?"#F59E0B":lowTime?"#DC2626":IV.acc,width:`${phase==="think"?left/IV_THINK*100:phase==="answer"?left/setup.limit*100:100}%`}}/></div>
                 </div>
                 {phase==="reading"&&<button style={{...btn(false),padding:"6px 12px",fontSize:13}} onClick={()=>{hush();beginThink();}}>Skip</button>}
@@ -1263,16 +1234,16 @@ function InterviewSim({major,defaultCompany,defaultRole}){
               {phase==="answer"&&<>
                 {setup.mode==="talk"&&canTalk&&<div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
                   <button type="button" onClick={()=>recording?stopRec():startRec()} aria-pressed={recording} style={{...btn(recording),display:"flex",alignItems:"center",gap:8,background:recording?"#B42318":"#fff",borderColor:recording?"#B42318":IV.line,color:recording?"#fff":IV.ink}}>
-                    <span aria-hidden="true" style={{width:9,height:9,borderRadius:"50%",background:recording?"#fff":"#B42318",animation:recording?"dblink 1.2s infinite":"none"}}/>{recording?"Listening — tap to pause":"Tap to talk"}</button>
-                  <span style={{fontSize:12.5,color:IV.dim}}>Your words show up below — fix anything it misheard.</span>
+                    <span aria-hidden="true" style={{width:9,height:9,borderRadius:"50%",background:recording?"#fff":"#B42318",animation:recording?"dblink 1.2s infinite":"none"}}/>{recording?"Listening, tap to pause":"Tap to talk"}</button>
+                  <span style={{fontSize:12.5,color:IV.dim}}>Your words show up below, fix anything it misheard.</span>
                 </div>}
                 {micErr&&<p role="alert" style={{fontSize:13,color:"#B42318",margin:"0 0 8px"}}>{micErr}</p>}
                 <label htmlFor="ivA" style={{position:"absolute",left:-9999}}>Your answer</label>
-                <textarea id="ivA" value={draft} onChange={e=>setDraft(e.target.value)} rows={4} autoFocus={setup.mode==="type"} placeholder={setup.mode==="talk"?"Start talking — your answer appears here.":"Type your answer. Tip: situation, what you did, the result."}
+                <textarea id="ivA" value={draft} onChange={e=>setDraft(e.target.value)} rows={4} autoFocus={setup.mode==="type"} placeholder={setup.mode==="talk"?"Start talking, your answer appears here.":"Type your answer. Tip: situation, what you did, the result."}
                   onKeyDown={e=>{if(e.key==="Enter"&&(e.metaKey||e.ctrlKey))submit(false);}} style={{...field,resize:"vertical"}}/>
                 {interim&&<p style={{fontSize:14,color:IV.dim,fontStyle:"italic",margin:"6px 2px 0"}}>{interim}</p>}
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,flexWrap:"wrap",marginTop:8}}>
-                  <span style={{fontSize:12,color:IV.dim}}>{setup.mode==="type"?"Ctrl/⌘ + Enter to send":"Done early? Send it — leftover time doesn't hurt you."}</span>
+                  <span style={{fontSize:12,color:IV.dim}}>{setup.mode==="type"?"Ctrl/⌘ + Enter to send":"Done early? Send it, leftover time doesn't hurt you."}</span>
                   <div style={{display:"flex",gap:8}}><button style={btn(false)} onClick={quit}>End</button><button style={btn(true)} onClick={()=>submit(false)} disabled={!(draft+interim).trim()}>Send answer</button></div>
                 </div>
               </>}
@@ -1304,7 +1275,7 @@ function SkillPicker({options,value,onToggle,major}){
   return (<div>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:12,marginBottom:10}}>
       <p style={{fontSize:13,fontWeight:600,color:ink,margin:0}}>For {major||"your major"}</p>
-      <p aria-live="polite" style={{fontSize:13,color:value.length?"#4A7000":dim,margin:0,fontWeight:value.length?600:400}}>{value.length?`${value.length} picked`:"Tap any that fit — skip the rest"}</p>
+      <p aria-live="polite" style={{fontSize:13,color:value.length?"#4A7000":dim,margin:0,fontWeight:value.length?600:400}}>{value.length?`${value.length} picked`:"Tap any that fit, skip the rest"}</p>
     </div>
     <div style={{display:"flex",flexWrap:"wrap",gap:8}}>{options.map(chip)}</div>
     <p style={{fontSize:13,fontWeight:600,color:ink,margin:"20px 0 10px"}}>Good for any major</p>
@@ -1578,14 +1549,14 @@ function App(){
       const r=await fetch("/api/results",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({zip:ans.zip,major:ans.major,type:ans.type||"Any",radius:(over&&over.radius)||ans.radius||50}),signal:ctrl.signal});
       clearTimeout(timer);
       const d=await r.json().catch(()=>({}));
-      if(!r.ok)throw new Error(d.error||"Couldn't load internships right now — try again in a minute");
+      if(!r.ok)throw new Error(d.error||"Couldn't load internships right now, try again in a minute");
       metaRef.current=d.meta||null;
       const initial=applyHonest(Array.isArray(d.results)?d.results:[],ans,extPicks);
       setResultsError("");setAiError(null);
       setResults(initial);
       if(initial.length&&(ans.resume||"").trim().length>=80)enrichWithPersonalizedReasons(initial);
     }catch(e){
-      const msg=e&&e.name==="AbortError"?"That took too long — check your connection and try again.":(e&&e.message)||"Couldn't load internships right now.";
+      const msg=e&&e.name==="AbortError"?"That took too long, check your connection and try again.":(e&&e.message)||"Couldn't load internships right now.";
       console.warn("[iq] results failed:",msg);
       setResults([]);setResultsError(msg);
     }
@@ -1694,7 +1665,7 @@ function App(){
         fetchWallPosts();
       }
     }catch(e){
-      setWallMessage({type:"error",text:"Network error — try again."});
+      setWallMessage({type:"error",text:"Network error, try again."});
     }finally{
       setWallSubmitting(false);
     }
@@ -1704,7 +1675,7 @@ function App(){
     if(!confirm("Report this for review? It will be checked by the Beat the Pile team."))return;
     try{
       const r=await fetch("/api/community",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action:"report",kind,id})});
-      setWallMessage(r.ok?{type:"success",text:"Thanks — we'll take a look."}:{type:"error",text:"Couldn't send the report. Try again."});
+      setWallMessage(r.ok?{type:"success",text:"Thanks, we'll take a look."}:{type:"error",text:"Couldn't send the report. Try again."});
     }catch(e){setWallMessage({type:"error",text:"Couldn't send the report. Try again."});}
   }
   // Delete a post you originally made on this browser
@@ -1726,7 +1697,7 @@ function App(){
       try{localStorage.setItem("iq_wall_tokens",JSON.stringify(tokens));}catch(e){}
       fetchWallPosts();
     }catch(e){
-      alert("Network error — try again.");
+      alert("Network error, try again.");
     }
   }
   function ownsPost(postId){
@@ -1865,7 +1836,7 @@ function App(){
       if(!resp.ok)throw new Error("backend "+resp.status);
       const data=await resp.json();
       const text=(data.text||"").trim();
-      if(!text||text.length<100)throw new Error("Got an unusually short response — try again.");
+      if(!text||text.length<100)throw new Error("Got an unusually short response, try again.");
       setBuilderState({loading:false,text,error:""});
       analytics.track("resume_builder_done",{chars:text.length});
     }catch(e){
@@ -1876,7 +1847,7 @@ function App(){
   function saveBuilderResumeToProfile(){
     if(!builderState.text)return;
     const id=Date.now();
-    const newResume={id,name:`Starter Resume — ${(ans.major||"").split(",")[0].trim()||"Draft"}`,text:builderState.text};
+    const newResume={id,name:`Starter Resume, ${(ans.major||"").split(",")[0].trim()||"Draft"}`,text:builderState.text};
     setProfile(p=>({...p,resumes:[...(p.resumes||[]),newResume]}));
     // Also stick it in ans.resume so it's available immediately for the current session
     setAns(p=>({...p,resume:builderState.text,needsResumeBuilder:false}));
@@ -2244,9 +2215,9 @@ function App(){
       if(matches&&matches.length){
         return matches.map(m=>m.replace(/<[^>]+>/g,"")).join(" ").replace(/\s+/g," ").trim();
       }
-      throw new Error("Couldn't read this .docx — try pasting the text instead.");
+      throw new Error("Couldn't read this .docx, try pasting the text instead.");
     }
-    throw new Error("Unsupported file type. Use .pdf, .docx, or .txt — or paste the text.");
+    throw new Error("Unsupported file type. Use .pdf, .docx, or .txt, or paste the text.");
   }
   async function handleResumeUpload(resumeId,fileList){
     setResumeUploadErr("");
@@ -2256,7 +2227,7 @@ function App(){
     setResumeUploading(true);
     try{
       const text=await extractTextFromFile(file);
-      if(!text||text.length<40){throw new Error("Couldn't read much text from that file — try pasting instead.");}
+      if(!text||text.length<40){throw new Error("Couldn't read much text from that file, try pasting instead.");}
       updateResume(resumeId,"text",text);
       // Also update the name if it's still default and the file has a recognizable name
       const cleanName=(file.name||"").replace(/\.[^.]+$/,"").slice(0,40);
@@ -2478,7 +2449,7 @@ function App(){
     }catch(e){
       console.error("[iq] cover letter backend failed, using template:",e&&e.message);
       setKit({loading:false,company:c.name,coverLetter:fallbackLetter(c),tips:[
-        "Apply within 48 hours of the posting going live — early applicants get reviewed first.",
+        "Apply within 48 hours of the posting going live, early applicants get reviewed first.",
         "Mirror 2–3 keywords from the job description so your resume passes screening filters.",
         "Send a short, polite follow-up email 5–7 business days after applying."
       ]});
@@ -2571,7 +2542,7 @@ function App(){
       analytics.track("score_completed",{screenerScore:obj.screenerScore,humanScore:obj.humanScore});
     }catch(e){
       console.error("[iq] score failed:",e&&e.message);
-      setScoreError("Something went wrong scoring this. Try again — or shorten your paste if it's very long.");
+      setScoreError("Something went wrong scoring this. Try again, or shorten your paste if it's very long.");
     }finally{
       setScoreLoading(false);
     }
@@ -2596,7 +2567,7 @@ function App(){
       throw new Error("parse");
     }catch(e){
       console.error("[iq] follow-up backend failed, using template:",e&&e.message);
-      setKit({loading:false,company:a.company,mode:"followup",coverLetter:`Subject: Following up — ${a.role} application\n\nHi,\n\nI recently applied for the ${a.role} position at ${a.company} and wanted to reaffirm how excited I am about the opportunity. I'd love the chance to contribute to your team and keep growing my skills in ${p.major||ans.major||"the field"}.\n\nIf there's any update on the timeline or next steps, I'd be grateful to hear it. Thank you again for your time and consideration.\n\nBest regards,\n${p.fullName||"[Your name]"}`,tips:["Send 5–7 business days after applying — Tuesday–Thursday mornings tend to land best.","Reply to any confirmation email you received so it reaches the right inbox, or send to the recruiter directly if you have their address."]});
+      setKit({loading:false,company:a.company,mode:"followup",coverLetter:`Subject: Following up, ${a.role} application\n\nHi,\n\nI recently applied for the ${a.role} position at ${a.company} and wanted to reaffirm how excited I am about the opportunity. I'd love the chance to contribute to your team and keep growing my skills in ${p.major||ans.major||"the field"}.\n\nIf there's any update on the timeline or next steps, I'd be grateful to hear it. Thank you again for your time and consideration.\n\nBest regards,\n${p.fullName||"[Your name]"}`,tips:["Send 5–7 business days after applying, Tuesday–Thursday mornings tend to land best.","Reply to any confirmation email you received so it reaches the right inbox, or send to the recruiter directly if you have their address."]});
       analytics.track("followup_generated",{company:a.company,fallback:true});
     }
   }
@@ -2625,13 +2596,13 @@ function App(){
     }catch(e){
       setPrepResult({questions:[
         {q:`Tell me about yourself and why you're interested in the ${a.role} role at ${a.company}.`,framework:"Lead with your major, a relevant project or experience, and close with why this company specifically. Keep it under 90 seconds."},
-        {q:"Walk me through a time you solved a difficult problem under pressure.",framework:"Use STAR format: Situation, Task, Action, Result. Pick something real — even a class project works."},
+        {q:"Walk me through a time you solved a difficult problem under pressure.",framework:"Use STAR format: Situation, Task, Action, Result. Pick something real, even a class project works."},
         {q:`What do you know about ${a.company} and the ${a.industry||"industry"} right now?`,framework:"Research 2-3 recent news items or facts about the company before the interview. Showing you did homework is a massive differentiator."},
-        {q:"Where do you see yourself in 5 years?",framework:"Align your answer with the field you're interviewing for. You don't have to be specific — showing direction and ambition matters more."},
+        {q:"Where do you see yourself in 5 years?",framework:"Align your answer with the field you're interviewing for. You don't have to be specific, showing direction and ambition matters more."},
         {q:"What's a weakness you've been actively working on?",framework:"Pick something real but not disqualifying for the role. Show the steps you're taking to improve it."},
-        {q:`What technical skills or tools are you most confident using that would help you in this role?`,framework:"Pull directly from your resume. Be specific — name a project or class where you used each skill."},
+        {q:`What technical skills or tools are you most confident using that would help you in this role?`,framework:"Pull directly from your resume. Be specific, name a project or class where you used each skill."},
         {q:"Do you have any questions for us?",framework:"Always ask something. Try: 'What does success look like in the first 90 days?' or 'What do the best interns do differently?'"}
-      ],tips:["Research the company for 20 minutes the night before — look at their LinkedIn, recent news, and the team you'd be joining.","Prepare 3 STAR stories from your resume that can be adapted to different behavioral questions.","Send a thank-you email within 24 hours. Most interns don't — you will stand out."]});
+      ],tips:["Research the company for 20 minutes the night before, look at their LinkedIn, recent news, and the team you'd be joining.","Prepare 3 STAR stories from your resume that can be adapted to different behavioral questions.","Send a thank-you email within 24 hours. Most interns don't, you will stand out."]});
       analytics.track("interview_prep_fallback",{company:a.company});
     }finally{
       setPrepLoading(false);
@@ -2651,7 +2622,7 @@ function App(){
     if(clerkUser&&company.listingId){
       (async()=>{try{const t=await getClerkToken();await fetch("/api/me",{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer "+t},body:JSON.stringify({list:"saved",id:company.listingId,on})});}catch(e){}})();
     }
-    if(on){setSaveNote(clerkUser?"Saved ♥ — find it on your Dashboard here, or in My Season → Saved.":"Saved ♥ on this device — find it on your Dashboard. Sign in to keep it in My Season too.");setTimeout(()=>setSaveNote(""),4500);}
+    if(on){setSaveNote(clerkUser?"Saved ♥, find it on your Dashboard here, or in My Season → Saved.":"Saved ♥ on this device, find it on your Dashboard. Sign in to keep it in My Season too.");setTimeout(()=>setSaveNote(""),4500);}
   }
   function isJobSaved(name){return savedJobs.some(j=>j.name===name);}
 
@@ -2688,7 +2659,7 @@ function App(){
       const loc=c.location&&!["National employer","Regional employer","Hires interns in your field"].includes(c.location)?` based in ${c.location}`:"";
       // AI unavailable: say only what we actually know (no guessed size or culture)
       setCardIntel(p=>({...p,[key]:{
-        description:`We couldn't load a summary right now. The posting is for ${role}${loc ? loc : ""} — open it for details.`,
+        description:`We couldn't load a summary right now. The posting is for ${role}${loc ? loc : ""}, open it for details.`,
         loading:false
       }}));
     }
@@ -2697,7 +2668,7 @@ function App(){
   // PRO MODAL
   const ProModal=()=>(
     <div style={{position:"fixed",inset:0,background:"rgba(10,22,40,0.6)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem",backdropFilter:"blur(4px)"}} onClick={()=>setShowProModal(false)}>
-      <div style={{background:"#fff",borderRadius:var_rxl,padding:"2.5rem",maxWidth:460,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.2)",animation:"pop 0.3s ease",position:"relative",maxHeight:"90vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
+      <div style={{background:"#fff",borderRadius:var_rxl,padding:"2.5rem",maxWidth:460,width:"100%",boxShadow:"none",animation:"pop 0.3s ease",position:"relative",maxHeight:"90vh",overflowY:"auto"}} onClick={e=>e.stopPropagation()}>
         <button onClick={()=>setShowProModal(false)} aria-label="Close" style={{position:"absolute",top:14,right:14,width:32,height:32,borderRadius:"50%",background:"#F5F8EE",border:"none",color:"#4A5568",fontSize:18,lineHeight:1,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center",fontFamily:"var(--font)"}}>×</button>
         <div style={{background:`${G}15`,borderRadius:var_rl,padding:"1.25rem",marginBottom:"1.25rem",border:`1px solid ${GL}`}}>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:6}}>
@@ -2712,27 +2683,26 @@ function App(){
             <p style={{fontWeight:700,fontSize:15,color:"#fff",letterSpacing:"-0.3px"}}>AI Resume Builder</p>
             <span style={{marginLeft:"auto",background:"#2563EB",color:"#fff",fontSize:10,fontWeight:700,padding:"2px 9px",borderRadius:99}}>PRO</span>
           </div>
-          <p style={{fontSize:13,color:"#94A3B8",lineHeight:1.55,marginBottom:10}}>Most students applying for internships don't have a resume yet. Pro builds yours from your quiz answers in seconds — tailored to your major, activities, and skills. Edit it, download it as a PDF, and use it across every application.</p>
+          <p style={{fontSize:13,color:"#94A3B8",lineHeight:1.55,marginBottom:10}}>Most students applying for internships don't have a resume yet. Pro builds yours from your quiz answers in seconds, tailored to your major, activities, and skills. Edit it, download it as a PDF, and use it across every application.</p>
           <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
             {["Built from your quiz answers","Editable in-app","Download as PDF","Saves to your profile"].map((t,i)=>(
-              <span key={i} style={{fontSize:11.5,fontWeight:700,color:G,background:`${G}15`,padding:"3px 10px",borderRadius:99}}>✓ {t}</span>
+              <span key={i} style={{fontSize:11.5,fontWeight:700,color:G,background:`${G}15`,padding:"3px 10px",borderRadius:99}}>{t}</span>
             ))}
           </div>
         </div>
         <div style={{display:"flex",flexDirection:"column",gap:12,marginBottom:"1.5rem"}}>
           {[
-            {icon:"",title:"Unlimited applications",desc:"Apply to as many companies as you want — auto-fill + cover letter for each"},
+            {icon:"",title:"Unlimited applications",desc:"Apply to as many companies as you want, auto-fill + cover letter for each"},
             {icon:"",title:"Follow-up reminders",desc:"Your dashboard flags each application at the 5-day mark, with a draft email ready for you to send"},
             {icon:"",title:"Full dashboard tracker",desc:"Every app, interview, offer, deadline, and note in one place"},
           ].map((f,i)=>(
             <div key={i} style={{display:"flex",gap:12,alignItems:"flex-start"}}>
-              <div aria-hidden="true" style={{width:20,height:20,borderRadius:6,background:GL,color:G,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,fontSize:12,fontWeight:700,marginTop:2}}>✓</div>
               <div><p style={{fontWeight:700,fontSize:13.5,color:"#060A2C"}}>{f.title}</p><p style={{fontSize:12.5,color:"#4A5568",marginTop:2,lineHeight:1.45}}>{f.desc}</p></div>
             </div>
           ))}
         </div>
-        <button onClick={()=>{analytics.track("pro_upgrade_clicked");setIsPro(true);setShowProModal(false);setProNudge(null);}} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"15px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:16,fontWeight:700,letterSpacing:"-0.3px",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
-          Unlock Pro — free during beta
+        <button onClick={()=>{analytics.track("pro_upgrade_clicked");setIsPro(true);setShowProModal(false);setProNudge(null);}} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"15px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:16,fontWeight:700,letterSpacing:"-0.3px",boxShadow:"none"}}>
+          Unlock Pro, free during beta
         </button>
         <p style={{textAlign:"center",fontSize:12,color:"#6B7280",marginTop:10}}>Unlocks on this device right away. Nothing to pay.</p>
       </div>
@@ -2751,7 +2721,7 @@ function App(){
     const canConfirmCustom=!isCustom||customActText.trim().length>0;
     return(
       <div style={{position:"fixed",inset:0,background:"rgba(10,22,40,0.5)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:"1rem",backdropFilter:"blur(3px)"}} onClick={()=>{setRoleModal(null);setCustomActText("");}}>
-        <div style={{background:"#fff",borderRadius:var_rxl,padding:"2rem",maxWidth:380,width:"100%",boxShadow:"0 20px 60px rgba(0,0,0,0.15)",animation:"pop 0.25s ease"}} onClick={e=>e.stopPropagation()}>
+        <div style={{background:"#fff",borderRadius:var_rxl,padding:"2rem",maxWidth:380,width:"100%",boxShadow:"none",animation:"pop 0.25s ease"}} onClick={e=>e.stopPropagation()}>
           <p style={{fontSize:12,fontWeight:600,color:"#6B7280",marginBottom:8}}>Your Role</p>
           <h3 style={{fontWeight:700,fontSize:18,color:"#060A2C",marginBottom:"0.25rem",letterSpacing:"-0.3px"}}>{act.name}</h3>
           {isCustom?(
@@ -2815,7 +2785,7 @@ function App(){
     const gated=!canApplyTo(c); // a new (4th+) company for a free user
     return(
       <div onClick={()=>setApplyModal(null)} style={{position:"fixed",inset:0,background:"rgba(10,22,40,0.6)",zIndex:400,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"1.5rem 1rem",backdropFilter:"blur(4px)",overflowY:"auto"}}>
-        <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:var_rxl,padding:"1.75rem",maxWidth:560,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.25)",animation:"pop 0.25s ease",margin:"auto 0"}}>
+        <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:var_rxl,padding:"1.75rem",maxWidth:560,width:"100%",boxShadow:"none",animation:"pop 0.25s ease",margin:"auto 0"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
             <div>
               <p style={{fontSize:12,fontWeight:600,color:"#6B7280"}}>Assisted Apply</p>
@@ -2830,8 +2800,8 @@ function App(){
             <div style={{background:`${GL}`,border:`1px solid ${G}25`,borderRadius:var_rl,padding:"1.75rem 1.5rem",textAlign:"center",marginTop:10}}>
               <p style={{fontSize:30,marginBottom:8}}></p>
               <p style={{fontWeight:700,fontSize:18,color:"#060A2C",marginBottom:6,letterSpacing:"-0.3px"}}>You've used your {FREE_APPLICATIONS} free applications</p>
-              <p style={{fontSize:13.5,color:"#4A5568",lineHeight:1.55,marginBottom:16,maxWidth:380,margin:"0 auto 16px"}}>You applied to {appliedCos.slice(0,FREE_APPLICATIONS).join(", ")} with Beat the Pile's help. Go Pro for <strong>unlimited applications</strong> — auto-fill and a tailored cover letter for every job, plus follow-up reminders.</p>
-              <button onClick={()=>{setApplyModal(null);setShowProModal(true);}} style={{background:`${G}`,border:"none",color:"#fff",padding:"13px 30px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Go Pro — unlimited applications</button>
+              <p style={{fontSize:13.5,color:"#4A5568",lineHeight:1.55,marginBottom:16,maxWidth:380,margin:"0 auto 16px"}}>You applied to {appliedCos.slice(0,FREE_APPLICATIONS).join(", ")} with Beat the Pile's help. Go Pro for <strong>unlimited applications</strong>, auto-fill and a tailored cover letter for every job, plus follow-up reminders.</p>
+              <button onClick={()=>{setApplyModal(null);setShowProModal(true);}} style={{background:`${G}`,border:"none",color:"#fff",padding:"13px 30px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"none"}}>Go Pro, unlimited applications</button>
               <p style={{fontSize:11.5,color:"#6B7280",marginTop:12}}>You can still open {c.name}'s site directly from your matches anytime.</p>
             </div>
           ):(<>
@@ -2839,7 +2809,7 @@ function App(){
             // Real Adzuna posting from the main search — direct apply link, always works
             <>
               <a href={safeHttpUrl(c.applyUrl)} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)}
-                style={{display:"block",textAlign:"center",background:`${G}`,color:"#fff",padding:"13px",borderRadius:var_rl,fontWeight:700,fontSize:15,textDecoration:"none",boxShadow:"0 1px 2px rgba(6,10,44,.06)",margin:"10px 0 4px"}}>
+                style={{display:"block",textAlign:"center",background:`${G}`,color:"#fff",padding:"13px",borderRadius:var_rl,fontWeight:700,fontSize:15,textDecoration:"none",boxShadow:"none",margin:"10px 0 4px"}}>
                 ✓ Apply to {c.role||"this role"} at {c.name} ↗
               </a>
               <p style={{fontSize:11,color:GD,textAlign:"center",fontWeight:700,marginBottom:10}}>Live posting{c.location?` · ${c.location}`:""}{c.created?` · posted ${(new Date(c.created)).toLocaleDateString()}`:""}</p>
@@ -2847,7 +2817,7 @@ function App(){
           ):safeHttpUrl(adzunaLink&&adzunaLink.applyUrl)?(
             <>
               <a href={safeHttpUrl(adzunaLink.applyUrl)} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)}
-                style={{display:"block",textAlign:"center",background:`${G}`,color:"#fff",padding:"13px",borderRadius:var_rl,fontWeight:700,fontSize:15,textDecoration:"none",boxShadow:"0 1px 2px rgba(6,10,44,.06)",margin:"10px 0 4px"}}>
+                style={{display:"block",textAlign:"center",background:`${G}`,color:"#fff",padding:"13px",borderRadius:var_rl,fontWeight:700,fontSize:15,textDecoration:"none",boxShadow:"none",margin:"10px 0 4px"}}>
                 ✓ Apply to {adzunaLink.title||(c.role+" at "+c.name)} ↗
               </a>
               <p style={{fontSize:11,color:GD,textAlign:"center",fontWeight:700,marginBottom:10}}>Live posting{adzunaLink.location?` · ${adzunaLink.location}`:""}</p>
@@ -2882,7 +2852,7 @@ function App(){
               }
               // Small/regional companies — only website (if known) + Google. No dead platform links.
               return(<>
-                <p style={{fontSize:11.5,color:"#6B7280",lineHeight:1.5,marginBottom:9}}>This is a smaller company — reach them directly.</p>
+                <p style={{fontSize:11.5,color:"#6B7280",lineHeight:1.5,marginBottom:9}}>This is a smaller company, reach them directly.</p>
                 <div style={{display:"flex",flexDirection:"column",gap:6}}>
                   {siteHref&&<a href={siteHref} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)} style={{...btnStyle,background:"#fff",color:"#0A66C2",border:`1.5px solid #0A66C2`}}>Company Website</a>}
                   <a href={googleHref} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)} style={outline}>Search on Google</a>
@@ -2902,7 +2872,7 @@ function App(){
             {/* AUTOFILL CARD */}
             <div style={{border:`1.5px solid ${GL}`,borderRadius:var_rl,padding:"1rem 1.1rem",marginBottom:14}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
-                <p style={{fontWeight:700,fontSize:14,color:"#060A2C"}}>Your info — tap any field to copy</p>
+                <p style={{fontWeight:700,fontSize:14,color:"#060A2C"}}>Your info, tap any field to copy</p>
                 <button onClick={()=>copyText(allText,"all")} style={{background:GL,border:`1px solid ${GM}`,color:GD,padding:"5px 12px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:12,fontWeight:700}}>{copied==="all"?"✓ Copied all":"Copy all"}</button>
               </div>
               <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:6}}>
@@ -2968,12 +2938,12 @@ function App(){
     const icons={university:"",gradYear:"",targetTerm:"",major:"",gpa:"",extracurriculars:"",skills:"",type:"",zip:"",radius:""};
     return(
       <div onClick={()=>setShowReview(false)} style={{position:"fixed",inset:0,background:"rgba(10,22,40,0.6)",zIndex:380,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"1.5rem 1rem",backdropFilter:"blur(4px)",overflowY:"auto"}}>
-        <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:var_rxl,padding:"1.75rem",maxWidth:540,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.25)",animation:"pop 0.25s ease",margin:"auto 0"}}>
+        <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:var_rxl,padding:"1.75rem",maxWidth:540,width:"100%",boxShadow:"none",animation:"pop 0.25s ease",margin:"auto 0"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
             <div>
               <p style={{fontSize:12,fontWeight:600,color:"#6B7280"}}>Your Answers</p>
               <h3 style={{fontWeight:700,fontSize:20,color:"#060A2C",letterSpacing:"-0.4px"}}>Tap any answer to change it</h3>
-              <p style={{color:"#4A5568",fontSize:13,marginTop:2}}>Update one thing and we'll instantly recalculate — no need to redo the quiz.</p>
+              <p style={{color:"#4A5568",fontSize:13,marginTop:2}}>Update one thing and we'll instantly recalculate, no need to redo the quiz.</p>
             </div>
             <button onClick={()=>setShowReview(false)} style={{background:"none",border:"none",fontSize:22,color:"#6B7280",cursor:"pointer",lineHeight:1}}>×</button>
           </div>
@@ -3000,11 +2970,11 @@ function App(){
     if(!proNudge)return null;
     const msg={
       welcome_back:"Welcome back. Want reminders when each follow-up is due, with the email drafted for you?",
-      followups:`You're tracking ${tracked.length} applications — Beat the Pile can remind you when each is due for a follow-up and draft it for you.`
+      followups:`You're tracking ${tracked.length} applications | Beat the Pile can remind you when each is due for a follow-up and draft it for you.`
     }[proNudge.reason]||"Unlock more with Pro.";
     return(
       <div style={{position:"fixed",left:0,right:0,bottom:16,zIndex:350,display:"flex",justifyContent:"center",padding:"0 1rem",pointerEvents:"none"}}>
-        <div style={{pointerEvents:"auto",background:"#060A2C",color:"#fff",borderRadius:var_rl,padding:"13px 14px 13px 16px",maxWidth:440,width:"100%",boxShadow:"0 12px 40px rgba(0,0,0,0.3)",display:"flex",alignItems:"center",gap:12,animation:"fadeUp 0.3s ease"}}>
+        <div style={{pointerEvents:"auto",background:"#060A2C",color:"#fff",borderRadius:var_rl,padding:"13px 14px 13px 16px",maxWidth:440,width:"100%",boxShadow:"none",display:"flex",alignItems:"center",gap:12,animation:"fadeUp 0.3s ease"}}>
           <span style={{fontSize:13.5,lineHeight:1.4,flex:1}}>{msg}</span>
           <button onClick={()=>{setProNudge(null);setShowProModal(true);}} style={{background:G,border:"none",color:"#fff",padding:"8px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,whiteSpace:"nowrap"}}>See Pro</button>
           <button onClick={()=>{analytics.track("nudge_dismissed",{reason:proNudge.reason});setProNudge(null);}} style={{background:"none",border:"none",color:"#6B7280",cursor:"pointer",fontSize:18,lineHeight:1}}>×</button>
@@ -3027,7 +2997,7 @@ function App(){
           <div style={{textAlign:"center",marginBottom:12}}>
             <p style={{fontSize:12,color:"#6B7280",fontWeight:600}}>Save your progress</p>
             <h3 style={{fontSize:20,fontWeight:700,color:"#060A2C",margin:"4px 0 6px"}}>Sign in to Beat the Pile</h3>
-            <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.5}}>Your tracker, profile, and resumes sync across all your devices. Sign in once — pick up where you left off anywhere.</p>
+            <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.5}}>Your tracker, profile, and resumes sync across all your devices. Sign in once, pick up where you left off anywhere.</p>
           </div>
           {/* Clerk's prebuilt sign-in UI mounts here */}
           <div id="clerk-signin-mount" style={{minHeight:380}}></div>
@@ -3040,11 +3010,11 @@ function App(){
     const dueApps=tracked.filter(a=>followUpStatus(a).state==="due");
     if(dueApps.length===0)return null;
     return (
-      <div role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setPage("dashboard");}}} onClick={()=>setPage("dashboard")} style={{background:"#FEF3C7",border:"1px solid #F59E0B",borderRadius:var_rl,padding:"12px 16px",marginBottom:18,cursor:"pointer",display:"flex",alignItems:"center",gap:12,boxShadow:"0 2px 8px rgba(245,158,11,0.15)"}}>
+      <div role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setPage("dashboard");}}} onClick={()=>setPage("dashboard")} style={{background:"#FEF3C7",border:"1px solid #F59E0B",borderRadius:var_rl,padding:"12px 16px",marginBottom:18,cursor:"pointer",display:"flex",alignItems:"center",gap:12,boxShadow:"none"}}>
         <div style={{fontSize:22,flexShrink:0}}></div>
         <div style={{flex:1,minWidth:0}}>
           <p style={{fontSize:13.5,fontWeight:700,color:"#92400E",marginBottom:2}}>{dueApps.length} follow-up{dueApps.length===1?"":"s"} due</p>
-          <p style={{fontSize:12,color:"#78350F",lineHeight:1.4}}>{dueApps.slice(0,3).map(a=>a.company).join(", ")}{dueApps.length>3?` +${dueApps.length-3} more`:""} — tap to draft them.</p>
+          <p style={{fontSize:12,color:"#78350F",lineHeight:1.4}}>{dueApps.slice(0,3).map(a=>a.company).join(", ")}{dueApps.length>3?` +${dueApps.length-3} more`:""}, tap to draft them.</p>
         </div>
         <div style={{fontSize:14,color:"#92400E",fontWeight:700,flexShrink:0}}>→</div>
       </div>
@@ -3057,7 +3027,7 @@ function App(){
     const a=followUpModal;
     return(
       <div onClick={()=>setFollowUpModal(null)} style={{position:"fixed",inset:0,background:"rgba(10,22,40,0.6)",zIndex:400,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"1.5rem 1rem",backdropFilter:"blur(4px)",overflowY:"auto"}}>
-        <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:var_rxl,padding:"1.75rem",maxWidth:560,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.25)",animation:"pop 0.25s ease",margin:"auto 0"}}>
+        <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:var_rxl,padding:"1.75rem",maxWidth:560,width:"100%",boxShadow:"none",animation:"pop 0.25s ease",margin:"auto 0"}}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:6}}>
             <div>
               <p style={{fontSize:12,fontWeight:600,color:"#6B7280"}}>Follow-up email</p>
@@ -3067,14 +3037,14 @@ function App(){
             <button onClick={()=>setFollowUpModal(null)} style={{background:"none",border:"none",fontSize:22,color:"#6B7280",cursor:"pointer",lineHeight:1}}>×</button>
           </div>
           <div style={{background:GL,border:`1px solid ${GM}`,borderRadius:var_r,padding:"10px 12px",margin:"10px 0 14px",fontSize:12.5,color:GD,lineHeight:1.5}}>
-            You send this from your own email, as yourself — that's what makes a follow-up work. We just handle the timing and the first draft.
+            You send this from your own email, as yourself, that's what makes a follow-up work. We just handle the timing and the first draft.
           </div>
           {kit.loading&&kit.company===a.company?(
             <div style={{display:"flex",alignItems:"center",gap:10,padding:"20px 0",color:"#4A5568",fontSize:14}}>
               <div style={{width:18,height:18,border:`3px solid ${GL}`,borderTopColor:G,borderRadius:"50%",animation:"spin 0.8s linear infinite"}}/> Drafting your follow-up…
             </div>
           ):kit.company===a.company&&kit.coverLetter?(<>
-            <p style={{fontSize:11.5,color:"#6B7280",margin:"0 0 6px",lineHeight:1.45}}><b>Draft</b> — edit it before you send. Nothing is sent for you.</p>
+            <p style={{fontSize:11.5,color:"#6B7280",margin:"0 0 6px",lineHeight:1.45}}><b>Draft</b>, edit it before you send. Nothing is sent for you.</p>
             <div style={{position:"relative",marginBottom:10}}>
               <textarea value={kit.coverLetter} onChange={e=>setKit(k=>({...k,coverLetter:e.target.value}))} style={{width:"100%",minHeight:200,background:"#FBFBFC",border:`1px solid ${GL}`,borderRadius:var_r,padding:"12px",fontFamily:"var(--font)",fontSize:13,lineHeight:1.6,color:"#060A2C",resize:"vertical",outline:"none"}}/>
               <button onClick={()=>copyText(kit.coverLetter,"fu")} style={{position:"absolute",top:8,right:8,background:GD,border:"none",color:"#fff",padding:"5px 14px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:11,fontWeight:700}}>{copied==="fu"?"✓ Copied":"Copy"}</button>
@@ -3082,7 +3052,7 @@ function App(){
             {/* Open in email app — parses Subject line and pre-fills mailto */}
             {(()=>{
               const subjMatch=(kit.coverLetter||"").match(/^Subject:\s*(.+)$/m);
-              const subject=subjMatch?subjMatch[1].trim():`Following up — ${a.role} application`;
+              const subject=subjMatch?subjMatch[1].trim():`Following up, ${a.role} application`;
               const body=(kit.coverLetter||"").replace(/^Subject:\s*.+\n?/m,"").trim();
               const mailtoUrl=`mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
               return (
@@ -3094,7 +3064,7 @@ function App(){
                 {kit.tips.map((t,i)=>(<div key={i} style={{display:"flex",gap:8,fontSize:12.5,color:"#4A5568",lineHeight:1.5}}><span style={{color:G,fontWeight:700}}>›</span><span>{t}</span></div>))}
               </div>
             )}
-            <button onClick={()=>{markFollowedUp(a.company);setFollowUpModal(null);}} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"13px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14.5,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>I sent it — mark as followed up ✓</button>
+            <button onClick={()=>{markFollowedUp(a.company);setFollowUpModal(null);}} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"13px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14.5,fontWeight:700,boxShadow:"none"}}>I sent it, mark as followed up ✓</button>
           </>):null}
         </div>
       </div>
@@ -3108,7 +3078,7 @@ function App(){
     // Nov 9: the account button lives only in /nav.js now (your picture / "Sign in"). The homepage used to add its own,
     // which on phones showed a second "Sign in" next to your picture while sign-in was still loading.
     return (<>
-      {saveNote&&<div role="status" style={{position:"fixed",left:"50%",bottom:22,transform:"translateX(-50%)",background:"#060A2C",color:"#fff",padding:"10px 16px",borderRadius:10,fontSize:13.5,fontWeight:500,zIndex:2000,maxWidth:"90vw",boxShadow:"0 6px 20px rgba(0,0,0,.25)"}}>{saveNote}</div>}
+      {saveNote&&<div role="status" style={{position:"fixed",left:"50%",bottom:22,transform:"translateX(-50%)",background:"#060A2C",color:"#fff",padding:"10px 16px",borderRadius:10,fontSize:13.5,fontWeight:500,zIndex:2000,maxWidth:"90vw",boxShadow:"none"}}>{saveNote}</div>}
     </>);
   };
 
@@ -3227,7 +3197,7 @@ function App(){
               {cur.multi&&picked.length>0&&!addingMore&&!atMax&&(
                 <button onClick={()=>{setAddingMore(true);setSearchQ("");}} style={{background:"none",border:`1.5px dashed #CBD5E1`,color:"#4A5568",padding:"9px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:600,marginTop:4,width:"100%",textAlign:"center"}}>+ Add another major <span style={{color:"#6B7280",fontWeight:500,marginLeft:4}}>(optional)</span></button>
               )}
-              {cur.multi&&atMax&&!addingMore&&<p style={{fontSize:11,color:"#6B7280",textAlign:"center",marginTop:6}}>Max of {cur.maxPicks} reached — remove one to add another.</p>}
+              {cur.multi&&atMax&&!addingMore&&<p style={{fontSize:11,color:"#6B7280",textAlign:"center",marginTop:6}}>Max of {cur.maxPicks} reached, remove one to add another.</p>}
             </div>);
           })()}
 
@@ -3236,7 +3206,7 @@ function App(){
             {cur.subLabel&&<p style={{fontSize:13,color:"#4A5568",lineHeight:1.5,marginBottom:12}}>{cur.subLabel}</p>}
             <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
               {cur.options.map((o,i)=>{const c=PALETTE[i%PALETTE.length];const sel=ans[cur.key]===o;
-                return<button key={o} onClick={()=>setA(cur.key,o,true)} style={{background:sel?c:"#fff",border:`1.5px solid ${sel?c:"#E2E8F0"}`,color:sel?"#fff":"#060A2C",padding:"10px 20px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:sel?700:400,transition:"all 0.18s",boxShadow:sel?`0 2px 10px ${c}40`:"none"}}>{o}</button>;
+                return<button key={o} onClick={()=>setA(cur.key,o,true)} style={{background:sel?c:"#fff",border:`1.5px solid ${sel?c:"#E2E8F0"}`,color:sel?"#fff":"#060A2C",padding:"10px 20px",borderRadius:99,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:sel?700:400,transition:"all 0.18s",boxShadow:"none"}}>{o}</button>;
               })}
             </div>
           </div>)}
@@ -3300,11 +3270,11 @@ function App(){
 
           {/* RESUME — Q1, optional, with builder teaser */}
           {cur.type==="resume"&&(<div className="fade-up">
-            <p style={{fontSize:13.5,color:"#4A5568",lineHeight:1.55,marginBottom:14}}><strong>Totally optional.</strong> If you already have a resume, dropping it in here lets us personalize every match with reasons tied to your actual background. If you don't — no worries, we'll help you build one after the quiz.</p>
+            <p style={{fontSize:13.5,color:"#4A5568",lineHeight:1.55,marginBottom:14}}><strong>Totally optional.</strong> If you already have a resume, dropping it in here lets us personalize every match with reasons tied to your actual background. If you don't, no worries, we'll help you build one after the quiz.</p>
 
             {/* Upload + saved-resume buttons */}
             <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:12}}>
-              <label style={{flex:"1 1 auto",background:`${G}`,color:"#fff",padding:"12px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,textAlign:"center",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
+              <label style={{flex:"1 1 auto",background:`${G}`,color:"#fff",padding:"12px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,textAlign:"center",boxShadow:"none"}}>
                 Upload file (PDF, DOCX, TXT)
                 <input type="file" accept=".pdf,.txt,.docx" onChange={e=>{handleQuizResumeUpload(e.target.files);e.target.value="";}} style={{display:"none"}}/>
               </label>
@@ -3327,11 +3297,11 @@ function App(){
             {(ans.resume||"").length<=40&&(
               <div style={{marginTop:18,padding:"14px 16px",background:"#F8FAFC",border:"1px dashed #CBD5E1",borderRadius:var_rl}}>
                 <p style={{fontSize:13,color:"#060A2C",fontWeight:700,marginBottom:4}}>Don't have a resume yet?</p>
-                <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.5,marginBottom:10}}>That's fine — most freshmen and sophomores don't. We'll help you build a starter resume from your quiz answers right after.</p>
+                <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.5,marginBottom:10}}>That's fine, most freshmen and sophomores don't. We'll help you build a starter resume from your quiz answers right after.</p>
                 <button onClick={()=>{
                   setAns(p=>({...p,needsResumeBuilder:true}));
                   setTimeout(()=>{const ni=nextStepIndex(step);if(ni>=0)setStep(ni);else setPage("emailgate");},150);
-                }} style={{background:"#fff",border:`1.5px solid ${G}`,color:GD,padding:"9px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,width:"100%"}}>Skip — I don't have one yet →</button>
+                }} style={{background:"#fff",border:`1.5px solid ${G}`,color:GD,padding:"9px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,width:"100%"}}>Skip, I don't have one yet →</button>
               </div>
             )}
           </div>)}
@@ -3352,7 +3322,7 @@ function App(){
             </div>
             <input type="range" min={10} max={200} step={5} value={ans.radius} onChange={e=>setA("radius",+e.target.value)} style={{width:"100%",accentColor:G,height:6,cursor:"pointer"}}/>
             <div style={{display:"flex",justifyContent:"space-between",marginTop:8,color:"#6B7280",fontSize:12}}><span>10 mi</span><span>200 mi</span></div>
-            <p style={{fontSize:13,color:"#4A5568",marginTop:12,textAlign:"center"}}>{ans.radius<=30?"Great for highly local results":ans.radius<=75?"Good balance of local and regional":"Wide net — more options, more competition"}</p>
+            <p style={{fontSize:13,color:"#4A5568",marginTop:12,textAlign:"center"}}>{ans.radius<=30?"Great for highly local results":ans.radius<=75?"Good balance of local and regional":"Wide net, more options, more competition"}</p>
           </div>)}
 
           {/* CONTINUE */}
@@ -3365,7 +3335,7 @@ function App(){
                   Save &amp; edit more
                 </button>
                 <button onClick={saveEdit} disabled={!canNext()}
-                  style={{flex:1,background:canNext()?`${G}`:"#E2E8F0",border:"none",color:canNext()?"#fff":"#6B7280",padding:"14px 20px",borderRadius:var_rl,cursor:canNext()?"pointer":"not-allowed",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:canNext()?`0 4px 16px ${G}40`:"none"}}>
+                  style={{flex:1,background:canNext()?`${G}`:"#E2E8F0",border:"none",color:canNext()?"#fff":"#6B7280",padding:"14px 20px",borderRadius:var_rl,cursor:canNext()?"pointer":"not-allowed",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"none"}}>
                   Save &amp; see results →
                 </button>
               </>
@@ -3373,7 +3343,7 @@ function App(){
               {step>0&&<button onClick={()=>setStep(s=>s-1)} style={{background:"#FBFBFC",border:`1.5px solid #E2E8F0`,color:"#4A5568",padding:"13px 18px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:16}}>←</button>}
               {(cur.type==="multi"||cur.type==="zip"||cur.type==="slider"||cur.type==="extracurricular")&&(
                 <button onClick={advanceQuiz} disabled={!canNext()}
-                  style={{flex:1,background:canNext()?`${G}`:"#E2E8F0",border:"none",color:canNext()?"#fff":"#6B7280",padding:"14px 24px",borderRadius:var_rl,cursor:canNext()?"pointer":"not-allowed",fontFamily:"var(--font)",fontSize:15,fontWeight:700,transition:"all 0.2s",boxShadow:canNext()?`0 4px 16px ${G}40`:"none"}}>
+                  style={{flex:1,background:canNext()?`${G}`:"#E2E8F0",border:"none",color:canNext()?"#fff":"#6B7280",padding:"14px 24px",borderRadius:var_rl,cursor:canNext()?"pointer":"not-allowed",fontFamily:"var(--font)",fontSize:15,fontWeight:700,transition:"all 0.2s",boxShadow:"none"}}>
                   {step===STEPS.length-1?"Find My Matches →":cur.type==="multi"&&!ans.skills.length?"Skip for now →":"Continue →"}
                 </button>
               )}
@@ -3391,7 +3361,7 @@ function App(){
         <SignInModal/>
       <Nav/>
       <div style={{maxWidth:480,margin:"0 auto",padding:"3rem 1.5rem"}}>
-        <div className="fade-up" style={{background:"#fff",border:`1.5px solid ${GL}`,borderRadius:var_rxl,padding:"2.5rem 2rem",textAlign:"center",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
+        <div className="fade-up" style={{background:"#fff",border:`1.5px solid ${GL}`,borderRadius:var_rxl,padding:"2.5rem 2rem",textAlign:"center",boxShadow:"none"}}>
           <div style={{fontSize:34,marginBottom:8}}></div>
           <h2 style={{fontSize:"clamp(1.5rem,3.5vw,2rem)",fontWeight:700,letterSpacing:"-1px",marginBottom:10,color:"#060A2C"}}>Want internship updates by email?</h2>
           <p style={{color:"#4A5568",fontSize:15,lineHeight:1.6,marginBottom:"1.5rem"}}><b>Optional.</b> Your matches show up either way. Leave your email if you'd like occasional internship tips and updates from Beat the Pile.</p>
@@ -3400,8 +3370,8 @@ function App(){
             onKeyDown={e=>{if(e.key==="Enter")submitEmail();}}
             style={{width:"100%",padding:"14px 16px",borderRadius:var_rl,border:`1.5px solid ${emailErr?CR:/.+@.+\..+/.test(email)?G:"#E2E8F0"}`,background:"#FBFBFC",fontFamily:"var(--font)",fontSize:16,textAlign:"center",outline:"none",marginBottom:8}}/>
           {emailErr&&<p style={{color:CR,fontSize:13,marginBottom:8}}>{emailErr}</p>}
-          <button onClick={submitEmail} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"15px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:16,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Save email &amp; show my matches →</button>
-          <button onClick={()=>{setEmailErr("");calcResults();}} style={{width:"100%",background:"#fff",border:"1.5px solid #E2E8F0",color:"#060A2C",padding:"13px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,marginTop:8}}>Skip — just show my matches</button>
+          <button onClick={submitEmail} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"15px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:16,fontWeight:700,boxShadow:"none"}}>Save email &amp; show my matches →</button>
+          <button onClick={()=>{setEmailErr("");calcResults();}} style={{width:"100%",background:"#fff",border:"1.5px solid #E2E8F0",color:"#060A2C",padding:"13px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,marginTop:8}}>Skip, just show my matches</button>
           <p style={{fontSize:11.5,color:"#6B7280",marginTop:14,lineHeight:1.5}}>Your email goes to our email-list provider (MailerLite). We only email about internships and Beat the Pile, never sell your info, and you can unsubscribe anytime. <a href="/privacy/" style={{color:"#4A5568"}}>Privacy</a></p>
         </div>
       </div>
@@ -3431,7 +3401,7 @@ function App(){
       "nearby":{text:"NEARBY",color:"#0891b2",bg:"#0891b215"},
       "metro":{text:"METRO",color:"#4A5568",bg:"#4A556815"},
       "regional":{text:"REGIONAL",color:"#6B7280",bg:"#6B728015"},
-      "remote":{text:"REMOTE",color:"#7c3aed",bg:"#7c3aed15"}
+      "remote":{text:"REMOTE",color:"#1E3A8A",bg:"#1E3A8A15"}
     }[b]||null);
     // Band priority: closer = better, used for tiebreaking in Big Names sort
     const bandOrder={"in-town":0,"nearby":1,"metro":2,"regional":3,"remote":4};
@@ -3481,7 +3451,7 @@ function App(){
                   <p style={{color:"#4A5568",fontSize:13,marginTop:4}}>{ans.major} · {ans.gpa} GPA · {ans.gradYear}{ans.type&&ans.type!=="Any"?` · ${ans.type}`:""}</p>
                 </div>
                 <div style={{display:"flex",gap:8,flexShrink:0,flexWrap:"wrap",justifyContent:"flex-end"}}>
-                  <button onClick={()=>setShowReview(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"10px 18px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,whiteSpace:"nowrap",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Edit answers</button>
+                  <button onClick={()=>setShowReview(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"10px 18px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,whiteSpace:"nowrap",boxShadow:"none"}}>Edit answers</button>
                   <button onClick={calcResults} style={{background:"#FBFBFC",border:`1.5px solid ${GL}`,color:"#060A2C",padding:"10px 18px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,whiteSpace:"nowrap"}}>↻ Refresh</button>
                   <button onClick={()=>{setEditStep(null);setShowReview(false);setStep(0);setSearchQ("");setPage("quiz");window.scrollTo(0,0);}} style={{background:"#fff",border:`1.5px solid #E2E8F0`,color:"#4A5568",padding:"10px 18px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,whiteSpace:"nowrap"}}>↺ Redo quiz</button>
                 </div>
@@ -3527,13 +3497,13 @@ function App(){
                 // Sparse-results: actionable
                 // (sparse note removed: the search widens to neighboring states automatically and says so below)
                 // Show expansion note when we auto-expanded the radius
-                if(metaRef.current?.radiusExpanded)lines.push({icon:"",text:<>Not enough openings in <strong>{metaRef.current.studentState||"your state"}</strong>, so we widened the search to <strong>{metaRef.current.expansionLabel}</strong>. Every listing shown is a real opening — check the location before applying.</>});
+                if(metaRef.current?.radiusExpanded)lines.push({icon:"",text:<>Not enough openings in <strong>{metaRef.current.studentState||"your state"}</strong>, so we widened the search to <strong>{metaRef.current.expansionLabel}</strong>. Every listing shown is a real opening, check the location before applying.</>});
                 // Resume nudge
                 if(!hasResume&&!hideResumeNudge)lines.push({icon:"",text:<><strong>Add your resume</strong> to auto-fill applications. <button onClick={()=>setPage("profile")} style={{background:"none",border:"none",color:GD,fontWeight:700,cursor:"pointer",fontFamily:"var(--font)",fontSize:12.5,textDecoration:"underline",padding:0}}>Add now</button></>});
                 // Timing
                 if(tt)lines.push({icon:late?"":"",text:timingNote(ans.targetTerm)});
                 if(exp.label)lines.push({icon:"",text:exp.label});
-                if(exc.length>0)lines.push({icon:"",text:<>Your standout leadership — <strong>{exc.map(e=>`${e.role} (${e.activity})`).join(", ")}</strong> — is exactly what recruiters look for. Make sure it's front and center on your resume.</>});
+                if(exc.length>0)lines.push({icon:"",text:<>Your standout leadership, <strong>{exc.map(e=>`${e.role} (${e.activity})`).join(", ")}</strong>, is exactly what recruiters look for. Make sure it's front and center on your resume.</>});
                 if(lines.length===0)return null;
 
                 return (
@@ -3592,27 +3562,27 @@ function App(){
                 const hasResume=(ans.resume||"").length>80||(profile.resumes||[]).filter(r=>r.text).length>0;
                 if(hasResume)return null;
                 return(
-                  <div style={{background:`#060A2C`,borderRadius:var_rxl,padding:"1.25rem 1.5rem",marginBottom:18,display:"flex",gap:14,alignItems:"center",flexWrap:"wrap",boxShadow:"0 6px 24px rgba(10,22,40,0.2)"}}>
+                  <div style={{background:`#060A2C`,borderRadius:var_rxl,padding:"1.25rem 1.5rem",marginBottom:18,display:"flex",gap:14,alignItems:"center",flexWrap:"wrap",boxShadow:"none"}}>
                     <div style={{flex:1,minWidth:220}}>
                       <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:5}}>
                         <span style={{fontSize:20}}></span>
                         <p style={{fontWeight:700,fontSize:15,color:"#fff",letterSpacing:"-0.3px"}}>No resume yet? Build one in 30 seconds.</p>
                       </div>
-                      <p style={{fontSize:13,color:"#5E6A80",lineHeight:1.5}}>Beat the Pile generates a starter resume from your quiz answers — your major, activities, skills, all filled in. Edit it, then use it on every application.</p>
+                      <p style={{fontSize:13,color:"#5E6A80",lineHeight:1.5}}>Beat the Pile generates a starter resume from your quiz answers, your major, activities, skills, all filled in. Edit it, then use it on every application.</p>
                     </div>
-                    <button onClick={()=>setPage("resumebuilder")} style={{flexShrink:0,background:`${G}`,border:"none",color:"#fff",padding:"12px 20px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,whiteSpace:"nowrap",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Build my resume ↗</button>
+                    <button onClick={()=>setPage("resumebuilder")} style={{flexShrink:0,background:`${G}`,border:"none",color:"#fff",padding:"12px 20px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,whiteSpace:"nowrap",boxShadow:"none"}}>Build my resume ↗</button>
                   </div>
                 );
               })()}
 
               {/* TOP PICKS — highlighted best matches worth your energy first */}
               {topPicks.length>0&&(
-                <div style={{background:`#fff`,border:`1.5px solid ${G}`,borderRadius:var_rxl,padding:"1.25rem 1.4rem",marginBottom:18,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
+                <div style={{background:`#fff`,border:`1.5px solid ${G}`,borderRadius:var_rxl,padding:"1.25rem 1.4rem",marginBottom:18,boxShadow:"none"}}>
                   <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
                     <span style={{fontSize:18}}></span>
                     <h3 style={{fontWeight:700,fontSize:17,color:"#060A2C",letterSpacing:"-0.4px"}}>Top picks for you</h3>
                   </div>
-                  <p style={{fontSize:12.5,color:"#4A5568",marginBottom:12,lineHeight:1.5}}>Of all your matches, these are the strongest realistic shots — where your time is best spent first.</p>
+                  <p style={{fontSize:12.5,color:"#4A5568",marginBottom:12,lineHeight:1.5}}>Of all your matches, these are the strongest realistic shots, where your time is best spent first.</p>
                   <div style={{display:"flex",flexDirection:"column",gap:8}}>
                     {topPicks.map((c,i)=>(
                       <div key={i} style={{display:"flex",alignItems:"center",gap:12,background:"#fff",border:`1px solid ${GM}`,borderRadius:var_rl,padding:"10px 14px"}}>
@@ -3644,7 +3614,7 @@ function App(){
                     ))}
                   </div>
                 </div>
-                {sortBy==="firms"&&<p style={{fontSize:11.5,color:"#6B7280",marginTop:6,textAlign:"right"}}>Recognized brand names first — harder to get, but worth having on your resume.</p>}
+                {sortBy==="firms"&&<p style={{fontSize:11.5,color:"#6B7280",marginTop:6,textAlign:"right"}}>Recognized brand names first, harder to get, but worth having on your resume.</p>}
               </div>
 
               {/* Free cards — original front design, flips to company intel on back */}
@@ -3674,7 +3644,7 @@ function App(){
                       <div style={cardStyle}>
 
                         {/* ── FRONT — original full card ── */}
-                        <div role="button" tabIndex={0} onKeyDown={e=>{if(e.target===e.currentTarget&&(e.key==="Enter"||e.key===" ")){e.preventDefault();setExpandedCard(i);fetchCardIntel(c);}}} onClick={()=>{setExpandedCard(i);fetchCardIntel(c);}} style={{...faceBase,background:"#fff",border:"1px solid #E3E7ED",padding:"1.5rem",display:"flex",flexDirection:"column",gap:"0.75rem",boxShadow:"0 1px 2px rgba(6,10,44,.06)",cursor:"pointer",overflowY:"auto"}}>
+                        <div role="button" tabIndex={0} onKeyDown={e=>{if(e.target===e.currentTarget&&(e.key==="Enter"||e.key===" ")){e.preventDefault();setExpandedCard(i);fetchCardIntel(c);}}} onClick={()=>{setExpandedCard(i);fetchCardIntel(c);}} style={{...faceBase,background:"#fff",border:"1px solid #E3E7ED",padding:"1.5rem",display:"flex",flexDirection:"column",gap:"0.75rem",boxShadow:"none",cursor:"pointer",overflowY:"auto"}}>
                           {/* Header */}
                           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
                             <div style={{flex:1,minWidth:0,paddingRight:12}}>
@@ -3732,9 +3702,9 @@ function App(){
                           <p style={{fontSize:10.5,color:"#C3D1D8",textAlign:"center",marginTop:"auto",letterSpacing:"0.3px"}}>tap anywhere to see company info →</p>
                           {/* Actions — stopPropagation so clicks on buttons don't flip */}
                           <div style={{display:"flex",flexDirection:"column",gap:6}} onClick={e=>e.stopPropagation()}>
-                            <button onClick={()=>openApply(c)} style={{background:`${G}`,color:"#fff",padding:"13px 8px",borderRadius:var_r,fontSize:14.5,fontWeight:700,border:"none",cursor:"pointer",fontFamily:"var(--font)",textAlign:"center",width:"100%",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Apply now ↗</button>
+                            <button onClick={()=>openApply(c)} style={{background:`${G}`,color:"#fff",padding:"13px 8px",borderRadius:var_r,fontSize:14.5,fontWeight:700,border:"none",cursor:"pointer",fontFamily:"var(--font)",textAlign:"center",width:"100%",boxShadow:"none"}}>Apply now ↗</button>
                             <div style={{display:"flex",gap:6}}>
-                              <button onClick={()=>{toggleSaveJob(c);analytics.track(saved?"job_unsaved":"job_saved",{company:c.name});}} style={{flex:1,background:saved?"#F5F3FF":"#fff",border:`1.5px solid ${saved?"#7C3AED":"#E2E8F0"}`,color:saved?"#7C3AED":"#6B7280",padding:"9px 13px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>{saved?"Saved":"Save"}</button>
+                              <button onClick={()=>{toggleSaveJob(c);analytics.track(saved?"job_unsaved":"job_saved",{company:c.name});}} style={{flex:1,background:saved?"#EFF3FB":"#fff",border:`1.5px solid ${saved?"#1E3A8A":"#E2E8F0"}`,color:saved?"#1E3A8A":"#6B7280",padding:"9px 13px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>{saved?"Saved":"Save"}</button>
                               <button onClick={()=>track(c)} style={{flex:1,background:isTracked?GL:"#fff",border:`1.5px solid ${isTracked?G:"#E2E8F0"}`,color:isTracked?GD:"#6B7280",padding:"9px 13px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>{isTracked?"✓ Tracked":"+ Track"}</button>
                             </div>
                           </div>
@@ -3794,10 +3764,10 @@ function App(){
                               /* Small company — no job posting, contact directly */
                               <div>
                                 <p style={{fontSize:12,fontWeight:600,color:G,marginBottom:6}}>Contact directly</p>
-                                <p style={{fontSize:11.5,color:"#94A3B8",marginBottom:8,lineHeight:1.5}}>This company doesn't post on job boards — reach out directly. Small companies hire this way all the time.</p>
+                                <p style={{fontSize:11.5,color:"#94A3B8",marginBottom:8,lineHeight:1.5}}>This company doesn't post on job boards, reach out directly. Small companies hire this way all the time.</p>
                                 {c.phone&&<p style={{fontSize:12,color:"#CBD5E1",marginBottom:8}}>{c.phone}</p>}
                                 <button onClick={()=>{
-                                  const subject=encodeURIComponent(`Internship Inquiry — ${c.role||"Internship"}`);
+                                  const subject=encodeURIComponent(`Internship Inquiry, ${c.role||"Internship"}`);
                                   const body=encodeURIComponent(`Hi,
 
 My name is [Your Name] and I'm a [Year] student studying ${ans.major||"my field"} at [Your University]. I came across ${c.name} and was impressed by your work in ${c.industry||"this field"}.
@@ -3821,7 +3791,7 @@ Thank you for your time,
                             <div>
                             <p style={{fontSize:12,fontWeight:600,color:"#475569",marginBottom:6}}>Find this role on</p>
                             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:5}}>
-                              {isVerified&&<a href={verified.applyUrl} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)} style={{gridColumn:"1/-1",display:"flex",alignItems:"center",justifyContent:"center",gap:5,background:`${G}`,color:"#fff",padding:"11px",borderRadius:var_r,fontWeight:700,fontSize:13.5,textDecoration:"none",marginBottom:2}}>✓ Direct apply — live posting ↗</a>}
+                              {isVerified&&<a href={verified.applyUrl} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)} style={{gridColumn:"1/-1",display:"flex",alignItems:"center",justifyContent:"center",gap:5,background:`${G}`,color:"#fff",padding:"11px",borderRadius:var_r,fontWeight:700,fontSize:13.5,textDecoration:"none",marginBottom:2}}>✓ Direct apply, live posting ↗</a>}
                               {(()=>{
                               const isNat=c.tier==="national"||isLikelyNational(c);
                               const btn=(href,label,style)=>href?<a href={href} target="_blank" rel="noopener noreferrer" onClick={()=>track(c)} style={{display:"flex",alignItems:"center",justifyContent:"center",gap:5,padding:"9px 8px",borderRadius:var_r,fontWeight:700,fontSize:12,textDecoration:"none",...style}}>{label}</a>:null;
@@ -3858,7 +3828,7 @@ Thank you for your time,
               </div>
 
               <p style={{fontSize:12,color:"#6B7280",lineHeight:1.55,textAlign:"center",maxWidth:560,margin:"20px auto 0"}}>
-                These are estimates based on your profile, company fit, and application timing — not a guarantee or an offer. We'd rather show you a low honest number than a high false one.
+                These are estimates based on your profile, company fit, and application timing, not a guarantee or an offer. We'd rather show you a low honest number than a high false one.
               </p>
             </>
           )}
@@ -3878,7 +3848,7 @@ Thank you for your time,
           <button onClick={()=>setPage(results.length>0?"results":"landing")} style={{background:"transparent",border:"none",color:GD,padding:0,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:600,marginBottom:14}}>← {results.length>0?"Back to results":"Back to home"}</button>
           <p style={{fontSize:12,fontWeight:600,color:G,marginBottom:6}}>Resume builder</p>
           <h1 style={{fontSize:30,fontWeight:700,letterSpacing:"-1px",color:"#060A2C",marginBottom:10}}>Let's build your starter resume.</h1>
-          <p style={{color:"#4A5568",fontSize:14.5,lineHeight:1.55,marginBottom:22}}>We'll use your quiz answers to build the structure with your real info filled in. There'll be <strong>[bracketed placeholders]</strong> where you need to add specifics yourself — like bullets describing what you did in each activity. Honest start, not a finished resume.</p>
+          <p style={{color:"#4A5568",fontSize:14.5,lineHeight:1.55,marginBottom:22}}>We'll use your quiz answers to build the structure with your real info filled in. There'll be <strong>[bracketed placeholders]</strong> where you need to add specifics yourself, like bullets describing what you did in each activity. Honest start, not a finished resume.</p>
 
           {/* Initial state — show preview of what we'll use, then a Generate button */}
           {!builderState.text&&!builderState.loading&&(
@@ -3901,7 +3871,7 @@ Thank you for your time,
               <button onClick={()=>{setStep(0);setPage("quiz");window.scrollTo(0,0);}} style={{background:G,border:"none",color:"#fff",padding:"10px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700}}>Take the quiz →</button>
             </div>)}
           {!builderState.text&&!builderState.loading&&(
-            <button onClick={buildStarterResume} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"15px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
+            <button onClick={buildStarterResume} style={{width:"100%",background:`${G}`,border:"none",color:"#fff",padding:"15px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"none"}}>
               Build my starter resume
             </button>
           )}
@@ -3921,7 +3891,7 @@ Thank you for your time,
             <div>
               <div style={{background:"#FEF7E6",border:`1px solid #F4D77E`,borderRadius:var_rl,padding:"12px 14px",marginBottom:14,display:"flex",gap:9,alignItems:"flex-start"}}>
                 <span style={{fontSize:14,flexShrink:0}}></span>
-                <p style={{fontSize:12.5,lineHeight:1.5,color:"#4A5568"}}><strong>This is a starting structure — not a finished resume.</strong> Replace every <code style={{background:"#fff",padding:"1px 5px",borderRadius:3,fontSize:11.5,color:CR}}>[bracketed]</code> placeholder with your real information before sending it to employers. The fewer brackets, the stronger your resume.</p>
+                <p style={{fontSize:12.5,lineHeight:1.5,color:"#4A5568"}}><strong>This is a starting structure, not a finished resume.</strong> Replace every <code style={{background:"#fff",padding:"1px 5px",borderRadius:3,fontSize:11.5,color:CR}}>[bracketed]</code> placeholder with your real information before sending it to employers. The fewer brackets, the stronger your resume.</p>
               </div>
 
               <textarea value={builderState.text} onChange={e=>setBuilderState(s=>({...s,text:e.target.value}))} spellCheck="true"
@@ -3945,7 +3915,7 @@ Thank you for your time,
                   {isPro?"⬇ Download PDF":<>⬇ Download PDF <span style={{fontSize:10,marginLeft:4}}>Pro</span></>}
                 </button>
                 <button onClick={()=>{saveBuilderResumeToProfile();setPage("results");}}
-                  style={{flex:"1 1 100%",background:`${G}`,border:"none",color:"#fff",padding:"13px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Save to my profile & use for matches</button>
+                  style={{flex:"1 1 100%",background:`${G}`,border:"none",color:"#fff",padding:"13px 16px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,boxShadow:"none"}}>Save to my profile & use for matches</button>
               </div>
               <p style={{fontSize:11.5,color:"#6B7280",textAlign:"center",marginTop:10,lineHeight:1.5}}>Saving adds this to your saved resumes so it personalizes your match reasoning. You can edit it any time from Profile.</p>
             </div>
@@ -3980,7 +3950,7 @@ Thank you for your time,
         <div style={{maxWidth:640,margin:"0 auto",padding:"2.5rem 1.5rem"}}>
           <p style={{fontSize:12,color:"#6B7280",fontWeight:600}}>Your Profile</p>
           <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:700,letterSpacing:"-1px",marginTop:"0.3rem",marginBottom:"0.4rem",color:"#060A2C"}}>Fill it once. Apply faster everywhere.</h2>
-          <p style={{color:"#4A5568",fontSize:14,lineHeight:1.6,marginBottom:"1.5rem"}}>Save your info and Beat the Pile auto-fills a copy-paste card and a tailored cover letter on every application — so you stop retyping the same fields on fifty different sites.</p>
+          <p style={{color:"#4A5568",fontSize:14,lineHeight:1.6,marginBottom:"1.5rem"}}>Save your info and Beat the Pile auto-fills a copy-paste card and a tailored cover letter on every application, so you stop retyping the same fields on fifty different sites.</p>
 
           {/* Account section — sign in / sign out + cross-device sync status */}
           <div style={{background:clerkUser?"#F0FDF4":"#F8FAFC",border:`1px solid ${clerkUser?"#86EFAC":"#E2E8F0"}`,borderRadius:var_rl,padding:"14px 16px",marginBottom:20,display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
@@ -3992,7 +3962,7 @@ Thank you for your time,
                   {syncStatus==="loading"?"⟳ Loading your data…":
                    syncStatus==="saving"?"⟳ Saving changes…":
                    syncStatus==="synced"?"✓ All changes synced across your devices":
-                   syncStatus==="error"?"Sync had a hiccup — your changes are saved locally; we'll retry":
+                   syncStatus==="error"?"Sync had a hiccup, your changes are saved locally; we'll retry":
                    "Syncing your data…"}
                 </p>
               </>):(<>
@@ -4065,7 +4035,7 @@ Thank you for your time,
                     </label>
                     <button onClick={()=>deleteResume(r.id)} aria-label="Delete resume" style={{background:"#fff",border:"1.5px solid #E2E8F0",color:CR,width:34,height:34,borderRadius:var_r,cursor:"pointer",fontSize:15,flexShrink:0}}></button>
                   </div>
-                  <textarea value={r.text} onChange={e=>updateResume(r.id,"text",e.target.value)} placeholder="Paste this resume's text here — or use the Upload button above to import a PDF / Word file." style={{...inp,minHeight:90,resize:"vertical",marginTop:0}}/>
+                  <textarea value={r.text} onChange={e=>updateResume(r.id,"text",e.target.value)} placeholder="Paste this resume's text here, or use the Upload button above to import a PDF / Word file." style={{...inp,minHeight:90,resize:"vertical",marginTop:0}}/>
                 </div>
               ))}
               {resumeUploading&&<p style={{fontSize:12,color:GD,fontWeight:600,marginTop:4}}>Reading file…</p>}
@@ -4074,11 +4044,11 @@ Thank you for your time,
           </div>
 
           <div style={{display:"flex",gap:10,flexWrap:"wrap",alignItems:"center"}}>
-            <button onClick={saveProfile} style={{background:`${G}`,border:"none",color:"#fff",padding:"13px 28px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>{profileSaved?"✓ Saved":"Save profile"}</button>
+            <button onClick={saveProfile} style={{background:`${G}`,border:"none",color:"#fff",padding:"13px 28px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"none"}}>{profileSaved?"✓ Saved":"Save profile"}</button>
             <button onClick={clearProfile} style={{background:"#fff",border:"1.5px solid #E2E8F0",color:"#4A5568",padding:"13px 20px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:600}}>Clear my data</button>
             {profileReady()&&<span style={{fontSize:13,color:GD,fontWeight:700}}>Ready to auto-fill applications ✓</span>}
           </div>
-          <p style={{fontSize:11.5,color:"#6B7280",marginTop:16,lineHeight:1.5}}>Your profile is saved on this device only — we don't send it anywhere in this version. You can clear it anytime. (When accounts launch, this same info will sync securely to your account.)</p>
+          <p style={{fontSize:11.5,color:"#6B7280",marginTop:16,lineHeight:1.5}}>Your profile is saved on this device only, we don't send it anywhere in this version. You can clear it anytime. (When accounts launch, this same info will sync securely to your account.)</p>
         </div>
       </div>
     );
@@ -4106,7 +4076,7 @@ Thank you for your time,
         <div style={{maxWidth:680,margin:"0 auto",padding:"2rem 1.25rem 4rem"}}>
           <p style={{fontSize:12,color:"#6B7280",fontWeight:600,marginBottom:6}}>Community Wall</p>
           <h1 style={{fontSize:30,fontWeight:700,letterSpacing:"-0.8px",color:"#060A2C",marginBottom:8}}>You're not alone in this.</h1>
-          <p style={{color:"#4A5568",fontSize:14.5,lineHeight:1.55,marginBottom:22}}>A space for the wins, the frustrations, and the questions. Posts are checked by AI moderation, so keep it real but keep it kind. Post anonymously or with your name — your choice on every post.</p>
+          <p style={{color:"#4A5568",fontSize:14.5,lineHeight:1.55,marginBottom:22}}>A space for the wins, the frustrations, and the questions. Posts are checked by AI moderation, so keep it real but keep it kind. Post anonymously or with your name, your choice on every post.</p>
 
           {/* Testimonials carousel — same data as the landing page, compact horizontal scroll here */}
           <div style={{marginBottom:26}}>
@@ -4188,10 +4158,10 @@ Thank you for your time,
                 </div>
                 <div style={{background:"#fff",border:`1px solid #E2E8F0`,borderRadius:var_r,padding:"10px 13px"}}>
                   <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:4}}>Advice</p>
-                  <p style={{fontSize:13,color:"#4A5568",fontStyle:"italic",lineHeight:1.5}}>"If you're stressing about the technical interview — practice OUT LOUD, not just in your head."</p>
+                  <p style={{fontSize:13,color:"#4A5568",fontStyle:"italic",lineHeight:1.5}}>"If you're stressing about the technical interview, practice OUT LOUD, not just in your head."</p>
                 </div>
               </div>
-              <p style={{fontSize:11,color:"#6B7280",textAlign:"center",marginTop:16,fontStyle:"italic"}}>These are examples of post types — real posts from real students will appear here.</p>
+              <p style={{fontSize:11,color:"#6B7280",textAlign:"center",marginTop:16,fontStyle:"italic"}}>These are examples of post types, real posts from real students will appear here.</p>
             </div>
           ):(
             <div style={{display:"flex",flexDirection:"column",gap:10}}>
@@ -4273,7 +4243,7 @@ Thank you for your time,
             </div>
           )}
 
-          <p style={{fontSize:11,color:"#6B7280",textAlign:"center",marginTop:32,lineHeight:1.5}}>All posts are moderated by AI for harmful content. You can post anonymously or with a name — your choice per post. Be respectful — this is a space for honest conversation.</p>
+          <p style={{fontSize:11,color:"#6B7280",textAlign:"center",marginTop:32,lineHeight:1.5}}>All posts are moderated by AI for harmful content. You can post anonymously or with a name, your choice per post. Be respectful, this is a space for honest conversation.</p>
         </div>
       </div>
     );
@@ -4290,7 +4260,7 @@ Thank you for your time,
         <div style={{maxWidth:680,margin:"0 auto",padding:"2.5rem 1.5rem"}}>
           <p style={{fontSize:12,color:"#6B7280",fontWeight:600}}>Tips & Resources</p>
           <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:700,letterSpacing:"-1px",marginTop:"0.3rem",marginBottom:"0.5rem",color:"#060A2C"}}>How to actually land the internship.</h2>
-          <p style={{color:"#4A5568",fontSize:14.5,lineHeight:1.6,marginBottom:"1.5rem"}}>Honest, no-fluff advice on timing, applications, and standing out — the stuff that actually moves the needle, in one place.</p>
+          <p style={{color:"#4A5568",fontSize:14.5,lineHeight:1.6,marginBottom:"1.5rem"}}>Honest, no-fluff advice on timing, applications, and standing out, the stuff that actually moves the needle, in one place.</p>
 
           {/* Category filter */}
           <div style={{display:"flex",gap:7,flexWrap:"wrap",marginBottom:"1.5rem"}}>
@@ -4302,7 +4272,7 @@ Thank you for your time,
           {/* Tips */}
           <div style={{display:"flex",flexDirection:"column",gap:12}}>
             {shown.map((t,i)=>(
-              <div key={i} className="card-hover" style={{background:"#fff",border:`1px solid ${GL}`,borderLeft:`4px solid ${G}`,borderRadius:var_rl,padding:"1.25rem 1.4rem",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>
+              <div key={i} className="card-hover" style={{background:"#fff",border:`1px solid ${GL}`,borderLeft:`4px solid ${G}`,borderRadius:var_rl,padding:"1.25rem 1.4rem",boxShadow:"none"}}>
                 <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
                   
                   <div>
@@ -4319,10 +4289,10 @@ Thank you for your time,
           <div style={{background:`${GL}`,border:`1px solid ${G}25`,borderRadius:var_rl,padding:"1.5rem",marginTop:18,textAlign:"center"}}>
             <p style={{fontWeight:700,fontSize:17,color:"#060A2C",marginBottom:6,letterSpacing:"-0.3px"}}>Ready to put this into action?</p>
             <p style={{fontSize:13.5,color:"#4A5568",lineHeight:1.55,marginBottom:14}}>Get your honest odds and a tailored list of internships to apply to.</p>
-            <button onClick={()=>{setStep(0);setEditStep(null);setPage("quiz");window.scrollTo(0,0);}} style={{background:`${G}`,border:"none",color:"#fff",padding:"12px 28px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Find my matches →</button>
+            <button onClick={()=>{setStep(0);setEditStep(null);setPage("quiz");window.scrollTo(0,0);}} style={{background:`${G}`,border:"none",color:"#fff",padding:"12px 28px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"none"}}>Find my matches →</button>
           </div>
 
-          <p style={{fontSize:11.5,color:"#6B7280",lineHeight:1.5,textAlign:"center",marginTop:16}}>More tips are added over time. Have one worth sharing? We'd love to hear it — reach out anytime.</p>
+          <p style={{fontSize:11.5,color:"#6B7280",lineHeight:1.5,textAlign:"center",marginTop:16}}>More tips are added over time. Have one worth sharing? We'd love to hear it, reach out anytime.</p>
         </div>
       </div>
     );
@@ -4390,7 +4360,7 @@ Thank you for your time,
                 </div>
               </div>
               <button onClick={scoreApplication} disabled={scoreLoading||(!scoreResume.trim()&&!scoreJD.trim())}
-                style={{width:"100%",background:scoreLoading||(!scoreResume.trim()&&!scoreJD.trim())?"#E2E8F0":`${G}`,border:"none",color:scoreLoading||(!scoreResume.trim()&&!scoreJD.trim())?"#6B7280":"#fff",padding:"15px",borderRadius:var_rl,cursor:scoreLoading||(!scoreResume.trim()&&!scoreJD.trim())?"not-allowed":"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:scoreLoading||(!scoreResume.trim()&&!scoreJD.trim())?"none":`0 4px 16px ${G}40`}}>
+                style={{width:"100%",background:scoreLoading||(!scoreResume.trim()&&!scoreJD.trim())?"#E2E8F0":`${G}`,border:"none",color:scoreLoading||(!scoreResume.trim()&&!scoreJD.trim())?"#6B7280":"#fff",padding:"15px",borderRadius:var_rl,cursor:scoreLoading||(!scoreResume.trim()&&!scoreJD.trim())?"not-allowed":"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700,boxShadow:"none"}}>
                 {scoreLoading?"Scoring your application...":"Score this application →"}
               </button>
               {scoreError&&<p style={{color:"#E11D48",fontSize:13,marginTop:10,textAlign:"center"}}>{scoreError}</p>}
@@ -4406,7 +4376,7 @@ Thank you for your time,
 
               <div style={{padding:"20px",background:"#fff",border:`1px solid #E2E8F0`,borderRadius:var_rl}}>
                 <p style={{fontSize:12,fontWeight:600,color:"#4A5568",marginBottom:6}}>Screener round</p>
-                <p style={{fontSize:13.5,color:"#6B7280",marginBottom:14,lineHeight:1.5}}>Many employers' application software filters before a person looks. This is our AI's estimate of how your application might do — not the employer's real score.</p>
+                <p style={{fontSize:13.5,color:"#6B7280",marginBottom:14,lineHeight:1.5}}>Many employers' application software filters before a person looks. This is our AI's estimate of how your application might do, not the employer's real score.</p>
                 <ScoreBar label="Score" value={scoreResult.screenerScore} verdict={scoreResult.screenerVerdict}/>
                 <FactorList factors={scoreResult.screenerFactors}/>
               </div>
@@ -4420,7 +4390,7 @@ Thank you for your time,
 
               {scoreResult.fixes&&scoreResult.fixes.length>0&&(
                 <div style={{padding:"20px",background:"#FEF7E6",border:`1px solid #F4D77E`,borderRadius:var_rl}}>
-                  <p style={{fontSize:13,fontWeight:700,color:"#060A2C",marginBottom:12}}>Top fixes — do these before you apply</p>
+                  <p style={{fontSize:13,fontWeight:700,color:"#060A2C",marginBottom:12}}>Top fixes, do these before you apply</p>
                   <ol style={{margin:0,paddingLeft:18,display:"flex",flexDirection:"column",gap:8}}>
                     {scoreResult.fixes.map((f,i)=>(
                       <li key={i} style={{fontSize:13,color:"#060A2C",lineHeight:1.5}}>{f}</li>
@@ -4497,7 +4467,7 @@ Thank you for your time,
             <h2 style={{fontSize:"clamp(1.6rem,3.5vw,2.3rem)",fontWeight:700,letterSpacing:"-1px",marginTop:"0.3rem",color:"#060A2C"}}>Your applications.</h2>
           </div>
           {isPro?<span style={{background:GL,color:GD,border:`1px solid ${GM}`,padding:"6px 16px",borderRadius:99,fontSize:13,fontWeight:700}}>Pro Active</span>
-          :<button onClick={()=>setShowProModal(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"9px 20px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Upgrade to Pro</button>}
+          :<button onClick={()=>setShowProModal(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"9px 20px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,boxShadow:"none"}}>Upgrade to Pro</button>}
         </div>
         {clerkUser?(
           <a href="/season/" style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:10,background:"#fff",border:"1px solid #E3E7ED",borderRadius:var_rl,padding:"12px 16px",marginBottom:14,textDecoration:"none",color:"#060A2C"}}>
@@ -4526,13 +4496,13 @@ Thank you for your time,
           const hasSaved=savedJobs.length>0;
           let card=null;
           if(noApps&&!hasSaved){
-            card={icon:"",color:G,bg:GL,title:"Start by finding your matches",body:"You haven't tracked any applications yet. Take the quiz to get your personalized company list — then come back here to track everything in one place.",cta:"Find my matches →",action:()=>{setStep(0);setPage("quiz");}};
+            card={icon:"",color:G,bg:GL,title:"Start by finding your matches",body:"You haven't tracked any applications yet. Take the quiz to get your personalized company list, then come back here to track everything in one place.",cta:"Find my matches →",action:()=>{setStep(0);setPage("quiz");}};
           } else if(noApps&&hasSaved){
-            card={icon:"",color:G,bg:GL,title:`You have ${savedJobs.length} saved job${savedJobs.length>1?"s":""} — ready to apply?`,body:"You've bookmarked companies from your results. The best time to apply is now — openings fill fast.",cta:"See saved jobs ↓",action:()=>{document.getElementById("saved-jobs-section")?.scrollIntoView({behavior:"smooth"});}};
+            card={icon:"",color:G,bg:GL,title:`You have ${savedJobs.length} saved job${savedJobs.length>1?"s":""}, ready to apply?`,body:"You've bookmarked companies from your results. The best time to apply is now, openings fill fast.",cta:"See saved jobs ↓",action:()=>{document.getElementById("saved-jobs-section")?.scrollIntoView({behavior:"smooth"});}};
           } else if(interviews.length>0){
             card={icon:"",color:AM,bg:AL,title:`You have ${interviews.length} interview${interviews.length>1?"s":""} coming up`,body:"Use the Prep button on your interview entry to get tailored questions and coaching.",cta:"Go to tracker ↓",action:()=>{document.getElementById("tracker-section")?.scrollIntoView({behavior:"smooth"});}};
           } else if(tracked.length>0&&tracked.length<5){
-            card={icon:"",color:G,bg:GL,title:"Apply to more — volume matters",body:"Internship searches are a numbers game — most students need many applications to land a few interviews. Your results page has more matches waiting.",cta:"See all my matches →",action:()=>setPage("results")};
+            card={icon:"",color:G,bg:GL,title:"Apply to more, volume matters",body:"Internship searches are a numbers game, most students need many applications to land a few interviews. Your results page has more matches waiting.",cta:"See all my matches →",action:()=>setPage("results")};
           }
           if(!card)return null;
           return(
@@ -4558,13 +4528,13 @@ Thank you for your time,
 
         {/* FEATURE 6: Saved Jobs bucket */}
         {savedJobs.length>0&&(
-          <div id="saved-jobs-section" style={{background:"#F5F3FF",border:`1.5px solid #7C3AED25`,borderRadius:var_rl,overflow:"hidden",marginBottom:"1rem"}}>
+          <div id="saved-jobs-section" style={{background:"#EFF3FB",border:`1.5px solid #1E3A8A25`,borderRadius:var_rl,overflow:"hidden",marginBottom:"1rem"}}>
             <div style={{padding:"1rem 1.25rem",borderBottom:"1px solid #E9D5FF",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
               <div>
-                <h3 style={{fontWeight:700,fontSize:15,color:"#060A2C"}}>Saved — haven't applied yet</h3>
-                <p style={{fontSize:12,color:"#7C3AED",marginTop:2}}>{savedJobs.length} job{savedJobs.length>1?"s":""} saved from your matches{clerkUser?" · also in My Season → Saved":" on this device"} · <a href="/jobs/?view=saved" style={{color:"#7C3AED",fontWeight:700}}>Jobs-page saves →</a></p>
+                <h3 style={{fontWeight:700,fontSize:15,color:"#060A2C"}}>Saved, haven't applied yet</h3>
+                <p style={{fontSize:12,color:"#1E3A8A",marginTop:2}}>{savedJobs.length} job{savedJobs.length>1?"s":""} saved from your matches{clerkUser?" · also in My Season → Saved":" on this device"} · <a href="/jobs/?view=saved" style={{color:"#1E3A8A",fontWeight:700}}>Jobs-page saves →</a></p>
               </div>
-              <button onClick={()=>setPage("results")} style={{background:"#7C3AED",color:"#fff",border:"none",padding:"6px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>View results →</button>
+              <button onClick={()=>setPage("results")} style={{background:"#1E3A8A",color:"#fff",border:"none",padding:"6px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700}}>View results →</button>
             </div>
             {savedJobs.map((j,i)=>(
               <div key={i} style={{padding:"0.85rem 1.25rem",borderBottom:i<savedJobs.length-1?"1px solid #E9D5FF":"none",display:"flex",alignItems:"center",gap:12}}>
@@ -4572,7 +4542,7 @@ Thank you for your time,
                   <p style={{fontWeight:700,fontSize:14,color:"#060A2C",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{j.name}</p>
                   <p style={{fontSize:12.5,color:"#6B7280",marginTop:2}}>{j.role} · {j.location}</p>
                 </div>
-                <span style={{fontSize:12,fontWeight:700,color:"#7C3AED",background:"#EDE9FE",padding:"3px 10px",borderRadius:99,flexShrink:0}}>{j.match}% match</span>
+                <span style={{fontSize:12,fontWeight:700,color:"#1E3A8A",background:"#E3E9F6",padding:"3px 10px",borderRadius:99,flexShrink:0}}>{j.match}% match</span>
                 <button onClick={()=>{
                   const today=new Date().toISOString().split("T")[0];
                   setTracked(p=>[...p,{company:j.name,role:j.role,date:today,status:"Applied"}]);
@@ -4595,13 +4565,13 @@ Thank you for your time,
             <h3 style={{fontWeight:700,fontSize:15,color:"#060A2C"}}>Application Tracker</h3>
             <div style={{display:"flex",gap:8}}>
               <button onClick={exportTrackerCsv} disabled={tracked.length===0} title={isPro?"Export as CSV":"CSV export is a Pro feature"} style={{background:"#fff",border:`1.5px solid ${GL}`,color:tracked.length===0?"#CBD5E0":GD,padding:"6px 14px",borderRadius:var_r,cursor:tracked.length===0?"not-allowed":"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,opacity:tracked.length===0?0.6:1}}>⤓ Export{!isPro&&" "}</button>
-              <button onClick={()=>setAddAppModal(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"6px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>+ Add Application</button>
+              <button onClick={()=>setAddAppModal(true)} style={{background:`${G}`,border:"none",color:"#fff",padding:"6px 14px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:13,fontWeight:700,boxShadow:"none"}}>+ Add Application</button>
             </div>
           </div>
 
           <div style={{display:"flex",gap:10,overflowX:"auto",paddingBottom:10,WebkitOverflowScrolling:"touch"}}>
             {[
-              {key:"Saved",    tint:"#7C3AED", empty:"Find a role you like? Drop it here."},
+              {key:"Saved",    tint:"#1E3A8A", empty:"Find a role you like? Drop it here."},
               {key:"Applied",  tint:G,         empty:"Applied somewhere? Track it."},
               {key:"Interview",tint:AM,        empty:"Got an interview? Move it over."},
               {key:"Offer",    tint:"#2563EB", empty:"Offers land here. You've got this."},
@@ -4635,7 +4605,7 @@ Thank you for your time,
                         <div key={i} draggable
                           onDragStart={e=>{setDragCompany(a.company);if(e.dataTransfer)e.dataTransfer.effectAllowed="move";}}
                           onDragEnd={()=>{setDragCompany(null);setDragOverStage(null);}}
-                          style={{background:"#fff",border:`1.5px solid ${GL}`,borderLeft:a.flag?`3px solid ${AM}`:"3px solid transparent",borderRadius:var_r,padding:"9px 10px",cursor:"grab",opacity:isDragging?0.5:1,transform:isDragging?"scale(1.02)":"none",boxShadow:isDragging?"0 10px 22px rgba(0,0,0,0.14)":"0 1px 2px rgba(0,0,0,0.04)",transition:"box-shadow 0.12s ease,transform 0.12s ease"}}>
+                          style={{background:"#fff",border:`1.5px solid ${GL}`,borderLeft:a.flag?`3px solid ${AM}`:"3px solid transparent",borderRadius:var_r,padding:"9px 10px",cursor:"grab",opacity:isDragging?0.5:1,transform:isDragging?"scale(1.02)":"none",boxShadow:"none",transition:"box-shadow 0.12s ease,transform 0.12s ease"}}>
                           <div style={{display:"flex",justifyContent:"space-between",gap:6,alignItems:"flex-start"}}>
                             <p style={{fontWeight:700,fontSize:13.5,color:"#060A2C",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap",minWidth:0}}>{a.company}</p>
                             <div style={{display:"flex",gap:3,flexShrink:0}}>
@@ -4648,7 +4618,7 @@ Thank you for your time,
                           {a.deadline&&<p style={{fontSize:10.5,fontWeight:700,color:dl<0?"#6B7280":dl<=2?CR:dl<=5?AM:GD,marginTop:2}}>{a.deadline}{dl!==null&&(dl<0?" (passed)":dl===0?" (today!)":` · ${dl}d`)}</p>}
 
                           {col.key==="Applied"&&fu.state!=="unknown"&&(
-                            <button onClick={()=>{setFollowUpModal(a);generateFollowUp(a);}} style={{marginTop:7,width:"100%",background:fu.state==="due"?`${G}`:"#fff",border:fu.state==="due"?"none":`1.5px solid ${G}`,color:fu.state==="due"?"#fff":GD,padding:"5px 8px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:11.5,fontWeight:700}}>{fu.state==="due"?"Follow up — due":fu.state==="done"?"Followed up ✓":"Draft follow-up"}</button>
+                            <button onClick={()=>{setFollowUpModal(a);generateFollowUp(a);}} style={{marginTop:7,width:"100%",background:fu.state==="due"?`${G}`:"#fff",border:fu.state==="due"?"none":`1.5px solid ${G}`,color:fu.state==="due"?"#fff":GD,padding:"5px 8px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:11.5,fontWeight:700}}>{fu.state==="due"?"Follow up, due":fu.state==="done"?"Followed up ✓":"Draft follow-up"}</button>
                           )}
                           {col.key==="Interview"&&(
                             <button onClick={()=>generateInterviewPrep(a)} style={{marginTop:7,width:"100%",background:`${AM}`,border:"none",color:"#fff",padding:"5px 8px",borderRadius:var_r,cursor:"pointer",fontFamily:"var(--font)",fontSize:11.5,fontWeight:700}}>Prep</button>
@@ -4659,14 +4629,14 @@ Thank you for your time,
                             {["Saved","Applied","Interview","Offer","Rejected"].map(s=><option key={s} value={s}>{s===col.key?`● ${s}`:`→ Move to ${s}`}</option>)}
                           </select>
 
-                          <button onClick={()=>setNotesOpen(p=>({...p,[a.company]:!isNoteOpen}))} style={{marginTop:6,background:"none",border:"none",color:noteText?"#7C3AED":"#6B7280",padding:0,cursor:"pointer",fontFamily:"var(--font)",fontSize:11,fontWeight:600}}>{isNoteOpen?"Hide details":(noteText?`Notes (${noteText.length})`:"+ Notes & deadline")}</button>
+                          <button onClick={()=>setNotesOpen(p=>({...p,[a.company]:!isNoteOpen}))} style={{marginTop:6,background:"none",border:"none",color:noteText?"#1E3A8A":"#6B7280",padding:0,cursor:"pointer",fontFamily:"var(--font)",fontSize:11,fontWeight:600}}>{isNoteOpen?"Hide details":(noteText?`Notes (${noteText.length})`:"+ Notes & deadline")}</button>
                           {isNoteOpen&&(
                             <div style={{marginTop:7}}>
                               <div style={{display:"flex",alignItems:"center",gap:5,marginBottom:6}}>
                                 <label style={{fontSize:10.5,color:"#6B7280",fontWeight:600}}>Deadline</label>
                                 <input type="date" value={a.deadline||""} onChange={e=>setTracked(p=>p.map((x,j)=>j===i?{...x,deadline:e.target.value}:x))} style={{padding:"2px 6px",border:"1.5px solid #E2E8F0",borderRadius:var_r,color:"#060A2C",background:"#FBFBFC",fontFamily:"var(--font)",cursor:"pointer"}}/>
                               </div>
-                              <textarea value={noteText} onChange={e=>setAppNotes(p=>({...p,[a.company]:e.target.value}))} placeholder="Recruiter name, portal link, screen notes…" style={{width:"100%",minHeight:54,padding:"7px 9px",borderRadius:var_r,border:`1.5px solid #7C3AED30`,background:"#FAF5FF",color:"#060A2C",fontFamily:"var(--font)",lineHeight:1.5,outline:"none",resize:"vertical"}}/>
+                              <textarea value={noteText} onChange={e=>setAppNotes(p=>({...p,[a.company]:e.target.value}))} placeholder="Recruiter name, portal link, screen notes…" style={{width:"100%",minHeight:54,padding:"7px 9px",borderRadius:var_r,border:`1.5px solid #1E3A8A30`,background:"#F4F6FB",color:"#060A2C",fontFamily:"var(--font)",lineHeight:1.5,outline:"none",resize:"vertical"}}/>
                             </div>
                           )}
                         </div>
@@ -4682,20 +4652,20 @@ Thank you for your time,
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:10}}>
             <h3 style={{fontWeight:700,fontSize:17,letterSpacing:"-0.4px",color:"#060A2C"}}>Smart follow-ups</h3>
           </div>
-          <p style={{color:"#4A5568",fontSize:14,lineHeight:1.6,marginBottom:14}}>Most students never follow up — and a short, polite one keeps you on the recruiter's radar. Beat the Pile tracks the timing for you and, when an application hits the 5-day mark, drafts a tailored follow-up email you send from your own inbox. You stay the sender; we handle the reminder and the words.</p>
+          <p style={{color:"#4A5568",fontSize:14,lineHeight:1.6,marginBottom:14}}>Most students never follow up, and a short, polite one keeps you on the recruiter's radar. Beat the Pile tracks the timing for you and, when an application hits the 5-day mark, drafts a tailored follow-up email you send from your own inbox. You stay the sender; we handle the reminder and the words.</p>
           <div style={{display:"flex",gap:14,flexWrap:"wrap",fontSize:12.5,color:GD,fontWeight:700}}>
-            <span>✓ Timed automatically</span><span>✓ Drafted for each role</span><span>✓ Sent by you, as you</span>
+            <span>Timed automatically</span><span>Drafted for each role</span><span>Sent by you, as you</span>
           </div>
           <div style={{background:"#fff",border:`1px solid ${GM}`,borderRadius:var_r,padding:"10px 12px",marginTop:14}}>
             <p style={{fontSize:12,fontWeight:600,color:GD,marginBottom:5}}>How reminders work</p>
-            <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.55}}>Reminders show <strong>inside Beat the Pile</strong> (the amber banner on your Dashboard and Results page + red badges on each due application). We don't send reminder emails yet, so check back every few days — or add each follow-up to your calendar from <a href="/season/" style={{color:GD}}>My Season</a>. <span style={{color:"#6B7280"}}>Email reminders are on the roadmap.</span></p>
+            <p style={{fontSize:12.5,color:"#4A5568",lineHeight:1.55}}>Reminders show <strong>inside Beat the Pile</strong> (the amber banner on your Dashboard and Results page + red badges on each due application). We don't send reminder emails yet, so check back every few days, or add each follow-up to your calendar from <a href="/season/" style={{color:GD}}>My Season</a>. <span style={{color:"#6B7280"}}>Email reminders are on the roadmap.</span></p>
           </div>
           {!isPro&&<p style={{fontSize:12,color:"#6B7280",marginTop:12,lineHeight:1.5}}>Free includes follow-up timing + drafts. Pro will add real email/text reminders so you don't have to check back manually.</p>}
         </div>
         {/* FEATURE 1: Interview Prep Modal */}
         {prepModal&&(
           <div style={{position:"fixed",inset:0,background:"rgba(10,22,40,0.65)",zIndex:500,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"1.5rem 1rem",backdropFilter:"blur(4px)",overflowY:"auto"}} onClick={()=>setPrepModal(null)}>
-            <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:var_rxl,padding:"2rem",maxWidth:580,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.25)",animation:"pop 0.25s ease",margin:"auto 0"}}>
+            <div onClick={e=>e.stopPropagation()} style={{background:"#fff",borderRadius:var_rxl,padding:"2rem",maxWidth:580,width:"100%",boxShadow:"none",animation:"pop 0.25s ease",margin:"auto 0"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
                 <div>
                   <p style={{fontSize:12,fontWeight:600,color:"#6B7280"}}>Interview Prep</p>
@@ -4725,7 +4695,7 @@ Thank you for your time,
                     </div>
                   ))}
                 </div>
-                <button onClick={()=>setPrepModal(null)} style={{width:"100%",marginTop:16,background:AM,border:"none",color:"#fff",padding:"13px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700}}>Got it — I'm ready </button>
+                <button onClick={()=>setPrepModal(null)} style={{width:"100%",marginTop:16,background:AM,border:"none",color:"#fff",padding:"13px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:15,fontWeight:700}}>Got it, I'm ready </button>
               </>)}
             </div>
           </div>
@@ -4733,7 +4703,7 @@ Thank you for your time,
         {/* ── Add Application modal — manual entry (not everything comes from matches) ── */}
         {addAppModal&&(
           <div style={{position:"fixed",inset:0,background:"rgba(10,22,40,0.65)",zIndex:500,display:"flex",alignItems:"flex-start",justifyContent:"center",padding:"1.5rem 1rem",backdropFilter:"blur(4px)",overflowY:"auto"}} onClick={()=>setAddAppModal(false)}>
-            <form onClick={e=>e.stopPropagation()} onSubmit={submitAddApp} style={{background:"#fff",borderRadius:var_rxl,padding:"1.75rem",maxWidth:420,width:"100%",boxShadow:"0 24px 80px rgba(0,0,0,0.25)",animation:"pop 0.25s ease",margin:"auto 0"}}>
+            <form onClick={e=>e.stopPropagation()} onSubmit={submitAddApp} style={{background:"#fff",borderRadius:var_rxl,padding:"1.75rem",maxWidth:420,width:"100%",boxShadow:"none",animation:"pop 0.25s ease",margin:"auto 0"}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:16}}>
                 <h3 style={{fontWeight:700,fontSize:19,color:"#060A2C",letterSpacing:"-0.4px"}}>Add Application</h3>
                 <button type="button" onClick={()=>setAddAppModal(false)} style={{background:"none",border:"none",fontSize:22,color:"#6B7280",cursor:"pointer",lineHeight:1}}>×</button>
@@ -4775,7 +4745,7 @@ Thank you for your time,
                 ))}
               </div>
             );})()}
-            <p style={{fontSize:11,color:"#6B7280",lineHeight:1.5}}>These counts are from <strong>this browser only</strong> — useful for testing that events fire. For real cross-user analytics, add Plausible or PostHog at the marked line in the analytics helper (one line). Remove this panel before public launch.</p>
+            <p style={{fontSize:11,color:"#6B7280",lineHeight:1.5}}>These counts are from <strong>this browser only</strong>, useful for testing that events fire. For real cross-user analytics, add Plausible or PostHog at the marked line in the analytics helper (one line). Remove this panel before public launch.</p>
           </div>
         </details>}
       </div>
@@ -4804,12 +4774,12 @@ class AppErrorBoundary extends React.Component {
   render(){
     if(!this.state.hasError) return this.props.children;
     return React.createElement('div',{style:{minHeight:"100vh",background:"#FBFBFC",display:"flex",alignItems:"center",justifyContent:"center",padding:"1.5rem",fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif"}},
-      React.createElement('div',{style:{background:"#fff",border:"1px solid #F2FADF",borderRadius:16,boxShadow:"0 8px 32px rgba(0,0,0,0.1)",padding:"2rem 1.75rem",maxWidth:440,width:"100%",textAlign:"center"}},
-        React.createElement('div',{style:{width:48,height:48,margin:"0 auto 14px",background:"#4A7000",borderRadius:12,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}},""),
+      React.createElement('div',{style:{background:"#fff",border:"1px solid #F2FADF",borderRadius:10,boxShadow:"none",padding:"2rem 1.75rem",maxWidth:440,width:"100%",textAlign:"center"}},
+        React.createElement('div',{style:{width:48,height:48,margin:"0 auto 14px",background:"#4A7000",borderRadius:10,display:"flex",alignItems:"center",justifyContent:"center",fontSize:24}},""),
         React.createElement('h2',{style:{fontSize:20,fontWeight:700,color:"#060A2C",margin:"0 0 6px",letterSpacing:"-0.4px"}},"Something went wrong"),
-        React.createElement('p',{style:{fontSize:13.5,color:"#4A5568",lineHeight:1.55,margin:"0 0 18px"}},"The app hit an unexpected error. Your saved progress is safe — try again, or reload the page."),
+        React.createElement('p',{style:{fontSize:13.5,color:"#4A5568",lineHeight:1.55,margin:"0 0 18px"}},"The app hit an unexpected error. Your saved progress is safe, try again, or reload the page."),
         React.createElement('div',{style:{display:"flex",gap:8,justifyContent:"center",flexWrap:"wrap"}},
-          React.createElement('button',{onClick:()=>this.setState({hasError:false,msg:""}),style:{background:"#4A7000",border:"none",color:"#fff",padding:"11px 22px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",fontSize:14,fontWeight:700,boxShadow:"0 1px 2px rgba(6,10,44,.06)"}},"Try again"),
+          React.createElement('button',{onClick:()=>this.setState({hasError:false,msg:""}),style:{background:"#4A7000",border:"none",color:"#fff",padding:"11px 22px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",fontSize:14,fontWeight:700,boxShadow:"none"}},"Try again"),
           React.createElement('button',{onClick:()=>{try{location.reload();}catch(e){}},style:{background:"#fff",border:"1.5px solid #E2E8F0",color:"#4A5568",padding:"11px 22px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",fontSize:14,fontWeight:700}},"Reload page")
         ),
         this.state.msg&&React.createElement('p',{style:{fontSize:11,color:"#6B7280",marginTop:16,fontFamily:"monospace",wordBreak:"break-word"}},this.state.msg)

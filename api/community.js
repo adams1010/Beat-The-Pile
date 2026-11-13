@@ -49,7 +49,7 @@ HIDE if it contains:
 
 DO NOT HIDE for:
 - Frustration, venting, strong opinions about employers/internships
-- Casual swearing — students vent and that's fine
+- Casual swearing, students vent and that's fine
 - Disagreement, debate, criticism of companies or schools
 - Personal struggles
 - Normal advice-seeking
@@ -66,9 +66,9 @@ Respond with ONLY a JSON object: {"hide": true_or_false, "reason": "brief one-ph
     const j = m ? JSON.parse(m[0]) : null;
     if (j?.hide === true) return { status: "hidden", note: clip(j.reason || "moderation flagged", 120) };
     if (j?.hide === false) return { status: "approved", note: null };
-    return { status: "pending", note: "AI answer unclear — waiting for review" };
+    return { status: "pending", note: "AI answer unclear, waiting for review" };
   } catch (e) {
-    return { status: "pending", note: e instanceof AIError ? `AI unavailable (${e.message}) — waiting for review` : "AI error — waiting for review" };
+    return { status: "pending", note: e instanceof AIError ? `AI unavailable (${e.message}), waiting for review` : "AI error, waiting for review" };
   }
 }
 
@@ -135,12 +135,12 @@ export default async function handler(req, res) {
       const table = body.kind === "reply" ? "community_replies" : "community_posts";
       if (!idOk(body.id)) return res.status(400).json({ error: "Missing id" });
       if (!(await rateOk(`community-report:${ip}:${table}:${body.id}`, 86400, 1))) return res.status(200).json({ ok: true });   // one report per person per item
-      if (!(await rateOk(`community-report-ip:${ip}`, 3600, 20))) return res.status(429).json({ error: "Too many reports — try later" });
+      if (!(await rateOk(`community-report-ip:${ip}`, 3600, 20))) return res.status(429).json({ error: "Too many reports, try later" });
       const row = (await db.selectAsAdmin(`${table}?select=id,reports,status&id=eq.${body.id}&limit=1`))[0];
       if (!row) return res.status(404).json({ error: "Not found" });
       const reports = Number(row.reports || 0) + 1;
       const patch = { reports };
-      if (reports >= HIDE_AFTER_REPORTS && row.status === "approved") { patch.status = "pending"; patch.review_note = `${reports} reports — waiting for owner review`; }
+      if (reports >= HIDE_AFTER_REPORTS && row.status === "approved") { patch.status = "pending"; patch.review_note = `${reports} reports, waiting for owner review`; }
       await db.update(`${table}?id=eq.${body.id}`, patch);
       await db.insert("feedback", [{ page: "/ (community)", kind: "community_report", message: `${table} #${body.id} reported (${reports} total)` }]).catch(() => null);
       return res.status(200).json({ ok: true });
@@ -165,7 +165,7 @@ export default async function handler(req, res) {
     if (content.length > maxLen) return res.status(400).json({ error: `Too long (max ${maxLen} characters).` });
     if (isReply && !idOk(body.post_id)) return res.status(400).json({ error: "Missing post_id" });
     if (!(await rateOk(`community-post:${ip}`, 60, 3)) || !(await rateOk(`community-post-day:${ip}`, 86400, 30)))
-      return res.status(429).json({ error: "Posting too fast — wait a minute." });
+      return res.status(429).json({ error: "Posting too fast, wait a minute." });
     if (isReply) {
       const parent = (await db.selectAsAdmin(`community_posts?select=id&id=eq.${body.post_id}&status=eq.approved&limit=1`))[0];
       if (!parent) return res.status(404).json({ error: "That post isn't available" });
@@ -181,7 +181,7 @@ export default async function handler(req, res) {
                                   visible: mod.status === "approved", flagged: mod.status !== "approved", message: visibleMsg(mod.status) });
   } catch (e) {
     console.error("[community]", e);
-    return res.status(500).json({ error: "Something went wrong — try again" });
+    return res.status(500).json({ error: "Something went wrong, try again" });
   }
 }
 

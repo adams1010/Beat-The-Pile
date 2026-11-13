@@ -16,7 +16,7 @@ export function toCard(l) {
     hasLinkedin: false, tier: "regional", locationBand: l.remote ? "remote" : null,
     applyUrl: l.url, listingId: l.id, companyId: l.company_id, firstSeen: l.first_seen, postedOn: l.posted_on || null,
     source: "db", verified: true,
-    reason: `Open now on ${l.company}'s own job board — we found it there ourselves.`,
+    reason: `Open now on ${l.company}'s own job board, we found it there ourselves.`,
     ...(l.mi != null ? { mi: l.mi } : {}), ...(l.remote ? { remote: true } : {}),
   };
 }
@@ -31,7 +31,7 @@ export default async function handler(req, res) {
   const remote = type === "Remote";
   const radius = Math.min(200, Math.max(10, Math.round(Number(body?.radius) || 50)));
   const state = zipToState(zip), center = remote ? null : lookupPlace(zip);
-  if (!remote && (!state || !center)) return res.status(400).json({ error: "We couldn't read that ZIP code — check it and try again" });
+  if (!remote && (!state || !center)) return res.status(400).json({ error: "We couldn't read that ZIP code, check it and try again" });
 
   const fields = fieldsForMajor(major);
   let base = "listings?select=id,company_id,company,title,location,state,url,posted_on,first_seen,geo_pts"
@@ -66,6 +66,6 @@ export default async function handler(req, res) {
     });
   } catch (e) {
     console.error("[results]", e);
-    return res.status(503).json({ error: "Couldn't load internships right now — try again in a minute" });
+    return res.status(503).json({ error: "Couldn't load internships right now, try again in a minute" });
   }
 }

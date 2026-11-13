@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Profile — Beat the Pile</title>
+<title>Profile | Beat the Pile</title>
 <meta name="description" content="A student's career profile on Beat the Pile.">
 <meta name="robots" content="noindex">
 <link rel="icon" href="/icons/icon-192.png">
@@ -15,7 +15,7 @@
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
   main{max-width:780px;margin:0 auto;padding:24px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))}
-  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:14px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin-bottom:14px}
   .hero{padding:0;overflow:hidden}
   .band{height:84px;background:var(--navy)}
   .hero .body{padding:0 24px 22px}
@@ -72,10 +72,10 @@
   .band{background:#060A2C;border-bottom:3px solid #B0F701}
   .photo{display:flex;gap:16px;align-items:center;padding:4px 0 8px;margin-bottom:4px;border-bottom:1px solid var(--line)}
   .photo img,.photo .ph{width:84px;height:84px;border-radius:50%;object-fit:cover;flex-shrink:0;border:1px solid var(--line)}
-  dialog.crop{border:0;border-radius:16px;padding:20px;max-width:calc(100vw - 24px);box-shadow:0 20px 60px rgba(6,10,44,.3)}
+  dialog.crop{border:0;border-radius:10px;padding:20px;max-width:calc(100vw - 24px);box-shadow:none}
   dialog.crop::backdrop{background:rgba(6,10,44,.55)}
   dialog.crop h2{margin:0 0 2px;font-size:18px}
-  .crop .cv{position:relative;overflow:hidden;margin:14px auto;border-radius:12px;background:#0B1030;touch-action:none;cursor:grab;user-select:none}
+  .crop .cv{position:relative;overflow:hidden;margin:14px auto;border-radius:10px;background:#0B1030;touch-action:none;cursor:grab;user-select:none}
   .crop .cv:active{cursor:grabbing}.crop .cv:focus-visible{outline:2px solid #4A7000;outline-offset:3px}
   .crop .cv img{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;pointer-events:none}
   .crop .cring{position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 999px rgba(6,10,44,.55);border:2px solid #fff;pointer-events:none}
@@ -94,7 +94,7 @@
   .toprow{flex-wrap:wrap}.own button,.own a{white-space:nowrap}
   @media(max-width:600px){.own{flex-basis:100%;order:2;margin-top:10px}.own button{padding:7px 12px}}
   .qrbox{position:fixed;inset:0;background:rgba(6,10,44,.55);display:grid;place-items:center;z-index:60;padding:16px}
-  .qrbox .in{background:#fff;border-radius:16px;padding:22px;max-width:340px;width:100%;text-align:center}
+  .qrbox .in{background:#fff;border-radius:10px;padding:22px;max-width:340px;width:100%;text-align:center}
   .qrbox svg{width:220px;height:220px}
   /* Nov 8 engagement pass: open-to badges, season strip, strength ring, visibility panel, highlights */
   .opento{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
@@ -109,7 +109,7 @@
   .hl div{padding:12px 8px;text-align:center;border-left:1px solid var(--line)}.hl div:first-child{border-left:0}
   .hl b{display:block;font-size:20px;color:var(--navy);font-variant-numeric:tabular-nums}.hl span{font-size:12.5px;color:var(--muted)}
   .season{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-  .season a{display:block;text-decoration:none;border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--navy);background:#fff}
+  .season a{display:block;text-decoration:none;border:1px solid var(--line);border-radius:10px;padding:12px;color:var(--navy);background:#fff}
   .season a:hover{border-color:var(--green);background:var(--green-light)}
   .season b{display:block;font-size:24px;font-variant-numeric:tabular-nums;line-height:1.1}.season span{font-size:12.5px;color:var(--muted)}
   .strong{display:flex;gap:18px;align-items:center}
@@ -291,7 +291,7 @@
     if (!r || r.status >= 500) { document.querySelector("main").innerHTML = '<div class="card center">Couldn’t load this profile right now. Try again in a minute.</div>'; return; }
     if (r.status === 404) { document.querySelector("main").innerHTML = `<div class="card center"><h1 style="font-size:22px">No public profile here</h1><p class="muted">This student hasn't made a profile public, or the link changed.</p><a class="btn pri" href="/u/">Make your own profile</a></div>`; return; }
     const d = await r.json();
-    document.title = (d.profile.name || "Profile") + " — Beat the Pile";
+    document.title = (d.profile.name || "Profile") + " | Beat the Pile";
     document.querySelector("main").innerHTML = profileHtml(d.profile, d.resume, false, d.founding);
     orbitButtons(d.handle, d.profile.name);
     $("#rep")?.addEventListener("click", (e) => { e.preventDefault(); window.iqReport ? window.iqReport({ message: "Report profile /u/" + d.handle + "\n" }) : alert("Use the Feedback button to report."); });
@@ -393,7 +393,7 @@
         <div class="row"><div><label for="c_email">Contact email</label><input id="c_email" type="email" data-contact="email" value="${esc((d.p.contact || {}).email || "")}" placeholder="you@school.edu"></div>
         <div><label for="c_phone">Phone (optional)</label><input id="c_phone" type="tel" data-contact="phone" value="${esc((d.p.contact || {}).phone || "")}" placeholder="(555) 123-4567"></div></div>
         <label class="switch"><input type="checkbox" id="c_show" ${(d.p.contact || {}).show === false ? "" : "checked"}><span>Show my contact info on my profile <small class="muted">(only to signed-in Beat the Pile members, so people can email or call you in one tap)</small></span></label>
-        <label class="switch"><input type="checkbox" id="f_resume" ${d.p.showResume ? "checked" : ""}><span><b>Show a "View resume" button</b><br><span class="muted small">${me.resume ? (me.resume.share ? "Uses your Career Fair resume link (on)." : "Your resume link is off — turn it on in <a href='/fair/' style='color:var(--green-dark)'>Career Fair Mode</a> for this to show.") : "Upload a resume in <a href='/fair/' style='color:var(--green-dark)'>Career Fair Mode</a> first."}</span></span></label>
+        <label class="switch"><input type="checkbox" id="f_resume" ${d.p.showResume ? "checked" : ""}><span><b>Show a "View resume" button</b><br><span class="muted small">${me.resume ? (me.resume.share ? "Uses your Career Fair resume link (on)." : "Your resume link is off, turn it on in <a href='/fair/' style='color:var(--green-dark)'>Career Fair Mode</a> for this to show.") : "Upload a resume in <a href='/fair/' style='color:var(--green-dark)'>Career Fair Mode</a> first."}</span></span></label>
       </section>
       ${!S.kitOk ? `<section class="card private" id="kit"><div class="ptag">Private</div><h2>Application kit</h2><p class="small muted">Couldn't load your application kit right now, so it's hidden to keep it safe. Refresh in a minute.</p></section>` : `<section class="card private" id="kit"><div class="ptag">Private · only you see this</div><h2>Application kit</h2>
         <p class="small muted" style="margin:-4px 0 4px">Fills applications and cover letters for you. Never on your public page.</p>
@@ -432,7 +432,7 @@
         note(d.p.school && !d.p.schoolId ? "" : ""); return;
       }
       const other = d.p.major && !progs.includes(d.p.major);
-      box.innerHTML = `<label for="f_majorSel">Major</label><select id="f_majorSel"><option value="">Pick your major</option>${progs.map((m) => `<option${m === d.p.major ? " selected" : ""}>${esc(m)}</option>`).join("")}<option value="__other"${other ? " selected" : ""}>Not listed — type it</option></select>
+      box.innerHTML = `<label for="f_majorSel">Major</label><select id="f_majorSel"><option value="">Pick your major</option>${progs.map((m) => `<option${m === d.p.major ? " selected" : ""}>${esc(m)}</option>`).join("")}<option value="__other"${other ? " selected" : ""}>Not listed, type it</option></select>
         <input id="f_major" value="${esc(d.p.major)}" placeholder="Your major" ${other ? "" : "hidden"} style="margin-top:6px">`;
       const sel = $("#f_majorSel"), inp = $("#f_major");
       sel.onchange = () => { if (sel.value === "__other") { inp.hidden = false; inp.value = ""; d.p.major = ""; inp.focus(); } else { inp.hidden = true; d.p.major = sel.value; } };
@@ -440,7 +440,7 @@
       note(`${progs.length} majors offered there (US Dept. of Education data).`);
     };
     si.removeAttribute("list");
-    P.attach(si, { load: P.schools, other: true, otherLabel: "Not listed — use", onPick: (it) => {
+    P.attach(si, { load: P.schools, other: true, otherLabel: "Not listed, use", onPick: (it) => {
       const was = d.p.schoolId; d.p.school = it ? it.label : ""; d.p.schoolId = it && it.id ? it.id : null;
       if (it && it.custom) note("Not on our list, so we'll match classmates by the name you typed.");
       if (was !== d.p.schoolId || !it) renderMajor(); } });
@@ -479,9 +479,9 @@
     const oe = $("#f_employers"); if (oe) oe.onchange = () => { d.p.openToEmployers = oe.checked; };
     main.querySelectorAll("[data-opento]").forEach((el) => el.onchange = () => { const k = el.dataset.opento; d.p.openTo = (d.p.openTo || []).filter((x) => x !== k); if (el.checked) d.p.openTo.push(k); });
     const ph = $("#f_photo"); if (ph) ph.onchange = async () => { const f = ph.files && ph.files[0]; if (!f) return;
-      const msg = $("#msg"); try { const out = await shrink(f); ph.value = ""; if (!out) return; d.p.photo = out; editor(); const m = $("#msg"); m.className = "msg"; m.textContent = "Photo ready — tap Save profile."; }
+      const msg = $("#msg"); try { const out = await shrink(f); ph.value = ""; if (!out) return; d.p.photo = out; editor(); const m = $("#msg"); m.className = "msg"; m.textContent = "Photo ready, tap Save profile."; }
       catch (e) { ph.value = ""; msg.className = "msg err"; msg.textContent = e.message; } };
-    const rp = $("#rmPhoto"); if (rp) rp.onclick = () => { d.p.photo = null; editor(); const m = $("#msg"); m.className = "msg"; m.textContent = "Photo removed — tap Save profile."; };
+    const rp = $("#rmPhoto"); if (rp) rp.onclick = () => { d.p.photo = null; editor(); const m = $("#msg"); m.className = "msg"; m.textContent = "Photo removed, tap Save profile."; };
     const sv = $("#save"); if (sv) sv.onclick = save;
     main.querySelectorAll("[data-kit]").forEach((el) => el.oninput = el.onchange = () => { d.kit[el.dataset.kit] = el.value; });
     main.querySelectorAll("[data-res]").forEach((el) => el.oninput = () => { d.resumes[+el.dataset.res][el.dataset.f] = el.value; });
@@ -491,7 +491,7 @@
         const file = { name: r.name, size: r.size, pages: r.pages, kind: r.kind }, nm = r.name.replace(/\.[^.]+$/, "").slice(0, 40);
         if (i == null) d.resumes.push({ id: Date.now(), name: nm, text: r.text, file });
         else { const x = d.resumes[i]; x.text = r.text; x.file = file; if (!x.name || /^Resume \d+$/.test(x.name)) x.name = nm; }
-        editor(); jump("kit"); const m2 = $("#msg"); m2.className = "msg"; m2.textContent = "Resume added — tap Save profile."; }
+        editor(); jump("kit"); const m2 = $("#msg"); m2.className = "msg"; m2.textContent = "Resume added, tap Save profile."; }
       catch (e) { m.className = "msg err"; m.textContent = e.message; } };
     const ar = $("#addResF"); if (ar) ar.onchange = () => readInto(ar, null);
     main.querySelectorAll("[data-upres]").forEach((inp) => inp.onchange = () => readInto(inp, +inp.dataset.upres));
@@ -533,7 +533,7 @@
       const nm = r.name.replace(/\.[^.]+$/, "").slice(0, 40);
       if (!d.resumes.some((z) => z.file && z.file.name === r.name) && d.resumes.length < 6) d.resumes.push({ id: Date.now(), name: nm, text: r.text, file: { name: r.name, size: r.size, pages: r.pages, kind: r.kind } });
       editor();
-      say(got.length ? `Filled in ${got.join(", ")}. Check it over, then tap Save profile.` : "Your profile already has everything we found in that resume. Your resume was added to your kit — tap Save profile.");
+      say(got.length ? `Filled in ${got.join(", ")}. Check it over, then tap Save profile.` : "Your profile already has everything we found in that resume. Your resume was added to your kit, tap Save profile.");
       jump("fill");
     } catch (e) { say(e.message, true); }
     finally { $("#fill")?.classList.remove("busy"); }
@@ -558,8 +558,8 @@
   // it's small (server limit ~65 KB). Resolves null if you cancel.
   function shrink(file){
     return new Promise((ok, bad) => {
-      if (!/^image\//.test(file.type || "image/")) return bad(new Error("That isn't an image — pick a JPG or PNG."));
-      if (file.size > 15e6) return bad(new Error("That photo is over 15 MB — pick a smaller one."));
+      if (!/^image\//.test(file.type || "image/")) return bad(new Error("That isn't an image, pick a JPG or PNG."));
+      if (file.size > 15e6) return bad(new Error("That photo is over 15 MB, pick a smaller one."));
       const url = URL.createObjectURL(file), img = new Image();
       img.onload = async () => {
         const crop = await cropPhoto(img, url);
@@ -569,9 +569,9 @@
           const x = c.getContext("2d"); x.fillStyle = "#fff"; x.fillRect(0, 0, N, N); x.imageSmoothingQuality = "high";
           x.drawImage(img, crop.sx, crop.sy, crop.side, crop.side, 0, 0, N, N);
           let q = 0.86, out = c.toDataURL("image/jpeg", q); while (out.length > 88000 && q > 0.4) { q -= 0.08; out = c.toDataURL("image/jpeg", q); }
-          URL.revokeObjectURL(url); out.length > 88000 ? bad(new Error("Couldn't make that photo small enough — try another.")) : ok(out);
-        } catch (e) { URL.revokeObjectURL(url); bad(new Error("Couldn't read that photo — try a JPG or PNG.")); } };
-      img.onerror = () => { URL.revokeObjectURL(url); bad(new Error("Couldn't read that photo — try a JPG or PNG (iPhone HEIC photos may need converting).")); };
+          URL.revokeObjectURL(url); out.length > 88000 ? bad(new Error("Couldn't make that photo small enough, try another.")) : ok(out);
+        } catch (e) { URL.revokeObjectURL(url); bad(new Error("Couldn't read that photo, try a JPG or PNG.")); } };
+      img.onerror = () => { URL.revokeObjectURL(url); bad(new Error("Couldn't read that photo, try a JPG or PNG (iPhone HEIC photos may need converting).")); };
       img.src = url;
     });
   }

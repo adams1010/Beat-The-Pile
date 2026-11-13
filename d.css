@@ -14,11 +14,11 @@ body{background:var(--bg);font-variant-numeric:tabular-nums}
 header{background:#060A2C;border-bottom:1px solid #1A2640}
 header h1{font-weight:600;letter-spacing:-.025em}
 header .sub,header p{color:#9FAAC0}
-header .trend{background:#0E1440;border:1px solid #22304D;border-radius:14px}
+header .trend{background:#0E1440;border:1px solid #22304D;border-radius:10px}
 header .trend .n,header .big{color:var(--mint);font-family:var(--mono);font-weight:500}
 
 /* cards */
-.card,.app,.empty{border-color:var(--line);border-radius:12px}
+.card,.app,.empty{border-color:var(--line);border-radius:10px}
 .card{box-shadow:none;transition:border-color .15s}
 .card:hover{border-color:#B9C3D3}
 .empty{border-style:solid}

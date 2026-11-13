@@ -135,7 +135,7 @@ export default async function handler(req, res) {
         const hint = cleanUrl(b.hint);
         if (!hint) return res.status(400).json({ error: "That doesn't look like a link (needs https://…)" });
         await db.update(`company_candidates?id=eq.${encodeURIComponent(b.id)}`, { hint, status: "pending", checked_at: null,
-          detail: who === "robot" ? "Browser pass found a job board — robot will verify it" : "Link added — robot will check it within the hour" });
+          detail: who === "robot" ? "Browser pass found a job board, robot will verify it" : "Link added, robot will check it within the hour" });
         return res.status(200).json({ ok: true });
       }
       const company = String(b?.company || "").trim().slice(0, 80);
@@ -224,7 +224,7 @@ export default async function handler(req, res) {
       ]);
       // Whole-system numbers for the live map + "where to spend time"
       const unsupportedBy = {};
-      for (const c of cands) if (c.status === "unsupported") { const m = /Uses (.+?) —/.exec(c.detail || ""); const k = m ? m[1] : "Other"; unsupportedBy[k] = (unsupportedBy[k] || 0) + 1; }
+      for (const c of cands) if (c.status === "unsupported") { const m = /Uses (.+?)(?:,| —) needs/.exec(c.detail || ""); const k = m ? m[1] : "Other"; unsupportedBy[k] = (unsupportedBy[k] || 0) + 1; }
       const week = Date.now() - 7 * 864e5;
       const eng = listings.filter((l) => l.match);
       const byField = {}; for (const l of listings) byField[l.field || "untagged"] = (byField[l.field || "untagged"] || 0) + 1;

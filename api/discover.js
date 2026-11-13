@@ -73,7 +73,7 @@ export default async function handler(req, res) {
     if (withHint.length) await db.upsert("company_candidates", withHint);
     if (noHint.length) await db.upsert("company_candidates", noHint);
   } catch (e) {
-    return res.status(500).json({ error: "Couldn't update company_candidates — run supabase/discovery.sql first. " + e.message });
+    return res.status(500).json({ error: "Couldn't update company_candidates, run supabase/discovery.sql first. " + e.message });
   }
 
   if (mark("upsert")) return res.status(200).json({ marks });
@@ -130,13 +130,13 @@ export default async function handler(req, res) {
     const left = t0 + HARD_STOP_MS - Date.now();
     try {
       r = await Promise.race([discoverOne(c, { deadline }),
-        new Promise((ok) => setTimeout(() => ok({ status: "no_board", detail: `Careers site too slow to check — retried in ${RETRY_AFTER_DAYS} days` }), left))]);
+        new Promise((ok) => setTimeout(() => ok({ status: "no_board", detail: `Careers site too slow to check, retried in ${RETRY_AFTER_DAYS} days` }), left))]);
     }
     catch (e) { r = { status: "error", detail: String(e.message || e).slice(0, 300) }; }
 
     if (r.status === "live") {
       const k = boardKey({ ats: r.ats, ...r.config });
-      if (taken.has(k) && taken.get(k) !== c.id) r = { status: "duplicate", detail: `Same board as ${taken.get(k)} — already listed` };
+      if (taken.has(k) && taken.get(k) !== c.id) r = { status: "duplicate", detail: `Same board as ${taken.get(k)}, already listed` };
       else taken.set(k, c.id);
     }
     const now = new Date().toISOString();

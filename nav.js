@@ -60,7 +60,7 @@
 .btpnav .q input::placeholder{color:#8D9AB3}
 .btpnav .q:focus-within{border-color:var(--n-acc)}
 .btpnav .q{position:relative}
-.btpnav .qs{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#fff;color:#060A2C;border:1px solid #DCE2EC;border-radius:10px;box-shadow:0 12px 30px rgba(6,10,44,.18);padding:6px;z-index:60}
+.btpnav .qs{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#fff;color:#060A2C;border:1px solid #DCE2EC;border-radius:10px;box-shadow:none;padding:6px;z-index:60}
 .btpnav .qs a{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:8px;color:#060A2C;text-decoration:none;font-size:14px}
 .btpnav .qs a:hover,.btpnav .qs a[aria-selected=true]{background:#F2FADF}
 .btpnav .qs small{color:#55627A;font-size:12px;margin-left:auto}
@@ -84,7 +84,7 @@
 .btpnav .links>details>summary .lbl{display:flex;align-items:center}
 .btpnav summary::-webkit-details-marker{display:none}
 .btpnav .mob summary::after,.btpnav .links summary .lbl::after{content:"";width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);margin-left:4px}
-.btpnav .menu{position:fixed;margin-top:8px;min-width:280px;background:#fff;color:#060A2C;border:1px solid #DCE2EC;border-radius:12px;box-shadow:0 16px 40px rgba(6,10,44,.22);padding:6px;z-index:60}
+.btpnav .menu{position:fixed;margin-top:8px;min-width:280px;background:#fff;color:#060A2C;border:1px solid #DCE2EC;border-radius:10px;box-shadow:none;padding:6px;z-index:60}
 .btpnav .menu a{display:block;padding:10px 12px;border-radius:8px;color:#060A2C;text-decoration:none;transition:background .12s}
 .btpnav .menu a:hover,.btpnav .menu a:focus-visible{background:#F1F4F9;color:#060A2C;box-shadow:inset 3px 0 0 #4A7000}
 .btpnav .menu a:hover small{color:#55627A}
@@ -256,13 +256,13 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   const roleDest = (c, next) => c.dataset.kind ? `/business/setup/?kind=${c.dataset.kind}` + (next ? `&next=${encodeURIComponent(next)}` : "") : next;
   window.btpRoleDest = roleDest;
   const sheetCss = `.btprole{position:fixed;inset:0;z-index:200;background:rgba(6,10,44,.72);display:grid;place-items:center;padding:16px;font-family:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-.btprole .box{background:#fff;border-radius:16px;max-width:1180px;width:100%;padding:28px;box-shadow:0 24px 60px rgba(6,10,44,.4)}
+.btprole .box{background:#fff;border-radius:10px;max-width:1180px;width:100%;padding:28px;box-shadow:none}
 .btprole h2{margin:0 0 4px;font-size:24px;color:#060A2C;letter-spacing:-.01em}.btprole p{margin:0 0 18px;color:#55627A}
 .btprole-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}@media (max-width:1020px){.btprole-cards{grid-template-columns:repeat(2,1fr)}}
-.btprole-card{font:inherit;text-align:left;cursor:pointer;background:#fff;border:2px solid #DCE2EC;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:8px;color:#060A2C;transition:border-color .12s,box-shadow .12s}
+.btprole-card{font:inherit;text-align:left;cursor:pointer;background:#fff;border:2px solid #DCE2EC;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:8px;color:#060A2C;transition:border-color .12s,box-shadow .12s}
 .btprole-card:hover,.btprole-card:focus-visible,.btprole-card.on{border-color:#4A7000;box-shadow:0 0 0 4px #F2FADF;outline:0}
 .btprole-card b{font-size:18px}.btprole-card small{color:#55627A;font-size:14px;line-height:1.45}
-.btprole-ic{width:44px;height:44px;border-radius:12px;background:#060A2C;color:#B0F701;display:grid;place-items:center}
+.btprole-ic{width:44px;height:44px;border-radius:10px;background:#060A2C;color:#B0F701;display:grid;place-items:center}
 .btprole-go{margin-top:auto;color:#4A7000;font-weight:600;font-size:14px;padding-top:6px}
 @media (max-width:620px){.btprole-cards{grid-template-columns:1fr}.btprole .box{padding:20px}}`;
   const sc = document.createElement("style"); sc.textContent = sheetCss; document.head.appendChild(sc);

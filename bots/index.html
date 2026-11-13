@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Beat the Pile — Bot Control Room</title>
+<title>Beat the Pile, Bot Control Room</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="theme-color" content="#060A2C">
@@ -21,7 +21,7 @@
   .acct button{font:inherit;font-weight:700;font-size:13px;color:#fff;background:transparent;border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:5px 10px;cursor:pointer}
   h1{font-size:clamp(24px,5vw,32px);margin:14px 0 2px;letter-spacing:-.02em}
   .sub{color:var(--muted);margin:0}
-  .card{background:var(--navy);border:1px solid var(--line);border-radius:16px;padding:16px}
+  .card{background:var(--navy);border:1px solid var(--line);border-radius:10px;padding:16px}
   .main{margin:18px 0 14px;border-color:rgba(0,194,133,.45);box-shadow:0 0 0 1px rgba(0,194,133,.15),0 20px 60px rgba(0,194,133,.08)}
   .row{display:flex;justify-content:space-between;align-items:center;gap:12px}
   .name{font-weight:800;font-size:17px;color:#fff;display:flex;align-items:center;gap:8px}
@@ -44,7 +44,7 @@
   .sw input:disabled + span{opacity:.45;cursor:not-allowed}
   /* pipeline */
   .pipe{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0 6px;position:relative}
-  .stage{background:var(--navy2);border-radius:12px;padding:12px 10px;text-align:center;position:relative}
+  .stage{background:var(--navy2);border-radius:10px;padding:12px 10px;text-align:center;position:relative}
   .stage b{display:block;font-size:clamp(22px,5vw,30px);font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.1}
   .stage span{font-size:11.5px;color:var(--muted)}
   .stage.live b{color:var(--green)}
@@ -52,7 +52,7 @@
   .parked{font-size:12.5px;color:var(--muted);margin-top:6px}
   .parked b{color:var(--text)}
   .bar{height:8px;border-radius:99px;background:var(--navy2);overflow:hidden;margin-top:8px}
-  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--green),#5EEAD4)}
+  .bar i{display:block;height:100%;background:var(--green)}
   /* runs */
   .dots{display:flex;gap:3px;margin-top:10px;flex-wrap:wrap}
   .dots i{width:10px;height:18px;border-radius:3px;background:var(--green);opacity:.85}
@@ -74,7 +74,7 @@
   .col{display:flex;flex-direction:column;gap:8px;position:relative;padding:0 14px}
   .col:first-child{padding-left:0}.col:last-child{padding-right:0}
   .col h4{margin:0 0 2px;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
-  .node{background:var(--navy2);border:1px solid var(--line);border-radius:12px;padding:9px 10px;position:relative}
+  .node{background:var(--navy2);border:1px solid var(--line);border-radius:10px;padding:9px 10px;position:relative}
   .node .t{font-size:12.5px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px}
   .node .n{font-size:22px;font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1.15;margin-top:2px}
   .node .s{font-size:11.5px;color:var(--muted);line-height:1.3}
@@ -112,7 +112,7 @@
   .feat{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:13px;margin-top:10px}
   .feat span:nth-child(even){color:var(--muted);text-align:right}
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#fff;color:var(--navy);font-weight:700;font-size:14px;padding:10px 16px;border-radius:10px;z-index:9}
-  .signin{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);color:#FCD34D;border-radius:12px;padding:10px 14px;font-size:13.5px;margin-top:12px}
+  .signin{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.35);color:#FCD34D;border-radius:10px;padding:10px 14px;font-size:13.5px;margin-top:12px}
 </style>
 </head>
 <body>
@@ -224,7 +224,7 @@
     const label = { brief: "Company briefs", followup_email: "AI follow-up emails", homepage: "Homepage AI", other: "Other" };
     return `<section class="card" style="margin-top:12px"><div class="row"><div class="name">🤖 AI spend (Anthropic)</div><span class="how">${esc(a.priceNote)}</span></div>
       <div class="spend" style="margin-top:8px"><b>${fmtUsd(a.month)}</b><span class="how">this month · ${fmtUsd(a.today)} today · ${a.calls} calls</span></div>
-      <div class="bar"><i style="width:${pct}%;${pct >= 80 ? "background:linear-gradient(90deg,#F59E0B,#F87171)" : ""}"></i></div>
+      <div class="bar"><i style="width:${pct}%;${pct >= 80 ? "background:#D97706" : ""}"></i></div>
       <div class="how" style="margin-top:4px">${a.cap ? `${pct}% of your ${fmtUsd(a.cap)} monthly cap. AI features pause automatically at the cap.` : "AI is switched off (cap $0)."}${a.paused && a.cap ? " <b style='color:#FCA5A5'>Paused for this month.</b>" : ""}</div>
       ${feats.length ? `<div class="feat">${feats.map(([k, v]) => `<span>${esc(label[k] || k)} · ${v.calls} calls</span><span>${fmtUsd(v.usd)}</span>`).join("")}</div>` : `<div class="how" style="margin-top:8px">No AI calls logged yet this month.</div>`}
       <div class="caps" aria-label="Monthly AI cap">${[0, 5, 10, 25, 50].map((v) => `<button data-cap="${v}" aria-pressed="${a.cap === v}" ${can ? "" : "disabled"}>${v === 0 ? "AI off" : "$" + v + "/mo"}</button>`).join("")}</div>

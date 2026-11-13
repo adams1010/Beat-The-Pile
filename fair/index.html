@@ -9,15 +9,15 @@
 <link rel="apple-touch-icon" href="/icons/icon-180.png">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Beat the Pile — Career Fair Mode</title>
-<meta name="description" content="Your resume as a QR code, every company at the fair with their open internships, conversation notes, and follow-up reminders — in one place.">
+<title>Beat the Pile, Career Fair Mode</title>
+<meta name="description" content="Your resume as a QR code, every company at the fair with their open internships, conversation notes, and follow-up reminders, in one place.">
 <meta name="theme-color" content="#060A2C">
 <style>
   :root{
     --green:#4A7000; --green-dark:#3A5A00; --green-light:#F2FADF;
     --navy:#060A2C; --ink:#1A2230; --muted:#64748B; --faint:#5E6A80;
     --bg:#FBFBFC; --card:#FFFFFF; --line:#E3E7ED; --amber:#B45309; --amber-light:#FFF4E6; --red:#B91C1C; --red-light:#FEF2F2;
-    --r:14px; --font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    --r:8px; --font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   }
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
@@ -49,7 +49,7 @@
 
   /* QR */
   .qrbox{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
-  .qr{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;width:156px;height:156px;display:grid;place-items:center;cursor:zoom-in}
+  .qr{background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px;width:156px;height:156px;display:grid;place-items:center;cursor:zoom-in}
   .qr svg{width:100%;height:100%;display:block}
   .qrtitle{font-size:18px;font-weight:800;color:var(--navy);margin:0 0 2px}
   .switch{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:600;cursor:pointer;user-select:none}
@@ -67,7 +67,7 @@
   .chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 12px}
   .chip{font:inherit;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer}
   .chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
-  .co{background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
+  .co{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden}
   .co > button{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 14px;cursor:pointer}
   .co > button:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
   .coname{font-weight:700;color:var(--navy)}
@@ -91,7 +91,7 @@
   .star{all:unset;cursor:pointer;font-size:22px;line-height:1;padding:12px 6px 12px 12px;color:#CBD5E1}
   .star[aria-pressed="true"]{color:#F59E0B}
   .star:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
-  .route{background:var(--navy);color:#fff;border-radius:12px;padding:14px;margin-bottom:10px}
+  .route{background:var(--navy);color:#fff;border-radius:10px;padding:14px;margin-bottom:10px}
   .route b{color:var(--green)}
   .route .stops{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
   .route .stops span{font-size:12px;font-weight:700;background:rgba(255,255,255,.1);border-radius:999px;padding:4px 9px}
@@ -99,7 +99,7 @@
   .fact{background:#F8FAFC;border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
   .fact b{display:block;font-size:22px;color:var(--navy);line-height:1.1}
   .fact span{font-size:11.5px;color:var(--muted)}
-  .ai{background:#F5F3FF;border:1px solid #DDD6FE;border-radius:12px;padding:12px 14px;margin-top:12px;font-size:14px}
+  .ai{background:#EFF3FB;border:1px solid #C7D2F0;border-radius:10px;padding:12px 14px;margin-top:12px;font-size:14px}
   .ai h4{margin:8px 0 2px;font-size:13px;color:#5B21B6}
   .ai h4:first-child{margin-top:0}
   .ai ul{margin:4px 0 0;padding-left:18px}
@@ -117,7 +117,7 @@
   /* Sheet (note form) */
   .scrim{position:fixed;inset:0;background:rgba(10,22,40,.45);z-index:40;display:none}
   .scrim.on{display:block}
-  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:#fff;border-radius:18px 18px 0 0;max-height:92vh;overflow:auto;padding:18px 16px calc(18px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .2s ease}
+  .sheet{position:fixed;left:0;right:0;bottom:0;z-index:41;background:#fff;border-radius:10px 18px 0 0;max-height:92vh;overflow:auto;padding:18px 16px calc(18px + env(safe-area-inset-bottom));transform:translateY(105%);transition:transform .2s ease}
   .sheet.on{transform:none}
   @media (min-width:720px){.sheet{left:50%;right:auto;width:640px;margin-left:-320px}}
   label{display:block;font-size:13px;font-weight:700;color:var(--navy);margin:12px 0 4px}
@@ -277,7 +277,7 @@
     // Grouped by school; every option says its term ("Business Horizons Career Fair — Spring 2027")
     const schools = [...new Set(S.fairs.map((f) => f.school))];
     $("#fairsel").innerHTML = schools.map((sc) => `<optgroup label="${esc(sc)}">${S.fairs.filter((f) => f.school === sc)
-      .map((f) => `<option value="${esc(f.id)}">${esc(f.name + (f.term ? " — " + f.term : ""))}</option>`).join("")}</optgroup>`).join("");
+      .map((f) => `<option value="${esc(f.id)}">${esc(f.name + (f.term ? " · " + f.term : ""))}</option>`).join("")}</optgroup>`).join("");
     pickFair(S.fairs.find((f) => f.id === want) ? want : S.fairs[0].id);
   }
   async function pickFair(id){
@@ -295,7 +295,7 @@
       const d = await fetch("/api/listings?field=all&companies=" + encodeURIComponent(ids.join(","))).then((r) => { if (!r.ok) throw 0; return r.json(); });
       S.listings = {};
       for (const l of d.listings || []) (S.listings[l.company_id] = S.listings[l.company_id] || []).push(l);
-    } catch { S.listingsErr = true; toast("Couldn't load internships — showing companies only"); }
+    } catch { S.listingsErr = true; toast("Couldn't load internships, showing companies only"); }
     renderCompanies();
   }
 
@@ -306,7 +306,7 @@
     const el = $("#qrcard"), r = S.me.resume;
     if (!S.user) {
       el.innerHTML = `<div class="qrtitle">Your resume, as a QR code</div>
-        <p class="muted small" style="margin:4px 0 12px">Recruiters scan it with their phone camera — no app needed. Sign in to set it up; browsing the fair is free.</p>
+        <p class="muted small" style="margin:4px 0 12px">Recruiters scan it with their phone camera, no app needed. Sign in to set it up; browsing the fair is free.</p>
         <button class="btn go" id="qrSign">Sign in to get your QR</button>`;
       $("#qrSign").onclick = () => signIn();
       return;
@@ -314,7 +314,7 @@
     if (!S.loaded) { el.innerHTML = `<div class="muted">Loading your resume…</div>`; return; }
     if (!r) {
       el.innerHTML = `<div class="qrtitle">Add your resume to get a QR code</div>
-        <p class="muted small" style="margin:4px 0 12px">PDF, under 3 MB. It starts <b>private</b> — nobody can open it until you turn the QR link on. You can turn it off, make a new link, or delete it anytime.</p>
+        <p class="muted small" style="margin:4px 0 12px">PDF, under 3 MB. It starts <b>private</b>, nobody can open it until you turn the QR link on. You can turn it off, make a new link, or delete it anytime.</p>
         <button class="btn go" id="up">Upload resume (PDF)</button>`;
       $("#up").onclick = () => $("#file").click();
       return;
@@ -334,7 +334,7 @@
     $("#share").onchange = (e) => setShare(e.target.checked);
   }
   async function setShare(on){
-    try { S.me = await api("POST", { action: "share", on }); toast(on ? "QR link is on" : "QR link is off — scans show 'not shared'"); }
+    try { S.me = await api("POST", { action: "share", on }); toast(on ? "QR link is on" : "QR link is off, scans show 'not shared'"); }
     catch (e) { toast(e.message); }
     renderAll();
   }
@@ -345,7 +345,7 @@
     if (f.size > 3 * 1024 * 1024) return toast("Resume must be under 3 MB");
     toast("Uploading…");
     const data = await new Promise((ok, bad) => { const rd = new FileReader(); rd.onload = () => ok(String(rd.result).split(",")[1]); rd.onerror = bad; rd.readAsDataURL(f); });
-    try { S.me = await api("POST", { action: "resume", name: f.name, data }); toast("Resume saved — your QR is ready"); }
+    try { S.me = await api("POST", { action: "resume", name: f.name, data }); toast("Resume saved, your QR is ready"); }
     catch (err) { toast(err.message); }
     renderAll();
   };
@@ -356,7 +356,7 @@
     if (!S.fair) return;
     if (!S.fair.companies.length) {     // announced fair, employer list not out yet
       $("#chips").innerHTML = "";
-      $("#cos").innerHTML = `<div class="empty"><b>${esc(S.fair.name)} — ${esc(S.fair.term || "")}</b><br>${esc(S.fair.when || "")} · ${esc(S.fair.where || "")}<br><br>
+      $("#cos").innerHTML = `<div class="empty"><b>${esc(S.fair.name)}, ${esc(S.fair.term || "")}</b><br>${esc(S.fair.when || "")} · ${esc(S.fair.where || "")}<br><br>
         The employer list isn't out yet. VT usually posts it on Handshake a week or two before the fair, and we'll add it here with every company's open internships.
         ${S.fair.source ? `<br><a href="${esc(S.fair.source)}" target="_blank" rel="noopener">VT's career fair calendar ↗</a>` : ""}</div>`;
       return;
@@ -389,8 +389,8 @@
         <div class="cohead">${c.id ? `<button class="star" aria-pressed="${c.star}" aria-label="${c.star ? "Remove from" : "Add to"} my plan">${c.star ? "★" : "☆"}</button>` : `<span style="width:16px"></span>`}<button class="exp" aria-expanded="${S.open.has(key)}"><span class="coname">${esc(c.name)}${c.booth ? `<span class="booth">Booth ${esc(c.booth)}</span>` : ""}</span>${pill}
           <span class="cosub">${c.jobs.length ? `${c.jobs.length} internship${c.jobs.length > 1 ? "s" : ""}${c.mine ? ` · ${c.mine} in your major` : ""}` : (c.id ? "We'll show internships as soon as their board posts them" : "Not tracked yet")}</span></button></div>
         <div class="codetail">
-          ${jobs || (S.listingsErr && c.id ? `<p class="muted small" style="margin:4px 0 10px">We couldn't load internships just now (our side or your connection) — this doesn't mean they have none. Refresh to try again.</p>`
-            : `<p class="muted small" style="margin:4px 0 10px">No open internships on their job board right now. Still worth a conversation — ask what's coming.</p>`)}
+          ${jobs || (S.listingsErr && c.id ? `<p class="muted small" style="margin:4px 0 10px">We couldn't load internships just now (our side or your connection), this doesn't mean they have none. Refresh to try again.</p>`
+            : `<p class="muted small" style="margin:4px 0 10px">No open internships on their job board right now. Still worth a conversation, ask what's coming.</p>`)}
           ${c.jobs.length > 12 ? `<p class="muted small">+ ${c.jobs.length - 12} more on the <a href="/jobs/">jobs page</a></p>` : ""}
           <div class="row" style="margin-top:10px"><button class="btn go note">${c.talked ? "Add more notes" : "I talked to them"}</button>
           ${c.id ? `<button class="btn brief">Brief</button>` : ""}
@@ -418,7 +418,7 @@
     if (!S.user) return signIn("Sign in to build your game plan");
     const on = !(S.me.starred || []).includes(c.id);
     S.me.starred = on ? [...(S.me.starred || []), c.id] : S.me.starred.filter((x) => x !== c.id); renderCompanies();
-    try { S.me = { ...S.me, ...(await api("POST", { action: "star", company: c.id, on })) }; if (on) toast(`★ ${c.name} added to your plan — we'll flag new internships from them`); }
+    try { S.me = { ...S.me, ...(await api("POST", { action: "star", company: c.id, on })) }; if (on) toast(`★ ${c.name} added to your plan, we'll flag new internships from them`); }
     catch (e) { toast(e.message); }
     renderCompanies();
   }
@@ -441,7 +441,7 @@
       ${states.length ? `<div class="small"><b>Where:</b> ${esc(states.slice(0, 6).join(", "))}${states.length > 6 ? ` +${states.length - 6} more` : ""}</div>` : ""}
       ${jobs.length ? `<div class="small" style="margin-top:4px"><b>Roles:</b> ${esc([...new Set(jobs.map((j) => j.title))].slice(0, 4).join(" · "))}</div>` : `<div class="small muted">Nothing posted right now. Ask the recruiter when their internships open.</div>`}
       ${others.length ? `<div class="small" style="margin-top:4px"><b>Also at:</b> ${esc(others.join(", "))}</div>` : ""}
-      <div class="ai" id="aiBrief">${S.user ? `<span class="muted">Writing the brief…</span>` : `<b>AI brief</b> — what they do, what interns work on, and smart questions to ask. <button class="btn go" id="briefSign" style="margin-top:8px">Sign in to see it</button>`}</div>
+      <div class="ai" id="aiBrief">${S.user ? `<span class="muted">Writing the brief…</span>` : `<b>AI brief</b>, what they do, what interns work on, and smart questions to ask. <button class="btn go" id="briefSign" style="margin-top:8px">Sign in to see it</button>`}</div>
       <div class="row" style="margin-top:14px"><button class="btn go" id="briefStar">${(S.me.starred || []).includes(c.id) ? "★ In my plan" : "☆ Add to my plan"}</button>${c.domain ? `<a class="btn" href="https://${esc(c.domain)}" target="_blank" rel="noopener">Website ↗</a>` : ""}</div>`;
     $("#briefSign")?.addEventListener("click", () => signIn());
     $("#briefStar").onclick = async () => { await toggleStar(c); openBrief(c); };
@@ -455,7 +455,7 @@
       if (!el()) return;
       el().innerHTML = `<h4>What they do</h4>${esc(b.about)}${b.engineers ? `<h4>What interns work on</h4>${esc(b.engineers)}` : ""}
         ${b.ask?.length ? `<h4>Good questions to ask</h4><ul>${b.ask.map((q) => `<li>${esc(q)}</li>`).join("")}</ul>` : ""}
-        <div class="warn">${b.known === false ? "We couldn't find much on this company — double-check their website. " : ""}AI-written summary. It can be wrong, so confirm on their site.</div>`;
+        <div class="warn">${b.known === false ? "We couldn't find much on this company, double-check their website. " : ""}AI-written summary. It can be wrong, so confirm on their site.</div>`;
     } catch (e) { if (el()) el().innerHTML = `<span class="muted">${esc(e.message)}</span>`; }
   }
   function closeBrief(){ $("#bsheet").classList.remove("on"); if (!$("#sheet").classList.contains("on")) $("#scrim").classList.remove("on"); }
@@ -485,9 +485,9 @@
     const talkedAt = editing.talkedAt || new Date().toISOString();
     const note = { ...editing, contact: $("#nContact").value, contactEmail: $("#nEmail").value, roles: $("#nRoles").value, said: $("#nSaid").value,
                    feel, talkedAt, followUpAt: new Date(new Date(talkedAt).getTime() + hours * 36e5).toISOString() };
-    if (!S.user) { S.draft = note; closeNote(); return signIn("Sign in to save your notes — they'll be waiting"); }
+    if (!S.user) { S.draft = note; closeNote(); return signIn("Sign in to save your notes, they'll be waiting"); }
     const b = $("#noteSave"); b.disabled = true;
-    try { S.me = await api("POST", { action: "note", note }); closeNote(); toast(`Saved — it's on your Follow-ups tab, due in ${hours === 168 ? "1 week" : hours + " hrs"}`); }
+    try { S.me = await api("POST", { action: "note", note }); closeNote(); toast(`Saved, it's on your Follow-ups tab, due in ${hours === 168 ? "1 week" : hours + " hrs"}`); }
     catch (e) { toast(e.message); }
     b.disabled = false; renderAll();
   };
@@ -512,12 +512,12 @@
     const fair = n.fair ? `the ${n.fair}` : "the career fair";
     const role = n.roles ? `the ${n.roles} role` : `internship opportunities at ${n.company}`;
     const link = S.me.resume?.share ? resumeUrl() : null;
-    const subject = `Great meeting you at ${n.fair || "the career fair"} — ${me}`;
+    const subject = `Great meeting you at ${n.fair || "the career fair"}, ${me}`;
     const body = `Hi ${first || "there"},
 
 Thank you for taking the time to talk with me at ${fair} ${when(n.talkedAt)}. I really enjoyed learning more about ${n.company} and ${role}.
 
-[Add one specific thing you two talked about — it's what makes them remember you.]
+[Add one specific thing you two talked about, it's what makes them remember you.]
 
 I'm very interested in ${n.roles ? "the role" : "interning with your team"} and would love to hear about next steps. ${link ? `My resume is here for easy reference: ${link}` : "I've attached my resume for easy reference."}
 
@@ -552,7 +552,7 @@ ${me}${email ? "\n" + email : ""}`;
     const el = $("#tab-follow");
     const due = S.me.notes.filter((n) => !n.done && new Date(n.followUpAt) - Date.now() <= 24 * 36e5).length;
     const b = $("#dueBadge"); b.textContent = due; b.classList.toggle("hidden", !due);
-    if (!S.user) { el.innerHTML = `<div class="card empty"><p><b>Your follow-ups live here.</b><br>After each conversation, tap "I talked to them" — we'll remind you to follow up and draft the email.</p><button class="btn go" id="fs">Sign in</button></div>`; $("#fs").onclick = () => signIn(); return; }
+    if (!S.user) { el.innerHTML = `<div class="card empty"><p><b>Your follow-ups live here.</b><br>After each conversation, tap "I talked to them", we'll remind you to follow up and draft the email.</p><button class="btn go" id="fs">Sign in</button></div>`; $("#fs").onclick = () => signIn(); return; }
     if (!S.me.notes.length) { el.innerHTML = `<div class="card empty"><p><b>No conversations yet.</b><br>At the fair, open a company and tap <b>I talked to them</b>. It lands here with a reminder and a ready-to-send email.</p></div>`; return; }
     const rank = { late: 0, due: 1, soon: 2, done: 3 };
     const notes = [...S.me.notes].sort((a, b) => rank[fuState(a)[0]] - rank[fuState(b)[0]] || new Date(a.followUpAt) - new Date(b.followUpAt));
@@ -570,7 +570,7 @@ ${me}${email ? "\n" + email : ""}`;
           <div class="small muted" style="margin-top:6px">“Write it with AI” sends this company, the recruiter's name, the roles and your notes to our AI provider to draft the email. Their email address isn't sent. Read it over before sending.</div></details>
         ${n.done ? "" : `<div class="small muted" style="margin-top:8px">The due date above is a reminder <b>inside this app</b> (your Follow-ups tab). For a phone notification, add it to your calendar:</div>
           <div class="row" style="margin-top:4px"><a class="btn ghost" href="${esc(gcal(n))}" target="_blank" rel="noopener">Google Calendar</a><button class="btn ghost ics">iPhone / Outlook</button></div>
-          <div class="small muted" style="margin-top:2px">Event: “${esc(reminderText(n).title)}” at ${esc(reminderTimes(n)[0].toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))} — your notes and their email stay out of your calendar.</div>`}
+          <div class="small muted" style="margin-top:2px">Event: “${esc(reminderText(n).title)}” at ${esc(reminderTimes(n)[0].toLocaleString(undefined, { weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))}, your notes and their email stay out of your calendar.</div>`}
         <div class="row" style="margin-top:10px"><button class="btn done">${n.done ? "Mark not done" : "✓ I followed up"}</button><button class="btn ghost edit">Edit</button><button class="btn ghost del">Delete</button></div>
       </div>`;
     }).join("");
@@ -581,16 +581,16 @@ ${me}${email ? "\n" + email : ""}`;
     if (e.target.closest(".ics")) return downloadIcs(n);
     if (e.target.closest(".polish")) {
       const b = e.target.closest(".polish"); b.disabled = true; b.textContent = "Writing…";
-      try { S.polished[n.id] = await api("POST", { action: "polish", note: { ...n, contactEmail: "" }, name: S.user?.fullName || "", resumeLink: S.me.resume?.share ? resumeUrl() : "" }); toast("Done — read it over before you send"); }
+      try { S.polished[n.id] = await api("POST", { action: "polish", note: { ...n, contactEmail: "" }, name: S.user?.fullName || "", resumeLink: S.me.resume?.share ? resumeUrl() : "" }); toast("Done, read it over before you send"); }
       catch (err) { toast(err.message); }
       return renderFollow();
     }
-    if (e.target.closest(".copy")) { const d = S.polished[n.id] || draft(n); try { await navigator.clipboard.writeText(`Subject: ${d.subject}\n\n${d.body}`); toast("Email copied"); } catch { toast("Couldn't copy — select the text instead"); } return; }
+    if (e.target.closest(".copy")) { const d = S.polished[n.id] || draft(n); try { await navigator.clipboard.writeText(`Subject: ${d.subject}\n\n${d.body}`); toast("Email copied"); } catch { toast("Couldn't copy, select the text instead"); } return; }
     if (e.target.closest(".edit")) return openNote(n.company, n.companyId, n);
     if (e.target.closest(".done") || e.target.closest(".del")) {
       const body = e.target.closest(".del") ? { action: "note_delete", id: n.id } : { action: "note", note: { ...n, done: !n.done } };
       if (body.action === "note_delete" && !confirm(`Delete your notes for ${n.company}?`)) return;
-      try { S.me = await api("POST", body); toast(body.action === "note_delete" ? "Deleted" : n.done ? "Marked not done" : "Nice — marked as followed up"); }
+      try { S.me = await api("POST", body); toast(body.action === "note_delete" ? "Deleted" : n.done ? "Marked not done" : "Nice, marked as followed up"); }
       catch (err) { toast(err.message); }
       renderAll();
     }
@@ -604,7 +604,7 @@ ${me}${email ? "\n" + email : ""}`;
       ${r ? `<p class="small muted" style="margin:4px 0 12px">${esc(r.name)} · updated ${esc(new Date(r.uploadedAt).toLocaleDateString())}</p>
         <div class="row"><a class="btn" href="${esc(resumeUrl())}" target="_blank" rel="noopener">Open what recruiters see ↗</a><button class="btn" id="rep">Replace PDF</button></div>
         <label class="switch" style="margin-top:14px"><input type="checkbox" id="share2" ${r.share ? "checked" : ""}> QR link is ${r.share ? "on" : '<span class="off">off</span>'}</label>
-        <div class="small" style="margin:10px 0 0;line-height:1.55"><b>Who can open it:</b> ${r.share ? "anyone who has your QR code or its link — for example a recruiter you let scan it, or anyone they forward the link to." : "nobody right now. It's private until you turn the QR link on."}
+        <div class="small" style="margin:10px 0 0;line-height:1.55"><b>Who can open it:</b> ${r.share ? "anyone who has your QR code or its link, for example a recruiter you let scan it, or anyone they forward the link to." : "nobody right now. It's private until you turn the QR link on."}
           It's never listed or searchable. Turning the link off blocks it within about 2 minutes.
           If a link got passed around, <b>make a new link</b>: the old QR stops working and you get a fresh one.</div>
         ${r.share ? `<div class="row" style="margin-top:12px"><button class="btn" id="copyLink">Copy resume link</button><button class="btn" id="dlqr">Download QR image</button></div>` : ""}
@@ -614,7 +614,7 @@ ${me}${email ? "\n" + email : ""}`;
     $("#share2")?.addEventListener("change", (e) => setShare(e.target.checked));
     $("#rotate")?.addEventListener("click", async () => {
       if (!confirm("Make a new link? Your old QR code and link will stop working (reprint or re-download the QR).")) return;
-      try { S.me = await api("POST", { action: "rotate" }); toast("New link ready — the old QR no longer works"); } catch (e) { toast(e.message); } renderAll();
+      try { S.me = await api("POST", { action: "rotate" }); toast("New link ready, the old QR no longer works"); } catch (e) { toast(e.message); } renderAll();
     });
     $("#delres")?.addEventListener("click", async () => {
       if (!confirm("Delete your resume? The file and its QR link are removed for good.")) return;

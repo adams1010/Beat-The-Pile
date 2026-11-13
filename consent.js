@@ -24,7 +24,7 @@
     var b = document.querySelector(".btpcookie"); if (b) b.remove();
     try { window.dispatchEvent(new CustomEvent("btp-consent", { detail: { analytics: v === "all" } })); } catch (e) {}
   }
-  var css = ".btpcookie{position:fixed;left:16px;right:16px;bottom:16px;z-index:9000;max-width:560px;margin:0 auto;background:#fff;color:#060A2C;border:1px solid #DCE2EC;border-radius:14px;box-shadow:0 12px 40px rgba(6,10,44,.18);padding:16px 18px;font:15px/1.5 Geist,-apple-system,Segoe UI,Roboto,sans-serif}"
+  var css = ".btpcookie{position:fixed;left:16px;right:16px;bottom:16px;z-index:9000;max-width:560px;margin:0 auto;background:#fff;color:#060A2C;border:1px solid #DCE2EC;border-radius:10px;box-shadow:none;padding:16px 18px;font:15px/1.5 Geist,-apple-system,Segoe UI,Roboto,sans-serif}"
     + ".btpcookie h2{font-size:16px;margin:0 0 4px}.btpcookie p{margin:0 0 12px;color:#3D4A5C}.btpcookie a{color:#3A5A00}"
     + ".btpcookie .row{display:flex;gap:8px;flex-wrap:wrap}.btpcookie button{font:inherit;font-weight:600;border-radius:999px;padding:9px 18px;cursor:pointer;border:1.5px solid #4A7000}"
     + ".btpcookie .yes{background:#4A7000;color:#fff}.btpcookie .no{background:#fff;color:#3A5A00}"

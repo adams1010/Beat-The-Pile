@@ -1605,7 +1605,64 @@
   "Showing results for": "Resultaten voor",
   "(you typed “": "(je typte “",
   "”).": "”).",
-  "Did you mean one of these?": "Bedoelde je een van deze?"
+  "Did you mean one of these?": "Bedoelde je een van deze?",
+  "Internships | Beat the Pile": "Stages | Beat the Pile",
+  "Type a city and state, like Blacksburg, VA, or just a state, like Virginia": "Typ een stad en staat, zoals Blacksburg, VA, of alleen een staat, zoals Virginia",
+  "Marked applied ✓, it's in My Season → Applied": "Gemarkeerd als gesolliciteerd ✓, staat in Mijn seizoen → Gesolliciteerd",
+  "Saved ♥, find it anytime under “♡ Saved” (top of this page) or in My Season → Saved": "Bewaard ♥, altijd terug te vinden onder „♡ Bewaard“ (bovenaan) of in Mijn seizoen → Bewaard",
+  "Couldn't save that, try again": "Kon niet opslaan, probeer opnieuw",
+  "Couldn't save, try again": "Opslaan mislukt, probeer opnieuw",
+  "Couldn’t load internships right now, that’s a problem on our side or your connection, not a sign there are no jobs. Refresh in a minute.": "Kon stages nu niet laden, een probleem bij ons of je verbinding, geen teken dat er geen banen zijn. Vernieuw over een minuut.",
+  "Companies you follow with ☆, you get flagged when they post": "Bedrijven die je volgt met ☆, je krijgt een seintje als ze iets plaatsen",
+  "Sign-in is loading, try again in a second": "Inloggen laadt, probeer het zo opnieuw",
+  "Couldn't get suggestions, try again": "Kon geen suggesties krijgen, probeer opnieuw",
+  "Couldn't read the suggestions, try again": "Kon de suggesties niet lezen, probeer opnieuw",
+  "Couldn't copy, select the text instead": "Kopiëren mislukt, selecteer de tekst",
+  "Beat the Pile, Career Fair Mode": "Beat the Pile, Beursmodus",
+  "Recruiters scan it with their phone camera, no app needed. Sign in to set it up; browsing the fair is free.": "Recruiters scannen hem met hun telefooncamera, geen app nodig. Log in om hem in te stellen; de beurs bekijken is gratis.",
+  "No open internships on their job board right now. Still worth a conversation, ask what's coming.": "Nu geen openstaande stages op hun site. Toch de moeite van een gesprek, vraag wat er aankomt.",
+  "We couldn't load internships just now (our side or your connection), this doesn't mean they have none. Refresh to try again.": "Kon stages net niet laden (bij ons of je verbinding), dat betekent niet dat ze er geen hebben. Vernieuw om opnieuw te proberen.",
+  "Couldn't load internships, showing companies only": "Kon stages niet laden, alleen bedrijven getoond",
+  "We couldn't find much on this company, double-check their website.": "We vonden weinig over dit bedrijf, check hun website.",
+  "Sign in to save your notes, they'll be waiting": "Log in om je notities op te slaan, ze wachten op je",
+  "After each conversation, tap \"I talked to them\", we'll remind you to follow up and draft the email.": "Tik na elk gesprek op „Ik heb ze gesproken“, we herinneren je eraan op te volgen en maken de e-mail klaar.",
+  "Nice, marked as followed up": "Mooi, gemarkeerd als opgevolgd",
+  "Done, read it over before you send": "Klaar, lees het na voor je verstuurt",
+  "Resume saved, your QR is ready": "Cv opgeslagen, je QR is klaar",
+  "QR link is off, scans show 'not shared'": "QR-link staat uit, scans tonen „niet gedeeld“",
+  "New link ready, the old QR no longer works": "Nieuwe link klaar, de oude QR werkt niet meer",
+  "Your resume as a QR code, every company at the fair with their open internships, conversation notes, and follow-up reminders, in one place.": "Je cv als QR-code, elk bedrijf op de beurs met openstaande stages, gespreksnotities en opvolgherinneringen, op één plek.",
+  "My Season | Beat the Pile": "Mijn seizoen | Beat the Pile",
+  "Couldn't load your saved jobs right now, refresh in a minute.": "Kon je bewaarde banen niet laden, vernieuw over een minuut.",
+  "Coming soon, email reminders aren't switched on yet.": "Binnenkort, e-mailherinneringen staan nog niet aan.",
+  "Profile | Beat the Pile": "Profiel | Beat the Pile",
+  "Photo ready, tap Save profile.": "Foto klaar, tik op Profiel opslaan.",
+  "Photo removed, tap Save profile.": "Foto verwijderd, tik op Profiel opslaan.",
+  "Resume read, tap Save profile.": "Cv gelezen, tik op Profiel opslaan.",
+  "Orbit | Beat the Pile": "Orbit | Beat the Pile",
+  "Wrong internship, dead link, company we're missing, or an idea, it goes straight to the team.": "Verkeerde stage, dode link, ontbrekend bedrijf of een idee, het gaat rechtstreeks naar het team.",
+  "Sent, thanks!": "Verstuurd, bedankt!",
+  "Couldn't send, try again": "Versturen mislukt, probeer opnieuw",
+  "Thanks, that goes straight to the team.": "Bedankt, dat gaat rechtstreeks naar het team.",
+  "Get started | Beat the Pile": "Aan de slag | Beat the Pile",
+  "Find talent | Beat the Pile for Business": "Talent vinden | Beat the Pile voor Bedrijven",
+  "Internships & new-grad jobs | Beat the Pile": "Stages & startersbanen | Beat the Pile",
+  "Beat the Pile, Opening Radar": "Beat the Pile, Openingsradar",
+  "You. Calendar reminders you add only carry the company, recruiter's name and roles, not your notes or their email.": "Jij. Agendaherinneringen bevatten alleen het bedrijf, de naam van de recruiter en de functies, niet je notities of hun e-mail.",
+  "turn the QR link on (it starts off). Then anyone with your QR or link, and anyone they forward it to.": "de QR-link aanzet (staat eerst uit). Daarna iedereen met je QR of link, en iedereen naar wie die wordt doorgestuurd.",
+  "to help you improve, not a prediction from any employer. AI can be wrong, so read everything before you send it.": "om je te helpen verbeteren, geen voorspelling van een werkgever. AI kan zich vergissen, lees dus alles voordat je het verstuurt.",
+  "Privacy | Beat the Pile": "Privacy | Beat the Pile",
+  "Beat the Pile for Business, Hire interns and new grads from every major": "Beat the Pile voor Bedrijven, Werf stagiairs en starters uit elke studierichting",
+  "Home | Beat the Pile Business": "Home | Beat the Pile Business",
+  "Set up your company | Beat the Pile Business": "Stel je bedrijf in | Beat the Pile Business",
+  "Company | Beat the Pile": "Bedrijf | Beat the Pile",
+  "Career fairs | Beat the Pile Business": "Banenbeurzen | Beat the Pile Business",
+  "My Internship | Beat the Pile": "Mijn stage | Beat the Pile",
+  "Every major | Beat the Pile": "Alle studies | Beat the Pile",
+  "Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board, no reposts, and jobs drop off when the company takes them down.": "Eerst stages, starterbanen ook. Alle studies, rechtstreeks van de vacaturesite van elk bedrijf: geen herplaatsingen, en vacatures verdwijnen zodra het bedrijf ze weghaalt.",
+  "Not listed, type it": "Staat er niet bij: typ het",
+  "Every major": "Alle studies",
+  "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "We lezen duizenden vacaturesites meerdere keren per dag. Plaats je stages of startersbanen op je carrièresite, dan zien studenten ze hier met een directe link naar je sollicitatiepagina. Je hoeft niets te plaatsen."
  },
  "patterns": [
   [
@@ -1705,12 +1762,12 @@
    "Gesproken met $1"
   ],
   [
-   "^(.+) — Spring (\\d{4})$",
-   "$1 — Voorjaar $2"
+   "^(.+) · Spring (\\d{4})$",
+   "$1 · Voorjaar $2"
   ],
   [
-   "^(.+) — Fall (\\d{4})$",
-   "$1 — Najaar $2"
+   "^(.+) · Fall (\\d{4})$",
+   "$1 · Najaar $2"
   ],
   [
    "^Spring (\\d{4})$",
@@ -1805,8 +1862,8 @@
    "Code verstuurd naar $1"
   ],
   [
-   "^(.+) — Beat the Pile$",
-   "$1 — Beat the Pile"
+   "^(.+), Beat the Pile$",
+   "$1, Beat the Pile"
   ],
   [
    "^Filled in (.+)\\. Check it over, then tap Save profile\\.$",
@@ -1889,7 +1946,7 @@
    "Je typte ‘$1’."
   ],
   [
-   "^Searched every major — (.+) had only a few matches\\.$",
+   "^Searched every major, (.+) had only a few matches\\.$",
    "In alle studies gezocht: $1 had maar weinig resultaten."
   ],
   [
@@ -1905,8 +1962,8 @@
    "$1 $2"
   ],
   [
-   "^Not listed — use “(.+)”$",
-   "Staat er niet bij — gebruik “$1”"
+   "^Not listed, use “(.+)”$",
+   "Staat er niet bij, gebruik “$1”"
   ],
   [
    "^Faculty & staff · (.+)$",

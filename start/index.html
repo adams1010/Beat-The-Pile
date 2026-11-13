@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Get started — Beat the Pile</title>
+<title>Get started | Beat the Pile</title>
 <meta name="description" content="Join Beat the Pile: find an internship or first job in any major, or hire interns and new grads.">
 <link rel="canonical" href="https://www.beatthepile.com/start/">
 <link rel="icon" href="/icons/icon-192.png">
@@ -21,7 +21,7 @@
   h1{font-size:clamp(28px,4.5vw,40px);line-height:1.1;letter-spacing:-.025em;text-align:center;margin:0 0 10px}
   h1 em{font-style:normal;color:var(--lime)}
   .lead{text-align:center;color:#C9D2E3;margin:0 auto 28px;max-width:52ch}
-  .panel{background:#fff;color:var(--ink);border-radius:16px;padding:28px;box-shadow:0 24px 60px rgba(0,0,0,.35)}
+  .panel{background:#fff;color:var(--ink);border-radius:10px;padding:28px;box-shadow:none}
   #signin{display:flex;justify-content:center;min-height:120px;width:100%}
   /* Nov 9: Clerk's own card is ~400px wide with its own shadow; inside our panel on a phone it ran off the right edge.
      Let it fill the panel, centered, with no second card around it. */
@@ -123,7 +123,7 @@
     const majorBox = async () => {
       const progs = st.schoolId ? (await P.majors(st.schoolId)).map((x) => x.label) : [];
       if (progs.length) {
-        $("#o_mjw").innerHTML = `<label for="o_mjs">${staff ? "Department (optional)" : "Major"}</label><select id="o_mjs"><option value="">${staff ? "Pick your department" : "Pick your major"}</option>${progs.map((m) => `<option${m === st.major ? " selected" : ""}>${esc(m)}</option>`).join("")}<option value="__o">Not listed — type it</option></select><input id="o_mj" hidden placeholder="Your major" style="margin-top:6px">`;
+        $("#o_mjw").innerHTML = `<label for="o_mjs">${staff ? "Department (optional)" : "Major"}</label><select id="o_mjs"><option value="">${staff ? "Pick your department" : "Pick your major"}</option>${progs.map((m) => `<option${m === st.major ? " selected" : ""}>${esc(m)}</option>`).join("")}<option value="__o">Not listed, type it</option></select><input id="o_mj" hidden placeholder="Your major" style="margin-top:6px">`;
         $("#o_mjs").onchange = (e) => { const v = e.target.value; $("#o_mj").hidden = v !== "__o"; st.major = v === "__o" ? "" : v; if (v === "__o") $("#o_mj").focus(); };
         $("#o_mj").oninput = (e) => { st.major = e.target.value; };
       } else {
@@ -164,7 +164,7 @@
       show();
     } catch { $("#view").innerHTML = '<div class="panel center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; }
   }
-  window.__startPreview = (who) => who ? stepRole({ user: { unsafeMetadata: {}, primaryEmailAddress: { emailAddress: "you@school.edu" } }, signOut(){} }) : stepEmail({ mountSignIn(el){ el.innerHTML = '<div style="width:380px;max-width:100%;border:1px dashed #DCE2EC;border-radius:12px;padding:30px;text-align:center;color:#55627A">Clerk email box</div>'; } });
+  window.__startPreview = (who) => who ? stepRole({ user: { unsafeMetadata: {}, primaryEmailAddress: { emailAddress: "you@school.edu" } }, signOut(){} }) : stepEmail({ mountSignIn(el){ el.innerHTML = '<div style="width:380px;max-width:100%;border:1px dashed #DCE2EC;border-radius:10px;padding:30px;text-align:center;color:#55627A">Clerk email box</div>'; } });
   loadClerk();
 })();
 </script>

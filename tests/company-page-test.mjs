@@ -13,7 +13,7 @@ const listings = (await import("../api/listings.js")).default;
 let r = await invoke(listings, { method: "GET", query: { page: "x-lockheed-martin" } });
 assert.equal(r.code, 200);
 const h = String(r.body);
-assert.ok(/<title>Lockheed Martin internships — 3 open now/.test(h), "title says how many are open");
+assert.ok(/<title>Lockheed Martin internships, 3 open now/.test(h), "title says how many are open");
 assert.ok(h.includes('rel="canonical" href="https://www.beatthepile.com/c/x-lockheed-martin"'));
 assert.ok(h.includes("2 states") && h.includes("lmco.wd1.myworkdayjobs.com"), "states + their own board");
 assert.ok(!h.includes("Old Closed Intern"), "closed jobs never shown");

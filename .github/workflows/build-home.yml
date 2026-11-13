@@ -1,0 +1,27 @@
+# Builds home.js from src/home.jsx whenever src/home.jsx changes on main (Nov 13 2026) — so an edit made where Babel
+# isn't installed still ships. Commits home.js only when it actually changed.
+name: build-home
+on:
+  push:
+    branches: [main]
+    paths: ["src/home.jsx", "scripts/build-home.mjs"]
+  workflow_dispatch:
+permissions: { contents: write }
+concurrency: { group: build-home, cancel-in-progress: false }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm ci --no-audit --no-fund || npm install --no-audit --no-fund
+      - run: node scripts/build-home.mjs
+      - run: node tests/home-build-test.mjs
+      - name: Commit home.js
+        run: |
+          git config user.name "btp-build"; git config user.email "build@users.noreply.github.com"
+          git add home.js
+          git diff --cached --quiet && { echo "home.js already up to date"; exit 0; }
+          git commit -q -m "Build home.js from src/home.jsx" && git pull --rebase -q && git push -q

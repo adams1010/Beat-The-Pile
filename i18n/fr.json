@@ -1605,7 +1605,64 @@
   "Showing results for": "Résultats pour",
   "(you typed “": "(vous avez tapé « ",
   "”).": "»).",
-  "Did you mean one of these?": "Vouliez-vous dire l'un de ceux-ci ?"
+  "Did you mean one of these?": "Vouliez-vous dire l'un de ceux-ci ?",
+  "Internships | Beat the Pile": "Stages | Beat the Pile",
+  "Type a city and state, like Blacksburg, VA, or just a state, like Virginia": "Saisissez une ville et un État, comme Blacksburg, VA, ou juste un État, comme Virginia",
+  "Marked applied ✓, it's in My Season → Applied": "Marqué comme postulé ✓, c'est dans Ma saison → Postulé",
+  "Saved ♥, find it anytime under “♡ Saved” (top of this page) or in My Season → Saved": "Enregistré ♥, retrouvez-le sous « ♡ Enregistrés » (en haut de la page) ou dans Ma saison → Enregistrés",
+  "Couldn't save that, try again": "Impossible d'enregistrer, réessayez",
+  "Couldn't save, try again": "Échec de l'enregistrement, réessayez",
+  "Couldn’t load internships right now, that’s a problem on our side or your connection, not a sign there are no jobs. Refresh in a minute.": "Impossible de charger les stages pour l'instant, problème de notre côté ou de connexion, pas un signe qu'il n'y a pas d'offres. Actualisez dans une minute.",
+  "Companies you follow with ☆, you get flagged when they post": "Entreprises suivies avec ☆, vous êtes alerté quand elles publient",
+  "Sign-in is loading, try again in a second": "La connexion se charge, réessayez dans une seconde",
+  "Couldn't get suggestions, try again": "Impossible d'obtenir des suggestions, réessayez",
+  "Couldn't read the suggestions, try again": "Impossible de lire les suggestions, réessayez",
+  "Couldn't copy, select the text instead": "Copie impossible, sélectionnez le texte",
+  "Beat the Pile, Career Fair Mode": "Beat the Pile, Mode Salon",
+  "Recruiters scan it with their phone camera, no app needed. Sign in to set it up; browsing the fair is free.": "Les recruteurs le scannent avec l'appareil photo de leur téléphone, sans appli. Connectez-vous pour le configurer ; parcourir le salon est gratuit.",
+  "No open internships on their job board right now. Still worth a conversation, ask what's coming.": "Aucun stage ouvert sur leur site pour l'instant. Ça vaut quand même une discussion, demandez ce qui arrive.",
+  "We couldn't load internships just now (our side or your connection), this doesn't mean they have none. Refresh to try again.": "Impossible de charger les stages (de notre côté ou de connexion), cela ne veut pas dire qu'ils n'en ont pas. Actualisez pour réessayer.",
+  "Couldn't load internships, showing companies only": "Impossible de charger les stages, affichage des entreprises seulement",
+  "We couldn't find much on this company, double-check their website.": "Peu d'infos trouvées sur cette entreprise, vérifiez leur site.",
+  "Sign in to save your notes, they'll be waiting": "Connectez-vous pour enregistrer vos notes, elles vous attendront",
+  "After each conversation, tap \"I talked to them\", we'll remind you to follow up and draft the email.": "Après chaque conversation, appuyez sur « Je leur ai parlé », nous vous rappellerons de relancer et rédigerons l'e-mail.",
+  "Nice, marked as followed up": "Bien, marqué comme relancé",
+  "Done, read it over before you send": "Terminé, relisez avant d'envoyer",
+  "Resume saved, your QR is ready": "CV enregistré, votre QR est prêt",
+  "QR link is off, scans show 'not shared'": "Le lien QR est désactivé, les scans affichent « non partagé »",
+  "New link ready, the old QR no longer works": "Nouveau lien prêt, l'ancien QR ne fonctionne plus",
+  "Your resume as a QR code, every company at the fair with their open internships, conversation notes, and follow-up reminders, in one place.": "Votre CV en code QR, chaque entreprise du salon avec ses stages ouverts, vos notes et rappels de relance, au même endroit.",
+  "My Season | Beat the Pile": "Ma saison | Beat the Pile",
+  "Couldn't load your saved jobs right now, refresh in a minute.": "Impossible de charger vos offres enregistrées, actualisez dans une minute.",
+  "Coming soon, email reminders aren't switched on yet.": "Bientôt, les rappels e-mail ne sont pas encore activés.",
+  "Profile | Beat the Pile": "Profil | Beat the Pile",
+  "Photo ready, tap Save profile.": "Photo prête, appuyez sur Enregistrer le profil.",
+  "Photo removed, tap Save profile.": "Photo retirée, appuyez sur Enregistrer le profil.",
+  "Resume read, tap Save profile.": "CV lu, appuyez sur Enregistrer le profil.",
+  "Orbit | Beat the Pile": "Orbit | Beat the Pile",
+  "Wrong internship, dead link, company we're missing, or an idea, it goes straight to the team.": "Stage erroné, lien mort, entreprise manquante ou idée, cela arrive directement à l'équipe.",
+  "Sent, thanks!": "Envoyé, merci !",
+  "Couldn't send, try again": "Envoi impossible, réessayez",
+  "Thanks, that goes straight to the team.": "Merci, cela arrive directement à l'équipe.",
+  "Get started | Beat the Pile": "Commencer | Beat the Pile",
+  "Find talent | Beat the Pile for Business": "Trouver des talents | Beat the Pile Entreprises",
+  "Internships & new-grad jobs | Beat the Pile": "Stages et postes jeunes diplômés | Beat the Pile",
+  "Beat the Pile, Opening Radar": "Beat the Pile, Radar des ouvertures",
+  "You. Calendar reminders you add only carry the company, recruiter's name and roles, not your notes or their email.": "Vous. Les rappels d'agenda ne contiennent que l'entreprise, le nom du recruteur et les postes, pas vos notes ni son e-mail.",
+  "turn the QR link on (it starts off). Then anyone with your QR or link, and anyone they forward it to.": "activez le lien QR (désactivé au départ). Ensuite, toute personne ayant votre QR ou lien, et toute personne à qui il est transféré.",
+  "to help you improve, not a prediction from any employer. AI can be wrong, so read everything before you send it.": "pour vous aider à progresser, pas une prédiction d'un employeur. L'IA peut se tromper : relisez tout avant d'envoyer.",
+  "Privacy | Beat the Pile": "Confidentialité | Beat the Pile",
+  "Beat the Pile for Business, Hire interns and new grads from every major": "Beat the Pile Entreprises, Recrutez stagiaires et jeunes diplômés de toutes les filières",
+  "Home | Beat the Pile Business": "Accueil | Beat the Pile Entreprises",
+  "Set up your company | Beat the Pile Business": "Configurez votre entreprise | Beat the Pile Entreprises",
+  "Company | Beat the Pile": "Entreprise | Beat the Pile",
+  "Career fairs | Beat the Pile Business": "Salons | Beat the Pile Entreprises",
+  "My Internship | Beat the Pile": "Mon stage | Beat the Pile",
+  "Every major | Beat the Pile": "Toutes les filières | Beat the Pile",
+  "Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board, no reposts, and jobs drop off when the company takes them down.": "Les stages d'abord, les postes jeunes diplômés aussi. Toutes les filières, tirés directement du site carrières de chaque entreprise : pas de republications, et les offres disparaissent quand l'entreprise les retire.",
+  "Not listed, type it": "Pas dans la liste : tapez-la",
+  "Every major": "Toutes les filières",
+  "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "Nous lisons des milliers de pages carrières plusieurs fois par jour. Si vous publiez des stages ou postes débutants sur votre site carrières, les étudiants les voient ici avec un lien direct vers votre page de candidature. Vous n'avez rien à publier."
  },
  "patterns": [
   [
@@ -1705,12 +1762,12 @@
    "Discuté avec $1"
   ],
   [
-   "^(.+) — Spring (\\d{4})$",
-   "$1 — Printemps $2"
+   "^(.+) · Spring (\\d{4})$",
+   "$1 · Printemps $2"
   ],
   [
-   "^(.+) — Fall (\\d{4})$",
-   "$1 — Automne $2"
+   "^(.+) · Fall (\\d{4})$",
+   "$1 · Automne $2"
   ],
   [
    "^Spring (\\d{4})$",
@@ -1805,8 +1862,8 @@
    "Code envoyé à $1"
   ],
   [
-   "^(.+) — Beat the Pile$",
-   "$1 — Beat the Pile"
+   "^(.+), Beat the Pile$",
+   "$1, Beat the Pile"
   ],
   [
    "^Filled in (.+)\\. Check it over, then tap Save profile\\.$",
@@ -1889,7 +1946,7 @@
    "Vous avez tapé « $1 »."
   ],
   [
-   "^Searched every major — (.+) had only a few matches\\.$",
+   "^Searched every major, (.+) had only a few matches\\.$",
    "Recherche dans toutes les filières : $1 avait peu de résultats."
   ],
   [
@@ -1905,8 +1962,8 @@
    "$1 $2"
   ],
   [
-   "^Not listed — use “(.+)”$",
-   "Absent de la liste — utiliser « $1 »"
+   "^Not listed, use “(.+)”$",
+   "Absent de la liste, utiliser « $1 »"
   ],
   [
    "^Faculty & staff · (.+)$",

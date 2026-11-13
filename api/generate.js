@@ -33,7 +33,7 @@ export const FEATURES = {
     if (entries.length < 40) throw new AIError("Add a few weekly log entries first", 400);
     return { maxTokens: 900, temperature: 0.2, prompt: `A student wrote a weekly log during their internship as ${role || "an intern"} at ${company || "a company"}. Turn it into 4-6 strong resume bullet points.
 
-Rules: use ONLY facts in the log — never invent numbers, tools, results or scope. Start each bullet with a strong past-tense verb. If a number would help but isn't in the log, write [number] as a placeholder for the student to fill in. Keep each bullet under 25 words.
+Rules: use ONLY facts in the log, never invent numbers, tools, results or scope. Start each bullet with a strong past-tense verb. If a number would help but isn't in the log, write [number] as a placeholder for the student to fill in. Keep each bullet under 25 words.
 
 LOG:
 ${entries}
@@ -45,22 +45,22 @@ Return ONLY a JSON array of strings. No other text.` };
   profile_fill(i) {
     const resume = str(i?.resume, 12000);
     if (resume.length < 80) throw new AIError("We couldn't read enough of that resume", 400);
-    return { maxTokens: 2500, temperature: 0, prompt: `Turn this resume into profile fields for a student's career profile page. COPY what the resume says — do not invent, guess or embellish anything. If something isn't in the resume, use "" (or [] for lists). Keep the student's own wording for bullet points; join a role's bullets into one or two plain sentences.
+    return { maxTokens: 2500, temperature: 0, prompt: `Turn this resume into profile fields for a student's career profile page. COPY what the resume says, do not invent, guess or embellish anything. If something isn't in the resume, use "" (or [] for lists). Keep the student's own wording for bullet points; join a role's bullets into one or two plain sentences.
 
 RESUME:
 ${resume}
 
 Return ONLY this JSON (no other text):
 {"name":"full name","headline":"short line like 'Mechanical Engineering student at Virginia Tech' built only from facts in the resume","school":"current college/university (not high school)","major":"major only, e.g. Mechanical Engineering","gradYear":2028,"location":"City, ST if listed","about":"2-3 sentences summarizing ONLY what the resume shows (objective/summary if present)","skills":["up to 20 skills, tools, languages listed"],"experience":[{"title":"role","org":"employer or organization","when":"dates as written, e.g. May 2025 – Aug 2025","desc":"what they did, from the bullets"}],"projects":[{"name":"project name","desc":"from the resume","link":"https link only if written in the resume"}],"links":{"linkedin":"https URL if listed","github":"https URL if listed","portfolio":"https URL if listed"}}
-Rules: gradYear is the expected graduation year as a number, or null. Experience = jobs, internships, research, leadership roles (most recent first, at most 8). Projects at most 6. Links must start with https:// — add https:// to a bare linkedin.com/github.com address from the resume; otherwise "".` };
+Rules: gradYear is the expected graduation year as a number, or null. Experience = jobs, internships, research, leadership roles (most recent first, at most 8). Projects at most 6. Links must start with https://, add https:// to a bare linkedin.com/github.com address from the resume; otherwise "".` };
   },
 
   reasons(i) {
     const resume = str(i?.resume, 3000);
     const cos = (Array.isArray(i?.companies) ? i.companies : []).slice(0, 30)
-      .map((c, n) => `${n + 1}. ${str(c?.name, 100)} — ${str(c?.role, 120)} (${str(c?.industry, 60) || "—"})`);
+      .map((c, n) => `${n + 1}. ${str(c?.name, 100)}, ${str(c?.role, 120)} (${str(c?.industry, 60) || "—"})`);
     if (resume.length < 80 || !cos.length) throw new AIError("Add a resume first", 400);
-    return { maxTokens: 3000, temperature: 0, prompt: `A college student has a resume and a list of internship companies. For each company, write ONE specific, honest sentence about why it fits THIS student based on their resume. Reference real things from the resume (specific skills, projects, classes, leadership). No generic "you'd be a great fit" — be specific. Never invent anything that is not in the resume.
+    return { maxTokens: 3000, temperature: 0, prompt: `A college student has a resume and a list of internship companies. For each company, write ONE specific, honest sentence about why it fits THIS student based on their resume. Reference real things from the resume (specific skills, projects, classes, leadership). No generic "you'd be a great fit", be specific. Never invent anything that is not in the resume.
 
 STUDENT RESUME:
 ${resume}
@@ -74,7 +74,7 @@ Return ONLY a JSON array, in the same order as the companies. Each entry: {"i":1
   resume_builder(i) {
     const majors = str(i?.majors, 160), skills = list(i?.skills, 30, 60).join(", ") || "(no skills listed yet)";
     const acts = (Array.isArray(i?.activities) ? i.activities : []).slice(0, 15).map((a) => `- ${str(a?.activity, 80)} (${str(a?.role, 60)})`).join("\n") || "- (no activities listed)";
-    return { maxTokens: 2200, temperature: 0, prompt: `Generate a starter resume in plain text for this college student. This is a STARTING DRAFT — fill in their real info from below, and use square-bracketed placeholders like "[Add 2-3 bullet points about your role here]" for things you don't have.
+    return { maxTokens: 2200, temperature: 0, prompt: `Generate a starter resume in plain text for this college student. This is a STARTING DRAFT, fill in their real info from below, and use square-bracketed placeholders like "[Add 2-3 bullet points about your role here]" for things you don't have.
 
 DO NOT invent specific accomplishments, GPAs different from theirs, work experience, projects, courses, awards, or technical details. Only use what's given. Where details are missing, use bracketed placeholders that tell the student exactly what to add.
 
@@ -92,14 +92,14 @@ STUDENT INFO:
 ${acts}
 
 STRUCTURE (use this exact section order):
-1. Header (name, contact info — use [bracketed] placeholders)
-2. EDUCATION (university, major, graduation, GPA — use their real values; placeholder for relevant coursework: "[List 4-5 relevant courses, e.g. ...]")
+1. Header (name, contact info, use [bracketed] placeholders)
+2. EDUCATION (university, major, graduation, GPA, use their real values; placeholder for relevant coursework: "[List 4-5 relevant courses, e.g. ...]")
 3. SKILLS (group by category if applicable; use their listed skills, add placeholder "[Add additional skills like certifications, languages, software you know]")
-4. LEADERSHIP & ACTIVITIES (one entry per activity they listed, with their role; under each: "[Add 2-3 bullets describing what you did — start with action verbs like Led, Organized, Coordinated]")
-5. EXPERIENCE (header only with placeholder: "[Add work experience or internships here — even part-time jobs count]")
+4. LEADERSHIP & ACTIVITIES (one entry per activity they listed, with their role; under each: "[Add 2-3 bullets describing what you did, start with action verbs like Led, Organized, Coordinated]")
+5. EXPERIENCE (header only with placeholder: "[Add work experience or internships here, even part-time jobs count]")
 6. PROJECTS (header only with placeholder: "[Add 1-2 class or personal projects relevant to ${majors || "your major"}]")
 
-Return ONLY the resume text. No preamble, no closing notes, no markdown — just the resume as if it were going in a plain text file.` };
+Return ONLY the resume text. No preamble, no closing notes, no markdown, just the resume as if it were going in a plain text file.` };
   },
 
   cover_letter(i) {
@@ -115,11 +115,11 @@ ROLE: ${role || "Intern"} at ${company} (${str(i?.industry, 60) || "industry not
     const p = student(i?.student), company = str(i?.company, 100), role = str(i?.role, 120), days = num(i?.days, 1, 120, 7);
     if (!company) throw new AIError("Which company?", 400);
     const resume = str(i?.resume, 2000);
-    const resumeBlock = resume.length >= 80 ? `\n\nStudent's resume snippet (use this to make ONE specific, true detail land — don't fabricate anything not in here):\n"""\n${resume}\n"""` : "";
+    const resumeBlock = resume.length >= 80 ? `\n\nStudent's resume snippet (use this to make ONE specific, true detail land, don't fabricate anything not in here):\n"""\n${resume}\n"""` : "";
     return { maxTokens: 800, temperature: 0.7, prompt: `Write a short, professional internship application follow-up email. Return ONLY valid JSON, no markdown: {"coverLetter":"...","tips":["...","..."]}.
 The student applied to the ${role || "internship"} role at ${company} about ${days} days ago and is checking in.
 STUDENT: ${p.fullName || "a student"}, ${p.major} at ${p.school}.${resumeBlock}
-Email must be first-person, under 120 words, warm but professional, reaffirm interest, politely ask about timeline. If a resume is provided, weave in ONE specific true detail (a project, skill, or experience from the resume) — keep it natural, not forced. "coverLetter" is the email body, starting with "Subject: ..." on the first line. "tips" = 2 short sending tips.` };
+Email must be first-person, under 120 words, warm but professional, reaffirm interest, politely ask about timeline. If a resume is provided, weave in ONE specific true detail (a project, skill, or experience from the resume), keep it natural, not forced. "coverLetter" is the email body, starting with "Subject: ..." on the first line. "tips" = 2 short sending tips.` };
   },
 
   score(i) {
@@ -143,7 +143,7 @@ Return ONLY a valid JSON object with this exact shape:
     {"label": "Experience signals", "good": true_or_false, "note": "specific"}
   ],
   "humanScore": NUMBER_0_TO_100,
-  "humanVerdict": "one-line, e.g. 'Strong human round — recruiter would likely interview'",
+  "humanVerdict": "one-line, e.g. 'Strong human round, recruiter would likely interview'",
   "humanFactors": [
     {"label": "Profile strength", "good": true_or_false, "note": "specific"},
     {"label": "Leadership signals", "good": true_or_false, "note": "specific"},
@@ -151,18 +151,18 @@ Return ONLY a valid JSON object with this exact shape:
     {"label": "Standout details", "good": true_or_false, "note": "specific"}
   ],
   "fixes": [
-    "specific actionable improvement #1, e.g. 'Add a Skills section listing Python, SQL, Excel — these appear 5+ times in the posting'",
+    "specific actionable improvement #1, e.g. 'Add a Skills section listing Python, SQL, Excel, these appear 5+ times in the posting'",
     "improvement #2",
     "improvement #3"
   ],
   "overallNote": "2-3 sentence honest summary: where they stand, what to do next"
 }
 
-In the actual JSON output, use real numbers for the scores (0-100) and real booleans (true or false) — those placeholders above are just describing the format.
+In the actual JSON output, use real numbers for the scores (0-100) and real booleans (true or false), those placeholders above are just describing the format.
 
 RULES:
-- Base scores on what's actually in the materials. If they only gave a resume (no JD), the screenerScore is a general resume-readiness score and the screenerFactors should reflect that (no keyword match possible — say so).
-- If they only gave a JD (no resume), screenerScore is the "bar to clear" — what an applicant would need; don't fabricate a personal score.
+- Base scores on what's actually in the materials. If they only gave a resume (no JD), the screenerScore is a general resume-readiness score and the screenerFactors should reflect that (no keyword match possible, say so).
+- If they only gave a JD (no resume), screenerScore is the "bar to clear", what an applicant would need; don't fabricate a personal score.
 - Be specific. "Missing Skills section" is good. "Could be stronger" is useless.
 - No fluff. No "great job!" filler. Honest > nice.
 - Match scores should be realistic: 50-90 range. Sub-40 means real red flags. 90+ means exceptional fit.` };
@@ -181,7 +181,7 @@ STUDENT: ${p.major}, ${p.school}, GPA ${p.gpa}, graduating ${p.gradDate}${resume
 Return ONLY valid JSON, no markdown:
 {
   "questions": [
-    {"q": "specific interview question", "framework": "2-3 sentence coaching note — how to answer this well, what to emphasize given this student's background"},
+    {"q": "specific interview question", "framework": "2-3 sentence coaching note, how to answer this well, what to emphasize given this student's background"},
     ... (7 questions total: 2 behavioral, 2 technical/role-specific, 2 company-specific, 1 curveball)
   ],
   "tips": ["short actionable tip 1", "short actionable tip 2", "short actionable tip 3"]
@@ -220,7 +220,7 @@ Return ONLY JSON, no other text:
  "lead_with":["the 1-3 things from their resume to move to the top for THIS job"],
  "rewrites":[{"before":"exact resume line","after":"sharper version","why":"short reason"}],
  "keywords":["terms from the posting they can honestly add"],
- "gaps":["things the job wants that the resume doesn't show — don't fake these; how to address them honestly"],
+ "gaps":["things the job wants that the resume doesn't show, don't fake these; how to address them honestly"],
  "note":"optional one-line caveat"}
 At most 5 rewrites, 8 keywords, 4 gaps.` };
   },
@@ -234,9 +234,9 @@ At most 5 rewrites, 8 keywords, 4 gaps.` };
     const hist = (Array.isArray(i?.history) ? i.history : []).slice(-8).map((h) => ({ q: str(h?.q, 400), a: str(h?.a, 2500), secs: num(h?.secs, 0, 600, 0), out: h?.timedOut === true })).filter((h) => h.q);
     const asked = hist.length, done = asked >= total;
     const transcript = hist.map((h, n) => `Q${n + 1}: ${h.q}\nStudent (${h.secs ? `${h.secs}s of ${limit}s` : "time not recorded"}${h.out ? ", ran out of time" : ""}): ${h.a || "(no answer)"}`).join("\n\n");
-    const rubric = `"scores":{"relevance":0-5,"structure":0-5,"specifics":0-5,"delivery":0-5} for the LAST answer only — relevance: answers the actual question; structure: clear story (situation, action, result) or clear reasoning; specifics: names real details, tools, numbers; delivery: concise and confident, little filler, used the time well (an empty or "(no answer)" reply scores 0 on everything). Score like a real interviewer: 3 = solid, 5 = rare.`;
+    const rubric = `"scores":{"relevance":0-5,"structure":0-5,"specifics":0-5,"delivery":0-5} for the LAST answer only, relevance: answers the actual question; structure: clear story (situation, action, result) or clear reasoning; specifics: names real details, tools, numbers; delivery: concise and confident, little filler, used the time well (an empty or "(no answer)" reply scores 0 on everything). Score like a real interviewer: 3 = solid, 5 = rare.`;
     return { maxTokens: done ? 800 : 520, temperature: 0.4, prompt: `You are a realistic, friendly but honest interviewer running a mock ${kind} interview for a ${role} internship at ${company}.${major ? ` The student studies ${major}; use that only to set the depth of technical questions.` : ""}
-${company !== "a company" ? `Make this an interview AT ${company}, not a generic one for the major: most questions should be about ${company} specifically — what it does or makes, its products, customers, industry and challenges, why the student wants to work there, and how this ${role} role would fit into ${company}'s work. Use only facts about ${company} you are confident of; if you don't know it well, ask about it without inventing details.
+${company !== "a company" ? `Make this an interview AT ${company}, not a generic one for the major: most questions should be about ${company} specifically, what it does or makes, its products, customers, industry and challenges, why the student wants to work there, and how this ${role} role would fit into ${company}'s work. Use only facts about ${company} you are confident of; if you don't know it well, ask about it without inventing details.
 ` : ""}Ask one question at a time, like a real first-round interview. Technical questions should fit an intern (fundamentals, projects, how they'd approach a problem), not trivia. Each answer has a ${limit}-second limit.${spoken ? " Answers were spoken out loud and auto-transcribed, so ignore spelling and small transcription mistakes; do judge rambling and heavy filler words." : ""}
 ${asked ? `Transcript so far:\n${transcript}\n` : "No questions asked yet."}
 ${done ? `That was the last question. Reply with ONLY this JSON:
@@ -252,7 +252,7 @@ Never invent facts about the student. If an answer is empty or off-topic, say so
     return { maxTokens: 250, temperature: 0, prompt: `Company: "${name}" | Industry: ${str(i?.industry, 60) || "unknown"} | Location: ${str(i?.location, 80) || "unknown"} | Hiring for: ${role}
 
 Return ONLY this exact JSON structure, no markdown, no extra text:
-{"description":"One specific sentence about what ${name} actually does or makes — be concrete, not generic","size":"Rough size if you are confident, e.g. ~500 employees or 10,000+; otherwise exactly: Unknown","internTasks":"One sentence starting with: A ${role} at ${name} — then describe what they typically work on day-to-day","culture":"3-6 word phrase, or exactly: Unknown"}
+{"description":"One specific sentence about what ${name} actually does or makes, be concrete, not generic","size":"Rough size if you are confident, e.g. ~500 employees or 10,000+; otherwise exactly: Unknown","internTasks":"One sentence starting with: A ${role} at ${name}, then describe what they typically work on day-to-day","culture":"3-6 word phrase, or exactly: Unknown"}
 If you do not confidently know this specific company, keep "description" to what its name and industry clearly show and do not invent details.` };
   },
 };
@@ -276,13 +276,13 @@ export default async function handler(req, res) {
   try {
     const job = FEATURES[feature](body.input || {});
     const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "?";
-    if (!(await rateOk(`gen-ip:${ip}`, 600, PER_IP_10MIN))) return res.status(429).json({ error: "Too many requests — try again in a few minutes" });
-    if (!(await rateOk("gen-site", 3600, SITE_PER_HOUR))) return res.status(429).json({ error: "AI is very busy right now — try again later" });
+    if (!(await rateOk(`gen-ip:${ip}`, 600, PER_IP_10MIN))) return res.status(429).json({ error: "Too many requests, try again in a few minutes" });
+    if (!(await rateOk("gen-site", 3600, SITE_PER_HOUR))) return res.status(429).json({ error: "AI is very busy right now, try again later" });
     const text = await callClaude({ feature: `home_${feature}`, prompt: job.prompt, maxTokens: job.maxTokens, temperature: job.temperature });
     return res.status(200).json({ text });
   } catch (e) {
     if (e instanceof AIError) return res.status(e.status).json({ error: e.message });
     console.error("[generate]", e);
-    return res.status(500).json({ error: "Something went wrong — try again" });
+    return res.status(500).json({ error: "Something went wrong, try again" });
   }
 }
