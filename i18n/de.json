@@ -1671,10 +1671,16 @@
   "Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board, no reposts, and jobs drop off when the company takes them down.": "Praktika zuerst, Einstiegsjobs auch. Alle Studienfächer, direkt von der Jobbörse jedes Unternehmens – keine Reposts, und Stellen verschwinden, wenn das Unternehmen sie entfernt.",
   "Not listed, type it": "Nicht dabei – eintippen",
   "Every major": "Alle Studienfächer",
-  "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "Wir lesen täglich mehrmals Tausende Unternehmens-Jobbörsen. Veröffentlichst du Praktika oder Einstiegsjobs auf deiner Karriereseite, sehen Studierende sie hier mit direktem Link zur Bewerbungsseite. Sie müssen nichts veröffentlichen."
+  "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "Wir lesen täglich mehrmals Tausende Unternehmens-Jobbörsen. Veröffentlichst du Praktika oder Einstiegsjobs auf deiner Karriereseite, sehen Studierende sie hier mit direktem Link zur Bewerbungsseite. Sie müssen nichts veröffentlichen.",
+  "Part-time & hourly": "Teilzeit & Stundenlohn",
+  "All": "Alle",
+  "Hourly": "Stundenlohn"
  },
  "patterns": [
-  ["^Show ([\\d,]+) more \\(([\\d,]+) left\\)$", "$1 weitere anzeigen ($2 übrig)"],
+  [
+   "^Show ([\\d,]+) more \\(([\\d,]+) left\\)$",
+   "$1 weitere anzeigen ($2 übrig)"
+  ],
   [
    "^([\\d,]+) full-time jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
    "$1 Vollzeitjobs bei $2 Unternehmen$3"
@@ -2002,6 +2008,14 @@
   [
    "^([\\d,]+) entry-level jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
    "$1 Einstiegsjobs bei $2 Unternehmen$3"
+  ],
+  [
+   "^([\\d,]+) part-time & hourly jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
+   "$1 Teilzeit- & Stundenjobs bei $2 Unternehmen$3"
+  ],
+  [
+   "^Searched every job type, (.+) had only a few matches\\.$",
+   "Alle Jobarten durchsucht, $1 hatte nur wenige Treffer."
   ]
  ]
 }

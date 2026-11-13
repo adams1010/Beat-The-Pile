@@ -1671,10 +1671,16 @@
   "Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board, no reposts, and jobs drop off when the company takes them down.": "Eerst stages, starterbanen ook. Alle studies, rechtstreeks van de vacaturesite van elk bedrijf: geen herplaatsingen, en vacatures verdwijnen zodra het bedrijf ze weghaalt.",
   "Not listed, type it": "Staat er niet bij: typ het",
   "Every major": "Alle studies",
-  "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "We lezen duizenden vacaturesites meerdere keren per dag. Plaats je stages of startersbanen op je carrièresite, dan zien studenten ze hier met een directe link naar je sollicitatiepagina. Je hoeft niets te plaatsen."
+  "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "We lezen duizenden vacaturesites meerdere keren per dag. Plaats je stages of startersbanen op je carrièresite, dan zien studenten ze hier met een directe link naar je sollicitatiepagina. Je hoeft niets te plaatsen.",
+  "Part-time & hourly": "Parttime & per uur",
+  "All": "Alles",
+  "Hourly": "Per uur"
  },
  "patterns": [
-  ["^Show ([\\d,]+) more \\(([\\d,]+) left\\)$", "Nog $1 tonen ($2 over)"],
+  [
+   "^Show ([\\d,]+) more \\(([\\d,]+) left\\)$",
+   "Nog $1 tonen ($2 over)"
+  ],
   [
    "^([\\d,]+) full-time jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
    "$1 fulltime banen bij $2 bedrijven$3"
@@ -2002,6 +2008,14 @@
   [
    "^([\\d,]+) entry-level jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
    "$1 startersbanen bij $2 bedrijven$3"
+  ],
+  [
+   "^([\\d,]+) part-time & hourly jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
+   "$1 parttime- en uurbanen bij $2 bedrijven$3"
+  ],
+  [
+   "^Searched every job type, (.+) had only a few matches\\.$",
+   "Alle soorten banen doorzocht, $1 had maar een paar resultaten."
   ]
  ]
 }

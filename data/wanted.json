@@ -1,7 +1,7 @@
 {
 "built": "2026-11-13",
-"why": "Big employers that hire for entry-level jobs (hospital systems, banks, insurers, schools, nonprofits) \u2014 the finder proves each board before anything goes live; exercise science / sports / rehab employers added Nov 13 (PT clinics, gyms, sports performance)",
-"count": 410,
+"why": "Big employers that hire for entry-level and part-time jobs (hospital systems, banks, insurers, schools, retailers, restaurants, hotels) \u2014 the finder proves each board before anything goes live",
+"count": 516,
 "companies": [
 {
 "company": "Athletico Physical Therapy",
@@ -2052,6 +2052,536 @@
 "company": "Big Brothers Big Sisters",
 "domain": "bbbs.org",
 "priority": 60
+},
+{
+"company": "Walmart",
+"domain": "walmart.com",
+"priority": 45
+},
+{
+"company": "Target",
+"domain": "target.com",
+"priority": 45
+},
+{
+"company": "Kroger",
+"domain": "kroger.com",
+"priority": 45
+},
+{
+"company": "Publix",
+"domain": "publix.com",
+"priority": 45
+},
+{
+"company": "Albertsons Companies",
+"domain": "albertsonscompanies.com",
+"priority": 45
+},
+{
+"company": "H-E-B",
+"domain": "heb.com",
+"priority": 45
+},
+{
+"company": "Wegmans",
+"domain": "wegmans.com",
+"priority": 45
+},
+{
+"company": "Meijer",
+"domain": "meijer.com",
+"priority": 45
+},
+{
+"company": "Giant Food",
+"domain": "giantfood.com",
+"priority": 45
+},
+{
+"company": "Safeway",
+"domain": "safeway.com",
+"priority": 45
+},
+{
+"company": "Whole Foods Market",
+"domain": "wholefoodsmarket.com",
+"priority": 45
+},
+{
+"company": "Trader Joe's",
+"domain": "traderjoes.com",
+"priority": 45
+},
+{
+"company": "Aldi",
+"domain": "aldi.us",
+"priority": 45
+},
+{
+"company": "Costco",
+"domain": "costco.com",
+"priority": 45
+},
+{
+"company": "Sam's Club",
+"domain": "samsclub.com",
+"priority": 45
+},
+{
+"company": "The Home Depot",
+"domain": "homedepot.com",
+"priority": 45
+},
+{
+"company": "Lowe's",
+"domain": "lowes.com",
+"priority": 45
+},
+{
+"company": "Best Buy",
+"domain": "bestbuy.com",
+"priority": 45
+},
+{
+"company": "Dick's Sporting Goods",
+"domain": "dickssportinggoods.com",
+"priority": 45
+},
+{
+"company": "Academy Sports + Outdoors",
+"domain": "academy.com",
+"priority": 45
+},
+{
+"company": "REI",
+"domain": "rei.com",
+"priority": 45
+},
+{
+"company": "Ulta Beauty",
+"domain": "ulta.com",
+"priority": 45
+},
+{
+"company": "Sephora",
+"domain": "sephora.com",
+"priority": 45
+},
+{
+"company": "TJX Companies",
+"domain": "tjx.com",
+"priority": 45
+},
+{
+"company": "Ross Stores",
+"domain": "rossstores.com",
+"priority": 45
+},
+{
+"company": "Burlington",
+"domain": "burlington.com",
+"priority": 45
+},
+{
+"company": "Macy's",
+"domain": "macys.com",
+"priority": 45
+},
+{
+"company": "Kohl's",
+"domain": "kohls.com",
+"priority": 45
+},
+{
+"company": "Nordstrom",
+"domain": "nordstrom.com",
+"priority": 45
+},
+{
+"company": "Gap Inc.",
+"domain": "gapinc.com",
+"priority": 45
+},
+{
+"company": "Nike",
+"domain": "nike.com",
+"priority": 45
+},
+{
+"company": "Foot Locker",
+"domain": "footlocker.com",
+"priority": 45
+},
+{
+"company": "American Eagle Outfitters",
+"domain": "ae.com",
+"priority": 45
+},
+{
+"company": "Abercrombie & Fitch",
+"domain": "abercrombie.com",
+"priority": 45
+},
+{
+"company": "Bath & Body Works",
+"domain": "bathandbodyworks.com",
+"priority": 45
+},
+{
+"company": "Victoria's Secret",
+"domain": "victoriassecret.com",
+"priority": 45
+},
+{
+"company": "Petco",
+"domain": "petco.com",
+"priority": 45
+},
+{
+"company": "PetSmart",
+"domain": "petsmart.com",
+"priority": 45
+},
+{
+"company": "Tractor Supply",
+"domain": "tractorsupply.com",
+"priority": 45
+},
+{
+"company": "Dollar General",
+"domain": "dollargeneral.com",
+"priority": 45
+},
+{
+"company": "Dollar Tree",
+"domain": "dollartree.com",
+"priority": 45
+},
+{
+"company": "Five Below",
+"domain": "fivebelow.com",
+"priority": 45
+},
+{
+"company": "Michaels",
+"domain": "michaels.com",
+"priority": 45
+},
+{
+"company": "Hobby Lobby",
+"domain": "hobbylobby.com",
+"priority": 45
+},
+{
+"company": "Barnes & Noble",
+"domain": "barnesandnoble.com",
+"priority": 45
+},
+{
+"company": "GameStop",
+"domain": "gamestop.com",
+"priority": 45
+},
+{
+"company": "Staples",
+"domain": "staples.com",
+"priority": 45
+},
+{
+"company": "AutoZone",
+"domain": "autozone.com",
+"priority": 45
+},
+{
+"company": "O'Reilly Auto Parts",
+"domain": "oreillyauto.com",
+"priority": 45
+},
+{
+"company": "Advance Auto Parts",
+"domain": "advanceautoparts.com",
+"priority": 45
+},
+{
+"company": "Starbucks",
+"domain": "starbucks.com",
+"priority": 45
+},
+{
+"company": "Chipotle",
+"domain": "chipotle.com",
+"priority": 45
+},
+{
+"company": "Panera Bread",
+"domain": "panerabread.com",
+"priority": 45
+},
+{
+"company": "Inspire Brands",
+"domain": "inspirebrands.com",
+"priority": 45
+},
+{
+"company": "Darden Restaurants",
+"domain": "darden.com",
+"priority": 45
+},
+{
+"company": "Texas Roadhouse",
+"domain": "texasroadhouse.com",
+"priority": 45
+},
+{
+"company": "Cracker Barrel",
+"domain": "crackerbarrel.com",
+"priority": 45
+},
+{
+"company": "Domino's",
+"domain": "dominos.com",
+"priority": 45
+},
+{
+"company": "Papa John's",
+"domain": "papajohns.com",
+"priority": 45
+},
+{
+"company": "Yum! Brands",
+"domain": "yum.com",
+"priority": 45
+},
+{
+"company": "Shake Shack",
+"domain": "shakeshack.com",
+"priority": 45
+},
+{
+"company": "Sweetgreen",
+"domain": "sweetgreen.com",
+"priority": 45
+},
+{
+"company": "CAVA",
+"domain": "cava.com",
+"priority": 45
+},
+{
+"company": "Raising Cane's",
+"domain": "raisingcanes.com",
+"priority": 45
+},
+{
+"company": "Wawa",
+"domain": "wawa.com",
+"priority": 45
+},
+{
+"company": "Sheetz",
+"domain": "sheetz.com",
+"priority": 45
+},
+{
+"company": "QuikTrip",
+"domain": "quiktrip.com",
+"priority": 45
+},
+{
+"company": "Buc-ee's",
+"domain": "buc-ees.com",
+"priority": 45
+},
+{
+"company": "7-Eleven",
+"domain": "7-eleven.com",
+"priority": 45
+},
+{
+"company": "Marriott International",
+"domain": "marriott.com",
+"priority": 45
+},
+{
+"company": "Hilton",
+"domain": "hilton.com",
+"priority": 45
+},
+{
+"company": "Hyatt",
+"domain": "hyatt.com",
+"priority": 45
+},
+{
+"company": "IHG Hotels & Resorts",
+"domain": "ihg.com",
+"priority": 45
+},
+{
+"company": "Six Flags",
+"domain": "sixflags.com",
+"priority": 45
+},
+{
+"company": "SeaWorld",
+"domain": "seaworld.com",
+"priority": 45
+},
+{
+"company": "Universal Parks & Resorts",
+"domain": "universalparks.com",
+"priority": 45
+},
+{
+"company": "Disney Parks",
+"domain": "disneycareers.com",
+"priority": 45
+},
+{
+"company": "AMC Theatres",
+"domain": "amctheatres.com",
+"priority": 45
+},
+{
+"company": "Regal Cinemas",
+"domain": "regmovies.com",
+"priority": 45
+},
+{
+"company": "Dave & Buster's",
+"domain": "daveandbusters.com",
+"priority": 45
+},
+{
+"company": "Topgolf",
+"domain": "topgolf.com",
+"priority": 45
+},
+{
+"company": "Equinox",
+"domain": "equinox.com",
+"priority": 45
+},
+{
+"company": "Amazon",
+"domain": "amazon.jobs",
+"priority": 45
+},
+{
+"company": "FedEx",
+"domain": "fedex.com",
+"priority": 45
+},
+{
+"company": "UPS",
+"domain": "ups.com",
+"priority": 45
+},
+{
+"company": "DHL",
+"domain": "dhl.com",
+"priority": 45
+},
+{
+"company": "Chewy",
+"domain": "chewy.com",
+"priority": 45
+},
+{
+"company": "Instacart",
+"domain": "instacart.com",
+"priority": 45
+},
+{
+"company": "DoorDash",
+"domain": "doordash.com",
+"priority": 45
+},
+{
+"company": "Uber",
+"domain": "uber.com",
+"priority": 45
+},
+{
+"company": "Enterprise Holdings",
+"domain": "enterprise.com",
+"priority": 45
+},
+{
+"company": "Avis Budget Group",
+"domain": "avisbudgetgroup.com",
+"priority": 45
+},
+{
+"company": "U-Haul",
+"domain": "uhaul.com",
+"priority": 45
+},
+{
+"company": "Aramark",
+"domain": "aramark.com",
+"priority": 45
+},
+{
+"company": "Sodexo",
+"domain": "sodexo.com",
+"priority": 45
+},
+{
+"company": "Compass Group USA",
+"domain": "compass-usa.com",
+"priority": 45
+},
+{
+"company": "Allied Universal",
+"domain": "aus.com",
+"priority": 45
+},
+{
+"company": "Securitas",
+"domain": "securitasinc.com",
+"priority": 45
+},
+{
+"company": "Cintas",
+"domain": "cintas.com",
+"priority": 45
+},
+{
+"company": "ABM Industries",
+"domain": "abm.com",
+"priority": 45
+},
+{
+"company": "Apple",
+"domain": "apple.com",
+"priority": 45
+},
+{
+"company": "Verizon",
+"domain": "verizon.com",
+"priority": 45
+},
+{
+"company": "T-Mobile",
+"domain": "t-mobile.com",
+"priority": 45
+},
+{
+"company": "AT&T",
+"domain": "att.com",
+"priority": 45
+},
+{
+"company": "Comcast",
+"domain": "comcast.com",
+"priority": 45
+},
+{
+"company": "Spectrum",
+"domain": "spectrum.com",
+"priority": 45
 }
 ]
 }

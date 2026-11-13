@@ -51,9 +51,11 @@ export function parse(q) {
   if (near && !/^[A-Za-z0-9 .,'-]+$/.test(near)) errs.push("near must be a 5-digit ZIP or 'City, ST'");
   const mi = raw("mi") ? Number(raw("mi")) : 50;
   if (!(Number.isInteger(mi) && mi >= 5 && mi <= 300)) errs.push("mi must be 5–300");
+  // Nov 13: server-side word search for big scopes (every major + every job type nationwide is too many rows to send)
+  const words = raw("q").toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((w) => w.length >= 2).slice(0, 6).map((w) => w.slice(0, 24));
   const kind = raw("kind").toLowerCase() || "intern";
-  if (!["intern", "fulltime", "all"].includes(kind)) errs.push("kind must be intern, fulltime or all");
-  return { errs, kind, near: near || null, mi, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, summary: raw("summary") === "1", names: raw("names") === "1" };
+  if (!["intern", "fulltime", "hourly", "career", "all"].includes(kind)) errs.push("kind must be intern, fulltime, hourly, career or all");
+  return { errs, kind, words, near: near || null, mi, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, summary: raw("summary") === "1", names: raw("names") === "1" };
 }
 
 /** Homepage map: every open job (internships + early-career full-time with ?kind=all) with a real city, as dots on the
@@ -84,18 +86,22 @@ async function dots(p, res) {
 // full-time = early-career title and not an internship. One regex, plain filters (no or()/and() quoting).
 // Nov 13: a stored column (set by fetchCompany at sync, indexed). The old title regex grew past 4,000 characters and
 // timed out every field=all load (homepage + /jobs answered 503).
-const KIND_ON = { intern: "&kind=eq.intern", fulltime: "&kind=eq.fulltime", all: "" };
+const KIND_ON = { intern: "&kind=eq.intern", fulltime: "&kind=eq.fulltime", hourly: "&kind=eq.hourly", career: "&kind=in.(intern,fulltime)", all: "" };   // Nov 13: + hourly (part-time & hourly), career = no hourly
 // Safety net: if the database ever rejects the pattern, this instance stops filtering by kind (rows still carry kind)
 // instead of failing every /jobs load. Logged as [listings] kind filter off.
 let kindOk = true;
 const KIND_Q = new Proxy(KIND_ON, { get: (t, k) => (kindOk ? t[k] : "") });
-const withKind = (rows) => rows.map((l) => ({ ...l, kind: l.kind || (kindOf(l.title) === "fulltime" ? "fulltime" : "intern") }));   // board-flagged interns (BambooHR) stay "intern"
+const kindFor = (title) => { const k = kindOf(title); return k === "fulltime" || k === "hourly" ? k : "intern"; };
+const withKind = (rows) => rows.map((l) => ({ ...l, kind: l.kind || kindFor(l.title) }));   // board-flagged interns (BambooHR) stay "intern"
+/** Every word must appear in the title, company or place: or() groups for a PostgREST and=(…) */
+const wordGroups = (p) => (p.words || []).map((w) => `or(title.ilike.*${w}*,company.ilike.*${w}*,location.ilike.*${w}*)`);
 function majorFilter(p) {
   let q = KIND_Q[p.kind || "intern"];
   if (p.match) q += `&match=eq.${p.match}`;
   else if (!p.field) q += "&match=not.is.null";
   if (p.field && p.field !== "all") q += `&field=eq.${p.field}`;
   if (p.companies.length) q += `&company_id=in.(${p.companies.join(",")})`;
+  if (p.words?.length && !p.near && !p.states.length) q += `&and=(${wordGroups(p).join(",")})`;   // near / states: merged into their own and=(…)
   return q;
 }
 /** "Within N miles of a ZIP / city": nearest first, each listing with its distance (city center to city center).
@@ -113,7 +119,7 @@ async function nearby(p, res) {
   const dLat = p.mi / 69, dLng = p.mi / (69 * Math.cos((center[0] * Math.PI) / 180));
   const r4 = (x) => Math.round(x * 1e4) / 1e4;
   const box = `and(geo_lat.gte.${r4(center[0] - dLat)},geo_lat.lte.${r4(center[0] + dLat)},geo_lng.gte.${r4(center[1] - dLng)},geo_lng.lte.${r4(center[1] + dLng)})`;
-  const q = `listings?select=${COLS},geo_pts&${LIVE}${majorFilter(p)}&and=(or(${box},geo_n.gt.1))&order=first_seen.desc,id.asc`;
+  const q = `listings?select=${COLS},geo_pts&${LIVE}${majorFilter(p)}&and=(or(${box},geo_n.gt.1)${p.words?.length ? "," + wordGroups(p).join(",") : ""})&order=first_seen.desc,id.asc`;
   const cand = [];
   for (let off = 0; off < 20000; off += 1000) { const page = await db.select(`${q}&limit=1000&offset=${off}`); cand.push(...page); if (page.length < 1000) break; }
   const hits = [];
@@ -144,7 +150,7 @@ async function scanAll() {
   const rows = []; let last = "";
   for (let i = 0; i < 200; i++) {
     const page = await db.select(`listings?select=id,company_id,company,field,match,title,kind&${LIVE}${last ? `&id=gt.${encodeURIComponent(last)}` : ""}&order=id.asc&limit=1000`);
-    for (const r of page) rows.push({ company_id: r.company_id, company: r.company, field: r.field, match: r.match, kind: r.kind || (kindOf(r.title) === "fulltime" ? "fulltime" : "intern") });
+    for (const r of page) rows.push({ company_id: r.company_id, company: r.company, field: r.field, match: r.match, kind: r.kind || kindFor(r.title) });
     if (page.length < 1000) break;
     last = page[page.length - 1].id;
   }
@@ -216,14 +222,14 @@ export default async function handler(req, res) {
       const top = scan ? [...scan.seen].sort((a, b) => b[1].n - a[1].n).slice(0, 8).map(([id, v]) => ({ id, company: v.company, n: v.n })) : [];
       // the headline numbers stay internships; full-time / entry-level is counted on its own (all from the one scan above)
       const rows = await scanAll();
-      let engineering = 0, me = 0, allMajors = 0, fulltime = 0;
-      for (const r of rows) { if (r.kind === "fulltime") { fulltime++; continue; } allMajors++; if (r.match) engineering++; if (r.match === "me") me++; }
+      let engineering = 0, me = 0, allMajors = 0, fulltime = 0, hourly = 0;
+      for (const r of rows) { if (r.kind === "fulltime") { fulltime++; continue; } if (r.kind === "hourly") { hourly++; continue; } allMajors++; if (r.match) engineering++; if (r.match === "me") me++; }
       const [companies, lastRun] = await Promise.all([
         db.count("company_candidates?status=eq.live"),
         db.select("feed_runs?select=ran_at&order=ran_at.desc&limit=1"),
       ]);
       // companies = boards the robot proved + the hand-checked starter list
-      return res.status(200).json({ engineering, me, allMajors, fulltime, hiringNow, top, byField: scan?.byField || null, companies: companies + COMPANIES.length, lastSync: lastRun?.[0]?.ran_at || null, at: new Date().toISOString() });
+      return res.status(200).json({ engineering, me, allMajors, fulltime, hourly, hiringNow, top, byField: scan?.byField || null, companies: companies + COMPANIES.length, lastSync: lastRun?.[0]?.ran_at || null, at: new Date().toISOString() });
     }
 
     if (p.names) {                                            // every company hiring right now, any major — small enough for a phone
@@ -246,7 +252,7 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=3600");
     let q = `listings?select=${COLS}&${LIVE}${KIND_Q[p.kind]}&order=first_seen.desc,id.asc`;
     // state column holds "VA" or "WA,VA,PA" — match any requested state inside it (re-checked exactly below)
-    if (p.states.length) q += `&and=(or(${p.states.map((s) => `state.ilike.*${s}*`).join(",")}))`;
+    if (p.states.length) q += `&and=(or(${p.states.map((s) => `state.ilike.*${s}*`).join(",")})${p.words?.length ? "," + wordGroups(p).join(",") : ""})`;
     if (p.match) q += `&match=eq.${p.match}`;
     else if (!p.field) q += "&match=not.is.null";                       // engineering view (default)
     if (p.field && p.field !== "all") q += `&field=eq.${p.field}`;

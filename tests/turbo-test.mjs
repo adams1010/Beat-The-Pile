@@ -45,9 +45,9 @@ const yes = ["Medical Assistant", "Certified Medical Assistant - Family Medicine
   "Bank Teller", "Front Desk Receptionist", "Customer Service Representative", "New Grad RN - ICU", "RN Residency Program 2027", "Teacher Assistant",
   "Research Assistant", "Behavior Technician", "Patient Access Representative", "Medical Scribe"];
 const no = ["Registered Nurse", "Medical Assistant II", "Lead Medical Assistant", "Senior Customer Service Representative", "Travel CNA", "Graduate Research Assistant",
-  "Cashier", "Retail Sales Associate", "Warehouse Associate", "Delivery Driver", "Pharmacy Technician Supervisor", "Medical Resident", "Customer Service Representative - 3+ years"];
+  "Pharmacy Technician Supervisor", "Medical Resident", "Customer Service Representative - 3+ years"];
 for (const t of yes) assert.equal(kindOf(t), "fulltime", "should be an entry-level job: " + t);
-for (const t of no) assert.equal(kindOf(t), null, "should NOT be kept: " + t);
+for (const t of no) assert.notEqual(kindOf(t), "fulltime", "should NOT be entry-level: " + t);   // retail/warehouse are "hourly" since Nov 13
 assert.equal(kindOf("Medical Assistant Intern"), "intern", "internships stay internships");
 for (const t of ["Medical Assistant", "Patient Care Technician", "Phlebotomist", "New Grad RN - ICU", "Behavior Technician"]) assert.equal(fieldOf(t), "science_health", t);
 assert.equal(fieldOf("Bank Teller"), "finance");
@@ -57,3 +57,20 @@ for (const t of yes) assert.ok(ft.test(t) && !it.test(t), "Postgres side: " + t)
 assert.ok(!ft.test("Medical Assistant Intern"));
 assert.ok(isEntryRole("Teller") && !isEntryRole("Senior Teller"));
 console.log("✓ turbo sync: robot-only list + save, only enabled companies, company name from config, vanished jobs closed, failures/empty boards close nothing; entry-level jobs kept (medical assistant, teller…), retail/senior out, Postgres agrees");
+
+// Nov 13: part-time & hourly — its own kind, never mixed into internships or entry-level
+{
+  const { kindOf, isHourlyRole } = await import("../lib/fields.js");
+  for (const t of ["Cashier", "Part Time Cashier", "Sales Associate", "Barista", "Crew Member", "Warehouse Associate", "Delivery Driver", "Lifeguard", "Overnight Stocker", "Server", "Seasonal Associate"])
+    assert.equal(kindOf(t), "hourly", t);
+  for (const t of ["Store Manager", "Shift Supervisor", "Senior Sales Associate", "CDL-A Truck Driver", "Assistant Store Manager", "Server Administrator", "SQL Server Developer", "Network Security Officer", "Software Engineer"])
+    assert.equal(kindOf(t), null, t);
+  assert.equal(kindOf("Medical Assistant"), "fulltime", "entry-level stays entry-level");
+  assert.equal(kindOf("Sales Associate Intern"), "intern");
+  assert.ok(!isHourlyRole("Pharmacy Technician"));
+  const { parse } = await import("../api/listings.js");
+  const p = parse({ kind: "hourly", q: "Medical  assistant!! dc" });
+  assert.equal(p.errs.length, 0); assert.deepEqual(p.words, ["medical", "assistant", "dc"]);
+  assert.ok(parse({ kind: "career" }).errs.length === 0 && parse({ kind: "nope" }).errs.length === 1);
+  console.log("✓ part-time & hourly: cashier/barista/warehouse kept as hourly, managers/CDL/IT 'server' out; server-side word search parses safely");
+}

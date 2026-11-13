@@ -118,7 +118,7 @@ function HeroMap({near,fresh,sum}){
   const [geo,setGeo]=React.useState(null),[pts,setPts]=React.useState(null),[err,setErr]=React.useState(false);
   React.useEffect(()=>{
     const get=(u)=>fetch(u).then(r=>{if(!r.ok)throw 0;return r.json();});
-    Promise.all([get("/map/us.json"),get("/api/listings?dots=1&field=all&kind=all")]).then(([g,d])=>{setGeo(g);setPts(d);}).catch(()=>setErr(true));
+    Promise.all([get("/map/us.json"),get("/api/listings?dots=1&field=all&kind=career")]).then(([g,d])=>{setGeo(g);setPts(d);}).catch(()=>setErr(true));
   },[]);
   const fmt=(n)=>n==null?"—":Number(n).toLocaleString();
   const xy=near?.meta?.near?.xy, r=near?.meta?near.meta.near.mi*MILES_PX:0;

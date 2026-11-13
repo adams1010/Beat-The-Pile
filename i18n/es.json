@@ -1671,10 +1671,16 @@
   "Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board, no reposts, and jobs drop off when the company takes them down.": "Prácticas primero, y empleos para recién graduados también. Todas las carreras, tomadas directamente de la bolsa de empleo de cada empresa: sin republicaciones, y las ofertas desaparecen cuando la empresa las retira.",
   "Not listed, type it": "No aparece: escríbela",
   "Every major": "Todas las carreras",
-  "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "Leemos miles de bolsas de empleo varias veces al día. Si publicas prácticas o empleos de entrada en tu sitio de empleo, los estudiantes los ven aquí con un enlace directo a tu página de postulación. No tienes que publicar nada."
+  "We read thousands of company job boards several times a day. If you post internships or entry-level jobs on your careers site, students see them here with a direct link to your apply page. You don't have to post anything.": "Leemos miles de bolsas de empleo varias veces al día. Si publicas prácticas o empleos de entrada en tu sitio de empleo, los estudiantes los ven aquí con un enlace directo a tu página de postulación. No tienes que publicar nada.",
+  "Part-time & hourly": "Medio tiempo y por hora",
+  "All": "Todo",
+  "Hourly": "Por hora"
  },
  "patterns": [
-  ["^Show ([\\d,]+) more \\(([\\d,]+) left\\)$", "Mostrar $1 más (quedan $2)"],
+  [
+   "^Show ([\\d,]+) more \\(([\\d,]+) left\\)$",
+   "Mostrar $1 más (quedan $2)"
+  ],
   [
    "^([\\d,]+) full-time jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
    "$1 empleos de tiempo completo en $2 empresas$3"
@@ -2002,6 +2008,14 @@
   [
    "^([\\d,]+) entry-level jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
    "$1 empleos de nivel inicial en $2 empresas$3"
+  ],
+  [
+   "^([\\d,]+) part-time & hourly jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
+   "$1 empleos de medio tiempo y por hora en $2 empresas$3"
+  ],
+  [
+   "^Searched every job type, (.+) had only a few matches\\.$",
+   "Buscamos en todos los tipos de empleo, $1 tenía pocos resultados."
   ]
  ]
 }
