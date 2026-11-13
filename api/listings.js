@@ -134,15 +134,28 @@ async function nearby(p, res) {
 }
 
 /** One pass over every open internship: company_id → {company, n}, plus counts per field (major). */
+// Nov 13: one plain scan of every live listing (keyset paging by id, NO regex in Postgres), kind worked out here in JS.
+// Counting with the kind regex in Postgres got too slow once entry-level jobs came in (a single count took 5–8 s and timed
+// out, so /api/listings?summary=1 answered 503). One scan per warm function, reused for 2 minutes.
+let scanMemo = null;
+async function scanAll() {
+  if (scanMemo && Date.now() - scanMemo.at < 120000) return scanMemo.rows;
+  const rows = []; let last = "";
+  for (let i = 0; i < 200; i++) {
+    const page = await db.select(`listings?select=id,company_id,company,field,match,title&${LIVE}${last ? `&id=gt.${encodeURIComponent(last)}` : ""}&order=id.asc&limit=1000`);
+    for (const r of page) rows.push({ company_id: r.company_id, company: r.company, field: r.field, match: r.match, kind: kindOf(r.title) === "fulltime" ? "fulltime" : "intern" });
+    if (page.length < 1000) break;
+    last = page[page.length - 1].id;
+  }
+  scanMemo = { at: Date.now(), rows };
+  return rows;
+}
 async function liveScan() {
   const seen = new Map(), byField = {};
-  for (let off = 0; off < 40000; off += 1000) {
-    const page = await db.select(`listings?select=company_id,company,field&${LIVE}${KIND_Q.intern}&order=id.asc&limit=1000&offset=${off}`);
-    for (const r of page) {
-      const e = seen.get(r.company_id); if (e) e.n++; else seen.set(r.company_id, { company: r.company, n: 1 });
-      const f = r.field || "other"; byField[f] = (byField[f] || 0) + 1;
-    }
-    if (page.length < 1000) break;
+  for (const r of await scanAll()) {
+    if (r.kind !== "intern") continue;
+    const e = seen.get(r.company_id); if (e) e.n++; else seen.set(r.company_id, { company: r.company, n: 1 });
+    const f = r.field || "other"; byField[f] = (byField[f] || 0) + 1;
   }
   return { seen, byField };
 }
@@ -197,15 +210,16 @@ export default async function handler(req, res) {
   try {
     if (p.summary) {
       res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=1800");
-      const scan = await liveScan().catch(() => null);
+      const scan = await liveScan();
       const hiringNow = scan ? scan.seen.size : null;
       const top = scan ? [...scan.seen].sort((a, b) => b[1].n - a[1].n).slice(0, 8).map(([id, v]) => ({ id, company: v.company, n: v.n })) : [];
-      const I = KIND_Q.intern;     // the headline numbers stay internships; full-time is counted on its own
-      const [engineering, me, allMajors, companies, lastRun, fulltime] = await Promise.all([
-        db.count(`listings?${LIVE}${I}&match=not.is.null`), db.count(`listings?${LIVE}${I}&match=eq.me`), db.count(`listings?${LIVE}${I}`),
+      // the headline numbers stay internships; full-time / entry-level is counted on its own (all from the one scan above)
+      const rows = await scanAll();
+      let engineering = 0, me = 0, allMajors = 0, fulltime = 0;
+      for (const r of rows) { if (r.kind === "fulltime") { fulltime++; continue; } allMajors++; if (r.match) engineering++; if (r.match === "me") me++; }
+      const [companies, lastRun] = await Promise.all([
         db.count("company_candidates?status=eq.live"),
         db.select("feed_runs?select=ran_at&order=ran_at.desc&limit=1"),
-        db.count(`listings?${LIVE}${KIND_Q.fulltime}`).catch(() => null),
       ]);
       // companies = boards the robot proved + the hand-checked starter list
       return res.status(200).json({ engineering, me, allMajors, fulltime, hiringNow, top, byField: scan?.byField || null, companies: companies + COMPANIES.length, lastSync: lastRun?.[0]?.ran_at || null, at: new Date().toISOString() });
