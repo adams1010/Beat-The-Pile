@@ -1,4 +1,4 @@
-/* built from src/home.jsx f31d9a5bf020ed37 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx f6285ddb297e2f70 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -1174,7 +1174,7 @@ function LandingD({
       margin: 0,
       padding: 0,
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
+      gridTemplateColumns: "repeat(auto-fit,minmax(min(300px,100%),1fr))",
       columnGap: 32
     }
   }, FEATURES.map(f => React.createElement("li", {

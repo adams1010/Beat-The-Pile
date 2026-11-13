@@ -56,5 +56,6 @@
     footer();
     if (!saved() && !gpc() && optInRegion()) banner(false);
   }
-  if (document.body) ready(); else document.addEventListener("DOMContentLoaded", ready);
+  // Nov 13: wait for the whole page to parse; running as soon as <body> existed put the footer ABOVE the page on /u/
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", ready); else ready();
 })();

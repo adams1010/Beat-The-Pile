@@ -38,6 +38,7 @@
   .f .go a{color:#4A7000;font-size:14px}.f .msg{font-size:13px;color:#B42318}
   .center{text-align:center;color:var(--muted)}
   .switch{text-align:center;margin-top:18px;font-size:14px;color:#9FAAC0}.switch a{color:var(--lime)}
+  .lead.legal a{color:#B0F701;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -64,11 +65,11 @@
       <p class="lead">${pre === "employer" ? "Sign in or create your company account. Next you'll set up your company and confirm your work email." : "Enter your email to sign in or create a free account. Students and companies both start here."}</p>
       ${pre === "employer" ? "" : `<p class="lead" id="found" hidden></p>`}
       <div class="panel"><div id="signin"></div></div>
-      <p class="lead" style="font-size:13.5px;margin-top:12px">By continuing, you agree to our <a href="/terms/">Terms of Use</a> and <a href="/privacy/">Privacy Policy</a>, and confirm you're 16 or older.</p>`;
+      <p class="lead legal" style="font-size:13.5px;margin-top:12px">By continuing, you agree to our <a href="/terms/">Terms of Use</a> and <a href="/privacy/">Privacy Policy</a>, and confirm you're 16 or older.</p>`;
     if (pre !== "employer") fetch("/api/me?founding=1").then((r) => r.ok ? r.json() : null).then((d) => { const el = $("#found");   // real count (lib/founding.js)
       if (el && d && d.left > 0) { el.innerHTML = `<b style="color:#4A7000">${+d.left} of ${+d.total} founding spots left.</b> The first ${+d.total} students keep every Pro feature free, for life.`; el.hidden = false; } }).catch(() => {});
     try { C.mountSignIn($("#signin"), { forceRedirectUrl: location.href, signUpForceRedirectUrl: location.href, withSignUp: true,
-      appearance: { elements: { rootBox: { width: "100%", maxWidth: "420px", margin: "0 auto" }, cardBox: { width: "100%", maxWidth: "420px", boxShadow: "none", border: "none" },
+      appearance: { variables: { colorPrimary: "#4A7000", fontFamily: "Geist, system-ui, sans-serif", fontSize: "16px", borderRadius: "12px" }, elements: { rootBox: { width: "100%", maxWidth: "420px", margin: "0 auto" }, cardBox: { width: "100%", maxWidth: "420px", boxShadow: "none", border: "none" },
         card: { width: "100%", boxShadow: "none", border: "none", padding: "0", background: "transparent" }, footer: { background: "transparent" } } } }); }
     catch { $("#signin").innerHTML = `<button class="btn" id="si" style="font:inherit;font-weight:600;background:#4A7000;color:#fff;border:0;border-radius:999px;padding:12px 24px;cursor:pointer">Continue with email</button>`; $("#si").onclick = () => C.openSignIn({}); }
   }

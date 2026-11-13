@@ -233,7 +233,7 @@ function LandingD({onQuiz,onPage}){
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#060A2C"}}>What we offer</h2><a href="/demo/" style={{fontSize:14,color:"#4A7000",textDecoration:"none",fontWeight:500}}>See it in the 2-minute tour →</a></div>
         {/* Nov 13 (less AI): a plain two-column list, not a grid of illustrated feature cards */}
         <div style={{...card,padding:"4px 20px"}}>
-          <ul className="d-offer" style={{listStyle:"none",margin:0,padding:0,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",columnGap:32}}>
+          <ul className="d-offer" style={{listStyle:"none",margin:0,padding:0,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(300px,100%),1fr))",columnGap:32}}>
           {FEATURES.map(f=>(
             <li key={f.k} style={{borderBottom:"1px solid #EEF1F6",padding:"14px 0"}}>
               <a href={f.h} onClick={f.pg?(e)=>{e.preventDefault();onPage(f.pg);window.scrollTo(0,0);}:undefined} style={{textDecoration:"none",color:"#060A2C",display:"block"}}>

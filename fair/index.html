@@ -128,6 +128,7 @@
   .feel button[aria-pressed="true"],.when button[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
   .when{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
   .empty{text-align:center;color:var(--muted);padding:28px 12px}
+  .linkbtn{background:none;border:0;padding:8px 0;font:inherit;font-weight:600;color:#4A7000;text-decoration:underline;cursor:pointer;min-height:44px}
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;font-size:14px;font-weight:600;padding:10px 16px;border-radius:10px;opacity:0;transition:.2s;z-index:60;pointer-events:none;max-width:90vw}
   .toast.on{opacity:1;transform:translateX(-50%)}
   .hidden{display:none !important}
@@ -273,7 +274,10 @@
     const d = await fetch("/fair/fairs.json").then((r) => r.json());
     S.fairs = d.fairs || [];
     // Default: the fair in the link, else the last one you used, else the first fair whose employer list is out
-    const want = new URLSearchParams(location.search).get("fair") || store.get("iq_fair") || (S.fairs.find((f) => f.companies.length) || S.fairs[0])?.id;
+    // Nov 13: default = the next fair that hasn't happened yet (was the first one with a list, a fair that ended in September)
+    const today = new Date().toISOString().slice(0, 10);
+    const next = S.fairs.filter((f) => f.date && f.date >= today).sort((a, b) => a.date.localeCompare(b.date))[0];
+    const want = new URLSearchParams(location.search).get("fair") || store.get("iq_fair") || (next || S.fairs.find((f) => f.companies.length) || S.fairs[0])?.id;
     // Grouped by school; every option says its term ("Business Horizons Career Fair — Spring 2027")
     const schools = [...new Set(S.fairs.map((f) => f.school))];
     $("#fairsel").innerHTML = schools.map((sc) => `<optgroup label="${esc(sc)}">${S.fairs.filter((f) => f.school === sc)
@@ -358,7 +362,9 @@
       $("#chips").innerHTML = "";
       $("#cos").innerHTML = `<div class="empty"><b>${esc(S.fair.name)}, ${esc(S.fair.term || "")}</b><br>${esc(S.fair.when || "")} · ${esc(S.fair.where || "")}<br><br>
         The employer list isn't out yet. VT usually posts it on Handshake a week or two before the fair, and we'll add it here with every company's open internships.
-        ${S.fair.source ? `<br><a href="${esc(S.fair.source)}" target="_blank" rel="noopener">VT's career fair calendar ↗</a>` : ""}</div>`;
+        ${S.fair.source ? `<br><a href="${esc(S.fair.source)}" target="_blank" rel="noopener">VT's career fair calendar ↗</a>` : ""}
+        ${(() => { const past = S.fairs.filter((f) => f.companies.length && f.school === S.fair.school); return past.length ? `<br><br>Until then, see who came last time:<br>${past.map((f) => `<button type="button" class="linkbtn" data-pastfair="${esc(f.id)}">${esc(f.name)} · ${esc(f.term || "")} (${f.companies.length} employers)</button>`).join("<br>")}` : ""; })()}</div>`;
+      $("#cos").querySelectorAll("[data-pastfair]").forEach((b) => b.addEventListener("click", () => pickFair(b.dataset.pastfair)));
       return;
     }
     const t = talked();

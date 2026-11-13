@@ -128,6 +128,13 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   .btpnav .mob .menu{left:8px!important;right:8px;min-width:0}}
 .btpnav .menu .sep{height:1px;background:#E3E7ED;margin:6px 4px}
 @media print{.btpnav{display:none}}
+/* Nov 13 mobile pass: iPhone zooms the page into any field under 16px; Clerk's sign-in boxes were 30px tall and grey */
+@media (max-width:768px){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),select,textarea{font-size:16px!important}
+.btpfoot nav a,.btpfoot nav button{display:inline-flex;align-items:center;min-height:44px;padding:0 6px}}
+.cl-formButtonPrimary{background:#4A7000!important;min-height:48px!important;font-size:16px!important;border-radius:999px!important;box-shadow:none!important}
+.cl-formButtonPrimary:hover{background:#3B5A00!important}
+.cl-socialButtonsBlockButton,.cl-formFieldInput{min-height:48px!important;font-size:16px!important}
+.cl-footerActionLink,.cl-formFieldAction{color:#4A7000!important}
 :focus-visible{outline:2px solid #4A7000;outline-offset:2px}.btpnav :focus-visible{outline-color:#B0F701}`;
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
   // Site language (English / Español): /i18n.js translates the page when Spanish is picked.

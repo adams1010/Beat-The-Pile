@@ -55,6 +55,7 @@
   .empty{text-align:center;color:var(--muted);padding:30px 10px}
   footer{color:var(--muted);font-size:12.5px;padding:24px 0 60px}
   .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:14px;font-weight:600;padding:10px 16px;border-radius:10px;z-index:20}
+  .more{display:block;width:100%;min-height:48px;margin:12px 0;font:inherit;font-weight:600;border:1px solid var(--line);border-radius:999px;background:#fff;color:#4A7000;cursor:pointer}
 </style>
 <link rel="stylesheet" href="/d.css">
 </head>
@@ -161,18 +162,22 @@
     $("#hint").textContent = S.view === "soon" ? `${n} companies haven't posted Summer ${season} internships yet. Here's when they usually do.`
       : S.view === "open" ? `${n} companies have opened Summer ${season} internships. Most recent first.`
       : `Freshman or sophomore? Summer ${season + 1} recruiting starts next year. Set reminders now and be first in line.`;
-    $("#list").innerHTML = n ? list.map((c) => S.view === "open" && !c.opened
+    // Nov 13: show 60 at a time (all 1,400+ at once made a 400,000-px page that crawled on phones)
+    const shown = list.slice(0, S.shown || 60), more = n - shown.length;
+    $("#list").innerHTML = n ? shown.map((c) => S.view === "open" && !c.opened
         ? `<div class="card"><div class="row1"><div class="name">${esc(c.name)}</div><span class="pill open">Open now</span></div><div class="big">Now: internships open on their job board (we track it)</div>${history(c)}<div class="acts">${jobsLink(c)}</div></div>`
         : card(c)).join("")
       : `<div class="empty">No companies match${q ? ` “${esc(S.q)}”` : ""}.</div>`;
+    if (more > 0) $("#list").insertAdjacentHTML("beforeend", `<button type="button" class="more" id="moreBtn">Show ${Math.min(more, 60)} more (${more} left)</button>`);
+    const mb = $("#moreBtn"); if (mb) mb.onclick = () => { S.shown = (S.shown || 60) + 60; render(); };
     $("#fresh").innerHTML = `Opening history updated ${esc(new Date(S.d.built).toLocaleDateString())}. ` + (S.liveErr
       ? `<b style="color:#B45309">We couldn't check which companies have jobs open right now</b> (our side or your connection), so “Open now” may be missing some. That doesn't mean they have none, refresh to try again.`
       : S.lastSync ? `Current openings checked against company job boards (last re-read ${esc(new Date(S.lastSync).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }))}).` : "");
   }
 
-  document.querySelector(".tabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; S.view = b.dataset.v; history_(); render(); });
+  document.querySelector(".tabs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; S.view = b.dataset.v; S.shown = 60; history_(); render(); });
   const history_ = () => { try { const u = new URL(location.href); u.searchParams.set("view", S.view); window.history.replaceState(null, "", u); } catch {} };
-  $("#q").addEventListener("input", (e) => { S.q = e.target.value.trim(); render(); });
+  $("#q").addEventListener("input", (e) => { S.q = e.target.value.trim(); S.shown = 60; render(); });
   $("#list").addEventListener("click", (e) => {
     const b = e.target.closest("[data-remind]"); if (!b) return;
     const c = S.d.companies.find((x) => x.k === b.dataset.remind); if (!c) return;

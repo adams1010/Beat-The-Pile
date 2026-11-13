@@ -305,7 +305,7 @@ export default async function handler(req, res) {
   }
   // Founding members counter (homepage, /start/): real count of student sign-ups, capped at 150
   if (req.method === "GET" && req.query?.founding !== undefined) {
-    try { res.setHeader("Cache-Control", "public, max-age=120"); return res.status(200).json(await foundingCount()); }
+    try { res.setHeader("Cache-Control", "public, max-age=30"); return res.status(200).json(await foundingCount()); }
     catch { return res.status(503).json({ error: "Founding count unavailable right now" }); }
   }
   if (req.method === "GET" && req.query?.u !== undefined) {
