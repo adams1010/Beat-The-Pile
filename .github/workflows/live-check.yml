@@ -1,0 +1,21 @@
+# Live check (Nov 14 2026): every time Vercel finishes a production deploy (and every 6 hours), open the real site and
+# check every page, every job tab, search and the APIs. A red run = something is broken for users right now
+# (GitHub emails the repo owner). Script: scripts/live-check.mjs
+name: live-check
+on:
+  deployment_status:
+  schedule:
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+concurrency: { group: live-check, cancel-in-progress: true }
+jobs:
+  check:
+    if: github.event_name != 'deployment_status' || (github.event.deployment_status.state == 'success' && github.event.deployment.environment == 'Production')
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm i --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
+      - run: sleep 30 && node scripts/live-check.mjs https://www.beatthepile.com
