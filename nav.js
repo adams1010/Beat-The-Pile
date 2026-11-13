@@ -127,9 +127,12 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   .btpnav .links{display:none}.btpnav .mob{display:block;margin-left:auto}.btpnav .mob summary{color:#fff;border:1px solid rgba(255,255,255,.18);padding:7px 10px}
   .btpnav .mob .menu{left:8px!important;right:8px;min-width:0}}
 .btpnav .menu .sep{height:1px;background:#E3E7ED;margin:6px 4px}
-@media print{.btpnav{display:none}}`;
+@media print{.btpnav{display:none}}
+:focus-visible{outline:2px solid #4A7000;outline-offset:2px}.btpnav :focus-visible{outline-color:#B0F701}`;
   const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st);
   // Site language (English / Español): /i18n.js translates the page when Spanish is picked.
+  // Nov 12: cookie choice + legal footer (Privacy · Terms · Cookies · Refunds · Accessibility) on every page
+  if (!document.querySelector('script[src="/consent.js"]')) { const c = document.createElement("script"); c.src = "/consent.js"; document.head.appendChild(c); }
   if (!document.querySelector('script[src="/i18n.js"]')) { const i = document.createElement("script"); i.src = "/i18n.js"; document.head.appendChild(i); }
   const LANGS = [["en", "English"], ["es", "Español"], ["fr", "Français"], ["de", "Deutsch"], ["nl", "Nederlands"]];
   let LANG = "en"; try { const l = localStorage.getItem("btp_lang"); if (LANGS.some(([k]) => k === l)) LANG = l; } catch {}
@@ -204,6 +207,9 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   const mount = () => {
     document.body.insertBefore(nav, document.body.firstChild);
     document.body.classList.add("btp-has-nav");
+    nav.querySelector(".btpskip").addEventListener("click", (e) => {   // pages without a <main>: jump to whatever follows the bar
+      let t = document.getElementById("main"); if (!t) { t = nav.nextElementSibling; while (t && /^(SCRIPT|STYLE)$/.test(t.tagName)) t = t.nextElementSibling; }
+      if (!t) return; e.preventDefault(); if (!t.hasAttribute("tabindex")) t.setAttribute("tabindex", "-1"); t.focus(); t.scrollIntoView(); });
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", later); else later();
     for (const det of nav.querySelectorAll("details")) {
       const place = () => { const r = det.querySelector("summary").getBoundingClientRect(), m = det.querySelector(".menu");

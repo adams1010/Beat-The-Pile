@@ -1,4 +1,4 @@
-/* built from src/home.jsx 0be03bb7209270a9 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx e7030f87e9e2cd09 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -14,7 +14,7 @@ const AM = "#B45309",
 const CR = "#B42318",
   CL = "#FEF3F2";
 const PALETTE = Array(12).fill("#060A2C");
-const LOAD_MSGS = ["Searching for internships near you...", "Tip: Apply Tuesday–Thursday morning — recruiter inboxes are cleanest then.", "Matching roles to your major...", "Tip: Many postings close once enough people apply, so earlier is better.", "Finding opportunities others overlook...", "Tip: A short, polite follow-up 5–7 days after applying keeps you on the recruiter's radar.", "Factoring in your timing and experience...", "Tip: Smaller regional firms often hire faster than the big names — and pay surprisingly well.", "Estimating your match scores...", "Tip: Don't filter by GPA cutoffs — many companies post them but rarely enforce them.", "Checking nearby states too...", "Tip: Customize your resume for each application. Even small tweaks beat a generic one.", "Reading company job boards...", "Tip: Your school's alumni network on LinkedIn is a hidden cheat code — message 1 per week.", "Ranking matches by realistic chance...", "Tip: Quality > quantity. 10 thoughtful applications beats 100 spray-and-pray every time.", "Polishing the list...", "Tip: After every rejection, ask for feedback. Most won't reply — the ones who do are gold."];
+const LOAD_MSGS = ["Searching for internships near you...", "Tip: Apply Tuesday–Thursday morning — recruiter inboxes are cleanest then.", "Matching roles to your major...", "Tip: Many postings close once enough people apply, so earlier is better.", "Finding opportunities others overlook...", "Tip: A short, polite follow-up 5–7 days after applying keeps you on the recruiter's radar.", "Factoring in your timing and experience...", "Tip: Look past the big names. Smaller regional firms are easy to overlook, so fewer students may be applying.", "Estimating your match scores...", "Tip: Don't filter by GPA cutoffs — many companies post them but rarely enforce them.", "Checking nearby states too...", "Tip: Customize your resume for each application. Even small tweaks beat a generic one.", "Reading company job boards...", "Tip: Your school's alumni network on LinkedIn is a hidden cheat code — message 1 per week.", "Ranking matches by realistic chance...", "Tip: Quality > quantity. 10 thoughtful applications beats 100 spray-and-pray every time.", "Polishing the list...", "Tip: After every rejection, ask for feedback. Most won't reply — the ones who do are gold."];
 const SCHOOL_ABBR = {
   "umd": "Maryland",
   "psu": "Penn State",
@@ -1552,7 +1552,7 @@ function LandingD({
     style: {
       fontSize: 11,
       fontWeight: 500,
-      color: "#8D9AB3"
+      color: "#5E6A80"
     }
   }, "Example preview")), React.createElement("p", {
     style: {
@@ -4613,6 +4613,18 @@ function App() {
   const [appliedCos, setAppliedCos] = useState([]);
   const [proNudge, setProNudge] = useState(null);
   const [followUpModal, setFollowUpModal] = useState(null);
+  useEffect(() => {
+    const k = e => {
+      if (e.key !== "Escape") return;
+      setFollowUpModal(null);
+      setApplyModal(null);
+      setRoleModal(null);
+      setShowProModal(false);
+      setShowReview(false);
+    };
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, []);
   const [sortBy, setSortBy] = useState("chance");
   const [expandedCard, setExpandedCard] = useState(null);
   const [expandedExplainer, setExpandedExplainer] = useState(null);
@@ -7905,6 +7917,14 @@ function App() {
     const dueApps = tracked.filter(a => followUpStatus(a).state === "due");
     if (dueApps.length === 0) return null;
     return React.createElement("div", {
+      role: "button",
+      tabIndex: 0,
+      onKeyDown: e => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setPage("dashboard");
+        }
+      },
       onClick: () => setPage("dashboard"),
       style: {
         background: "#FEF3C7",
@@ -9139,6 +9159,8 @@ function App() {
     type: "email",
     value: email,
     autoFocus: true,
+    "aria-label": "Email address (optional)",
+    autoComplete: "email",
     placeholder: "you@email.com",
     onChange: e => {
       setEmail(e.target.value);
@@ -9801,7 +9823,7 @@ function App() {
       }, "No resume yet? Build one in 30 seconds.")), React.createElement("p", {
         style: {
           fontSize: 13,
-          color: "#94A3B8",
+          color: "#5E6A80",
           lineHeight: 1.5
         }
       }, "Beat the Pile generates a starter resume from your quiz answers \u2014 your major, activities, skills, all filled in. Edit it, then use it on every application.")), React.createElement("button", {
@@ -10084,6 +10106,15 @@ function App() {
       }, React.createElement("div", {
         style: cardStyle
       }, React.createElement("div", {
+        role: "button",
+        tabIndex: 0,
+        onKeyDown: e => {
+          if (e.target === e.currentTarget && (e.key === "Enter" || e.key === " ")) {
+            e.preventDefault();
+            setExpandedCard(i);
+            fetchCardIntel(c);
+          }
+        },
         onClick: () => {
           setExpandedCard(i);
           fetchCardIntel(c);
@@ -10197,7 +10228,7 @@ function App() {
       }, [hasRealLocation ? displayLocation : c.location, c.industry].filter(Boolean).join(" · ")), typeof c.distanceMiles === "number" && c.distanceMiles > 0 ? React.createElement("span", {
         style: {
           fontSize: 10.5,
-          color: "#94A3B8",
+          color: "#5E6A80",
           background: "#F1F5F9",
           padding: "1px 7px",
           borderRadius: 99,
@@ -10217,7 +10248,7 @@ function App() {
       }, "AI-suggested \xB7 distance unverified") : c.locationBand && c.locationBand !== "remote" && React.createElement("span", {
         style: {
           fontSize: 10.5,
-          color: "#94A3B8",
+          color: "#5E6A80",
           background: "#F1F5F9",
           padding: "1px 7px",
           borderRadius: 99,

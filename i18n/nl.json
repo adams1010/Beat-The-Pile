@@ -1580,7 +1580,27 @@
   "You're not signed in, so this sheet is saved on this device only.": "Je bent niet ingelogd, dus deze sheet staat alleen op dit apparaat.",
   "to keep it in your account. Your rows come with you.": "om hem in je account te bewaren. Je rijen gaan mee.",
   "No applications yet. Click": "Nog geen sollicitaties. Klik op",
-  "to start your sheet, or tap Apply on any job in": "om te beginnen, of tik op Solliciteren bij een vacature in"
+  "to start your sheet, or tap Apply on any job in": "om te beginnen, of tik op Solliciteren bij een vacature in",
+  "Terms": "Voorwaarden",
+  "Cookies": "Cookies",
+  "Refunds": "Terugbetalingen",
+  "Accessibility": "Toegankelijkheid",
+  "Cookie settings": "Cookie-instellingen",
+  "Cookie policy": "Cookiebeleid",
+  "Accept analytics": "Analyse accepteren",
+  "Necessary only": "Alleen noodzakelijke",
+  "Legal": "Juridisch",
+  "Cookie choices": "Cookiekeuzes",
+  "We use cookies and similar storage that the site needs to work, like keeping you signed in. With your OK we also count page visits with PostHog analytics, without your name or email.": "We gebruiken cookies en vergelijkbare opslag die de site nodig heeft, bijvoorbeeld om je ingelogd te houden. Met je toestemming tellen we ook paginabezoeken met PostHog, zonder je naam of e-mail.",
+  "Real internships, straight from the source.": "Echte stages, rechtstreeks van de bron.",
+  "Tip: Look past the big names. Smaller regional firms are easy to overlook, so fewer students may be applying.": "Tip: kijk verder dan de grote namen. Kleinere regionale bedrijven worden snel over het hoofd gezien, dus misschien solliciteren er minder studenten.",
+  "By continuing, you agree to our": "Door verder te gaan, ga je akkoord met onze",
+  "Terms of Use": "Gebruiksvoorwaarden",
+  "Privacy Policy": "Privacybeleid",
+  ", and confirm you're 16 or older.": ", en bevestig je dat je 16 of ouder bent.",
+  "Email address (optional)": "E-mailadres (optioneel)",
+  "By verifying, you agree to the": "Door te verifiëren ga je akkoord met de",
+  ", including the rules for employers in section 7, and our": ", inclusief de regels voor werkgevers in sectie 7, en ons"
  },
  "patterns": [
   [
@@ -1902,6 +1922,10 @@
   [
    "^Join (\\d+) people's orbits$",
    "Sluit je aan bij de baan van $1 mensen"
+  ],
+  [
+   "^© (\\d{4}) Beat the Pile\\. Job listings come from each employer's own job board\\. Company names and logos belong to their owners\\.$",
+   "© $1 Beat the Pile. Vacatures komen van de eigen vacaturesite van elke werkgever. Bedrijfsnamen en logo's zijn van hun eigenaars."
   ]
  ]
 }

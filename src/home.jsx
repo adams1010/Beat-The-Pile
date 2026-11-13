@@ -15,7 +15,7 @@ const LOAD_MSGS=[
   "Finding opportunities others overlook...",
   "Tip: A short, polite follow-up 5–7 days after applying keeps you on the recruiter's radar.",
   "Factoring in your timing and experience...",
-  "Tip: Smaller regional firms often hire faster than the big names — and pay surprisingly well.",
+  "Tip: Look past the big names. Smaller regional firms are easy to overlook, so fewer students may be applying.",
   "Estimating your match scores...",
   "Tip: Don't filter by GPA cutoffs — many companies post them but rarely enforce them.",
   "Checking nearby states too...",
@@ -266,7 +266,7 @@ function LandingD({onQuiz,onPage}){
                 <FeatViz k={f.k}/>
               </div>
               <div style={{padding:20}}>
-                <p style={{fontSize:13,fontWeight:600,color:"#4A7000",margin:"0 0 6px",display:"flex",justifyContent:"space-between"}}>{f.name}<span style={{fontSize:11,fontWeight:500,color:"#8D9AB3"}}>Example preview</span></p>
+                <p style={{fontSize:13,fontWeight:600,color:"#4A7000",margin:"0 0 6px",display:"flex",justifyContent:"space-between"}}>{f.name}<span style={{fontSize:11,fontWeight:500,color:"#5E6A80"}}>Example preview</span></p>
                 <p style={{fontSize:17,fontWeight:600,margin:"0 0 6px"}}>{f.t}</p>
                 <p style={{fontSize:14,lineHeight:1.5,color:"#55627A",margin:0}}>{f.d}</p>
               </div></a>))}
@@ -1430,6 +1430,9 @@ function App(){
   const [appliedCos,setAppliedCos]=useState([]); // distinct companies applied to (free-tier metering)
   const [proNudge,setProNudge]=useState(null); // {reason} or null
   const [followUpModal,setFollowUpModal]=useState(null); // tracked app being followed up, or null
+  // Nov 12 (accessibility): Escape closes whichever pop-up is open
+  useEffect(()=>{const k=e=>{if(e.key!=="Escape")return;setFollowUpModal(null);setApplyModal(null);setRoleModal(null);setShowProModal(false);setShowReview(false);};
+    window.addEventListener("keydown",k);return()=>window.removeEventListener("keydown",k);},[]);
   const [sortBy,setSortBy]=useState("chance"); // results sort: 'chance' high→low
   const [expandedCard,setExpandedCard]=useState(null); // which result card is expanded
   const [expandedExplainer,setExpandedExplainer]=useState(null); // which result's Score Explainer is open (accordion, by company name)
@@ -3037,7 +3040,7 @@ function App(){
     const dueApps=tracked.filter(a=>followUpStatus(a).state==="due");
     if(dueApps.length===0)return null;
     return (
-      <div onClick={()=>setPage("dashboard")} style={{background:"#FEF3C7",border:"1px solid #F59E0B",borderRadius:var_rl,padding:"12px 16px",marginBottom:18,cursor:"pointer",display:"flex",alignItems:"center",gap:12,boxShadow:"0 2px 8px rgba(245,158,11,0.15)"}}>
+      <div role="button" tabIndex={0} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setPage("dashboard");}}} onClick={()=>setPage("dashboard")} style={{background:"#FEF3C7",border:"1px solid #F59E0B",borderRadius:var_rl,padding:"12px 16px",marginBottom:18,cursor:"pointer",display:"flex",alignItems:"center",gap:12,boxShadow:"0 2px 8px rgba(245,158,11,0.15)"}}>
         <div style={{fontSize:22,flexShrink:0}}></div>
         <div style={{flex:1,minWidth:0}}>
           <p style={{fontSize:13.5,fontWeight:700,color:"#92400E",marginBottom:2}}>{dueApps.length} follow-up{dueApps.length===1?"":"s"} due</p>
@@ -3392,7 +3395,7 @@ function App(){
           <div style={{fontSize:34,marginBottom:8}}></div>
           <h2 style={{fontSize:"clamp(1.5rem,3.5vw,2rem)",fontWeight:700,letterSpacing:"-1px",marginBottom:10,color:"#060A2C"}}>Want internship updates by email?</h2>
           <p style={{color:"#4A5568",fontSize:15,lineHeight:1.6,marginBottom:"1.5rem"}}><b>Optional.</b> Your matches show up either way. Leave your email if you'd like occasional internship tips and updates from Beat the Pile.</p>
-          <input type="email" value={email} autoFocus placeholder="you@email.com"
+          <input type="email" value={email} autoFocus aria-label="Email address (optional)" autoComplete="email" placeholder="you@email.com"
             onChange={e=>{setEmail(e.target.value);setEmailErr("");}}
             onKeyDown={e=>{if(e.key==="Enter")submitEmail();}}
             style={{width:"100%",padding:"14px 16px",borderRadius:var_rl,border:`1.5px solid ${emailErr?CR:/.+@.+\..+/.test(email)?G:"#E2E8F0"}`,background:"#FBFBFC",fontFamily:"var(--font)",fontSize:16,textAlign:"center",outline:"none",marginBottom:8}}/>
@@ -3595,7 +3598,7 @@ function App(){
                         <span style={{fontSize:20}}></span>
                         <p style={{fontWeight:700,fontSize:15,color:"#fff",letterSpacing:"-0.3px"}}>No resume yet? Build one in 30 seconds.</p>
                       </div>
-                      <p style={{fontSize:13,color:"#94A3B8",lineHeight:1.5}}>Beat the Pile generates a starter resume from your quiz answers — your major, activities, skills, all filled in. Edit it, then use it on every application.</p>
+                      <p style={{fontSize:13,color:"#5E6A80",lineHeight:1.5}}>Beat the Pile generates a starter resume from your quiz answers — your major, activities, skills, all filled in. Edit it, then use it on every application.</p>
                     </div>
                     <button onClick={()=>setPage("resumebuilder")} style={{flexShrink:0,background:`${G}`,border:"none",color:"#fff",padding:"12px 20px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:14,fontWeight:700,whiteSpace:"nowrap",boxShadow:"0 1px 2px rgba(6,10,44,.06)"}}>Build my resume ↗</button>
                   </div>
@@ -3671,7 +3674,7 @@ function App(){
                       <div style={cardStyle}>
 
                         {/* ── FRONT — original full card ── */}
-                        <div onClick={()=>{setExpandedCard(i);fetchCardIntel(c);}} style={{...faceBase,background:"#fff",border:"1px solid #E3E7ED",padding:"1.5rem",display:"flex",flexDirection:"column",gap:"0.75rem",boxShadow:"0 1px 2px rgba(6,10,44,.06)",cursor:"pointer",overflowY:"auto"}}>
+                        <div role="button" tabIndex={0} onKeyDown={e=>{if(e.target===e.currentTarget&&(e.key==="Enter"||e.key===" ")){e.preventDefault();setExpandedCard(i);fetchCardIntel(c);}}} onClick={()=>{setExpandedCard(i);fetchCardIntel(c);}} style={{...faceBase,background:"#fff",border:"1px solid #E3E7ED",padding:"1.5rem",display:"flex",flexDirection:"column",gap:"0.75rem",boxShadow:"0 1px 2px rgba(6,10,44,.06)",cursor:"pointer",overflowY:"auto"}}>
                           {/* Header */}
                           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
                             <div style={{flex:1,minWidth:0,paddingRight:12}}>
@@ -3688,10 +3691,10 @@ function App(){
                               <div style={{display:"flex",alignItems:"center",gap:6,marginTop:2,flexWrap:"wrap"}}>
                                 <p style={{color:"#6B7280",fontSize:12}}>{[hasRealLocation?displayLocation:c.location,c.industry].filter(Boolean).join(" · ")}</p>
                                 {typeof c.distanceMiles==="number"&&c.distanceMiles>0
-                                  ?<span style={{fontSize:10.5,color:"#94A3B8",background:"#F1F5F9",padding:"1px 7px",borderRadius:99,fontWeight:600,whiteSpace:"nowrap"}}>{c.distanceMiles} mi</span>
+                                  ?<span style={{fontSize:10.5,color:"#5E6A80",background:"#F1F5F9",padding:"1px 7px",borderRadius:99,fontWeight:600,whiteSpace:"nowrap"}}>{c.distanceMiles} mi</span>
                                   :c.source==="ai"
                                     ?<span style={{fontSize:10.5,color:"#B45309",background:"#FEF3C7",padding:"1px 7px",borderRadius:99,fontWeight:600,whiteSpace:"nowrap"}}>AI-suggested · distance unverified</span>
-                                    :c.locationBand&&c.locationBand!=="remote"&&<span style={{fontSize:10.5,color:"#94A3B8",background:"#F1F5F9",padding:"1px 7px",borderRadius:99,fontWeight:600}}>{{["in-town"]:"< 3 mi",["nearby"]:"3-15 mi",["metro"]:"15-30 mi",["regional"]:"30+ mi"}[c.locationBand]||""}</span>
+                                    :c.locationBand&&c.locationBand!=="remote"&&<span style={{fontSize:10.5,color:"#5E6A80",background:"#F1F5F9",padding:"1px 7px",borderRadius:99,fontWeight:600}}>{{["in-town"]:"< 3 mi",["nearby"]:"3-15 mi",["metro"]:"15-30 mi",["regional"]:"30+ mi"}[c.locationBand]||""}</span>
                                 }
                               </div>
                             </div>

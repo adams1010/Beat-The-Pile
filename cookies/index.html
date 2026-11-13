@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cookie Policy — Beat the Pile</title>
+<meta name="description" content="Which cookies and browser storage Beat the Pile uses, which outside services load on our pages, and how to change your choice.">
+<link rel="canonical" href="https://www.beatthepile.com/cookies/">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#060A2C">
+<style>
+  :root{--green:#4A7000;--green-dark:#3A5A00;--navy:#060A2C;--ink:#1A2230;--muted:#52606D;--line:#E3E7ED;--bg:#FBFBFC;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6}
+  main{max-width:720px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
+  h1{font-size:30px;line-height:1.15;color:var(--navy);margin:8px 0 6px;letter-spacing:-.02em}
+  h2{font-size:19px;color:var(--navy);margin:30px 0 8px}
+  p,li{max-width:65ch}
+  .lead{color:var(--muted);margin:0 0 10px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#F2FADF;color:var(--navy);font-size:13px}
+  tr:last-child td{border-bottom:0}
+  .wrap{overflow-x:auto}
+  .box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  a{color:var(--green-dark)}
+  .small{font-size:13.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main">
+  <h1>Cookie Policy</h1>
+  <p class="lead">What we store in your browser, what loads from other services, and how to change your choice. Last updated November 12, 2026.</p>
+
+  <div class="box"><p style="margin:0"><b>The short version.</b> We use cookies and browser storage the site needs to work, like keeping you signed in and remembering your saved jobs. The only optional one is <b>PostHog analytics</b>, which counts page visits and taps without your name or email. No advertising cookies, no ad networks, and we don't sell your data. <button type="button" onclick="window.btpConsent&&window.btpConsent.open()" style="font:inherit;color:#3A5A00;background:none;border:0;padding:0;text-decoration:underline;cursor:pointer">Change your cookie choice</button></p></div>
+
+  <h2>Who sees the cookie banner</h2>
+  <ul>
+    <li><b>Visitors in Europe</b> (EU, EEA, UK, Switzerland), going by your device's time zone: analytics stays off until you tap <b>Accept analytics</b>.</li>
+    <li><b>Everyone else:</b> analytics is on by default, and you can turn it off any time with <b>Cookie settings</b> at the bottom of every page.</li>
+    <li>If your browser sends <b>Global Privacy Control</b> or <b>Do Not Track</b>, analytics stays off unless you turn it on yourself.</li>
+    <li>Your choice is saved in this browser (<code>btp_consent</code>). Clearing your browser data resets it.</li>
+  </ul>
+
+  <h2>Necessary (always on)</h2>
+  <div class="wrap"><table>
+    <tr><th>What</th><th>Set by</th><th>Why</th></tr>
+    <tr><td>Sign-in cookies (names start with <code>__session</code>, <code>__client</code>, <code>__clerk</code>)</td><td>Clerk, our sign-in provider</td><td>Keep you signed in and protect your account. Only set when you sign in.</td></tr>
+    <tr><td>Browser storage starting with <code>btp_</code> or <code>iq_</code></td><td>Beat the Pile</td><td>Remember things you chose on this device: language, major, saved and applied jobs before you sign in, your tracker, quiz answers, your cookie choice, and which tips you've dismissed. Never sent to advertisers.</td></tr>
+  </table></div>
+
+  <h2>Analytics (optional)</h2>
+  <div class="wrap"><table>
+    <tr><th>What</th><th>Set by</th><th>Why</th></tr>
+    <tr><td>A cookie and browser storage named <code>ph_…_posthog</code></td><td>PostHog (United States)</td><td>Count page visits and taps so we can see what works. Text on buttons and cards is masked, there are no session recordings, and your name and email are never sent. If you're signed in, we link visits to an account id only.</td></tr>
+  </table></div>
+
+  <h2>Outside services that load on our pages</h2>
+  <p>These don't set cookies for us, but your browser contacts them, so they receive your IP address and normal browser details:</p>
+  <ul>
+    <li><b>Google Fonts</b>: the Geist font.</li>
+    <li><b>cdnjs (Cloudflare)</b> and <b>unpkg</b>: code libraries for reading resume files, making PDFs, and running the homepage.</li>
+    <li><b>Company logos</b>: loaded from each company's own website or Google's public icon service.</li>
+    <li><b>MailerLite</b>: only if you type your email into the homepage quiz and choose to save it.</li>
+  </ul>
+  <p>We don't embed videos, maps, social media widgets, or ads from other companies.</p>
+
+  <h2>Controlling cookies yourself</h2>
+  <p>You can also block or delete cookies in your browser settings. If you block the necessary ones, sign-in and saved jobs won't work.</p>
+
+  <p class="small">More about what we collect: <a href="/privacy/">Privacy Policy</a>. Questions: use the Feedback button on any page.</p>
+</main>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

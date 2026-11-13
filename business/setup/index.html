@@ -110,6 +110,7 @@
       <div id="codebox" ${S.sentTo ? "" : "hidden"}><label for="cd">Code sent to <span id="to">${esc(S.sentTo || "")}</span></label>
         <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input id="cd" class="code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000"><button class="btn pri" id="ok">Confirm</button></div>
         <p class="small muted">It can take a minute. Check spam too. The code works for 15 minutes.</p></div>
+      <p class="small muted">By verifying, you agree to the <a href="/terms/">Terms of Use</a>, including the rules for employers in section 7, and our <a href="/privacy/">Privacy Policy</a>.</p>
       <p style="margin:16px 0 0"><span class="msg" id="msg" role="status" style="margin:0"></span></p>
       <p class="small" style="margin:14px 0 0"><button class="btn" id="back" style="font-size:13px;padding:5px 12px">← Edit company details</button></p></section>`;
     const say = (t, err) => { $("#msg").className = "msg" + (err ? " err" : ""); $("#msg").textContent = t; };

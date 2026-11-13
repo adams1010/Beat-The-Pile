@@ -1580,7 +1580,27 @@
   "You're not signed in, so this sheet is saved on this device only.": "Vous n'êtes pas connecté : ce tableau est enregistré sur cet appareil uniquement.",
   "to keep it in your account. Your rows come with you.": "pour la garder dans votre compte. Vos lignes vous suivent.",
   "No applications yet. Click": "Pas encore de candidatures. Cliquez sur",
-  "to start your sheet, or tap Apply on any job in": "pour commencer, ou touchez Postuler sur une offre dans"
+  "to start your sheet, or tap Apply on any job in": "pour commencer, ou touchez Postuler sur une offre dans",
+  "Terms": "Conditions",
+  "Cookies": "Cookies",
+  "Refunds": "Remboursements",
+  "Accessibility": "Accessibilité",
+  "Cookie settings": "Paramètres des cookies",
+  "Cookie policy": "Politique de cookies",
+  "Accept analytics": "Accepter l'analyse",
+  "Necessary only": "Nécessaires uniquement",
+  "Legal": "Mentions légales",
+  "Cookie choices": "Choix des cookies",
+  "We use cookies and similar storage that the site needs to work, like keeping you signed in. With your OK we also count page visits with PostHog analytics, without your name or email.": "Nous utilisons des cookies et un stockage similaire nécessaires au fonctionnement du site, par exemple pour rester connecté. Avec votre accord, nous comptons aussi les visites avec PostHog, sans votre nom ni votre e-mail.",
+  "Real internships, straight from the source.": "De vrais stages, directement à la source.",
+  "Tip: Look past the big names. Smaller regional firms are easy to overlook, so fewer students may be applying.": "Astuce : regardez au-delà des grands noms. Les petites entreprises régionales passent souvent inaperçues, donc moins d'étudiants y postulent peut-être.",
+  "By continuing, you agree to our": "En continuant, vous acceptez nos",
+  "Terms of Use": "Conditions d'utilisation",
+  "Privacy Policy": "Politique de confidentialité",
+  ", and confirm you're 16 or older.": ", et confirmez avoir 16 ans ou plus.",
+  "Email address (optional)": "Adresse e-mail (facultatif)",
+  "By verifying, you agree to the": "En vérifiant, vous acceptez les",
+  ", including the rules for employers in section 7, and our": ", y compris les règles pour employeurs de la section 7, et notre"
  },
  "patterns": [
   [
@@ -1902,6 +1922,10 @@
   [
    "^Join (\\d+) people's orbits$",
    "Rejoignez l'orbite de $1 personnes"
+  ],
+  [
+   "^© (\\d{4}) Beat the Pile\\. Job listings come from each employer's own job board\\. Company names and logos belong to their owners\\.$",
+   "© $1 Beat the Pile. Les offres viennent du site carrières de chaque employeur. Les noms et logos appartiennent à leurs propriétaires."
   ]
  ]
 }

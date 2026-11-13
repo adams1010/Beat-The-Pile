@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{--green:#4A7000;--green-dark:#3A5A00;--green-light:#F2FADF;--mint:#B0F701;--navy:#060A2C;--navy2:#0E1440;--line2:#22304D;
-        --ink:#060A2C;--muted:#55627A;--faint:#8590A6;--line:#DCE2EC;--bg:#EEF1F6;--amber:#8A4B08;--amber-light:#FFF4E6;
+        --ink:#060A2C;--muted:#55627A;--faint:#5E6A80;--line:#DCE2EC;--bg:#EEF1F6;--amber:#8A4B08;--amber-light:#FFF4E6;
         --font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;--ease:cubic-bezier(.2,.8,.2,1)}
   *{box-sizing:border-box}
   html,body{margin:0;background:#050B16;color:#fff;font-family:var(--font);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
@@ -220,7 +220,7 @@
   const CH = [];
   const ch = (o) => CH.push(o);
 
-  ch({ key: "find", label: "Find", url: "/jobs", title: "Every internship, straight from the source.",
+  ch({ key: "find", label: "Find", url: "/jobs", title: "Real internships, straight from the source.",
     line: "Real, open internships and entry-level jobs for every major, pulled from thousands of companies' own job boards. No reposts, no recruiters.",
     real: "Live data", steps: [["[data-m]", "Pick a major", "below"], ["[data-kind='fulltime']", "See full-time jobs too", "below"], [".job", "Tap a job"], ["#save", "Save it"]],
     async mount(v) {

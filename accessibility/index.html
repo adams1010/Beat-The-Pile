@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Accessibility — Beat the Pile</title>
+<meta name="description" content="How Beat the Pile works to be usable for everyone, what we've done, what's still being fixed, and how to tell us about a barrier.">
+<link rel="canonical" href="https://www.beatthepile.com/accessibility/">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#060A2C">
+<style>
+  :root{--green:#4A7000;--green-dark:#3A5A00;--navy:#060A2C;--ink:#1A2230;--muted:#52606D;--line:#E3E7ED;--bg:#FBFBFC;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6}
+  main{max-width:720px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 60px max(16px,env(safe-area-inset-left,0px))}
+  h1{font-size:30px;line-height:1.15;color:var(--navy);margin:8px 0 6px;letter-spacing:-.02em}
+  h2{font-size:19px;color:var(--navy);margin:30px 0 8px}
+  p,li{max-width:65ch}
+  .lead{color:var(--muted);margin:0 0 10px}
+  table{width:100%;border-collapse:collapse;font-size:14.5px;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{background:#F2FADF;color:var(--navy);font-size:13px}
+  tr:last-child td{border-bottom:0}
+  .wrap{overflow-x:auto}
+  .box{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  a{color:var(--green-dark)}
+  .small{font-size:13.5px;color:var(--muted)}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main">
+  <h1>Accessibility</h1>
+  <p class="lead">We want every student to be able to use Beat the Pile, including people who use a screen reader, keyboard, zoom, or other assistive tools. Last updated November 12, 2026.</p>
+
+  <h2>Our goal</h2>
+  <p>We're working toward the Web Content Accessibility Guidelines (WCAG) 2.1, level AA. We haven't had an outside audit yet, so we don't claim full conformance.</p>
+
+  <h2>What we do</h2>
+  <ul>
+    <li>A "Skip to content" link at the top of every page, and a visible outline that shows where you are when you use the keyboard.</li>
+    <li>Pop-ups on the homepage close with the Escape key, and clickable cards work with Enter and Space.</li>
+    <li>Every image on the site has a text alternative, and icons in the top bar have a written label under them.</li>
+    <li>We check our text colors against the WCAG contrast ratio of 4.5 to 1. Our bright lime green is only used on the dark navy background, where it passes easily.</li>
+    <li>The site is available in English, Spanish, French, German and Dutch.</li>
+  </ul>
+
+  <h2>What we're still fixing</h2>
+  <ul>
+    <li>Some form fields show a hint inside the box instead of a separate label. We're adding proper labels.</li>
+    <li>The Orbit map is a drawing. The people on it are also listed below the map as cards with buttons.</li>
+    <li>Job descriptions and apply pages are on employers' own websites, which we don't control.</li>
+    <li>Some older parts of the homepage are still being checked for keyboard and screen reader use.</li>
+  </ul>
+
+  <h2>Tell us about a barrier</h2>
+  <p>If something on the site doesn't work for you, use the <b>Feedback</b> button at the bottom right of every page. Tell us the page and what happened. We'll reply and fix it as quickly as we can. If you need information from the site in another way, ask and we'll help.</p>
+</main>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

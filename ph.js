@@ -14,7 +14,7 @@
     window.posthog.init("phc_rUddfFnzyon2QLwAKxKaXddaubzoiz8oayTq57tfu8rf", {
       api_host: "https://us.i.posthog.com", person_profiles: "identified_only",
       disable_session_recording: true, disable_surveys: true, capture_performance: false, capture_dead_clicks: false,
-      mask_all_text: false, mask_all_element_attributes: false,
+      mask_all_text: true, mask_all_element_attributes: true,   // Nov 12: never record what a button or card says (it can contain names)
       loaded: function (ph) {
         ph.__loaded = true;
         for (var i = 0; i < q.length; i++) { if (q[i][0] === "$identify") ph.identify(String(q[i][1])); else ph.capture(q[i][0], q[i][1]); }
@@ -22,6 +22,16 @@
       },
     });
   }
-  function later() { setTimeout(boot, 1200); }
+  // Nov 12: analytics only with consent (/consent.js decides: your choice → GPC/DNT → Europe opt-in → on elsewhere)
+  var booted = false;
+  function tryBoot() {
+    if (booted) return;
+    var c = window.btpConsent;
+    if (!c) { if (!document.querySelector('script[src="/consent.js"]')) { var s = document.createElement("script"); s.src = "/consent.js"; s.onload = tryBoot; document.head.appendChild(s); } else setTimeout(tryBoot, 400); return; }
+    if (!c.analytics()) return;
+    booted = true; boot();
+  }
+  window.addEventListener("btp-consent", function (e) { if (e.detail && e.detail.analytics) tryBoot(); });
+  function later() { setTimeout(tryBoot, 1200); }
   if (document.readyState === "complete") later(); else window.addEventListener("load", later);
 })();

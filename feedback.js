@@ -53,7 +53,7 @@
     function showPulse() {
       const st2 = document.createElement("style");
       st2.textContent = `.iqp{position:fixed;right:14px;bottom:62px;z-index:69;width:min(330px,calc(100vw - 28px));background:#fff;border:1px solid #DCE2EC;border-radius:12px;padding:14px;box-shadow:0 8px 24px rgba(10,20,38,.12);font:14px "Geist",-apple-system,Segoe UI,Roboto,sans-serif;color:#060A2C}
-.iqp b{display:block;font-weight:600;margin-bottom:8px;padding-right:22px}.iqp .x{position:absolute;top:8px;right:8px;border:0;background:none;font-size:18px;color:#8590A6;cursor:pointer;line-height:1;padding:4px}
+.iqp b{display:block;font-weight:600;margin-bottom:8px;padding-right:22px}.iqp .x{position:absolute;top:8px;right:8px;border:0;background:none;font-size:18px;color:#5E6A80;cursor:pointer;line-height:1;padding:4px}
 .iqp .o{display:flex;gap:6px;flex-wrap:wrap}.iqp .o button{font:500 13px inherit;padding:7px 12px;border-radius:999px;border:1px solid #C9D1DE;background:#fff;color:#060A2C;cursor:pointer}
 .iqp .o button:hover{border-color:#4A7000}.iqp textarea{width:100%;box-sizing:border-box;font:16px inherit;padding:8px;border:1px solid #C9D1DE;border-radius:8px;margin:10px 0 8px;min-height:64px}
 .iqp .go{font:600 13px inherit;padding:8px 14px;border-radius:999px;border:0;background:#4A7000;color:#fff;cursor:pointer}.iqp small{color:#55627A}
