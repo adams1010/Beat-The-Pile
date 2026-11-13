@@ -16,7 +16,7 @@ export const config = { maxDuration: 60 };
 const PER_RUN = 60;               // most checks finish in a few seconds (queued companies come with a board link)
 const START_BUDGET_MS = 22000;   // don't start a company after this
 const HARD_STOP_MS = 50000;      // give up on any company still running (Vercel kills the function at 60s)
-const READERS_UPDATED_AT = "2026-11-07T06:00:00Z";   // bump when a new reader ships → re-test companies parked before it
+const READERS_UPDATED_AT = "2026-11-13T16:00:00Z";   // Nov 13: re-test Ashby/iCIMS/Eightfold/SmartRecruiters/ADP/Taleo companies parked as "needs a new scraper"   // bump when a new reader ships → re-test companies parked before it
 // Failed checks are retried after 14 days — 7 in peak hiring season (Aug–Feb), when boards fill up fast — up to 6 tries.
 const inSeason = (d = new Date()) => { const m = d.getUTCMonth(); return m >= 7 || m <= 1; };
 const RETRY_AFTER_DAYS = inSeason() ? 7 : 14;
