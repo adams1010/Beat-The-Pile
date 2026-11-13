@@ -12,6 +12,7 @@
     fair: '<path d="M4 9.5 5.5 4h13L20 9.5"/><path d="M4 9.5c0 1.4 1.1 2.5 2.5 2.5S9 10.9 9 9.5c0 1.4 1.1 2.5 2.5 2.5h1c1.4 0 2.5-1.1 2.5-2.5 0 1.4 1.1 2.5 2.5 2.5S20 10.9 20 9.5"/><path d="M5.5 12v8h13v-8"/><path d="M10 20v-4.5h4V20"/>',
     orbit: '<circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5S9.7 5.9 12 3.5z"/>',
     season: '<path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M21 20H3"/>',
+    tracker: '<rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M3.5 9.5h17"/><path d="M9.5 9.5V20"/><path d="m5.6 6.9.9.9 1.6-1.6"/><path d="M12 14.5h6"/><path d="M12 17.5h4"/>',   // Nov 12: Tracker — a sheet with a ticked box
     profile: '<circle cx="12" cy="8.5" r="3.75"/><path d="M4.5 20c.9-3.6 3.9-5.75 7.5-5.75s6.6 2.15 7.5 5.75"/>',
     talent: '<circle cx="9" cy="8.5" r="3.25"/><path d="M3 19.5c.6-3.1 3-5 6-5s5.4 1.9 6 5"/><circle cx="17" cy="9.5" r="2.5"/><path d="M16 14.6c2.6-.3 4.6 1.3 5 4.9"/>',
     business: '<path d="M4 20.5V6.5L12 3.5v17"/><path d="M12 9.5h8v11"/><path d="M3 20.5h18"/><path d="M7.5 8.5h1M7.5 12h1M7.5 15.5h1M15.5 13h1M15.5 16.5h1"/>',
@@ -26,11 +27,11 @@
   const BIZ = ROLE === "employer";
   if (BIZ) {
     const p0 = location.pathname.replace(/index\.html$/, "");
-    if (["/", "/jobs/", "/jobs", "/season/", "/season", "/fair/", "/fair", "/radar/", "/radar", "/demo/", "/demo", "/u/", "/u", "/business/", "/business", "/internship/", "/internship"].includes(p0)) { location.replace("/business/home/"); return; }
+    if (["/", "/jobs/", "/jobs", "/season/", "/season", "/fair/", "/fair", "/radar/", "/radar", "/demo/", "/demo", "/u/", "/u", "/business/", "/business", "/internship/", "/internship", "/tracker/", "/tracker"].includes(p0)) { location.replace("/business/home/"); return; }
   }
   const MAIN = BIZ
     ? [["/business/home/", "Home", "home"], ["/business/talent/", "Talent", "talent"], ["/orbit/", "Orbit", "orbit"], ["/business/fairs/", "Career Fairs", "fair"]]
-    : [["/", "Home", "home"], ["/jobs/", "Jobs", "jobs"], ["/fair/", "Career Fair", "fair"], ["/orbit/", "Orbit", "orbit"], ["/season/", "My Season", "season"]];
+    : [["/", "Home", "home"], ["/jobs/", "Jobs", "jobs"], ["/fair/", "Career Fair", "fair"], ["/orbit/", "Orbit", "orbit"], ["/season/", "My Season", "season"], ["/tracker/", "Tracker", "tracker"]];
   // Your profile (or company page), switching between student and business, language and sign-out all live in the
   // menu behind your picture on the right — like Instagram's "switch to professional account".
   const TOOLS = BIZ ? [] : [

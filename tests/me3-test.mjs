@@ -26,3 +26,20 @@ r = await call({ action: "app_delete", id: g.id }); assert.equal(r.body.apps.len
 assert.equal((await call({ action: "goal", goal: 0 })).code, 400); r = await call({ action: "goal", goal: 5 }); assert.equal(r.body.goal, 5);
 assert.deepEqual((await call(null, "user_b")).body.apps, [], "users isolated");
 console.log("✓ My Season: applies flow in, employer date vs first-seen kept apart, unknown dates stay unknown, stages, manual adds, goal");
+
+// Nov 12 — Tracker tab: pay, unit, type, place, deadline, contact, notes, tick boxes ride on the same record
+{
+  let t = await call({ action: "app", app: { company: "Dominion Energy", title: "Engineering Intern", kind: "intern", pay: "24.5", payUnit: "hour", location: "Richmond, VA",
+    deadline: "2026-12-01", contact: "Jo (recruiter)", notes: "Met at fair", checks: { interviewed: true, thankyou: true } } });
+  let d = t.body.apps.find((x) => x.company === "Dominion Energy");
+  assert.equal(d.pay, 24.5); assert.equal(d.payUnit, "hour"); assert.equal(d.kind, "intern"); assert.equal(d.location, "Richmond, VA");
+  assert.match(d.deadline, /^2026-12-01/); assert.equal(d.contact, "Jo (recruiter)"); assert.equal(d.notes, "Met at fair");
+  assert.deepEqual(d.checks, { submitted: true, interviewed: true, offered: false, accepted: false, thankyou: true }, "applied by default, other boxes as ticked");
+  t = await call({ action: "app", app: { ...d, pay: 85000, payUnit: "year", kind: "fulltime", checks: { ...d.checks, submitted: false } } });
+  d = t.body.apps.find((x) => x.company === "Dominion Energy");
+  assert.equal(d.pay, 85000); assert.equal(d.payUnit, "year"); assert.equal(d.kind, "fulltime"); assert.equal(d.checks.submitted, false, "can untick Applied");
+  t = await call({ action: "app", app: { ...d, pay: -5, payUnit: "decade", kind: "contract" } });
+  d = t.body.apps.find((x) => x.company === "Dominion Energy");
+  assert.equal(d.pay, null); assert.equal(d.payUnit, null); assert.equal(d.kind, null, "junk refused");
+  console.log("✓ tracker: pay + per hour/year, type, place, deadline, contact, notes, tick boxes saved; junk refused");
+}

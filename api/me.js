@@ -76,6 +76,15 @@ function cleanApp(a) {
     postedEstimate: a?.postedEstimate === true,                    // true = worked out from "posted N days ago"
     firstSeenAt: iso(a?.firstSeenAt),                              // when our robot first saw it on their board
     followedUpAt: iso(a?.followedUpAt),                            // student said they followed up (stops reminders)
+    // Nov 12 — Tracker tab (/tracker/): the spreadsheet columns, same record as My Season
+    kind: a?.kind === "fulltime" ? "fulltime" : a?.kind === "intern" ? "intern" : null,
+    pay: Number.isFinite(+a?.pay) && a?.pay !== "" && a?.pay != null && +a.pay >= 0 && +a.pay <= 10000000 ? Math.round(+a.pay * 100) / 100 : null,
+    payUnit: ["hour", "week", "month", "year", "total"].includes(a?.payUnit) ? a.payUnit : null,
+    location: clean(a?.location, 120) || null,
+    deadline: iso(a?.deadline),
+    contact: clean(a?.contact, 120) || null,
+    notes: clean(a?.notes, 1000) || null,
+    checks: Object.fromEntries(["submitted", "interviewed", "offered", "accepted", "thankyou"].map((k) => [k, k === "submitted" ? a?.checks?.[k] !== false : a?.checks?.[k] === true])),   // an entry counts as applied unless unticked
     updatedAt: new Date().toISOString(),
   };
 }
