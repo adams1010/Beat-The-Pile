@@ -2,6 +2,8 @@
 // Supabase REST (PostgREST filters we use, upsert, PATCH with filters, count, rpc rate_take / ai_reserve),
 // Supabase Storage, Clerk (JWKS + users), and Anthropic. Install with `const f = installFake()`.
 import crypto from "node:crypto";
+import { isInternship, isEarlyCareer } from "../lib/fields.js";
+const kindOfTitle = (t) => (!isInternship(t) && isEarlyCareer(t) ? "fulltime" : "intern");
 
 export function makeKeys() {
   const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
@@ -129,6 +131,8 @@ export function installFake({ jwk, anthropic, clerkUsers = {} } = {}) {
       throw new Error("unknown rpc " + fn);
     }
     const rows = T(name), sp = url.searchParams;
+    // listings.kind is set by fetchCompany at sync (and backfilled in the real DB); test fixtures that push rows by hand get it here
+    if (name === "listings") for (const r of rows) if (r.kind == null && r.title) r.kind = kindOfTitle(r.title);
     if (m === "GET") {
       let out = filterRows(rows, sp);
       const order = sp.get("order");

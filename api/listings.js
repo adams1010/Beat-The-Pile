@@ -9,14 +9,14 @@
 //   GET /api/listings?limit=200&offset=400       → one page (default: everything, up to 20,000)
 //   GET /api/listings?ids=a:1,b:2                → these exact listings INCLUDING closed ones (your saved/applied history)
 //   GET /api/listings?kind=intern (default) | fulltime | all  → internships, early-career full-time jobs, or both.
-//       Told apart by title (PostgREST imatch on lib/fields.js INTERN_PG), so no extra column; each row carries kind.
+//       Told apart by the stored, indexed listings.kind column (set by fetchCompany; Nov 13), each row carries kind.
 //   GET /api/listings?summary=1                  → just counts + last update time (homepage/demo stats; tiny + cached)
 //   GET /api/listings?names=1                    → just the companies with an open internship right now (any major; Radar)
 //   GET /c/<id>        (→ ?page=<id>)            → the company's page as HTML (server-built so search engines can read it)
 //   GET /sitemap.xml   (→ ?sitemap=1)            → main pages + every company hiring now
 // Bad parameters → 400 with what's wrong. A database problem → 503 (never an empty list that looks like "no jobs").
 import { db } from "../lib/db.js";
-import { FIELDS, FULLTIME_PG, kindOf } from "../lib/fields.js";
+import { FIELDS, kindOf } from "../lib/fields.js";
 import { COMPANIES } from "../lib/companies.js";
 import { companyPage, radarFor, sitemap } from "../lib/companypage.js";
 import { resolvePlace, geocodeOne, miles } from "../lib/geocode.js";
@@ -29,7 +29,7 @@ import { zipToState } from "../lib/geo.js";
 const FIELD_KEYS = new Set([...FIELDS.map(([k]) => k), "other"]);
 const STATES = new Set("AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY PR".split(" "));
 const LIVE = "closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)";
-const COLS = "id,company_id,company,title,location,state,url,match,field,posted_on,first_seen,link_checked_at";
+const COLS = "id,company_id,company,title,location,state,url,match,field,posted_on,first_seen,link_checked_at,kind";
 
 export function parse(q) {
   const errs = [];
@@ -82,12 +82,14 @@ async function dots(p, res) {
 /** Same major filters as the main list (field / strict ME / companies), as a PostgREST query string tail. */
 // internships = every title that isn't a real early-career full-time title (keeps board-flagged interns);
 // full-time = early-career title and not an internship. One regex, plain filters (no or()/and() quoting).
-const KIND_ON = { intern: `&title=not.imatch.${encodeURIComponent(FULLTIME_PG)}`, fulltime: `&title=imatch.${encodeURIComponent(FULLTIME_PG)}`, all: "" };
+// Nov 13: a stored column (set by fetchCompany at sync, indexed). The old title regex grew past 4,000 characters and
+// timed out every field=all load (homepage + /jobs answered 503).
+const KIND_ON = { intern: "&kind=eq.intern", fulltime: "&kind=eq.fulltime", all: "" };
 // Safety net: if the database ever rejects the pattern, this instance stops filtering by kind (rows still carry kind)
 // instead of failing every /jobs load. Logged as [listings] kind filter off.
 let kindOk = true;
 const KIND_Q = new Proxy(KIND_ON, { get: (t, k) => (kindOk ? t[k] : "") });
-const withKind = (rows) => rows.map((l) => ({ ...l, kind: kindOf(l.title) === "fulltime" ? "fulltime" : "intern" }));   // board-flagged interns (BambooHR) stay "intern"
+const withKind = (rows) => rows.map((l) => ({ ...l, kind: l.kind || (kindOf(l.title) === "fulltime" ? "fulltime" : "intern") }));   // board-flagged interns (BambooHR) stay "intern"
 function majorFilter(p) {
   let q = KIND_Q[p.kind || "intern"];
   if (p.match) q += `&match=eq.${p.match}`;
@@ -141,8 +143,8 @@ async function scanAll() {
   if (scanMemo && Date.now() - scanMemo.at < 120000) return scanMemo.rows;
   const rows = []; let last = "";
   for (let i = 0; i < 200; i++) {
-    const page = await db.select(`listings?select=id,company_id,company,field,match,title&${LIVE}${last ? `&id=gt.${encodeURIComponent(last)}` : ""}&order=id.asc&limit=1000`);
-    for (const r of page) rows.push({ company_id: r.company_id, company: r.company, field: r.field, match: r.match, kind: kindOf(r.title) === "fulltime" ? "fulltime" : "intern" });
+    const page = await db.select(`listings?select=id,company_id,company,field,match,title,kind&${LIVE}${last ? `&id=gt.${encodeURIComponent(last)}` : ""}&order=id.asc&limit=1000`);
+    for (const r of page) rows.push({ company_id: r.company_id, company: r.company, field: r.field, match: r.match, kind: r.kind || (kindOf(r.title) === "fulltime" ? "fulltime" : "intern") });
     if (page.length < 1000) break;
     last = page[page.length - 1].id;
   }
