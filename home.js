@@ -1,4 +1,4 @@
-/* built from src/home.jsx e7030f87e9e2cd09 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 67ef374fb911b6d1 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -14,7 +14,7 @@ const AM = "#B45309",
 const CR = "#B42318",
   CL = "#FEF3F2";
 const PALETTE = Array(12).fill("#060A2C");
-const LOAD_MSGS = ["Searching for internships near you...", "Tip: Apply Tuesday–Thursday morning — recruiter inboxes are cleanest then.", "Matching roles to your major...", "Tip: Many postings close once enough people apply, so earlier is better.", "Finding opportunities others overlook...", "Tip: A short, polite follow-up 5–7 days after applying keeps you on the recruiter's radar.", "Factoring in your timing and experience...", "Tip: Look past the big names. Smaller regional firms are easy to overlook, so fewer students may be applying.", "Estimating your match scores...", "Tip: Don't filter by GPA cutoffs — many companies post them but rarely enforce them.", "Checking nearby states too...", "Tip: Customize your resume for each application. Even small tweaks beat a generic one.", "Reading company job boards...", "Tip: Your school's alumni network on LinkedIn is a hidden cheat code — message 1 per week.", "Ranking matches by realistic chance...", "Tip: Quality > quantity. 10 thoughtful applications beats 100 spray-and-pray every time.", "Polishing the list...", "Tip: After every rejection, ask for feedback. Most won't reply — the ones who do are gold."];
+const LOAD_MSGS = ["Searching for internships near you...", "Tip: Apply Tuesday–Thursday morning, recruiter inboxes are cleanest then.", "Matching roles to your major...", "Tip: Many postings close once enough people apply, so earlier is better.", "Finding opportunities others overlook...", "Tip: A short, polite follow-up 5–7 days after applying keeps you on the recruiter's radar.", "Factoring in your timing and experience...", "Tip: Look past the big names. Smaller regional firms are easy to overlook, so fewer students may be applying.", "Estimating your match scores...", "Tip: Don't filter by GPA cutoffs, many companies post them but rarely enforce them.", "Checking nearby states too...", "Tip: Customize your resume for each application. Even small tweaks beat a generic one.", "Reading company job boards...", "Tip: Your school's alumni network on LinkedIn is a hidden cheat code, message 1 per week.", "Ranking matches by realistic chance...", "Tip: Quality > quantity. 10 thoughtful applications beats 100 spray-and-pray every time.", "Polishing the list...", "Tip: After every rejection, ask for feedback. Most won't reply, the ones who do are gold."];
 const SCHOOL_ABBR = {
   "umd": "Maryland",
   "psu": "Penn State",
@@ -181,10 +181,10 @@ const LiveStats = () => {
     style: {
       background: "#fff",
       border: "1px solid #F2FADF",
-      borderRadius: 14,
+      borderRadius: 10,
       padding: "1.75rem 1.25rem",
       textAlign: "center",
-      boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+      boxShadow: "none"
     }
   }, React.createElement("div", {
     style: {
@@ -288,7 +288,7 @@ const JobPreview = () => {
       display: "block",
       background: "#fff",
       border: "1px solid #E3E7ED",
-      borderRadius: 12,
+      borderRadius: 10,
       padding: "12px 14px",
       textDecoration: "none",
       color: "#060A2C"
@@ -445,348 +445,6 @@ const FEATURES = [{
   h: "/#interview",
   pg: "interview"
 }];
-function FeatViz({
-  k
-}) {
-  const box = {
-    background: "#fff",
-    border: "1px solid #DCE2EC",
-    borderRadius: 10,
-    boxShadow: "0 6px 18px rgba(10,20,38,.06)"
-  };
-  const bar = (w, c = "#DCE2EC", h = 7) => React.createElement("span", {
-    style: {
-      display: "block",
-      height: h,
-      width: w,
-      background: c,
-      borderRadius: 99
-    }
-  });
-  if (k === "tailor") return React.createElement("div", {
-    style: {
-      ...box,
-      width: "88%",
-      padding: 12,
-      display: "grid",
-      gap: 8
-    }
-  }, React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      fontSize: 12,
-      fontWeight: 600
-    }
-  }, React.createElement("span", null, "Fit for this role"), React.createElement("span", {
-    style: {
-      color: "#4A7000",
-      ...DM
-    }
-  }, "Strong")), React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 6,
-      flexWrap: "wrap"
-    }
-  }, ["SolidWorks", "GD&T", "testing"].map(x => React.createElement("span", {
-    key: x,
-    style: {
-      fontSize: 11,
-      background: "#F2FADF",
-      color: "#4A7000",
-      padding: "3px 8px",
-      borderRadius: 99
-    }
-  }, x)), React.createElement("span", {
-    style: {
-      fontSize: 11,
-      background: "#FBEFE6",
-      color: "#9A4B12",
-      padding: "3px 8px",
-      borderRadius: 99
-    }
-  }, "gap: FEA")), React.createElement("div", {
-    style: {
-      display: "grid",
-      gap: 5
-    }
-  }, bar("100%"), bar("72%", "#DDF3A8")));
-  if (k === "alerts") return React.createElement("div", {
-    style: {
-      ...box,
-      width: "88%",
-      padding: 12,
-      display: "grid",
-      gap: 8
-    }
-  }, React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 8,
-      alignItems: "center"
-    }
-  }, React.createElement("img", {
-    src: "/brand/mark.png",
-    alt: "",
-    width: "26",
-    height: "26",
-    style: {
-      width: 26,
-      height: 26,
-      objectFit: "contain"
-    }
-  }), React.createElement("span", {
-    style: {
-      fontSize: 12,
-      fontWeight: 600
-    }
-  }, "5 new internships this week")), [["Mechanical Intern", "Richmond, VA"], ["Test Engineering Co-op", "Arlington, VA"]].map(([a, b]) => React.createElement("div", {
-    key: a,
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      fontSize: 11,
-      borderTop: "1px solid #EEF1F6",
-      paddingTop: 6
-    }
-  }, React.createElement("span", {
-    style: {
-      fontWeight: 500
-    }
-  }, a), React.createElement("span", {
-    style: {
-      color: "#55627A"
-    }
-  }, b))));
-  if (k === "radar") {
-    const m = ["Jul", "Aug", "Sep", "Oct", "Nov"];
-    return React.createElement("div", {
-      style: {
-        ...box,
-        width: "88%",
-        padding: 12
-      }
-    }, React.createElement("div", {
-      style: {
-        fontSize: 12,
-        fontWeight: 600,
-        marginBottom: 10
-      }
-    }, "Usually opens ", React.createElement("span", {
-      style: {
-        color: "#4A7000"
-      }
-    }, "~mid Aug")), React.createElement("div", {
-      style: {
-        position: "relative",
-        height: 8,
-        background: "#EEF1F6",
-        borderRadius: 99
-      }
-    }, React.createElement("span", {
-      style: {
-        position: "absolute",
-        left: "22%",
-        width: "18%",
-        top: 0,
-        bottom: 0,
-        background: "#DDF3A8",
-        borderRadius: 99
-      }
-    }), React.createElement("span", {
-      style: {
-        position: "absolute",
-        left: "30%",
-        top: -4,
-        width: 16,
-        height: 16,
-        marginLeft: -8,
-        borderRadius: "50%",
-        background: "#4A7000",
-        border: "3px solid #fff",
-        boxShadow: "0 0 0 1px #4A7000"
-      }
-    })), React.createElement("div", {
-      style: {
-        display: "flex",
-        justifyContent: "space-between",
-        fontSize: 10,
-        color: "#8D9AB3",
-        marginTop: 8
-      }
-    }, m.map(x => React.createElement("span", {
-      key: x
-    }, x))));
-  }
-  if (k === "fair") return React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 12,
-      alignItems: "center",
-      width: "88%"
-    }
-  }, React.createElement("svg", {
-    viewBox: "0 0 140 100",
-    style: {
-      flex: 1,
-      height: 110
-    }
-  }, React.createElement("rect", {
-    x: "1",
-    y: "1",
-    width: "138",
-    height: "98",
-    rx: "10",
-    fill: "#fff",
-    stroke: "#DCE2EC"
-  }), [[20, 20], [60, 20], [100, 20], [20, 55], [60, 55], [100, 55], [40, 82], [80, 82]].map(([x, y], i) => React.createElement("rect", {
-    key: i,
-    x: x,
-    y: y - 6,
-    width: "22",
-    height: "12",
-    rx: "3",
-    fill: [0, 4, 7].includes(i) ? "#DDF3A8" : "#EEF1F6"
-  })), React.createElement("path", {
-    d: "M31 20 C 50 40, 60 40, 71 55 S 90 80, 91 82",
-    fill: "none",
-    stroke: "#4A7000",
-    strokeWidth: "2",
-    strokeDasharray: "4 3"
-  }), [[31, 20, 1], [71, 55, 2], [91, 82, 3]].map(([x, y, n]) => React.createElement("g", {
-    key: n
-  }, React.createElement("circle", {
-    cx: x,
-    cy: y,
-    r: "7",
-    fill: "#4A7000"
-  }), React.createElement("text", {
-    x: x,
-    y: y + 3.5,
-    fontSize: "9",
-    textAnchor: "middle",
-    fill: "#fff",
-    fontWeight: "700"
-  }, n)))), React.createElement("svg", {
-    viewBox: "0 0 7 7",
-    style: {
-      width: 56,
-      height: 56,
-      background: "#fff",
-      padding: 5,
-      border: "1px solid #DCE2EC",
-      borderRadius: 8
-    },
-    shapeRendering: "crispEdges"
-  }, "1110111101010111101111000000101101111010101110111".split("").map((b, i) => b === "1" && React.createElement("rect", {
-    key: i,
-    x: i % 7,
-    y: Math.floor(i / 7),
-    width: "1",
-    height: "1",
-    fill: "#060A2C"
-  }))));
-  if (k === "season") return React.createElement("div", {
-    style: {
-      display: "grid",
-      gridTemplateColumns: "repeat(4,1fr)",
-      gap: 6,
-      width: "92%"
-    }
-  }, [["Saved", 3], ["Applied", 2], ["Interview", 1], ["Offer", 0]].map(([c, n]) => React.createElement("div", {
-    key: c,
-    style: {
-      background: "#EEF1F6",
-      borderRadius: 8,
-      padding: 6,
-      minHeight: 96
-    }
-  }, React.createElement("div", {
-    style: {
-      fontSize: 10,
-      fontWeight: 600,
-      color: "#55627A",
-      marginBottom: 6
-    }
-  }, c), Array.from({
-    length: n
-  }).map((_, i) => React.createElement("div", {
-    key: i,
-    style: {
-      ...box,
-      boxShadow: "none",
-      borderRadius: 6,
-      height: 18,
-      marginBottom: 4,
-      borderColor: c === "Interview" ? "#4A7000" : "#DCE2EC",
-      background: c === "Interview" ? "#F2FADF" : "#fff"
-    }
-  })))));
-  return React.createElement("div", {
-    style: {
-      ...box,
-      width: "88%",
-      padding: 12,
-      display: "flex",
-      gap: 14,
-      alignItems: "center"
-    }
-  }, React.createElement("span", {
-    style: {
-      width: 56,
-      height: 56,
-      borderRadius: 12,
-      background: "#060A2C",
-      color: "#B0F701",
-      fontSize: 24,
-      fontWeight: 700,
-      display: "grid",
-      placeItems: "center",
-      flexShrink: 0
-    }
-  }, "B+"), React.createElement("div", {
-    style: {
-      flex: 1,
-      display: "grid",
-      gap: 6
-    }
-  }, [["Q1", 86], ["Q2", 74], ["Q3", 91]].map(([q, v]) => React.createElement("div", {
-    key: q,
-    style: {
-      display: "flex",
-      gap: 8,
-      alignItems: "center",
-      fontSize: 11
-    }
-  }, React.createElement("span", {
-    style: {
-      width: 18,
-      color: "#55627A"
-    }
-  }, q), React.createElement("span", {
-    style: {
-      flex: 1,
-      height: 6,
-      background: "#EEF1F6",
-      borderRadius: 99
-    }
-  }, React.createElement("span", {
-    style: {
-      display: "block",
-      height: 6,
-      width: v + "%",
-      background: "#4A7000",
-      borderRadius: 99
-    }
-  })), React.createElement("span", {
-    style: {
-      ...DM,
-      width: 20
-    }
-  }, v)))));
-}
 const MILES_PX = 1.609 * 1300 / 6371;
 function HeroMap({
   near,
@@ -815,9 +473,9 @@ function HeroMap({
       boxSizing: "border-box",
       background: "#0E1440",
       border: "1px solid #2A3B5C",
-      borderRadius: 16,
+      borderRadius: 10,
       padding: "18px 18px 14px",
-      boxShadow: "0 24px 60px rgba(0,0,0,.45)",
+      boxShadow: "none",
       ...DM
     }
   }, React.createElement("div", {
@@ -1073,7 +731,7 @@ function LandingD({
   const card = {
     background: "#fff",
     border: "1px solid #DCE2EC",
-    borderRadius: 14
+    borderRadius: 10
   };
   const wrap = {
     maxWidth: 1240,
@@ -1141,7 +799,7 @@ function LandingD({
       margin: "0 0 28px",
       maxWidth: 560
     }
-  }, "Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board \u2014 no reposts, and jobs drop off when the company takes them down."), React.createElement("form", {
+  }, "Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board, no reposts, and jobs drop off when the company takes them down."), React.createElement("form", {
     onSubmit: go,
     role: "search",
     className: "d-search",
@@ -1149,7 +807,7 @@ function LandingD({
       display: "flex",
       alignItems: "stretch",
       background: "#fff",
-      borderRadius: 14,
+      borderRadius: 10,
       padding: 6,
       boxShadow: "0 0 0 1px #2FD39A33, 0 20px 50px rgba(0,0,0,.35)",
       maxWidth: 760
@@ -1379,7 +1037,7 @@ function LandingD({
     href: `/jobs/?major=${k}&state=all`,
     style: {
       ...card,
-      borderRadius: 12,
+      borderRadius: 10,
       textDecoration: "none",
       color: "#060A2C",
       padding: 18,
@@ -1504,70 +1162,57 @@ function LandingD({
       fontWeight: 500
     }
   }, "See it in the 2-minute tour \u2192")), React.createElement("div", {
-    className: "d-grid3"
-  }, FEATURES.map(f => React.createElement("a", {
+    style: {
+      ...card,
+      padding: "4px 20px"
+    }
+  }, React.createElement("ul", {
+    className: "d-offer",
+    style: {
+      listStyle: "none",
+      margin: 0,
+      padding: 0,
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
+      columnGap: 32
+    }
+  }, FEATURES.map(f => React.createElement("li", {
     key: f.k,
+    style: {
+      borderBottom: "1px solid #EEF1F6",
+      padding: "14px 0"
+    }
+  }, React.createElement("a", {
     href: f.h,
     onClick: f.pg ? e => {
       e.preventDefault();
       onPage(f.pg);
       window.scrollTo(0, 0);
     } : undefined,
-    className: "d-feat",
     style: {
-      ...card,
       textDecoration: "none",
       color: "#060A2C",
-      display: "flex",
-      flexDirection: "column",
-      overflow: "hidden"
+      display: "block"
     }
-  }, React.createElement("div", {
-    "aria-hidden": "true",
+  }, React.createElement("span", {
     style: {
-      background: "#F6F8FB",
-      borderBottom: "1px solid #EEF1F6",
-      height: 150,
-      position: "relative",
-      display: "grid",
-      placeItems: "center",
-      padding: 16
+      fontSize: 15,
+      fontWeight: 600
     }
-  }, React.createElement(FeatViz, {
-    k: f.k
-  })), React.createElement("div", {
+  }, f.name), React.createElement("span", {
     style: {
-      padding: 20
-    }
-  }, React.createElement("p", {
-    style: {
-      fontSize: 13,
-      fontWeight: 600,
       color: "#4A7000",
-      margin: "0 0 6px",
-      display: "flex",
-      justifyContent: "space-between"
+      fontWeight: 600
     }
-  }, f.name, React.createElement("span", {
+  }, " \xB7 ", f.t), React.createElement("span", {
     style: {
-      fontSize: 11,
-      fontWeight: 500,
-      color: "#5E6A80"
-    }
-  }, "Example preview")), React.createElement("p", {
-    style: {
-      fontSize: 17,
-      fontWeight: 600,
-      margin: "0 0 6px"
-    }
-  }, f.t), React.createElement("p", {
-    style: {
+      display: "block",
       fontSize: 14,
       lineHeight: 1.5,
       color: "#55627A",
-      margin: 0
+      marginTop: 3
     }
-  }, f.d))))))), React.createElement("footer", {
+  }, f.d)))))))), React.createElement("footer", {
     style: {
       textAlign: "center",
       padding: "1.5rem",
@@ -1632,7 +1277,7 @@ const EXT_CATS = [{
   label: "Competitions & Challenges",
   icon: "",
   color: "#FF8C00",
-  why: "Competitions signal initiative and real-world problem-solving — recruiters love this.",
+  why: "Competitions signal initiative and real-world problem-solving, recruiters love this.",
   options: [{
     name: "Case Competition",
     roles: ["Participated", "Advanced to Finals", "Regional Winner", "National Winner"]
@@ -1661,7 +1306,7 @@ const EXT_CATS = [{
   label: "Research & Innovation",
   icon: "",
   color: "#2563EB",
-  why: "Research experience proves analytical thinking — critical for technical and finance roles.",
+  why: "Research experience proves analytical thinking, critical for technical and finance roles.",
   options: [{
     name: "Professor Research Lab",
     roles: ["Research Assistant", "Co-author", "Lead Researcher", "Published Author"]
@@ -1689,8 +1334,8 @@ const EXT_CATS = [{
   id: "work",
   label: "Work & Entrepreneurship",
   icon: "",
-  color: "#7C3AED",
-  why: "Paid work experience — especially with real responsibility — is often weighted higher than GPA.",
+  color: "#1E3A8A",
+  why: "Paid work experience, especially with real responsibility, is often weighted higher than GPA.",
   options: [{
     name: "Prior Internship",
     roles: ["Completed", "Return Offer", "Multiple Internships", "Full-time Convert"]
@@ -1719,7 +1364,7 @@ const EXT_CATS = [{
   label: "Sports & Athletics",
   icon: "",
   color: "#059669",
-  why: "Sports show discipline, teamwork, and grit — qualities every employer wants.",
+  why: "Sports show discipline, teamwork, and grit, qualities every employer wants.",
   options: [{
     name: "Varsity Sport (D1/D2/D3)",
     roles: ["Athlete", "Starter", "Captain (Nominated)", "Team Captain"]
@@ -1768,7 +1413,7 @@ const EXT_CATS = [{
   label: "Community & Volunteering",
   icon: "",
   color: "#0EA5E9",
-  why: "Shows character — especially leadership in service roles, not just participation.",
+  why: "Shows character, especially when you led something, not only took part.",
   options: [{
     name: "Nonprofit Volunteer",
     roles: ["Occasional", "Regular (Monthly+)", "Team Lead", "Founded / Directed"]
@@ -1848,15 +1493,15 @@ const TYPE_OPTS = ["Any", "Hybrid", "In-person", "Remote"];
 const TERM_OPTS = ["Summer 2026", "Fall 2026", "Spring 2027", "Summer 2027"];
 const STEP_HINTS = {
   university: "Your school's reputation and alumni network directly affect which companies recruit you.",
-  gradYear: "Hiring timelines vary — we match you to companies currently recruiting for your graduation date.",
-  term: "Timing is huge. Most summer internships fill the prior fall — applying late sharply lowers your real odds, and we show that honestly.",
+  gradYear: "Hiring timelines vary, we match you to companies currently recruiting for your graduation date.",
+  term: "Timing is huge. Most summer internships fill the prior fall, applying late sharply lowers your real odds, and we show that honestly.",
   major: "The most important factor. We find companies that specifically hire your major.",
   gpa: "Honest answers give better matches. Many great firms don't require a 4.0.",
   extracurriculars: "Recruiters care more about leadership roles than participation. Be specific.",
   skills: "Technical skills get you past automated screening filters. Select what you actually know.",
   type: "Narrows results so you only see positions that actually fit your life.",
   zip: "This helps us factor location into your matches and tailor your search.",
-  radius: "Cast wider for more options — especially in rural areas."
+  radius: "Cast wider for more options, especially in rural areas."
 };
 const STEPS = [{
   key: "resume",
@@ -1918,7 +1563,7 @@ const TIPS = [{
   cat: "Timing",
   icon: "",
   title: "Apply the fall before, not the spring of",
-  text: "The single biggest mistake students make: applying in spring for that same summer. Most competitive summer internships open August–October the year before. If you're applying late, apply anyway — but know the strongest roles are usually gone, and target companies with rolling or later deadlines."
+  text: "The single biggest mistake students make: applying in spring for that same summer. Most competitive summer internships open August–October the year before. If you're applying late, apply anyway, but know the strongest roles are usually gone, and target companies with rolling or later deadlines."
 }, {
   cat: "Timing",
   icon: "",
@@ -1928,12 +1573,12 @@ const TIPS = [{
   cat: "Resume",
   icon: "",
   title: "A solid application beats a perfect GPA",
-  text: "A 3.2 with two relevant projects you can talk about for five minutes will often beat a 3.9 with nothing to show. Recruiters hire for evidence you can do the work — build something, then make it the center of your resume and interviews."
+  text: "A 3.2 with two relevant projects you can talk about for five minutes will often beat a 3.9 with nothing to show. Recruiters hire for evidence you can do the work, build something, then make it the center of your resume and interviews."
 }, {
   cat: "Resume",
   icon: "",
   title: "Mirror the job description's keywords",
-  text: "Many companies screen resumes with software before a human sees them. Pull two or three exact phrases from the posting (tools, skills, responsibilities) and make sure they appear naturally in your resume. It's not gaming the system — it's speaking their language."
+  text: "Many companies screen resumes with software before a human sees them. Pull two or three exact phrases from the posting (tools, skills, responsibilities) and make sure they appear naturally in your resume. That's how you speak their language."
 }, {
   cat: "Applications",
   icon: "",
@@ -1948,7 +1593,7 @@ const TIPS = [{
   cat: "Follow-up",
   icon: "",
   title: "A polite follow-up genuinely works",
-  text: "Send a short, courteous follow-up email five to seven business days after applying or interviewing. It's not annoying — it signals genuine interest and puts you back on top of the pile. Keep it to a few sentences and reference the specific role."
+  text: "Send a short, courteous follow-up email five to seven business days after applying or interviewing. It's not annoying, it signals genuine interest and puts you back on top of the pile. Keep it to a few sentences and reference the specific role."
 }, {
   cat: "Networking",
   icon: "",
@@ -1963,7 +1608,7 @@ const TIPS = [{
   cat: "Mindset",
   icon: "",
   title: "Rejection is the default, not the exception",
-  text: "Strong candidates routinely apply to 50+ roles to land a few. A rejection — or silence — usually means timing or volume, not that you're not good enough. Keep your pipeline full so no single 'no' carries too much weight."
+  text: "Strong candidates routinely apply to 50+ roles to land a few. A rejection, or silence, usually means timing or volume, not that you're not good enough. Keep your pipeline full so no single 'no' carries too much weight."
 }, {
   cat: "Resume",
   icon: "",
@@ -1978,32 +1623,32 @@ const TIPS = [{
   cat: "Networking",
   icon: "",
   title: "Ask for advice, not a job",
-  text: "\"Can you give me a job?\" puts people on the spot. \"Could I ask you two questions about how you got into this field?\" gets a yes far more often — and those conversations are where referrals quietly come from. Be genuinely curious, not transactional."
+  text: "\"Can you give me a job?\" puts people on the spot. \"Could I ask you two questions about how you got into this field?\" gets a yes far more often, and those conversations are where referrals quietly come from. Be genuinely curious, not transactional."
 }, {
   cat: "Interviews",
   icon: "",
   title: "Always have questions to ask them",
-  text: "\"Do you have any questions for us?\" is not optional — having none signals low interest. Prepare three: one about the team, one about the work itself, one about growth. Avoid asking things easily found on their website."
+  text: "\"Do you have any questions for us?\" is not optional, having none signals low interest. Prepare three: one about the team, one about the work itself, one about growth. Avoid asking things easily found on their website."
 }, {
   cat: "Timing",
   icon: "",
-  title: "Reapply — being early last year helps this year",
+  title: "Reapply, being early last year helps this year",
   text: "If you applied somewhere and didn't get it, applying again the next cycle isn't desperate, it's normal. Recruiters often view returning applicants favorably, especially if you've added skills or experience since. Persistence reads as genuine interest."
 }, {
   cat: "Resume",
   icon: "",
   title: "Tailor your resume per role type",
-  text: "You don't need 50 versions, but having 2-3 — say one for technical roles and one for business roles — lets you front-load the most relevant experience for each. Beat the Pile lets you save multiple named resumes and pick one per application."
+  text: "You don't need 50 versions, but having 2-3, say one for technical roles and one for business roles, lets you front-load the most relevant experience for each. Beat the Pile lets you save multiple named resumes and pick one per application."
 }, {
   cat: "Mindset",
   icon: "",
   title: "Cast a wide net early, then focus",
-  text: "Early on, apply broadly to learn what sticks and get interview reps. As you get callbacks, you'll see which roles fit — then concentrate your energy there. Don't over-optimize your first ten applications; treat them as practice."
+  text: "Early on, apply broadly to learn what sticks and get interview reps. As you get callbacks, you'll see which roles fit, then concentrate your energy there. Don't over-optimize your first ten applications; treat them as practice."
 }, {
   cat: "Networking",
   icon: "",
   title: "Your career center is underused gold",
-  text: "Campus career centers have employer connections, resume reviews, and often exclusive postings most students ignore. They're already paid for by your tuition. Book one appointment this week — it's the highest-leverage hour you're not using."
+  text: "Campus career centers have employer connections, resume reviews, and often exclusive postings most students ignore. They're already paid for by your tuition. Book one appointment this week, it's the highest-leverage hour you're not using."
 }];
 const TIP_CATS = ["All", "Timing", "Resume", "Applications", "Follow-up", "Networking", "Interviews", "Mindset"];
 function MatchBar({
@@ -2235,7 +1880,7 @@ function BlurCard({
       background: "white",
       borderRadius: var_rl,
       border: `1.5px solid ${GL}`,
-      boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+      boxShadow: "none"
     }
   }, React.createElement("div", {
     style: {
@@ -2271,7 +1916,7 @@ function experienceFromGrad(gradYear) {
   };
   if (/grad/i.test(gradYear)) return {
     factor: 1.0,
-    label: "As a graduate student, you bring the most experience — lean into that in applications."
+    label: "As a graduate student, you bring the most experience, lean into that in applications."
   };
   const now = new Date(2026, 4, 21);
   const m = gradYear.match(/(May|Dec)\s+(\d{4})/i);
@@ -2285,19 +1930,19 @@ function experienceFromGrad(gradYear) {
   let factor, label;
   if (monthsToGrad <= 2) {
     factor = 1.0;
-    label = "You're about to graduate — you have the most coursework and experience behind you, which strengthens your odds.";
+    label = "You're about to graduate, you have the most coursework and experience behind you, which strengthens your odds.";
   } else if (monthsToGrad <= 14) {
     factor = 0.9;
-    label = "As a rising senior, you're in the strongest position experience-wise — recruiters favor near-grads for internships.";
+    label = "As a rising senior, you're in the strongest position experience-wise, recruiters favor near-grads for internships.";
   } else if (monthsToGrad <= 26) {
     factor = 0.72;
-    label = "As a junior-level student, you've got solid coursework behind you — a competitive spot for most internships.";
+    label = "As a junior-level student, you've got solid coursework behind you, a competitive spot for most internships.";
   } else if (monthsToGrad <= 38) {
     factor = 0.55;
-    label = "As an underclassman, you're early — that's great for getting ahead, but expect more competition from older students for the same roles.";
+    label = "As an underclassman, you're early, that's great for getting ahead, but expect more competition from older students for the same roles.";
   } else {
     factor = 0.42;
-    label = "As a first-year, you're applying early in your journey — focus on roles open to underclassmen, and know your odds reflect competing against more experienced students.";
+    label = "As a first-year, you're applying early in your journey, focus on roles open to underclassmen, and know your odds reflect competing against more experienced students.";
   }
   return {
     factor,
@@ -2332,10 +1977,10 @@ function timingNote(targetTerm) {
     months
   } = termTiming(targetTerm);
   const t = targetTerm || "that term";
-  if (months < 1) return `You're applying for ${t} after the window has basically closed — most of these roles were filled months ago. The estimates below are intentionally low.`;
-  if (months < 3) return `Heads up: applying now for ${t} is very late. Most of these internships fill the prior fall, so your odds are lower — and that's reflected honestly below.`;
+  if (months < 1) return `You're applying for ${t} after the window has basically closed, most of these roles were filled months ago. The estimates below are intentionally low.`;
+  if (months < 3) return `Heads up: applying now for ${t} is very late. Most of these internships fill the prior fall, so your odds are lower, and that's reflected honestly below.`;
   if (months < 6) return `You're a little behind the ideal window for ${t}. Some roles are still open, but the most competitive ones are likely gone.`;
-  if (months <= 10) return `Good timing — you're applying in the sweet spot for ${t}. These estimates reflect a realistic, on-time application.`;
+  if (months <= 10) return `Good timing, you're applying in the sweet spot for ${t}. These estimates reflect a realistic, on-time application.`;
   return `You're applying early for ${t}. That's smart, but many postings aren't open yet, so treat these as a forward-looking estimate.`;
 }
 const EXCEPTIONAL_KEYWORDS = ["president", "founder", "founded", "captain", "chair", "head ", "national", "winner", "1st place", "published", "funded", "scaled", "secretary-general", "director", "editor-in-chief", "valedictorian", "executive", "ceo", "100k", "10k+ revenue", "$10k", "return offer", "full-time convert", "co-inventor", "granted patent", "lead "];
@@ -2428,13 +2073,13 @@ function generateReason(c, ans, extPicks) {
     const opts = [`Your profile lines up well with what they typically look for.`, `This is one of your stronger realistic shots based on your profile.`, `Your background fits their typical intern profile closely.`];
     assessment = opts[seed % opts.length];
   } else if (pct >= 50) {
-    const opts = [`A solid shot — worth a strong application.`, `Realistic if you put care into your application.`, `Within reach, though you'll be one of several qualified applicants.`];
+    const opts = [`A solid shot, worth a strong application.`, `Realistic if you put care into your application.`, `Within reach, though you'll be one of several qualified applicants.`];
     assessment = opts[seed % opts.length];
   } else if (pct >= 35) {
-    const opts = [`Competitive — they get more applicants than spots, so make your application stand out.`, `A reach, but reaches land when the application is sharp. Worth trying.`, `Tougher odds here — apply, but don't count on it as your only option.`];
+    const opts = [`Competitive, they get more applicants than spots, so make your application stand out.`, `A reach, but reaches land when the application is sharp. Worth trying.`, `Tougher odds here, apply, but don't count on it as your only option.`];
     assessment = opts[seed % opts.length];
   } else {
-    const opts = [`A long shot — popular employer with limited intern spots. Apply if it excites you.`, `Highly competitive; treat this as a reach and keep safer options in your list too.`, `The odds are steep here, but someone gets in — a standout application is your best bet.`];
+    const opts = [`A long shot, popular employer with limited intern spots. Apply if it excites you.`, `Highly competitive; treat this as a reach and keep safer options in your list too.`, `The odds are steep here, but someone gets in, a standout application is your best bet.`];
     assessment = opts[seed % opts.length];
   }
   let opener;
@@ -2524,7 +2169,7 @@ const EMPTY_PROFILE = {
 const FREE_APPLICATIONS = 3;
 let memSession = {};
 if (new URLSearchParams(window.location.search).get("dev") === "1") {
-  console.log("[iq] DEV MODE active — clearing all cached sessions and results");
+  console.log("[iq] DEV MODE active, clearing all cached sessions and results");
   try {
     Object.keys(localStorage).filter(k => k.startsWith("iq_")).forEach(k => {
       localStorage.removeItem(k);
@@ -2681,7 +2326,7 @@ function computeScoreFactors(profile, job) {
     label: 'Class Year / Timing',
     status: yearMatch ? 'pass' : yearAdjacent ? 'partial' : 'fail',
     impact: yearMatch ? +10 : yearAdjacent ? +4 : -8,
-    detail: !timingKnown ? `Your graduation timing${gy ? ` (${gy})` : ''} looks compatible with this role.` : yearMatch ? `This role targets ${targetYears.join('/')} — you're in the right year.` : yearAdjacent ? `This role targets ${targetYears.join('/')}. You're adjacent — mention your timeline in the cover letter.` : `This role targets ${targetYears.join('/')}. You're a ${gy} — there's a timing mismatch.`,
+    detail: !timingKnown ? `Your graduation timing${gy ? ` (${gy})` : ''} looks compatible with this role.` : yearMatch ? `This role targets ${targetYears.join('/')}, you're in the right year.` : yearAdjacent ? `This role targets ${targetYears.join('/')}. You're adjacent, mention your timeline in the cover letter.` : `This role targets ${targetYears.join('/')}. You're a ${gy}, there's a timing mismatch.`,
     fix: timingKnown && !yearMatch ? `Apply anyway and briefly explain your timeline. Companies often flex for strong candidates.` : null,
     scoreGain: timingKnown && !yearMatch && !yearAdjacent ? 6 : 0
   });
@@ -2765,7 +2410,7 @@ function ScoreExplainerCard({
       fontSize: 11,
       background: GL,
       color: GD,
-      borderRadius: 20,
+      borderRadius: 10,
       padding: '2px 8px',
       fontWeight: 600
     }
@@ -2849,7 +2494,7 @@ function ScoreExplainerCard({
       background: CL,
       color: CR,
       border: `1px solid ${CR}30`,
-      borderRadius: 20,
+      borderRadius: 10,
       padding: '2px 8px'
     }
   }, '✗ ' + s)), ...(f.matchedSkills || []).map(s => React.createElement('span', {
@@ -2859,7 +2504,7 @@ function ScoreExplainerCard({
       background: GL,
       color: GD,
       border: `1px solid ${G}30`,
-      borderRadius: 20,
+      borderRadius: 10,
       padding: '2px 8px'
     }
   }, '✓ ' + s))))), potentialGain > 0 && React.createElement('div', {
@@ -2938,7 +2583,7 @@ function ScoreExplainerCard({
       padding: '16px 20px',
       background: '#fff',
       borderRadius: var_rl,
-      boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+      boxShadow: 'none',
       border: `1px solid ${G}30`
     }
   }, React.createElement('div', {
@@ -2959,7 +2604,7 @@ function ScoreExplainerCard({
       color: '#666',
       marginBottom: 12
     }
-  }, downCount > 0 ? 'Pro shows you exactly what they are — and how to fix them.' : 'Pro shows every factor behind your score — and how to push it higher.'), React.createElement('button', {
+  }, downCount > 0 ? 'Pro shows you exactly what they are, and how to fix them.' : 'Pro shows every factor behind your score, and how to push it higher.'), React.createElement('button', {
     onClick: () => {
       analytics.track('score_explainer_upgrade_click', {
         jobId: job.id || job.name,
@@ -3054,7 +2699,7 @@ function ivVoiceLabel(v) {
   const nm = v.name.replace(/^(Microsoft|Google|Apple)\s+/i, "").replace(/\s*Online\s*/i, " ").replace(/\s*\((Natural|Neural|Premium|Enhanced)\)/ig, "").replace(/\s*-\s*English.*$/i, "").replace(/\s+/g, " ").trim();
   return `${nm} · ${region}${nat ? " · most natural" : ""}`;
 }
-const IV_LINE = "Hi, thanks for coming in today. Let's start with you — tell me a little about yourself.";
+const IV_LINE = "Hi, thanks for coming in today. Let's start with you, tell me a little about yourself.";
 function InterviewSim({
   major,
   defaultCompany,
@@ -3281,7 +2926,7 @@ function InterviewSim({
       rec.onerror = e => {
         if (e.error === "not-allowed" || e.error === "service-not-allowed" || e.error === "audio-capture") {
           wantRec.current = false;
-          setMicErr("Your microphone is blocked or missing — type your answer instead (or allow the mic in your browser and tap Talk).");
+          setMicErr("Your microphone is blocked or missing, type your answer instead (or allow the mic in your browser and tap Talk).");
         }
       };
       rec.onend = () => {
@@ -3299,7 +2944,7 @@ function InterviewSim({
       rec.start();
       setRecording(true);
     } catch (x) {
-      setMicErr("Couldn't start the microphone — type your answer instead.");
+      setMicErr("Couldn't start the microphone, type your answer instead.");
     }
   }
   function stopRec() {
@@ -3379,13 +3024,13 @@ function InterviewSim({
         })
       });
       const d = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(d.error || "The interviewer couldn't answer — try again.");
+      if (!r.ok) throw new Error(d.error || "The interviewer couldn't answer, try again.");
       const m = String(d.text || "").match(/\{[\s\S]*\}/);
       let j = null;
       try {
         j = m ? JSON.parse(m[0]) : null;
       } catch (x) {}
-      if (!j) throw new Error("The interviewer gave an unreadable answer — try again.");
+      if (!j) throw new Error("The interviewer gave an unreadable answer, try again.");
       const next = history.map((t, i) => i === history.length - 1 && t.answered ? {
         ...t,
         feedback: j.feedback || "",
@@ -3408,7 +3053,7 @@ function InterviewSim({
         a: "",
         feedback: "",
         answered: false
-      }]);else throw new Error("The interviewer gave an unreadable answer — try again.");
+      }]);else throw new Error("The interviewer gave an unreadable answer, try again.");
     } catch (e) {
       setErr(String(e.message || e));
     } finally {
@@ -3528,10 +3173,10 @@ function InterviewSim({
       margin: "0 0 22px",
       maxWidth: "64ch"
     }
-  }, "An AI interviewer asks one question at a time. You get ", IV_THINK, " seconds to think, then the clock runs \u2014 talk (or type) your answer, and it sends itself when time's up. Every answer is scored, and you get a letter grade at the end. Grades are an AI estimate, not a hiring decision. Your answers go to our AI provider to write the feedback; nothing is saved", canTalk ? " (speech is turned into text by your browser)" : "", "."), !started && !busy ? React.createElement("section", {
+  }, "An AI interviewer asks one question at a time. You get ", IV_THINK, " seconds to think, then the clock runs, talk (or type) your answer, and it sends itself when time's up. Every answer is scored, and you get a letter grade at the end. Grades are an AI estimate, not a hiring decision. Your answers go to our AI provider to write the feedback; nothing is saved", canTalk ? " (speech is turned into text by your browser)" : "", "."), !started && !busy ? React.createElement("section", {
     style: {
       border: `1px solid ${IV.line}`,
-      borderRadius: 12,
+      borderRadius: 10,
       padding: "18px 18px 20px",
       background: "#fff"
     }
@@ -3597,7 +3242,7 @@ function InterviewSim({
       background: "#fff",
       border: "1px solid #DCE2EC",
       borderRadius: 10,
-      boxShadow: "0 12px 30px rgba(6,10,44,.12)",
+      boxShadow: "none",
       zIndex: 20,
       maxHeight: 300,
       overflowY: "auto"
@@ -3676,11 +3321,11 @@ function InterviewSim({
     }))
   }, React.createElement("option", {
     value: 3
-  }, "Quick \u2014 3 questions"), React.createElement("option", {
+  }, "Quick, 3 questions"), React.createElement("option", {
     value: 5
-  }, "Standard \u2014 5 questions"), React.createElement("option", {
+  }, "Standard, 5 questions"), React.createElement("option", {
     value: 8
-  }, "Full \u2014 8 questions"))), React.createElement("div", null, React.createElement("label", {
+  }, "Full, 8 questions"))), React.createElement("div", null, React.createElement("label", {
     style: label,
     htmlFor: "ivT"
   }, "Time per answer"), React.createElement("select", {
@@ -3732,7 +3377,7 @@ function InterviewSim({
       color: IV.dim,
       margin: "6px 0 0"
     }
-  }, "This browser can't turn speech into text \u2014 try Chrome, Edge or Safari, or type."))), brief && React.createElement("div", {
+  }, "This browser can't turn speech into text, try Chrome, Edge or Safari, or type."))), brief && React.createElement("div", {
     style: {
       marginTop: 14,
       background: "#F7F9FC",
@@ -3864,7 +3509,7 @@ function InterviewSim({
       color: IV.dim,
       margin: "8px 0 0"
     }
-  }, "Voices come from your device. The ones marked \"most natural\" sound the most human \u2014 on a Mac or iPhone you can download better ones in Settings \u2192 Accessibility \u2192 Spoken Content \u2192 Voices."), React.createElement("button", {
+  }, "Voices come from your device. The ones marked \"most natural\" sound the most human, on a Mac or iPhone you can download better ones in Settings \u2192 Accessibility \u2192 Spoken Content \u2192 Voices."), React.createElement("button", {
     style: {
       ...btn(true),
       marginTop: 18,
@@ -4008,7 +3653,7 @@ function InterviewSim({
   }, "Retry")), summary ? React.createElement("div", {
     style: {
       border: `1px solid ${IV.line}`,
-      borderRadius: 14,
+      borderRadius: 10,
       padding: 20,
       background: "#fff"
     }
@@ -4023,7 +3668,7 @@ function InterviewSim({
     style: {
       width: 96,
       height: 96,
-      borderRadius: 16,
+      borderRadius: 10,
       background: "#060A2C",
       color: "#B0F701",
       display: "grid",
@@ -4136,9 +3781,9 @@ function InterviewSim({
       bottom: 12,
       background: "#fff",
       border: `1px solid ${lowTime ? "#F4B4AE" : IV.line}`,
-      borderRadius: 14,
+      borderRadius: 10,
       padding: 12,
-      boxShadow: "0 6px 20px rgba(6,10,44,.08)"
+      boxShadow: "none"
     }
   }, React.createElement("div", {
     style: {
@@ -4166,7 +3811,7 @@ function InterviewSim({
       marginBottom: 5
     },
     "aria-live": "polite"
-  }, phase === "reading" ? "Listen to the question…" : phase === "think" ? "Think time — answer starts automatically" : lowTime ? "Wrap it up — sends when the clock hits 0:00" : "Answer now"), React.createElement("div", {
+  }, phase === "reading" ? "Listen to the question…" : phase === "think" ? "Think time, answer starts automatically" : lowTime ? "Wrap it up, sends when the clock hits 0:00" : "Answer now"), React.createElement("div", {
     style: {
       height: 6,
       background: "#EEF1F6",
@@ -4227,12 +3872,12 @@ function InterviewSim({
       background: recording ? "#fff" : "#B42318",
       animation: recording ? "dblink 1.2s infinite" : "none"
     }
-  }), recording ? "Listening — tap to pause" : "Tap to talk"), React.createElement("span", {
+  }), recording ? "Listening, tap to pause" : "Tap to talk"), React.createElement("span", {
     style: {
       fontSize: 12.5,
       color: IV.dim
     }
-  }, "Your words show up below \u2014 fix anything it misheard.")), micErr && React.createElement("p", {
+  }, "Your words show up below, fix anything it misheard.")), micErr && React.createElement("p", {
     role: "alert",
     style: {
       fontSize: 13,
@@ -4251,7 +3896,7 @@ function InterviewSim({
     onChange: e => setDraft(e.target.value),
     rows: 4,
     autoFocus: setup.mode === "type",
-    placeholder: setup.mode === "talk" ? "Start talking — your answer appears here." : "Type your answer. Tip: situation, what you did, the result.",
+    placeholder: setup.mode === "talk" ? "Start talking, your answer appears here." : "Type your answer. Tip: situation, what you did, the result.",
     onKeyDown: e => {
       if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) submit(false);
     },
@@ -4280,7 +3925,7 @@ function InterviewSim({
       fontSize: 12,
       color: IV.dim
     }
-  }, setup.mode === "type" ? "Ctrl/⌘ + Enter to send" : "Done early? Send it — leftover time doesn't hurt you."), React.createElement("div", {
+  }, setup.mode === "type" ? "Ctrl/⌘ + Enter to send" : "Done early? Send it, leftover time doesn't hurt you."), React.createElement("div", {
     style: {
       display: "flex",
       gap: 8
@@ -4371,7 +4016,7 @@ function SkillPicker({
       margin: 0,
       fontWeight: value.length ? 600 : 400
     }
-  }, value.length ? `${value.length} picked` : "Tap any that fit — skip the rest")), React.createElement("div", {
+  }, value.length ? `${value.length} picked` : "Tap any that fit, skip the rest")), React.createElement("div", {
     style: {
       display: "flex",
       flexWrap: "wrap",
@@ -4830,7 +4475,7 @@ function App() {
       });
       clearTimeout(timer);
       const d = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(d.error || "Couldn't load internships right now — try again in a minute");
+      if (!r.ok) throw new Error(d.error || "Couldn't load internships right now, try again in a minute");
       metaRef.current = d.meta || null;
       const initial = applyHonest(Array.isArray(d.results) ? d.results : [], ans, extPicks);
       setResultsError("");
@@ -4838,7 +4483,7 @@ function App() {
       setResults(initial);
       if (initial.length && (ans.resume || "").trim().length >= 80) enrichWithPersonalizedReasons(initial);
     } catch (e) {
-      const msg = e && e.name === "AbortError" ? "That took too long — check your connection and try again." : e && e.message || "Couldn't load internships right now.";
+      const msg = e && e.name === "AbortError" ? "That took too long, check your connection and try again." : e && e.message || "Couldn't load internships right now.";
       console.warn("[iq] results failed:", msg);
       setResults([]);
       setResultsError(msg);
@@ -5012,7 +4657,7 @@ function App() {
     } catch (e) {
       setWallMessage({
         type: "error",
-        text: "Network error — try again."
+        text: "Network error, try again."
       });
     } finally {
       setWallSubmitting(false);
@@ -5034,7 +4679,7 @@ function App() {
       });
       setWallMessage(r.ok ? {
         type: "success",
-        text: "Thanks — we'll take a look."
+        text: "Thanks, we'll take a look."
       } : {
         type: "error",
         text: "Couldn't send the report. Try again."
@@ -5080,7 +4725,7 @@ function App() {
       } catch (e) {}
       fetchWallPosts();
     } catch (e) {
-      alert("Network error — try again.");
+      alert("Network error, try again.");
     }
   }
   function ownsPost(postId) {
@@ -5336,7 +4981,7 @@ function App() {
       if (!resp.ok) throw new Error("backend " + resp.status);
       const data = await resp.json();
       const text = (data.text || "").trim();
-      if (!text || text.length < 100) throw new Error("Got an unusually short response — try again.");
+      if (!text || text.length < 100) throw new Error("Got an unusually short response, try again.");
       setBuilderState({
         loading: false,
         text,
@@ -5358,7 +5003,7 @@ function App() {
     const id = Date.now();
     const newResume = {
       id,
-      name: `Starter Resume — ${(ans.major || "").split(",")[0].trim() || "Draft"}`,
+      name: `Starter Resume, ${(ans.major || "").split(",")[0].trim() || "Draft"}`,
       text: builderState.text
     };
     setProfile(p => ({
@@ -5863,9 +5508,9 @@ function App() {
       if (matches && matches.length) {
         return matches.map(m => m.replace(/<[^>]+>/g, "")).join(" ").replace(/\s+/g, " ").trim();
       }
-      throw new Error("Couldn't read this .docx — try pasting the text instead.");
+      throw new Error("Couldn't read this .docx, try pasting the text instead.");
     }
-    throw new Error("Unsupported file type. Use .pdf, .docx, or .txt — or paste the text.");
+    throw new Error("Unsupported file type. Use .pdf, .docx, or .txt, or paste the text.");
   }
   async function handleResumeUpload(resumeId, fileList) {
     setResumeUploadErr("");
@@ -5879,7 +5524,7 @@ function App() {
     try {
       const text = await extractTextFromFile(file);
       if (!text || text.length < 40) {
-        throw new Error("Couldn't read much text from that file — try pasting instead.");
+        throw new Error("Couldn't read much text from that file, try pasting instead.");
       }
       updateResume(resumeId, "text", text);
       const cleanName = (file.name || "").replace(/\.[^.]+$/, "").slice(0, 40);
@@ -6206,7 +5851,7 @@ function App() {
         loading: false,
         company: c.name,
         coverLetter: fallbackLetter(c),
-        tips: ["Apply within 48 hours of the posting going live — early applicants get reviewed first.", "Mirror 2–3 keywords from the job description so your resume passes screening filters.", "Send a short, polite follow-up email 5–7 business days after applying."]
+        tips: ["Apply within 48 hours of the posting going live, early applicants get reviewed first.", "Mirror 2–3 keywords from the job description so your resume passes screening filters.", "Send a short, polite follow-up email 5–7 business days after applying."]
       });
       analytics.track("cover_letter_generated", {
         company: c.name,
@@ -6372,7 +6017,7 @@ function App() {
       });
     } catch (e) {
       console.error("[iq] score failed:", e && e.message);
-      setScoreError("Something went wrong scoring this. Try again — or shorten your paste if it's very long.");
+      setScoreError("Something went wrong scoring this. Try again, or shorten your paste if it's very long.");
     } finally {
       setScoreLoading(false);
     }
@@ -6442,8 +6087,8 @@ function App() {
         loading: false,
         company: a.company,
         mode: "followup",
-        coverLetter: `Subject: Following up — ${a.role} application\n\nHi,\n\nI recently applied for the ${a.role} position at ${a.company} and wanted to reaffirm how excited I am about the opportunity. I'd love the chance to contribute to your team and keep growing my skills in ${p.major || ans.major || "the field"}.\n\nIf there's any update on the timeline or next steps, I'd be grateful to hear it. Thank you again for your time and consideration.\n\nBest regards,\n${p.fullName || "[Your name]"}`,
-        tips: ["Send 5–7 business days after applying — Tuesday–Thursday mornings tend to land best.", "Reply to any confirmation email you received so it reaches the right inbox, or send to the recruiter directly if you have their address."]
+        coverLetter: `Subject: Following up, ${a.role} application\n\nHi,\n\nI recently applied for the ${a.role} position at ${a.company} and wanted to reaffirm how excited I am about the opportunity. I'd love the chance to contribute to your team and keep growing my skills in ${p.major || ans.major || "the field"}.\n\nIf there's any update on the timeline or next steps, I'd be grateful to hear it. Thank you again for your time and consideration.\n\nBest regards,\n${p.fullName || "[Your name]"}`,
+        tips: ["Send 5–7 business days after applying, Tuesday–Thursday mornings tend to land best.", "Reply to any confirmation email you received so it reaches the right inbox, or send to the recruiter directly if you have their address."]
       });
       analytics.track("followup_generated", {
         company: a.company,
@@ -6508,24 +6153,24 @@ function App() {
           framework: "Lead with your major, a relevant project or experience, and close with why this company specifically. Keep it under 90 seconds."
         }, {
           q: "Walk me through a time you solved a difficult problem under pressure.",
-          framework: "Use STAR format: Situation, Task, Action, Result. Pick something real — even a class project works."
+          framework: "Use STAR format: Situation, Task, Action, Result. Pick something real, even a class project works."
         }, {
           q: `What do you know about ${a.company} and the ${a.industry || "industry"} right now?`,
           framework: "Research 2-3 recent news items or facts about the company before the interview. Showing you did homework is a massive differentiator."
         }, {
           q: "Where do you see yourself in 5 years?",
-          framework: "Align your answer with the field you're interviewing for. You don't have to be specific — showing direction and ambition matters more."
+          framework: "Align your answer with the field you're interviewing for. You don't have to be specific, showing direction and ambition matters more."
         }, {
           q: "What's a weakness you've been actively working on?",
           framework: "Pick something real but not disqualifying for the role. Show the steps you're taking to improve it."
         }, {
           q: `What technical skills or tools are you most confident using that would help you in this role?`,
-          framework: "Pull directly from your resume. Be specific — name a project or class where you used each skill."
+          framework: "Pull directly from your resume. Be specific, name a project or class where you used each skill."
         }, {
           q: "Do you have any questions for us?",
           framework: "Always ask something. Try: 'What does success look like in the first 90 days?' or 'What do the best interns do differently?'"
         }],
-        tips: ["Research the company for 20 minutes the night before — look at their LinkedIn, recent news, and the team you'd be joining.", "Prepare 3 STAR stories from your resume that can be adapted to different behavioral questions.", "Send a thank-you email within 24 hours. Most interns don't — you will stand out."]
+        tips: ["Research the company for 20 minutes the night before, look at their LinkedIn, recent news, and the team you'd be joining.", "Prepare 3 STAR stories from your resume that can be adapted to different behavioral questions.", "Send a thank-you email within 24 hours. Most interns don't, you will stand out."]
       });
       analytics.track("interview_prep_fallback", {
         company: a.company
@@ -6565,7 +6210,7 @@ function App() {
       })();
     }
     if (on) {
-      setSaveNote(clerkUser ? "Saved ♥ — find it on your Dashboard here, or in My Season → Saved." : "Saved ♥ on this device — find it on your Dashboard. Sign in to keep it in My Season too.");
+      setSaveNote(clerkUser ? "Saved ♥, find it on your Dashboard here, or in My Season → Saved." : "Saved ♥ on this device, find it on your Dashboard. Sign in to keep it in My Season too.");
       setTimeout(() => setSaveNote(""), 4500);
     }
   }
@@ -6632,7 +6277,7 @@ function App() {
       setCardIntel(p => ({
         ...p,
         [key]: {
-          description: `We couldn't load a summary right now. The posting is for ${role}${loc ? loc : ""} — open it for details.`,
+          description: `We couldn't load a summary right now. The posting is for ${role}${loc ? loc : ""}, open it for details.`,
           loading: false
         }
       }));
@@ -6658,7 +6303,7 @@ function App() {
       padding: "2.5rem",
       maxWidth: 460,
       width: "100%",
-      boxShadow: "0 24px 80px rgba(0,0,0,0.2)",
+      boxShadow: "none",
       animation: "pop 0.3s ease",
       position: "relative",
       maxHeight: "90vh",
@@ -6771,7 +6416,7 @@ function App() {
       lineHeight: 1.55,
       marginBottom: 10
     }
-  }, "Most students applying for internships don't have a resume yet. Pro builds yours from your quiz answers in seconds \u2014 tailored to your major, activities, and skills. Edit it, download it as a PDF, and use it across every application."), React.createElement("div", {
+  }, "Most students applying for internships don't have a resume yet. Pro builds yours from your quiz answers in seconds, tailored to your major, activities, and skills. Edit it, download it as a PDF, and use it across every application."), React.createElement("div", {
     style: {
       display: "flex",
       gap: 8,
@@ -6787,7 +6432,7 @@ function App() {
       padding: "3px 10px",
       borderRadius: 99
     }
-  }, "\u2713 ", t)))), React.createElement("div", {
+  }, t)))), React.createElement("div", {
     style: {
       display: "flex",
       flexDirection: "column",
@@ -6797,7 +6442,7 @@ function App() {
   }, [{
     icon: "",
     title: "Unlimited applications",
-    desc: "Apply to as many companies as you want — auto-fill + cover letter for each"
+    desc: "Apply to as many companies as you want, auto-fill + cover letter for each"
   }, {
     icon: "",
     title: "Follow-up reminders",
@@ -6813,23 +6458,7 @@ function App() {
       gap: 12,
       alignItems: "flex-start"
     }
-  }, React.createElement("div", {
-    "aria-hidden": "true",
-    style: {
-      width: 20,
-      height: 20,
-      borderRadius: 6,
-      background: GL,
-      color: G,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      flexShrink: 0,
-      fontSize: 12,
-      fontWeight: 700,
-      marginTop: 2
-    }
-  }, "\u2713"), React.createElement("div", null, React.createElement("p", {
+  }, React.createElement("div", null, React.createElement("p", {
     style: {
       fontWeight: 700,
       fontSize: 13.5,
@@ -6861,9 +6490,9 @@ function App() {
       fontSize: 16,
       fontWeight: 700,
       letterSpacing: "-0.3px",
-      boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+      boxShadow: "none"
     }
-  }, "Unlock Pro \u2014 free during beta"), React.createElement("p", {
+  }, "Unlock Pro, free during beta"), React.createElement("p", {
     style: {
       textAlign: "center",
       fontSize: 12,
@@ -6902,7 +6531,7 @@ function App() {
         padding: "2rem",
         maxWidth: 380,
         width: "100%",
-        boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+        boxShadow: "none",
         animation: "pop 0.25s ease"
       },
       onClick: e => e.stopPropagation()
@@ -7055,7 +6684,7 @@ function App() {
         padding: "1.75rem",
         maxWidth: 560,
         width: "100%",
-        boxShadow: "0 24px 80px rgba(0,0,0,0.25)",
+        boxShadow: "none",
         animation: "pop 0.25s ease",
         margin: "auto 0"
       }
@@ -7125,7 +6754,7 @@ function App() {
         maxWidth: 380,
         margin: "0 auto 16px"
       }
-    }, "You applied to ", appliedCos.slice(0, FREE_APPLICATIONS).join(", "), " with Beat the Pile's help. Go Pro for ", React.createElement("strong", null, "unlimited applications"), " \u2014 auto-fill and a tailored cover letter for every job, plus follow-up reminders."), React.createElement("button", {
+    }, "You applied to ", appliedCos.slice(0, FREE_APPLICATIONS).join(", "), " with Beat the Pile's help. Go Pro for ", React.createElement("strong", null, "unlimited applications"), ", auto-fill and a tailored cover letter for every job, plus follow-up reminders."), React.createElement("button", {
       onClick: () => {
         setApplyModal(null);
         setShowProModal(true);
@@ -7140,9 +6769,9 @@ function App() {
         fontFamily: "var(--font)",
         fontSize: 15,
         fontWeight: 700,
-        boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+        boxShadow: "none"
       }
-    }, "Go Pro \u2014 unlimited applications"), React.createElement("p", {
+    }, "Go Pro, unlimited applications"), React.createElement("p", {
       style: {
         fontSize: 11.5,
         color: "#6B7280",
@@ -7163,7 +6792,7 @@ function App() {
         fontWeight: 700,
         fontSize: 15,
         textDecoration: "none",
-        boxShadow: "0 1px 2px rgba(6,10,44,.06)",
+        boxShadow: "none",
         margin: "10px 0 4px"
       }
     }, "\u2713 Apply to ", c.role || "this role", " at ", c.name, " \u2197"), React.createElement("p", {
@@ -7189,7 +6818,7 @@ function App() {
         fontWeight: 700,
         fontSize: 15,
         textDecoration: "none",
-        boxShadow: "0 1px 2px rgba(6,10,44,.06)",
+        boxShadow: "none",
         margin: "10px 0 4px"
       }
     }, "\u2713 Apply to ", adzunaLink.title || c.role + " at " + c.name, " \u2197"), React.createElement("p", {
@@ -7309,7 +6938,7 @@ function App() {
           lineHeight: 1.5,
           marginBottom: 9
         }
-      }, "This is a smaller company \u2014 reach them directly."), React.createElement("div", {
+      }, "This is a smaller company, reach them directly."), React.createElement("div", {
         style: {
           display: "flex",
           flexDirection: "column",
@@ -7400,7 +7029,7 @@ function App() {
         fontSize: 14,
         color: "#060A2C"
       }
-    }, "Your info \u2014 tap any field to copy"), React.createElement("button", {
+    }, "Your info, tap any field to copy"), React.createElement("button", {
       onClick: () => copyText(allText, "all"),
       style: {
         background: GL,
@@ -7662,7 +7291,7 @@ function App() {
         padding: "1.75rem",
         maxWidth: 540,
         width: "100%",
-        boxShadow: "0 24px 80px rgba(0,0,0,0.25)",
+        boxShadow: "none",
         animation: "pop 0.25s ease",
         margin: "auto 0"
       }
@@ -7692,7 +7321,7 @@ function App() {
         fontSize: 13,
         marginTop: 2
       }
-    }, "Update one thing and we'll instantly recalculate \u2014 no need to redo the quiz.")), React.createElement("button", {
+    }, "Update one thing and we'll instantly recalculate, no need to redo the quiz.")), React.createElement("button", {
       onClick: () => setShowReview(false),
       style: {
         background: "none",
@@ -7766,7 +7395,7 @@ function App() {
     if (!proNudge) return null;
     const msg = {
       welcome_back: "Welcome back. Want reminders when each follow-up is due, with the email drafted for you?",
-      followups: `You're tracking ${tracked.length} applications — Beat the Pile can remind you when each is due for a follow-up and draft it for you.`
+      followups: `You're tracking ${tracked.length} applications | Beat the Pile can remind you when each is due for a follow-up and draft it for you.`
     }[proNudge.reason] || "Unlock more with Pro.";
     return React.createElement("div", {
       style: {
@@ -7789,7 +7418,7 @@ function App() {
         padding: "13px 14px 13px 16px",
         maxWidth: 440,
         width: "100%",
-        boxShadow: "0 12px 40px rgba(0,0,0,0.3)",
+        boxShadow: "none",
         display: "flex",
         alignItems: "center",
         gap: 12,
@@ -7906,7 +7535,7 @@ function App() {
         color: "#4A5568",
         lineHeight: 1.5
       }
-    }, "Your tracker, profile, and resumes sync across all your devices. Sign in once \u2014 pick up where you left off anywhere.")), React.createElement("div", {
+    }, "Your tracker, profile, and resumes sync across all your devices. Sign in once, pick up where you left off anywhere.")), React.createElement("div", {
       id: "clerk-signin-mount",
       style: {
         minHeight: 380
@@ -7936,7 +7565,7 @@ function App() {
         display: "flex",
         alignItems: "center",
         gap: 12,
-        boxShadow: "0 2px 8px rgba(245,158,11,0.15)"
+        boxShadow: "none"
       }
     }, React.createElement("div", {
       style: {
@@ -7961,7 +7590,7 @@ function App() {
         color: "#78350F",
         lineHeight: 1.4
       }
-    }, dueApps.slice(0, 3).map(a => a.company).join(", "), dueApps.length > 3 ? ` +${dueApps.length - 3} more` : "", " \u2014 tap to draft them.")), React.createElement("div", {
+    }, dueApps.slice(0, 3).map(a => a.company).join(", "), dueApps.length > 3 ? ` +${dueApps.length - 3} more` : "", ", tap to draft them.")), React.createElement("div", {
       style: {
         fontSize: 14,
         color: "#92400E",
@@ -7995,7 +7624,7 @@ function App() {
         padding: "1.75rem",
         maxWidth: 560,
         width: "100%",
-        boxShadow: "0 24px 80px rgba(0,0,0,0.25)",
+        boxShadow: "none",
         animation: "pop 0.25s ease",
         margin: "auto 0"
       }
@@ -8045,7 +7674,7 @@ function App() {
         color: GD,
         lineHeight: 1.5
       }
-    }, "You send this from your own email, as yourself \u2014 that's what makes a follow-up work. We just handle the timing and the first draft."), kit.loading && kit.company === a.company ? React.createElement("div", {
+    }, "You send this from your own email, as yourself, that's what makes a follow-up work. We just handle the timing and the first draft."), kit.loading && kit.company === a.company ? React.createElement("div", {
       style: {
         display: "flex",
         alignItems: "center",
@@ -8070,7 +7699,7 @@ function App() {
         margin: "0 0 6px",
         lineHeight: 1.45
       }
-    }, React.createElement("b", null, "Draft"), " \u2014 edit it before you send. Nothing is sent for you."), React.createElement("div", {
+    }, React.createElement("b", null, "Draft"), ", edit it before you send. Nothing is sent for you."), React.createElement("div", {
       style: {
         position: "relative",
         marginBottom: 10
@@ -8113,7 +7742,7 @@ function App() {
       }
     }, copied === "fu" ? "✓ Copied" : "Copy")), (() => {
       const subjMatch = (kit.coverLetter || "").match(/^Subject:\s*(.+)$/m);
-      const subject = subjMatch ? subjMatch[1].trim() : `Following up — ${a.role} application`;
+      const subject = subjMatch ? subjMatch[1].trim() : `Following up, ${a.role} application`;
       const body = (kit.coverLetter || "").replace(/^Subject:\s*.+\n?/m, "").trim();
       const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
       return React.createElement("a", {
@@ -8170,9 +7799,9 @@ function App() {
         fontFamily: "var(--font)",
         fontSize: 14.5,
         fontWeight: 700,
-        boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+        boxShadow: "none"
       }
-    }, "I sent it \u2014 mark as followed up \u2713")) : null));
+    }, "I sent it, mark as followed up \u2713")) : null));
   };
   const Nav = () => {
     return React.createElement(React.Fragment, null, saveNote && React.createElement("div", {
@@ -8190,7 +7819,7 @@ function App() {
         fontWeight: 500,
         zIndex: 2000,
         maxWidth: "90vw",
-        boxShadow: "0 6px 20px rgba(0,0,0,.25)"
+        boxShadow: "none"
       }
     }, saveNote));
   };
@@ -8561,7 +8190,7 @@ function App() {
           textAlign: "center",
           marginTop: 6
         }
-      }, "Max of ", cur.maxPicks, " reached \u2014 remove one to add another."));
+      }, "Max of ", cur.maxPicks, " reached, remove one to add another."));
     })(), cur.type === "chips" && React.createElement("div", {
       className: "fade-up"
     }, cur.subLabel && React.createElement("p", {
@@ -8594,7 +8223,7 @@ function App() {
           fontSize: 14,
           fontWeight: sel ? 700 : 400,
           transition: "all 0.18s",
-          boxShadow: sel ? `0 2px 10px ${c}40` : "none"
+          boxShadow: "none"
         }
       }, o);
     }))), cur.type === "extracurricular" && React.createElement("div", {
@@ -8785,7 +8414,7 @@ function App() {
         lineHeight: 1.55,
         marginBottom: 14
       }
-    }, React.createElement("strong", null, "Totally optional."), " If you already have a resume, dropping it in here lets us personalize every match with reasons tied to your actual background. If you don't \u2014 no worries, we'll help you build one after the quiz."), React.createElement("div", {
+    }, React.createElement("strong", null, "Totally optional."), " If you already have a resume, dropping it in here lets us personalize every match with reasons tied to your actual background. If you don't, no worries, we'll help you build one after the quiz."), React.createElement("div", {
       style: {
         display: "flex",
         gap: 8,
@@ -8804,7 +8433,7 @@ function App() {
         fontSize: 14,
         fontWeight: 700,
         textAlign: "center",
-        boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+        boxShadow: "none"
       }
     }, "Upload file (PDF, DOCX, TXT)", React.createElement("input", {
       type: "file",
@@ -8912,7 +8541,7 @@ function App() {
         lineHeight: 1.5,
         marginBottom: 10
       }
-    }, "That's fine \u2014 most freshmen and sophomores don't. We'll help you build a starter resume from your quiz answers right after."), React.createElement("button", {
+    }, "That's fine, most freshmen and sophomores don't. We'll help you build a starter resume from your quiz answers right after."), React.createElement("button", {
       onClick: () => {
         setAns(p => ({
           ...p,
@@ -8935,7 +8564,7 @@ function App() {
         fontWeight: 700,
         width: "100%"
       }
-    }, "Skip \u2014 I don't have one yet \u2192"))), cur.type === "zip" && React.createElement("div", {
+    }, "Skip, I don't have one yet \u2192"))), cur.type === "zip" && React.createElement("div", {
       className: "fade-up"
     }, React.createElement("input", {
       type: "text",
@@ -9024,7 +8653,7 @@ function App() {
         marginTop: 12,
         textAlign: "center"
       }
-    }, ans.radius <= 30 ? "Great for highly local results" : ans.radius <= 75 ? "Good balance of local and regional" : "Wide net — more options, more competition")), React.createElement("div", {
+    }, ans.radius <= 30 ? "Great for highly local results" : ans.radius <= 75 ? "Good balance of local and regional" : "Wide net, more options, more competition")), React.createElement("div", {
       style: {
         display: "flex",
         gap: 8,
@@ -9081,7 +8710,7 @@ function App() {
         fontFamily: "var(--font)",
         fontSize: 15,
         fontWeight: 700,
-        boxShadow: canNext() ? `0 4px 16px ${G}40` : "none"
+        boxShadow: "none"
       }
     }, "Save & see results \u2192")) : React.createElement(React.Fragment, null, step > 0 && React.createElement("button", {
       onClick: () => setStep(s => s - 1),
@@ -9110,7 +8739,7 @@ function App() {
         fontSize: 15,
         fontWeight: 700,
         transition: "all 0.2s",
-        boxShadow: canNext() ? `0 4px 16px ${G}40` : "none"
+        boxShadow: "none"
       }
     }, step === STEPS.length - 1 ? "Find My Matches →" : cur.type === "multi" && !ans.skills.length ? "Skip for now →" : "Continue →")))));
   }
@@ -9133,7 +8762,7 @@ function App() {
       borderRadius: var_rxl,
       padding: "2.5rem 2rem",
       textAlign: "center",
-      boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+      boxShadow: "none"
     }
   }, React.createElement("div", {
     style: {
@@ -9200,7 +8829,7 @@ function App() {
       fontFamily: "var(--font)",
       fontSize: 16,
       fontWeight: 700,
-      boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+      boxShadow: "none"
     }
   }, "Save email & show my matches \u2192"), React.createElement("button", {
     onClick: () => {
@@ -9220,7 +8849,7 @@ function App() {
       fontWeight: 700,
       marginTop: 8
     }
-  }, "Skip \u2014 just show my matches"), React.createElement("p", {
+  }, "Skip, just show my matches"), React.createElement("p", {
     style: {
       fontSize: 11.5,
       color: "#6B7280",
@@ -9265,8 +8894,8 @@ function App() {
       },
       "remote": {
         text: "REMOTE",
-        color: "#7c3aed",
-        bg: "#7c3aed15"
+        color: "#1E3A8A",
+        bg: "#1E3A8A15"
       }
     }[b] || null;
     const bandOrder = {
@@ -9408,7 +9037,7 @@ function App() {
         fontSize: 13,
         fontWeight: 700,
         whiteSpace: "nowrap",
-        boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+        boxShadow: "none"
       }
     }, "Edit answers"), React.createElement("button", {
       onClick: calcResults,
@@ -9548,7 +9177,7 @@ function App() {
       });
       if (metaRef.current?.radiusExpanded) lines.push({
         icon: "",
-        text: React.createElement(React.Fragment, null, "Not enough openings in ", React.createElement("strong", null, metaRef.current.studentState || "your state"), ", so we widened the search to ", React.createElement("strong", null, metaRef.current.expansionLabel), ". Every listing shown is a real opening \u2014 check the location before applying.")
+        text: React.createElement(React.Fragment, null, "Not enough openings in ", React.createElement("strong", null, metaRef.current.studentState || "your state"), ", so we widened the search to ", React.createElement("strong", null, metaRef.current.expansionLabel), ". Every listing shown is a real opening, check the location before applying.")
       });
       if (!hasResume && !hideResumeNudge) lines.push({
         icon: "",
@@ -9577,7 +9206,7 @@ function App() {
       });
       if (exc.length > 0) lines.push({
         icon: "",
-        text: React.createElement(React.Fragment, null, "Your standout leadership \u2014 ", React.createElement("strong", null, exc.map(e => `${e.role} (${e.activity})`).join(", ")), " \u2014 is exactly what recruiters look for. Make sure it's front and center on your resume.")
+        text: React.createElement(React.Fragment, null, "Your standout leadership, ", React.createElement("strong", null, exc.map(e => `${e.role} (${e.activity})`).join(", ")), ", is exactly what recruiters look for. Make sure it's front and center on your resume.")
       });
       if (lines.length === 0) return null;
       return React.createElement("div", {
@@ -9795,7 +9424,7 @@ function App() {
           gap: 14,
           alignItems: "center",
           flexWrap: "wrap",
-          boxShadow: "0 6px 24px rgba(10,22,40,0.2)"
+          boxShadow: "none"
         }
       }, React.createElement("div", {
         style: {
@@ -9826,7 +9455,7 @@ function App() {
           color: "#5E6A80",
           lineHeight: 1.5
         }
-      }, "Beat the Pile generates a starter resume from your quiz answers \u2014 your major, activities, skills, all filled in. Edit it, then use it on every application.")), React.createElement("button", {
+      }, "Beat the Pile generates a starter resume from your quiz answers, your major, activities, skills, all filled in. Edit it, then use it on every application.")), React.createElement("button", {
         onClick: () => setPage("resumebuilder"),
         style: {
           flexShrink: 0,
@@ -9840,7 +9469,7 @@ function App() {
           fontSize: 14,
           fontWeight: 700,
           whiteSpace: "nowrap",
-          boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+          boxShadow: "none"
         }
       }, "Build my resume \u2197"));
     })(), topPicks.length > 0 && React.createElement("div", {
@@ -9850,7 +9479,7 @@ function App() {
         borderRadius: var_rxl,
         padding: "1.25rem 1.4rem",
         marginBottom: 18,
-        boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+        boxShadow: "none"
       }
     }, React.createElement("div", {
       style: {
@@ -9877,7 +9506,7 @@ function App() {
         marginBottom: 12,
         lineHeight: 1.5
       }
-    }, "Of all your matches, these are the strongest realistic shots \u2014 where your time is best spent first."), React.createElement("div", {
+    }, "Of all your matches, these are the strongest realistic shots, where your time is best spent first."), React.createElement("div", {
       style: {
         display: "flex",
         flexDirection: "column",
@@ -10038,7 +9667,7 @@ function App() {
         marginTop: 6,
         textAlign: "right"
       }
-    }, "Recognized brand names first \u2014 harder to get, but worth having on your resume.")), React.createElement("div", {
+    }, "Recognized brand names first, harder to get, but worth having on your resume.")), React.createElement("div", {
       style: {
         display: "grid",
         gridTemplateColumns: "repeat(auto-fit,minmax(320px,1fr))",
@@ -10127,7 +9756,7 @@ function App() {
           display: "flex",
           flexDirection: "column",
           gap: "0.75rem",
-          boxShadow: "0 1px 2px rgba(6,10,44,.06)",
+          boxShadow: "none",
           cursor: "pointer",
           overflowY: "auto"
         }
@@ -10378,7 +10007,7 @@ function App() {
           fontFamily: "var(--font)",
           textAlign: "center",
           width: "100%",
-          boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+          boxShadow: "none"
         }
       }, "Apply now \u2197"), React.createElement("div", {
         style: {
@@ -10394,9 +10023,9 @@ function App() {
         },
         style: {
           flex: 1,
-          background: saved ? "#F5F3FF" : "#fff",
-          border: `1.5px solid ${saved ? "#7C3AED" : "#E2E8F0"}`,
-          color: saved ? "#7C3AED" : "#6B7280",
+          background: saved ? "#EFF3FB" : "#fff",
+          border: `1.5px solid ${saved ? "#1E3A8A" : "#E2E8F0"}`,
+          color: saved ? "#1E3A8A" : "#6B7280",
           padding: "9px 13px",
           borderRadius: var_r,
           cursor: "pointer",
@@ -10607,7 +10236,7 @@ function App() {
           marginBottom: 8,
           lineHeight: 1.5
         }
-      }, "This company doesn't post on job boards \u2014 reach out directly. Small companies hire this way all the time."), c.phone && React.createElement("p", {
+      }, "This company doesn't post on job boards, reach out directly. Small companies hire this way all the time."), c.phone && React.createElement("p", {
         style: {
           fontSize: 12,
           color: "#CBD5E1",
@@ -10615,7 +10244,7 @@ function App() {
         }
       }, c.phone), React.createElement("button", {
         onClick: () => {
-          const subject = encodeURIComponent(`Internship Inquiry — ${c.role || "Internship"}`);
+          const subject = encodeURIComponent(`Internship Inquiry, ${c.role || "Internship"}`);
           const body = encodeURIComponent(`Hi,
 
 My name is [Your Name] and I'm a [Year] student studying ${ans.major || "my field"} at [Your University]. I came across ${c.name} and was impressed by your work in ${c.industry || "this field"}.
@@ -10717,7 +10346,7 @@ Thank you for your time,
           textDecoration: "none",
           marginBottom: 2
         }
-      }, "\u2713 Direct apply \u2014 live posting \u2197"), (() => {
+      }, "\u2713 Direct apply, live posting \u2197"), (() => {
         const isNat = c.tier === "national" || isLikelyNational(c);
         const btn = (href, label, style) => href ? React.createElement("a", {
           href: href,
@@ -10793,7 +10422,7 @@ Thank you for your time,
         maxWidth: 560,
         margin: "20px auto 0"
       }
-    }, "These are estimates based on your profile, company fit, and application timing \u2014 not a guarantee or an offer. We'd rather show you a low honest number than a high false one."))));
+    }, "These are estimates based on your profile, company fit, and application timing, not a guarantee or an offer. We'd rather show you a low honest number than a high false one."))));
   }
   if (page === "resumebuilder") {
     return React.createElement("div", {
@@ -10842,7 +10471,7 @@ Thank you for your time,
         lineHeight: 1.55,
         marginBottom: 22
       }
-    }, "We'll use your quiz answers to build the structure with your real info filled in. There'll be ", React.createElement("strong", null, "[bracketed placeholders]"), " where you need to add specifics yourself \u2014 like bullets describing what you did in each activity. Honest start, not a finished resume."), !builderState.text && !builderState.loading && React.createElement("div", {
+    }, "We'll use your quiz answers to build the structure with your real info filled in. There'll be ", React.createElement("strong", null, "[bracketed placeholders]"), " where you need to add specifics yourself, like bullets describing what you did in each activity. Honest start, not a finished resume."), !builderState.text && !builderState.loading && React.createElement("div", {
       style: {
         background: GL,
         border: `1px solid ${GM}`,
@@ -10941,7 +10570,7 @@ Thank you for your time,
         fontFamily: "var(--font)",
         fontSize: 15,
         fontWeight: 700,
-        boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+        boxShadow: "none"
       }
     }, "Build my starter resume"), builderState.error && React.createElement("p", {
       style: {
@@ -11013,7 +10642,7 @@ Thank you for your time,
         lineHeight: 1.5,
         color: "#4A5568"
       }
-    }, React.createElement("strong", null, "This is a starting structure \u2014 not a finished resume."), " Replace every ", React.createElement("code", {
+    }, React.createElement("strong", null, "This is a starting structure, not a finished resume."), " Replace every ", React.createElement("code", {
       style: {
         background: "#fff",
         padding: "1px 5px",
@@ -11139,7 +10768,7 @@ Thank you for your time,
         fontFamily: "var(--font)",
         fontSize: 14,
         fontWeight: 700,
-        boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+        boxShadow: "none"
       }
     }, "Save to my profile & use for matches")), React.createElement("p", {
       style: {
@@ -11248,7 +10877,7 @@ Thank you for your time,
         lineHeight: 1.6,
         marginBottom: "1.5rem"
       }
-    }, "Save your info and Beat the Pile auto-fills a copy-paste card and a tailored cover letter on every application \u2014 so you stop retyping the same fields on fifty different sites."), React.createElement("div", {
+    }, "Save your info and Beat the Pile auto-fills a copy-paste card and a tailored cover letter on every application, so you stop retyping the same fields on fifty different sites."), React.createElement("div", {
       style: {
         background: clerkUser ? "#F0FDF4" : "#F8FAFC",
         border: `1px solid ${clerkUser ? "#86EFAC" : "#E2E8F0"}`,
@@ -11283,7 +10912,7 @@ Thank you for your time,
         lineHeight: 1.4,
         marginTop: 2
       }
-    }, syncStatus === "loading" ? "⟳ Loading your data…" : syncStatus === "saving" ? "⟳ Saving changes…" : syncStatus === "synced" ? "✓ All changes synced across your devices" : syncStatus === "error" ? "Sync had a hiccup — your changes are saved locally; we'll retry" : "Syncing your data…")) : React.createElement(React.Fragment, null, React.createElement("p", {
+    }, syncStatus === "loading" ? "⟳ Loading your data…" : syncStatus === "saving" ? "⟳ Saving changes…" : syncStatus === "synced" ? "✓ All changes synced across your devices" : syncStatus === "error" ? "Sync had a hiccup, your changes are saved locally; we'll retry" : "Syncing your data…")) : React.createElement(React.Fragment, null, React.createElement("p", {
       style: {
         fontSize: 13.5,
         fontWeight: 700,
@@ -11554,7 +11183,7 @@ Thank you for your time,
     })), React.createElement("textarea", {
       value: r.text,
       onChange: e => updateResume(r.id, "text", e.target.value),
-      placeholder: "Paste this resume's text here \u2014 or use the Upload button above to import a PDF / Word file.",
+      placeholder: "Paste this resume's text here, or use the Upload button above to import a PDF / Word file.",
       style: {
         ...inp,
         minHeight: 90,
@@ -11593,7 +11222,7 @@ Thank you for your time,
         fontFamily: "var(--font)",
         fontSize: 15,
         fontWeight: 700,
-        boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+        boxShadow: "none"
       }
     }, profileSaved ? "✓ Saved" : "Save profile"), React.createElement("button", {
       onClick: clearProfile,
@@ -11621,7 +11250,7 @@ Thank you for your time,
         marginTop: 16,
         lineHeight: 1.5
       }
-    }, "Your profile is saved on this device only \u2014 we don't send it anywhere in this version. You can clear it anytime. (When accounts launch, this same info will sync securely to your account.)")));
+    }, "Your profile is saved on this device only, we don't send it anywhere in this version. You can clear it anytime. (When accounts launch, this same info will sync securely to your account.)")));
   }
   if (page === "wall") {
     const relTime = iso => {
@@ -11669,7 +11298,7 @@ Thank you for your time,
         lineHeight: 1.55,
         marginBottom: 22
       }
-    }, "A space for the wins, the frustrations, and the questions. Posts are checked by AI moderation, so keep it real but keep it kind. Post anonymously or with your name \u2014 your choice on every post."), React.createElement("div", {
+    }, "A space for the wins, the frustrations, and the questions. Posts are checked by AI moderation, so keep it real but keep it kind. Post anonymously or with your name, your choice on every post."), React.createElement("div", {
       style: {
         marginBottom: 26
       }
@@ -12030,7 +11659,7 @@ Thank you for your time,
         fontStyle: "italic",
         lineHeight: 1.5
       }
-    }, "\"If you're stressing about the technical interview \u2014 practice OUT LOUD, not just in your head.\""))), React.createElement("p", {
+    }, "\"If you're stressing about the technical interview, practice OUT LOUD, not just in your head.\""))), React.createElement("p", {
       style: {
         fontSize: 11,
         color: "#6B7280",
@@ -12038,7 +11667,7 @@ Thank you for your time,
         marginTop: 16,
         fontStyle: "italic"
       }
-    }, "These are examples of post types \u2014 real posts from real students will appear here.")) : React.createElement("div", {
+    }, "These are examples of post types, real posts from real students will appear here.")) : React.createElement("div", {
       style: {
         display: "flex",
         flexDirection: "column",
@@ -12277,7 +11906,7 @@ Thank you for your time,
         marginTop: 32,
         lineHeight: 1.5
       }
-    }, "All posts are moderated by AI for harmful content. You can post anonymously or with a name \u2014 your choice per post. Be respectful \u2014 this is a space for honest conversation.")));
+    }, "All posts are moderated by AI for harmful content. You can post anonymously or with a name, your choice per post. Be respectful, this is a space for honest conversation.")));
   }
   if (page === "community") {
     const shown = tipCat === "All" ? TIPS : TIPS.filter(t => t.cat === tipCat);
@@ -12314,7 +11943,7 @@ Thank you for your time,
         lineHeight: 1.6,
         marginBottom: "1.5rem"
       }
-    }, "Honest, no-fluff advice on timing, applications, and standing out \u2014 the stuff that actually moves the needle, in one place."), React.createElement("div", {
+    }, "Honest, no-fluff advice on timing, applications, and standing out, the stuff that actually moves the needle, in one place."), React.createElement("div", {
       style: {
         display: "flex",
         gap: 7,
@@ -12351,7 +11980,7 @@ Thank you for your time,
         borderLeft: `4px solid ${G}`,
         borderRadius: var_rl,
         padding: "1.25rem 1.4rem",
-        boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+        boxShadow: "none"
       }
     }, React.createElement("div", {
       style: {
@@ -12421,7 +12050,7 @@ Thank you for your time,
         fontFamily: "var(--font)",
         fontSize: 15,
         fontWeight: 700,
-        boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+        boxShadow: "none"
       }
     }, "Find my matches \u2192")), React.createElement("p", {
       style: {
@@ -12431,7 +12060,7 @@ Thank you for your time,
         textAlign: "center",
         marginTop: 16
       }
-    }, "More tips are added over time. Have one worth sharing? We'd love to hear it \u2014 reach out anytime.")));
+    }, "More tips are added over time. Have one worth sharing? We'd love to hear it, reach out anytime.")));
   }
   if (page === "score") {
     const ScoreBar = ({
@@ -12714,7 +12343,7 @@ Thank you for your time,
         fontFamily: "var(--font)",
         fontSize: 15,
         fontWeight: 700,
-        boxShadow: scoreLoading || !scoreResume.trim() && !scoreJD.trim() ? "none" : `0 4px 16px ${G}40`
+        boxShadow: "none"
       }
     }, scoreLoading ? "Scoring your application..." : "Score this application →"), scoreError && React.createElement("p", {
       style: {
@@ -12771,7 +12400,7 @@ Thank you for your time,
         marginBottom: 14,
         lineHeight: 1.5
       }
-    }, "Many employers' application software filters before a person looks. This is our AI's estimate of how your application might do \u2014 not the employer's real score."), React.createElement(ScoreBar, {
+    }, "Many employers' application software filters before a person looks. This is our AI's estimate of how your application might do, not the employer's real score."), React.createElement(ScoreBar, {
       label: "Score",
       value: scoreResult.screenerScore,
       verdict: scoreResult.screenerVerdict
@@ -12818,7 +12447,7 @@ Thank you for your time,
         color: "#060A2C",
         marginBottom: 12
       }
-    }, "Top fixes \u2014 do these before you apply"), React.createElement("ol", {
+    }, "Top fixes, do these before you apply"), React.createElement("ol", {
       style: {
         margin: 0,
         paddingLeft: 18,
@@ -12991,7 +12620,7 @@ Thank you for your time,
       fontFamily: "var(--font)",
       fontSize: 14,
       fontWeight: 700,
-      boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+      boxShadow: "none"
     }
   }, "Upgrade to Pro")), clerkUser ? React.createElement("a", {
     href: "/season/",
@@ -13086,7 +12715,7 @@ Thank you for your time,
         color: G,
         bg: GL,
         title: "Start by finding your matches",
-        body: "You haven't tracked any applications yet. Take the quiz to get your personalized company list — then come back here to track everything in one place.",
+        body: "You haven't tracked any applications yet. Take the quiz to get your personalized company list, then come back here to track everything in one place.",
         cta: "Find my matches →",
         action: () => {
           setStep(0);
@@ -13098,8 +12727,8 @@ Thank you for your time,
         icon: "",
         color: G,
         bg: GL,
-        title: `You have ${savedJobs.length} saved job${savedJobs.length > 1 ? "s" : ""} — ready to apply?`,
-        body: "You've bookmarked companies from your results. The best time to apply is now — openings fill fast.",
+        title: `You have ${savedJobs.length} saved job${savedJobs.length > 1 ? "s" : ""}, ready to apply?`,
+        body: "You've bookmarked companies from your results. The best time to apply is now, openings fill fast.",
         cta: "See saved jobs ↓",
         action: () => {
           document.getElementById("saved-jobs-section")?.scrollIntoView({
@@ -13126,8 +12755,8 @@ Thank you for your time,
         icon: "",
         color: G,
         bg: GL,
-        title: "Apply to more — volume matters",
-        body: "Internship searches are a numbers game — most students need many applications to land a few interviews. Your results page has more matches waiting.",
+        title: "Apply to more, volume matters",
+        body: "Internship searches are a numbers game, most students need many applications to land a few interviews. Your results page has more matches waiting.",
         cta: "See all my matches →",
         action: () => setPage("results")
       };
@@ -13226,8 +12855,8 @@ Thank you for your time,
   }, s.l)))), savedJobs.length > 0 && React.createElement("div", {
     id: "saved-jobs-section",
     style: {
-      background: "#F5F3FF",
-      border: `1.5px solid #7C3AED25`,
+      background: "#EFF3FB",
+      border: `1.5px solid #1E3A8A25`,
       borderRadius: var_rl,
       overflow: "hidden",
       marginBottom: "1rem"
@@ -13246,22 +12875,22 @@ Thank you for your time,
       fontSize: 15,
       color: "#060A2C"
     }
-  }, "Saved \u2014 haven't applied yet"), React.createElement("p", {
+  }, "Saved, haven't applied yet"), React.createElement("p", {
     style: {
       fontSize: 12,
-      color: "#7C3AED",
+      color: "#1E3A8A",
       marginTop: 2
     }
   }, savedJobs.length, " job", savedJobs.length > 1 ? "s" : "", " saved from your matches", clerkUser ? " · also in My Season → Saved" : " on this device", " \xB7 ", React.createElement("a", {
     href: "/jobs/?view=saved",
     style: {
-      color: "#7C3AED",
+      color: "#1E3A8A",
       fontWeight: 700
     }
   }, "Jobs-page saves \u2192"))), React.createElement("button", {
     onClick: () => setPage("results"),
     style: {
-      background: "#7C3AED",
+      background: "#1E3A8A",
       color: "#fff",
       border: "none",
       padding: "6px 14px",
@@ -13304,8 +12933,8 @@ Thank you for your time,
     style: {
       fontSize: 12,
       fontWeight: 700,
-      color: "#7C3AED",
-      background: "#EDE9FE",
+      color: "#1E3A8A",
+      background: "#E3E9F6",
       padding: "3px 10px",
       borderRadius: 99,
       flexShrink: 0
@@ -13404,7 +13033,7 @@ Thank you for your time,
       fontFamily: "var(--font)",
       fontSize: 13,
       fontWeight: 700,
-      boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+      boxShadow: "none"
     }
   }, "+ Add Application"))), React.createElement("div", {
     style: {
@@ -13416,7 +13045,7 @@ Thank you for your time,
     }
   }, [{
     key: "Saved",
-    tint: "#7C3AED",
+    tint: "#1E3A8A",
     empty: "Find a role you like? Drop it here."
   }, {
     key: "Applied",
@@ -13534,7 +13163,7 @@ Thank you for your time,
           cursor: "grab",
           opacity: isDragging ? 0.5 : 1,
           transform: isDragging ? "scale(1.02)" : "none",
-          boxShadow: isDragging ? "0 10px 22px rgba(0,0,0,0.14)" : "0 1px 2px rgba(0,0,0,0.04)",
+          boxShadow: "none",
           transition: "box-shadow 0.12s ease,transform 0.12s ease"
         }
       }, React.createElement("div", {
@@ -13626,7 +13255,7 @@ Thank you for your time,
           fontSize: 11.5,
           fontWeight: 700
         }
-      }, fu.state === "due" ? "Follow up — due" : fu.state === "done" ? "Followed up ✓" : "Draft follow-up"), col.key === "Interview" && React.createElement("button", {
+      }, fu.state === "due" ? "Follow up, due" : fu.state === "done" ? "Followed up ✓" : "Draft follow-up"), col.key === "Interview" && React.createElement("button", {
         onClick: () => generateInterviewPrep(a),
         style: {
           marginTop: 7,
@@ -13668,7 +13297,7 @@ Thank you for your time,
           marginTop: 6,
           background: "none",
           border: "none",
-          color: noteText ? "#7C3AED" : "#6B7280",
+          color: noteText ? "#1E3A8A" : "#6B7280",
           padding: 0,
           cursor: "pointer",
           fontFamily: "var(--font)",
@@ -13720,8 +13349,8 @@ Thank you for your time,
           minHeight: 54,
           padding: "7px 9px",
           borderRadius: var_r,
-          border: `1.5px solid #7C3AED30`,
-          background: "#FAF5FF",
+          border: `1.5px solid #1E3A8A30`,
+          background: "#F4F6FB",
           color: "#060A2C",
           fontFamily: "var(--font)",
           lineHeight: 1.5,
@@ -13758,7 +13387,7 @@ Thank you for your time,
       lineHeight: 1.6,
       marginBottom: 14
     }
-  }, "Most students never follow up \u2014 and a short, polite one keeps you on the recruiter's radar. Beat the Pile tracks the timing for you and, when an application hits the 5-day mark, drafts a tailored follow-up email you send from your own inbox. You stay the sender; we handle the reminder and the words."), React.createElement("div", {
+  }, "Most students never follow up, and a short, polite one keeps you on the recruiter's radar. Beat the Pile tracks the timing for you and, when an application hits the 5-day mark, drafts a tailored follow-up email you send from your own inbox. You stay the sender; we handle the reminder and the words."), React.createElement("div", {
     style: {
       display: "flex",
       gap: 14,
@@ -13767,7 +13396,7 @@ Thank you for your time,
       color: GD,
       fontWeight: 700
     }
-  }, React.createElement("span", null, "\u2713 Timed automatically"), React.createElement("span", null, "\u2713 Drafted for each role"), React.createElement("span", null, "\u2713 Sent by you, as you")), React.createElement("div", {
+  }, React.createElement("span", null, "Timed automatically"), React.createElement("span", null, "Drafted for each role"), React.createElement("span", null, "Sent by you, as you")), React.createElement("div", {
     style: {
       background: "#fff",
       border: `1px solid ${GM}`,
@@ -13788,7 +13417,7 @@ Thank you for your time,
       color: "#4A5568",
       lineHeight: 1.55
     }
-  }, "Reminders show ", React.createElement("strong", null, "inside Beat the Pile"), " (the amber banner on your Dashboard and Results page + red badges on each due application). We don't send reminder emails yet, so check back every few days \u2014 or add each follow-up to your calendar from ", React.createElement("a", {
+  }, "Reminders show ", React.createElement("strong", null, "inside Beat the Pile"), " (the amber banner on your Dashboard and Results page + red badges on each due application). We don't send reminder emails yet, so check back every few days, or add each follow-up to your calendar from ", React.createElement("a", {
     href: "/season/",
     style: {
       color: GD
@@ -13826,7 +13455,7 @@ Thank you for your time,
       padding: "2rem",
       maxWidth: 580,
       width: "100%",
-      boxShadow: "0 24px 80px rgba(0,0,0,0.25)",
+      boxShadow: "none",
       animation: "pop 0.25s ease",
       margin: "auto 0"
     }
@@ -13955,7 +13584,7 @@ Thank you for your time,
       fontSize: 15,
       fontWeight: 700
     }
-  }, "Got it \u2014 I'm ready ")))), addAppModal && React.createElement("div", {
+  }, "Got it, I'm ready ")))), addAppModal && React.createElement("div", {
     style: {
       position: "fixed",
       inset: 0,
@@ -13978,7 +13607,7 @@ Thank you for your time,
       padding: "1.75rem",
       maxWidth: 420,
       width: "100%",
-      boxShadow: "0 24px 80px rgba(0,0,0,0.25)",
+      boxShadow: "none",
       animation: "pop 0.25s ease",
       margin: "auto 0"
     }
@@ -14217,7 +13846,7 @@ Thank you for your time,
       color: "#6B7280",
       lineHeight: 1.5
     }
-  }, "These counts are from ", React.createElement("strong", null, "this browser only"), " \u2014 useful for testing that events fire. For real cross-user analytics, add Plausible or PostHog at the marked line in the analytics helper (one line). Remove this panel before public launch.")))));
+  }, "These counts are from ", React.createElement("strong", null, "this browser only"), ", useful for testing that events fire. For real cross-user analytics, add Plausible or PostHog at the marked line in the analytics helper (one line). Remove this panel before public launch.")))));
   return null;
 }
 class AppErrorBoundary extends React.Component {
@@ -14261,8 +13890,8 @@ class AppErrorBoundary extends React.Component {
       style: {
         background: "#fff",
         border: "1px solid #F2FADF",
-        borderRadius: 16,
-        boxShadow: "0 8px 32px rgba(0,0,0,0.1)",
+        borderRadius: 10,
+        boxShadow: "none",
         padding: "2rem 1.75rem",
         maxWidth: 440,
         width: "100%",
@@ -14274,7 +13903,7 @@ class AppErrorBoundary extends React.Component {
         height: 48,
         margin: "0 auto 14px",
         background: "#4A7000",
-        borderRadius: 12,
+        borderRadius: 10,
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -14295,7 +13924,7 @@ class AppErrorBoundary extends React.Component {
         lineHeight: 1.55,
         margin: "0 0 18px"
       }
-    }, "The app hit an unexpected error. Your saved progress is safe — try again, or reload the page."), React.createElement('div', {
+    }, "The app hit an unexpected error. Your saved progress is safe, try again, or reload the page."), React.createElement('div', {
       style: {
         display: "flex",
         gap: 8,
@@ -14317,7 +13946,7 @@ class AppErrorBoundary extends React.Component {
         fontFamily: "inherit",
         fontSize: 14,
         fontWeight: 700,
-        boxShadow: "0 1px 2px rgba(6,10,44,.06)"
+        boxShadow: "none"
       }
     }, "Try again"), React.createElement('button', {
       onClick: () => {
