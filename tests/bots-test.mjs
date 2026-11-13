@@ -47,6 +47,7 @@ console.log("✓ switches: owner only (anon, other users, robot refused)");
 r = await call("sync", { auth: "cron" }); assert.deepEqual(r.body, { off: true, bot: "sync" });
 await call("discovery", { method: "POST", auth: tok("user_owner"), body: { action: "bot", bot: "links", on: false } });
 r = await call("check-links", { auth: "cron" }); assert.deepEqual(r.body, { off: true, bot: "links" });
+await call("discovery", { method: "POST", auth: tok("user_owner"), body: { action: "bot", bot: "import", on: false } });   // 07:xx UTC the import runs first
 await call("discovery", { method: "POST", auth: tok("user_owner"), body: { action: "bot", bot: "finder", on: false } });
 r = await call("discover", { auth: "cron" }); assert.deepEqual(r.body, { off: true, bot: "finder" });
 console.log("✓ off = the bot skips its run (sync, link checker, company finder)");
