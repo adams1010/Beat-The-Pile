@@ -46,7 +46,7 @@
     if (document.querySelector(".btpfoot") || document.body.hasAttribute("data-nofoot")) return;
     var f = document.createElement("footer"); f.className = "btpfoot";
     f.innerHTML = "<nav aria-label=\"Legal\"><a href=\"/privacy/\">Privacy</a><a href=\"/terms/\">Terms</a><a href=\"/cookies/\">Cookies</a><a href=\"/refunds/\">Refunds</a><a href=\"/accessibility/\">Accessibility</a><button type=\"button\" class=\"btpcset\">Cookie settings</button></nav>"
-      + "<div>© " + new Date().getFullYear() + " Beat the Pile. Job listings come from each employer's own job board. Company names and logos belong to their owners.</div>";
+      + "<div>© " + new Date().getFullYear() + " CuzzoCore LLC. Beat the Pile is a service of CuzzoCore LLC. Job listings come from each employer's own job board. Company names and logos belong to their owners.</div>";
     f.querySelector(".btpcset").onclick = function () { banner(true); };
     document.body.appendChild(f);
   }

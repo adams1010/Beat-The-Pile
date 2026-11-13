@@ -1924,8 +1924,8 @@
    "Únete a la órbita de $1 personas"
   ],
   [
-   "^© (\\d{4}) Beat the Pile\\. Job listings come from each employer's own job board\\. Company names and logos belong to their owners\\.$",
-   "© $1 Beat the Pile. Las ofertas vienen del portal de empleo de cada empleador. Los nombres y logotipos de las empresas pertenecen a sus dueños."
+   "^© (\\d{4}) CuzzoCore LLC\\. Beat the Pile is a service of CuzzoCore LLC\\. Job listings come from each employer's own job board\\. Company names and logos belong to their owners\\.$",
+   "© $1 CuzzoCore LLC. Beat the Pile es un servicio de CuzzoCore LLC. Las ofertas vienen del portal de empleo de cada empleador. Los nombres y logotipos de las empresas pertenecen a sus dueños."
   ]
  ]
 }
