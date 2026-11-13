@@ -11,8 +11,9 @@ const DRY = process.argv.includes("--dry");
 const LIMIT = +arg("limit", 20000);
 const CRAWLS = +arg("crawls", 4);   // Nov 6 2026: 4 crawls found 4,008 boards 2 crawls missed
 const RECHECK_DAYS = 30;
+const ENTRY_SINCE = "2026-11-13";
 const STATE = "data/scout-state.json";
-const MAX_MINUTES = +arg("minutes", 50);
+const MAX_MINUTES = +arg("minutes", 100);
 const auth = { "Content-Type": "application/json", Authorization: `Bearer ${process.env.CRON_SECRET}` };
 const botlog = (ok, summary, stats) => DRY ? null : fetch(`${SITE}/api/discovery`, { method: "POST", headers: auth, body: JSON.stringify({ action: "botlog", bot: "scout", ok, summary, stats }) }).catch(() => null);
 
@@ -31,18 +32,19 @@ const cutoff = Date.now() - RECHECK_DAYS * 864e5;
 const todo = new Map();
 for (const [k, b] of all) {
   if (knownBoards.has(k)) continue;                                        // already tracked
-  const last = state.checked[k]; if (last && Date.parse(last) > cutoff) continue;   // probed recently
+  // probed recently — except boards last probed before Nov 13, when only internships counted (entry-level jobs count now)
+  const last = state.checked[k]; if (last && Date.parse(last) > cutoff && last >= ENTRY_SINCE) continue;
   todo.set(k, b);
   if (todo.size >= LIMIT) break;
 }
 console.log(`Crawls ${crawls.join(", ")}: ${all.size} boards · ${knownBoards.size} already tracked · probing ${todo.size}`);
 
-const { found, checked, busy } = await scout(todo, { concurrency: 14, deadline: t0 + MAX_MINUTES * 6e4, onProgress: (n, f) => console.log(`  …${n} probed, ${f} with internships`) });
+const { found, checked, busy } = await scout(todo, { concurrency: +arg("at", 24), deadline: t0 + MAX_MINUTES * 6e4, onProgress: (n, f) => console.log(`  …${n} probed, ${f} with internships`) });
 const today = new Date().toISOString().slice(0, 10);
 for (const k of checked) state.checked[k] = today;
 if (busy) console.log(`${busy} boards were rate-limited (Paylocity) — left for the next run`);
-console.log(`Probed ${checked.length} boards in ${Math.round((Date.now() - t0) / 1000)}s → ${found.length} with US internships`);
-for (const f of found.slice(0, 25)) console.log(`  p${f.priority} ${f.company} (${f.ats}) · ${f.interns} interns, ${f.me} ME · e.g. ${f.sample[0]}`);
+console.log(`Probed ${checked.length} boards in ${Math.round((Date.now() - t0) / 1000)}s → ${found.length} hiring (internships or entry-level)`);
+for (const f of found.slice(0, 25)) console.log(`  p${f.priority} ${f.company} (${f.ats}) · ${f.interns} interns, ${f.early} entry-level, ${f.me} ME · e.g. ${f.sample[0]}`);
 
 let added = 0;
 if (!DRY) {
@@ -55,6 +57,6 @@ if (!DRY) {
   fs.writeFileSync(STATE, JSON.stringify({ updated: today, checked: state.checked }));
 }
 const me = found.filter((f) => f.me).length;
-const summary = `Scanned ${all.size.toLocaleString()} job boards · probed ${checked.length.toLocaleString()} new · ${found.length} hiring interns (${me} with ME roles) · ${added} new companies queued`;
+const summary = `Scanned ${all.size.toLocaleString()} job boards · probed ${checked.length.toLocaleString()} new · ${found.length} hiring (${found.filter((f) => f.interns).length} with internships, ${me} with ME roles) · ${added} new companies queued`;
 console.log(summary);
 await botlog(true, summary, { boards: all.size, probed: checked.length, found: found.length, me, added });

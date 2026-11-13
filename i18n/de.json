@@ -1601,7 +1601,11 @@
   "Email address (optional)": "E-Mail-Adresse (optional)",
   "By verifying, you agree to the": "Mit der Bestätigung stimmst du den",
   ", including the rules for employers in section 7, and our": "zu, einschließlich der Regeln für Arbeitgeber in Abschnitt 7, sowie unserer",
-  "Entry-level": "Einstieg"
+  "Entry-level": "Einstieg",
+  "Showing results for": "Ergebnisse für",
+  "(you typed “": "(du hast „",
+  "”).": "“ eingegeben).",
+  "Did you mean one of these?": "Meintest du einen dieser Orte?"
  },
  "patterns": [
   [

@@ -1601,7 +1601,11 @@
   "Email address (optional)": "Correo electrónico (opcional)",
   "By verifying, you agree to the": "Al verificar, aceptas los",
   ", including the rules for employers in section 7, and our": ", incluidas las reglas para empleadores de la sección 7, y nuestra",
-  "Entry-level": "Primer empleo"
+  "Entry-level": "Primer empleo",
+  "Showing results for": "Mostrando resultados para",
+  "(you typed “": "(escribiste “",
+  "”).": "”).",
+  "Did you mean one of these?": "¿Quisiste decir uno de estos?"
  },
  "patterns": [
   [

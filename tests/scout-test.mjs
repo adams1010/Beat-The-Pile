@@ -76,3 +76,21 @@ console.log("\nSCOUT TESTS PASSED");
   console.log("✓ board titles like 'Work at X' / 'X Portal' → X"); }
 { const { cleanName } = await import("../lib/scout.js"); assert.equal(cleanName("YellaWood&reg; Pressure Treated Pine"), "YellaWood"); console.log("✓ ® / ™ taglines dropped"); }
 { const { cleanName } = await import("../lib/scout.js"); assert.equal(cleanName("11th Second"), "11th Second"); assert.equal(cleanName("1010 Games"), "1010 Games"); assert.equal(cleanName("3220 Analog Devices (Thailand) Co., Ltd."), "Analog Devices"); console.log("✓ names that start with a number keep it"); }
+
+// Nov 13: a board with no internships but entry-level jobs (a clinic) is worth tracking; one entry job isn't enough
+{
+  const { probe, worth, scoutPriority } = await import("../lib/scout.js");
+  const board = (rows) => { globalThis.fetch = async (u) => { const s = String(u);
+    if (s.startsWith("https://api.lever.co/v0/postings/clinic")) return { ok: true, status: 200, json: async () => rows, text: async () => "" };
+    if (s.startsWith("https://jobs.lever.co/clinic")) return { ok: true, status: 200, text: async () => "<html><title>Riverside Clinic - Jobs</title></html>", json: async () => ({}) };
+    return { ok: false, status: 404, json: async () => ({}), text: async () => "" }; }; };
+  board([{ text: "Medical Assistant", categories: { location: "Richmond, VA" }, country: "US" }, { text: "Patient Care Technician", categories: { location: "Richmond, VA" }, country: "US" },
+         { text: "Medical Assistant", categories: { location: "Toronto" }, country: "CA" }, { text: "Senior Physician", categories: { location: "Richmond, VA" }, country: "US" }]);
+  let r = await probe({ ats: "lever", token: "clinic" });
+  assert.equal(r.interns, 0); assert.equal(r.early, 2, "US entry-level jobs counted, Canada and senior not");
+  assert.ok(worth(r)); assert.equal(r.company, "Riverside Clinic"); assert.ok(scoutPriority(r) > 20);
+  board([{ text: "Medical Assistant", categories: { location: "Richmond, VA" }, country: "US" }, { text: "Senior Physician", categories: { location: "Richmond, VA" }, country: "US" }]);
+  r = await probe({ ats: "lever", token: "clinic" });
+  assert.equal(worth(r), false, "one entry-level job alone isn't enough");
+  console.log("✓ Board Scout: boards with entry-level jobs (≥2) count now, not just internships");
+}

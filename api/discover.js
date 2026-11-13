@@ -9,6 +9,7 @@ import { botOn, logRun } from "../lib/bots.js";
 import { mapLimit, get } from "../lib/http.js";
 import { SIMPLIFY_URL, SIMPLIFY_NEWGRAD_URL, pickCompanies, normName, keyFor } from "../lib/simplify.js";
 import BACKLOG from "../data/backlog.json" with { type: "json" };
+import WANTED from "../data/wanted.json" with { type: "json" };
 
 export const config = { maxDuration: 60 };
 
@@ -191,10 +192,12 @@ export async function refillFromBacklog() {
   // and unrelated names (Squarespace ⟵ "Square"). Real duplicates are still caught: the same board is never listed twice (step 2).
   const known = (n) => names.has(n);
   const next = [];
-  for (const b of BACKLOG.companies || []) {
+  // Nov 13: big employers that hire for entry-level jobs (hospital systems, banks, insurers…) go first — data/wanted.json
+  const wanted = (WANTED.companies || []).map((b) => ({ ...b, src: "Wanted list (big entry-level employers)" }));
+  for (const b of [...wanted, ...(BACKLOG.companies || [])]) {
     const n = normName(b.company), id = "s-" + slug(b.company);
     if (n.length < 3 || ids.has(id) || known(n)) continue;
-    next.push({ id, company: b.company, domain: b.domain || null, key: b.key || keyFor(b.company), hint: b.hint || null, source: "Backlog (SimplifyJobs history)", status: "pending", priority: b.priority ?? 10 });
+    next.push({ id, company: b.company, domain: b.domain || null, key: b.key || keyFor(b.company), hint: b.hint || null, source: b.src || "Backlog (SimplifyJobs history)", status: "pending", priority: b.priority ?? 10 });
     names.add(n); ids.add(id);
     if (next.length >= REFILL_SIZE) break;
   }

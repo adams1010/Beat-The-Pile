@@ -216,9 +216,9 @@ export default async function handler(req, res) {
         db.selectAsAdmin(`bot_runs?select=bot,ran_at,ok,summary,stats&ran_at=gt.${new Date(Date.now() - 7 * 864e5).toISOString()}&order=ran_at.desc&limit=1500`),
         db.selectAllAsAdmin("company_candidates?select=id,company,status,verified_at,checked_at,detail"),
         aiSummary().catch(() => null),
-        (async () => { const out = []; for (let off = 0; off < 10000; off += 1000) {           // Supabase returns ≤1000 rows per request
-          const pg = await db.selectAsAdmin(`listings?select=company_id,match,field,first_seen&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)&order=id.asc&limit=1000&offset=${off}`);
-          out.push(...pg); if (pg.length < 1000) break; } return out; })().catch(() => []),
+        (async () => { const out = []; let last = ""; for (let i = 0; i < 200; i++) {           // ≤1000 rows per request; keyset paging (Nov 13: was capped at 10k)
+          const pg = await db.selectAsAdmin(`listings?select=id,company_id,match,field,first_seen&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)${last ? `&id=gt.${encodeURIComponent(last)}` : ""}&order=id.asc&limit=1000`);
+          out.push(...pg); if (pg.length < 1000) break; last = pg[pg.length - 1].id; } return out; })().catch(() => []),
         db.selectAllAsAdmin("user_jobs?select=clerk_user_id,updated_at,apps,starred,resume_path&order=clerk_user_id.asc").catch(() => []),
         db.selectAsAdmin("feedback?select=created_at&limit=10000").catch(() => []),
       ]);

@@ -19,7 +19,7 @@ import { db } from "../lib/db.js";
 import { FIELDS, FULLTIME_PG, kindOf } from "../lib/fields.js";
 import { COMPANIES } from "../lib/companies.js";
 import { companyPage, radarFor, sitemap } from "../lib/companypage.js";
-import { cityMatches, lookupPlace, geocodeOne, miles } from "../lib/geocode.js";
+import { resolvePlace, geocodeOne, miles } from "../lib/geocode.js";
 import { geoAlbersUsa } from "d3-geo";
 // Same projection as map/us.json (scripts/build-map.mjs): d3 Albers USA, scale 1300, 975×610.
 const PROJ = geoAlbersUsa().scale(1300).translate([487.5, 305]);
@@ -100,13 +100,12 @@ function majorFilter(p) {
  *  Only listings whose location names a real US city are on the map; remote and "4 Locations" postings are counted
  *  separately so the page can say so instead of quietly hiding or guessing them. */
 async function nearby(p, res) {
-  let center = lookupPlace(p.near);
-  if (!center && !/^\d{5}$/.test(p.near) && !/,/.test(p.near)) {        // just a city name: "Blacksburg"
-    const m = cityMatches(p.near);
-    if (m.length === 1) { center = m[0].pt; p.near = m[0].q; }
-    else if (m.length > 1) { res.setHeader("Cache-Control", "s-maxage=86400");
-      return res.status(400).json({ error: `There's more than one ${m[0].q.split(",")[0]}. Which state?`, choices: m.map((x) => x.q).slice(0, 30) }); }
-  }
+  // Nov 13: forgiving — typos ("washingdon dc"), missing commas, misspelled states, bare big-city names (lib/geocode.js resolvePlace)
+  const typed = p.near, R = resolvePlace(p.near);
+  let center = R?.pt || null, fixedTo = null, others = [];
+  if (R?.choices?.length) { res.setHeader("Cache-Control", "s-maxage=86400");
+    return res.status(400).json({ error: R.fixed ? "Did you mean one of these?" : `There's more than one ${R.choices[0].split(",")[0]}. Which state?`, choices: R.choices.slice(0, 30) }); }
+  if (center) { if (R.fixed) fixedTo = R.q; if (!/^\d{5}$/.test(typed)) p.near = R.q; others = R.others || []; }
   if (!center) { res.setHeader("Cache-Control", "no-store"); return res.status(400).json({ error: "We couldn't find that place. Try a city and state (Blacksburg, VA) or a 5-digit ZIP code." }); }
   const st = /^\d{5}$/.test(p.near) ? zipToState(p.near) : geocodeOne(p.near)?.state || null;
   const dLat = p.mi / 69, dLng = p.mi / (69 * Math.cos((center[0] * Math.PI) / 180));
@@ -129,7 +128,7 @@ async function nearby(p, res) {
   const page = p.limit != null ? hits.slice(p.offset, p.offset + p.limit) : hits;
   res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=3600");
   return res.status(200).json({ listings: withKind(page), meta: { count: hits.length, kind: p.kind, lastSync: lastRun?.[0]?.ran_at || null,
-    near: { q: p.near, mi: p.mi, lat: center[0], lng: center[1], state: st, xy: project(center[0], center[1]) }, remote, unplacedInState: unplaced,
+    near: { q: p.near, typed, fixedTo, others: others.slice(0, 12), mi: p.mi, lat: center[0], lng: center[1], state: st, xy: project(center[0], center[1]) }, remote, unplacedInState: unplaced,
     ...(p.limit != null ? { limit: p.limit, offset: p.offset, more: p.offset + p.limit < hits.length } : {}) } });
 }
 

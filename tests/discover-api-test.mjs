@@ -41,7 +41,7 @@ console.log(st);
 const core = Object.fromEntries(Object.entries(st).filter(([k]) => k.startsWith("x-")));
 assert.deepEqual(core, { "x-corning": "live+ON", "x-merck-dup": "duplicate", "x-trex": "board_error", "x-ghost": "no_board" });
 assert.match(T.get("x-trex").detail, /iCIMS .* answered 404/, "real reason recorded, not \"needs a new scraper\"");
-const fromBacklog = [...T.values()].filter((x) => x.source === "Backlog (SimplifyJobs history)");
+const fromBacklog = [...T.values()].filter((x) => x.source === "Backlog (SimplifyJobs history)" || x.source === "Wanted list (big entry-level employers)");   // wanted list goes first (Nov 13)
 assert.equal(fromBacklog.length, 60, "queue low → 60 pulled from backlog"); assert.equal(r.body.addedFromBacklog, 60);
 assert.ok(fromBacklog.every((x) => x.hint || x.domain), "each has a board link or a domain to start from");
 assert.ok(!fromBacklog.some((x) => /^(corning|trex)$/i.test(x.company)), "never re-adds a known company");

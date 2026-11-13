@@ -471,7 +471,8 @@
     $("savedN").textContent = state.mine.saved.size ? `(${state.mine.saved.size})` : "";
     const nm = state.near && !state.savedOnly && !state.followOnly ? state.nearMeta : null;
     const wider = state.near ? { 25: 50, 50: 100, 100: 200 }[state.near.mi] : null;
-    const nearNote = nm ? `Within ${state.near.mi} mi, nearest first.${wider ? ` <button class="linkbtn" data-widen="${wider}">Show within ${wider} mi</button>` : ""} Distances are city center to city center. ${nm.unplacedInState ? `${nm.unplacedInState} more in ${esc(NAMES[nm.near.state] || nm.near.state)} ${nm.unplacedInState === 1 ? "doesn't" : "don't"} say which city. <button class="linkbtn" data-near-st="${esc(nm.near.state)}">See all of ${esc(NAMES[nm.near.state] || nm.near.state)}</button> ` : ""}${nm.remote ? `${nm.remote} remote not counted. ` : ""}` : "";
+    const fixedNote = nm?.near?.fixedTo && nm.near.typed ? `Showing results for <b data-noi18n>${esc(nm.near.fixedTo)}</b> (you typed “<span data-noi18n>${esc(nm.near.typed)}</span>”). ` : "";
+    const nearNote = nm ? fixedNote + `Within ${state.near.mi} mi, nearest first.${wider ? ` <button class="linkbtn" data-widen="${wider}">Show within ${wider} mi</button>` : ""} Distances are city center to city center. ${nm.unplacedInState ? `${nm.unplacedInState} more in ${esc(NAMES[nm.near.state] || nm.near.state)} ${nm.unplacedInState === 1 ? "doesn't" : "don't"} say which city. <button class="linkbtn" data-near-st="${esc(nm.near.state)}">See all of ${esc(NAMES[nm.near.state] || nm.near.state)}</button> ` : ""}${nm.remote ? `${nm.remote} remote not counted. ` : ""}` : "";
     $("note").innerHTML = nearNote + (state.st !== "ALL" && !state.savedOnly && !state.followOnly
         ? `Showing ${esc(state.st.map((x) => NAMES[x] || x).join(" & "))}. <button class="linkbtn" id="goAll">See all US</button> `
         : "") + (state.company ? `One company, every major. <button class="linkbtn" id="allCos">Show all companies</button> ` : "") + (state.savedOnly || state.followOnly ? "Every major and state." : strict ? "Showing roles that say mechanical (or close, like manufacturing)." : `Major: <b>${esc(MAJOR_LABEL())}</b> (change it above).`)
@@ -606,7 +607,7 @@
   // The box asks for "City, state or ZIP" (24060 → distance search too): "Blacksburg, VA" → distance search; "Virginia" / "VA" → that state's filter.
   // A 5-digit ZIP still works (old links, people who type one anyway).
   // Nov 8: a city on its own works too ("Blacksburg"); if several states have one, the API asks which (data.choices).
-  function nearOk(q){ return /^\d{5}$/.test(q) || /^[A-Za-z .'-]{2,30}(,\s*[A-Za-z]{2})?$/.test(q); }
+  function nearOk(q){ return /^\d{5}$/.test(q) || /^[A-Za-z .,'-]{2,50}$/.test(q); }   // Nov 13: the server forgives typos ("washingdon dc", "Blacksburg, Virginia")
   function stateFrom(q){ const t = q.trim().replace(/\.$/, "").toLowerCase(); if (!t) return null;
     for (const [ab, nm] of Object.entries(NAMES)) if (t === ab.toLowerCase() || t === nm.toLowerCase()) return ab;
     return null; }

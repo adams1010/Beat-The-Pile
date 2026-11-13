@@ -15,8 +15,9 @@ globalThis.fetch = async (url, o = {}) => {
   return mk(200, +x.searchParams.get("offset") > 0 ? [] : [...T.values()]);
 };
 const { refillFromBacklog } = await import("../api/discover.js");
-const added = (await refillFromBacklog()).map((x) => x.company);
+// Nov 13: the wanted list (data/wanted.json) goes first, so pull until the backlog companies show up
+const added = []; for (let i = 0; i < 12; i++) { for (const x of T.values()) if (x.status === "pending") x.status = "tested"; added.push(...(await refillFromBacklog()).map((x) => x.company)); }
 assert.ok(added.includes("Amazon"), "Amazon is queued even though \"Amazon (Project Leo)\" exists");
 assert.ok(!added.includes("Meta"), "an exact name already in the queue is still skipped");
-assert.equal(added.length, 60, "a full batch of 60 is pulled");
+assert.equal(added.length, 720, "full batches of 60 are pulled (12 runs)");
 console.log("✓ backlog refill: exact-name check only (Amazon queued, Meta skipped)");
