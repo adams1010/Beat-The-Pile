@@ -1,6 +1,7 @@
 # ⚡ Turbo Sync (Nov 13 2026): reads every verified company's job board from GitHub's servers — 24 at once, no 60-second
 # limit, deeper searches (BTP_TURBO) — and hands the results to Vercel to store (/api/discovery "turbo_save").
-# Every 2 hours; GitHub sometimes fires schedules late, which is fine. Switch: "Turbo Sync" on /bots.
+# Nov 14: GitHub skips a lot of scheduled runs, so each run starts the next one itself, about an hour after it began
+# (the cron stays as a backup). Off on /bots → the run stops and the chain ends. Switch: "Turbo Sync" on /bots.
 name: turbo-sync
 on:
   schedule:
@@ -9,6 +10,7 @@ on:
     inputs:
       args: { description: "e.g. --limit=40 --minutes=10", required: false, default: "" }
 concurrency: { group: turbo-sync, cancel-in-progress: false }
+permissions: { contents: read, actions: write }
 jobs:
   run:
     runs-on: ubuntu-latest
@@ -21,3 +23,12 @@ jobs:
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
           BTP_TURBO: "1"
+      - name: Start the next run (about an hour after this one began)
+        if: always() && !inputs.args
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          on=$(curl -s https://www.beatthepile.com/api/discovery?bots=1 | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const b=JSON.parse(s).bots.find(x=>x.id==="turbo");console.log(b&&b.enabled===false?"off":"on")}catch{console.log("on")}})')
+          [ "$on" = "off" ] && { echo "Turbo Sync is off: chain ends"; exit 0; }
+          elapsed=$(( $(date +%s) - $(date -d "$(gh run view ${{ github.run_id }} --repo ${{ github.repository }} --json createdAt -q .createdAt)" +%s) ))
+          wait=$(( 3600 - elapsed )); [ $wait -gt 0 ] && { echo "sleeping $wait s"; sleep $wait; }
+          gh workflow run turbo-sync.yml --repo ${{ github.repository }} --ref main && echo "next run started"
