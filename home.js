@@ -1,4 +1,4 @@
-/* built from src/home.jsx aca00e5f697ff0ad — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx bbee10364f49af12 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -152,7 +152,12 @@ const LiveStats = () => {
     const m = Math.round((Date.now() - new Date(t)) / 6e4);
     return m < 60 ? `${Math.max(1, m)} min ago` : m < 1440 ? `${Math.round(m / 60)} hr ago` : `${Math.round(m / 1440)} days ago`;
   };
+  const total = d && d.fulltime != null ? (d.allMajors || 0) + (d.fulltime || 0) + (d.hourly || 0) : null;
   const items = [{
+    v: total,
+    l: "open jobs right now: internships, entry-level and part-time",
+    c: G
+  }, {
     v: d?.allMajors,
     l: "open internships right now, every major",
     c: "#060A2C"
@@ -779,7 +784,7 @@ function LandingD({
       marginRight: 8,
       verticalAlign: 1
     }
-  }), sum ? `${fmt(sum.companies)} company job boards${sum.lastSync ? `, last checked ${dAgoLong(sum.lastSync)}` : ""}` : sumErr ? "Live numbers unavailable right now" : "Loading the latest numbers…"), React.createElement("h1", {
+  }), sum ? `${sum.allMajors != null && sum.fulltime != null ? `${fmt((sum.allMajors || 0) + (sum.fulltime || 0) + (sum.hourly || 0))} open jobs from ` : ""}${fmt(sum.companies)} company job boards${sum.lastSync ? `, last checked ${dAgoLong(sum.lastSync)}` : ""}` : sumErr ? "Live numbers unavailable right now" : "Loading the latest numbers…"), React.createElement("h1", {
     style: {
       fontSize: "clamp(2.3rem,5vw,3.6rem)",
       lineHeight: 1.03,
@@ -810,7 +815,6 @@ function LandingD({
       background: "#fff",
       borderRadius: 10,
       padding: 6,
-      boxShadow: "0 0 0 1px #2FD39A33, 0 20px 50px rgba(0,0,0,.35)",
       maxWidth: 760
     }
   }, React.createElement("label", {
