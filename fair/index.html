@@ -252,7 +252,7 @@
     // First visit from a signed-in student: open their own school's next fair
     const sid = S.me?.profile?.schoolId;
     if (sid && S.fairs?.length) { const had = store.get("btp_school_id"); store.set("btp_school_id", String(sid));
-      const f = nextAtSchool(sid); if (f && !had && !store.get("iq_fair") && !new URLSearchParams(location.search).get("fair") && S.fair?.id !== f.id) pickFair(f.id); }
+      const f = nextAtSchool(sid); if (f && !store.get("iq_fair_v2") && !new URLSearchParams(location.search).get("fair") && S.fair?.id !== f.id) pickFair(f.id); }
     renderAll();
     if (S.user && S.draft) { const d = S.draft; S.draft = null; openNote(d.company, d.companyId, d); }
   }
@@ -283,7 +283,7 @@
     const next = S.fairs.filter((f) => f.date && f.date >= today).sort((a, b) => a.date.localeCompare(b.date))[0];
     // Nov 14: fairs from 20 schools; prefer the next fair at YOUR school (profile schoolId, remembered on this device)
     const mine = nextAtSchool(store.get("btp_school_id"));
-    const want = new URLSearchParams(location.search).get("fair") || store.get("iq_fair") || (mine || next || S.fairs.find((f) => f.companies.length) || S.fairs[0])?.id;
+    const want = new URLSearchParams(location.search).get("fair") || store.get("iq_fair_v2") || (mine || next || S.fairs.find((f) => f.companies.length) || S.fairs[0])?.id;
     // Grouped by school; every option says its term ("Business Horizons Career Fair — Spring 2027")
     const schools = [...new Set(S.fairs.map((f) => f.school))];
     $("#fairsel").innerHTML = schools.map((sc) => `<optgroup label="${esc(sc)}">${S.fairs.filter((f) => f.school === sc)
@@ -296,7 +296,7 @@
     return at.filter((f) => f.date && f.date >= today).sort((a, b) => a.date.localeCompare(b.date))[0] || at[0] || null;
   }
   async function pickFair(id){
-    S.fair = S.fairs.find((f) => f.id === id); store.set("iq_fair", id);
+    S.fair = S.fairs.find((f) => f.id === id);
     $("#fairsel").value = id; S.open.clear();
     const booths = S.fair.companies.filter((c) => c.booth).length;
     $("#fairmeta").textContent = (S.fair.companies.length
@@ -375,7 +375,7 @@
         The employer list isn't out yet. Schools usually post it a week or two before the fair, and we'll add it here with every company's open internships.
         ${S.fair.source ? `<br><a href="${esc(S.fair.source)}" target="_blank" rel="noopener">${esc(S.fair.school)} career fair page ↗</a>` : ""}
         ${(() => { const past = S.fairs.filter((f) => f.companies.length && f.school === S.fair.school); return past.length ? `<br><br>Until then, see who came last time:<br>${past.map((f) => `<button type="button" class="linkbtn" data-pastfair="${esc(f.id)}">${esc(f.name)} · ${esc(f.term || "")} (${f.companies.length} employers)</button>`).join("<br>")}` : ""; })()}</div>`;
-      $("#cos").querySelectorAll("[data-pastfair]").forEach((b) => b.addEventListener("click", () => pickFair(b.dataset.pastfair)));
+      $("#cos").querySelectorAll("[data-pastfair]").forEach((b) => b.addEventListener("click", () => { store.set("iq_fair_v2", b.dataset.pastfair); pickFair(b.dataset.pastfair); }));
       return;
     }
     const t = talked();
@@ -428,7 +428,7 @@
     if (e.target.closest(".star")) return toggleStar(c);
     if (e.target.closest(".exp")) { S.open.has(key) ? S.open.delete(key) : S.open.add(key); renderCompanies(); }
   });
-  $("#fairsel").onchange = (e) => pickFair(e.target.value);
+  $("#fairsel").onchange = (e) => { store.set("iq_fair_v2", e.target.value); pickFair(e.target.value); };
 
   // ── Game plan (★) ──
   async function toggleStar(c){
