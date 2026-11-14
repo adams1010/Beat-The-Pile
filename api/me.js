@@ -338,7 +338,8 @@ export default async function handler(req, res) {
 
   const view = (row) => ({ saved: row?.saved || [], applied: row?.applied || [], resume: publicResume(row), notes: row?.fair_notes || [],
                             starred: row?.starred || [], seenAt: row?.seen_at || null, apps: row?.apps || [], goal: row?.weekly_goal ?? null,
-                            profile: row?.profile || null, handle: row?.handle || null, profilePublic: row?.profile_public === true,
+                            // Nov 14: older profiles typed the school by name; give them the list id so /fair and Orbit match their school
+                            profile: row?.profile ? { ...row.profile, schoolId: row.profile.schoolId || schoolIdFor(row.profile.school) || null } : null, handle: row?.handle || null, profilePublic: row?.profile_public === true,
                             remindEmail: row?.remind_email === true,
                             alerts: row?.alert_on === true ? { major: row.alert_major || "all", states: row.alert_states || "" } : null, emailReady: !!process.env.RESEND_API_KEY,
                             internship: row?.internship || null, internshipReady: row ? "internship" in row : true });
