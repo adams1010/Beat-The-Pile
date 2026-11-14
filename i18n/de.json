@@ -1700,7 +1700,13 @@
   "Business & Operations": "Business & Operations",
   "Security & Public Safety": "Sicherheit",
   "Fitness & Recreation": "Fitness & Freizeit",
-  "Job title, keyword or company": "Jobtitel, Stichwort oder Firma"
+  "Job title, keyword or company": "Jobtitel, Stichwort oder Firma",
+  "Add a profile photo": "Profilfoto hinzufügen",
+  "Classmates and recruiters recognize you faster.": "Kommilitonen und Recruiter erkennen dich schneller.",
+  "Choose a photo": "Foto auswählen",
+  "Let verified employers find me. Only companies we've checked can see your public profile and message you about real jobs and internships. You can turn this off any time on your profile.": "Verifizierte Arbeitgeber dürfen mich finden. Nur von uns geprüfte Firmen sehen dein öffentliches Profil und können dir zu echten Jobs und Praktika schreiben. Du kannst das jederzeit in deinem Profil ausschalten.",
+  "Profile photo added": "Profilfoto hinzugefügt",
+  "Add one": "Hinzufügen"
  },
  "patterns": [
   [

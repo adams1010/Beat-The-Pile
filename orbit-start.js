@@ -63,6 +63,7 @@
           <ul class="chk">
             <li class="ok"><i>✓</i><span>Profile saved</span></li>
             <li class="${m.isPublic ? "ok" : ""}"><i>${m.isPublic ? "✓" : ""}</i><span>${m.isPublic ? "Classmates can find you in Orbit" : `Show your profile in Orbit <a href="#" id="bosPub">Turn it on</a>`}</span></li>
+            <li class="${m.hasPhoto ? "ok" : ""}"><i>${m.hasPhoto ? "✓" : ""}</i><span>${m.hasPhoto ? "Profile photo added" : `Add a profile photo <a href="/u/#photo">Add one</a>`}</span></li>
             <li class="${n >= GOAL ? "ok" : ""}"><i>${n >= GOAL ? "✓" : ""}</i><span>Join ${GOAL} people's orbits <b data-noi18n>(${n}/${GOAL})</b></span></li>
             <li class="${(m.following || 0) > 0 ? "ok" : ""}"><i>${(m.following || 0) > 0 ? "✓" : ""}</i><span>${(m.following || 0) > 0 ? "Following a company" : `Follow a company you want <a href="/jobs/">Browse jobs</a>`}</span></li>
           </ul>

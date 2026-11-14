@@ -34,4 +34,13 @@ r = await call("u_c", { action: "orbit_count" }); assert.equal(r.body.needsSchoo
 r = await call("u_p", { action: "onboard", name: "Dr. Kim", school: "Virginia Tech", major: "Mechanical Engineering", staff: "Professor", gradYear: 2027, show: true });
 assert.equal(r.body.profile.staff, "Professor"); assert.equal(r.body.profile.gradYear, null); assert.equal(r.body.handle, "dr-kim");
 assert.equal((await call("u_p", { action: "onboard", name: "Dr. Kim", school: "VT", staff: "Wizard" })).body.profile.staff, null, "only listed roles");
+// Nov 14: "Let employers find me" is ticked at sign-up (an untick wins; never for staff); an optional photo is kept
+assert.equal(r.body.profile.openToEmployers, false, "staff never open to employers");
+const px = "data:image/jpeg;base64," + Buffer.from([0xff, 0xd8, 0xff, 0xe0, 1, 2, 3, 4]).toString("base64");
+r = await call("u_b", { action: "onboard", name: "Ana Lopez", school: "Virginia Tech", employers: true, photo: px });
+assert.equal(r.body.profile.openToEmployers, true); assert.equal(r.body.profile.photo, px);
+r = await call("u_c", { action: "onboard", name: "Cal", school: "VT", employers: false });
+assert.equal(r.body.profile.openToEmployers, false, "unticked stays off");
+r = await call("u_b", { action: "onboard", name: "Ana Lopez", school: "Virginia Tech", photo: "javascript:alert(1)" });
+assert.equal(r.body.profile.photo, px, "a bad photo never replaces a good one");
 console.log("✓ onboarding: school/major/graduation, unique link name, aliases resolve, classmates see each other, opt-out respected");

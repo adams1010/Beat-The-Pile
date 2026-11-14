@@ -1700,7 +1700,13 @@
   "Business & Operations": "Business & operations",
   "Security & Public Safety": "Beveiliging & openbare veiligheid",
   "Fitness & Recreation": "Fitness & recreatie",
-  "Job title, keyword or company": "Functie, trefwoord of bedrijf"
+  "Job title, keyword or company": "Functie, trefwoord of bedrijf",
+  "Add a profile photo": "Voeg een profielfoto toe",
+  "Classmates and recruiters recognize you faster.": "Medestudenten en recruiters herkennen je sneller.",
+  "Choose a photo": "Kies een foto",
+  "Let verified employers find me. Only companies we've checked can see your public profile and message you about real jobs and internships. You can turn this off any time on your profile.": "Laat geverifieerde werkgevers me vinden. Alleen bedrijven die wij hebben gecontroleerd zien je openbare profiel en kunnen je berichten sturen over echte banen en stages. Je kunt dit altijd uitzetten op je profiel.",
+  "Profile photo added": "Profielfoto toegevoegd",
+  "Add one": "Toevoegen"
  },
  "patterns": [
   [

@@ -42,6 +42,10 @@
   .tourpick{display:grid;gap:10px;max-width:420px;margin:18px auto 0}
   .tourgo,.tourskip{display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:999px;font-weight:700;font-size:17px;text-decoration:none}
   .tourgo{background:#4A7000;color:#fff}.tourskip{color:#4A7000;border:1px solid #C9D2E0;background:#fff}
+  .ph{display:flex;gap:14px;align-items:center;margin:14px 0 4px;padding:12px;border:1px solid #DCE2EC;border-radius:10px}
+  .phav{flex:0 0 56px;width:56px;height:56px;border-radius:50%;background:#DDF3A8;color:#060A2C;display:flex;align-items:center;justify-content:center;font:700 20px Geist,system-ui,sans-serif;overflow:hidden}
+  .phav img{width:100%;height:100%;object-fit:cover}
+  .phbtn{display:inline-block;margin-top:6px;border:1px solid #C9D1DE;border-radius:999px;padding:6px 14px;font-weight:600;font-size:13.5px;cursor:pointer;color:#4A7000}
 </style>
 </head>
 <body>
@@ -129,7 +133,9 @@
         <div id="o_mjw"><label for="o_mj">${staff ? "Department (optional)" : "Major"}</label><input id="o_mj" value="${esc(st.major)}" placeholder="Pick your school first"></div>
         <div class="two"${staff ? ' style="display:none"' : ""}><div><label for="o_gt">Graduation</label><select id="o_gt"><option value="">Term</option>${["Spring", "Summer", "Fall", "Winter"].map((t) => `<option${mine.gradTerm === t ? " selected" : ""}>${t}</option>`).join("")}</select></div>
           <div><label for="o_gy">Year</label><select id="o_gy"><option value="">Year</option>${Array.from({ length: 8 }, (_, i) => Y + i - 1).map((y) => `<option${+mine.gradYear === y ? " selected" : ""}>${y}</option>`).join("")}</select></div></div>
+        ${staff ? "" : `<div class="ph"><span class="phav" id="o_phv" aria-hidden="true">${esc((nm || "?").trim().slice(0, 1).toUpperCase())}</span><div><b>Add a profile photo</b> <span class="muted">(optional)</span><br><span class="muted">Classmates and recruiters recognize you faster.</span><br><label class="phbtn" for="o_ph">Choose a photo</label><input type="file" id="o_ph" accept="image/*" hidden></div></div>`}
         <label class="chk"><input type="checkbox" id="o_show" checked> <span>${staff ? "Show me to students at my school in Orbit (your name, school, role and photo). You can turn this off any time on your profile." : "Show me to students at my school in Orbit (your name, school, major and photo). You can turn this off any time on your profile."}</span></label>
+        ${staff ? "" : `<label class="chk"><input type="checkbox" id="o_emp" checked> <span>Let verified employers find me. Only companies we've checked can see your public profile and message you about real jobs and internships. You can turn this off any time on your profile.</span></label>`}
         <div class="go"><button id="o_go">Continue</button><a href="#" id="o_skip">Skip for now</a><span class="msg" id="o_msg" role="status"></span></div>
       </div>`;
     const majorBox = async () => {
@@ -147,13 +153,24 @@
     P.attach($("#o_sc"), { load: P.schools, other: true, hint: "Type the first letters of your school, e.g. Virginia Tech", onPick: (it) => { st.school = it ? it.label : ""; st.schoolId = it && it.id ? it.id : null; majorBox(); } });
     majorBox();
     if (nm) $("#o_sc").focus();
+    // Nov 14: optional profile photo at sign-up: center square, 256 px JPEG (the same size /u/ stores)
+    const phIn = $("#o_ph");
+    if (phIn) phIn.onchange = () => {
+      const f = phIn.files && phIn.files[0]; if (!f || !/^image\//.test(f.type)) return;
+      const img = new Image(), url = URL.createObjectURL(f);
+      img.onload = () => { const S = Math.min(img.naturalWidth, img.naturalHeight), c = document.createElement("canvas"); c.width = c.height = 256;
+        c.getContext("2d").drawImage(img, (img.naturalWidth - S) / 2, (img.naturalHeight - S) / 2, S, S, 0, 0, 256, 256);
+        let q = 0.85, d = c.toDataURL("image/jpeg", q); while (d.length > 60000 && q > 0.4) { q -= 0.1; d = c.toDataURL("image/jpeg", q); }
+        st.photo = d; $("#o_phv").innerHTML = `<img src="${d}" alt="">`; URL.revokeObjectURL(url); };
+      img.src = url;
+    };
     $("#o_skip").onclick = (e) => { e.preventDefault(); try { sessionStorage.setItem("btp_school_skip", "1"); } catch {} tour(); };
     $("#o_go").onclick = async () => {
       const b = $("#o_go"); $("#o_msg").textContent = "";
       if (staff && !$("#o_rl").value) { $("#o_msg").textContent = "Pick your role."; return; }
       b.disabled = true;
       try { await api({ action: "onboard", name: $("#o_nm").value, school: st.school || $("#o_sc").value, schoolId: st.schoolId, major: st.major || ($("#o_mj") && $("#o_mj").value) || "",
-          gradTerm: $("#o_gt").value, gradYear: $("#o_gy").value ? +$("#o_gy").value : null, show: $("#o_show").checked, ...(staff ? { staff: $("#o_rl").value } : {}) });
+          gradTerm: $("#o_gt").value, gradYear: $("#o_gy").value ? +$("#o_gy").value : null, show: $("#o_show").checked, ...(staff ? { staff: $("#o_rl").value } : { employers: !!$("#o_emp")?.checked, ...(st.photo ? { photo: st.photo } : {}) }) });
         // Nov 10: right after sign-up, the "build your orbit" checklist (join classmates' orbits) — then on to the site
         if (window.btpOrbitStart) return window.btpOrbitStart.show({ getToken: () => C.session.getToken(), done: tour, force: true });
         tour(); }

@@ -675,7 +675,9 @@
       S.me = me; S.kitOk = !!home;
       if (home) { const d = home.data || {}; S.kit = d.profile || {}; S.resumes = Array.isArray(d.resumes?.list) ? d.resumes.list : Array.isArray(S.kit.resumes) ? S.kit.resumes : []; }
       load(); remember();
-      if (location.hash === "#kit") { S.tab = "edit"; editor(); jump("kit"); } else editor();
+      if (location.hash === "#kit") { S.tab = "edit"; editor(); jump("kit"); }
+      else if (location.hash === "#photo") { S.tab = "edit"; editor(); const ph = document.getElementById("f_photo"); if (ph) { ph.closest("div")?.scrollIntoView({ block: "center" }); ph.click(); } }   // Nov 14: "Add a profile photo" links
+      else editor();
     }
     catch { document.querySelector("main").innerHTML = '<div class="card center">Couldn’t load your profile right now. Refresh in a minute.</div>'; }
   }

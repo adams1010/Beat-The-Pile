@@ -465,7 +465,10 @@ export default async function handler(req, res) {
       const base = cur?.profile && typeof cur.profile === "object" ? cur.profile : {};
       const pick = (k) => (body[k] !== undefined && body[k] !== null && body[k] !== "" ? body[k] : base[k]);
       const profile = cleanProfile({ ...base, name: pick("name"), school: pick("school"), schoolId: body.school !== undefined ? body.schoolId : base.schoolId,
-        major: pick("major"), gradYear: body.staff ? null : pick("gradYear"), gradTerm: body.staff ? null : pick("gradTerm"), staff: body.staff !== undefined ? body.staff : base.staff });
+        major: pick("major"), gradYear: body.staff ? null : pick("gradYear"), gradTerm: body.staff ? null : pick("gradTerm"), staff: body.staff !== undefined ? body.staff : base.staff,
+        // Nov 14: sign-up step 3 has "Let employers find me" ticked (students only; never faculty/staff); an explicit untick wins
+        openToEmployers: body.staff || base.staff ? false : body.employers === false ? false : body.employers === true ? true : base.openToEmployers,
+        photo: body.photo && cleanPhoto(body.photo) ? body.photo : base.photo });
       if (!profile.name) return res.status(400).json({ error: "Add your name" });
       if (!profile.school) return res.status(400).json({ error: "Pick your school" });
       const handle = cur?.handle || (await autoHandle(uid, profile));
