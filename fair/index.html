@@ -372,7 +372,7 @@
     if (!S.fair.companies.length) {     // announced fair, employer list not out yet
       $("#chips").innerHTML = "";
       $("#cos").innerHTML = `<div class="empty"><b>${esc(S.fair.name)}, ${esc(S.fair.term || "")}</b><br>${esc(S.fair.when || "")} · ${esc(S.fair.where || "")}<br><br>
-        The employer list isn't out yet. VT usually posts it on Handshake a week or two before the fair, and we'll add it here with every company's open internships.
+        The employer list isn't out yet. Schools usually post it a week or two before the fair, and we'll add it here with every company's open internships.
         ${S.fair.source ? `<br><a href="${esc(S.fair.source)}" target="_blank" rel="noopener">${esc(S.fair.school)} career fair page ↗</a>` : ""}
         ${(() => { const past = S.fairs.filter((f) => f.companies.length && f.school === S.fair.school); return past.length ? `<br><br>Until then, see who came last time:<br>${past.map((f) => `<button type="button" class="linkbtn" data-pastfair="${esc(f.id)}">${esc(f.name)} · ${esc(f.term || "")} (${f.companies.length} employers)</button>`).join("<br>")}` : ""; })()}</div>`;
       $("#cos").querySelectorAll("[data-pastfair]").forEach((b) => b.addEventListener("click", () => pickFair(b.dataset.pastfair)));
