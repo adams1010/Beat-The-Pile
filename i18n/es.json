@@ -1682,7 +1682,7 @@
   "Warehouse, delivery & supply chain": "Almacén, reparto y cadena de suministro",
   "Retail & Customer Service": "Comercio y atención al cliente",
   "Food, Hotels & Recreation": "Comida, hoteles y recreación",
-  "open jobs right now: internships, entry-level and part-time": "empleos abiertos ahora: prácticas, nivel inicial y medio tiempo"
+  "open jobs and internships right now": "empleos y prácticas abiertos ahora"
  },
  "patterns": [
   [
@@ -2036,6 +2036,22 @@
   [
    "^Searched every job type, (.+) had only a few matches\\.$",
    "Buscamos en todos los tipos de empleo, $1 tenía pocos resultados."
+  ],
+  [
+   "^([\\d,]+) internships$",
+   "$1 prácticas"
+  ],
+  [
+   "^([\\d,]+) entry-level$",
+   "$1 de nivel inicial"
+  ],
+  [
+   "^([\\d,]+) part-time$",
+   "$1 de medio tiempo"
+  ],
+  [
+   "^([\\d,]+) companies$",
+   "$1 empresas"
   ]
  ]
 }

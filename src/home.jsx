@@ -61,7 +61,7 @@ const LiveStats=()=>{
   const fmt=(n)=>n==null?"—":n.toLocaleString();
   const ago=(t)=>{if(!t)return null;const m=Math.round((Date.now()-new Date(t))/6e4);return m<60?`${Math.max(1,m)} min ago`:m<1440?`${Math.round(m/60)} hr ago`:`${Math.round(m/1440)} days ago`;};
   const total=d&&d.fulltime!=null?(d.allMajors||0)+(d.fulltime||0)+(d.hourly||0):null;
-  const items=[{v:total,l:"open jobs right now: internships, entry-level and part-time",c:G},{v:d?.allMajors,l:"open internships right now, every major",c:"#060A2C"},{v:d?.hiringNow,l:"companies hiring interns right now",c:"#060A2C"},{v:d?.companies,l:"company job boards we read directly",c:G}];
+  const items=[{v:total,l:"open jobs and internships right now",c:G},{v:d?.allMajors,l:"open internships right now, every major",c:"#060A2C"},{v:d?.hiringNow,l:"companies hiring interns right now",c:"#060A2C"},{v:d?.companies,l:"company job boards we read directly",c:G}];
   return (<div style={{maxWidth:760,margin:"0 auto"}}>
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:"1rem"}}>
     {items.map((s,i)=>(<div key={i} style={{background:"#fff",border:"1px solid #F2FADF",borderRadius:10,padding:"1.75rem 1.25rem",textAlign:"center",boxShadow:"none"}}>
@@ -112,14 +112,14 @@ const FEATURES=[
   {k:"season",name:"My Season",t:"Every application, one board.",d:"Saved, applied, interviewing, offer. Plus a weekly goal and follow-up nudges.",h:"/season/"},
   {k:"interview",name:"Interview practice",t:"Talk it out. Get a grade.",d:"Answer out loud against a timer, get scored on every answer and a letter grade at the end.",h:"/#interview",pg:"interview"},
 ];
-// The hero map: every dot is a real open internship whose location text names a real US city (api/listings ?dots=1).
+// The hero map: every dot is a real open job (internships, entry-level and part-time since Nov 14) whose location text names a real US city (api/listings ?dots=1).
 // Type a city ("Blacksburg, VA") or ZIP in the search and a circle shows how many are within 50 miles (the same numbers /jobs will show).
 const MILES_PX=1.609*1300/6371;   // Albers USA at scale 1300: ~0.33 px per mile (lower 48)
 function HeroMap({near,fresh,sum}){
   const [geo,setGeo]=React.useState(null),[pts,setPts]=React.useState(null),[err,setErr]=React.useState(false);
   React.useEffect(()=>{
     const get=(u)=>fetch(u).then(r=>{if(!r.ok)throw 0;return r.json();});
-    Promise.all([get("/map/us.json"),get("/api/listings?dots=1&field=all&kind=career")]).then(([g,d])=>{setGeo(g);setPts(d);}).catch(()=>setErr(true));
+    Promise.all([get("/map/us.json"),get("/api/listings?dots=1&field=all&kind=all")]).then(([g,d])=>{setGeo(g);setPts(d);}).catch(()=>setErr(true));
   },[]);
   const fmt=(n)=>n==null?"—":Number(n).toLocaleString();
   const xy=near?.meta?.near?.xy, r=near?.meta?near.meta.near.mi*MILES_PX:0;
@@ -140,7 +140,7 @@ function HeroMap({near,fresh,sum}){
       {near?.bad&&<div style={{position:"absolute",left:8,bottom:6,fontSize:13,color:"#F2B8A2",fontFamily:"Geist,sans-serif"}}>We couldn't find that city. Try “Blacksburg, VA”.</div>}
     </div>
     <div style={{borderTop:"1px solid #22304D",marginTop:10,paddingTop:8}}>
-      <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"#8D9AB3",fontFamily:"Geist,sans-serif",marginBottom:2}}><span>Just found</span><span>{sum?`${fmt(sum.allMajors)} internships · ${fmt(sum.fulltime)} jobs · ${fmt(sum.hiringNow)} companies`:""}</span></div>
+      <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"#8D9AB3",fontFamily:"Geist,sans-serif",marginBottom:2}}><span>Just found</span><span>{sum?`${fmt(sum.allMajors)} internships · ${fmt((sum.fulltime||0)+(sum.hourly||0))} jobs · ${fmt(sum.hiringNow)} companies`:""}</span></div>
       {(fresh||[]).slice(0,3).map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"flex",justifyContent:"space-between",gap:12,padding:"7px 0",borderTop:"1px solid #1A2640",textDecoration:"none",fontSize:13}}>
         <span style={{color:"#fff",fontFamily:"Geist,sans-serif",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{j.company} <span style={{color:"#8D9AB3"}}>· {j.title}</span></span><span style={{color:"#B0F701",flexShrink:0}}>{dAgo(j.first_seen)}</span></a>))}
     </div>

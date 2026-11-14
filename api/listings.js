@@ -62,7 +62,12 @@ export function parse(q) {
  *  US map (grouped into 6-px cells so nearby postings share one dot). A posting open in several cities is a dot in each
  *  (Nov 9). `placed` counts postings, not dots. Nothing is placed that the geocoder couldn't place (lib/geocode.js). */
 async function dots(p, res) {
-  const rows = await db.selectAllAsAdmin(`listings?select=geo_lat,geo_lng,geo_pts&${LIVE}${majorFilter(p)}&geo_lat=not.is.null`);
+  // Nov 14: keyset paging by id (the old offset reader stopped at 50,000 rows, so the map said "50,000" while 76k+ were live)
+  const rows = []; let last = "";
+  for (let i = 0; i < 300; i++) {
+    const page = await db.selectAsAdmin(`listings?select=id,geo_lat,geo_lng,geo_pts&${LIVE}${majorFilter(p)}&geo_lat=not.is.null${last ? `&id=gt.${encodeURIComponent(last)}` : ""}&order=id.asc&limit=1000`);
+    rows.push(...page); if (page.length < 1000) break; last = page[page.length - 1].id;
+  }
   const cells = new Map(); let placed = 0;
   for (const r of rows) {
     const pts = Array.isArray(r.geo_pts) && r.geo_pts.length ? r.geo_pts.slice(0, 25) : [[r.geo_lat, r.geo_lng]];

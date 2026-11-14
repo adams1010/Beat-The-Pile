@@ -1682,7 +1682,7 @@
   "Warehouse, delivery & supply chain": "Magazijn, bezorging & supply chain",
   "Retail & Customer Service": "Retail & klantenservice",
   "Food, Hotels & Recreation": "Horeca, hotels & recreatie",
-  "open jobs right now: internships, entry-level and part-time": "open vacatures nu: stages, starters- en bijbanen"
+  "open jobs and internships right now": "open vacatures en stages nu"
  },
  "patterns": [
   [
@@ -2036,6 +2036,22 @@
   [
    "^Searched every job type, (.+) had only a few matches\\.$",
    "Alle soorten banen doorzocht, $1 had maar een paar resultaten."
+  ],
+  [
+   "^([\\d,]+) internships$",
+   "$1 stages"
+  ],
+  [
+   "^([\\d,]+) entry-level$",
+   "$1 startersbanen"
+  ],
+  [
+   "^([\\d,]+) part-time$",
+   "$1 bijbanen"
+  ],
+  [
+   "^([\\d,]+) companies$",
+   "$1 bedrijven"
   ]
  ]
 }
