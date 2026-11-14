@@ -8,6 +8,7 @@
 //        schools/world.json  [[name, country], …]  universities outside the US, from the open "university-domains-list"
 //                            (github.com/Hipo/university-domains-list, MIT) when world_universities_and_domains.json is in <dir>
 import fs from "node:fs";
+import { cleanMajorName } from "../lib/majornames.js";
 const dir = process.argv[2];
 if (!dir) { console.error("usage: node scripts/build-schools.mjs <dir>"); process.exit(1); }
 const find = (re) => { const f = fs.readdirSync(dir).find((n) => re.test(n)); if (!f) throw new Error("missing " + re); return dir + "/" + f; };
@@ -39,17 +40,23 @@ const cip = {};
   const c = ix("CIPCODE"), t = ix("CIPTITLE");
   for (const r of it) {
     const code = String(r[c] || "").replace(/[="\s]/g, ""); if (!/^\d{2}\.\d{4}$/.test(code)) continue;
-    cip[code] = String(r[t] || "").trim().replace(/\.$/, "").replace(/,\s*General$/i, "").replace(/\s*\/\s*/g, " / ");
+    cip[code] = cleanMajorName(String(r[t] || "").trim().replace(/\.$/, "").replace(/,\s*General$/i, "").replace(/\s*\/\s*/g, " / "), code);   // Nov 14: names students say
   } }
-// 2) which programs each school awards (associate 3, bachelor's 5, master's 7; any graduate in the last year counts)
-const progs = new Map();
+// 2) which programs each school awards (associate 3, bachelor's 5, master's 7; any graduate in the last year counts).
+// Nov 14: a school that awards bachelor's degrees lists ONLY its bachelor's majors (no grad-only programs or certificates in an
+// undergrad's dropdown); a two-year college lists its associate programs; a graduate-only school its master's programs.
+const progs = new Map(), byLevel = new Map();
 { const { ix, it } = table(find(/^c20\d\d_a(_rv)?\.csv$/i));
   const u = ix("UNITID"), c = ix("CIPCODE"), a = ix("AWLEVEL"), n = ix("CTOTALT");
   for (const r of it) {
     const code = String(r[c] || "").trim(); if (!/^\d{2}\.\d{4}$/.test(code) || !cip[code]) continue;
     if (!["3", "5", "7"].includes(String(r[a]).trim()) || !(+r[n] > 0)) continue;
-    const id = +r[u]; if (!progs.has(id)) progs.set(id, new Set()); progs.get(id).add(code);
-  } }
+    const id = +r[u], lv = String(r[a]).trim();
+    if (!byLevel.has(id)) byLevel.set(id, { 3: new Set(), 5: new Set(), 7: new Set() });
+    byLevel.get(id)[lv].add(code);
+  }
+  for (const [id, L] of byLevel) progs.set(id, L[5].size ? L[5] : L[3].size ? L[3] : L[7]);
+}
 // 3) the schools
 const index = [];
 { const { ix, it } = table(find(/^hd20\d\d(_rv)?\.csv$/i));
