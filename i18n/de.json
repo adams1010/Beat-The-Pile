@@ -1744,6 +1744,7 @@
   "What's next": "Wie es weitergeht"
  },
  "patterns": [
+  ["^(.+) career fair page ↗$", "Karrieremessen-Seite von $1 ↗"],
   ["^See everything \\((\\d+) chapters\\)$", "Alles ansehen ($1 Kapitel)"],
   [
    "^([\\d,]+) open jobs from ([\\d,]+) company job boards$",

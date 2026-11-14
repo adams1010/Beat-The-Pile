@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-08",
+ "updated": "2026-11-14",
  "fairs": [
   {
    "id": "vt-business-horizons-s27",
@@ -10,7 +10,8 @@
    "when": "Feb 4, 2027",
    "where": "Blacksburg, VA",
    "source": "https://career.vt.edu/resources/career-fairs/",
-   "companies": []
+   "companies": [],
+   "unitid": 233921
   },
   {
    "id": "vt-cs-source-s27",
@@ -21,7 +22,8 @@
    "when": "Feb 9, 2027",
    "where": "Blacksburg, VA",
    "source": "https://career.vt.edu/resources/career-fairs/",
-   "companies": []
+   "companies": [],
+   "unitid": 233921
   },
   {
    "id": "vt-connection-s27",
@@ -32,7 +34,8 @@
    "when": "Feb 10, 2027",
    "where": "Blacksburg, VA",
    "source": "https://career.vt.edu/resources/career-fairs/",
-   "companies": []
+   "companies": [],
+   "unitid": 233921
   },
   {
    "id": "vt-clahs-s27",
@@ -43,7 +46,8 @@
    "when": "Feb 17, 2027",
    "where": "Blacksburg, VA",
    "source": "https://career.vt.edu/resources/career-fairs/",
-   "companies": []
+   "companies": [],
+   "unitid": 233921
   },
   {
    "id": "vt-construction-s27",
@@ -54,7 +58,8 @@
    "when": "Feb 18, 2027",
    "where": "Blacksburg, VA",
    "source": "https://career.vt.edu/resources/career-fairs/",
-   "companies": []
+   "companies": [],
+   "unitid": 233921
   },
   {
    "id": "vt-cameo-s27",
@@ -65,7 +70,8 @@
    "when": "Feb 22, 2027 (interviews Feb 23)",
    "where": "Blacksburg, VA",
    "source": "https://career.vt.edu/resources/career-fairs/",
-   "companies": []
+   "companies": [],
+   "unitid": 233921
   },
   {
    "id": "vt-real-estate-s27",
@@ -76,7 +82,8 @@
    "when": "Feb 23, 2027",
    "where": "Blacksburg, VA",
    "source": "https://career.vt.edu/resources/career-fairs/",
-   "companies": []
+   "companies": [],
+   "unitid": 233921
   },
   {
    "id": "vt-expo",
@@ -1035,7 +1042,8 @@
      "domain": "zim-aircraft-seating.com"
     }
    ],
-   "term": "Fall 2026"
+   "term": "Fall 2026",
+   "unitid": 233921
   },
   {
    "id": "vt-aero-defense",
@@ -1222,7 +1230,8 @@
      "name": "US Army DEVCOM CBC"
     }
    ],
-   "term": "Fall 2026"
+   "term": "Fall 2026",
+   "unitid": 233921
   },
   {
    "id": "vt-construction",
@@ -1848,8 +1857,513 @@
      "domain": "wrallp.com"
     }
    ],
-   "term": "Spring 2026"
+   "term": "Spring 2026",
+   "unitid": 233921
+  },
+  {
+   "id": "psu-spring-career-days-s27",
+   "name": "Spring Career Days",
+   "school": "Penn State",
+   "term": "Spring 2027",
+   "date": "2027-01-27",
+   "when": "Jan 27–28, 2027",
+   "where": "University Park, PA",
+   "source": "https://studentaffairs.psu.edu/career/fairs/spring/student/before",
+   "companies": [],
+   "unitid": 214777
+  },
+  {
+   "id": "purdue-college-of-agriculture-career-fair-s27",
+   "name": "College of Agriculture Career Fair",
+   "school": "Purdue University",
+   "term": "Spring 2027",
+   "date": "2027-02-24",
+   "when": "Feb 24, 2027",
+   "where": "West Lafayette, IN",
+   "source": "https://ag.purdue.edu/department/oap/career/employers.html",
+   "companies": [],
+   "unitid": 243780
+  },
+  {
+   "id": "tamu-engineering-honors-career-fair-s27",
+   "name": "Engineering Honors Career Fair",
+   "school": "Texas A&M University",
+   "term": "Spring 2027",
+   "date": "2027-01-29",
+   "when": "Jan 29, 2027",
+   "where": "College Station, TX",
+   "source": "https://careercenter.tamu.edu/events/career-fairs",
+   "companies": [],
+   "unitid": 228723
+  },
+  {
+   "id": "tamu-engineering-career-fair-s27",
+   "name": "Engineering Career Fair",
+   "school": "Texas A&M University",
+   "term": "Spring 2027",
+   "date": "2027-02-03",
+   "when": "Feb 3–4, 2027",
+   "where": "Bryan, TX",
+   "source": "https://careercenter.tamu.edu/events/career-fairs",
+   "companies": [],
+   "unitid": 228723
+  },
+  {
+   "id": "tamu-construction-science-career-fair-s27",
+   "name": "Construction Science Career Fair",
+   "school": "Texas A&M University",
+   "term": "Spring 2027",
+   "date": "2027-02-18",
+   "when": "Feb 18, 2027",
+   "where": "Bryan, TX",
+   "source": "https://texasam-architecture.foleon.com/newsletters/ciac-spring-2026/upcoming-events",
+   "companies": [],
+   "unitid": 228723
+  },
+  {
+   "id": "ua-technical-and-engineering-career-fair-s27",
+   "name": "Technical and Engineering Career Fair",
+   "school": "University of Alabama",
+   "term": "Spring 2027",
+   "date": "2027-02-23",
+   "when": "Feb 23, 2027",
+   "where": "Tuscaloosa, AL",
+   "source": "https://career.sa.ua.edu/employers/career-fairs/",
+   "companies": [],
+   "unitid": 100751
+  },
+  {
+   "id": "ua-general-interest-and-business-career-fai-s27",
+   "name": "General Interest and Business Career Fair",
+   "school": "University of Alabama",
+   "term": "Spring 2027",
+   "date": "2027-02-24",
+   "when": "Feb 24, 2027",
+   "where": "Tuscaloosa, AL",
+   "source": "https://career.sa.ua.edu/employers/career-fairs/",
+   "companies": [],
+   "unitid": 100751
+  },
+  {
+   "id": "csuf-engineering-computer-science-career-fair-s27",
+   "name": "Engineering & Computer Science Career Fair",
+   "school": "Cal State Fullerton",
+   "term": "Spring 2027",
+   "date": "2027-02-17",
+   "when": "Feb 17, 2027",
+   "where": "Fullerton, CA",
+   "source": "https://www.fullerton.edu/career/events/career-fairs-expos.html",
+   "companies": [],
+   "unitid": 110565
+  },
+  {
+   "id": "csuf-spring-internship-career-fair-s27",
+   "name": "Spring Internship & Career Fair",
+   "school": "Cal State Fullerton",
+   "term": "Spring 2027",
+   "date": "2027-04-07",
+   "when": "Apr 7, 2027",
+   "where": "Fullerton, CA",
+   "source": "https://www.fullerton.edu/career/events/career-fairs-expos.html",
+   "companies": [],
+   "unitid": 110565
+  },
+  {
+   "id": "ncsu-ise-mem-career-fair-s27",
+   "name": "ISE/MEM Career Fair",
+   "school": "NC State University",
+   "term": "Spring 2027",
+   "date": "2027-01-27",
+   "when": "Jan 27, 2027",
+   "where": "Raleigh, NC",
+   "source": "https://careers.dasa.ncsu.edu/gain-experience/career-fairs/",
+   "companies": [],
+   "unitid": 199193
+  },
+  {
+   "id": "ncsu-mechanical-and-aerospace-engineering-car-s27",
+   "name": "Mechanical and Aerospace Engineering Career Fair",
+   "school": "NC State University",
+   "term": "Spring 2027",
+   "date": "2027-01-28",
+   "when": "Jan 28, 2027",
+   "where": "Raleigh, NC",
+   "source": "https://careers.dasa.ncsu.edu/gain-experience/career-fairs/",
+   "companies": [],
+   "unitid": 199193
+  },
+  {
+   "id": "ncsu-engineering-career-fair-s27",
+   "name": "Engineering Career Fair",
+   "school": "NC State University",
+   "term": "Spring 2027",
+   "date": "2027-02-02",
+   "when": "Feb 2, 2027",
+   "where": "Raleigh, NC",
+   "source": "https://careers.dasa.ncsu.edu/gain-experience/career-fairs/",
+   "companies": [],
+   "unitid": 199193
+  },
+  {
+   "id": "ncsu-civil-construction-environmental-enginee-s27",
+   "name": "Civil, Construction & Environmental Engineering Career Connections",
+   "school": "NC State University",
+   "term": "Spring 2027",
+   "date": "2027-02-08",
+   "when": "Feb 8–9, 2027",
+   "where": "Raleigh, NC",
+   "source": "https://careers.dasa.ncsu.edu/gain-experience/career-fairs/",
+   "companies": [],
+   "unitid": 199193
+  },
+  {
+   "id": "ncsu-design-career-expo-s27",
+   "name": "Design Career Expo",
+   "school": "NC State University",
+   "term": "Spring 2027",
+   "date": "2027-02-10",
+   "when": "Feb 10, 2027",
+   "where": "Raleigh, NC",
+   "source": "https://careers.dasa.ncsu.edu/gain-experience/career-fairs/",
+   "companies": [],
+   "unitid": 199193
+  },
+  {
+   "id": "ncsu-biomanufacturing-btec-career-fair-s27",
+   "name": "Biomanufacturing (BTEC) Career Fair",
+   "school": "NC State University",
+   "term": "Spring 2027",
+   "date": "2027-02-19",
+   "when": "Feb 19, 2027",
+   "where": "Raleigh, NC",
+   "source": "https://btec.ncsu.edu/career-fairs/",
+   "companies": [],
+   "unitid": 199193
+  },
+  {
+   "id": "uiuc-grainger-engineering-career-fair-s27",
+   "name": "Grainger Engineering Career Fair",
+   "school": "University of Illinois Urbana-Champaign",
+   "term": "Spring 2027",
+   "date": "2027-02-03",
+   "when": "Feb 3, 2027",
+   "where": "Urbana, IL",
+   "source": "https://ecs.grainger.illinois.edu/employer-resources/career-fair",
+   "companies": [],
+   "unitid": 145637
+  },
+  {
+   "id": "uiuc-grainger-engineering-virtual-career-fair-s27",
+   "name": "Grainger Engineering Virtual Career Fair",
+   "school": "University of Illinois Urbana-Champaign",
+   "term": "Spring 2027",
+   "date": "2027-02-18",
+   "when": "Feb 18, 2027",
+   "where": "Online",
+   "source": "https://ecs.grainger.illinois.edu/employer-resources/career-fair",
+   "companies": [],
+   "unitid": 145637
+  },
+  {
+   "id": "usf-job-internship-fair-s27",
+   "name": "Job & Internship Fair",
+   "school": "University of South Florida",
+   "term": "Spring 2027",
+   "date": "2027-02-09",
+   "when": "Feb 9, 2027",
+   "where": "Tampa, FL",
+   "source": "https://careers.usf.edu/resources/career-fairs-and-events/",
+   "companies": [],
+   "unitid": 137351
+  },
+  {
+   "id": "usf-engineering-ai-tech-career-fair-s27",
+   "name": "Engineering, AI & Tech Career Fair",
+   "school": "University of South Florida",
+   "term": "Spring 2027",
+   "date": "2027-02-16",
+   "when": "Feb 16, 2027",
+   "where": "Tampa, FL",
+   "source": "https://careers.usf.edu/resources/career-fairs-and-events/",
+   "companies": [],
+   "unitid": 137351
+  },
+  {
+   "id": "usf-civil-engineering-career-fair-s27",
+   "name": "Civil Engineering Career Fair",
+   "school": "University of South Florida",
+   "term": "Spring 2027",
+   "date": "2027-02-17",
+   "when": "Feb 17, 2027",
+   "where": "Tampa, FL",
+   "source": "https://careers.usf.edu/resources/career-fairs-and-events/",
+   "companies": [],
+   "unitid": 137351
+  },
+  {
+   "id": "usf-nursing-healthcare-career-fair-s27",
+   "name": "Nursing & Healthcare Career Fair",
+   "school": "University of South Florida",
+   "term": "Spring 2027",
+   "date": "2027-02-25",
+   "when": "Feb 25, 2027",
+   "where": "Tampa, FL",
+   "source": "https://careers.usf.edu/resources/career-fairs-and-events/",
+   "companies": [],
+   "unitid": 137351
+  },
+  {
+   "id": "gt-supply-chain-day-s27",
+   "name": "Supply Chain Day",
+   "school": "Georgia Tech",
+   "term": "Spring 2027",
+   "date": "2027-01-20",
+   "when": "Jan 20, 2027",
+   "where": "Atlanta, GA",
+   "source": "https://gatech-csm.symplicity.com/events/upcoming",
+   "companies": [],
+   "unitid": 139755
+  },
+  {
+   "id": "gt-all-majors-career-fair-s27",
+   "name": "All-Majors Career Fair",
+   "school": "Georgia Tech",
+   "term": "Spring 2027",
+   "date": "2027-01-25",
+   "when": "Jan 25–26, 2027",
+   "where": "Atlanta, GA",
+   "source": "https://gatech-csm.symplicity.com/events/upcoming",
+   "companies": [],
+   "unitid": 139755
+  },
+  {
+   "id": "gt-electrical-computer-engineering-career-f-s27",
+   "name": "Electrical & Computer Engineering Career Fair",
+   "school": "Georgia Tech",
+   "term": "Spring 2027",
+   "date": "2027-01-28",
+   "when": "Jan 28, 2027",
+   "where": "Atlanta, GA",
+   "source": "https://gatech-csm.symplicity.com/events/upcoming",
+   "companies": [],
+   "unitid": 139755
+  },
+  {
+   "id": "gt-mechanical-engineering-asme-career-fair-s27",
+   "name": "Mechanical Engineering & ASME Career Fair",
+   "school": "Georgia Tech",
+   "term": "Spring 2027",
+   "date": "2027-01-29",
+   "when": "Jan 29, 2027",
+   "where": "Atlanta, GA",
+   "source": "https://gatech-csm.symplicity.com/events/upcoming",
+   "companies": [],
+   "unitid": 139755
+  },
+  {
+   "id": "mtu-spring-career-fair-s27",
+   "name": "Spring Career Fair",
+   "school": "Michigan Tech",
+   "term": "Spring 2027",
+   "date": "2027-02-16",
+   "when": "Feb 16, 2027",
+   "where": "Houghton, MI",
+   "source": "https://mtu.edu/career/events/career-fest",
+   "companies": [],
+   "unitid": 171128
+  },
+  {
+   "id": "jmu-cise-career-internship-fair-s27",
+   "name": "CISE Career & Internship Fair",
+   "school": "James Madison University",
+   "term": "Spring 2027",
+   "date": "2027-02-09",
+   "when": "Feb 9, 2027",
+   "where": "Harrisonburg, VA",
+   "source": "https://www.jmu.edu/career/careerfairs/index.shtml",
+   "companies": [],
+   "unitid": 232423
+  },
+  {
+   "id": "jmu-career-and-internship-fair-s27",
+   "name": "Career and Internship Fair",
+   "school": "James Madison University",
+   "term": "Spring 2027",
+   "date": "2027-02-16",
+   "when": "Feb 16–17, 2027",
+   "where": "Harrisonburg, VA",
+   "source": "https://www.jmu.edu/career/careerfairs/index.shtml",
+   "companies": [],
+   "unitid": 232423
+  },
+  {
+   "id": "jmu-education-recruitment-day-s27",
+   "name": "Education Recruitment Day",
+   "school": "James Madison University",
+   "term": "Spring 2027",
+   "date": "2027-03-04",
+   "when": "Mar 4, 2027",
+   "where": "Harrisonburg, VA",
+   "source": "https://www.jmu.edu/career/careerfairs/index.shtml",
+   "companies": [],
+   "unitid": 232423
+  },
+  {
+   "id": "vcu-nonprofit-public-human-services-fair-s27",
+   "name": "Nonprofit, Public & Human Services Fair",
+   "school": "Virginia Commonwealth University",
+   "term": "Spring 2027",
+   "date": "2027-02-10",
+   "when": "Feb 10, 2027",
+   "where": "Richmond, VA",
+   "source": "https://careers.vcu.edu/career-fairs---events",
+   "companies": [],
+   "unitid": 234030
+  },
+  {
+   "id": "vcu-creative-careers-showcase-s27",
+   "name": "Creative Careers Showcase",
+   "school": "Virginia Commonwealth University",
+   "term": "Spring 2027",
+   "date": "2027-03-19",
+   "when": "Mar 19, 2027",
+   "where": "Richmond, VA",
+   "source": "https://careers.vcu.edu/career-fairs---events",
+   "companies": [],
+   "unitid": 234030
+  },
+  {
+   "id": "vcu-spring-career-fair-s27",
+   "name": "Spring Career Fair",
+   "school": "Virginia Commonwealth University",
+   "term": "Spring 2027",
+   "date": "2027-04-07",
+   "when": "Apr 7, 2027",
+   "where": "Richmond, VA",
+   "source": "https://careers.vcu.edu/career-fairs---events",
+   "companies": [],
+   "unitid": 234030
+  },
+  {
+   "id": "uf-computer-information-science-engineering-s27",
+   "name": "Computer & Information Science & Engineering and AI Fair",
+   "school": "University of Florida",
+   "term": "Spring 2027",
+   "date": "2027-01-25",
+   "when": "Jan 25, 2027",
+   "where": "Gainesville, FL",
+   "source": "https://career.ufl.edu/events-and-programs/career-fairs/",
+   "companies": [],
+   "unitid": 134130
+  },
+  {
+   "id": "uf-career-showcase-non-technical-day-s27",
+   "name": "Career Showcase: Non-Technical Day",
+   "school": "University of Florida",
+   "term": "Spring 2027",
+   "date": "2027-01-26",
+   "when": "Jan 26, 2027",
+   "where": "Gainesville, FL",
+   "source": "https://career.ufl.edu/events-and-programs/career-fairs/",
+   "companies": [],
+   "unitid": 134130
+  },
+  {
+   "id": "uf-career-showcase-technical-day-s27",
+   "name": "Career Showcase: Technical Day",
+   "school": "University of Florida",
+   "term": "Spring 2027",
+   "date": "2027-01-27",
+   "when": "Jan 27, 2027",
+   "where": "Gainesville, FL",
+   "source": "https://career.ufl.edu/events-and-programs/career-fairs/",
+   "companies": [],
+   "unitid": 134130
+  },
+  {
+   "id": "uf-helps-fair-healthcare-education-law-publ-s27",
+   "name": "HELPS Fair (Healthcare, Education, Law, Public Service)",
+   "school": "University of Florida",
+   "term": "Spring 2027",
+   "date": "2027-02-24",
+   "when": "Feb 24, 2027",
+   "where": "Gainesville, FL",
+   "source": "https://career.ufl.edu/events-and-programs/career-fairs/",
+   "companies": [],
+   "unitid": 134130
+  },
+  {
+   "id": "ut-spring-engineering-expo-s27",
+   "name": "Spring Engineering Expo",
+   "school": "University of Texas at Austin",
+   "term": "Spring 2027",
+   "date": "2027-01-28",
+   "when": "Jan 28, 2027",
+   "where": "Austin, TX",
+   "source": "https://cockrell.utexas.edu/student-life/career-services/career-fairs/engineering-expo-information-for-students",
+   "companies": [],
+   "unitid": 228778
+  },
+  {
+   "id": "umn-job-internship-fair-s27",
+   "name": "Job & Internship Fair",
+   "school": "University of Minnesota",
+   "term": "Spring 2027",
+   "date": "2027-02-26",
+   "when": "Feb 26, 2027",
+   "where": "Minneapolis, MN",
+   "source": "https://jobfair.umn.edu/employer",
+   "companies": [],
+   "unitid": 174066
+  },
+  {
+   "id": "mnsu-engineering-career-and-internship-fair-s27",
+   "name": "Engineering Career and Internship Fair",
+   "school": "Minnesota State University, Mankato",
+   "term": "Spring 2027",
+   "date": "2027-02-16",
+   "when": "Feb 16, 2027",
+   "where": "Mankato, MN",
+   "source": "https://mankato.mnsu.edu/university-life/career-development-center/events-and-fairs",
+   "companies": [],
+   "unitid": 173920
+  },
+  {
+   "id": "mnsu-spring-career-and-internship-fair-s27",
+   "name": "Spring Career and Internship Fair",
+   "school": "Minnesota State University, Mankato",
+   "term": "Spring 2027",
+   "date": "2027-02-24",
+   "when": "Feb 24, 2027",
+   "where": "Mankato, MN",
+   "source": "https://mankato.mnsu.edu/university-life/career-development-center/events-and-fairs/spring-career-and-internship-fair-2027/",
+   "companies": [],
+   "unitid": 173920
+  },
+  {
+   "id": "scsu-winter-career-fair-s27",
+   "name": "Winter Career Fair",
+   "school": "St. Cloud State University",
+   "term": "Spring 2027",
+   "date": "2027-02-05",
+   "when": "Feb 5, 2027",
+   "where": "St. Cloud, MN",
+   "source": "https://www.stcloudstate.edu/careercenter/employers/fairs.aspx",
+   "companies": [],
+   "unitid": 174783
+  },
+  {
+   "id": "uwstout-spring-career-conference-s27",
+   "name": "Spring Career Conference",
+   "school": "University of Wisconsin-Stout",
+   "term": "Spring 2027",
+   "date": "2027-02-22",
+   "when": "Feb 22–25, 2027",
+   "where": "Menomonie, WI",
+   "source": "https://eda.uwstout.edu/node/10836",
+   "companies": [],
+   "unitid": 240417
   }
  ],
- "note": "Spring 2027 dates from VT Career & Professional Development (https://career.vt.edu/resources/career-fairs/), read Nov 7 2026. Employer lists are added when VT posts them on Handshake."
+ "note": "Spring 2027 dates from each school's own career-fair page (the source link on every fair), read Nov 14 2026. Employer lists are added when schools post them."
 }

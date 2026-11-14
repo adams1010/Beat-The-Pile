@@ -1744,6 +1744,7 @@
   "What's next": "Wat komt er"
  },
  "patterns": [
+  ["^(.+) career fair page ↗$", "Banenbeurspagina van $1 ↗"],
   ["^See everything \\((\\d+) chapters\\)$", "Alles bekijken ($1 hoofdstukken)"],
   [
    "^([\\d,]+) open jobs from ([\\d,]+) company job boards$",

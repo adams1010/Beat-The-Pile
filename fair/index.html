@@ -249,6 +249,10 @@
     S.user = u || null; S.me = { resume: null, notes: [], starred: [] }; S.loaded = false;
     renderAcct();
     if (S.user) { try { S.me = await api("GET"); S.loaded = true; } catch (e) { toast(e.message); } }
+    // First visit from a signed-in student: open their own school's next fair
+    const sid = S.me?.profile?.schoolId;
+    if (sid && S.fairs?.length) { const had = store.get("btp_school_id"); store.set("btp_school_id", String(sid));
+      const f = nextAtSchool(sid); if (f && !had && !store.get("iq_fair") && !new URLSearchParams(location.search).get("fair") && S.fair?.id !== f.id) pickFair(f.id); }
     renderAll();
     if (S.user && S.draft) { const d = S.draft; S.draft = null; openNote(d.company, d.companyId, d); }
   }
@@ -277,12 +281,19 @@
     // Nov 13: default = the next fair that hasn't happened yet (was the first one with a list, a fair that ended in September)
     const today = new Date().toISOString().slice(0, 10);
     const next = S.fairs.filter((f) => f.date && f.date >= today).sort((a, b) => a.date.localeCompare(b.date))[0];
-    const want = new URLSearchParams(location.search).get("fair") || store.get("iq_fair") || (next || S.fairs.find((f) => f.companies.length) || S.fairs[0])?.id;
+    // Nov 14: fairs from 20 schools; prefer the next fair at YOUR school (profile schoolId, remembered on this device)
+    const mine = nextAtSchool(store.get("btp_school_id"));
+    const want = new URLSearchParams(location.search).get("fair") || store.get("iq_fair") || (mine || next || S.fairs.find((f) => f.companies.length) || S.fairs[0])?.id;
     // Grouped by school; every option says its term ("Business Horizons Career Fair — Spring 2027")
     const schools = [...new Set(S.fairs.map((f) => f.school))];
     $("#fairsel").innerHTML = schools.map((sc) => `<optgroup label="${esc(sc)}">${S.fairs.filter((f) => f.school === sc)
       .map((f) => `<option value="${esc(f.id)}">${esc(f.name + (f.term ? " · " + f.term : ""))}</option>`).join("")}</optgroup>`).join("");
     pickFair(S.fairs.find((f) => f.id === want) ? want : S.fairs[0].id);
+  }
+  function nextAtSchool(uid){
+    if (!uid) return null; const today = new Date().toISOString().slice(0, 10);
+    const at = S.fairs.filter((f) => String(f.unitid || "") === String(uid));
+    return at.filter((f) => f.date && f.date >= today).sort((a, b) => a.date.localeCompare(b.date))[0] || at[0] || null;
   }
   async function pickFair(id){
     S.fair = S.fairs.find((f) => f.id === id); store.set("iq_fair", id);
@@ -362,7 +373,7 @@
       $("#chips").innerHTML = "";
       $("#cos").innerHTML = `<div class="empty"><b>${esc(S.fair.name)}, ${esc(S.fair.term || "")}</b><br>${esc(S.fair.when || "")} · ${esc(S.fair.where || "")}<br><br>
         The employer list isn't out yet. VT usually posts it on Handshake a week or two before the fair, and we'll add it here with every company's open internships.
-        ${S.fair.source ? `<br><a href="${esc(S.fair.source)}" target="_blank" rel="noopener">VT's career fair calendar ↗</a>` : ""}
+        ${S.fair.source ? `<br><a href="${esc(S.fair.source)}" target="_blank" rel="noopener">${esc(S.fair.school)} career fair page ↗</a>` : ""}
         ${(() => { const past = S.fairs.filter((f) => f.companies.length && f.school === S.fair.school); return past.length ? `<br><br>Until then, see who came last time:<br>${past.map((f) => `<button type="button" class="linkbtn" data-pastfair="${esc(f.id)}">${esc(f.name)} · ${esc(f.term || "")} (${f.companies.length} employers)</button>`).join("<br>")}` : ""; })()}</div>`;
       $("#cos").querySelectorAll("[data-pastfair]").forEach((b) => b.addEventListener("click", () => pickFair(b.dataset.pastfair)));
       return;
