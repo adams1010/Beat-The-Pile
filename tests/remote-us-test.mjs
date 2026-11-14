@@ -28,3 +28,27 @@ assert.equal(by["3"].state, "CA", "big city without a state");
 assert.equal(by["4"].state, "US"); assert.equal(by["4"].geo_kind, "remote", "US-wide remote");
 assert.ok(!by["5"] && !by["6"] && !by["7"], "Canada, London and a Lisbon-only office stay out");
 console.log("✓ remote/US: Greenhouse offices fill 'Hybrid'/'In-Office', big cities without a state, US-wide remote kept; foreign stays out");
+
+// Nov 14 sweep: foreign places never get a US state from a bare city, a "Remote", a 2-letter country code or the URL
+{
+  const assert = (await import("node:assert/strict")).default;
+  const { extractStates, isForeignPlace } = await import("../lib/filter.js");
+  for (const t of ["Santa Marta, Colombia, Colombia, CO", "Colombia, CO", "Indonesia, ID | Singapore, SG | Australia, AU"]) assert.deepEqual(extractStates(t), [], t);
+  for (const t of ["Cambridge, Cambridgeshire, United Kingdom, GB", "Huntsville, Canada", "Vancouver | Toronto | Calgary", "Remote, Mexico"]) assert.ok(isForeignPlace(t), t);
+  for (const t of ["Denver, CO", "Boise, ID", "Remote, United States", "San Francisco - SF9", "Vancouver, WA"]) assert.ok(!isForeignPlace(t), t);
+  assert.deepEqual(extractStates("Denver, CO"), ["CO"]); assert.deepEqual(extractStates("Boise, ID"), ["ID"]);
+  console.log("✓ foreign places (Colombia CO, Indonesia ID, Cambridge UK, Vancouver|Toronto) stay out; Denver CO, Boise ID stay in");
+}
+
+// Nov 14 sweep: titles that carry an internal status ("Unsubscribed - …", "Offline - …") are not real openings
+{
+  const assert = (await import("node:assert/strict")).default;
+  const jobs = [{ id: 1, title: "Unsubscribed - Brand Ambassador (Sales Associate)", location: { name: "Austin, TX" }, absolute_url: "https://x/1" },
+    { id: 2, title: "Offline - Brand Ambassador (Sales Associate)", location: { name: "Austin, TX" }, absolute_url: "https://x/2" },
+    { id: 3, title: "AE - Brand Ambassador (Sales Associate)", location: { name: "Austin, TX" }, absolute_url: "https://x/3" }];
+  globalThis.fetch = async () => ({ ok: true, status: 200, headers: new Map(), json: async () => ({ jobs }), text: async () => JSON.stringify({ jobs }) });
+  const { fetchCompany } = await import("../lib/fetchers/index.js");
+  const { listings } = await fetchCompany({ id: "x-ae", company: "AE", ats: "greenhouse", token: "ae" });
+  assert.deepEqual(listings.map((l) => l.id), ["x-ae:3"]);
+  console.log("✓ 'Unsubscribed -' / 'Offline -' titles dropped");
+}
