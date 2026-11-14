@@ -21,6 +21,7 @@ const READERS_UPDATED_AT = "2026-11-13T16:00:00Z";   // Nov 13: re-test Ashby/iC
 const inSeason = (d = new Date()) => { const m = d.getUTCMonth(); return m >= 7 || m <= 1; };
 const RETRY_AFTER_DAYS = inSeason() ? 7 : 14;
 const MAX_TRIES = 6;
+const BUSY_RETRY_HOURS = 6;          // Nov 14: 5xx = the board was down (Workday's Saturday maintenance), not gone
 const BOARD_ERROR_RETRY_DAYS = 2;    // Nov 10: a board that errored is usually a hiccup — try again in 2 days, not 1–2 weeks
 const RESCUE_AT = "2026-11-10T18:00:00Z";   // Nov 10: held-back boards with no website on file get one re-check with the website rescue
 
@@ -116,8 +117,10 @@ export default async function handler(req, res) {
   // 3) Next batch: never-tried first; failures get retried after RETRY_AFTER_DAYS (max MAX_TRIES tries)
   const cutoff = new Date(Date.now() - RETRY_AFTER_DAYS * 86400000).toISOString();
   const cutoffErr = new Date(Date.now() - BOARD_ERROR_RETRY_DAYS * 86400000).toISOString();
+  // Nov 14: a board that answered 5xx (Workday maintenance, a 521 from its firewall) was just down: try again after 6 hours
+  const cutoffBusy = new Date(Date.now() - BUSY_RETRY_HOURS * 3600000).toISOString();
   const rows = await db.selectAsAdmin(
-    `company_candidates?select=*&or=(status.eq.pending,and(status.in.(error,blocked,no_board,board_error),checked_at.lt.${cutoff},attempts.lt.${MAX_TRIES}),and(status.eq.board_error,checked_at.lt.${cutoffErr},attempts.lt.${MAX_TRIES}))` +
+    `company_candidates?select=*&or=(status.eq.pending,and(status.in.(error,blocked,no_board,board_error),checked_at.lt.${cutoff},attempts.lt.${MAX_TRIES}),and(status.eq.board_error,checked_at.lt.${cutoffErr},attempts.lt.${MAX_TRIES}),and(status.eq.board_error,detail.ilike.*answered%205*,checked_at.lt.${cutoffBusy},attempts.lt.${MAX_TRIES}))` +
     `&order=priority.desc,checked_at.asc.nullsfirst&limit=${Math.min(+req.query?.n || PER_RUN, PER_RUN)}`
   );
 
