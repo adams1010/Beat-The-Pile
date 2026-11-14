@@ -16,9 +16,10 @@ console.log("✓ BambooHR list parsed (locations, remote, employment type)");
 globalThis.fetch = async (u) => ({ ok: true, status: 200, headers: { get: () => "application/json" }, json: async () => list, text: async () => JSON.stringify(list) });
 const { fetchCompany } = await import("../lib/fetchers/index.js");
 const { listings } = await fetchCompany({ id: "b-aclu-ga", ats: "bamboohr", token: "acluga", company: "ACLU of Georgia" });
-assert.deepEqual(listings.map((l) => l.title), ["2027 Spring Legal Externship"], "remote with no US state is dropped, same as every other board system");
+assert.deepEqual(listings.map((l) => l.title), ["2027 Spring Legal Externship", "Policy Intern"], "US-wide remote is kept (Nov 14) with state US");
+assert.equal(listings[1].state, "US");
 assert.ok(listings.every((l) => l.company === "ACLU of Georgia"));
-console.log("✓ fetchCompany: board's Internship type counts; non-US, stateless remote and full-time dropped");
+console.log("✓ fetchCompany: board's Internship type counts; US remote kept; non-US and full-time dropped");
 
 // detection on a company's careers page + proof by the board's own registered name
 const { scanHtml, discoverOne } = await import("../lib/discover.js");
