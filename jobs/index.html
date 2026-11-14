@@ -534,7 +534,7 @@
       $("count").textContent = `${sumTotal.toLocaleString("en-US")} open jobs across the US · newest ${nOpen} shown. Pick a state or search to see the rest`;
     } else $("count").textContent = rows.length
       ? `${nOpen} ${state.kind === "fulltime" ? "entry-level job" : state.kind === "hourly" ? "part-time & hourly job" : state.kind === "all" ? "job" : "internship"}${openings === 1 ? "" : "s"} at ${companies.toLocaleString("en-US")} compan${companies === 1 ? "y" : "ies"} ${where}` +
-        (state.savedOnly || state.followOnly ? "" : ` · ${MAJOR_LABEL()}`) + (simRows.length ? ` · plus ${simRows.length} similar` : "") + (state.partial && !state.savedOnly && !state.followOnly ? " so far · loading the rest…" : "")
+        (state.savedOnly || state.followOnly ? "" : ` · ${MAJOR_LABEL()}`) + (simRows.length ? ` · plus ${simRows.length} similar` : "") + (relRows.length ? ` · ${relRows.length.toLocaleString("en-US")} more ${window.btpCats?.CAT?.[state.relCat]?.label || ""} jobs below` : "") + (state.partial && !state.savedOnly && !state.followOnly ? " so far · loading the rest…" : "")
       : simRows.length ? `${simRows.length} similar ${state.kind === "intern" ? "internship" : "job"}${simRows.length === 1 ? "" : "s"} ${where}` : "";
 
     renderMailme(rows.length);

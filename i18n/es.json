@@ -2078,6 +2078,10 @@
   [
    "^([\\d,]+) more in the same area of work\\.$",
    "$1 más en la misma área de trabajo."
+  ],
+  [
+   "^([\\d,]+) more (.+) jobs below$",
+   "$1 empleos más de $2 abajo"
   ]
  ]
 }

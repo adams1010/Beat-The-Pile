@@ -2078,6 +2078,10 @@
   [
    "^([\\d,]+) more in the same area of work\\.$",
    "$1 meer in hetzelfde vakgebied."
+  ],
+  [
+   "^([\\d,]+) more (.+) jobs below$",
+   "$1 meer $2-vacatures hieronder"
   ]
  ]
 }
