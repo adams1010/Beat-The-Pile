@@ -109,8 +109,9 @@ async function load() {
   store.set({ kind: S.kind, cat: S.cat, where: S.where });
   history.replaceState(null, "", location.pathname + (S.cat || S.where || S.kind !== "all" ? "?" + new URLSearchParams(Object.entries({ cat: S.cat, near: S.where, kind: S.kind !== "all" ? S.kind : "" }).filter(([, v]) => v)) : ""));
   try {
-    const r = await fetch(url());
-    const d = await r.json().catch(() => ({}));
+    // newest 3,000 (three pages at once): a single big company batch can fill 1,000 rows in a few minutes
+    const res = await Promise.all([0, 1000, 2000].map((o) => fetch(url({ offset: String(o) })).then(async (r) => ({ r, d: await r.json().catch(() => ({})) }))));
+    const { r, d } = res[0]; d.listings = res.flatMap((x) => x.r.ok ? x.d.listings || [] : []);
     if (!r.ok) { $("feed").innerHTML = `<div class="err" role="alert">${esc(d.error || "Couldn’t load the drops right now. That’s on our side, not a sign there are no new jobs. Try again in a minute.")}</div>`; $("pulse").innerHTML = ""; return; }
     rows = (d.listings || []).slice().sort((a, b) => new Date(b.first_seen) - new Date(a.first_seen));
     seen = new Set(rows.map((x) => x.id));
@@ -120,14 +121,14 @@ async function load() {
 function draw() {
   const now = Date.now(), day = rows.filter((l) => now - new Date(l.first_seen) < DAY), hour = rows.filter((l) => now - new Date(l.first_seen) < HOUR);
   const coDay = new Map(); for (const l of day) coDay.set(l.company_id || l.company, (coDay.get(l.company_id || l.company) || 0) + 1);
-  const capped = rows.length >= 1000 && day.length === rows.length;
-  $("pulse").innerHTML = `<span><b>${hour.length.toLocaleString("en-US")}</b>in the last hour</span><span><b>${day.length.toLocaleString("en-US")}${capped ? "+" : ""}</b>in the last 24 hours</span><span><b>${coDay.size.toLocaleString("en-US")}</b>companies hiring today</span>`;
+  const full = rows.length >= 3000, capped = full && day.length === rows.length, hcap = full && hour.length === rows.length;
+  $("pulse").innerHTML = `<span><b>${hour.length.toLocaleString("en-US")}${hcap ? "+" : ""}</b>in the last hour</span><span><b>${day.length.toLocaleString("en-US")}${capped ? "+" : ""}</b>in the last 24 hours</span><span><b>${coDay.size.toLocaleString("en-US")}</b>companies hiring today</span>`;
   if (!rows.length) { $("feed").innerHTML = `<div class="empty">No drops here yet. Try another category or a wider place.</div>`; return; }
   // Hiring sprees: one company, 5+ new jobs in the last 24 hours → one card in the timeline where its first job would be
   const spree = new Map(); for (const [co, n] of coDay) if (n >= 5) spree.set(co, day.filter((l) => (l.company_id || l.company) === co));
   const shownSpree = new Set();
   let html = "", lastB = "";
-  for (const l of rows.slice(0, 400)) {
+  for (const l of rows.slice(0, 1200)) {
     const t = new Date(l.first_seen).getTime(), [bk, bl] = bucketOf(t), key = l.company_id || l.company;
     if (bk !== lastB) { const n = rows.filter((x) => bucketOf(new Date(x.first_seen).getTime())[0] === bk).length;
       html += `<div class="bucket${bk === "now" ? " now" : ""}">${bl}<span>${n.toLocaleString("en-US")} ${n === 1 ? "drop" : "drops"}</span></div>`; lastB = bk; }
@@ -143,7 +144,7 @@ function draw() {
       <div class="tags"><span class="tag">${kindTag(l.kind)}</span>${d1 ? '<span class="tag d1">Day 1</span>' : ""}</div></div>
       <a class="apply" href="${esc(l.url)}" target="_blank" rel="noopener">Apply</a></article>`;
   }
-  if (rows.length > 400) html += `<div class="empty">That's the newest 400. <a href="/jobs/?kind=all${S.cat ? "&cat=" + S.cat : ""}${S.where ? "&near=" + encodeURIComponent(S.where) : ""}">See every job on the Jobs page</a></div>`;
+  if (rows.length > 1200) html += `<div class="empty">That's the newest 1,200. <a href="/jobs/?kind=all${S.cat ? "&cat=" + S.cat : ""}${S.where ? "&near=" + encodeURIComponent(S.where) : ""}">See every job on the Jobs page</a></div>`;
   $("feed").innerHTML = `<div class="rail">${html}</div>`;
   try { window.btpLogos && window.btpLogos(); } catch {}
 }

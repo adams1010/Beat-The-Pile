@@ -34,7 +34,7 @@ console.log("✓ remote/US: Greenhouse offices fill 'Hybrid'/'In-Office', big ci
   const assert = (await import("node:assert/strict")).default;
   const { extractStates, isForeignPlace } = await import("../lib/filter.js");
   for (const t of ["Santa Marta, Colombia, Colombia, CO", "Colombia, CO", "Indonesia, ID | Singapore, SG | Australia, AU"]) assert.deepEqual(extractStates(t), [], t);
-  for (const t of ["Cambridge, Cambridgeshire, United Kingdom, GB", "Huntsville, Canada", "Vancouver | Toronto | Calgary", "Remote, Mexico"]) assert.ok(isForeignPlace(t), t);
+  for (const t of ["Panama, PA", "Cambridge, Cambridgeshire, United Kingdom, GB", "Huntsville, Canada", "Vancouver | Toronto | Calgary", "Remote, Mexico"]) assert.ok(isForeignPlace(t), t);
   for (const t of ["Peru, Illinois", "Denver, CO", "Boise, ID", "Remote, United States", "San Francisco - SF9", "Vancouver, WA"]) assert.ok(!isForeignPlace(t), t);
   assert.deepEqual(extractStates("Denver, CO"), ["CO"]); assert.deepEqual(extractStates("Boise, ID"), ["ID"]);
   console.log("✓ foreign places (Colombia CO, Indonesia ID, Cambridge UK, Vancouver|Toronto) stay out; Denver CO, Boise ID stay in");
