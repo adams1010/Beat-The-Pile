@@ -317,14 +317,19 @@
     s = s.replace(/^USA?\s*-\s*/i, "").replace(/,\s*(US|USA|United States( of America)?)\b.*$/i, "").trim();
     return s.replace(/\s*,\s*$/, "");
   }
+  // Nov 14: work-mode words ("Hybrid", "In-Office") aren't places; the card shows them as a Remote/Hybrid/In person tag
+  const MODE_ONLY = /^(hybrid|in[- ]?office|on[- ]?site|onsite|in[- ]?person|remote|flexible|field|virtual)$/i;
+  const placesOf = (j) => String(j.location || "").split("|").map((x) => x.trim()).filter((x) => x && !MODE_ONLY.test(x));
   function cleanLocation(j){
-    const sites = String(j.location || "").split("|").map((x) => x.trim()).filter(Boolean);
-    if (sites.length <= 1) return cleanOne(sites[0] || "");
-    // Multi-site posting: show a site in the states being viewed, then "+N more"
+    const sites = placesOf(j);
+    if (!sites.length) return j.state === "US" ? "Remote, US" : NAMES[String(j.state || "").split(",")[0]] || "United States";
+    if (sites.length === 1) return cleanOne(sites[0]);
+    // Multi-site posting: show a site in the states being viewed (the card adds "+N more")
     const want = state.st === "ALL" ? null : state.st;
-    const pick = (want && sites.find((x) => want.some((s) => new RegExp("\\b(" + s + "|" + NAMES[s] + ")\\b", "i").test(x)))) || sites[0];
-    return cleanOne(pick) + " +" + (sites.length - 1) + " more";
+    return cleanOne((want && sites.find((x) => want.some((s) => new RegExp("\\b(" + s + "|" + NAMES[s] + ")\\b", "i").test(x)))) || sites[0]);
   }
+  // how many other places a group of postings covers (each posting may list several)
+  const morePlaces = (g) => Math.max(g.sites.length - 1, (g.places || 1) - 1);
   // Season + clearance from the title (descriptions aren't read yet, so we only show what the title says)
   function seasonOf(t){
     t = String(t || "");
@@ -473,9 +478,9 @@
     const group = (list) => { const groups = new Map();
       for (const j of list) {
         const k = (j.company + "|" + niceTitle(j.title)).toLowerCase().replace(/\s+/g, " ");
-        const site = { id: j.id, loc: cleanLocation(j), url: j.url };
-        if (groups.has(k)) { const g = groups.get(k); g.count++; g.ids.push(j.id); if (!g.sites.some((x) => x.loc === site.loc)) g.sites.push(site); }
-        else groups.set(k, { ...j, count: 1, ids: [j.id], sites: [site] });
+        const site = { id: j.id, loc: cleanLocation(j), url: j.url }, n = placesOf(j).length || 1;
+        if (groups.has(k)) { const g = groups.get(k); g.count++; g.ids.push(j.id); if (!g.sites.some((x) => x.loc === site.loc)) { g.sites.push(site); g.places += n; } }
+        else groups.set(k, { ...j, count: 1, ids: [j.id], sites: [site], places: n });
       }
       return [...groups.values()]; };
     const rows = group(S.exact);
@@ -526,7 +531,7 @@
         <a class="lg" href="${coHref(j)}" aria-hidden="true" tabindex="-1" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</a>
         <div style="min-width:0">
           <div class="title">${esc(niceTitle(j.title))}${j.kind === "fulltime" ? '<span class="ftag">Entry-level</span>' : j.kind === "hourly" ? '<span class="ftag">Hourly</span>' : ""}${isNew(j) ? '<span class="tag new">New</span>' : ""}${j.closed ? '<span class="tag closed">Closed by the company</span>' : ""}</div>
-          <div class="co"><a class="cn" href="${coHref(j)}">${esc(j.company)}</a> <span class="loc">· ${esc(j.sites[0].loc)}${j.sites.length > 1 ? ` +${j.sites.length - 1} more` : ""}</span> <span class="wtag wt-${workOf(j)}">${WORK_NAME[workOf(j)]}</span></div>
+          <div class="co"><a class="cn" href="${coHref(j)}">${esc(j.company)}</a> <span class="loc">· ${esc(j.sites[0].loc)}${morePlaces(j) ? ` +${morePlaces(j)} more` : ""}</span> <span class="wtag wt-${workOf(j)}">${WORK_NAME[workOf(j)]}</span></div>
           <div class="meta2">${[state.near && j.mi != null ? `<span class="dist">${j.mi < 1 ? "Under 1" : "~" + j.mi} mi away</span>` : "", esc(postedText(j)), j.sites.length > 1 ? `${j.sites.length} locations` : j.count > 1 ? `${j.count} openings` : "", seasonOf(j.title) ? esc(seasonOf(j.title)) : "", (state.major === "all" || !state.major) && FIELD_NAME[j.field] ? esc(FIELD_NAME[j.field]) : "", j.match === "me" && STRICT_OK() ? "Mechanical match" : "", needsClearance(j.title) ? "US citizens / clearance" : ""].filter(Boolean).join(" · ")}</div>
           ${j.sites.length > 1 ? `<details class="sites"><summary>All ${j.sites.length} locations</summary><ul>${j.sites.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.loc)}</a></li>`).join("")}</ul></details>` : ""}
         </div>
