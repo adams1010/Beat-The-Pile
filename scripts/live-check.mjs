@@ -2,6 +2,7 @@
 // script errors, the job tabs and search return jobs, and the APIs answer. Exits 1 on any failure (the GitHub run turns red
 // and GitHub emails the repo owner). Run: node scripts/live-check.mjs [https://www.beatthepile.com]
 import { chromium } from "playwright";
+import fs from "node:fs";
 
 const SITE = process.argv[2] || "https://www.beatthepile.com";
 const bust = `v=${Date.now()}`;
@@ -49,6 +50,13 @@ for (const vp of [{ width: 1280, height: 900, name: "desktop" }, { width: 390, h
         const s = await page.evaluate(() => ({ cards: document.querySelectorAll("#list .title").length, err: document.querySelector("#list .err")?.textContent || "" }));
         if (s.err) fail(`${vp.name} ${path}: shows "couldn't load"`);
         else if (!s.cards) fail(`${vp.name} ${path}: no job cards`);
+      }
+      // Nov 14: on phones nothing may stick out sideways (a sideways scroll = cramped layout); screenshots of key pages
+      if (vp.name === "phone") {
+        const wide = await page.evaluate(() => { const W = window.innerWidth; const bad = [...document.querySelectorAll("body *")].filter((el) => { const r = el.getBoundingClientRect(); if (!r.width || r.right <= W + 2) return false; for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) { const o = getComputedStyle(p).overflowX; if (o === "auto" || o === "scroll" || o === "hidden" || o === "clip") return false; } return true; });
+          return { scroll: document.documentElement.scrollWidth - W, first: bad.slice(0, 3).map((el) => el.tagName.toLowerCase() + (el.id ? "#" + el.id : "") + (el.className && typeof el.className === "string" ? "." + el.className.trim().split(/\s+/).slice(0, 2).join(".") : "") + " " + Math.round(el.getBoundingClientRect().right) + "px") }; });
+        if (wide.scroll > 2 || wide.first.length) notes.push(`phone ${path}: sticks out sideways by ${wide.scroll}px: ${wide.first.join(", ")}`);
+        if (["/", "/jobs/", "/jobs/?kind=hourly", "/tracker/"].includes(path)) { fs.mkdirSync("shots", { recursive: true }); await page.screenshot({ path: `shots/phone${path.replace(/[^a-z0-9]+/gi, "_")}.png`, fullPage: false }); }
       }
       const nav = await page.evaluate(() => !!document.querySelector(".btpnav"));
       if (!nav) fail(`${vp.name} ${path}: top bar missing`);

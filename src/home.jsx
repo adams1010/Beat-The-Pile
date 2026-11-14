@@ -60,7 +60,8 @@ const LiveStats=()=>{
   },[]);
   const fmt=(n)=>n==null?"—":n.toLocaleString();
   const ago=(t)=>{if(!t)return null;const m=Math.round((Date.now()-new Date(t))/6e4);return m<60?`${Math.max(1,m)} min ago`:m<1440?`${Math.round(m/60)} hr ago`:`${Math.round(m/1440)} days ago`;};
-  const items=[{v:d?.allMajors,l:"open internships right now, every major",c:"#060A2C"},{v:d?.hiringNow,l:"companies hiring interns right now",c:"#060A2C"},{v:d?.companies,l:"company job boards we read directly",c:G}];
+  const total=d&&d.fulltime!=null?(d.allMajors||0)+(d.fulltime||0)+(d.hourly||0):null;
+  const items=[{v:total,l:"open jobs right now: internships, entry-level and part-time",c:G},{v:d?.allMajors,l:"open internships right now, every major",c:"#060A2C"},{v:d?.hiringNow,l:"companies hiring interns right now",c:"#060A2C"},{v:d?.companies,l:"company job boards we read directly",c:G}];
   return (<div style={{maxWidth:760,margin:"0 auto"}}>
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:"1rem"}}>
     {items.map((s,i)=>(<div key={i} style={{background:"#fff",border:"1px solid #F2FADF",borderRadius:10,padding:"1.75rem 1.25rem",textAlign:"center",boxShadow:"none"}}>
@@ -181,10 +182,10 @@ function LandingD({onQuiz,onPage}){
       <div style={{...wrap,position:"relative",paddingTop:64,paddingBottom:48,display:"flex",gap:48,flexWrap:"wrap",alignItems:"center"}}>
         <div style={{flex:"1 1 480px",minWidth:0}}>
           <p style={{fontSize:14,fontWeight:500,color:"#D9F99A",margin:"0 0 18px"}}><span style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#B0F701",marginRight:8,verticalAlign:1}}/>
-            {sum?`${fmt(sum.companies)} company job boards${sum.lastSync?`, last checked ${dAgoLong(sum.lastSync)}`:""}`:sumErr?"Live numbers unavailable right now":"Loading the latest numbers…"}</p>
+            {sum?`${sum.allMajors!=null&&sum.fulltime!=null?`${fmt((sum.allMajors||0)+(sum.fulltime||0)+(sum.hourly||0))} open jobs from `:""}${fmt(sum.companies)} company job boards${sum.lastSync?`, last checked ${dAgoLong(sum.lastSync)}`:""}`:sumErr?"Live numbers unavailable right now":"Loading the latest numbers…"}</p>
           <h1 style={{fontSize:"clamp(2.3rem,5vw,3.6rem)",lineHeight:1.03,letterSpacing:"-0.035em",fontWeight:600,margin:"0 0 16px",color:"#fff"}}>Find your job<br/>before the <span style={{color:"#B0F701"}}>pile</span> does.</h1>
           <p style={{fontSize:18,lineHeight:1.5,color:"#9FAAC0",margin:"0 0 28px",maxWidth:560}}>Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board, no reposts, and jobs drop off when the company takes them down.</p>
-          <form onSubmit={go} role="search" className="d-search" style={{display:"flex",alignItems:"stretch",background:"#fff",borderRadius:10,padding:6,boxShadow:"0 0 0 1px #2FD39A33, 0 20px 50px rgba(0,0,0,.35)",maxWidth:760}}>
+          <form onSubmit={go} role="search" className="d-search" style={{display:"flex",alignItems:"stretch",background:"#fff",borderRadius:10,padding:6,maxWidth:760}}>
             <label style={{flex:"3 1 0",display:"flex",alignItems:"center",gap:10,padding:"0 14px",minWidth:0}}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55627A" strokeWidth="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
               <input value={q} onChange={e=>setQ(e.target.value)} aria-label="Role, company or major" placeholder="Role, company or major" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#060A2C",height:48,background:"transparent",outline:"none"}}/></label>

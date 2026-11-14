@@ -1681,9 +1681,18 @@
   "Food, hotels & recreation": "Gastronomie, Hotels & Freizeit",
   "Warehouse, delivery & supply chain": "Lager, Lieferung & Lieferkette",
   "Retail & Customer Service": "Einzelhandel & Kundenservice",
-  "Food, Hotels & Recreation": "Gastronomie, Hotels & Freizeit"
+  "Food, Hotels & Recreation": "Gastronomie, Hotels & Freizeit",
+  "open jobs right now: internships, entry-level and part-time": "offene Jobs gerade: Praktika, Einstiegsjobs und Teilzeit"
  },
  "patterns": [
+  [
+   "^([\\d,]+) open jobs from ([\\d,]+) company job boards$",
+   "$1 offene Jobs von $2 Karriereseiten von Unternehmen"
+  ],
+  [
+   "^([\\d,]+) open jobs from ([\\d,]+) company job boards, last checked (.+)$",
+   "$1 offene Jobs von $2 Karriereseiten von Unternehmen, zuletzt geprüft $3"
+  ],
   [
    "^([\\d,]+) open jobs across the US · newest ([\\d,]+) shown\\. Pick a state or search to see the rest$",
    "$1 offene Jobs in den USA · die neuesten $2 werden angezeigt. Wähle einen Bundesstaat oder suche, um den Rest zu sehen"

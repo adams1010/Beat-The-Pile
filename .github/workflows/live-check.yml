@@ -19,3 +19,6 @@ jobs:
         with: { node-version: 22 }
       - run: npm i --no-save playwright@1.48.2 && npx playwright install --with-deps chromium
       - run: sleep 30 && node scripts/live-check.mjs https://www.beatthepile.com
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with: { name: phone-shots, path: shots/, if-no-files-found: ignore, retention-days: 7 }

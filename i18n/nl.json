@@ -1681,9 +1681,18 @@
   "Food, hotels & recreation": "Horeca, hotels & recreatie",
   "Warehouse, delivery & supply chain": "Magazijn, bezorging & supply chain",
   "Retail & Customer Service": "Retail & klantenservice",
-  "Food, Hotels & Recreation": "Horeca, hotels & recreatie"
+  "Food, Hotels & Recreation": "Horeca, hotels & recreatie",
+  "open jobs right now: internships, entry-level and part-time": "open vacatures nu: stages, starters- en bijbanen"
  },
  "patterns": [
+  [
+   "^([\\d,]+) open jobs from ([\\d,]+) company job boards$",
+   "$1 open vacatures van $2 vacaturesites van bedrijven"
+  ],
+  [
+   "^([\\d,]+) open jobs from ([\\d,]+) company job boards, last checked (.+)$",
+   "$1 open vacatures van $2 vacaturesites van bedrijven, laatst bekeken $3"
+  ],
   [
    "^([\\d,]+) open jobs across the US · newest ([\\d,]+) shown\\. Pick a state or search to see the rest$",
    "$1 open vacatures in de VS · de nieuwste $2 worden getoond. Kies een staat of zoek om de rest te zien"
