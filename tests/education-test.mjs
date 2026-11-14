@@ -40,12 +40,18 @@ console.log(`✓ education: several schools, grad term, school ids; Orbit matche
   const assert = (await import("node:assert/strict")).default;
   const { readFileSync } = await import("node:fs");
   const off = JSON.parse(readFileSync(new URL("../schools/official.json", import.meta.url)));
+  const { fieldsForMajor: fieldsForMajorEarly } = await import("../lib/geo.js");
   const vt = off["233921"];
+  for (const id of Object.keys(off).filter((k) => /^\d+$/.test(k))) {
+    const left = off[id].filter((m) => !(fieldsForMajorEarly(m) || []).length);
+    assert.deepEqual(left, [], `school ${id}: every official major finds its job areas`);
+    assert.ok(id === "233921" || off._sources?.[id], `school ${id}: source page recorded`);
+  }
   assert.equal(vt.length, 135); assert.ok(vt.includes("Mechanical Engineering") && vt.includes("Cybersecurity Management and Analytics"));
   const { fieldsForMajor } = await import("../lib/geo.js");
   const none = vt.filter((m) => !(fieldsForMajor(m) || []).length);
   assert.deepEqual(none, [], "every VT major finds its job areas");
   const pick = readFileSync(new URL("../pick.js", import.meta.url), "utf8"), u = readFileSync(new URL("../u/index.html", import.meta.url), "utf8");
   assert.ok(pick.includes("/schools/official.json") && u.includes("/schools/official.json"), "both pickers read the official list");
-  console.log("✓ Virginia Tech: 135 official majors in the picker, all mapped to job areas");
+  console.log("✓ official major lists: Virginia Tech (135) + " + (Object.keys(off).filter((k) => /^\d+$/.test(k)).length - 1) + " more schools, every major mapped to job areas");
 }
