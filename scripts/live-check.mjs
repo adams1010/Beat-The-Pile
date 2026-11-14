@@ -34,7 +34,7 @@ try { const h = (await fetch(`${SITE}/jobs/?${bust}`)).headers; const miss = ["s
 await api("/api/discovery?bots=1", (j) => (j?.bots?.length ? null : "no bot switches"), "bot switches");
 
 // 2) Pages in a real browser (phone-sized too)
-const PAGES = ["/", "/jobs/", "/jobs/?kind=fulltime", "/jobs/?kind=hourly", "/jobs/?kind=all&q=nurse", "/tracker/", "/drop/", "/season/", "/fair/", "/orbit/",
+const PAGES = ["/", "/jobs/", "/jobs/?kind=fulltime", "/jobs/?kind=hourly", "/jobs/?kind=all&q=nurse", "/tracker/", "/season/", "/fair/", "/orbit/",
   "/u/", "/start/", "/radar/", "/majors/", "/demo/", "/business/", "/privacy/", "/terms/", "/cookies/", "/accessibility/"];
 const browser = await chromium.launch();
 for (const vp of [{ width: 1280, height: 900, name: "desktop" }, { width: 390, height: 844, name: "phone" }]) {

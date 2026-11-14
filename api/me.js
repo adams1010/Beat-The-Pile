@@ -194,6 +194,8 @@ const txt = (v, n) => clean(v, n);
 // Profile photo: a small image the browser already resized (≤ ~65 KB), stored with the profile.
 // Only real JPEG/PNG/WebP bytes pass (checked by magic number, not just the label) — never SVG or anything scriptable.
 const PHOTO_MAX = 90000;   // characters of base64 (~65 KB)
+const EXP_TYPES = ["internship", "job", "parttime", "research", "leadership", "volunteer", "project"];
+const YM = (v) => { const m = /^(\d{4})-(\d{2})$/.exec(String(v || "")); return m && +m[1] >= 1970 && +m[1] <= 2100 && +m[2] >= 1 && +m[2] <= 12 ? v : ""; };
 export function cleanPhoto(v) {
   const m = /^data:image\/(jpeg|png|webp);base64,([A-Za-z0-9+/]+={0,2})$/.exec(typeof v === "string" ? v : "");
   if (!m || v.length > PHOTO_MAX) return null;
@@ -226,7 +228,9 @@ function cleanProfile(p) {
     education: arr(p.education, 20).map((x) => ({ school: txt(x?.school, 100), degree: txt(x?.degree, 60), major: txt(x?.major, 80), when: txt(x?.when, 40) })).filter((x) => x.school).slice(0, 5),
     location: txt(p.location, 80), lookingFor: txt(p.lookingFor, 140), about: txt(p.about, 1200),
     skills: [...new Set(arr(p.skills, 30).map((x) => txt(x, 40)).filter(Boolean))],
-    experience: arr(p.experience, 10).map((x) => ({ title: txt(x?.title, 100), org: txt(x?.org, 100), when: txt(x?.when, 40), desc: txt(x?.desc, 600) })).filter((x) => x.title || x.org),
+    // Nov 14: experience timeline — real dates ("YYYY-MM", end may be "present"), a type and a place; `when` stays for old profiles
+    experience: arr(p.experience, 12).map((x) => ({ title: txt(x?.title, 100), org: txt(x?.org, 100), when: txt(x?.when, 40), desc: txt(x?.desc, 600),
+      start: YM(x?.start), end: x?.end === "present" ? "present" : YM(x?.end), type: EXP_TYPES.includes(x?.type) ? x.type : "", location: txt(x?.location, 80) })).filter((x) => x.title || x.org),
     projects: arr(p.projects, 8).map((x) => ({ name: txt(x?.name, 100), desc: txt(x?.desc, 600), link: httpsUrl(x?.link) })).filter((x) => x.name),
     links: { linkedin: httpsUrl(p.links?.linkedin), github: httpsUrl(p.links?.github), portfolio: httpsUrl(p.links?.portfolio) },
     // Nov 10: contact on the profile — shown (clickable) to signed-in Beat the Pile users only, never to anonymous visitors

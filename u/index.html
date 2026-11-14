@@ -133,11 +133,35 @@
   .rfile .rmeta input{font:inherit;font-weight:600;border:1px solid transparent;border-radius:6px;padding:4px 6px;margin-left:-6px;background:transparent}
   .rfile .rmeta input:hover,.rfile .rmeta input:focus{border-color:var(--line);background:#fff}
   .res{border:1px solid var(--line);border-radius:10px;padding:8px 12px 12px;margin-top:10px;position:relative;background:#fff}
+  /* Nov 14: experience timeline (career line + roles grouped by company) */
+  .xp .xsum{margin:-2px 0 10px;color:var(--muted);font-size:14px}
+  .cline{margin:4px 0 16px;padding:22px 0 18px;border-bottom:1px solid var(--line)}
+  .ctrack{position:relative;margin:0 4px}
+  .cyr{position:absolute;top:-20px;bottom:-16px;border-left:1px dashed #C9D1DE}.cyr i{position:absolute;top:-2px;left:4px;font-style:normal;font-size:11.5px;color:#5E6A80;font-variant-numeric:tabular-nums}
+  .cbar{position:absolute;height:18px;border-radius:999px;background:#4A7000;color:#fff;font-size:11.5px;font-weight:600;line-height:18px;overflow:hidden;text-decoration:none;min-width:8px}
+  .cbar span{padding:0 7px;white-space:nowrap}
+  .cbar.t-internship{background:#4A7000}.cbar.t-job,.cbar.t-parttime{background:#1E3A8A}.cbar.t-research{background:#0F6E6E}.cbar.t-leadership{background:#8A4B00}.cbar.t-volunteer{background:#9B2C55}.cbar.t-project,.cbar.t-none{background:#4B5568}
+  .cbar.cur{border-top-right-radius:0;border-bottom-right-radius:0;box-shadow:inset -3px 0 0 #B0F701}
+  .cnext{position:absolute;height:18px;border:2px dashed #4A7000;border-radius:999px;background:#F2FADF;color:#3A5800;font-size:11.5px;font-weight:600;line-height:14px;overflow:hidden;white-space:nowrap}.cnext span{padding:0 7px}
+  .cnow,.cgrad{position:absolute;top:-8px;bottom:-14px;border-left:2px solid #060A2C}.cnow i,.cgrad i{position:absolute;bottom:-16px;left:-14px;font-style:normal;font-size:11px;font-weight:700;color:#060A2C}
+  .cgrad{border-left:2px dotted #8A4B00}.cgrad i{color:#8A4B00}
+  .xgroup{display:block;padding:12px 0;border-top:1px solid var(--line)}.xgroup:first-of-type{border-top:0}
+  .xhead{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start}
+  .xroles{margin:6px 0 0 56px}.xroles.one{margin-top:2px}
+  .xroles:not(.one) .xrole{position:relative;padding:6px 0 6px 16px;border-left:2px solid #DCE2EC}
+  .xroles:not(.one) .xrole::before{content:"";position:absolute;left:-6px;top:11px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid #4A7000}
+  .xrole p{margin:4px 0 0}
+  .xtype{font-size:11.5px;font-weight:600;border-radius:999px;padding:1px 8px;background:#EEF1F6;color:#1E3A8A;margin-left:4px}
+  .xnow{font-size:11.5px;font-weight:600;border-radius:999px;padding:1px 8px;background:#F2FADF;color:#3A5800}
+  .hire a{display:inline-block;margin-top:4px;font-size:13px;font-weight:600;color:#4A7000}
+  .chkrow{display:flex;gap:6px;align-items:center;font-weight:400;font-size:13.5px;margin-top:6px}
+  .chkrow input{width:auto;margin:0}
 </style>
 <link rel="stylesheet" href="/d.css">
 </head>
 <body>
 <script src="/nav.js"></script>
+<script type="module">import * as T from "/lib/timeline.js"; window.btpTL = T; dispatchEvent(new Event("btptl"));</script>
 <script src="/resume-file.js"></script>
 <script src="/pick.js"></script>
 <script src="/orbit-start.js" defer></script>
@@ -253,8 +277,7 @@
     const hasC = p.contact && (p.contact.email || p.contact.phone);
     const contactBtns = hasC ? `${p.contact.email ? `<a class="btn pri" href="mailto:${esc(p.contact.email)}" title="Send an email">Email</a>` : ""}${p.contact.phone ? `<a class="btn" href="tel:${esc(tel(p.contact.phone))}" title="Call">Call</a>` : ""}` : "";
     const contactNote = hasC && isPreview ? `<p class="small muted" style="margin:6px 0 0">${p.contact.show === false ? "Contact info is hidden from your profile." : "Contact info is shown to signed-in Beat the Pile members, not to the public web."}</p>` : "";
-    const exp = (p.experience || []).map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.org || x.title))}</div><div><b>${esc(x.title)}</b>
-      <div class="sm">${esc([x.org, x.when].filter(Boolean).join(" · "))}</div>${x.desc ? `<p>${esc(x.desc)}</p>` : ""}</div></div>`).join("");
+    const exp = expTimeline(p);
     const proj = (p.projects || []).map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.name))}</div><div><b>${safeUrl(x.link) ? `<a href="${esc(x.link)}" target="_blank" rel="noopener nofollow ugc">${esc(x.name)} ↗</a>` : esc(x.name)}</b>
       ${x.desc ? `<p>${esc(x.desc)}</p>` : ""}</div></div>`).join("");
     return `
@@ -276,7 +299,7 @@
       ${isPreview ? ownerCards(p) : ""}
       ${p.about ? `<section class="card"><h2>About</h2><p class="about">${esc(p.about)}</p></section>` : ""}
       ${edu ? `<section class="card"><h2>Education</h2>${edu}</section>` : ""}
-      ${exp ? `<section class="card"><h2>Experience</h2>${exp}</section>` : ""}
+      ${exp ? `<section class="card xp"><h2>Experience</h2>${exp}</section>` : ""}
       ${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}
       ${(p.skills || []).length ? `<section class="card"><h2>Skills</h2><div class="chips">${p.skills.map((s, i) => `<span class="chip${i < 3 ? " top" : ""}">${esc(s)}</span>`).join("")}</div>${p.skills.length > 3 ? `<p class="small muted" style="margin:8px 0 0">Top skills first.</p>` : ""}</section>` : ""}
       ${isPreview ? kitCard(p) : ""}
@@ -292,6 +315,7 @@
     if (r.status === 404) { document.querySelector("main").innerHTML = `<div class="card center"><h1 style="font-size:22px">No public profile here</h1><p class="muted">This student hasn't made a profile public, or the link changed.</p><a class="btn pri" href="/u/">Make your own profile</a></div>`; return; }
     const d = await r.json();
     document.title = (d.profile.name || "Profile") + " | Beat the Pile";
+    await TL_READY;
     document.querySelector("main").innerHTML = profileHtml(d.profile, d.resume, false, d.founding);
     orbitButtons(d.handle, d.profile.name);
     $("#rep")?.addEventListener("click", (e) => { e.preventDefault(); window.iqReport ? window.iqReport({ message: "Report profile /u/" + d.handle + "\n" }) : alert("Use the Feedback button to report."); });
@@ -368,13 +392,17 @@
         <datalist id="degreelist">${["Bachelor's", "Associate", "Master's", "PhD", "Minor", "Certificate", "Study abroad", "Transfer", "High school"].map((x) => `<option value="${x}">`).join("")}</datalist>
         <datalist id="majorlist"></datalist>
       </section>
-      <section class="card"><h2>Experience</h2><div id="exp">${d.p.experience.map((x, i) => `
+      <section class="card"><h2>Experience</h2><p class="small muted" style="margin:-4px 0 10px">Real dates put each role on your career line.</p><div id="exp">${d.p.experience.map((x, i) => { const sp = window.btpTL ? window.btpTL.parseWhen(x.when) : { start: "", end: "" }; const st = x.start || sp.start || "", en = x.end || sp.end || ""; return `
         <div class="rep"><button class="rm" data-rm="experience" data-i="${i}">Remove</button>
           <div class="row"><div><label>Role</label><input data-list="experience" data-i="${i}" data-f="title" value="${esc(x.title)}" placeholder="Marketing Intern"></div>
           <div><label>Company / team</label><input data-list="experience" data-i="${i}" data-f="org" value="${esc(x.org)}" placeholder="Acme Corp"></div></div>
-          <label>When</label><input data-list="experience" data-i="${i}" data-f="when" value="${esc(x.when)}" placeholder="Summer 2026">
-          <label>What you did</label><textarea data-list="experience" data-i="${i}" data-f="desc" maxlength="600">${esc(x.desc)}</textarea></div>`).join("")}</div>
-        ${d.p.experience.length < 10 ? `<button class="btn" data-add="experience" style="margin-top:12px">+ Add experience</button>` : ""}</section>
+          <div class="row"><div><label>Type</label><select data-list="experience" data-i="${i}" data-f="type"><option value="">Pick one</option>${Object.entries(window.btpTL ? window.btpTL.TYPES : {}).map(([k, v]) => `<option value="${k}"${x.type === k ? " selected" : ""}>${v}</option>`).join("")}</select></div>
+          <div><label>Location</label><input data-list="experience" data-i="${i}" data-f="location" value="${esc(x.location || "")}" placeholder="Seattle, WA or Remote"></div></div>
+          <div class="row"><div><label>Start</label><input type="month" data-list="experience" data-i="${i}" data-f="start" value="${esc(st)}" placeholder="2025-05"></div>
+          <div><label>End</label><input type="month" data-list="experience" data-i="${i}" data-f="end" value="${esc(en === "present" ? "" : en)}" placeholder="2025-08"${en === "present" ? " disabled" : ""}>
+            <label class="chkrow"><input type="checkbox" data-now="${i}"${en === "present" ? " checked" : ""}> I work here now</label></div></div>
+          <label>What you did</label><textarea data-list="experience" data-i="${i}" data-f="desc" maxlength="600">${esc(x.desc)}</textarea></div>`; }).join("")}</div>
+        ${d.p.experience.length < 12 ? `<button class="btn" data-add="experience" style="margin-top:12px">+ Add experience</button>` : ""}</section>
       <section class="card"><h2>Projects</h2><div>${d.p.projects.map((x, i) => `
         <div class="rep"><button class="rm" data-rm="projects" data-i="${i}">Remove</button>
           <div class="row"><div><label>Project</label><input data-list="projects" data-i="${i}" data-f="name" value="${esc(x.name)}" placeholder="Stock pitch competition"></div>
@@ -461,11 +489,14 @@
     const sh = $("#shareP"); if (sh) sh.onclick = async () => { const url = location.origin + "/u/" + S.me.handle;
       try { if (navigator.share) await navigator.share({ title: (S.me.profile && S.me.profile.name) || "My profile", url }); else { await navigator.clipboard.writeText(url); sh.textContent = "Link copied"; setTimeout(() => sh.textContent = "Share", 1600); } } catch {} };
     main.querySelectorAll("[data-k]").forEach((el) => el.oninput = () => { d.p[el.dataset.k] = el.value; });
-    main.querySelectorAll("[data-list]").forEach((el) => el.oninput = () => { d.p[el.dataset.list][+el.dataset.i][el.dataset.f] = el.value; });
+    main.querySelectorAll("[data-list]").forEach((el) => el.oninput = el.onchange = () => { const it = d.p[el.dataset.list][+el.dataset.i]; it[el.dataset.f] = el.value;
+      if (el.dataset.list === "experience" && (el.dataset.f === "start" || el.dataset.f === "end") && window.btpTL) it.when = expWhen(it); });   // Nov 14: keep the text date in step
+    main.querySelectorAll("[data-now]").forEach((el) => el.onchange = () => { const it = d.p.experience[+el.dataset.now]; const endIn = main.querySelector(`[data-list="experience"][data-i="${el.dataset.now}"][data-f="end"]`);
+      it.end = el.checked ? "present" : ""; if (endIn) { endIn.disabled = el.checked; if (el.checked) endIn.value = ""; } if (window.btpTL) it.when = expWhen(it); });
     main.querySelectorAll("[data-link]").forEach((el) => el.oninput = () => { d.p.links[el.dataset.link] = el.value.trim(); });
     main.querySelectorAll("[data-contact]").forEach((el) => el.oninput = () => { d.p.contact = { ...(d.p.contact || {}), [el.dataset.contact]: el.value.trim() }; });
     const cs = $("#c_show"); if (cs) cs.onchange = () => { d.p.contact = { ...(d.p.contact || {}), show: cs.checked }; };
-    const NEW = { experience: { title: "", org: "", when: "", desc: "" }, projects: { name: "", link: "", desc: "" }, education: { school: "", degree: "", major: "", when: "" } };
+    const NEW = { experience: { title: "", org: "", when: "", desc: "", start: "", end: "", type: "", location: "" }, projects: { name: "", link: "", desc: "" }, education: { school: "", degree: "", major: "", when: "" } };
     main.querySelectorAll("[data-add]").forEach((b) => b.onclick = () => { (d.p[b.dataset.add] ||= []).push({ ...NEW[b.dataset.add] }); editor(); });
     wireEducation(d);
     main.querySelectorAll("[data-rm]").forEach((b) => b.onclick = () => { d.p[b.dataset.rm].splice(+b.dataset.i, 1); editor(); });
@@ -540,6 +571,56 @@
     } catch (e) { say(e.message, true); }
     finally { $("#fill")?.classList.remove("busy"); }
   }
+  // Nov 14: the experience timeline. Twist on LinkedIn: a "career line" across the years (one bar per role, overlapping
+  // roles stack, a Now marker, a graduation flag and a dashed "Next" bar for what you're looking for), then roles grouped by
+  // company with real dates and length, and a "Hiring now" link when that company has open jobs on Beat the Pile.
+  const TL_READY = window.btpTL ? Promise.resolve() : new Promise((ok) => { addEventListener("btptl", ok, { once: true }); setTimeout(ok, 2500); });
+  const GRAD_M = { Spring: 5, Summer: 8, Fall: 12, Winter: 12 };
+  function expTimeline(p){
+    const T = window.btpTL, xs = p.experience || [];
+    if (!xs.length) return "";
+    if (!T) return xs.map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.org || x.title))}</div><div><b>${esc(x.title)}</b><div class="sm">${esc([x.org, x.when].filter(Boolean).join(" · "))}</div>${x.desc ? `<p>${esc(x.desc)}</p>` : ""}</div></div>`).join("");
+    const grad = p.gradYear ? `${p.gradYear}-${String(GRAD_M[p.gradTerm] || 5).padStart(2, "0")}` : null;
+    const next = p.lookingFor || ((p.openTo || []).includes("intern") ? "Next internship" : (p.openTo || []).includes("fulltime") ? "First full-time role" : "");
+    const L = T.careerLine(xs, { grad, next });
+    const tot = T.totalMonths(xs), yrs = Math.floor(tot / 12), mos = tot % 12;
+    const kinds = {}; for (const x of xs) if (x.type) kinds[x.type] = (kinds[x.type] || 0) + 1;
+    const summary = [tot ? `${[yrs ? `${yrs} yr${yrs > 1 ? "s" : ""}` : "", mos ? `${mos} mo${mos > 1 ? "s" : ""}` : ""].filter(Boolean).join(" ")} of experience` : "",
+      ...Object.entries(kinds).map(([k, n]) => `${n} ${(T.TYPES[k] || k).toLowerCase()}${n > 1 && !/time$|research$|leadership$/.test(k) ? "s" : ""}`)].filter(Boolean).join(" · ");
+    const line = L ? `<div class="cline" role="img" aria-label="Career line: ${esc(xs.map((x) => [x.title, x.org].filter(Boolean).join(" at ")).join("; "))}">
+        <div class="ctrack" style="height:${L.lanes * 22 + 8}px">
+          ${L.years.map((y) => `<span class="cyr" style="left:${y.at}%"><i>${y.y}</i></span>`).join("")}
+          ${L.bars.map((b) => `<a class="cbar t-${esc(b.type || "none")}${b.current ? " cur" : ""}" href="#xp${b.i}" style="left:${b.left}%;width:${b.width}%;top:${b.lane * 22 + 4}px" title="${esc([b.title, b.org].filter(Boolean).join(" · "))}"><span>${esc(b.org || b.title)}</span></a>`).join("")}
+          ${L.next ? `<span class="cnext" style="left:${L.next.left}%;width:${L.next.width}%;top:${L.lanes * 22 - 18}px"><span>Next: ${esc(L.next.label)}</span></span>` : ""}
+          <span class="cnow" style="left:${L.now}%"><i>Now</i></span>
+          ${L.grad != null ? `<span class="cgrad" style="left:${L.grad}%"><i>Grad</i></span>` : ""}
+        </div></div>` : "";
+    const groups = T.groupByOrg(xs).map((g) => {
+      const multi = g.roles.length > 1;
+      const head = `<div class="xhead"><div class="dot" aria-hidden="true">${esc(initials(g.org || g.roles[0].title))}</div><div style="min-width:0">
+          ${multi ? `<b>${esc(g.org)}</b><div class="sm">${g.roles.length} roles${g.span ? " · " + T.duration(g.span.a, g.span.b) : ""}</div>`
+            : `<b>${esc(g.roles[0].title)}</b><div class="sm">${esc([g.org, T.TYPES[g.roles[0].type]].filter(Boolean).join(" · "))}</div>`}
+          ${g.org ? `<span class="hire" data-hire="${esc(g.org)}"></span>` : ""}</div></div>`;
+      const role = (r, showTitle) => `<div class="xrole" id="xp${r.i}">${showTitle ? `<b>${esc(r.title)}</b>${r.type ? ` <span class="xtype t-${esc(r.type)}">${esc(T.TYPES[r.type])}</span>` : ""}` : (r.type && multi ? "" : "")}
+          <div class="sm">${esc(r.sp ? T.rangeText(r.sp) : r.when || "")}${r.location ? " · " + esc(r.location) : ""}${r.sp?.current ? ' <span class="xnow">Current</span>' : ""}</div>
+          ${r.desc ? `<p>${esc(r.desc)}</p>` : ""}</div>`;
+      return `<div class="xgroup${multi ? " multi" : ""}">${head}${multi ? `<div class="xroles">${g.roles.map((r) => role(r, true)).join("")}</div>` : `<div class="xroles one">${role(g.roles[0], false)}</div>`}</div>`;
+    }).join("");
+    setTimeout(hiringNow, 0);
+    return `${summary ? `<p class="xsum">${esc(summary)}</p>` : ""}${line}${groups}`;
+  }
+  // "Hiring now": the company you worked at has open jobs on Beat the Pile right now (live list, matched by name)
+  let HIRING = null;
+  async function hiringNow(){
+    const els = document.querySelectorAll("[data-hire]"); if (!els.length) return;
+    try { HIRING ||= fetch("/api/listings?names=1").then((r) => r.ok ? r.json() : { companies: [] });
+      const d = await HIRING, k = (x) => String(x || "").toLowerCase().replace(/\b(inc|llc|corp(oration)?|co|company|the|ltd|group)\b/g, "").replace(/[^a-z0-9]/g, "");
+      const map = new Map((d.companies || []).map((c) => [k(c.company), c.id]));
+      els.forEach((el) => { const id = map.get(k(el.dataset.hire)); if (id) el.innerHTML = `<a href="/jobs/?company=${encodeURIComponent(id)}&kind=all">Hiring now · see their jobs</a>`; });
+    } catch { /* the timeline works without it */ }
+  }
+  // "May 2025 – Aug 2025" / "Sep 2024 – Present" from the date fields (old profiles and the resume filler read `when`)
+  function expWhen(x){ const T = window.btpTL; if (!x.start) return x.when || ""; return `${T.fmtYM(x.start)} – ${x.end === "present" ? "Present" : x.end ? T.fmtYM(x.end) : T.fmtYM(x.start)}`; }
   function jump(id){ const el = document.getElementById(id); if (el) el.scrollIntoView({ block: "start" }); }
   async function showQr(){
     const url = location.origin + "/u/" + S.me.handle;
@@ -674,7 +755,7 @@
       const [me, home] = await Promise.all([api("GET"), sync({ action: "get_all" }).catch(() => null)]);
       S.me = me; S.kitOk = !!home;
       if (home) { const d = home.data || {}; S.kit = d.profile || {}; S.resumes = Array.isArray(d.resumes?.list) ? d.resumes.list : Array.isArray(S.kit.resumes) ? S.kit.resumes : []; }
-      load(); remember();
+      load(); remember(); await TL_READY;
       if (location.hash === "#kit") { S.tab = "edit"; editor(); jump("kit"); }
       else if (location.hash === "#photo") { S.tab = "edit"; editor(); const ph = document.getElementById("f_photo"); if (ph) { ph.closest("div")?.scrollIntoView({ block: "center" }); ph.click(); } }   // Nov 14: "Add a profile photo" links
       else editor();

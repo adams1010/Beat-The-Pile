@@ -1725,7 +1725,17 @@
   "No drops here yet. Try another category or a wider place.": "Rien de neuf ici pour l'instant. Essayez une autre catégorie ou une zone plus large.",
   "in the last hour": "dans la dernière heure",
   "in the last 24 hours": "ces dernières 24 heures",
-  "companies hiring today": "entreprises qui recrutent aujourd'hui"
+  "companies hiring today": "entreprises qui recrutent aujourd'hui",
+  "Real dates put each role on your career line.": "Les vraies dates placent chaque poste sur ta ligne de carrière.",
+  "End": "Fin",
+  "I work here now": "Je travaille ici",
+  "Research": "Recherche",
+  "Leadership": "Leadership",
+  "Volunteer": "Bénévolat",
+  "Now": "Maintenant",
+  "Grad": "Diplôme",
+  "Current": "Actuel",
+  "Hiring now · see their jobs": "Recrute · voir leurs offres"
  },
  "patterns": [
   [
