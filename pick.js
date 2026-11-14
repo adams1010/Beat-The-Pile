@@ -88,6 +88,9 @@
   const majors = async (schoolId) => {
     const names = (await getJ("/schools/cip.json")) || {};
     if (schoolId) {
+      // Nov 14: a school's own official major names win over the federal program codes (Virginia Tech first)
+      const official = ((await getJ("/schools/official.json")) || {})[schoolId];
+      if (official?.length) return official.map((m) => ({ label: m }));
       const shard = (await getJ(`/schools/p/${schoolId % 64}.json`)) || {};
       const own = [...new Set((shard[schoolId] || []).map((c) => names[c]).filter(Boolean))].sort((x, y) => x.localeCompare(y));
       if (own.length) return own.map((m) => ({ label: m }));

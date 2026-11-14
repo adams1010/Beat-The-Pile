@@ -34,3 +34,18 @@ assert.ok(idx.length > 3000 && vt && vt[2].includes("Virginia Tech"));
 const vtp = JSON.parse(readFileSync(new URL(`../schools/p/${233921 % 64}.json`, import.meta.url)))[233921].map((c) => cip[c]);
 assert.ok(vtp.includes("Mechanical Engineering") && vtp.includes("Psychology"));
 console.log(`✓ education: several schools, grad term, school ids; Orbit matches by id; ${idx.length} schools with real program lists`);
+
+// Nov 14: Virginia Tech's official major names are what the VT Major picker offers, and every one maps to job areas
+{
+  const assert = (await import("node:assert/strict")).default;
+  const { readFileSync } = await import("node:fs");
+  const off = JSON.parse(readFileSync(new URL("../schools/official.json", import.meta.url)));
+  const vt = off["233921"];
+  assert.equal(vt.length, 135); assert.ok(vt.includes("Mechanical Engineering") && vt.includes("Cybersecurity Management and Analytics"));
+  const { fieldsForMajor } = await import("../lib/geo.js");
+  const none = vt.filter((m) => !(fieldsForMajor(m) || []).length);
+  assert.deepEqual(none, [], "every VT major finds its job areas");
+  const pick = readFileSync(new URL("../pick.js", import.meta.url), "utf8"), u = readFileSync(new URL("../u/index.html", import.meta.url), "utf8");
+  assert.ok(pick.includes("/schools/official.json") && u.includes("/schools/official.json"), "both pickers read the official list");
+  console.log("✓ Virginia Tech: 135 official majors in the picker, all mapped to job areas");
+}

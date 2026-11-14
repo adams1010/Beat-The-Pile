@@ -312,7 +312,9 @@
   const getJ = (u) => fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
   const schools = () => (SCH.index ||= getJ("/schools/index.json").then((x) => x || []));
   const cipNames = () => (SCH.cip ||= getJ("/schools/cip.json").then((x) => x || {}));
-  async function programsOf(id){ const sh = (SCH["p" + (id % 64)] ||= getJ(`/schools/p/${id % 64}.json`)); const m = await sh; const names = await cipNames();
+  const officialMajors = () => (SCH.official ||= getJ("/schools/official.json").then((x) => x || {}));
+  async function programsOf(id){ const own = (await officialMajors())[id]; if (own?.length) return own.slice();   // Nov 14: school's own names first
+    const sh = (SCH["p" + (id % 64)] ||= getJ(`/schools/p/${id % 64}.json`)); const m = await sh; const names = await cipNames();
     return [...new Set(((m && m[id]) || []).map((c) => names[c]).filter(Boolean))].sort((a, b) => a.localeCompare(b)); }
   async function findSchool(name){ const n = sNorm(name); if (n.length < 2) return null;
     return (await schools()).find((x) => sNorm(x[1]) === n || String(x[2] || "").split("|").some((a) => sNorm(a) === n)) || null; }
