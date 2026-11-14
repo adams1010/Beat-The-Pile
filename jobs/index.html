@@ -937,7 +937,8 @@
     const rows = [...(first.listings || [])];
     if (!first.meta?.more) return rows;
     if (onFirst) onFirst(rows.slice());
-    for (let off = 1000, done = false; !done && off <= 30000; off += 4000) {
+    let done = false;
+    for (let off = 1000; !done && off <= 30000; off += 4000) {
       // a later page that fails keeps what already loaded (never wipe a working list over one bad page)
       const batch = await Promise.all([0, 1000, 2000, 3000].map((d) => off + d).filter((o) => o <= 30000).map((o) => page(o).catch(() => ({ listings: [], meta: { more: false } }))));
       for (const d of batch) { rows.push(...(d.listings || [])); if (!d.meta?.more) { done = true; break; } }
