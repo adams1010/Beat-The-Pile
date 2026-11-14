@@ -1706,7 +1706,26 @@
   "Choose a photo": "Elegir una foto",
   "Let verified employers find me. Only companies we've checked can see your public profile and message you about real jobs and internships. You can turn this off any time on your profile.": "Dejar que me encuentren empresas verificadas. Solo las empresas que hemos comprobado pueden ver tu perfil público y escribirte sobre empleos y prácticas reales. Puedes desactivarlo cuando quieras en tu perfil.",
   "Profile photo added": "Foto de perfil añadida",
-  "Add one": "Añadir"
+  "Add one": "Añadir",
+  "The Drop": "The Drop",
+  "New internships and jobs the moment they show up on company job boards. Be early, before the pile builds.": "Prácticas y empleos nuevos en cuanto aparecen en las bolsas de empleo de las empresas. Llega pronto, antes de que se acumulen.",
+  "Everything": "Todo",
+  "Near a city, state or ZIP (optional)": "Cerca de una ciudad, estado o código postal (opcional)",
+  "Go": "Ir",
+  "Last hour": "Última hora",
+  "Earlier today": "Hoy, más temprano",
+  "Yesterday": "Ayer",
+  "This week": "Esta semana",
+  "Earlier": "Antes",
+  "Day 1": "Día 1",
+  "Part-time": "Medio tiempo",
+  "Job": "Empleo",
+  "Apply": "Postular",
+  "A hiring spree in the last 24 hours. Companies that post a batch usually review the first applicants first.": "Una ola de contrataciones en las últimas 24 horas. Las empresas que publican en bloque suelen revisar primero a los primeros candidatos.",
+  "No drops here yet. Try another category or a wider place.": "Aún no hay novedades aquí. Prueba otra categoría o un lugar más amplio.",
+  "in the last hour": "en la última hora",
+  "in the last 24 hours": "en las últimas 24 horas",
+  "companies hiring today": "empresas contratando hoy"
  },
  "patterns": [
   [
@@ -2088,6 +2107,26 @@
   [
    "^([\\d,]+) more (.+) jobs below$",
    "$1 empleos más de $2 abajo"
+  ],
+  [
+   "^([\\d,]+) drops?$",
+   "$1 novedades"
+  ],
+  [
+   "^(.+) just dropped ([\\d,]+) roles$",
+   "$1 acaba de publicar $2 puestos"
+  ],
+  [
+   "^See all ([\\d,]+) at (.+)$",
+   "Ver los $1 en $2"
+  ],
+  [
+   "^([\\d,]+) new drops?, show$",
+   "$1 novedades, ver"
+  ],
+  [
+   "^(\\d+) (min|h|d) ago$",
+   "hace $1 $2"
   ]
  ]
 }

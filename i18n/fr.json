@@ -1706,7 +1706,26 @@
   "Choose a photo": "Choisir une photo",
   "Let verified employers find me. Only companies we've checked can see your public profile and message you about real jobs and internships. You can turn this off any time on your profile.": "Laisser les employeurs vérifiés me trouver. Seules les entreprises que nous avons vérifiées peuvent voir votre profil public et vous écrire au sujet de vrais emplois et stages. Vous pouvez désactiver cette option à tout moment sur votre profil.",
   "Profile photo added": "Photo de profil ajoutée",
-  "Add one": "En ajouter une"
+  "Add one": "En ajouter une",
+  "The Drop": "The Drop",
+  "New internships and jobs the moment they show up on company job boards. Be early, before the pile builds.": "Nouveaux stages et emplois dès qu'ils apparaissent sur les sites carrières des entreprises. Soyez en avance, avant que la pile grossisse.",
+  "Everything": "Tout",
+  "Near a city, state or ZIP (optional)": "Près d'une ville, d'un État ou d'un code postal (facultatif)",
+  "Go": "Aller",
+  "Last hour": "Dernière heure",
+  "Earlier today": "Plus tôt aujourd'hui",
+  "Yesterday": "Hier",
+  "This week": "Cette semaine",
+  "Earlier": "Plus tôt",
+  "Day 1": "Jour 1",
+  "Part-time": "Temps partiel",
+  "Job": "Emploi",
+  "Apply": "Postuler",
+  "A hiring spree in the last 24 hours. Companies that post a batch usually review the first applicants first.": "Une vague de recrutement ces dernières 24 heures. Les entreprises qui publient en lot examinent souvent les premiers candidats en premier.",
+  "No drops here yet. Try another category or a wider place.": "Rien de neuf ici pour l'instant. Essayez une autre catégorie ou une zone plus large.",
+  "in the last hour": "dans la dernière heure",
+  "in the last 24 hours": "ces dernières 24 heures",
+  "companies hiring today": "entreprises qui recrutent aujourd'hui"
  },
  "patterns": [
   [
@@ -2088,6 +2107,26 @@
   [
    "^([\\d,]+) more (.+) jobs below$",
    "$1 autres offres $2 plus bas"
+  ],
+  [
+   "^([\\d,]+) drops?$",
+   "$1 nouveautés"
+  ],
+  [
+   "^(.+) just dropped ([\\d,]+) roles$",
+   "$1 vient de publier $2 postes"
+  ],
+  [
+   "^See all ([\\d,]+) at (.+)$",
+   "Voir les $1 chez $2"
+  ],
+  [
+   "^([\\d,]+) new drops?, show$",
+   "$1 nouveautés, afficher"
+  ],
+  [
+   "^(\\d+) (min|h|d) ago$",
+   "il y a $1 $2"
   ]
  ]
 }

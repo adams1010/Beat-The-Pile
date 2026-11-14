@@ -1706,7 +1706,26 @@
   "Choose a photo": "Kies een foto",
   "Let verified employers find me. Only companies we've checked can see your public profile and message you about real jobs and internships. You can turn this off any time on your profile.": "Laat geverifieerde werkgevers me vinden. Alleen bedrijven die wij hebben gecontroleerd zien je openbare profiel en kunnen je berichten sturen over echte banen en stages. Je kunt dit altijd uitzetten op je profiel.",
   "Profile photo added": "Profielfoto toegevoegd",
-  "Add one": "Toevoegen"
+  "Add one": "Toevoegen",
+  "The Drop": "The Drop",
+  "New internships and jobs the moment they show up on company job boards. Be early, before the pile builds.": "Nieuwe stages en banen zodra ze op vacaturesites van bedrijven verschijnen. Wees er vroeg bij, voordat de stapel groeit.",
+  "Everything": "Alles",
+  "Near a city, state or ZIP (optional)": "In de buurt van een stad, staat of postcode (optioneel)",
+  "Go": "Ga",
+  "Last hour": "Afgelopen uur",
+  "Earlier today": "Eerder vandaag",
+  "Yesterday": "Gisteren",
+  "This week": "Deze week",
+  "Earlier": "Eerder",
+  "Day 1": "Dag 1",
+  "Part-time": "Deeltijd",
+  "Job": "Baan",
+  "Apply": "Solliciteren",
+  "A hiring spree in the last 24 hours. Companies that post a batch usually review the first applicants first.": "Een wervingsgolf in de afgelopen 24 uur. Bedrijven die veel vacatures tegelijk plaatsen, bekijken meestal de eerste sollicitanten eerst.",
+  "No drops here yet. Try another category or a wider place.": "Hier is nog niets nieuws. Probeer een andere categorie of een grotere plek.",
+  "in the last hour": "in het afgelopen uur",
+  "in the last 24 hours": "in de afgelopen 24 uur",
+  "companies hiring today": "bedrijven die vandaag aannemen"
  },
  "patterns": [
   [
@@ -2088,6 +2107,26 @@
   [
    "^([\\d,]+) more (.+) jobs below$",
    "$1 meer $2-vacatures hieronder"
+  ],
+  [
+   "^([\\d,]+) drops?$",
+   "$1 nieuw"
+  ],
+  [
+   "^(.+) just dropped ([\\d,]+) roles$",
+   "$1 heeft net $2 vacatures geplaatst"
+  ],
+  [
+   "^See all ([\\d,]+) at (.+)$",
+   "Bekijk alle $1 bij $2"
+  ],
+  [
+   "^([\\d,]+) new drops?, show$",
+   "$1 nieuw, tonen"
+  ],
+  [
+   "^(\\d+) (min|h|d) ago$",
+   "$1 $2 geleden"
   ]
  ]
 }

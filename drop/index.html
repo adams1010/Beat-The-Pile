@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>The Drop | Beat the Pile</title>
+<meta name="description" content="A live timeline of new internships and jobs the moment companies post them, grouped by the hour, with hiring sprees called out.">
+<link rel="canonical" href="https://www.beatthepile.com/drop/">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/business/biz.css">
+<style>
+  /* /drop/ (Nov 14): "The Drop", a live timeline of new jobs. Real data only (/api/listings ordered by first_seen = when our
+     robot first saw the job on the company's board). Twists: hour buckets on a timeline rail, a "Day 1" badge for jobs that
+     appeared in the last 24 hours, "hiring spree" cards when one company drops 5+ jobs in a day, and a "N new drops" pill
+     that appears when the robot finds more while you're on the page. */
+  main{max-width:860px}
+  .head{background:var(--navy);color:#fff;border-radius:10px;padding:20px 22px;margin-bottom:12px}
+  .head h1{color:#fff;margin:0;font-size:28px;letter-spacing:-.02em}.head .sub{color:#C9D2E3;margin:4px 0 0;font-size:15px}
+  .pulse{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:14px;color:#C9D2E3}
+  .pulse b{color:var(--lime);font-size:22px;font-variant-numeric:tabular-nums;margin-right:4px}
+  .ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 8px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:#fff;padding:3px}
+  .seg button{border:0;background:none;font:inherit;font-size:14px;padding:6px 14px;border-radius:999px;cursor:pointer;color:var(--ink)}
+  .seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+  .ctl form{display:flex;gap:6px;flex:1 1 240px}
+  .ctl input{font:inherit;font-size:14px;border:1px solid var(--line);border-radius:999px;padding:8px 12px;flex:1;min-width:0;margin:0}
+  .ctl button.go{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 16px;background:#4A7000;color:#fff;cursor:pointer}
+  .cats{display:flex;gap:6px;overflow-x:auto;padding:2px 0 12px}
+  .cats button{flex:0 0 auto;border:1px solid #C9D1DE;background:#fff;color:#060A2C;border-radius:999px;padding:6px 12px;font:500 13.5px Geist,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+  .cats button[aria-pressed="true"]{background:#060A2C;border-color:#060A2C;color:#fff}
+  .newpill{position:sticky;top:76px;z-index:5;display:flex;justify-content:center;margin:0 0 8px}
+  .newpill button{border:0;border-radius:999px;background:#060A2C;color:#B0F701;font:600 14px Geist,system-ui,sans-serif;padding:9px 18px;cursor:pointer}
+  .rail{position:relative;margin-left:14px;padding-left:26px;border-left:2px solid #C9D1DE}
+  .bucket{position:relative;margin:18px 0 8px;font-size:13px;font-weight:600;color:#4B5568}
+  .bucket::before{content:"";position:absolute;left:-34px;top:2px;width:12px;height:12px;border-radius:50%;background:#EEF1F6;border:2px solid #4A7000}
+  .bucket.now::before{background:#B0F701;border-color:#060A2C}
+  .bucket span{font-weight:400;color:#5E6A80;margin-left:6px}
+  .drop{position:relative;background:#fff;border:1px solid #DCE2EC;border-radius:10px;padding:12px 14px;margin:0 0 8px;display:grid;grid-template-columns:40px 1fr auto;gap:12px;align-items:center}
+  .drop::before{content:"";position:absolute;left:-31px;top:22px;width:6px;height:6px;border-radius:50%;background:#9AA6BA}
+  .lg{width:40px;height:40px;border-radius:8px;background:#E3E8F4;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:#060A2C;overflow:hidden;text-decoration:none}
+  .lg img{width:100%;height:100%;object-fit:contain;background:#fff}
+  .t{font-weight:600;font-size:15.5px;line-height:1.3}
+  .m{font-size:13.5px;color:#4B5568;margin-top:2px}.m a{color:#4B5568}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+  .tag{font-size:12px;font-weight:600;border-radius:999px;padding:2px 9px;background:#EEF1F6;color:#1E3A8A}
+  .tag.d1{background:#F2FADF;color:#3A5800}
+  .apply{font-size:14px;font-weight:600;color:#fff;background:#4A7000;border-radius:999px;padding:8px 14px;text-decoration:none;white-space:nowrap}
+  .spree{position:relative;background:#060A2C;color:#fff;border-radius:10px;padding:14px 16px;margin:0 0 8px}
+  .spree::before{content:"";position:absolute;left:-33px;top:20px;width:10px;height:10px;border-radius:50%;background:#B0F701}
+  .spree h3{margin:0;font-size:17px;color:#fff}.spree h3 b{color:#B0F701}
+  .spree p{margin:4px 0 8px;color:#C9D2E3;font-size:13.5px}
+  .spree ul{list-style:none;margin:0;padding:0}
+  .spree li{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-top:1px solid #22304D;font-size:14px}
+  .spree li a{color:#fff;text-decoration:none}.spree li span{color:#8D9AB3;white-space:nowrap}
+  .spree .all{display:inline-block;margin-top:8px;color:#B0F701;font-weight:600;font-size:14px}
+  .empty,.err{background:#fff;border:1px solid #DCE2EC;border-radius:10px;padding:22px;text-align:center;color:#4B5568}
+  .skel{height:74px;border-radius:10px;margin:0 0 8px;background:linear-gradient(90deg,#E3E8F0,#F1F4F9,#E3E8F0);background-size:200% 100%;animation:sh 1.2s infinite}
+  @keyframes sh{to{background-position:-200% 0}}
+  @media (max-width:560px){.drop{grid-template-columns:36px 1fr}.drop .apply{grid-column:2;justify-self:start}.rail{margin-left:6px;padding-left:18px}.bucket::before{left:-26px}.drop::before{left:-23px}.spree::before{left:-25px}}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main">
+  <section class="head">
+    <h1>The Drop</h1>
+    <p class="sub">New internships and jobs the moment they show up on company job boards. Be early, before the pile builds.</p>
+    <div class="pulse" id="pulse" aria-live="polite"></div>
+  </section>
+  <div class="ctl">
+    <div class="seg" role="group" aria-label="Job type"><button type="button" data-k="all" aria-pressed="true">Everything</button><button type="button" data-k="intern" aria-pressed="false">Internships</button><button type="button" data-k="career" aria-pressed="false">Jobs</button></div>
+    <form id="whereF" role="search" aria-label="Drops near a city, state or ZIP"><input id="where" placeholder="Near a city, state or ZIP (optional)" autocomplete="off" maxlength="40" aria-label="Near a city, state or ZIP"><button class="go" type="submit">Go</button></form>
+  </div>
+  <div class="cats" id="cats" role="group" aria-label="Job category"></div>
+  <div class="newpill" id="newpill" hidden><button type="button" id="newBtn"></button></div>
+  <div id="feed"><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>
+</main>
+<script type="module">
+import { CATEGORIES } from "/lib/categories.js";
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const ini = (n) => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+const HOUR = 3600e3, DAY = 24 * HOUR;
+const store = { get: () => { try { return JSON.parse(localStorage.getItem("btp_drop") || "{}"); } catch { return {}; } }, set: (v) => { try { localStorage.setItem("btp_drop", JSON.stringify(v)); } catch {} } };
+const S = Object.assign({ kind: "all", cat: "", where: "" }, store.get());
+const p0 = new URLSearchParams(location.search);
+if (p0.get("cat")) S.cat = p0.get("cat"); if (p0.get("near")) S.where = p0.get("near"); if (["all", "intern", "career"].includes(p0.get("kind"))) S.kind = p0.get("kind");
+let rows = [], seen = new Set(), pending = [];
+
+const ago = (t) => { const m = Math.max(1, Math.round((Date.now() - t) / 60000)); return m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
+const bucketOf = (t) => { const a = Date.now() - t, d = new Date(t), now = new Date();
+  if (a < HOUR) return ["now", "Last hour"];
+  if (d.toDateString() === now.toDateString()) return ["today", "Earlier today"];
+  const y = new Date(now); y.setDate(now.getDate() - 1); if (d.toDateString() === y.toDateString()) return ["yday", "Yesterday"];
+  if (a < 7 * DAY) return ["week", "This week"];
+  return ["older", "Earlier"]; };
+const kindTag = (k) => k === "intern" ? "Internship" : k === "hourly" ? "Part-time" : "Job";
+const place = (l) => String(l.location || "").split("|").map((x) => x.trim()).filter((x) => x && !/^(hybrid|remote|in[- ]?office|on[- ]?site)$/i.test(x))[0] || (l.state === "US" ? "Remote, US" : l.state || "");
+
+function url(extra = {}) {
+  const q = new URLSearchParams({ field: "all", kind: S.kind, limit: "1000", offset: "0", ...extra });
+  if (S.cat) q.set("cat", S.cat);
+  if (S.where) { q.set("near", S.where); q.set("mi", "50"); }
+  return "/api/listings?" + q;
+}
+async function load() {
+  $("feed").innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>'; $("newpill").hidden = true; pending = [];
+  store.set({ kind: S.kind, cat: S.cat, where: S.where });
+  history.replaceState(null, "", location.pathname + (S.cat || S.where || S.kind !== "all" ? "?" + new URLSearchParams(Object.entries({ cat: S.cat, near: S.where, kind: S.kind !== "all" ? S.kind : "" }).filter(([, v]) => v)) : ""));
+  try {
+    const r = await fetch(url());
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) { $("feed").innerHTML = `<div class="err" role="alert">${esc(d.error || "Couldn’t load the drops right now. That’s on our side, not a sign there are no new jobs. Try again in a minute.")}</div>`; $("pulse").innerHTML = ""; return; }
+    rows = (d.listings || []).slice().sort((a, b) => new Date(b.first_seen) - new Date(a.first_seen));
+    seen = new Set(rows.map((x) => x.id));
+    draw();
+  } catch { $("feed").innerHTML = '<div class="err" role="alert">Couldn’t load the drops right now. Try again in a minute.</div>'; }
+}
+function draw() {
+  const now = Date.now(), day = rows.filter((l) => now - new Date(l.first_seen) < DAY), hour = rows.filter((l) => now - new Date(l.first_seen) < HOUR);
+  const coDay = new Map(); for (const l of day) coDay.set(l.company_id || l.company, (coDay.get(l.company_id || l.company) || 0) + 1);
+  const capped = rows.length >= 1000 && day.length === rows.length;
+  $("pulse").innerHTML = `<span><b>${hour.length.toLocaleString("en-US")}</b>in the last hour</span><span><b>${day.length.toLocaleString("en-US")}${capped ? "+" : ""}</b>in the last 24 hours</span><span><b>${coDay.size.toLocaleString("en-US")}</b>companies hiring today</span>`;
+  if (!rows.length) { $("feed").innerHTML = `<div class="empty">No drops here yet. Try another category or a wider place.</div>`; return; }
+  // Hiring sprees: one company, 5+ new jobs in the last 24 hours → one card in the timeline where its first job would be
+  const spree = new Map(); for (const [co, n] of coDay) if (n >= 5) spree.set(co, day.filter((l) => (l.company_id || l.company) === co));
+  const shownSpree = new Set();
+  let html = "", lastB = "";
+  for (const l of rows.slice(0, 400)) {
+    const t = new Date(l.first_seen).getTime(), [bk, bl] = bucketOf(t), key = l.company_id || l.company;
+    if (bk !== lastB) { const n = rows.filter((x) => bucketOf(new Date(x.first_seen).getTime())[0] === bk).length;
+      html += `<div class="bucket${bk === "now" ? " now" : ""}">${bl}<span>${n.toLocaleString("en-US")} ${n === 1 ? "drop" : "drops"}</span></div>`; lastB = bk; }
+    if (spree.has(key)) {
+      if (shownSpree.has(key)) continue; shownSpree.add(key);
+      const js = spree.get(key);
+      html += `<article class="spree"><h3><span data-noi18n>${esc(l.company)}</span> just dropped <b>${js.length}</b> roles</h3><p>A hiring spree in the last 24 hours. Companies that post a batch usually review the first applicants first.</p><ul>${js.slice(0, 4).map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener" data-noi18n>${esc(x.title)}</a><span data-noi18n>${esc(place(x))}</span></li>`).join("")}</ul>${l.company_id ? `<a class="all" href="/jobs/?company=${encodeURIComponent(l.company_id)}&kind=all">See all ${js.length} at <span data-noi18n>${esc(l.company)}</span></a>` : ""}</article>`;
+      continue;
+    }
+    const d1 = now - t < DAY;
+    html += `<article class="drop"><a class="lg" href="${l.company_id ? "/co/" + encodeURIComponent(l.company_id) : "#"}" data-logo-id="${esc(l.company_id || "")}" aria-hidden="true" tabindex="-1">${esc(ini(l.company))}</a>
+      <div style="min-width:0"><div class="t" data-noi18n>${esc(l.title)}</div><div class="m"><span data-noi18n>${esc(l.company)} · ${esc(place(l))}</span> · ${ago(t)}</div>
+      <div class="tags"><span class="tag">${kindTag(l.kind)}</span>${d1 ? '<span class="tag d1">Day 1</span>' : ""}</div></div>
+      <a class="apply" href="${esc(l.url)}" target="_blank" rel="noopener">Apply</a></article>`;
+  }
+  if (rows.length > 400) html += `<div class="empty">That's the newest 400. <a href="/jobs/?kind=all${S.cat ? "&cat=" + S.cat : ""}${S.where ? "&near=" + encodeURIComponent(S.where) : ""}">See every job on the Jobs page</a></div>`;
+  $("feed").innerHTML = `<div class="rail">${html}</div>`;
+  try { window.btpLogos && window.btpLogos(); } catch {}
+}
+// While you're here: check for new drops every 3 minutes and offer them (never jump the list under your thumb)
+setInterval(async () => {
+  if (document.hidden) return;
+  try { const r = await fetch(url({ limit: "200" })); if (!r.ok) return; const d = await r.json();
+    pending = (d.listings || []).filter((l) => !seen.has(l.id));
+    if (pending.length) { $("newBtn").textContent = `${pending.length} new ${pending.length === 1 ? "drop" : "drops"}, show`; $("newpill").hidden = false; } } catch {}
+}, 180000);
+$("newBtn").onclick = () => { rows = [...pending, ...rows]; for (const l of pending) seen.add(l.id); pending = []; $("newpill").hidden = true; draw(); scrollTo({ top: 0, behavior: "smooth" }); };
+function cats() {
+  $("cats").innerHTML = `<button type="button" data-c="" aria-pressed="${!S.cat}">All jobs</button>` + CATEGORIES.map((c) => `<button type="button" data-c="${c.key}" aria-pressed="${S.cat === c.key}">${esc(c.label)}</button>`).join("");
+}
+$("cats").onclick = (e) => { const b = e.target.closest("[data-c]"); if (!b) return; S.cat = b.dataset.c; cats(); load(); };
+document.querySelectorAll("[data-k]").forEach((b) => { b.setAttribute("aria-pressed", String(b.dataset.k === S.kind));
+  b.onclick = () => { S.kind = b.dataset.k; document.querySelectorAll("[data-k]").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); load(); }; });
+$("where").value = S.where;
+$("whereF").onsubmit = (e) => { e.preventDefault(); S.where = $("where").value.trim(); load(); };
+cats(); load();
+</script>
+<script src="/logos.js" defer></script>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>
