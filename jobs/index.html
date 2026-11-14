@@ -506,8 +506,14 @@
 
     const companies = new Set(rows.map((j) => j.company)).size;
     const where = state.savedOnly ? "saved" : state.followOnly ? "you follow" : state.near && !state.company ? `within ${state.near.mi} mi of ${state.near.q}` : state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
-    $("count").textContent = rows.length
-      ? `${rows.length} ${state.kind === "fulltime" ? "entry-level job" : state.kind === "hourly" ? "part-time & hourly job" : state.kind === "all" ? "job" : "internship"}${rows.length === 1 ? "" : "s"} at ${companies} compan${companies === 1 ? "y" : "ies"} ${where}` +
+    // Nov 14: count every opening (a card can hold the same job in many places), commas so it reads like a number
+    const openings = rows.reduce((t, j) => t + (j.count || 1), 0), nOpen = openings.toLocaleString("en-US");
+    // Nov 14: too many to load at once (every job type, whole country): say the real total from the live summary
+    const sumTotal = state.sum ? { intern: state.sum.allMajors, fulltime: state.sum.fulltime, hourly: state.sum.hourly, all: (state.sum.allMajors || 0) + (state.sum.fulltime || 0) + (state.sum.hourly || 0) }[state.kind] : 0;
+    if (state.capped && sumTotal && state.major === "all" && state.st === "ALL" && !state.near && !state.q && !state.company && !state.savedOnly && !state.followOnly) {
+      $("count").textContent = `${sumTotal.toLocaleString("en-US")} open jobs across the US · newest ${nOpen} shown. Pick a state or search to see the rest`;
+    } else $("count").textContent = rows.length
+      ? `${nOpen} ${state.kind === "fulltime" ? "entry-level job" : state.kind === "hourly" ? "part-time & hourly job" : state.kind === "all" ? "job" : "internship"}${openings === 1 ? "" : "s"} at ${companies.toLocaleString("en-US")} compan${companies === 1 ? "y" : "ies"} ${where}` +
         (state.savedOnly || state.followOnly ? "" : ` · ${MAJOR_LABEL()}`) + (simRows.length ? ` · plus ${simRows.length} similar` : "") + (state.partial && !state.savedOnly && !state.followOnly ? " so far · loading the rest…" : "")
       : simRows.length ? `${simRows.length} similar ${state.kind === "intern" ? "internship" : "job"}${simRows.length === 1 ? "" : "s"} ${where}` : "";
 
@@ -936,6 +942,7 @@
       const batch = await Promise.all([0, 1000, 2000, 3000].map((d) => off + d).filter((o) => o <= 30000).map((o) => page(o).catch(() => ({ listings: [], meta: { more: false } }))));
       for (const d of batch) { rows.push(...(d.listings || [])); if (!d.meta?.more) { done = true; break; } }
     }
+    if (!done) rows.capped = true;      // Nov 14: more exist than a browser should load at once (the count line says so)
     return rows;
   }
   const order = () => state.near ? (a, b) => (a.mi - b.mi) || (sortKey(b) - sortKey(a)) : (a, b) => sortKey(b) - sortKey(a);
@@ -961,7 +968,8 @@
       cache.set(qs, rows);
       if (seq !== loadSeq) return;
       state.all = rows.slice().sort(order());
-      state.loaded = true; state.partial = false;
+      state.loaded = true; state.partial = false; state.capped = !!rows.capped;
+      if (state.capped && !state.sum) fetch("/api/listings?summary=1").then((r) => r.ok ? r.json() : null).then((d) => { if (d) { state.sum = d; render(); } }).catch(() => {});
       if (state.lastSync) { $("trustText").textContent = `Job boards last re-read ${timeOfDay(state.lastSync)}`; $("trust").hidden = false; }
       urlReady = true;
       render();

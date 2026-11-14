@@ -1685,6 +1685,10 @@
  },
  "patterns": [
   [
+   "^([\\d,]+) open jobs across the US · newest ([\\d,]+) shown\\. Pick a state or search to see the rest$",
+   "$1 offres ouvertes aux États-Unis · les $2 plus récentes sont affichées. Choisissez un État ou cherchez pour voir le reste"
+  ],
+  [
    "^Show ([\\d,]+) more \\(([\\d,]+) left\\)$",
    "Afficher $1 de plus ($2 restants)"
   ],

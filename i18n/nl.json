@@ -1685,6 +1685,10 @@
  },
  "patterns": [
   [
+   "^([\\d,]+) open jobs across the US · newest ([\\d,]+) shown\\. Pick a state or search to see the rest$",
+   "$1 open vacatures in de VS · de nieuwste $2 worden getoond. Kies een staat of zoek om de rest te zien"
+  ],
+  [
    "^Show ([\\d,]+) more \\(([\\d,]+) left\\)$",
    "Nog $1 tonen ($2 over)"
   ],
