@@ -1735,7 +1735,11 @@
   "Now": "Maintenant",
   "Grad": "Diplôme",
   "Current": "Actuel",
-  "Hiring now · see their jobs": "Recrute · voir leurs offres"
+  "Hiring now · see their jobs": "Recrute · voir leurs offres",
+  "Up next": "À venir",
+  "Find openings": "Trouver des offres",
+  "Companies": "Entreprises",
+  "What's next": "La suite"
  },
  "patterns": [
   [

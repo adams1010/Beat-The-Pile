@@ -1735,7 +1735,11 @@
   "Now": "Ahora",
   "Grad": "Graduación",
   "Current": "Actual",
-  "Hiring now · see their jobs": "Contratando ahora · ver sus empleos"
+  "Hiring now · see their jobs": "Contratando ahora · ver sus empleos",
+  "Up next": "Lo siguiente",
+  "Find openings": "Buscar vacantes",
+  "Companies": "Empresas",
+  "What's next": "Lo que sigue"
  },
  "patterns": [
   [

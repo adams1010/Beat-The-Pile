@@ -133,27 +133,39 @@
   .rfile .rmeta input{font:inherit;font-weight:600;border:1px solid transparent;border-radius:6px;padding:4px 6px;margin-left:-6px;background:transparent}
   .rfile .rmeta input:hover,.rfile .rmeta input:focus{border-color:var(--line);background:#fff}
   .res{border:1px solid var(--line);border-radius:10px;padding:8px 12px 12px;margin-top:10px;position:relative;background:#fff}
-  /* Nov 14: experience timeline (career line + roles grouped by company) */
-  .xp .xsum{margin:-2px 0 10px;color:var(--muted);font-size:14px}
-  .cline{margin:4px 0 16px;padding:22px 0 18px;border-bottom:1px solid var(--line)}
-  .ctrack{position:relative;margin:0 4px}
-  .cyr{position:absolute;top:-20px;bottom:-16px;border-left:1px dashed #C9D1DE}.cyr i{position:absolute;top:-2px;left:4px;font-style:normal;font-size:11.5px;color:#5E6A80;font-variant-numeric:tabular-nums}
-  .cbar{position:absolute;height:18px;border-radius:999px;background:#4A7000;color:#fff;font-size:11.5px;font-weight:600;line-height:18px;overflow:hidden;text-decoration:none;min-width:8px}
-  .cbar span{padding:0 7px;white-space:nowrap}
-  .cbar.t-internship{background:#4A7000}.cbar.t-job,.cbar.t-parttime{background:#1E3A8A}.cbar.t-research{background:#0F6E6E}.cbar.t-leadership{background:#8A4B00}.cbar.t-volunteer{background:#9B2C55}.cbar.t-project,.cbar.t-none{background:#4B5568}
-  .cbar.cur{border-top-right-radius:0;border-bottom-right-radius:0;box-shadow:inset -3px 0 0 #B0F701}
-  .cnext{position:absolute;height:18px;border:2px dashed #4A7000;border-radius:999px;background:#F2FADF;color:#3A5800;font-size:11.5px;font-weight:600;line-height:14px;overflow:hidden;white-space:nowrap}.cnext span{padding:0 7px}
-  .cnow,.cgrad{position:absolute;top:-8px;bottom:-14px;border-left:2px solid #060A2C}.cnow i,.cgrad i{position:absolute;bottom:-16px;left:-14px;font-style:normal;font-size:11px;font-weight:700;color:#060A2C}
-  .cgrad{border-left:2px dotted #8A4B00}.cgrad i{color:#8A4B00}
-  .xgroup{display:block;padding:12px 0;border-top:1px solid var(--line)}.xgroup:first-of-type{border-top:0}
-  .xhead{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start}
-  .xroles{margin:6px 0 0 56px}.xroles.one{margin-top:2px}
-  .xroles:not(.one) .xrole{position:relative;padding:6px 0 6px 16px;border-left:2px solid #DCE2EC}
-  .xroles:not(.one) .xrole::before{content:"";position:absolute;left:-6px;top:11px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid #4A7000}
-  .xrole p{margin:4px 0 0}
-  .xtype{font-size:11.5px;font-weight:600;border-radius:999px;padding:1px 8px;background:#EEF1F6;color:#1E3A8A;margin-left:4px}
-  .xnow{font-size:11.5px;font-weight:600;border-radius:999px;padding:1px 8px;background:#F2FADF;color:#3A5800}
-  .hire a{display:inline-block;margin-top:4px;font-size:13px;font-weight:600;color:#4A7000}
+  /* Nov 14: experience timeline (vertical rail, roles grouped by company, "Up next" on top) */
+  .tl-stats{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+  .tl-stats>div{flex:1 1 90px;background:#F5F7FA;border-radius:10px;padding:10px 12px}
+  .tl-stats b{display:block;font-size:20px;font-variant-numeric:tabular-nums;color:#060A2C}.tl-stats span{font-size:12.5px;color:var(--muted)}
+  .tl{position:relative;padding-left:26px}
+  .tl::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:#DCE2EC}
+  .tl-item{position:relative;margin:0 0 12px}
+  .tl-node{position:absolute;left:-26px;top:18px;width:16px;height:16px;border-radius:50%;background:#fff;border:3px solid #9AA6B8;box-sizing:border-box}
+  .tl-item.cur .tl-node{border-color:#4A7000;background:#B0F701}
+  .tl-item.next .tl-node{border:2px dashed #4A7000;background:#F2FADF}
+  .tl-card{border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fff}
+  .tl-item.next .tl-card{border:1.5px dashed #4A7000;background:#F7FBEC}
+  .tl-up{font-size:12px;font-weight:700;color:#3A5800;margin-bottom:2px}
+  .tl-find{display:inline-block;margin-top:8px;font-size:13.5px;font-weight:600;color:#4A7000}
+  .tl-year{position:relative;margin:4px 0 10px -26px}.tl-year span{display:inline-block;background:#060A2C;color:#fff;font-size:12px;font-weight:600;border-radius:999px;padding:2px 9px;font-variant-numeric:tabular-nums}
+  .tl-head{display:grid;grid-template-columns:44px 1fr;gap:12px;align-items:start}
+  .tl-logo{width:44px;height:44px;border-radius:8px;background:#EEF1F6;color:#1E3A8A;display:grid;place-items:center;font-weight:700;font-size:14px}
+  .tl-main{min-width:0}
+  .tl-row{display:flex;justify-content:space-between;gap:10px;align-items:baseline}
+  .tl-title{font-size:16px}.tl-co{font-weight:500;color:#2B3446}
+  .tl-len{flex:none;font-size:12.5px;font-weight:600;color:#3A5800;background:#F2FADF;border-radius:999px;padding:1px 9px;font-variant-numeric:tabular-nums}
+  .tl-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}.tl-chips:empty{display:none}
+  .tl-type,.tl-now{font-size:11.5px;font-weight:600;border-radius:999px;padding:1px 8px}
+  .tl-type{background:#EEF1F6;color:#1E3A8A}.tl-type.t-internship{background:#F2FADF;color:#3A5800}.tl-type.t-research{background:#E3F2F2;color:#0F5E5E}.tl-type.t-leadership{background:#FBEFDF;color:#7A4200}.tl-type.t-volunteer{background:#FBE8EF;color:#8A2449}
+  .tl-now{background:#060A2C;color:#B0F701}
+  .tl-body{margin-left:56px}
+  .tl-desc{margin:10px 0 0;padding-left:18px;color:#2B3446;font-size:14.5px;line-height:1.5}.tl-desc li{margin:3px 0}p.tl-desc{padding-left:0}
+  .tl-more summary{cursor:pointer;font-size:13px;font-weight:600;color:#4A7000;margin-top:4px;list-style:none}.tl-more summary::-webkit-details-marker{display:none}.tl-more[open] summary{display:none}
+  .tl-roles{margin:10px 0 0 56px;border-left:2px solid #DCE2EC}
+  .tl-role{position:relative;padding:4px 0 10px 16px}
+  .tl-role::before{content:"";position:absolute;left:-6px;top:9px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid #4A7000}
+  .hire a{display:inline-block;margin-top:6px;font-size:13px;font-weight:600;color:#4A7000}
+  @media (max-width:560px){.tl{padding-left:22px}.tl-node{left:-22px}.tl-year{margin-left:-22px}.tl-body,.tl-roles{margin-left:0}.tl-head{grid-template-columns:38px 1fr;gap:10px}.tl-logo{width:38px;height:38px}.tl-card{padding:12px}}
   .chkrow{display:flex;gap:6px;align-items:center;font-weight:400;font-size:13.5px;margin-top:6px}
   .chkrow input{width:auto;margin:0}
 </style>
@@ -580,34 +592,48 @@
     const T = window.btpTL, xs = p.experience || [];
     if (!xs.length) return "";
     if (!T) return xs.map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.org || x.title))}</div><div><b>${esc(x.title)}</b><div class="sm">${esc([x.org, x.when].filter(Boolean).join(" · "))}</div>${x.desc ? `<p>${esc(x.desc)}</p>` : ""}</div></div>`).join("");
-    const grad = p.gradYear ? `${p.gradYear}-${String(GRAD_M[p.gradTerm] || 5).padStart(2, "0")}` : null;
-    const next = p.lookingFor || ((p.openTo || []).includes("intern") ? "Next internship" : (p.openTo || []).includes("fulltime") ? "First full-time role" : "");
-    const L = T.careerLine(xs, { grad, next });
+    const groups = T.groupByOrg(xs);
     const tot = T.totalMonths(xs), yrs = Math.floor(tot / 12), mos = tot % 12;
-    const kinds = {}; for (const x of xs) if (x.type) kinds[x.type] = (kinds[x.type] || 0) + 1;
-    const summary = [tot ? `${[yrs ? `${yrs} yr${yrs > 1 ? "s" : ""}` : "", mos ? `${mos} mo${mos > 1 ? "s" : ""}` : ""].filter(Boolean).join(" ")} of experience` : "",
-      ...Object.entries(kinds).map(([k, n]) => `${n} ${(T.TYPES[k] || k).toLowerCase()}${n > 1 && !/time$|research$|leadership$/.test(k) ? "s" : ""}`)].filter(Boolean).join(" · ");
-    const line = L ? `<div class="cline" role="img" aria-label="Career line: ${esc(xs.map((x) => [x.title, x.org].filter(Boolean).join(" at ")).join("; "))}">
-        <div class="ctrack" style="height:${L.lanes * 22 + 8}px">
-          ${L.years.map((y) => `<span class="cyr" style="left:${y.at}%"><i>${y.y}</i></span>`).join("")}
-          ${L.bars.map((b) => `<a class="cbar t-${esc(b.type || "none")}${b.current ? " cur" : ""}" href="#xp${b.i}" style="left:${b.left}%;width:${b.width}%;top:${b.lane * 22 + 4}px" title="${esc([b.title, b.org].filter(Boolean).join(" · "))}"><span>${esc(b.org || b.title)}</span></a>`).join("")}
-          ${L.next ? `<span class="cnext" style="left:${L.next.left}%;width:${L.next.width}%;top:${L.lanes * 22 - 18}px"><span>Next: ${esc(L.next.label)}</span></span>` : ""}
-          <span class="cnow" style="left:${L.now}%"><i>Now</i></span>
-          ${L.grad != null ? `<span class="cgrad" style="left:${L.grad}%"><i>Grad</i></span>` : ""}
-        </div></div>` : "";
-    const groups = T.groupByOrg(xs).map((g) => {
-      const multi = g.roles.length > 1;
-      const head = `<div class="xhead"><div class="dot" aria-hidden="true">${esc(initials(g.org || g.roles[0].title))}</div><div style="min-width:0">
-          ${multi ? `<b>${esc(g.org)}</b><div class="sm">${g.roles.length} roles${g.span ? " · " + T.duration(g.span.a, g.span.b) : ""}</div>`
-            : `<b>${esc(g.roles[0].title)}</b><div class="sm">${esc([g.org, T.TYPES[g.roles[0].type]].filter(Boolean).join(" · "))}</div>`}
-          ${g.org ? `<span class="hire" data-hire="${esc(g.org)}"></span>` : ""}</div></div>`;
-      const role = (r, showTitle) => `<div class="xrole" id="xp${r.i}">${showTitle ? `<b>${esc(r.title)}</b>${r.type ? ` <span class="xtype t-${esc(r.type)}">${esc(T.TYPES[r.type])}</span>` : ""}` : (r.type && multi ? "" : "")}
-          <div class="sm">${esc(r.sp ? T.rangeText(r.sp) : r.when || "")}${r.location ? " · " + esc(r.location) : ""}${r.sp?.current ? ' <span class="xnow">Current</span>' : ""}</div>
-          ${r.desc ? `<p>${esc(r.desc)}</p>` : ""}</div>`;
-      return `<div class="xgroup${multi ? " multi" : ""}">${head}${multi ? `<div class="xroles">${g.roles.map((r) => role(r, true)).join("")}</div>` : `<div class="xroles one">${role(g.roles[0], false)}</div>`}</div>`;
+    const intern = xs.filter((x) => x.type === "internship" || /\bintern(ship)?\b|co-?op/i.test(x.title || "")).length;
+    const stats = [tot ? [[yrs ? `${yrs} yr${yrs > 1 ? "s" : ""}` : "", mos ? `${mos} mo${mos > 1 ? "s" : ""}` : ""].filter(Boolean).join(" "), "Experience"] : null,
+      [String(groups.length), groups.length === 1 ? "Company" : "Companies"], intern ? [String(intern), intern === 1 ? "Internship" : "Internships"] : null].filter(Boolean);
+    // Up next: what they're looking for + graduation (the part LinkedIn doesn't have)
+    const ft = (p.openTo || []).includes("fulltime"), it = (p.openTo || []).includes("intern");
+    const nextText = p.lookingFor || (it ? "Next internship" : ft ? "First full-time role" : "");
+    const gradText = p.gradYear ? `Graduating ${p.gradTerm ? p.gradTerm + " " : ""}${p.gradYear}` : "";
+    const nextHref = "/jobs/?kind=" + (ft && !it ? "fulltime" : it && !ft ? "intern" : "all");
+    let lastYear = null;
+    const yearTag = (b) => { const y = b == null ? null : Math.floor(b / 12); if (y == null || y === lastYear) return ""; lastYear = y; return `<div class="tl-year"><span>${y}</span></div>`; };
+    const bullets = (d) => {
+      const parts = String(d || "").split(/\s*(?:\n+|•|·\s(?=[A-Z])|^-\s|\n-\s)\s*/).map((t) => t.trim()).filter(Boolean);
+      if (parts.length < 2) return d ? `<p class="tl-desc">${esc(d)}</p>` : "";
+      const li = (a) => a.map((t) => `<li>${esc(t)}</li>`).join("");
+      return `<ul class="tl-desc">${li(parts.slice(0, 2))}</ul>${parts.length > 2 ? `<details class="tl-more"><summary>Show ${parts.length - 2} more</summary><ul class="tl-desc">${li(parts.slice(2))}</ul></details>` : ""}`;
+    };
+    const meta = (r) => [r.sp ? T.rangeText(r.sp).replace(/ · [^·]+$/, "") : r.when || "", r.location].filter(Boolean).map(esc).join(" · ");
+    const len = (r) => r.sp ? T.duration(r.sp.a, r.sp.b) : "";
+    const chip = (t) => t ? `<span class="tl-type t-${esc(t)}">${esc(T.TYPES[t] || t)}</span>` : "";
+    const cards = groups.map((g) => {
+      const multi = g.roles.length > 1, cur = g.roles.some((r) => r.sp?.current), top = g.roles[0];
+      const tile = `<div class="tl-logo" aria-hidden="true">${esc(initials(g.org || top.title))}</div>`;
+      const hire = g.org ? `<span class="hire" data-hire="${esc(g.org)}"></span>` : "";
+      const body = multi
+        ? `<div class="tl-head">${tile}<div class="tl-main"><div class="tl-co">${esc(g.org)}</div><div class="sm">${g.roles.length} roles${g.span ? " · " + T.duration(g.span.a, g.span.b) : ""}</div>${hire}</div></div>
+           <div class="tl-roles">${g.roles.map((r) => `<div class="tl-role" id="xp${r.i}"><div class="tl-row"><b>${esc(r.title)}</b>${len(r) ? `<span class="tl-len">${esc(len(r))}</span>` : ""}</div>
+             <div class="sm">${meta(r)}</div><div class="tl-chips">${chip(r.type)}${r.sp?.current ? '<span class="tl-now">Current</span>' : ""}</div>${bullets(r.desc)}</div>`).join("")}</div>`
+        : `<div class="tl-head" id="xp${top.i}">${tile}<div class="tl-main"><div class="tl-row"><b class="tl-title">${esc(top.title)}</b>${len(top) ? `<span class="tl-len">${esc(len(top))}</span>` : ""}</div>
+             <div class="tl-co">${esc(g.org || "")}</div><div class="sm">${meta(top)}</div><div class="tl-chips">${chip(top.type)}${cur ? '<span class="tl-now">Current</span>' : ""}</div>${hire}</div></div>
+           <div class="tl-body">${bullets(top.desc)}</div>`;
+      return `${yearTag(g.span ? g.span.b : null)}<div class="tl-item${cur ? " cur" : ""}"><span class="tl-node" aria-hidden="true"></span><div class="tl-card">${body}</div></div>`;
     }).join("");
     setTimeout(hiringNow, 0);
-    return `${summary ? `<p class="xsum">${esc(summary)}</p>` : ""}${line}${groups}`;
+    return `<div class="tl-stats">${stats.map(([n, l]) => `<div><b>${esc(n)}</b><span>${esc(l)}</span></div>`).join("")}</div>
+      <div class="tl">
+        ${nextText || gradText ? `<div class="tl-item next"><span class="tl-node" aria-hidden="true"></span><div class="tl-card"><div class="tl-up">Up next</div>
+          <b class="tl-title">${esc(nextText || "What's next")}</b>${gradText ? `<div class="sm">${esc(gradText)}</div>` : ""}
+          <a class="tl-find" href="${nextHref}">Find openings</a></div></div>` : ""}
+        ${cards}
+      </div>`;
   }
   // "Hiring now": the company you worked at has open jobs on Beat the Pile right now (live list, matched by name)
   let HIRING = null;

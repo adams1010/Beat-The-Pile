@@ -21,5 +21,5 @@ const { cleanProfile } = await import("../api/me.js").catch(() => ({}));
 const api = readFileSync(new URL("../api/me.js", import.meta.url), "utf8");
 assert.ok(/start: YM\(x\?\.start\)/.test(api) && /EXP_TYPES\.includes/.test(api), "server cleans the new experience fields");
 const u = readFileSync(new URL("../u/index.html", import.meta.url), "utf8");
-assert.ok(u.includes("/lib/timeline.js") && u.includes("careerLine") && u.includes('data-f="start"') && u.includes("data-now"), "/u/ career line + date editor");
+assert.ok(u.includes("/lib/timeline.js") && u.includes("tl-node") && u.includes('data-f="start"') && u.includes("data-now"), "/u/ career line + date editor");
 console.log("✓ experience timeline: dates parsed from old text, career line lanes/Now/Grad/Next, grouped by company, total time");
