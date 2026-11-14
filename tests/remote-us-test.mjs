@@ -10,11 +10,12 @@ const jobs = [
   { id: 6, title: "Product Intern", location: { name: "London" }, absolute_url: "https://x/6" },
   { id: 7, title: "Design Intern", location: { name: "Hybrid" }, absolute_url: "https://x/7" },
 ];
-const offices = { offices: [{ id: 9, name: "Austin", location: "Austin, TX", jobs: [{ id: 1 }], child_offices: [{ id: 10, name: "Lisbon", location: "Lisbon, Portugal", jobs: [{ id: 7 }] }] }, { id: 11, name: "New York", location: "New York, NY", jobs: [{ id: 2 }] }] };
+const OFF = { 1: [{ name: "Austin, TX", location: "Austin, TX, United States" }], 2: [{ name: "New York, NY", location: null }], 7: [{ name: "Lisbon", location: "Lisbon, Portugal" }] };
+const content = { jobs: jobs.map((j) => ({ ...j, offices: OFF[j.id] || [] })) };
 let officeCalls = 0;
 globalThis.fetch = async (u) => {
   const s = String(u);
-  const body = s.endsWith("/offices") ? (officeCalls++, offices) : { jobs };
+  const body = s.includes("content=true") ? (officeCalls++, content) : { jobs };
   return { ok: true, status: 200, json: async () => body, text: async () => JSON.stringify(body), headers: new Map() };
 };
 const { fetchCompany } = await import("../lib/fetchers/index.js");
