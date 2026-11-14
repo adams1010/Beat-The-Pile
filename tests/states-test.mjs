@@ -38,3 +38,13 @@ console.log(bad?`${bad} bad`:`states: all ${cases.length} formats ✓`);
   assert.deepEqual(xs("US - California - Camarillo"), ["CA"]); assert.deepEqual(xs("Ontario, CA"), ["CA"]);
   console.log("✓ 'CA - Quebec - …' is Canada");
 }
+
+// Nov 14: a street named after a state is not the state (Accenture Canada: "510 W. Georgia" = Vancouver)
+{
+  const { extractStates } = await import("../lib/filter.js");
+  const assert = (await import("node:assert/strict")).default;
+  assert.deepEqual(extractStates("Vancouver, 510 W. Georgia, Corp | Toronto, 40 King St W., Corp"), []);
+  assert.deepEqual(extractStates("Atlanta, Georgia"), ["GA"]);
+  assert.deepEqual(extractStates("Charleston, West Virginia"), ["WV"]);
+  console.log("✓ street names ('510 W. Georgia') are not states");
+}
