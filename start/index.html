@@ -108,9 +108,13 @@
   async function stepSchool(C, staff){
     const api = async (body) => { const t = await C.session?.getToken?.(); const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + t }, body: JSON.stringify(body) });
       const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Couldn't save. Try again."); return j; };
-    let mine = {}; try { const t = await C.session?.getToken?.(); const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + t } }); if (r.ok) mine = (await r.json()).profile || {}; } catch {}
+    let mine = {}, pubNow = null; try { const t = await C.session?.getToken?.(); const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + t } }); if (r.ok) { const j = await r.json(); mine = j.profile || {}; pubNow = j.profilePublic; } } catch {}
     const go = () => { location.href = next || "/jobs/"; };
-    if (mine.school && (staff ? mine.staff : mine.major)) return go();           // already set up
+    // Already set up with a school picked from the list (has its id) → straight in. Nov 14: an older profile with a typed
+    // school name and no id now sees step 3 filled in ("Is this still right?"), so the step bar never promises a step
+    // that silently disappears, and picking from the list gives the school id Orbit and Career Fair match on.
+    if (mine.school && mine.schoolId && (staff ? mine.staff : mine.major)) return go();
+    const confirm = !!(mine.school && (staff ? mine.staff : mine.major));
     // Nov 13: brand-new students get one choice before the site: the 2-minute tour, or straight to jobs
     const tour = () => {
       if (next || staff) return go();
@@ -127,6 +131,7 @@
     $("#view").innerHTML = `${staff ? `<h1>Where do you <em>work</em>?</h1>
       <p class="lead">We use this to put you in your school's orbit, with a Faculty &amp; staff tag on your profile.</p>` : `<h1>Where do you go to <em>school</em>?</h1>
       <p class="lead">We use this to show you classmates in Orbit and internships for your major.</p>`}
+      ${confirm ? `<p class="lead"><b>Is this still right?</b> Pick your school from the list so classmates and your school's career fairs find you.</p>` : ""}
       <div class="panel f">
         <label for="o_nm">Your name</label><input id="o_nm" value="${esc(nm)}" autocomplete="name" placeholder="Jordan Lee">
         <label for="o_sc">School</label><input id="o_sc" value="${esc(st.school)}" placeholder="Start typing, e.g. Virginia Tech">
@@ -135,7 +140,7 @@
         <div class="two"${staff ? ' style="display:none"' : ""}><div><label for="o_gt">Graduation</label><select id="o_gt"><option value="">Term</option>${["Spring", "Summer", "Fall", "Winter"].map((t) => `<option${mine.gradTerm === t ? " selected" : ""}>${t}</option>`).join("")}</select></div>
           <div><label for="o_gy">Year</label><select id="o_gy"><option value="">Year</option>${Array.from({ length: 8 }, (_, i) => Y + i - 1).map((y) => `<option${+mine.gradYear === y ? " selected" : ""}>${y}</option>`).join("")}</select></div></div>
         ${staff ? "" : `<div class="ph"><span class="phav" id="o_phv" aria-hidden="true">${esc((nm || "?").trim().slice(0, 1).toUpperCase())}</span><div><b>Add a profile photo</b> <span class="muted">(optional)</span><br><span class="muted">Classmates and recruiters recognize you faster.</span><br><label class="phbtn" for="o_ph">Choose a photo</label><input type="file" id="o_ph" accept="image/*" hidden></div></div>`}
-        <label class="chk"><input type="checkbox" id="o_show" checked> <span>${staff ? "Show me to students at my school in Orbit (your name, school, role and photo). You can turn this off any time on your profile." : "Show me to students at my school in Orbit (your name, school, major and photo). You can turn this off any time on your profile."}</span></label>
+        <label class="chk"><input type="checkbox" id="o_show"${pubNow === false ? "" : " checked"}> <span>${staff ? "Show me to students at my school in Orbit (your name, school, role and photo). You can turn this off any time on your profile." : "Show me to students at my school in Orbit (your name, school, major and photo). You can turn this off any time on your profile."}</span></label>
         ${staff ? "" : `<label class="chk"><input type="checkbox" id="o_emp" checked> <span>Let verified employers find me. Only companies we've checked can see your public profile and message you about real jobs and internships. You can turn this off any time on your profile.</span></label>`}
         <div class="go"><button id="o_go">Continue</button><a href="#" id="o_skip">Skip for now</a><span class="msg" id="o_msg" role="status"></span></div>
       </div>`;
