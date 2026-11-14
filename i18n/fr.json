@@ -1333,6 +1333,8 @@
   "Skip, show me jobs": "Passer, montrez-moi les offres",
   "Go to my jobs →": "Voir mes offres →",
   "Until then, see who came last time:": "En attendant, voyez qui était là la dernière fois :",
+  "See how Beat the Pile works in about a minute.": "Découvrez comment fonctionne Beat the Pile en une minute.",
+  "Take the tour": "Faire la visite",
   "Science, Health & Environment": "Sciences, santé et environnement",
   "Legal, Policy & Government": "Juridique, politiques publiques et gouvernement",
   "Education & Social Impact": "Éducation et impact social",
@@ -1742,6 +1744,7 @@
   "What's next": "La suite"
  },
  "patterns": [
+  ["^See everything \\((\\d+) chapters\\)$", "Tout voir ($1 chapitres)"],
   [
    "^([\\d,]+) open jobs from ([\\d,]+) company job boards$",
    "$1 offres ouvertes issues de $2 sites carrières d'entreprises"

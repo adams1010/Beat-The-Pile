@@ -117,6 +117,7 @@
       $("#view").innerHTML = `<h1>You're in. <em>Want the 2-minute tour?</em></h1>
         <p class="lead">See every part of Beat the Pile with real data: jobs near you, your major, Career Fair Mode, My Season, Orbit and interview practice.</p>
         <div class="panel center tourpick"><a class="tourgo" href="/demo/?from=signup">Take the 2-minute tour</a><a class="tourskip" href="/jobs/">Skip, show me jobs</a></div>`;
+      const sk = $("#view").querySelector(".tourskip"); if (sk) sk.addEventListener("click", () => { try { localStorage.setItem("btp_tour_offer", "1"); } catch {} });
       window.scrollTo(0, 0);
     };
     const nm = mine.name || [C.user.firstName, C.user.lastName].filter(Boolean).join(" ");

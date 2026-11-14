@@ -210,6 +210,9 @@
   .cats button[aria-pressed="true"]{background:#060A2C;border-color:#060A2C;color:#fff}
   .relhead{margin:18px 0 8px;padding-top:14px;border-top:1px solid #C9D1DE}
   .relhead b{display:block;font-size:16px}.relhead span{font-size:13.5px;color:#4B5568}
+  .tourban{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#F2FADF;border:1px solid #DDF3A8;border-radius:10px;padding:10px 14px;margin-top:14px;font-size:15px}
+  .tourban span{flex:1 1 220px}.tourban a{background:#4A7000;color:#fff;border-radius:999px;padding:0 18px;min-height:44px;display:inline-flex;align-items:center;font-weight:600;text-decoration:none}
+  .tourban button{background:none;border:0;font:inherit;color:#3A4560;min-height:44px;padding:0 8px;cursor:pointer;text-decoration:underline}
 </style>
 </head>
 <body>
@@ -228,6 +231,17 @@
 </header>
 
 <main>
+  <div class="wrap tourban" id="tourBan" hidden>
+    <span><b>New here?</b> See how Beat the Pile works in about a minute.</span>
+    <a href="/demo/?from=signup">Take the tour</a>
+    <button type="button" id="tourX" aria-label="Hide this">Not now</button>
+  </div>
+  <script>
+    // Nov 14: students who skipped the tour right after sign-up see this once (set by /start/), until they take it or hide it
+    (function () { try { if (localStorage.getItem("btp_tour_offer") !== "1") return; const b = document.getElementById("tourBan"); b.hidden = false;
+      const off = () => { localStorage.removeItem("btp_tour_offer"); b.hidden = true; };
+      b.querySelector("a").addEventListener("click", off); document.getElementById("tourX").addEventListener("click", off); } catch {} })();
+  </script>
   <div class="wrap layout">
     <aside class="rail left" aria-label="You">
       <section class="panel prof" id="prof"></section>

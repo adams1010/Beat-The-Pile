@@ -498,10 +498,17 @@ Thanks again,
         ["My Season", "/season/", "Pipeline, weekly goal, interview prep"], ["Interview practice", "/#interview", "Any company, out loud, graded"], ["Orbit", "/orbit/", "Classmates, insiders, messages"],
         ["My Internship", "/internship/", "Checklist + resume bullets"], ["Opening Radar", "/radar/", "When companies open"], ["Profile", "/u/", "Your school, your link"]];
       v.innerHTML = `<div class="finale">${F.map(([t, h, s], i) => `<a class="fz fade" style="animation-delay:${i * 45}ms" href="${h}"><b>${t}</b>${s}</a>`).join("")}</div>
-        <div class="acts" style="margin-top:14px;justify-content:center"><a class="b go" href="/jobs/?major=${D.major}" style="padding:12px 22px;font-size:15px">${END_LABEL}</a><button class="b" id="again">Replay the tour</button></div>`;
+        <div class="acts" style="margin-top:14px;justify-content:center"><a class="b go" href="/jobs/?major=${D.major}" style="padding:12px 22px;font-size:15px">${END_LABEL}</a>${QUICK_MODE ? `<button class="b" id="full">See everything (${FULL_N} chapters)</button>` : ""}<button class="b" id="again">Replay the tour</button></div>`;
       $("again").onclick = () => engine.go(0);
+      if ($("full")) $("full").onclick = () => { const q = new URLSearchParams(location.search); q.set("full", "1"); q.set("start", "company"); location.search = q.toString(); };
     } });
 
+  // Nov 14: the quick tour (default, ~1 min): the 8 things a student uses most, then the finale with "See everything".
+  // ?full=1 shows all chapters; ?start=<key> opens at that chapter.
+  const QS = new URLSearchParams(location.search), FULL_N = CH.length - 1;
+  const QUICK = ["find", "near", "fair", "season", "interview", "orbit", "radar", "profile", "finale"];
+  const QUICK_MODE = QS.get("full") !== "1";
+  if (QUICK_MODE) { const keep = CH.filter((c) => QUICK.includes(c.key)); CH.length = 0; CH.push(...keep); }
   // ── engine: chapters, spotlight, autoplay ──
   // Nov 13: arriving from sign-up (/start/ offers the tour), the last step says "Go to my jobs", not "Start free"
   const FROM_SIGNUP = new URLSearchParams(location.search).get("from") === "signup";
@@ -601,7 +608,7 @@ Thanks again,
   view.addEventListener("pointerdown", (e) => { if (engine.auto && e.isTrusted) stopAuto(); });
   addEventListener("keydown", (e) => { if (e.target.closest("input,textarea")) return; if (e.key === "ArrowRight") $("next").click(); if (e.key === "ArrowLeft") $("back").click(); });
   try { const m = localStorage.getItem("btp_major"); if (LABEL[m]) D.major = m; } catch {}
-  engine.go(0);
+  engine.go(Math.max(0, CH.findIndex((c) => c.key === QS.get("start"))));
 })();
 </script>
 <script src="/nav.js" defer></script>
