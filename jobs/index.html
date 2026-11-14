@@ -928,7 +928,9 @@
   // the rest are fetched 4 at a time in parallel instead of one after another.
   async function getAll(qs, onFirst){
     const page = async (off) => {
-      const r = await fetch(`/api/listings?${qs}${qs ? "&" : ""}limit=1000&offset=${off}`);
+      const url = `/api/listings?${qs}${qs ? "&" : ""}limit=1000&offset=${off}`;
+      let r = await fetch(url);
+      if (r.status >= 500) { await new Promise((ok) => setTimeout(ok, 1500)); r = await fetch(url); }   // Nov 14: one retry when the database is briefly busy
       if (!r.ok) { const e = new Error(r.status); e.status = r.status; try { e.data = await r.json(); } catch {} throw e; }
       const d = await r.json(); if (d.meta?.lastSync) state.lastSync = d.meta.lastSync; if (d.meta?.near && off === 0) { state.nearMeta = d.meta;
         if (state.near && d.meta.near.q && d.meta.near.q !== state.near.q) { state.near.q = d.meta.near.q; $("nearIn").value = d.meta.near.q; } } return d;
