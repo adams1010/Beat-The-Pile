@@ -118,7 +118,7 @@ export default async function handler(req, res) {
           // only rows for THIS company, with the company name from our own config (never from the payload)
           const listings = (Array.isArray(r.listings) ? r.listings : []).filter((l) => l && typeof l.id === "string" && l.id.startsWith(cfg.id + ":") && typeof l.title === "string" && typeof l.url === "string")
             .map((l) => ({ ...l, company_id: cfg.id, company: cfg.listAs || cfg.company }));
-          got = { raw: Math.max(0, +r.raw || 0), listings };
+          got = { raw: Math.max(0, +r.raw || 0), listings, partial: r.partial === true };
         }
         const e = await saveResult(cfg, runStart, got);
         out.push({ id: cfg.id, ok: !!e.ok, kept: e.kept_count || 0, busy: !!e.busy, error: e.error || null });

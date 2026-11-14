@@ -55,8 +55,8 @@ await mapLimit(todo, AT_ONCE, async (cfg) => {
   if ((Date.now() - t0) / 6e4 > MINUTES) return;            // out of time: the rest go first next run (oldest first)
   let res;
   try {
-    const { raw, listings } = await withTimeout(fetchCompany(cfg), PER_BOARD_S * 1000);
-    res = { id: cfg.id, raw, listings };
+    const { raw, listings, partial } = await withTimeout(fetchCompany(cfg), PER_BOARD_S * 1000);
+    res = { id: cfg.id, raw, listings, ...(partial ? { partial: true } : {}) };
   } catch (e) { res = { id: cfg.id, error: String(e?.message || e).slice(0, 400), busy: !!e?.busy }; }
   read++;
   const size = JSON.stringify(res).length;

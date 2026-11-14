@@ -52,7 +52,7 @@ export async function saveResult(cfg, runStart, got) {
   const entry = { company_id: cfg.id, ran_at: runStart, ok: false, raw_count: 0, kept_count: 0, closed_skipped: false, error: null };
   try {
     if (got.error) throw got.error;
-    const { raw, listings } = got;
+    const { raw, listings, partial } = got;
     entry.raw_count = raw;
     entry.kept_count = listings.length;
 
@@ -66,6 +66,10 @@ export async function saveResult(cfg, runStart, got) {
       entry.closed_skipped = true;
       entry.error = "Board returned 0 jobs; kept existing listings. Check the fetcher.";
       await closeIfGone(cfg, runStart, "empty");
+    } else if (partial) {
+      // Nov 14: some of the board's searches failed this time (Workday busy/maintenance) → keep what we didn't see
+      entry.closed_skipped = true;
+      entry.error = "Partial read (some searches failed); closed nothing.";
     } else {
       // 3) Anything we didn't see this run is gone from the company's board → closed.
       await db.update(
@@ -73,7 +77,7 @@ export async function saveResult(cfg, runStart, got) {
         { closed_at: runStart }
       );
     }
-    entry.ok = !entry.closed_skipped;
+    entry.ok = !entry.closed_skipped || !!partial;
   } catch (e) {
     if (e?.busy) return { company_id: cfg.id, skipped: true, busy: true };   // board host asked us to slow down: not a failure, first in line next run
     entry.error = String(e.message || e).slice(0, 500);   // fetch failed or timed out → close nothing…
