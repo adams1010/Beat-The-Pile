@@ -27,6 +27,9 @@ for (const kind of ["intern", "fulltime", "hourly", "all"])
 await api("/api/listings?field=all&kind=all&q=medical%20assistant&limit=50", (j) => (j?.listings?.length && j.listings.every((l) => /medical/i.test(l.title + l.company + l.location)) ? null : "search words not applied"), "server search");
 await api("/api/listings?field=all&kind=all&near=Washington%2C%20DC&mi=25&limit=50", (j) => (j?.listings?.length ? null : "no jobs near DC"), "near search");
 await api("/api/listings?field=all&kind=all&near=washingdon%20dc&mi=25&limit=5", (j) => (j?.meta?.near?.fixedTo ? null : "typo not fixed"), "typo place search");
+// Nov 14: security headers stay on (vercel.json)
+try { const h = (await fetch(`${SITE}/jobs/?${bust}`)).headers; const miss = ["strict-transport-security", "x-content-type-options", "x-frame-options", "content-security-policy", "referrer-policy", "permissions-policy"].filter((k) => !h.get(k));
+  if (miss.length) fail("security headers missing: " + miss.join(", ")); else ok("security headers"); } catch (e) { fail("security headers: " + e.message); }
 await api("/api/discovery?bots=1", (j) => (j?.bots?.length ? null : "no bot switches"), "bot switches");
 
 // 2) Pages in a real browser (phone-sized too)

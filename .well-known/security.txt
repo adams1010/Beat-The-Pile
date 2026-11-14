@@ -1,0 +1,5 @@
+# Found a security problem in Beat the Pile? Thank you. Please report it privately.
+Contact: https://www.beatthepile.com/privacy/#contact
+Expires: 2027-11-14T00:00:00.000Z
+Preferred-Languages: en
+Policy: https://www.beatthepile.com/privacy/#security
