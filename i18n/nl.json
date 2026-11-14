@@ -78,7 +78,7 @@
   "Major": "Studierichting",
   "All majors": "Alle studierichtingen",
   "All engineering": "Alle techniek",
-  "Engineering": "Techniek",
+  "Engineering": "Engineering",
   "Tech": "Tech",
   "Business": "Business",
   "Mechanical & Aerospace": "Werktuigbouw & lucht- en ruimtevaart",
@@ -94,7 +94,7 @@
   "Cybersecurity & IT": "Cybersecurity & IT",
   "Product & Design": "Product & design",
   "Product & design": "Product & design",
-  "Finance & Accounting": "Financiën & accounting",
+  "Finance & Accounting": "Financiën & boekhouding",
   "Finance, Accounting & Insurance": "Financiën, accounting & verzekeringen",
   "Marketing & Media": "Marketing & media",
   "Marketing, Media & Communications": "Marketing, media & communicatie",
@@ -112,7 +112,7 @@
   "Education": "Onderwijs",
   "Finance": "Financiën",
   "Marketing": "Marketing",
-  "Sales": "Sales",
+  "Sales": "Verkoop",
   "Consulting": "Consultancy",
   "Software": "Software",
   "Mechanical": "Werktuigbouw",
@@ -224,7 +224,7 @@
   "Search companies at this fair…": "Zoek bedrijven op deze beurs…",
   "Search companies": "Bedrijven zoeken",
   "Your major": "Je studierichting",
-  "Any major": "Elke studierichting",
+  "Any major": "Elke studie",
   "Loading companies…": "Bedrijven laden…",
   "No companies match.": "Geen bedrijven gevonden.",
   "No listings yet": "Nog geen vacatures",
@@ -1682,7 +1682,25 @@
   "Warehouse, delivery & supply chain": "Magazijn, bezorging & supply chain",
   "Retail & Customer Service": "Retail & klantenservice",
   "Food, Hotels & Recreation": "Horeca, hotels & recreatie",
-  "open jobs and internships right now": "open vacatures en stages nu"
+  "open jobs and internships right now": "open vacatures en stages nu",
+  "All jobs": "Alle vacatures",
+  "Healthcare": "Zorg",
+  "Retail": "Detailhandel",
+  "Customer Service": "Klantenservice",
+  "Food & Hospitality": "Horeca",
+  "Office & Admin": "Kantoor & administratie",
+  "Education & Childcare": "Onderwijs & kinderopvang",
+  "Warehouse & Delivery": "Magazijn & bezorging",
+  "Software & IT": "Software & IT",
+  "HR & Recruiting": "HR & werving",
+  "Legal & Government": "Juridisch & overheid",
+  "Science & Research": "Wetenschap & onderzoek",
+  "Trades & Maintenance": "Vakmanschap & onderhoud",
+  "Design & Product": "Design & product",
+  "Business & Operations": "Business & operations",
+  "Security & Public Safety": "Beveiliging & openbare veiligheid",
+  "Fitness & Recreation": "Fitness & recreatie",
+  "Job title, keyword or company": "Functie, trefwoord of bedrijf"
  },
  "patterns": [
   [
@@ -2052,6 +2070,14 @@
   [
    "^([\\d,]+) companies$",
    "$1 bedrijven"
+  ],
+  [
+   "^More (.+) jobs (.+)$",
+   "Meer $1-vacatures $2"
+  ],
+  [
+   "^([\\d,]+) more in the same area of work\\.$",
+   "$1 meer in hetzelfde vakgebied."
   ]
  ]
 }

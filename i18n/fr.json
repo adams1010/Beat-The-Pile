@@ -112,7 +112,7 @@
   "Education": "Éducation",
   "Finance": "Finance",
   "Marketing": "Marketing",
-  "Sales": "Ventes",
+  "Sales": "Vente",
   "Consulting": "Conseil",
   "Software": "Logiciel",
   "Mechanical": "Mécanique",
@@ -1682,7 +1682,25 @@
   "Warehouse, delivery & supply chain": "Entrepôt, livraison et logistique",
   "Retail & Customer Service": "Commerce et service client",
   "Food, Hotels & Recreation": "Restauration, hôtels et loisirs",
-  "open jobs and internships right now": "offres d'emploi et stages ouverts en ce moment"
+  "open jobs and internships right now": "offres d'emploi et stages ouverts en ce moment",
+  "All jobs": "Tous les emplois",
+  "Healthcare": "Santé",
+  "Retail": "Commerce de détail",
+  "Customer Service": "Service client",
+  "Food & Hospitality": "Restauration et hôtellerie",
+  "Office & Admin": "Bureau et administration",
+  "Education & Childcare": "Éducation et garde d'enfants",
+  "Warehouse & Delivery": "Entrepôt et livraison",
+  "Software & IT": "Logiciel et informatique",
+  "HR & Recruiting": "RH et recrutement",
+  "Legal & Government": "Juridique et administration publique",
+  "Science & Research": "Science et recherche",
+  "Trades & Maintenance": "Métiers et maintenance",
+  "Design & Product": "Design et produit",
+  "Business & Operations": "Business et opérations",
+  "Security & Public Safety": "Sécurité et sûreté publique",
+  "Fitness & Recreation": "Fitness et loisirs",
+  "Job title, keyword or company": "Poste, mot-clé ou entreprise"
  },
  "patterns": [
   [
@@ -2052,6 +2070,14 @@
   [
    "^([\\d,]+) companies$",
    "$1 entreprises"
+  ],
+  [
+   "^More (.+) jobs (.+)$",
+   "Plus d'offres $1 $2"
+  ],
+  [
+   "^([\\d,]+) more in the same area of work\\.$",
+   "$1 de plus dans le même domaine."
   ]
  ]
 }

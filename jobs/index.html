@@ -199,11 +199,23 @@
   .sites ul{margin:6px 0 0;padding-left:18px;max-height:220px;overflow:auto;columns:2;column-gap:18px}.sites li{break-inside:avoid;margin:2px 0}
   @media(max-width:560px){.sites ul{columns:1}}
   [hidden]{display:none!important}
+
+  /* Nov 14: What + Where search on top, category chips (lib/categories.js) */
+  .whatwhere{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .whatwhere .sform{flex:2 1 320px;display:flex;gap:6px;min-width:0}
+  .whatwhere .sform .search{flex:1;min-width:0;font-size:16px;padding:11px 14px}
+  .whatwhere .near{flex:1 1 220px;min-width:0}
+  .cats{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:thin}
+  .cats button{flex:0 0 auto;border:1px solid #C9D1DE;background:#fff;color:#060A2C;border-radius:999px;padding:7px 13px;font:500 13.5px Geist,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
+  .cats button[aria-pressed="true"]{background:#060A2C;border-color:#060A2C;color:#fff}
+  .relhead{margin:18px 0 8px;padding-top:14px;border-top:1px solid #C9D1DE}
+  .relhead b{display:block;font-size:16px}.relhead span{font-size:13.5px;color:#4B5568}
 </style>
 </head>
 <body>
 <script src="/nav.js"></script>
 <script src="/jobs/search.js"></script>
+<script type="module">import * as C from "/lib/categories.js"; window.btpCats = C; dispatchEvent(new Event("btpcats"));</script>
 <script src="/resume-file.js"></script>
 <header>
   <div class="wrap">
@@ -232,12 +244,16 @@
         <div class="wchips" id="welcomeChips"></div>
       </section>
 <div class="controls">
+    <div class="whatwhere">
+      <form class="sform" id="qForm" role="search"><input class="search" id="q" type="search" enterkeyhint="search" placeholder="Job title, keyword or company" aria-label="Job title, keyword or company"><button class="sbtn" type="submit">Search</button></form>
+      <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
+    </div>
+    <div class="cats" id="cats" role="group" aria-label="Job category"></div>
     <div class="kindseg" role="group" aria-label="Job type"><button type="button" data-kind="intern" aria-pressed="true">Internships</button><button type="button" data-kind="fulltime" aria-pressed="false">Entry-level</button><button type="button" data-kind="hourly" aria-pressed="false">Part-time &amp; hourly</button><button type="button" data-kind="all" aria-pressed="false">All</button></div>
     <div class="row">
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">All US states</option></select>
-      <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
       <select class="statesel" id="majorSel" aria-label="Major">
-        <option value="all">All majors</option>
+        <option value="all">Any major</option>
         <optgroup label="Engineering"><option value="eng">All engineering</option><option value="mechanical">Mechanical &amp; Aerospace</option><option value="electrical">Electrical &amp; Computer Eng.</option><option value="civil">Civil, Construction &amp; Architecture</option><option value="chemical">Chemical &amp; Materials</option><option value="industrial">Industrial &amp; Manufacturing</option></optgroup>
         <optgroup label="Tech"><option value="software">Software &amp; Computer Science</option><option value="data">Data &amp; AI</option><option value="cyber_it">Cybersecurity &amp; IT</option><option value="product_design">Product &amp; Design</option></optgroup>
         <optgroup label="Business"><option value="finance">Finance, Accounting &amp; Insurance</option><option value="consulting">Consulting &amp; Strategy</option><option value="marketing">Marketing, Media &amp; Communications</option><option value="sales">Sales &amp; Business Development</option><option value="supply_chain">Supply Chain, Operations &amp; Projects</option><option value="people_hr">HR &amp; People</option></optgroup>
@@ -248,7 +264,6 @@
       <label class="toggle" id="meWrap" title="Only roles that say mechanical (or a close match like manufacturing)."><input type="checkbox" id="meOnly"> Strictly mechanical</label>
       <button class="chip" id="savedOnly" aria-pressed="false" title="Jobs you saved with ♡">♡ Saved <span id="savedN"></span></button>
       <button class="chip" id="followOnly" aria-pressed="false" title="Companies you follow with ☆, you get flagged when they post">Following <span id="followN"></span></button>
-      <form class="sform" id="qForm" role="search"><input class="search" id="q" type="search" enterkeyhint="search" placeholder="Search company or role" aria-label="Search company or role"><button class="sbtn" type="submit">Search</button></form>
     </div>
     <div class="count" id="count" aria-live="polite"></div>
     <div class="note" id="note"></div>
@@ -283,7 +298,7 @@
   // Nov 13: where the work happens, read from the posting's title + location ("Remote", "Hybrid"); everything else is in person
   const workOf = (j) => { const t = `${j.title} ${j.location || ""}`; return /\bhybrid\b/i.test(t) ? "hybrid" : (/\b(remote|work from home|wfh|telecommute|virtual)\b/i.test(t) || j.geo_kind === "remote") ? "remote" : "onsite"; };
   const WORK_NAME = { remote: "Remote", hybrid: "Hybrid", onsite: "In person" };
-  const state = { work: "any", kind: "intern", near: null, nearMeta: null, all: [], savedRows: [], followRows: [], major: "all", st: "ALL", meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
+  const state = { cat: null, relCat: null, relRows: [], work: "any", kind: "intern", near: null, nearMeta: null, all: [], savedRows: [], followRows: [], major: "all", st: "ALL", meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
                   user: null, clerk: null, mine: { saved: new Set(), applied: new Set(), starred: new Set(), seenAt: null } };
   const NAMES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"Washington DC",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
   const statesOf = (j) => String(j.state || "").split(",").filter(Boolean);
@@ -293,7 +308,7 @@
   const DAY = 86400000;
   // Majors (keys from lib/fields.js; "eng" = the engineering view, "all" = everything). tests/fields-test.mjs checks this list.
   const MAJOR_KEYS = [...document.querySelectorAll("#majorSel option")].map((o) => o.value);
-  const MAJOR_LABEL = () => state.major === "all" ? "every major" : (document.querySelector(`#majorSel option[value="${state.major}"]`)?.textContent || "");
+  const MAJOR_LABEL = () => state.cat && window.btpCats?.CAT?.[state.cat] ? window.btpCats.CAT[state.cat].label : state.major === "all" ? "every major" : (document.querySelector(`#majorSel option[value="${state.major}"]`)?.textContent || "");
   const STRICT_OK = () => state.major === "mechanical";   // Nov 10: not under general Engineering — only Mechanical
   const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k, v){ try { localStorage.setItem(k, v); } catch {} } };
   function defaultMajor(){
@@ -487,6 +502,11 @@
     const exactKeys = new Set(rows.map((j) => (j.company + "|" + niceTitle(j.title)).toLowerCase().replace(/\s+/g, " ")));
     const simRows = group(S.similar).filter((j) => !exactKeys.has((j.company + "|" + niceTitle(j.title)).toLowerCase().replace(/\s+/g, " ")));
     if (simRows.length) simRows[0]._simFirst = true;
+    // Nov 14: a search like "medical assistant" also lists every other job in its category nearby ("More Healthcare jobs …")
+    const seenKeys = new Set([...exactKeys, ...simRows.map((j) => (j.company + "|" + niceTitle(j.title)).toLowerCase().replace(/\s+/g, " "))]);
+    const relRows = state.q && state.relCat && !state.savedOnly && !state.followOnly && !state.company
+      ? group(state.relRows.filter((j) => inView(j) && matches(j))).filter((j) => !seenKeys.has((j.company + "|" + niceTitle(j.title)).toLowerCase().replace(/\s+/g, " "))) : [];
+    if (relRows.length) relRows[0]._relFirst = true;
     const has = (list, j) => j.ids.some((id) => state.mine[list].has(id));
     $("savedN").textContent = state.mine.saved.size ? `(${state.mine.saved.size})` : "";
     const nm = state.near && !state.savedOnly && !state.followOnly ? state.nearMeta : null;
@@ -523,7 +543,7 @@
     if (!rows.length && !simRows.length && state.partial && !state.savedOnly && !state.followOnly){   // don't say "nothing found" until every page is in
       $("list").innerHTML = '<div class="skel"></div><div class="skel"></div>'; $("count").textContent = "Searching every listing…"; syncUrl(); return;
     }
-    if (!rows.length && !simRows.length){
+    if (!rows.length && !simRows.length && !relRows.length){
       $("list").innerHTML = state.followOnly
         ? `<div class="empty">${state.user ? "Follow companies with ☆ on any internship (or in Career Fair Mode). New postings from them show up here first." : "Sign in to follow companies and get alerted when they post."}</div>`
         : state.savedOnly
@@ -532,7 +552,9 @@
       return;
     }
     const simHead = () => `<div class="simhead"><b>${rows.length ? "Similar roles" : `No exact matches for “${esc(state.q)}”`}</b><span>${rows.length ? "These fit some of your words." : "Here are the closest roles. They fit some of your words."}${widen}</span></div>`;
-    const tpl = (j) => (j._simFirst ? simHead() : "") + `
+    const relLabel = window.btpCats?.CAT?.[state.relCat]?.label || "";
+    const relHead = () => `<div class="relhead"><b>More ${esc(relLabel)} jobs ${esc(where)}</b><span>${relRows.length.toLocaleString("en-US")} more in the same area of work.</span></div>`;
+    const tpl = (j) => (j._simFirst ? simHead() : "") + (j._relFirst ? relHead() : "") + `
       <article class="card${has("applied", j) ? " applied" : ""}${j.closed ? " closed" : ""}">
         <a class="lg" href="${coHref(j)}" aria-hidden="true" tabindex="-1" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</a>
         <div style="min-width:0">
@@ -554,9 +576,9 @@
       </article>`;
     // Nov 8: paint the list in pages of 40 and add more as you scroll (thousands of cards at once made scrolling choppy).
     // A filter change starts over at the top page; re-renders from Save/Apply clicks keep what you've already scrolled through.
-    const sig = [state.kind, state.major, state.q, state.st === "ALL" ? "ALL" : state.st.join(","), state.near?.q, state.near?.mi, state.meOnly, state.savedOnly, state.followOnly, state.company].join("|");
+    const sig = [state.cat, state.relCat, state.kind, state.major, state.q, state.st === "ALL" ? "ALL" : state.st.join(","), state.near?.q, state.near?.mi, state.meOnly, state.savedOnly, state.followOnly, state.company].join("|");
     if (sig !== LIST.sig) { LIST.sig = sig; LIST.shown = PAGE; }
-    LIST.rows = rows.concat(simRows); LIST.tpl = tpl;
+    LIST.rows = rows.concat(simRows, relRows); LIST.tpl = tpl;
     const fixedNote = S.fixed ? `<div class="simhead"><b>Showing results for “${esc(S.fixed)}”</b><span>You typed “${esc(state.q)}”.</span></div>` : "";
     const KNAME = { intern: "Internships", fulltime: "Entry-level", hourly: "Part-time & hourly" };
     const widenNote = (state.widenedFrom && state.major === "all" && state.widenedFor === state.q ? `<div class="simhead"><span>Searched every major, ${esc(state.widenedFrom)} had only a few matches.</span></div>` : "")
@@ -596,6 +618,7 @@
     if (state.work !== "any") p.set("work", state.work);
     if (state.meOnly && STRICT_OK()) p.set("me", "1");
     if (state.q) p.set("q", state.q);
+    if (state.cat) p.set("cat", state.cat);
     if (state.savedOnly) p.set("view", "saved"); else if (state.followOnly) p.set("view", "following");
     const url = location.pathname + (p.toString() ? "?" + p : "");
     if (url !== location.pathname + location.search) history.replaceState(null, "", url);
@@ -612,6 +635,7 @@
     const mj = (p.get("major") || "").toLowerCase();
     state.major = MAJOR_KEYS.includes(mj) ? mj : state.meOnly ? "mechanical" : p.get("q") ? "all" : defaultMajor();   // old ?me=1 links still work; a search link looks at every major
     state.q = (p.get("q") || "").slice(0, 80); $("q").value = state.q; state.qSubmitted = state.q;
+    state.cat = /^[a-z_]{2,30}$/.test(p.get("cat") || "") ? p.get("cat") : null;   // Nov 14: job category chips (lib/categories.js)
     if (state.q && !p.get("state")) state.st = "ALL";              // a search link (e.g. from the Radar) looks nationwide
     state.savedOnly = p.get("view") === "saved"; state.followOnly = p.get("view") === "following";
     const nq = (p.get("near") || "").trim().slice(0, 40), nmi = [25, 50, 100, 200].includes(+p.get("mi")) ? +p.get("mi") : 50;
@@ -624,7 +648,7 @@
     const single = state.st !== "ALL" && state.st.length === 1 ? state.st[0] : "";
     $("stateSel").classList.toggle("on", !!single); if (single) $("stateSel").value = single;
   }
-  function resetFilters(){ history.replaceState(null, "", location.pathname); readUrl(); state.company = null; state.st = "ALL"; state.major = "all"; $("majorSel").value = "all"; $("meWrap").hidden = true; readUrlButtons(); loadScope(); }
+  function resetFilters(){ history.replaceState(null, "", location.pathname); readUrl(); state.company = null; state.cat = null; renderCats(); state.st = "ALL"; state.major = "all"; $("majorSel").value = "all"; $("meWrap").hidden = true; readUrlButtons(); loadScope(); }
   function readUrlButtons(){ const one = state.st !== "ALL" && state.st.length === 1 ? state.st[0] : ""; $("stateSel").value = one; $("stateSel").classList.toggle("on", state.st !== "ALL"); }
   document.addEventListener("click", (e) => {
     if (e.target.closest("#goAll")) { $("stateSel").value = ""; setView("ALL", null); }
@@ -910,6 +934,13 @@
   // Search button / Enter: apply now, close the phone keyboard, and jump to the results.
   $("qForm").addEventListener("submit", (e) => {
     e.preventDefault(); state.q = $("q").value.trim(); state.qSubmitted = state.q;
+    const det = window.btpCats && state.q ? window.btpCats.categoryForQuery(state.q) : null;
+    if (det?.whole) {                                    // "healthcare", "nursing jobs", "retail": that IS the category, every job in it
+      state.cat = det.cat; state.q = ""; state.qSubmitted = ""; $("q").value = ""; state.company = null;
+      if (state.kind === "intern") setKind("all");
+      renderCats(); syncUrl(); loadScope(); $("q").blur(); return;
+    }
+    loadRelated();
     if ((state.kind === "all" || state.kind === "hourly") && !state.near && state.st === "ALL" && !state.company) loadScope(); else render();   // big scopes search on the server
     $("q").blur();
     const c = $("count"); if (c && c.getBoundingClientRect().top < 60) c.scrollIntoView({ block: "start" });
@@ -949,13 +980,42 @@
     return rows;
   }
   const order = () => state.near ? (a, b) => (a.mi - b.mi) || (sortKey(b) - sortKey(a)) : (a, b) => sortKey(b) - sortKey(a);
+  // Nov 14: "More <category> jobs near you" under a search (lib/categories.js categoryForQuery). Every job type, so a
+  // "medical assistant" search in DC also lists the CNAs, patient care techs and pharmacy techs around it.
+  let relSeq = 0;
+  async function loadRelated(where, kindQ){
+    const C = window.btpCats, det = C && state.q && !state.cat ? C.categoryForQuery(state.q) : null;
+    const seq = ++relSeq;
+    if (!det) { if (state.relCat) { state.relCat = null; state.relRows = []; } return; }
+    if (where == null) where = state.near ? `near=${encodeURIComponent(state.near.q)}&mi=${state.near.mi}` : state.st === "ALL" ? "" : `state=${state.st.join(",")}`;
+    try {
+      const r = await fetch(`/api/listings?${["field=all", where, "kind=all", `cat=${det.cat}`].filter(Boolean).join("&")}&limit=1000&offset=0`);
+      if (!r.ok || seq !== relSeq) return;
+      const d = await r.json(); state.relCat = det.cat; state.relRows = d.listings || []; render();
+    } catch { /* the main list still works */ }
+  }
+  function setKind(k){ state.kind = k; document.querySelectorAll("[data-kind]").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.kind === k))); }
+  function renderCats(){
+    const C = window.btpCats, box = $("cats"); if (!C || !box) return;
+    box.innerHTML = `<button type="button" data-cat="" aria-pressed="${!state.cat}">All jobs</button>` + C.CATEGORIES.map((c) => `<button type="button" data-cat="${c.key}" aria-pressed="${state.cat === c.key}">${esc(c.label)}</button>`).join("");
+  }
+  addEventListener("btpcats", () => { renderCats(); if (state.q) loadRelated(); });
+  if (window.btpCats) renderCats();
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("#cats [data-cat]"); if (!b) return;
+    state.cat = b.dataset.cat || null; state.company = null;
+    if (state.cat && state.kind === "intern") setKind("all");    // a category shows every job type; the switch above narrows it
+    track("category_picked", { cat: state.cat || "all" }); renderCats(); syncUrl(); loadScope();
+  });
   async function loadScope(){
     const where = state.near ? `near=${encodeURIComponent(state.near.q)}&mi=${state.near.mi}` : state.st === "ALL" ? "" : `state=${state.st.join(",")}`;
     const kindQ = state.kind === "intern" ? "" : `kind=${state.kind}`;      // internships = the API's default
     // Nov 13: every job type (or every hourly job) across the whole country is too many to send, so the server does the word search
     const bigScope = (state.kind === "all" || state.kind === "hourly") && !state.near && state.st === "ALL" && !state.company;
     const serverQ = bigScope && state.q ? `q=${encodeURIComponent(state.q)}` : "";
-    const qs = state.company ? [`field=all&companies=${state.company}`, kindQ].filter(Boolean).join("&") : [majorParam(), where, kindQ, serverQ].filter(Boolean).join("&");
+    const catQ = state.cat ? `cat=${state.cat}` : "";        // Nov 14: a category is filtered on the server, so the list is every job in it
+    const qs = state.company ? [`field=all&companies=${state.company}`, kindQ].filter(Boolean).join("&") : [state.cat ? "field=all" : majorParam(), where, kindQ, serverQ, catQ].filter(Boolean).join("&");
+    loadRelated(where, kindQ);
     const seq = ++loadSeq;
     if (!cache.has(qs)) { state.loaded = false; $("list").innerHTML = '<div class="skel"></div><div class="skel"></div><div class="skel"></div>'; $("count").textContent = ""; }
     try {

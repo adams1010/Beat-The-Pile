@@ -94,7 +94,7 @@
   "Cybersecurity & IT": "Cybersicherheit & IT",
   "Product & Design": "Produkt & Design",
   "Product & design": "Produkt & Design",
-  "Finance & Accounting": "Finanzen & Rechnungswesen",
+  "Finance & Accounting": "Finanzen & Buchhaltung",
   "Finance, Accounting & Insurance": "Finanzen, Rechnungswesen & Versicherung",
   "Marketing & Media": "Marketing & Medien",
   "Marketing, Media & Communications": "Marketing, Medien & Kommunikation",
@@ -224,7 +224,7 @@
   "Search companies at this fair…": "Unternehmen auf dieser Messe suchen…",
   "Search companies": "Unternehmen suchen",
   "Your major": "Deine Studienrichtung",
-  "Any major": "Jede Studienrichtung",
+  "Any major": "Jedes Studienfach",
   "Loading companies…": "Unternehmen werden geladen…",
   "No companies match.": "Keine passenden Unternehmen.",
   "No listings yet": "Noch keine Anzeigen",
@@ -1682,7 +1682,25 @@
   "Warehouse, delivery & supply chain": "Lager, Lieferung & Lieferkette",
   "Retail & Customer Service": "Einzelhandel & Kundenservice",
   "Food, Hotels & Recreation": "Gastronomie, Hotels & Freizeit",
-  "open jobs and internships right now": "offene Jobs und Praktika gerade"
+  "open jobs and internships right now": "offene Jobs und Praktika gerade",
+  "All jobs": "Alle Jobs",
+  "Healthcare": "Gesundheitswesen",
+  "Retail": "Einzelhandel",
+  "Customer Service": "Kundenservice",
+  "Food & Hospitality": "Gastronomie & Hotellerie",
+  "Office & Admin": "Büro & Verwaltung",
+  "Education & Childcare": "Bildung & Kinderbetreuung",
+  "Warehouse & Delivery": "Lager & Lieferung",
+  "Software & IT": "Software & IT",
+  "HR & Recruiting": "Personal & Recruiting",
+  "Legal & Government": "Recht & Verwaltung",
+  "Science & Research": "Wissenschaft & Forschung",
+  "Trades & Maintenance": "Handwerk & Instandhaltung",
+  "Design & Product": "Design & Produkt",
+  "Business & Operations": "Business & Operations",
+  "Security & Public Safety": "Sicherheit",
+  "Fitness & Recreation": "Fitness & Freizeit",
+  "Job title, keyword or company": "Jobtitel, Stichwort oder Firma"
  },
  "patterns": [
   [
@@ -2052,6 +2070,14 @@
   [
    "^([\\d,]+) companies$",
    "$1 Unternehmen"
+  ],
+  [
+   "^More (.+) jobs (.+)$",
+   "Mehr $1-Jobs $2"
+  ],
+  [
+   "^([\\d,]+) more in the same area of work\\.$",
+   "$1 weitere im selben Bereich."
   ]
  ]
 }

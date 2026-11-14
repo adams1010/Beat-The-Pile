@@ -1682,7 +1682,25 @@
   "Warehouse, delivery & supply chain": "Almacén, reparto y cadena de suministro",
   "Retail & Customer Service": "Comercio y atención al cliente",
   "Food, Hotels & Recreation": "Comida, hoteles y recreación",
-  "open jobs and internships right now": "empleos y prácticas abiertos ahora"
+  "open jobs and internships right now": "empleos y prácticas abiertos ahora",
+  "All jobs": "Todos los empleos",
+  "Healthcare": "Salud",
+  "Retail": "Comercio minorista",
+  "Customer Service": "Atención al cliente",
+  "Food & Hospitality": "Comida y hostelería",
+  "Office & Admin": "Oficina y administración",
+  "Education & Childcare": "Educación y cuidado infantil",
+  "Warehouse & Delivery": "Almacén y reparto",
+  "Software & IT": "Software e IT",
+  "HR & Recruiting": "RR. HH. y selección",
+  "Legal & Government": "Legal y gobierno",
+  "Science & Research": "Ciencia e investigación",
+  "Trades & Maintenance": "Oficios y mantenimiento",
+  "Design & Product": "Diseño y producto",
+  "Business & Operations": "Negocios y operaciones",
+  "Security & Public Safety": "Seguridad",
+  "Fitness & Recreation": "Fitness y recreación",
+  "Job title, keyword or company": "Puesto, palabra clave o empresa"
  },
  "patterns": [
   [
@@ -2052,6 +2070,14 @@
   [
    "^([\\d,]+) companies$",
    "$1 empresas"
+  ],
+  [
+   "^More (.+) jobs (.+)$",
+   "Más empleos de $1 $2"
+  ],
+  [
+   "^([\\d,]+) more in the same area of work\\.$",
+   "$1 más en la misma área de trabajo."
   ]
  ]
 }

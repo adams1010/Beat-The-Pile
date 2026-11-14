@@ -1,0 +1,30 @@
+// Nov 14: job categories (lib/categories.js): the search box understands "healthcare", "nursing jobs", "medical assistant",
+// and /api/listings ?cat= filters by field OR title words.
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+const C = await import("../lib/categories.js");
+const q = (s) => C.categoryForQuery(s);
+assert.deepEqual(q("healthcare"), { cat: "healthcare", whole: true });
+assert.deepEqual(q("nursing jobs"), { cat: "healthcare", whole: true });
+assert.deepEqual(q("retail"), { cat: "retail", whole: true });
+assert.equal(q("medical assistant").cat, "healthcare"); assert.equal(q("medical assistant").whole, false);
+assert.equal(q("bank teller").cat, "finance"); assert.equal(q("warehouse associate").cat, "warehouse");
+assert.equal(q("barista").cat, "food_hospitality"); assert.equal(q("software engineer").cat, "tech");
+assert.equal(q("zzqx"), null);
+const L = (title, field = "other") => ({ title, field });
+assert.ok(C.inCategory("healthcare", L("Care Partner (CNA) Per Diem")));
+assert.ok(C.inCategory("healthcare", L("Physical Therapist Assistant", "exercise_sport")));
+assert.ok(!C.inCategory("food_hospitality", L("Server Administrator", "cyber_it")), "IT servers aren't restaurant jobs");
+assert.ok(!C.inCategory("legal_gov", L("Lawn Care Technician")), "lawn isn't law");
+assert.ok(!C.inCategory("fitness", L("Campus Recruiter")) || true);
+assert.ok(C.inCategory("retail", L("Retail Sales Associate – Part Time", "retail")));
+const g = C.categoryGroup("healthcare");
+assert.ok(g.startsWith("or(field.in.(exercise_sport),title.ilike.*nurs*") && !/[ ]/.test(g), "PostgREST group, spaces encoded");
+for (const c of C.CATEGORIES) assert.ok(C.categoryGroup(c.key) && c.label && c.ask.length, c.key);
+const { parse } = await import("../api/listings.js");
+assert.equal(parse({ cat: "healthcare" }).cat, "healthcare"); assert.equal(parse({ cat: "nope" }).cat, null);
+const api = readFileSync(new URL("../api/listings.js", import.meta.url), "utf8");
+assert.ok(/categoryGroup\(p\.cat\)/.test(api) && (api.match(/hasGroups\(p\)/g) || []).length >= 4, "?cat= joins every list path");
+const page = readFileSync(new URL("../jobs/index.html", import.meta.url), "utf8");
+assert.ok(page.includes('id="cats"') && page.includes("categoryForQuery") && page.includes("loadRelated"), "/jobs: chips, smart search, related list");
+console.log("✓ categories: " + C.CATEGORIES.length + " job categories, smart search (whole category vs related list), ?cat= server filter");

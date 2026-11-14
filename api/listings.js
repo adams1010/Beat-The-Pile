@@ -15,6 +15,7 @@
 //   GET /c/<id>        (→ ?page=<id>)            → the company's page as HTML (server-built so search engines can read it)
 //   GET /sitemap.xml   (→ ?sitemap=1)            → main pages + every company hiring now
 // Bad parameters → 400 with what's wrong. A database problem → 503 (never an empty list that looks like "no jobs").
+import { CAT, categoryGroup } from "../lib/categories.js";
 import { db } from "../lib/db.js";
 import { FIELDS, kindOf } from "../lib/fields.js";
 import { COMPANIES } from "../lib/companies.js";
@@ -55,7 +56,8 @@ export function parse(q) {
   const words = raw("q").toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((w) => w.length >= 2).slice(0, 6).map((w) => w.slice(0, 24));
   const kind = raw("kind").toLowerCase() || "intern";
   if (!["intern", "fulltime", "hourly", "career", "all"].includes(kind)) errs.push("kind must be intern, fulltime, hourly, career or all");
-  return { errs, kind, words, near: near || null, mi, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, summary: raw("summary") === "1", names: raw("names") === "1" };
+  const cat = CAT[raw("cat")] ? raw("cat") : null;   // Nov 14: job category (lib/categories.js)
+  return { errs, kind, words, cat, near: near || null, mi, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, summary: raw("summary") === "1", names: raw("names") === "1" };
 }
 
 /** Homepage map: every open job (internships + early-career full-time with ?kind=all) with a real city, as dots on the
@@ -99,14 +101,16 @@ const KIND_Q = new Proxy(KIND_ON, { get: (t, k) => (kindOk ? t[k] : "") });
 const kindFor = (title) => { const k = kindOf(title); return k === "fulltime" || k === "hourly" ? k : "intern"; };
 const withKind = (rows) => rows.map((l) => ({ ...l, kind: l.kind || kindFor(l.title) }));   // board-flagged interns (BambooHR) stay "intern"
 /** Every word must appear in the title, company or place: or() groups for a PostgREST and=(…) */
-const wordGroups = (p) => (p.words || []).map((w) => `or(title.ilike.*${w}*,company.ilike.*${w}*,location.ilike.*${w}*)`);
+// Nov 14: ?cat= (lib/categories.js) adds one more group: or(field.in.(…),title.ilike.*word*,…)
+const wordGroups = (p) => [...(p.words || []).map((w) => `or(title.ilike.*${w}*,company.ilike.*${w}*,location.ilike.*${w}*)`), ...(p.cat ? [categoryGroup(p.cat)] : [])];
+const hasGroups = (p) => !!(p.words?.length || p.cat);
 function majorFilter(p) {
   let q = KIND_Q[p.kind || "intern"];
   if (p.match) q += `&match=eq.${p.match}`;
   else if (!p.field) q += "&match=not.is.null";
   if (p.field && p.field !== "all") q += `&field=eq.${p.field}`;
   if (p.companies.length) q += `&company_id=in.(${p.companies.join(",")})`;
-  if (p.words?.length && !p.near && !p.states.length) q += `&and=(${wordGroups(p).join(",")})`;   // near / states: merged into their own and=(…)
+  if (hasGroups(p) && !p.near && !p.states.length) q += `&and=(${wordGroups(p).join(",")})`;   // near / states: merged into their own and=(…)
   return q;
 }
 /** "Within N miles of a ZIP / city": nearest first, each listing with its distance (city center to city center).
@@ -124,7 +128,7 @@ async function nearby(p, res) {
   const dLat = p.mi / 69, dLng = p.mi / (69 * Math.cos((center[0] * Math.PI) / 180));
   const r4 = (x) => Math.round(x * 1e4) / 1e4;
   const box = `and(geo_lat.gte.${r4(center[0] - dLat)},geo_lat.lte.${r4(center[0] + dLat)},geo_lng.gte.${r4(center[1] - dLng)},geo_lng.lte.${r4(center[1] + dLng)})`;
-  const q = `listings?select=${COLS},geo_pts&${LIVE}${majorFilter(p)}&and=(or(${box},geo_n.gt.1)${p.words?.length ? "," + wordGroups(p).join(",") : ""})&order=first_seen.desc,id.asc`;
+  const q = `listings?select=${COLS},geo_pts&${LIVE}${majorFilter(p)}&and=(or(${box},geo_n.gt.1)${hasGroups(p) ? "," + wordGroups(p).join(",") : ""})&order=first_seen.desc,id.asc`;
   const cand = [];
   for (let off = 0; off < 20000; off += 1000) { const page = await db.select(`${q}&limit=1000&offset=${off}`); cand.push(...page); if (page.length < 1000) break; }
   const hits = [];
@@ -257,12 +261,12 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=3600");
     let q = `listings?select=${COLS}&${LIVE}${KIND_Q[p.kind]}&order=first_seen.desc,id.asc`;
     // state column holds "VA" or "WA,VA,PA" — match any requested state inside it (re-checked exactly below)
-    if (p.states.length) q += `&and=(or(${[...p.states.map((s) => `state.ilike.*${s}*`), "state.eq.US"].join(",")})${p.words?.length ? "," + wordGroups(p).join(",") : ""})`;
+    if (p.states.length) q += `&and=(or(${[...p.states.map((s) => `state.ilike.*${s}*`), "state.eq.US"].join(",")})${hasGroups(p) ? "," + wordGroups(p).join(",") : ""})`;
     if (p.match) q += `&match=eq.${p.match}`;
     else if (!p.field) q += "&match=not.is.null";                       // engineering view (default)
     if (p.field && p.field !== "all") q += `&field=eq.${p.field}`;
     if (p.companies.length) q += `&company_id=in.(${p.companies.join(",")})`;
-    if (p.words?.length && !p.states.length) q += `&and=(${wordGroups(p).join(",")})`;   // states: already merged above
+    if (hasGroups(p) && !p.states.length) q += `&and=(${wordGroups(p).join(",")})`;   // states: already merged above
 
     let listings = [];
     if (p.limit != null) listings = await db.select(`${q}&limit=${p.limit}&offset=${p.offset}`);
