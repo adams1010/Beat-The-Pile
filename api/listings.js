@@ -252,7 +252,7 @@ export default async function handler(req, res) {
     res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=3600");
     let q = `listings?select=${COLS}&${LIVE}${KIND_Q[p.kind]}&order=first_seen.desc,id.asc`;
     // state column holds "VA" or "WA,VA,PA" — match any requested state inside it (re-checked exactly below)
-    if (p.states.length) q += `&and=(or(${p.states.map((s) => `state.ilike.*${s}*`).join(",")})${p.words?.length ? "," + wordGroups(p).join(",") : ""})`;
+    if (p.states.length) q += `&and=(or(${[...p.states.map((s) => `state.ilike.*${s}*`), "state.eq.US"].join(",")})${p.words?.length ? "," + wordGroups(p).join(",") : ""})`;
     if (p.match) q += `&match=eq.${p.match}`;
     else if (!p.field) q += "&match=not.is.null";                       // engineering view (default)
     if (p.field && p.field !== "all") q += `&field=eq.${p.field}`;
