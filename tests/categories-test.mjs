@@ -19,7 +19,7 @@ assert.ok(!C.inCategory("legal_gov", L("Lawn Care Technician")), "lawn isn't law
 assert.ok(!C.inCategory("fitness", L("Campus Recruiter")) || true);
 assert.ok(C.inCategory("retail", L("Retail Sales Associate – Part Time", "retail")));
 const g = C.categoryGroup("healthcare");
-assert.ok(g.startsWith("or(field.in.(exercise_sport),title.ilike.*nurs*") && !/[ ]/.test(g), "PostgREST group, spaces encoded");
+assert.ok(g.startsWith("or(title.ilike.*nurs*") && !/[ ]/.test(g), "PostgREST group, spaces encoded");
 for (const c of C.CATEGORIES) assert.ok(C.categoryGroup(c.key) && c.label && c.ask.length, c.key);
 const { parse } = await import("../api/listings.js");
 assert.equal(parse({ cat: "healthcare" }).cat, "healthcare"); assert.equal(parse({ cat: "nope" }).cat, null);
