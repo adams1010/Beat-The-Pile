@@ -1,4 +1,4 @@
-/* built from src/home.jsx bbee10364f49af12 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 1a1be1f1bf111eda — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -155,7 +155,7 @@ const LiveStats = () => {
   const total = d && d.fulltime != null ? (d.allMajors || 0) + (d.fulltime || 0) + (d.hourly || 0) : null;
   const items = [{
     v: total,
-    l: "open jobs right now: internships, entry-level and part-time",
+    l: "open jobs and internships right now",
     c: G
   }, {
     v: d?.allMajors,
@@ -465,7 +465,7 @@ function HeroMap({
       if (!r.ok) throw 0;
       return r.json();
     });
-    Promise.all([get("/map/us.json"), get("/api/listings?dots=1&field=all&kind=career")]).then(([g, d]) => {
+    Promise.all([get("/map/us.json"), get("/api/listings?dots=1&field=all&kind=all")]).then(([g, d]) => {
       setGeo(g);
       setPts(d);
     }).catch(() => setErr(true));
@@ -608,7 +608,7 @@ function HeroMap({
       fontFamily: "Geist,sans-serif",
       marginBottom: 2
     }
-  }, React.createElement("span", null, "Just found"), React.createElement("span", null, sum ? `${fmt(sum.allMajors)} internships · ${fmt(sum.fulltime)} jobs · ${fmt(sum.hiringNow)} companies` : "")), (fresh || []).slice(0, 3).map(j => React.createElement("a", {
+  }, React.createElement("span", null, "Just found"), React.createElement("span", null, sum ? `${fmt(sum.allMajors)} internships · ${fmt((sum.fulltime || 0) + (sum.hourly || 0))} jobs · ${fmt(sum.hiringNow)} companies` : "")), (fresh || []).slice(0, 3).map(j => React.createElement("a", {
     key: j.id,
     href: j.url,
     target: "_blank",
