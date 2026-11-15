@@ -1,4 +1,4 @@
-/* built from src/home.jsx 03eb4789204af1fb — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 1bae5ea286723050 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -152,7 +152,7 @@ const LiveStats = () => {
     const m = Math.round((Date.now() - new Date(t)) / 6e4);
     return m < 60 ? `${Math.max(1, m)} min ago` : m < 1440 ? `${Math.round(m / 60)} hr ago` : `${Math.round(m / 1440)} days ago`;
   };
-  const total = d && d.fulltime != null ? (d.allMajors || 0) + (d.fulltime || 0) + (d.hourly || 0) : null;
+  const total = d && d.fulltime != null ? (d.allMajors || 0) + (d.fulltime || 0) + (d.hourly || 0) + (d.shadow || 0) : null;
   const items = [{
     v: total,
     l: "open jobs and internships right now",
@@ -510,7 +510,7 @@ function HeroMap({
       marginRight: 8,
       verticalAlign: 1
     }
-  }), sum && sum.allMajors != null && sum.fulltime != null ? `${fmt((sum.allMajors || 0) + (sum.fulltime || 0) + (sum.hourly || 0))} open jobs and internships` : sumErr ? "Live numbers unavailable right now" : "Loading the latest numbers…"), React.createElement("span", {
+  }), sum && sum.allMajors != null && sum.fulltime != null ? `${fmt((sum.allMajors || 0) + (sum.fulltime || 0) + (sum.hourly || 0) + (sum.shadow || 0))} open jobs and internships` : sumErr ? "Live numbers unavailable right now" : "Loading the latest numbers…"), React.createElement("span", {
     style: {
       fontSize: 12,
       color: "#8D9AB3"
@@ -627,7 +627,7 @@ function HeroMap({
       fontFamily: "Geist,sans-serif",
       marginBottom: 2
     }
-  }, React.createElement("span", null, "Just found"), React.createElement("span", null, sum ? `${fmt(sum.allMajors)} internships · ${fmt((sum.fulltime || 0) + (sum.hourly || 0))} jobs · ${fmt(sum.hiringNow)} companies` : "")), (fresh || []).slice(0, 3).map(j => React.createElement("a", {
+  }, React.createElement("span", null, "Just found"), React.createElement("span", null, sum ? `${fmt(sum.allMajors)} internships · ${fmt((sum.fulltime || 0) + (sum.hourly || 0))} jobs${sum.shadow ? ` · ${fmt(sum.shadow)} shadowing` : ""} · ${fmt(sum.hiringNow)} companies` : "")), (fresh || []).slice(0, 3).map(j => React.createElement("a", {
     key: j.id,
     href: j.url,
     target: "_blank",

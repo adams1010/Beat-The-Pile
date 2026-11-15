@@ -8,7 +8,7 @@
 //   GET /api/listings?near=24060&mi=50          → within 50 miles of a ZIP (or near=Blacksburg, VA), nearest first, with .mi
 //   GET /api/listings?limit=200&offset=400       → one page (default: everything, up to 20,000)
 //   GET /api/listings?ids=a:1,b:2                → these exact listings INCLUDING closed ones (your saved/applied history)
-//   GET /api/listings?kind=intern (default) | fulltime | all  → internships, early-career full-time jobs, or both.
+//   GET /api/listings?kind=intern (default) | fulltime | hourly | shadow | all  → internships, early-career full-time, part-time & hourly, shadowing & volunteer (Nov 15), or everything.
 //       Told apart by the stored, indexed listings.kind column (set by fetchCompany; Nov 13), each row carries kind.
 //   GET /api/listings?summary=1                  → just counts + last update time (homepage/demo stats; tiny + cached)
 //   GET /api/listings?names=1                    → just the companies with an open internship right now (any major; Radar)
@@ -55,7 +55,7 @@ export function parse(q) {
   // Nov 13: server-side word search for big scopes (every major + every job type nationwide is too many rows to send)
   const words = raw("q").toLowerCase().replace(/[^a-z0-9 ]/g, " ").split(/\s+/).filter((w) => w.length >= 2).slice(0, 6).map((w) => w.slice(0, 24));
   const kind = raw("kind").toLowerCase() || "intern";
-  if (!["intern", "fulltime", "hourly", "career", "all"].includes(kind)) errs.push("kind must be intern, fulltime, hourly, career or all");
+  if (!["intern", "fulltime", "hourly", "shadow", "career", "all"].includes(kind)) errs.push("kind must be intern, fulltime, hourly, shadow, career or all");
   const cat = CAT[raw("cat")] ? raw("cat") : null;   // Nov 14: job category (lib/categories.js)
   return { errs, kind, words, cat, near: near || null, mi, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, summary: raw("summary") === "1", names: raw("names") === "1" };
 }
@@ -93,12 +93,12 @@ async function dots(p, res) {
 // full-time = early-career title and not an internship. One regex, plain filters (no or()/and() quoting).
 // Nov 13: a stored column (set by fetchCompany at sync, indexed). The old title regex grew past 4,000 characters and
 // timed out every field=all load (homepage + /jobs answered 503).
-const KIND_ON = { intern: "&kind=eq.intern", fulltime: "&kind=eq.fulltime", hourly: "&kind=eq.hourly", career: "&kind=in.(intern,fulltime)", all: "" };   // Nov 13: + hourly (part-time & hourly), career = no hourly
+const KIND_ON = { intern: "&kind=eq.intern", fulltime: "&kind=eq.fulltime", hourly: "&kind=eq.hourly", shadow: "&kind=eq.shadow", career: "&kind=in.(intern,fulltime)", all: "" };   // Nov 13: + hourly (part-time & hourly), career = no hourly
 // Safety net: if the database ever rejects the pattern, this instance stops filtering by kind (rows still carry kind)
 // instead of failing every /jobs load. Logged as [listings] kind filter off.
 let kindOk = true;
 const KIND_Q = new Proxy(KIND_ON, { get: (t, k) => (kindOk ? t[k] : "") });
-const kindFor = (title) => { const k = kindOf(title); return k === "fulltime" || k === "hourly" ? k : "intern"; };
+const kindFor = (title) => { const k = kindOf(title); return k === "fulltime" || k === "hourly" || k === "shadow" ? k : "intern"; };
 const withKind = (rows) => rows.map((l) => ({ ...l, kind: l.kind || kindFor(l.title) }));   // board-flagged interns (BambooHR) stay "intern"
 /** Every word must appear in the title, company or place: or() groups for a PostgREST and=(…) */
 // Nov 14: ?cat= (lib/categories.js) adds one more group: or(field.in.(…),title.ilike.*word*,…)
@@ -231,14 +231,14 @@ export default async function handler(req, res) {
       const top = scan ? [...scan.seen].sort((a, b) => b[1].n - a[1].n).slice(0, 8).map(([id, v]) => ({ id, company: v.company, n: v.n })) : [];
       // the headline numbers stay internships; full-time / entry-level is counted on its own (all from the one scan above)
       const rows = await scanAll();
-      let engineering = 0, me = 0, allMajors = 0, fulltime = 0, hourly = 0;
-      for (const r of rows) { if (r.kind === "fulltime") { fulltime++; continue; } if (r.kind === "hourly") { hourly++; continue; } allMajors++; if (r.match) engineering++; if (r.match === "me") me++; }
+      let engineering = 0, me = 0, allMajors = 0, fulltime = 0, hourly = 0, shadow = 0;
+      for (const r of rows) { if (r.kind === "fulltime") { fulltime++; continue; } if (r.kind === "hourly") { hourly++; continue; } if (r.kind === "shadow") { shadow++; continue; } allMajors++; if (r.match) engineering++; if (r.match === "me") me++; }
       const [companies, lastRun] = await Promise.all([
         db.count("company_candidates?status=eq.live"),
         db.select("feed_runs?select=ran_at&order=ran_at.desc&limit=1"),
       ]);
       // companies = boards the robot proved + the hand-checked starter list
-      return res.status(200).json({ engineering, me, allMajors, fulltime, hourly, hiringNow, top, byField: scan?.byField || null, companies: companies + COMPANIES.length, lastSync: lastRun?.[0]?.ran_at || null, at: new Date().toISOString() });
+      return res.status(200).json({ engineering, me, allMajors, fulltime, hourly, shadow, hiringNow, top, byField: scan?.byField || null, companies: companies + COMPANIES.length, lastSync: lastRun?.[0]?.ran_at || null, at: new Date().toISOString() });
     }
 
     if (p.names) {                                            // every company hiring right now, any major — small enough for a phone

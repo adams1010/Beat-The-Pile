@@ -60,7 +60,7 @@ const LiveStats=()=>{
   },[]);
   const fmt=(n)=>n==null?"—":n.toLocaleString();
   const ago=(t)=>{if(!t)return null;const m=Math.round((Date.now()-new Date(t))/6e4);return m<60?`${Math.max(1,m)} min ago`:m<1440?`${Math.round(m/60)} hr ago`:`${Math.round(m/1440)} days ago`;};
-  const total=d&&d.fulltime!=null?(d.allMajors||0)+(d.fulltime||0)+(d.hourly||0):null;
+  const total=d&&d.fulltime!=null?(d.allMajors||0)+(d.fulltime||0)+(d.hourly||0)+(d.shadow||0):null;
   const items=[{v:total,l:"open jobs and internships right now",c:G},{v:d?.allMajors,l:"open internships right now, every major",c:"#060A2C"},{v:d?.hiringNow,l:"companies hiring interns right now",c:"#060A2C"},{v:d?.companies,l:"company job boards we read directly",c:G}];
   return (<div style={{maxWidth:760,margin:"0 auto"}}>
     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(160px,1fr))",gap:"1rem"}}>
@@ -127,7 +127,7 @@ function HeroMap({near,fresh,sum,sumErr}){
     {/* One live number for the whole hero (Nov 15): the same "open jobs" total as /api/listings?summary=1, no second count above the headline */}
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",flexWrap:"wrap",gap:"4px 12px",fontFamily:"Geist,sans-serif"}}>
       <span style={{fontSize:14,fontWeight:600,color:"#fff"}}><span style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#B0F701",marginRight:8,verticalAlign:1}}/>
-        {sum&&sum.allMajors!=null&&sum.fulltime!=null?`${fmt((sum.allMajors||0)+(sum.fulltime||0)+(sum.hourly||0))} open jobs and internships`:sumErr?"Live numbers unavailable right now":"Loading the latest numbers…"}</span>
+        {sum&&sum.allMajors!=null&&sum.fulltime!=null?`${fmt((sum.allMajors||0)+(sum.fulltime||0)+(sum.hourly||0)+(sum.shadow||0))} open jobs and internships`:sumErr?"Live numbers unavailable right now":"Loading the latest numbers…"}</span>
       <span style={{fontSize:12,color:"#8D9AB3"}}>{sum?`from ${fmt(sum.companies)} company job boards${sum.lastSync?`, checked ${dAgoLong(sum.lastSync)}`:""}`:""}</span></div>
     <div style={{fontSize:12,color:"#8D9AB3",marginTop:2,fontFamily:"Geist,sans-serif"}}>Every dot is a real job or internship</div>
     <div style={{position:"relative",marginTop:8}}>
@@ -143,7 +143,7 @@ function HeroMap({near,fresh,sum,sumErr}){
       {near?.bad&&<div style={{position:"absolute",left:8,bottom:6,fontSize:13,color:"#F2B8A2",fontFamily:"Geist,sans-serif"}}>We couldn't find that city. Try “Blacksburg, VA”.</div>}
     </div>
     <div style={{borderTop:"1px solid #22304D",marginTop:10,paddingTop:8}}>
-      <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"#8D9AB3",fontFamily:"Geist,sans-serif",marginBottom:2}}><span>Just found</span><span>{sum?`${fmt(sum.allMajors)} internships · ${fmt((sum.fulltime||0)+(sum.hourly||0))} jobs · ${fmt(sum.hiringNow)} companies`:""}</span></div>
+      <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"#8D9AB3",fontFamily:"Geist,sans-serif",marginBottom:2}}><span>Just found</span><span>{sum?`${fmt(sum.allMajors)} internships · ${fmt((sum.fulltime||0)+(sum.hourly||0))} jobs${sum.shadow?` · ${fmt(sum.shadow)} shadowing`:""} · ${fmt(sum.hiringNow)} companies`:""}</span></div>
       {(fresh||[]).slice(0,3).map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"flex",justifyContent:"space-between",gap:12,padding:"7px 0",borderTop:"1px solid #1A2640",textDecoration:"none",fontSize:13}}>
         <span style={{color:"#fff",fontFamily:"Geist,sans-serif",minWidth:0,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{j.company} <span style={{color:"#8D9AB3"}}>· {j.title}</span></span><span style={{color:"#B0F701",flexShrink:0}}>{dAgo(j.first_seen)}</span></a>))}
     </div>

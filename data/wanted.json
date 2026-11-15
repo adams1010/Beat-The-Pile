@@ -1,7 +1,7 @@
 {
-"built": "2026-11-13",
-"why": "Big employers that hire for entry-level and part-time jobs (hospital systems, banks, insurers, schools, retailers, restaurants, hotels) \u2014 the finder proves each board before anything goes live",
-"count": 516,
+"built": "2026-11-15",
+"why": "Big employers that hire for entry-level and part-time jobs (hospital systems, banks, insurers, schools, retailers, restaurants, hotels; since Nov 15 also golf courses, resorts, parks, childcare, pet care) \u2014 the finder proves each board before anything goes live",
+"count": 570,
 "companies": [
 {
 "company": "Athletico Physical Therapy",
@@ -2582,6 +2582,276 @@
 "company": "Spectrum",
 "domain": "spectrum.com",
 "priority": 45
+},
+{
+"company": "Troon",
+"domain": "troon.com",
+"priority": 60
+},
+{
+"company": "Invited",
+"domain": "invitedclubs.com",
+"priority": 60
+},
+{
+"company": "Arcis Golf",
+"domain": "arcisgolf.com",
+"priority": 60
+},
+{
+"company": "KemperSports",
+"domain": "kempersports.com",
+"priority": 60
+},
+{
+"company": "Drive Shack",
+"domain": "driveshack.com",
+"priority": 60
+},
+{
+"company": "PGA TOUR Superstore",
+"domain": "pgatoursuperstore.com",
+"priority": 60
+},
+{
+"company": "Pinehurst Resort",
+"domain": "pinehurst.com",
+"priority": 60
+},
+{
+"company": "Billy Casper Golf",
+"domain": "billycaspergolf.com",
+"priority": 60
+},
+{
+"company": "Concert Golf Partners",
+"domain": "concertgolfpartners.com",
+"priority": 60
+},
+{
+"company": "Sea Pines Resort",
+"domain": "seapines.com",
+"priority": 60
+},
+{
+"company": "The Broadmoor",
+"domain": "broadmoor.com",
+"priority": 60
+},
+{
+"company": "Vail Resorts",
+"domain": "vailresorts.com",
+"priority": 60
+},
+{
+"company": "Alterra Mountain Company",
+"domain": "alterramtn.co",
+"priority": 60
+},
+{
+"company": "Boyne Resorts",
+"domain": "boyneresorts.com",
+"priority": 60
+},
+{
+"company": "Aspen Skiing Company",
+"domain": "aspensnowmass.com",
+"priority": 60
+},
+{
+"company": "Powdr",
+"domain": "powdr.com",
+"priority": 60
+},
+{
+"company": "Snowbird",
+"domain": "snowbird.com",
+"priority": 60
+},
+{
+"company": "Cedar Fair",
+"domain": "cedarfair.com",
+"priority": 60
+},
+{
+"company": "United Parks & Resorts",
+"domain": "unitedparks.com",
+"priority": 60
+},
+{
+"company": "Great Wolf Lodge",
+"domain": "greatwolf.com",
+"priority": 60
+},
+{
+"company": "Kalahari Resorts",
+"domain": "kalahariresorts.com",
+"priority": 60
+},
+{
+"company": "Hersheypark",
+"domain": "hersheyentertainment.com",
+"priority": 60
+},
+{
+"company": "Dollywood",
+"domain": "dollywood.com",
+"priority": 60
+},
+{
+"company": "Silver Dollar City",
+"domain": "silverdollarcity.com",
+"priority": 60
+},
+{
+"company": "Main Event",
+"domain": "mainevent.com",
+"priority": 60
+},
+{
+"company": "Lucky Strike Entertainment",
+"domain": "luckystrikeent.com",
+"priority": 60
+},
+{
+"company": "Chuck E. Cheese",
+"domain": "chuckecheese.com",
+"priority": 60
+},
+{
+"company": "Urban Air Adventure Park",
+"domain": "urbanair.com",
+"priority": 60
+},
+{
+"company": "Sky Zone",
+"domain": "skyzone.com",
+"priority": 60
+},
+{
+"company": "Delaware North",
+"domain": "delawarenorth.com",
+"priority": 60
+},
+{
+"company": "Levy Restaurants",
+"domain": "levyrestaurants.com",
+"priority": 60
+},
+{
+"company": "Legends",
+"domain": "legends.net",
+"priority": 60
+},
+{
+"company": "Xanterra Travel Collection",
+"domain": "xanterra.com",
+"priority": 60
+},
+{
+"company": "Live Nation",
+"domain": "livenation.com",
+"priority": 60
+},
+{
+"company": "Oak View Group",
+"domain": "oakviewgroup.com",
+"priority": 60
+},
+{
+"company": "Goldfish Swim School",
+"domain": "goldfishswimschool.com",
+"priority": 60
+},
+{
+"company": "British Swim School",
+"domain": "britishswimschool.com",
+"priority": 60
+},
+{
+"company": "i9 Sports",
+"domain": "i9sports.com",
+"priority": 60
+},
+{
+"company": "Soccer Shots",
+"domain": "soccershots.com",
+"priority": 60
+},
+{
+"company": "US Sports Camps",
+"domain": "ussportscamps.com",
+"priority": 60
+},
+{
+"company": "BrightView",
+"domain": "brightview.com",
+"priority": 60
+},
+{
+"company": "Yellowstone Landscape",
+"domain": "yellowstonelandscape.com",
+"priority": 60
+},
+{
+"company": "The Davey Tree Expert Company",
+"domain": "davey.com",
+"priority": 60
+},
+{
+"company": "SavATree",
+"domain": "savatree.com",
+"priority": 60
+},
+{
+"company": "The Goddard School",
+"domain": "goddardschool.com",
+"priority": 60
+},
+{
+"company": "Learning Care Group",
+"domain": "learningcaregroup.com",
+"priority": 60
+},
+{
+"company": "Mathnasium",
+"domain": "mathnasium.com",
+"priority": 60
+},
+{
+"company": "Kumon",
+"domain": "kumon.com",
+"priority": 60
+},
+{
+"company": "Camp Bow Wow",
+"domain": "campbowwow.com",
+"priority": 60
+},
+{
+"company": "Dogtopia",
+"domain": "dogtopia.com",
+"priority": 60
+},
+{
+"company": "Safe Harbor Marinas",
+"domain": "shmarinas.com",
+"priority": 60
+},
+{
+"company": "Suntex Marinas",
+"domain": "suntex.com",
+"priority": 60
+},
+{
+"company": "Two Men and a Truck",
+"domain": "twomenandatruck.com",
+"priority": 60
+},
+{
+"company": "College Hunks Hauling Junk",
+"domain": "collegehunkshaulingjunk.com",
+"priority": 60
 }
 ]
 }
