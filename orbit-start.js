@@ -46,9 +46,9 @@
     let o; try { o = await api(getToken, { action: "orbit" }); } catch { return finish(); }
     const joined0 = (o.connections || []).length + (o.sent || 0);
     if (!force && joined0 >= GOAL) return finish();
-    // Real people: your major + school first, then your school, then insiders at companies you follow. Only ones you haven't joined.
+    // Real people: your major + school first, then your school, then everyone else. Only ones you haven't joined.
     const seen = new Set(), ppl = [];
-    for (const [list, tag] of [[o.classmates, "Your major"], [o.schoolmates, "Your school"], [o.atTargets, "Insider"]])
+    for (const [list, tag] of [[o.classmates, "Your major"], [o.schoolmates, "Your school"], [o.everyone, "On Beat the Pile"]])
       for (const p of list || []) if (p.handle && (p.link || "none") === "none" && !seen.has(p.handle) && ppl.length < 8) { seen.add(p.handle); ppl.push({ ...p, tag }); }
     const m = o.me || {};
     let joined = joined0;

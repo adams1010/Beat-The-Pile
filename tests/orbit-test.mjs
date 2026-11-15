@@ -24,7 +24,7 @@ const o = buildOrbit({ uid: "user_me", me, publics, followed: [{ id: "x-lm", com
 
 assert.deepEqual(o.classmates.map((c) => c.handle), ["ana"], "same school (long name) + same major");
 assert.deepEqual(o.schoolmates.map((c) => c.handle), ["ben"], "same school, other major");
-assert.deepEqual(o.atTargets.map((c) => [c.handle, c.at]), [["cal", "Lockheed Martin Corporation"]], "interned at a followed company");
+assert.deepEqual(o.everyone.map((c) => c.handle), ["cal"], "outer ring = everyone else public (other school), not already in an inner ring");
 assert.deepEqual(o.feed.map((f) => f.kind), ["job", "post"], "newest first");
 const all = JSON.stringify(o);
 assert.ok(!all.includes("dee") && !all.includes("DEE"), "private profiles never appear");
@@ -32,5 +32,6 @@ assert.ok(!all.includes("user_"), "no account ids in the response");
 assert.equal(o.me.isPublic, false); assert.equal(o.me.following, 1);
 
 const empty = buildOrbit({ uid: "u", me: null, publics, followed: [], fresh: [], posts: [] });
-assert.deepEqual([empty.classmates.length, empty.schoolmates.length, empty.atTargets.length], [0, 0, 0], "no school on file → no guesses");
-console.log("✓ orbit: classmates by school+major, at-your-targets, feed, private profiles + ids never leak");
+assert.deepEqual([empty.classmates.length, empty.schoolmates.length], [0, 0], "no school on file → no classmate guesses");
+assert.deepEqual(empty.everyone.map((c) => c.handle).sort(), ["ana", "ben", "cal", "me"], "no school on file → every public profile is in the outer ring (still never private ones)");
+console.log("✓ orbit: classmates by school+major, everyone else in the outer ring, feed, private profiles + ids never leak");

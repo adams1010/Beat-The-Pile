@@ -430,7 +430,7 @@ Thanks again,
     } });
 
   ch({ key: "orbit", label: "Orbit", url: "/orbit", title: "Your people, around your search.",
-    line: "You're in the middle. Classmates in your major, others at your school, and students who interned where you're aiming. Join each other's orbit and message.",
+    line: "You're in the middle. Classmates in your major, others at your school, and everyone else on Beat the Pile. Join each other's orbit and message.",
     real: "Example people", steps: [["[data-pp='0']", "Tap a classmate"], ["#joinO", "Join their orbit"]],
     mount(v) {
       const P = [["JL", 150, 70, "Jordan Lee", "Mechanical Engineering · Virginia Tech · 2027", "#B0F701"], ["SP", 228, 168, "Sam Patel", "Mechanical Engineering · Virginia Tech · 2026", "#B0F701"], ["MR", 62, 210, "Maya Ross", "Finance · Virginia Tech · 2027", "#7FB2FF"], ["DK", 268, 92, "Dev Kim", "Interned at Example Aerospace", "#FFB86B"]];
@@ -438,7 +438,7 @@ Thanks again,
         <svg class="orb" viewBox="0 0 330 290" aria-label="Your orbit"><circle cx="165" cy="145" r="60" fill="none" stroke="#B0F701" stroke-opacity=".5"/><circle cx="165" cy="145" r="95" fill="none" stroke="#7FB2FF" stroke-opacity=".4"/><circle cx="165" cy="145" r="130" fill="none" stroke="#FFB86B" stroke-opacity=".35"/>
           <circle cx="165" cy="145" r="22" fill="#B0F701"/><text x="165" y="150" text-anchor="middle" font-size="13" font-weight="700" fill="#060A2C">You</text>
           ${P.map(([i, x, y, , , c], k) => `<g class="p" data-pp="${k}"><circle cx="${x}" cy="${y}" r="17" fill="#13223B" stroke="${c}" stroke-width="2"/><text x="${x}" y="${y + 4}" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">${i}</text></g>`).join("")}</svg></div>
-        <div style="flex:1;min-width:200px"><div class="leg"><div><i style="border-color:#fff"></i>In orbit · people who joined yours</div><div><i style="border-color:#B0F701"></i>Inner orbit · your major, your school</div><div><i style="border-color:#7FB2FF"></i>Campus · other majors at your school</div><div><i style="border-color:#FFB86B"></i>Insiders · interned where you're aiming</div></div><div id="pc" style="margin-top:10px"></div></div></div>`;
+        <div style="flex:1;min-width:200px"><div class="leg"><div><i style="border-color:#fff"></i>In orbit · people who joined yours</div><div><i style="border-color:#B0F701"></i>Inner orbit · your major, your school</div><div><i style="border-color:#7FB2FF"></i>Campus · other majors at your school</div><div><i style="border-color:#FFB86B"></i>Everyone else · other students on Beat the Pile</div></div><div id="pc" style="margin-top:10px"></div></div></div>`;
       v.querySelectorAll("[data-pp]").forEach((g) => g.onclick = () => { const p = P[+g.dataset.pp];
         $("pc").innerHTML = `<div class="card fade"><b>${esc(p[3])}</b> <span class="ex">Example</span><div style="font-size:12.5px;color:var(--muted);margin-top:2px">${esc(p[4])}</div><div class="acts"><button class="b go" id="joinO">Join orbit</button></div></div>`;
         $("joinO").onclick = () => { $("joinO").className = "b on"; $("joinO").textContent = "✓ Orbit requested"; $("joinO").insertAdjacentHTML("afterend", `<span style="font-size:12px;color:var(--muted);align-self:center">Once they accept, you can message.</span>`); };
@@ -495,7 +495,7 @@ Thanks again,
     mount(v) {
       const F = [["Internships + full-time", "/jobs/?major=" + D.major, "Every major, from company job boards"], ["Near you", "/jobs/?near=Blacksburg, VA", "Within 50 miles of your school"], ["Company pages", "/jobs/", "Roles, locations, opening dates"],
         ["Weekly email", "/jobs/", "New jobs, once a week"], ["Tailor resume", "/jobs/", "On every job card"], ["Career Fair Mode", "/fair/", "Route, briefs, QR, notes, follow-ups"],
-        ["My Season", "/season/", "Pipeline, weekly goal, interview prep"], ["Interview practice", "/#interview", "Any company, out loud, graded"], ["Orbit", "/orbit/", "Classmates, insiders, messages"],
+        ["My Season", "/season/", "Pipeline, weekly goal, interview prep"], ["Interview practice", "/#interview", "Any company, out loud, graded"], ["Orbit", "/orbit/", "Classmates, everyone else, messages"],
         ["My Internship", "/internship/", "Checklist + resume bullets"], ["Opening Radar", "/radar/", "When companies open"], ["Profile", "/u/", "Your school, your link"]];
       v.innerHTML = `<div class="acts" style="margin:0 0 14px;justify-content:center;flex-wrap:wrap"><a class="b go" href="/jobs/?major=${D.major}" style="padding:12px 22px;font-size:15px">${END_LABEL}</a>${QUICK_MODE ? `<button class="b" id="full">See everything (${FULL_N} chapters)</button>` : ""}<button class="b" id="again">Replay the tour</button></div>
         <div class="finale">${F.map(([t, h, s], i) => `<a class="fz fade" style="animation-delay:${i * 45}ms" href="${h}"><b>${t}</b>${s}</a>`).join("")}</div>`;

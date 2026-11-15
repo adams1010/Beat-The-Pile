@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Orbit | Beat the Pile</title>
-<meta name="description" content="Orbit: classmates in your major, students who interned where you're applying, and what's new at the companies you follow.">
+<meta name="description" content="Orbit: classmates in your major, everyone else on Beat the Pile, and what's new at the companies you follow.">
 <link rel="canonical" href="https://www.beatthepile.com/orbit/">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="theme-color" content="#060A2C">
@@ -140,12 +140,12 @@
   const RINGS = [
     ["inner", "Inner orbit", "Your major, your school", "#B0F701"],
     ["campus", "Campus", "Other majors at your school", "#7FB2FF"],
-    ["insiders", "Insiders", "Interned where you're aiming", "#FFB86B"],
+    ["everyone", "Everyone else", "Other students on Beat the Pile", "#FFB86B"],
     ["conn", "In orbit", "People who joined your orbit", "#FFFFFF"],
   ];
   const LEGEND = [RINGS[3], RINGS[0], RINGS[1], RINGS[2]];   // Nov 9: the people already in your orbit come first
   const photoOk = (u) => typeof u === "string" && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(u);   // only real image data, never a link
-  function sky(o, sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets }, rings3 = RINGS.slice(0, 3), center = { text: initials(o.me.name) || "You", label: "You", photo: o.me.photo }){
+  function sky(o, sets = { inner: o.classmates, campus: o.schoolmates, everyone: o.everyone }, rings3 = RINGS.slice(0, 3), center = { text: initials(o.me.name) || "You", label: "You", photo: o.me.photo }){
     const RAD = [92, 150, 205], C = 230;
     let nodes = "", rings = "";
     rings3.forEach(([k, , , col], ri) => {
@@ -196,13 +196,13 @@
   }
   function render(o){
     S.o = o; const m = o.me, ring = S.ring || ((o.connections || []).length ? "conn" : "inner");
-    const sets = { inner: o.classmates, campus: o.schoolmates, insiders: o.atTargets, conn: o.connections || [] };
+    const sets = { inner: o.classmates, campus: o.schoolmates, everyone: o.everyone, conn: o.connections || [] };
     const gravity = !m.hasSchool || !m.hasMajor ? `<span>Add your school and major to <a href="/u/">your profile</a> to fill your orbit.</span>`
       : !m.isPublic ? `<span>You're hidden, so classmates can't see you or join your orbit.</span><button type="button" class="btn pri" id="goPublic">Show me in Orbit</button>`
       : `<span>You're visible in other students' orbits.</span>`;
     const empty = { inner: m.hasSchool ? "No one in your major has a public profile yet. Invite a classmate." : `<a href="/u/">Add your school and major</a> first.`,
       campus: m.hasSchool ? "No one else at your school has a public profile yet." : `<a href="/u/">Add your school</a> first.`,
-      insiders: m.following ? "No public profiles list the companies you follow yet." : `Follow companies with ☆ on <a href="/jobs/">Jobs</a> to find insiders.`,
+      everyone: "No one else has a public profile yet. Invite a friend.",
       conn: "No one's in your orbit yet. Tap Join orbit on anyone above." };
     const [, title, desc] = RINGS.find((r) => r[0] === ring);
     const feed = o.feed.length ? o.feed.map((f) => f.kind === "job"
@@ -391,7 +391,7 @@
   async function onUser(u){
     if (!u) {
       $("main").innerHTML = `<div class="card center"><div class="orb-ic">${GLOBE}</div><h1>Orbit</h1>
-        <p class="sub" style="max-width:52ch;margin:6px auto 16px">The people around your internship search: classmates in your major, students who interned where you're applying, and what's new at the companies you follow.</p>
+        <p class="sub" style="max-width:52ch;margin:6px auto 16px">The people around your internship search: classmates in your major, everyone else on Beat the Pile, and what's new at the companies you follow.</p>
         <button class="btn pri" id="si">Sign in to see your Orbit</button></div>`;
       $("#si").onclick = () => S.clerk.openSignIn({}); return;
     }
