@@ -1,9 +1,9 @@
+# Nov 15: no schedule. Turbo Sync (GitHub, every 2 h) reads every board without using Vercel CPU; the Link Checker
+# runs from Vercel's 2 daily crons. Kept for manual runs only.
 # Hourly (when GitHub actually fires it): 3 passes of sync + link check back to back.
 # Uses the same CRON_SECRET repo secret as discover.yml.
 name: sync
 on:
-  schedule:
-    - cron: "7 * * * *"
   workflow_dispatch: {}
 concurrency: { group: sync, cancel-in-progress: false }
 jobs:
