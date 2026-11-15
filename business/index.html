@@ -184,7 +184,7 @@
 </main>
 <script>
 (() => {
-  const fmt = (n) => n == null ? "—" : Number(n).toLocaleString();
+  const fmt = (n) => n == null ? "…" : Number(n).toLocaleString();
   fetch("/api/listings?summary=1").then((r) => r.ok ? r.json() : Promise.reject()).then((s) => {
     document.getElementById("nOpen").textContent = fmt(s.allMajors ?? s.listings);
     document.getElementById("nCos").textContent = fmt(s.hiringNow ?? s.companies);

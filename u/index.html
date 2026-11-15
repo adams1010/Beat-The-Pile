@@ -279,7 +279,7 @@
   // ── Public view (anyone, no sign-in) ──
   const STAFF_ROLES = ["Professor", "Lecturer or instructor", "Academic advisor", "Career center", "Department staff", "Other school staff"];
   function profileHtml(p, resume, isPreview, founding){
-    const where = [p.school, p.major, gradLabel(p)].filter(Boolean).join(" · ");
+    const where = [p.schoolShort || p.school, p.major, gradLabel(p)].filter(Boolean).join(" · ");
     const edu = [{ school: p.school, degree: "", major: p.major, when: gradLabel(p) }, ...(p.education || [])].filter((x) => x.school)
       .map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.school))}</div><div><b>${esc(x.school)}</b><div class="sm">${esc([x.degree, x.major, x.when].filter(Boolean).join(" · "))}</div></div></div>`).join("");
     const links = [["linkedin","LinkedIn"],["github","GitHub"],["portfolio","Portfolio"]].filter(([k]) => safeUrl(p.links?.[k]))

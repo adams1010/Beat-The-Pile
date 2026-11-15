@@ -49,7 +49,7 @@ import { orbitExtras, orbitAction, deleteOrbitData } from "../lib/orbitnet.js";
 import { bizAction, publicCompany, isVerifiedEmployer, isAdmin } from "../lib/employer.js";
 import { cleanInternship, internPeers } from "../lib/internship.js";
 import { foundingCount, foundingFor } from "../lib/founding.js";
-import { schoolIdFor } from "../lib/schools.js";
+import { schoolIdFor, shortSchool } from "../lib/schools.js";
 import { talentFor, roleOf } from "../lib/talent.js";
 
 const LISTS = ["saved", "applied"];
@@ -263,7 +263,7 @@ async function publicProfile(req, res) {
   if (!member || !p.contact || !p.contact.show) delete p.contact; else delete p.contact.show;
   res.setHeader("Cache-Control", member ? "private, no-store" : "public, max-age=60"); res.setHeader("Vary", "Authorization");
   const founding = await foundingFor(r.clerk_user_id).catch(() => null);
-  return res.status(200).json({ handle: r.handle, profile: p, resume, founding });
+  return res.status(200).json({ handle: r.handle, profile: p && p.school ? { ...p, schoolShort: shortSchool(p.schoolId || p.school) } : p, resume, founding });
 }
 async function unsubscribe(req, res) {
   const t = String(req.query.unsub || "");
@@ -339,7 +339,7 @@ export default async function handler(req, res) {
   const view = (row) => ({ saved: row?.saved || [], applied: row?.applied || [], resume: publicResume(row), notes: row?.fair_notes || [],
                             starred: row?.starred || [], seenAt: row?.seen_at || null, apps: row?.apps || [], goal: row?.weekly_goal ?? null,
                             // Nov 14: older profiles typed the school by name; give them the list id so /fair and Orbit match their school
-                            profile: row?.profile ? { ...row.profile, schoolId: row.profile.schoolId || schoolIdFor(row.profile.school) || null } : null, handle: row?.handle || null, profilePublic: row?.profile_public === true,
+                            profile: row?.profile ? { ...row.profile, schoolId: row.profile.schoolId || schoolIdFor(row.profile.school) || null, schoolShort: shortSchool(row.profile.schoolId || row.profile.school) } : null, handle: row?.handle || null, profilePublic: row?.profile_public === true,
                             remindEmail: row?.remind_email === true,
                             alerts: row?.alert_on === true ? { major: row.alert_major || "all", states: row.alert_states || "" } : null, emailReady: !!process.env.RESEND_API_KEY,
                             internship: row?.internship || null, internshipReady: row ? "internship" in row : true });

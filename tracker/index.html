@@ -108,8 +108,8 @@
     const of = A.filter((a) => a.checks.offered || a.stage === "offer").length, rej = A.filter((a) => a.stage === "rejected").length;
     const hr = A.filter((a) => a.pay && a.payUnit === "hour").map((a) => a.pay), yr = A.filter((a) => a.pay && a.payUnit === "year").map((a) => a.pay);
     const avg = (x) => x.reduce((s, v) => s + v, 0) / x.length, money = (v, d = 0) => "$" + v.toLocaleString(undefined, { maximumFractionDigits: d });
-    const pay = hr.length ? money(avg(hr), 2) + "/hr" : yr.length ? money(avg(yr)) + "/yr" : "—";
-    return [[sent, "Applied"], [iv, "Interviews"], [of, "Offers"], [rej, "Rejected"], [sent ? Math.round(((iv + rej) / sent) * 100) + "%" : "—", "Heard back"], [pay, hr.length ? "Avg hourly pay" : "Avg pay"]]
+    const pay = hr.length ? money(avg(hr), 2) + "/hr" : yr.length ? money(avg(yr)) + "/yr" : "n/a";
+    return [[sent, "Applied"], [iv, "Interviews"], [of, "Offers"], [rej, "Rejected"], [sent ? Math.round(((iv + rej) / sent) * 100) + "%" : "n/a", "Heard back"], [pay, hr.length ? "Avg hourly pay" : "Avg pay"]]
       .map(([b, s]) => `<div class="stat"><b data-noi18n>${esc(b)}</b><span>${esc(s)}</span></div>`).join("") + (n ? "" : "");
   }
 
