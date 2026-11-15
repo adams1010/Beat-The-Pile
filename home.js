@@ -1,4 +1,4 @@
-/* built from src/home.jsx 1a1be1f1bf111eda — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 03eb4789204af1fb — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -455,7 +455,8 @@ const MILES_PX = 1.609 * 1300 / 6371;
 function HeroMap({
   near,
   fresh,
-  sum
+  sum,
+  sumErr
 }) {
   const [geo, setGeo] = React.useState(null),
     [pts, setPts] = React.useState(null),
@@ -489,7 +490,8 @@ function HeroMap({
       display: "flex",
       justifyContent: "space-between",
       alignItems: "baseline",
-      gap: 12,
+      flexWrap: "wrap",
+      gap: "4px 12px",
       fontFamily: "Geist,sans-serif"
     }
   }, React.createElement("span", {
@@ -498,12 +500,29 @@ function HeroMap({
       fontWeight: 600,
       color: "#fff"
     }
-  }, "Every dot is a real job or internship"), React.createElement("span", {
+  }, React.createElement("span", {
+    style: {
+      display: "inline-block",
+      width: 7,
+      height: 7,
+      borderRadius: "50%",
+      background: "#B0F701",
+      marginRight: 8,
+      verticalAlign: 1
+    }
+  }), sum && sum.allMajors != null && sum.fulltime != null ? `${fmt((sum.allMajors || 0) + (sum.fulltime || 0) + (sum.hourly || 0))} open jobs and internships` : sumErr ? "Live numbers unavailable right now" : "Loading the latest numbers…"), React.createElement("span", {
     style: {
       fontSize: 12,
       color: "#8D9AB3"
     }
-  }, pts ? `${fmt(pts.placed)} jobs and internships on the map` : "")), React.createElement("div", {
+  }, sum ? `from ${fmt(sum.companies)} company job boards${sum.lastSync ? `, checked ${dAgoLong(sum.lastSync)}` : ""}` : "")), React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "#8D9AB3",
+      marginTop: 2,
+      fontFamily: "Geist,sans-serif"
+    }
+  }, "Every dot is a real job or internship"), React.createElement("div", {
     style: {
       position: "relative",
       marginTop: 8
@@ -767,24 +786,7 @@ function LandingD({
       flex: "1 1 480px",
       minWidth: 0
     }
-  }, React.createElement("p", {
-    style: {
-      fontSize: 14,
-      fontWeight: 500,
-      color: "#D9F99A",
-      margin: "0 0 18px"
-    }
-  }, React.createElement("span", {
-    style: {
-      display: "inline-block",
-      width: 7,
-      height: 7,
-      borderRadius: "50%",
-      background: "#B0F701",
-      marginRight: 8,
-      verticalAlign: 1
-    }
-  }), sum ? `${sum.allMajors != null && sum.fulltime != null ? `${fmt((sum.allMajors || 0) + (sum.fulltime || 0) + (sum.hourly || 0))} open jobs from ` : ""}${fmt(sum.companies)} company job boards${sum.lastSync ? `, last checked ${dAgoLong(sum.lastSync)}` : ""}` : sumErr ? "Live numbers unavailable right now" : "Loading the latest numbers…"), React.createElement("h1", {
+  }, React.createElement("h1", {
     style: {
       fontSize: "clamp(2.3rem,5vw,3.6rem)",
       lineHeight: 1.03,
@@ -1001,7 +1003,8 @@ function LandingD({
   }, React.createElement(HeroMap, {
     near: near,
     fresh: fresh,
-    sum: sum
+    sum: sum,
+    sumErr: sumErr
   })))), React.createElement("main", {
     style: {
       ...wrap,

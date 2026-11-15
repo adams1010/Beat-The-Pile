@@ -115,7 +115,7 @@ const FEATURES=[
 // The hero map: every dot is a real open job (internships, entry-level and part-time since Nov 14) whose location text names a real US city (api/listings ?dots=1).
 // Type a city ("Blacksburg, VA") or ZIP in the search and a circle shows how many are within 50 miles (the same numbers /jobs will show).
 const MILES_PX=1.609*1300/6371;   // Albers USA at scale 1300: ~0.33 px per mile (lower 48)
-function HeroMap({near,fresh,sum}){
+function HeroMap({near,fresh,sum,sumErr}){
   const [geo,setGeo]=React.useState(null),[pts,setPts]=React.useState(null),[err,setErr]=React.useState(false);
   React.useEffect(()=>{
     const get=(u)=>fetch(u).then(r=>{if(!r.ok)throw 0;return r.json();});
@@ -124,9 +124,12 @@ function HeroMap({near,fresh,sum}){
   const fmt=(n)=>n==null?"—":Number(n).toLocaleString();
   const xy=near?.meta?.near?.xy, r=near?.meta?near.meta.near.mi*MILES_PX:0;
   return(<aside style={{position:"relative",boxSizing:"border-box",background:"#0E1440",border:"1px solid #2A3B5C",borderRadius:10,padding:"18px 18px 14px",boxShadow:"none",...DM}}>
-    <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:12,fontFamily:"Geist,sans-serif"}}>
-      <span style={{fontSize:14,fontWeight:600,color:"#fff"}}>Every dot is a real job or internship</span>
-      <span style={{fontSize:12,color:"#8D9AB3"}}>{pts?`${fmt(pts.placed)} jobs and internships on the map`:""}</span></div>
+    {/* One live number for the whole hero (Nov 15): the same "open jobs" total as /api/listings?summary=1, no second count above the headline */}
+    <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",flexWrap:"wrap",gap:"4px 12px",fontFamily:"Geist,sans-serif"}}>
+      <span style={{fontSize:14,fontWeight:600,color:"#fff"}}><span style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#B0F701",marginRight:8,verticalAlign:1}}/>
+        {sum&&sum.allMajors!=null&&sum.fulltime!=null?`${fmt((sum.allMajors||0)+(sum.fulltime||0)+(sum.hourly||0))} open jobs and internships`:sumErr?"Live numbers unavailable right now":"Loading the latest numbers…"}</span>
+      <span style={{fontSize:12,color:"#8D9AB3"}}>{sum?`from ${fmt(sum.companies)} company job boards${sum.lastSync?`, checked ${dAgoLong(sum.lastSync)}`:""}`:""}</span></div>
+    <div style={{fontSize:12,color:"#8D9AB3",marginTop:2,fontFamily:"Geist,sans-serif"}}>Every dot is a real job or internship</div>
     <div style={{position:"relative",marginTop:8}}>
       {err?<p style={{fontSize:13,color:"#8D9AB3",padding:"40px 0",textAlign:"center",fontFamily:"Geist,sans-serif"}}>Map didn't load. <a href="/jobs/" style={{color:"#B0F701"}}>See the internships →</a></p>:
       <svg viewBox="0 0 975 610" role="img" aria-label={pts?`Map of the US with ${fmt(pts.placed)} open jobs and internships, one dot per city`:"Loading map"} style={{width:"100%",height:"auto",display:"block"}}>
@@ -181,8 +184,6 @@ function LandingD({onQuiz,onPage}){
     <section style={{position:"relative",overflow:"hidden",background:"#060A2C",color:"#E8EDF5"}}>
       <div style={{...wrap,position:"relative",paddingTop:64,paddingBottom:48,display:"flex",gap:48,flexWrap:"wrap",alignItems:"center"}}>
         <div style={{flex:"1 1 480px",minWidth:0}}>
-          <p style={{fontSize:14,fontWeight:500,color:"#D9F99A",margin:"0 0 18px"}}><span style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#B0F701",marginRight:8,verticalAlign:1}}/>
-            {sum?`${sum.allMajors!=null&&sum.fulltime!=null?`${fmt((sum.allMajors||0)+(sum.fulltime||0)+(sum.hourly||0))} open jobs from `:""}${fmt(sum.companies)} company job boards${sum.lastSync?`, last checked ${dAgoLong(sum.lastSync)}`:""}`:sumErr?"Live numbers unavailable right now":"Loading the latest numbers…"}</p>
           <h1 style={{fontSize:"clamp(2.3rem,5vw,3.6rem)",lineHeight:1.03,letterSpacing:"-0.035em",fontWeight:600,margin:"0 0 16px",color:"#fff"}}>Find your job<br/>before the <span style={{color:"#B0F701"}}>pile</span> does.</h1>
           <p style={{fontSize:18,lineHeight:1.5,color:"#9FAAC0",margin:"0 0 28px",maxWidth:560}}>Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board, no reposts, and jobs drop off when the company takes them down.</p>
           <form onSubmit={go} role="search" className="d-search" style={{display:"flex",alignItems:"stretch",background:"#fff",borderRadius:10,padding:6,maxWidth:760}}>
@@ -203,7 +204,7 @@ function LandingD({onQuiz,onPage}){
           {found&&found.left>0&&<p style={{fontSize:13.5,color:"#CFD7E6",marginTop:10,display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><span style={{fontWeight:600,color:"#B0F701",...DM}}>{found.left} of {found.total} founding spots left</span><span>The first {found.total} students keep every Pro feature free, for life.</span><a href="/start/" style={{color:"#B0F701",fontWeight:600,textDecoration:"none"}}>Claim yours →</a></p>}
         </div>
         <div style={{position:"relative",flex:"1 1 340px",maxWidth:560,minWidth:0,width:"100%"}}>
-          <HeroMap near={near} fresh={fresh} sum={sum}/>
+          <HeroMap near={near} fresh={fresh} sum={sum} sumErr={sumErr}/>
         </div>
       </div>
 
