@@ -566,10 +566,19 @@ export default async function handler(req, res) {
       const pub = body.show === false ? false : body.show === true ? true : cur?.handle ? cur?.profile_public === true : true;
       // Nov 16: weekly job alerts are on by default for students (one-click unsubscribe in every email). Only for accounts that
       // never set alerts up (alert_major null), so an unsubscribe or a /jobs choice is never overridden; an explicit untick wins.
+      // Nov 16: invite links. Credit the student whose link brought them here, once, only on a first sign-up, never yourself.
+      const ref = String(body.ref || "").toLowerCase();
+      const refOk = !cur?.profile && !cur?.referred_by && HANDLE_OK.test(ref) && ref !== handle &&
+        (await db.selectAsAdmin(`user_jobs?select=handle&handle=eq.${encodeURIComponent(ref)}&limit=1`).catch(() => [])).length > 0;
       const alertsOn = (r) => !profile.staff && body.alerts !== false && !r?.alert_major;
       const alertPatch = (r) => (alertsOn(r) ? { alert_on: true, alert_major: defaultAlertMajor(profile.major), remind_unsub: r?.remind_unsub || crypto.randomBytes(18).toString("base64url") } : {});
-      try { return send(await mutate(uid, (r) => ({ profile: { ...profile, ...keepStaffVerified(r.profile, profile) }, handle, profile_public: pub, ...alertPatch(r) }))); }
+      try { return send(await mutate(uid, (r) => ({ profile: { ...profile, ...keepStaffVerified(r.profile, profile) }, handle, profile_public: pub, ...alertPatch(r), ...(refOk ? { referred_by: ref } : {}) }))); }
       catch (e) { if (/23505|duplicate key/i.test(String(e?.message))) return res.status(409).json({ error: "Try again in a moment" }); throw e; }
+    }
+    if (action === "invite_stats") {           // Nov 16: your invite link + how many students joined from it
+      const row = await loadRow(uid);
+      const joined = row?.handle ? await db.countAsAdmin(`user_jobs?referred_by=eq.${encodeURIComponent(row.handle)}`).catch(() => null) : 0;
+      return res.status(200).json({ handle: row?.handle || null, isPublic: row?.profile_public === true, joined });
     }
     if (action === "remind_test") {            // send yourself one sample reminder (3 a day)
       if (!process.env.RESEND_API_KEY) return res.status(400).json({ error: "Email reminders aren't switched on yet" });

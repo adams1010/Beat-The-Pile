@@ -1,6 +1,16 @@
 {
  "lang": "nl",
  "strings": {
+  "Invite classmates": "Studiegenoten uitnodigen",
+  "Save your profile first to get your own invite link.": "Sla eerst je profiel op om je eigen uitnodigingslink te krijgen.",
+  "Set up my profile": "Mijn profiel instellen",
+  "Orbit works best when your friends are on it. Send your link to the people in your major or your group chats.": "Orbit werkt het best als je vrienden erop zitten. Stuur je link naar mensen uit je studie of je groepschats.",
+  "Invite friends": "Vrienden uitnodigen",
+  "Copy link": "Link kopiëren",
+  "Message copied": "Bericht gekopieerd",
+  "Nobody has joined from your link yet": "Nog niemand is via je link lid geworden",
+  "friend joined from your link": "vriend lid geworden via je link",
+  "friends joined from your link": "vrienden lid geworden via je link",
   "Email me new jobs for my major once a week. One-click unsubscribe in every email.": "Mail me één keer per week nieuwe vacatures voor mijn studie. Afmelden met één klik in elke e-mail.",
   "Jobs": "Banen",
   "Career Fair": "Banenbeurs",

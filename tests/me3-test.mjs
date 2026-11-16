@@ -56,3 +56,15 @@ console.log("✓ My Season: applies flow in, employer date vs first-seen kept ap
   assert.match(src, /!profile\.staff && body\.alerts !== false && !r\?\.alert_major/);
   console.log("✓ job alerts default on at sign-up");
 }
+
+// Nov 16: invite links — credited once, on first sign-up, never yourself; stats action exists; widget + nav capture wired
+{
+  const assert = (await import("node:assert/strict")).default; const fs = await import("node:fs");
+  const me = fs.readFileSync(new URL("../api/me.js", import.meta.url), "utf8");
+  assert.match(me, /!cur\?\.profile && !cur\?\.referred_by && HANDLE_OK\.test\(ref\) && ref !== handle/);
+  assert.match(me, /action === "invite_stats"/);
+  assert.match(fs.readFileSync(new URL("../nav.js", import.meta.url), "utf8"), /localStorage\.setItem\("btp_ref"/);
+  assert.match(fs.readFileSync(new URL("../start/index.html", import.meta.url), "utf8"), /ref: \(\(\) => \{ try \{ return localStorage\.getItem\("btp_ref"\)/);
+  for (const p of ["../orbit/index.html", "../u/index.html"]) assert.match(fs.readFileSync(new URL(p, import.meta.url), "utf8"), /btpInvite\.mount/);
+  console.log("✓ invite links wired");
+}

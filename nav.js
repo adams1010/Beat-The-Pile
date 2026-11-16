@@ -22,6 +22,8 @@
   const svg = (k) => `<svg class="btpic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
   // Account type (chosen once after sign-in on /start/ or in the welcome sheet below): "student" | "employer" | null
   let ROLE = null; try { ROLE = localStorage.getItem("btp_role"); } catch {}
+  // Nov 16: invite links (?ref=<handle>) — remember who sent this visitor so sign-up can credit them
+  try { const r = new URLSearchParams(location.search).get("ref"); if (r && /^[a-z0-9][a-z0-9-]{1,28}[a-z0-9]$/.test(r)) localStorage.setItem("btp_ref", r); } catch {}
   // Nov 8: employers get their own site — no student pages in their bar, and student-only pages (and the /business/ sales page)
   // send them to their home, /business/home/.
   const BIZ = ROLE === "employer";

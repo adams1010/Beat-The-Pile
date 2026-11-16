@@ -176,7 +176,7 @@
       if (staff && !$("#o_rl").value) { $("#o_msg").textContent = "Pick your role."; return; }
       b.disabled = true;
       try { await api({ action: "onboard", name: $("#o_nm").value, school: st.school || $("#o_sc").value, schoolId: st.schoolId, major: st.major || ($("#o_mj") && $("#o_mj").value) || "",
-          gradTerm: $("#o_gt").value, gradYear: $("#o_gy").value ? +$("#o_gy").value : null, show: $("#o_show").checked, ...(staff ? { staff: $("#o_rl").value } : { employers: !!$("#o_emp")?.checked, alerts: !!$("#o_alerts")?.checked, ...(st.photo ? { photo: st.photo } : {}) }) });
+          gradTerm: $("#o_gt").value, gradYear: $("#o_gy").value ? +$("#o_gy").value : null, show: $("#o_show").checked, ...(staff ? { staff: $("#o_rl").value } : { employers: !!$("#o_emp")?.checked, alerts: !!$("#o_alerts")?.checked, ref: (() => { try { return localStorage.getItem("btp_ref") || ""; } catch { return ""; } })(), ...(st.photo ? { photo: st.photo } : {}) }) });
         // Nov 10: right after sign-up, the "build your orbit" checklist (join classmates' orbits) — then on to the site
         if (window.btpOrbitStart) return window.btpOrbitStart.show({ getToken: () => C.session.getToken(), done: tour, force: true });
         tour(); }

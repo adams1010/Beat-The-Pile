@@ -220,6 +220,7 @@
 <script src="/resume-file.js"></script>
 <script src="/pick.js"></script>
 <script src="/orbit-start.js" defer></script>
+<script src="/invite.js" defer></script>
 <main id="main"><div class="card center muted" id="app">Loading…</div></main>
 <script>
 (function(){
@@ -278,7 +279,7 @@
     return `
       <section class="card"><div class="ptag">Only you see this</div><h2>Your season</h2>
         <div class="season"><a href="/jobs/?view=saved"><b>${(me.saved || []).length}</b><span>Saved</span></a><a href="/season/"><b>${apps.length || (me.applied || []).length}</b><span>Applied</span></a>
-          <a href="/season/"><b>${interviews}</b><span>Interviews + offers</span></a><a href="/jobs/?view=following"><b>${(me.starred || []).length}</b><span>Companies followed</span></a></div></section>
+          <a href="/season/"><b>${interviews}</b><span>Interviews + offers</span></a><a href="/jobs/?view=following"><b>${(me.starred || []).length}</b><span>Companies followed</span></a></div></section><div id="invSlot"></div>
       <section class="card"><div class="ptag">Only you see this</div>
         <div class="strong">${ringSvg(st.pct)}<div><span class="lvl">${esc(lvl)}</span><h2 style="margin:2px 0 2px">Profile strength</h2>
           <p class="small muted" style="margin:0">${todo.length ? `${todo.length} step${todo.length === 1 ? "" : "s"} to go. Complete profiles get found in Orbit and by employers.` : "Every step done. Recruiters see your best side."}</p></div></div>
@@ -579,6 +580,7 @@
       </section>`}`}
       ${S.tab === "preview" ? `<span class="msg" id="msg" role="status" hidden></span>` : `<div class="bar"><button class="btn pri" id="save">Save profile</button><button class="btn" type="button" data-tab="preview">Cancel</button><span class="msg" id="msg" role="status"></span></div>`}`;
     wire();
+    if (window.btpInvite && document.getElementById("invSlot")) window.btpInvite.mount(document.getElementById("invSlot"), token);   // Nov 16
   }
   // School → that school's real majors as a dropdown (so everyone at a school picks the same name → inner orbit)
   // School / major / location come from real lists (/pick.js): every US college (US Dept. of Education) + universities

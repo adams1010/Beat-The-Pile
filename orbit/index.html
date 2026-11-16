@@ -108,6 +108,7 @@
 </style>
 </head>
 <body>
+<script src="/invite.js"></script>
 <script src="/nav.js"></script>
 <div id="acct"></div>
 <main id="main"><div class="card center">Loading Orbit…</div></main>
@@ -246,11 +247,12 @@
         <div>${findBox()}${requests(o)}
         ${expNudge(m)}
         <section class="card" id="ringList"><h2>${title}</h2><p class="sub">${desc}${ring === "inner" && m.hasSchool ? ` · ${esc(m.major || "")} at ${esc(m.school)}` : ring === "campus" && m.hasSchool ? ` · ${esc(m.school)}` : ""}</p>${ring === "insiders" ? wantBox(o) : ""}${people(sets[ring], empty[ring])}</section></div>
-        <aside class="feedcol">
+        <aside class="feedcol"><div id="invSlot"></div>
           <section class="card" id="messages"><h2>Messages${o.unread ? `<span class="count">${o.unread}</span>` : ""}</h2><p class="sub">Students in your orbit, plus employers if you turned on “Let employers find me”.</p><div id="threads"><p class="empty">Loading…</p></div></section>
           ${fairBox(o)}
           <section class="card feed"><h2>Signals</h2><p class="sub">New openings at companies you follow, and posts from students.</p>${feed}</section></aside>
       </div>`;
+    if (window.btpInvite) window.btpInvite.mount(document.getElementById("invSlot"), token);   // Nov 16: invite classmates
     document.querySelectorAll("[data-ring]").forEach((b) => b.onclick = () => pickRing(b.dataset.ring, render));
     const gp = $("#goPublic"); if (gp) gp.onclick = async () => {   // Nov 9: one tap — gives you a link name and a public profile (name, school, major, photo)
       gp.disabled = true;

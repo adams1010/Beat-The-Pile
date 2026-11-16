@@ -1,6 +1,16 @@
 {
  "lang": "de",
  "strings": {
+  "Invite classmates": "Kommilitonen einladen",
+  "Save your profile first to get your own invite link.": "Speichere zuerst dein Profil, um deinen Einladungslink zu bekommen.",
+  "Set up my profile": "Mein Profil einrichten",
+  "Orbit works best when your friends are on it. Send your link to the people in your major or your group chats.": "Orbit funktioniert am besten, wenn deine Freunde dabei sind. Schick deinen Link an Leute aus deinem Studiengang oder in deine Gruppenchats.",
+  "Invite friends": "Freunde einladen",
+  "Copy link": "Link kopieren",
+  "Message copied": "Nachricht kopiert",
+  "Nobody has joined from your link yet": "Über deinen Link ist noch niemand beigetreten",
+  "friend joined from your link": "Freund ist über deinen Link beigetreten",
+  "friends joined from your link": "Freunde sind über deinen Link beigetreten",
   "Email me new jobs for my major once a week. One-click unsubscribe in every email.": "Schick mir einmal pro Woche neue Jobs für mein Studienfach. Abmelden mit einem Klick in jeder E-Mail.",
   "Jobs": "Jobs",
   "Career Fair": "Karrieremesse",
