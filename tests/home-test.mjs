@@ -74,7 +74,7 @@ r = await invoke(res, { method: "POST", body: { zip: "24060", major: "Mechanical
 assert.ok(r.body.results.some((c) => c.name === "MBA Co"), "graduate students still see MBA roles");
 const { GRAD_ONLY, gradOnly, staleForTerm } = await import("../api/results.js");
 assert.ok(!gradOnly("Bachelors/Masters - Structural Engineering Intern (Summer 2027!)") && !gradOnly("(2028 Bachelor's/Master's graduates) Consulting Intern") && gradOnly("Machine Learning Intern (Masters) - Summer 2027"));
-for (const t of ["Pharmacy Intern - Grad", "PhD Research Intern", "Master's Intern", "DVM/VMD Extern", "Grad Intern – R&D"]) assert.ok(GRAD_ONLY.test(t), t);
+for (const t of ["Foreign Pharmacy Grad - International Pharmacy Intern", "Pharmacy Intern - Grad", "PhD Research Intern", "Master's Intern", "DVM/VMD Extern", "Grad Intern – R&D"]) assert.ok(GRAD_ONLY.test(t), t);
 for (const t of ["Mechanical Engineering Intern", "Marketing Intern (Undergraduate)", "Engineering Co-op", "Masters Golf Intern"]) assert.ok(!GRAD_ONLY.test(t) || t === "Masters Golf Intern", t);
 assert.ok(staleForTerm("2026 Summer Intern", 2027) && !staleForTerm("2026-2027 Co-op", 2027) && !staleForTerm("Intern", 2027));
 { const t = f.T("listings"); for (let k = t.length - 1; k >= 0; k--) if (/^[hmsn]:1$/.test(t[k].id)) t.splice(k, 1); }   // leave the table as the next tests expect

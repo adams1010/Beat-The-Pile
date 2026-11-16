@@ -11,7 +11,7 @@ import { majorWords, fitOf, classYearAt } from "../lib/quizfit.js";
 
 const MAX = 60;
 // Nov 15 (quiz audit): undergrads were shown MBA, PhD, PharmD and DVM roles. These only show for "Graduate Student".
-export const GRAD_ONLY = /\b(mba|ph\.?\s?d|doctoral|doctorate|post-?doc|master'?s|ms\/phd|pharm\.?\s?d|dvm|vmd|jd|law clerk|juris|grad(uate)? (intern|student)|(intern|internship)\W+grad\b|residency)\b/i;
+export const GRAD_ONLY = /\b(mba|ph\.?\s?d|doctoral|doctorate|post-?doc|master'?s|ms\/phd|pharm\.?\s?d|dvm|vmd|jd|law clerk|juris|grad(uate)? (intern|student)|pharmacy grad|(intern|internship)\W+grad\b|residency)\b/i;
 /** Grad-degree only, unless the title also invites undergrads ("Bachelors/Masters - Structural Engineering Intern"). */
 export const gradOnly = (t) => GRAD_ONLY.test(t || "") && !/bachelor|undergrad|\bbs\/ms\b|\bb\.?s\.?\s*\/\s*m\.?s\b/i.test(t || "");
 const YEAR = /\b(20\d\d)\b/g;
