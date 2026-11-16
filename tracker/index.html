@@ -106,10 +106,9 @@
     const A = S.apps.filter((a) => a.company), n = A.length;
     const sent = A.filter((a) => a.checks.submitted).length, iv = A.filter((a) => a.checks.interviewed || a.stage === "interview" || a.stage === "offer").length;
     const of = A.filter((a) => a.checks.offered || a.stage === "offer").length, rej = A.filter((a) => a.stage === "rejected").length;
-    const hr = A.filter((a) => a.pay && a.payUnit === "hour").map((a) => a.pay), yr = A.filter((a) => a.pay && a.payUnit === "year").map((a) => a.pay);
-    const avg = (x) => x.reduce((s, v) => s + v, 0) / x.length, money = (v, d = 0) => "$" + v.toLocaleString(undefined, { maximumFractionDigits: d });
-    const pay = hr.length ? money(avg(hr), 2) + "/hr" : yr.length ? money(avg(yr)) + "/yr" : "n/a";
-    return [[sent, "Applied"], [iv, "Interviews"], [of, "Offers"], [rej, "Rejected"], [sent ? Math.round(((iv + rej) / sent) * 100) + "%" : "n/a", "Heard back"], [pay, hr.length ? "Avg hourly pay" : "Avg pay"]]
+    const today = new Date(); today.setHours(0, 0, 0, 0); const wk = today.getTime() + 7 * 864e5;
+    const due = A.filter((a) => { if (!a.deadline) return false; const t = new Date(a.deadline).getTime(); return t >= today.getTime() && t < wk + 864e5; }).length;
+    return [[sent, "Applied"], [iv, "Interviews"], [of, "Offers"], [rej, "Rejected"], [sent ? Math.round(((iv + rej) / sent) * 100) + "%" : "n/a", "Heard back"], [due, "Deadlines this week"]]
       .map(([b, s]) => `<div class="stat"><b data-noi18n>${esc(b)}</b><span>${esc(s)}</span></div>`).join("") + (n ? "" : "");
   }
 
