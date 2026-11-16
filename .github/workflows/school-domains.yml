@@ -1,0 +1,29 @@
+# On demand (Actions → school-domains → Run workflow): every US college's own web domain from IPEDS (HD file, WEBADDR),
+# used by faculty/staff verification (email must be on the school's domain). Once a year is plenty.
+name: school-domains
+on:
+  workflow_dispatch:
+    inputs:
+      year: { description: "IPEDS year (e.g. 2024)", required: false, default: "2024" }
+permissions: { contents: write }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Download IPEDS HD
+        run: |
+          Y="${{ inputs.year || '2024' }}"; mkdir -p /tmp/ipeds && cd /tmp/ipeds
+          curl -sfL --retry 3 -o hd.zip "https://nces.ed.gov/ipeds/datacenter/data/HD${Y}.zip" && unzip -o -q hd.zip && ls -la
+      - name: Build
+        run: node scripts/build-school-domains.mjs "$(ls /tmp/ipeds/*.csv | grep -i hd | head -1)"
+      - name: Commit if changed
+        run: |
+          git pull --rebase origin main
+          git add schools/domains.json
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git config user.name "btp-schools"; git config user.email "schools@users.noreply.github.com"
+          git commit -m "Schools: web domains from IPEDS" && git push
