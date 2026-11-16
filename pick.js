@@ -25,7 +25,7 @@
       if (!words.every((w) => hay.includes(w))) continue;
       const lab = it._l || (it._l = norm(it.label)), al = norm(it.alias || "");
       const score = lab === nq || (it.aliases || []).some((x) => norm(x) === nq) ? 0 : lab.startsWith(nq) ? 1 : (" " + al + " ").includes(" " + nq + " ") ? 1 : (" " + hay).includes(" " + words[0]) ? 2 : 3;
-      out.push([score, -(it.size || 0), lab.length, it]);   // Nov 16: within a tier, the biggest school first (degrees awarded), so "texas" finds UT and A&M before tiny colleges
+      out.push([score === 2 ? 1 : score, -(it.size || 0), lab.length, it]);   // Nov 16: within a tier, the biggest school first (degrees awarded), so "texas" finds UT and A&M before tiny colleges
       if (out.length > 4000) break;
     }
     return out.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2] - b[2]).slice(0, max).map((x) => x[3]);
