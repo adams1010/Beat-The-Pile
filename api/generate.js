@@ -3,7 +3,7 @@
 // So nobody can use this endpoint as a free general-purpose Claude.
 //
 //   POST /api/generate { feature, input }   → { text }
-//   features: reasons · resume_builder · cover_letter · followup · score · interview_prep · interview_turn · intel · profile_fill · intern_bullets
+//   features: fit_grade · reasons · resume_builder · cover_letter · followup · score · interview_prep · interview_turn · intel · profile_fill · intern_bullets
 //
 // Controls (all shared across every server, stored in Postgres):
 //   - Origin/Referer must be our own site. That only stops other websites' browsers — it is NOT authentication.
@@ -53,6 +53,26 @@ ${resume}
 Return ONLY this JSON (no other text):
 {"name":"full name","headline":"short line like 'Mechanical Engineering student at Virginia Tech' built only from facts in the resume","school":"current college/university (not high school)","major":"major only, e.g. Mechanical Engineering","gradYear":2028,"location":"City, ST if listed","about":"2-3 sentences summarizing ONLY what the resume shows (objective/summary if present)","skills":["up to 20 skills, tools, languages listed"],"experience":[{"title":"role","org":"employer or organization","when":"dates as written, e.g. May 2025 – Aug 2025","desc":"what they did, from the bullets"}],"projects":[{"name":"project name","desc":"from the resume","link":"https link only if written in the resume"}],"links":{"linkedin":"https URL if listed","github":"https URL if listed","portfolio":"https URL if listed"}}
 Rules: gradYear is the expected graduation year as a number, or null. Experience = jobs, internships, research, leadership roles (most recent first, at most 8). Projects at most 6. Links must start with https://, add https:// to a bare linkedin.com/github.com address from the resume; otherwise "".` };
+  },
+
+  // Nov 15: match quiz "resume check": an ATS-style read of the student's resume against each job title. We only have the
+  // title + company (not the full posting), so this is an estimate of what such roles usually screen for. Copy, never invent.
+  fit_grade(i) {
+    const resume = str(i?.resume, 6000), major = str(i?.major, 120), year = str(i?.gradYear, 30);
+    const jobs = (Array.isArray(i?.jobs) ? i.jobs : []).slice(0, 20).map((j, n) => `${n + 1}. ${str(j?.role, 140)} at ${str(j?.name, 100)}`);
+    if (resume.length < 80 || !jobs.length) throw new AIError("Add a resume first", 400);
+    return { maxTokens: 3200, temperature: 0, prompt: `You screen internship applications the way applicant tracking software and a recruiter's 30-second skim do: keyword and skill match, relevant experience, major and coursework fit, and clear evidence (numbers, results, tools). The student is a ${major || "college"} student graduating ${year || "soon"}.
+
+For each job below you only know the title and company. Judge what that kind of role at that kind of company usually screens for, and score how well THIS resume would do, 0 to 100. Be honest: most students land 40 to 75; reserve 85+ for a resume that clearly shows the skills and experience the role usually needs. Never invent anything that is not in the resume.
+
+RESUME:
+${resume}
+
+JOBS:
+${jobs.join("\n")}
+
+Return ONLY a JSON array in the same order, no other text. Each entry:
+{"i":1,"score":0-100,"matched":["up to 4 short things FROM THE RESUME that this role screens for"],"missing":["up to 3 short things this kind of role usually asks for that the resume does not show"],"note":"one specific sentence, e.g. 'Your SolidWorks project and FEA class line up; add a measurable result to stand out.'"}` };
   },
 
   reasons(i) {

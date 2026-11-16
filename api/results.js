@@ -7,6 +7,7 @@
 import { db } from "../lib/db.js";
 import { zipToState, fieldsForMajor } from "../lib/geo.js";
 import { lookupPlace, miles } from "../lib/geocode.js";
+import { majorWords, fitOf, classYearAt } from "../lib/quizfit.js";
 
 const MAX = 60;
 // Nov 15 (quiz audit): undergrads were shown MBA, PhD, PharmD and DVM roles. These only show for "Graduate Student".
@@ -25,9 +26,9 @@ export function toCard(l) {
   return {
     name: l.company, role: l.title, location: l.location || "", industry: "", website: "",
     hasLinkedin: false, tier: "regional", locationBand: l.remote ? "remote" : null,
-    applyUrl: l.url, listingId: l.id, companyId: l.company_id, firstSeen: l.first_seen, postedOn: l.posted_on || null,
+    applyUrl: l.url, ...(l.fit != null ? { match: l.fit, why: l.why || [] } : {}), listingId: l.id, companyId: l.company_id, firstSeen: l.first_seen, postedOn: l.posted_on || null,
     source: "db", verified: true,
-    reason: `Open now on ${l.company}'s own job board, we found it there ourselves.`,
+    reason: (l.why && l.why.length ? l.why.join(" · ") + ". " : "") + `Open now on ${l.company}'s own job board.`,
     ...(l.mi != null ? { mi: l.mi } : {}), ...(l.remote ? { remote: true } : {}),
   };
 }
@@ -48,7 +49,7 @@ export default async function handler(req, res) {
   if (!remote && (!state || !center)) return res.status(400).json({ error: "We couldn't read that ZIP code, check it and try again" });
 
   const fields = fieldsForMajor(major);
-  let base = "listings?select=id,company_id,company,title,location,state,url,posted_on,first_seen,geo_pts"
+  let base = "listings?select=id,company_id,company,title,location,state,url,posted_on,first_seen,geo_pts,field"
            + "&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)&kind=eq.intern&order=first_seen.desc,id.asc";   // internships only (Nov 15: hourly/full-time were leaking in)
   if (fields) base += `&field=in.(${fields.join(",")})`;      // unknown major ("Other") → every major
   const remoteQ = `${base}&and=(or(location.ilike.*remote*,geo_kind.eq.remote))&limit=400`;
@@ -68,6 +69,11 @@ export default async function handler(req, res) {
       rows.sort((x, y) => x.mi - y.mi || (x.first_seen < y.first_seen ? 1 : -1));
       if (type === "Any") rows.push(...(await db.select(remoteQ)).filter((l) => fits(l) && !rows.some((x) => x.id === l.id)).map((l) => ({ ...l, remote: true })));
     }
+    // Nov 15: rank by real fit (title vs major, skills, class year, term, distance, freshness), never by chance
+    const ctx = { words: majorWords(major), majorLabel: major.split(",")[0].trim(), fields, skills: (Array.isArray(body?.skills) ? body.skills : []).map((x) => String(x).slice(0, 40)).slice(0, 30),
+      year: classYearAt(body?.gradYear, body?.term), term: body?.term, now: Date.now() };
+    for (const l of rows) Object.assign(l, fitOf(l, ctx));
+    rows.sort((a, b) => b.fit - a.fit || (a.mi ?? 999) - (b.mi ?? 999));
     // One card per company first (most variety), then fill with extra roles
     const seen = new Set(), first = [], rest = [];
     for (const l of rows) (seen.has(l.company_id) ? rest : (seen.add(l.company_id), first)).push(l);

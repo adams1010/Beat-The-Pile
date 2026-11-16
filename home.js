@@ -1,4 +1,4 @@
-/* built from src/home.jsx 38b65f9bbbed9319 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 9be3e0ef3d2acd41 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -945,31 +945,41 @@ function LandingD({
       padding: "6px 12px",
       borderRadius: 999
     }
-  }, D_FIELD[k].split(" & ")[0]))), React.createElement("p", {
+  }, D_FIELD[k].split(" & ")[0]))), React.createElement("div", {
     style: {
-      fontSize: 13,
-      color: "#8D9AB3",
+      display: "flex",
+      gap: 12,
+      alignItems: "center",
+      flexWrap: "wrap",
       marginTop: 18
     }
-  }, "Free \xB7 no account needed to browse \xB7 ", React.createElement("button", {
+  }, React.createElement("button", {
     onClick: onQuiz,
     style: {
-      background: "none",
-      border: 0,
-      padding: 0,
-      color: "#B0F701",
-      cursor: "pointer",
       font: "inherit",
-      fontWeight: 600
+      fontSize: 15,
+      fontWeight: 600,
+      background: "transparent",
+      color: "#B0F701",
+      border: "1.5px solid #B0F701",
+      padding: "10px 18px",
+      borderRadius: 999,
+      cursor: "pointer",
+      minHeight: 44
     }
-  }, "2-minute match quiz"), " \xB7 ", React.createElement("a", {
+  }, "Not sure where to start? Take the 2-minute match quiz"), React.createElement("span", {
+    style: {
+      fontSize: 13,
+      color: "#8D9AB3"
+    }
+  }, "Free \xB7 no account needed to browse \xB7 ", React.createElement("a", {
     href: "/demo/",
     style: {
       color: "#B0F701",
       fontWeight: 600,
       textDecoration: "none"
     }
-  }, "90-second demo")), found && found.left > 0 && React.createElement("p", {
+  }, "90-second demo"))), found && found.left > 0 && React.createElement("p", {
     style: {
       fontSize: 13.5,
       color: "#CFD7E6",
@@ -2048,7 +2058,6 @@ function companyFitScore(company) {
     hash = hash * 31 + seed.charCodeAt(i) >>> 0;
   }
   const rand = hash % 1000 / 1000;
-  base += (rand - 0.5) * 0.18;
   return Math.max(0.12, Math.min(0.97, base));
 }
 function honestScore(company, ans, extPicks) {
@@ -2288,21 +2297,22 @@ function computeScoreFactors(profile, job) {
   profile = profile || {};
   job = job || {};
   const skills = profile.skills || [];
-  const has = s => skills.some(ps => (ps || "").toLowerCase().includes((s || "").toLowerCase()));
+  const has = s => (job.resumeCheck && job.resumeCheck.matched || []).includes(s) || skills.some(ps => (ps || "").toLowerCase().includes((s || "").toLowerCase()));
   const factors = [];
-  const reqMajors = Array.isArray(job.requiredMajors) ? job.requiredMajors : [];
-  const majorKnown = reqMajors.length > 0;
-  const majorMatch = !majorKnown || reqMajors.some(m => (profile.major || "").toLowerCase().includes(m.toLowerCase()));
+  const why = Array.isArray(job.why) ? job.why : [];
+  const reqMajors = why.length ? why.some(w => /^Title fits/.test(w)) ? [] : ["a related area"] : Array.isArray(job.requiredMajors) ? job.requiredMajors : [];
+  const majorKnown = reqMajors.length > 0 || why.length > 0;
+  const majorMatch = why.length ? why.some(w => /^Title fits/.test(w)) : !reqMajors.length || reqMajors.some(m => (profile.major || "").toLowerCase().includes(m.toLowerCase()));
   factors.push({
     id: 'major',
     label: 'Major / Field',
     status: majorMatch ? 'pass' : 'fail',
     impact: majorMatch ? +20 : -15,
-    detail: !majorKnown ? `Your ${profile.major || 'field'} fits the general profile for this role.` : majorMatch ? `Your ${profile.major} is a strong fit for this role.` : `This role typically targets ${reqMajors.join(', ')}. Your major is a partial mismatch.`,
+    detail: !majorKnown ? `We can't tell from this posting which majors it wants.` : majorMatch ? `The job title lines up with ${profile.major || "your major"}.` : why.length ? `It's in your job area, but the title doesn't name ${profile.major || "your major"}. Read the posting to check.` : `This role typically targets ${reqMajors.join(', ')}. Your major is a partial mismatch.`,
     fix: majorMatch ? null : 'Highlight relevant coursework and projects in your cover letter to bridge the gap.',
     scoreGain: majorMatch ? 0 : 18
   });
-  const reqSkills = Array.isArray(job.requiredSkills) ? job.requiredSkills : [];
+  const reqSkills = job.resumeCheck ? [...(job.resumeCheck.matched || []), ...(job.resumeCheck.missing || [])] : Array.isArray(job.requiredSkills) ? job.requiredSkills : [];
   const prefSkills = Array.isArray(job.preferredSkills) ? job.preferredSkills : [];
   const matchedSkills = reqSkills.filter(has);
   const missingRequired = reqSkills.filter(s => !has(s));
@@ -4380,8 +4390,31 @@ function App() {
     }
     return -1;
   }
+  function startQuiz() {
+    const pick = (v, opts) => (opts || []).find(o => o.toLowerCase() === String(v || "").toLowerCase().trim()) || "";
+    setAns(a => ({
+      ...a,
+      university: a.university || String(profile.school || "").trim(),
+      major: a.major || String(profile.major || "").trim(),
+      gradYear: a.gradYear || pick(profile.gradDate, GRAD_YEARS),
+      targetTerm: TERM_OPTS.includes(a.targetTerm) ? a.targetTerm : ""
+    }));
+    analytics.track("quiz_started", {
+      prefilled: !!(profile.school || profile.major)
+    });
+    setEditStep(null);
+    setStep(0);
+    setPage("quiz");
+    window.scrollTo(0, 0);
+  }
   function advanceQuiz() {
     if (!canNext()) return;
+    try {
+      analytics.track("quiz_step", {
+        step: STEPS[step].key,
+        n: step + 1
+      });
+    } catch (e) {}
     if (editStep !== null) {
       saveEdit();
       return;
@@ -4489,7 +4522,8 @@ function App() {
           type: ans.type || "Any",
           radius: over && over.radius || ans.radius || 50,
           term: ans.targetTerm || "",
-          gradYear: ans.gradYear || ""
+          gradYear: ans.gradYear || "",
+          skills: ans.skills || []
         }),
         signal: ctrl.signal
       });
@@ -4501,7 +4535,7 @@ function App() {
       setResultsError("");
       setAiError(null);
       setResults(initial);
-      if (initial.length && (ans.resume || "").trim().length >= 80) enrichWithPersonalizedReasons(initial);
+      if (initial.length && (ans.resume || "").trim().length >= 80) gradeWithResume(initial);
     } catch (e) {
       const msg = e && e.name === "AbortError" ? "That took too long, check your connection and try again." : e && e.message || "Couldn't load internships right now.";
       console.warn("[iq] results failed:", msg);
@@ -4515,6 +4549,75 @@ function App() {
       setShowConfetti(true);
       setTimeout(() => setShowConfetti(false), 3000);
     }, 400);
+  }
+  async function gradeWithResume(list) {
+    const resume = (ans.resume || "").trim();
+    if (resume.length < 80 || !list.length) return;
+    setGrading(true);
+    try {
+      const top = list.slice(0, 20);
+      const ctrl = new AbortController();
+      const timer = setTimeout(() => ctrl.abort(), 45000);
+      const r = await fetch("/api/generate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        signal: ctrl.signal,
+        body: JSON.stringify({
+          feature: "fit_grade",
+          input: {
+            resume: resume.slice(0, 6000),
+            major: ans.major || "",
+            gradYear: ans.gradYear || "",
+            jobs: top.map(c => ({
+              role: c.role,
+              name: c.name
+            }))
+          }
+        })
+      });
+      clearTimeout(timer);
+      if (!r.ok) throw new Error("backend " + r.status);
+      const t = (await r.json()).text || "";
+      let g = null;
+      try {
+        g = JSON.parse(t.trim());
+      } catch {
+        const m = t.match(/\[[\s\S]*\]/);
+        if (m) try {
+          g = JSON.parse(m[0]);
+        } catch {}
+      }
+      if (!Array.isArray(g)) throw new Error("parse");
+      const ids = new Map(top.map((c, n) => [c.listingId || c.name + c.role, n + 1]));
+      setResults(prev => prev.map(c => {
+        const n = ids.get(c.listingId || c.name + c.role);
+        const x = n && g.find(y => +y.i === n);
+        if (!x || typeof x.score !== "number") return c;
+        const sc = Math.max(1, Math.min(99, Math.round(x.score)));
+        const m = Math.round(c.match * 0.6 + sc * 0.4);
+        return {
+          ...c,
+          match: m,
+          low: Math.max(1, m - 8),
+          high: Math.min(99, m + 6),
+          resumeCheck: {
+            score: sc,
+            matched: (x.matched || []).slice(0, 4),
+            missing: (x.missing || []).slice(0, 3)
+          },
+          reason: x.note ? String(x.note) : c.reason,
+          personalized: true
+        };
+      }));
+      analytics.track("results_resume_checked", {
+        count: g.length
+      });
+    } catch (e) {
+      console.warn("[iq] resume check skipped:", e && e.message);
+    }
+    setGrading(false);
   }
   async function enrichWithPersonalizedReasons(currentResults) {
     const resume = (ans.resume || "").trim();
@@ -5048,6 +5151,7 @@ function App() {
     ensureClerkLoaded();
   }, []);
   const restoredRef = useRef(false);
+  const [grading, setGrading] = useState(false);
   const metaRef = useRef(null);
   useEffect(() => {
     const s = sessionStore.load();
@@ -7874,10 +7978,7 @@ function App() {
       minHeight: "100vh"
     }
   }, showProModal && React.createElement(ProModal, null), React.createElement(SignInModal, null), React.createElement(Nav, null), React.createElement(LandingD, {
-    onQuiz: () => {
-      setStep(0);
-      setPage("quiz");
-    },
+    onQuiz: startQuiz,
     onPage: setPage
   }));
   if (page === "quiz") {
@@ -9316,7 +9417,7 @@ function App() {
           borderTop: `1px solid #E2E8F0`,
           marginTop: 2
         }
-      }, "Match % is our own estimate of your fit from your quiz answers (field, GPA, grad year, timing, leadership). It is not from the employer and is not a prediction of an offer. We'd rather show a low honest number than a high false one."))));
+      }, "Match % is our estimate, built only from real signals: how the job title fits your major and skills, the class year and term it asks for, distance, how new the posting is, plus your GPA, activities and timing. With a resume, 40% comes from an AI resume check against the job title. It is not from the employer and is not a prediction of an offer."))));
     })(), showResultsHint && topPicks.length > 0 && React.createElement("div", {
       style: {
         position: "relative",
@@ -9492,7 +9593,19 @@ function App() {
           boxShadow: "none"
         }
       }, "Build my resume \u2197"));
-    })(), topPicks.length > 0 && React.createElement("div", {
+    })(), grading && React.createElement("div", {
+      role: "status",
+      style: {
+        background: GL,
+        border: `1px solid ${GM}`,
+        borderRadius: var_rl,
+        padding: "10px 14px",
+        marginBottom: 14,
+        fontSize: 13.5,
+        color: GD,
+        fontWeight: 600
+      }
+    }, "Checking your resume against each job, the way screening software does. Scores update in a few seconds."), topPicks.length > 0 && React.createElement("div", {
       style: {
         background: `#fff`,
         border: `1.5px solid ${G}`,
@@ -9934,16 +10047,53 @@ function App() {
         pct: c.match,
         color: accent,
         delay: 0
-      }), React.createElement("div", {
+      }), (c.why || []).length > 0 && React.createElement("div", {
         style: {
           display: "flex",
-          gap: 10,
-          flexWrap: "wrap",
-          fontSize: 11,
-          color: "#6B7280",
-          fontWeight: 600
+          gap: 6,
+          flexWrap: "wrap"
         }
-      }, React.createElement("span", null, "GPA/Profile ", c._profile, "%"), React.createElement("span", null, "\xB7 Experience ", c._exp, "%"), c._lead > 0 && React.createElement("span", null, "\xB7 Leadership ", c._lead, "%"), React.createElement("span", null, "\xB7 Timing ", c._timing, "%"), React.createElement("span", null, "\xB7 Fit (est.) ", c._fit, "%")), React.createElement("div", {
+      }, c.why.map(w => React.createElement("span", {
+        key: w,
+        style: {
+          fontSize: 11.5,
+          fontWeight: 600,
+          color: /^Title fits|^Open to your|^Mentions|^For /.test(w) ? GD : "#334155",
+          background: /^Title fits|^Open to your|^Mentions|^For /.test(w) ? GL : "#F1F5F9",
+          padding: "3px 9px",
+          borderRadius: 99
+        }
+      }, w))), c.resumeCheck && React.createElement("div", {
+        style: {
+          border: "1px solid #E2E8F0",
+          borderRadius: var_r,
+          padding: "9px 11px"
+        }
+      }, React.createElement("p", {
+        style: {
+          fontSize: 12,
+          fontWeight: 700,
+          color: "#060A2C",
+          marginBottom: 6
+        }
+      }, "Resume check ", c.resumeCheck.score, "/100 ", React.createElement("span", {
+        style: {
+          fontWeight: 500,
+          color: "#6B7280"
+        }
+      }, "\xB7 AI estimate from the job title")), c.resumeCheck.matched.length > 0 && React.createElement("p", {
+        style: {
+          fontSize: 12,
+          color: GD,
+          lineHeight: 1.5
+        }
+      }, React.createElement("b", null, "You show:"), " ", c.resumeCheck.matched.join(", ")), c.resumeCheck.missing.length > 0 && React.createElement("p", {
+        style: {
+          fontSize: 12,
+          color: "#92400E",
+          lineHeight: 1.5
+        }
+      }, React.createElement("b", null, "Often asked for:"), " ", c.resumeCheck.missing.join(", "))), React.createElement("div", {
         onClick: e => e.stopPropagation()
       }, React.createElement(ScoreExplainerCard, {
         job: c,
@@ -9981,7 +10131,7 @@ function App() {
           color: c.personalized ? GD : "#6B7280",
           marginBottom: 4
         }
-      }, c.personalized ? "Why this fits you" : "Why this is a realistic shot"), React.createElement("p", {
+      }, c.personalized ? "From your resume" : "Why it's on your list"), React.createElement("p", {
         style: {
           fontSize: 13,
           color: "#4A5568",

@@ -200,7 +200,10 @@ function LandingD({onQuiz,onPage}){
             <span style={{fontSize:13,color:"#8D9AB3",marginRight:4}}>Popular:</span>
             {pills.map(k=><a key={k} href={`/jobs/?major=${k}&state=all`} style={{fontSize:13,color:"#CFD7E6",textDecoration:"none",border:"1px solid #22304D",padding:"6px 12px",borderRadius:999}}>{D_FIELD[k].split(" & ")[0]}</a>)}
           </div>
-          <p style={{fontSize:13,color:"#8D9AB3",marginTop:18}}>Free · no account needed to browse · <button onClick={onQuiz} style={{background:"none",border:0,padding:0,color:"#B0F701",cursor:"pointer",font:"inherit",fontWeight:600}}>2-minute match quiz</button> · <a href="/demo/" style={{color:"#B0F701",fontWeight:600,textDecoration:"none"}}>90-second demo</a></p>
+          <div style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap",marginTop:18}}>
+            <button onClick={onQuiz} style={{font:"inherit",fontSize:15,fontWeight:600,background:"transparent",color:"#B0F701",border:"1.5px solid #B0F701",padding:"10px 18px",borderRadius:999,cursor:"pointer",minHeight:44}}>Not sure where to start? Take the 2-minute match quiz</button>
+            <span style={{fontSize:13,color:"#8D9AB3"}}>Free · no account needed to browse · <a href="/demo/" style={{color:"#B0F701",fontWeight:600,textDecoration:"none"}}>90-second demo</a></span>
+          </div>
           {found&&found.left>0&&<p style={{fontSize:13.5,color:"#CFD7E6",marginTop:10,display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><span style={{fontWeight:600,color:"#B0F701",...DM}}>{found.left} of {found.total} founding spots left</span><span>The first {found.total} students keep every Pro feature free, for life.</span><a href="/start/" style={{color:"#B0F701",fontWeight:600,textDecoration:"none"}}>Claim yours →</a></p>}
         </div>
         <div style={{position:"relative",flex:"1 1 340px",maxWidth:560,minWidth:0,width:"100%"}}>
@@ -634,7 +637,7 @@ function companyFitScore(company){
   let hash=0;
   for(let i=0;i<seed.length;i++){hash=(hash*31+seed.charCodeAt(i))>>>0;}
   const rand=(hash%1000)/1000; // deterministic 0..1
-  base+=(rand-0.5)*0.18; // spread of about ±9%
+  // Nov 15: no more random spread. Real fit comes from /api/results (company.match); this fallback is only for old saved results.
   return Math.max(0.12,Math.min(0.97,base)); // loosened — a genuinely hard match can show single digits
 }
 function honestScore(company,ans,extPicks){
@@ -798,26 +801,27 @@ const usageStore={
 function computeScoreFactors(profile, job){
   profile=profile||{}; job=job||{};
   const skills=profile.skills||[];
-  const has=s=>skills.some(ps=>(ps||"").toLowerCase().includes((s||"").toLowerCase()));
+  const has=s=>((job.resumeCheck&&job.resumeCheck.matched)||[]).includes(s)||skills.some(ps=>(ps||"").toLowerCase().includes((s||"").toLowerCase()));
   const factors=[];
 
-  // Factor 1: Major / Field — judge only if the job lists required majors.
-  const reqMajors=Array.isArray(job.requiredMajors)?job.requiredMajors:[];
-  const majorKnown=reqMajors.length>0;
-  const majorMatch=!majorKnown||reqMajors.some(m=>(profile.major||"").toLowerCase().includes(m.toLowerCase()));
+  // Factor 1: Major / Field. Nov 15: judged from the job title (/api/results "why"), never assumed.
+  const why=Array.isArray(job.why)?job.why:[];
+  const reqMajors=why.length?(why.some(w=>/^Title fits/.test(w))?[]:["a related area"]):(Array.isArray(job.requiredMajors)?job.requiredMajors:[]);
+  const majorKnown=reqMajors.length>0||why.length>0;
+  const majorMatch=why.length?why.some(w=>/^Title fits/.test(w)):(!reqMajors.length||reqMajors.some(m=>(profile.major||"").toLowerCase().includes(m.toLowerCase())));
   factors.push({
     id:'major', label:'Major / Field',
     status:majorMatch?'pass':'fail',
     impact:majorMatch?+20:-15,
-    detail:!majorKnown?`Your ${profile.major||'field'} fits the general profile for this role.`
-      :majorMatch?`Your ${profile.major} is a strong fit for this role.`
-      :`This role typically targets ${reqMajors.join(', ')}. Your major is a partial mismatch.`,
+    detail:!majorKnown?`We can't tell from this posting which majors it wants.`
+      :majorMatch?`The job title lines up with ${profile.major||"your major"}.`
+      :why.length?`It's in your job area, but the title doesn't name ${profile.major||"your major"}. Read the posting to check.`:`This role typically targets ${reqMajors.join(', ')}. Your major is a partial mismatch.`,
     fix:majorMatch?null:'Highlight relevant coursework and projects in your cover letter to bridge the gap.',
     scoreGain:majorMatch?0:18,
   });
 
   // Factor 2: Skills Match — judge only if the job lists required skills.
-  const reqSkills=Array.isArray(job.requiredSkills)?job.requiredSkills:[];
+  const reqSkills=job.resumeCheck?[...(job.resumeCheck.matched||[]),...(job.resumeCheck.missing||[])]:(Array.isArray(job.requiredSkills)?job.requiredSkills:[]);
   const prefSkills=Array.isArray(job.preferredSkills)?job.preferredSkills:[];
   const matchedSkills=reqSkills.filter(has);
   const missingRequired=reqSkills.filter(s=>!has(s));
@@ -1481,8 +1485,16 @@ function App(){
     }
     return -1; // past end → emailgate
   }
+  // Nov 15: start the quiz with what we already know (signed-in profile: school, major, graduation), and count each step
+  function startQuiz(){
+    const pick=(v,opts)=>(opts||[]).find(o=>o.toLowerCase()===String(v||"").toLowerCase().trim())||"";
+    setAns(a=>({...a,university:a.university||String(profile.school||"").trim(),major:a.major||String(profile.major||"").trim(),gradYear:a.gradYear||pick(profile.gradDate,GRAD_YEARS),targetTerm:TERM_OPTS.includes(a.targetTerm)?a.targetTerm:""}));
+    analytics.track("quiz_started",{prefilled:!!(profile.school||profile.major)});
+    setEditStep(null);setStep(0);setPage("quiz");window.scrollTo(0,0);
+  }
   function advanceQuiz(){
     if(!canNext())return;
+    try{analytics.track("quiz_step",{step:STEPS[step].key,n:step+1});}catch(e){}
     if(editStep!==null){saveEdit();return;}
     const ni=nextStepIndex(step);
     if(ni>=0)setStep(ni); else setPage("emailgate");
@@ -1549,7 +1561,7 @@ function App(){
     // board. No AI-made company lists and no placeholder companies: if nothing matches, we say so.
     try{
       const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),20000);
-      const r=await fetch("/api/results",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({zip:ans.zip,major:ans.major,type:ans.type||"Any",radius:(over&&over.radius)||ans.radius||50,term:ans.targetTerm||"",gradYear:ans.gradYear||""}),signal:ctrl.signal});
+      const r=await fetch("/api/results",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({zip:ans.zip,major:ans.major,type:ans.type||"Any",radius:(over&&over.radius)||ans.radius||50,term:ans.targetTerm||"",gradYear:ans.gradYear||"",skills:ans.skills||[]}),signal:ctrl.signal});
       clearTimeout(timer);
       const d=await r.json().catch(()=>({}));
       if(!r.ok)throw new Error(d.error||"Couldn't load internships right now, try again in a minute");
@@ -1557,7 +1569,7 @@ function App(){
       const initial=applyHonest(Array.isArray(d.results)?d.results:[],ans,extPicks);
       setResultsError("");setAiError(null);
       setResults(initial);
-      if(initial.length&&(ans.resume||"").trim().length>=80)enrichWithPersonalizedReasons(initial);
+      if(initial.length&&(ans.resume||"").trim().length>=80)gradeWithResume(initial);
     }catch(e){
       const msg=e&&e.name==="AbortError"?"That took too long, check your connection and try again.":(e&&e.message)||"Couldn't load internships right now.";
       console.warn("[iq] results failed:",msg);
@@ -1568,6 +1580,29 @@ function App(){
     setTimeout(()=>{setLoading(false);setShowConfetti(true);setTimeout(()=>setShowConfetti(false),3000);},400);
   }
 
+  // Nov 15: "Resume check" — an ATS-style AI read of the resume against each of the top 20 job titles (/api/generate fit_grade).
+  // Blended into the match (60% real-signal fit, 40% resume check) and shown separately, labeled as an AI estimate.
+  async function gradeWithResume(list){
+    const resume=(ans.resume||"").trim(); if(resume.length<80||!list.length)return;
+    setGrading(true);
+    try{
+      const top=list.slice(0,20);
+      const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),45000);
+      const r=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},signal:ctrl.signal,
+        body:JSON.stringify({feature:"fit_grade",input:{resume:resume.slice(0,6000),major:ans.major||"",gradYear:ans.gradYear||"",jobs:top.map(c=>({role:c.role,name:c.name}))}})});
+      clearTimeout(timer);
+      if(!r.ok)throw new Error("backend "+r.status);
+      const t=(await r.json()).text||"";let g=null;try{g=JSON.parse(t.trim());}catch{const m=t.match(/\[[\s\S]*\]/);if(m)try{g=JSON.parse(m[0]);}catch{}}
+      if(!Array.isArray(g))throw new Error("parse");
+      const ids=new Map(top.map((c,n)=>[c.listingId||c.name+c.role,n+1]));
+      setResults(prev=>prev.map(c=>{const n=ids.get(c.listingId||c.name+c.role);const x=n&&g.find(y=>+y.i===n);
+        if(!x||typeof x.score!=="number")return c;
+        const sc=Math.max(1,Math.min(99,Math.round(x.score)));const m=Math.round(c.match*0.6+sc*0.4);
+        return {...c,match:m,low:Math.max(1,m-8),high:Math.min(99,m+6),resumeCheck:{score:sc,matched:(x.matched||[]).slice(0,4),missing:(x.missing||[]).slice(0,3)},reason:x.note?String(x.note):c.reason,personalized:true};}));
+      analytics.track("results_resume_checked",{count:g.length});
+    }catch(e){console.warn("[iq] resume check skipped:",e&&e.message);}
+    setGrading(false);
+  }
   // B3: Take a list of already-loaded companies + the student's resume, and ask the AI
   // to rewrite the "reason" field on each one to reference specific things from the resume.
   // Runs asynchronously after results show — fast call, small prompt, ~1-2 sec.
@@ -1864,6 +1899,7 @@ function App(){
   // Restore the full session (answers, picks, results, email, tracker, Pro) so a returning
   // user on the same device sees the exact same state — consistent stats and matches.
   const restoredRef=useRef(false);
+  const [grading,setGrading]=useState(false); // Nov 15: AI resume check running
   const metaRef=useRef(null); // stores meta from /api/results (radius expansion info etc)
   useEffect(()=>{
     const s=sessionStore.load();
@@ -3097,7 +3133,7 @@ function App(){
       {showProModal&&<ProModal/>}
       <SignInModal/>
       <Nav/>
-      <LandingD onQuiz={()=>{setStep(0);setPage("quiz");}} onPage={setPage}/>
+      <LandingD onQuiz={startQuiz} onPage={setPage}/>
     </div>
   );
 
@@ -3524,7 +3560,7 @@ function App(){
                               <span style={{flex:1}}>{l.text}</span>
                             </div>
                           ))}
-                          <p style={{fontSize:11,color:"#6B7280",lineHeight:1.55,paddingTop:8,borderTop:`1px solid #E2E8F0`,marginTop:2}}>Match % is our own estimate of your fit from your quiz answers (field, GPA, grad year, timing, leadership). It is not from the employer and is not a prediction of an offer. We'd rather show a low honest number than a high false one.</p>
+                          <p style={{fontSize:11,color:"#6B7280",lineHeight:1.55,paddingTop:8,borderTop:`1px solid #E2E8F0`,marginTop:2}}>Match % is our estimate, built only from real signals: how the job title fits your major and skills, the class year and term it asks for, distance, how new the posting is, plus your GPA, activities and timing. With a resume, 40% comes from an AI resume check against the job title. It is not from the employer and is not a prediction of an offer.</p>
                         </div>
                       </div>
                     )}
@@ -3578,6 +3614,7 @@ function App(){
                 );
               })()}
 
+              {grading&&<div role="status" style={{background:GL,border:`1px solid ${GM}`,borderRadius:var_rl,padding:"10px 14px",marginBottom:14,fontSize:13.5,color:GD,fontWeight:600}}>Checking your resume against each job, the way screening software does. Scores update in a few seconds.</div>}
               {/* TOP PICKS — highlighted best matches worth your energy first */}
               {topPicks.length>0&&(
                 <div style={{background:`#fff`,border:`1.5px solid ${G}`,borderRadius:var_rxl,padding:"1.25rem 1.4rem",marginBottom:18,boxShadow:"none"}}>
@@ -3679,9 +3716,13 @@ function App(){
                           </div>
                           {/* Match bar + breakdown */}
                           <MatchBar pct={c.match} color={accent} delay={0}/>
-                          <div style={{display:"flex",gap:10,flexWrap:"wrap",fontSize:11,color:"#6B7280",fontWeight:600}}>
-                            <span>GPA/Profile {c._profile}%</span><span>· Experience {c._exp}%</span>{c._lead>0&&<span>· Leadership {c._lead}%</span>}<span>· Timing {c._timing}%</span><span>· Fit (est.) {c._fit}%</span>
-                          </div>
+                          {/* Nov 15: the real reasons this job ranks here (from /api/results), not made-up percentages */}
+                          {(c.why||[]).length>0&&<div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{c.why.map(w=><span key={w} style={{fontSize:11.5,fontWeight:600,color:/^Title fits|^Open to your|^Mentions|^For /.test(w)?GD:"#334155",background:/^Title fits|^Open to your|^Mentions|^For /.test(w)?GL:"#F1F5F9",padding:"3px 9px",borderRadius:99}}>{w}</span>)}</div>}
+                          {c.resumeCheck&&<div style={{border:"1px solid #E2E8F0",borderRadius:var_r,padding:"9px 11px"}}>
+                            <p style={{fontSize:12,fontWeight:700,color:"#060A2C",marginBottom:6}}>Resume check {c.resumeCheck.score}/100 <span style={{fontWeight:500,color:"#6B7280"}}>· AI estimate from the job title</span></p>
+                            {c.resumeCheck.matched.length>0&&<p style={{fontSize:12,color:GD,lineHeight:1.5}}><b>You show:</b> {c.resumeCheck.matched.join(", ")}</p>}
+                            {c.resumeCheck.missing.length>0&&<p style={{fontSize:12,color:"#92400E",lineHeight:1.5}}><b>Often asked for:</b> {c.resumeCheck.missing.join(", ")}</p>}
+                          </div>}
                           {/* Pro Score Explainer — factor-by-factor "why this score". stopPropagation so toggling it doesn't flip the card. */}
                           <div onClick={e=>e.stopPropagation()}>
                             <ScoreExplainerCard
@@ -3696,7 +3737,7 @@ function App(){
                           {/* Reason */}
                           {c.reason&&(
                             <div style={{background:c.personalized?GL:"#FBFBFC",border:`1px solid ${c.personalized?GM:"#E2E8F0"}`,borderRadius:var_r,padding:"9px 11px"}}>
-                              <p style={{fontSize:12,fontWeight:600,color:c.personalized?GD:"#6B7280",marginBottom:4}}>{c.personalized?"Why this fits you":"Why this is a realistic shot"}</p>
+                              <p style={{fontSize:12,fontWeight:600,color:c.personalized?GD:"#6B7280",marginBottom:4}}>{c.personalized?"From your resume":"Why it's on your list"}</p>
                               <p style={{fontSize:13,color:"#4A5568",lineHeight:1.6,fontStyle:"italic"}}>{c.reason}</p>
                             </div>
                           )}
