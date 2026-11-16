@@ -420,6 +420,49 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, deleted: true });
     }
 
+    // ── Owner: your duplicate sign-ins (Nov 16). Lists every account with YOUR name (from sign-in or profile) so you can tell
+    // them apart (founding #, @handle, companies on the profile, masked email), and deletes one you pick: its data here
+    // (same as Delete all my data) + the sign-in itself at Clerk. Never the account you're signed in with. ──
+    if (action === "admin_my_accounts" || action === "admin_delete_account") {
+      const { isAdmin } = await import("../lib/employer.js");
+      if (!(await isAdmin(uid, { clerkUser }))) return res.status(403).json({ error: "Owners only" });
+      if (!process.env.CLERK_SECRET_KEY) return res.status(503).json({ error: "Not available right now" });
+      const CK = { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` };
+      const all = []; for (let off = 0; off < 10000; off += 500) { const r = await fetch(`https://api.clerk.com/v1/users?limit=500&offset=${off}&order_by=created_at`, { headers: CK });
+        if (!r.ok) return res.status(503).json({ error: "Couldn't list accounts" }); const pg = await r.json(); all.push(...pg); if (pg.length < 500) break; }
+      const norm = (x) => String(x || "").toLowerCase().replace(/[^a-z]/g, "");
+      const rows = await db.selectAllAsAdmin("user_jobs?select=clerk_user_id,handle,profile").catch(() => []);
+      const byId = new Map(rows.map((r) => [r.clerk_user_id, r]));
+      const nameOf = (u) => norm([u.first_name, u.last_name].filter(Boolean).join("")) || norm(byId.get(u.id)?.profile?.name);
+      const me = all.find((u) => u.id === uid); const mine = nameOf(me) || "x";
+      const names = new Set([mine, norm(byId.get(uid)?.profile?.name)].filter(Boolean));
+      const same = all.filter((u) => names.has(norm([u.first_name, u.last_name].filter(Boolean).join(""))) || names.has(norm(byId.get(u.id)?.profile?.name)));
+      const key = (id) => crypto.createHash("sha1").update("acct:" + id).digest("hex").slice(0, 16);
+      const mask = (e) => String(e || "").replace(/^(.)[^@]*(@.*)$/, "$1…$2");
+      if (action === "admin_my_accounts") {
+        return res.status(200).json({ accounts: same.map((u) => { const r = byId.get(u.id), p = r?.profile || {};
+          return { key: key(u.id), you: u.id === uid, name: [u.first_name, u.last_name].filter(Boolean).join(" ") || p.name || null,
+            emails: (u.email_addresses || []).map((e) => mask(e.email_address)), signIn: [...new Set((u.external_accounts || []).map((x) => String(x.provider || "").replace(/^oauth_/, "")))],
+            created: u.created_at ? new Date(u.created_at).toISOString().slice(0, 10) : null, lastSignIn: u.last_sign_in_at ? new Date(u.last_sign_in_at).toISOString().slice(0, 10) : null,
+            role: u.unsafe_metadata?.role || null, founding: +u.public_metadata?.founding || null, handle: r?.handle || null,
+            companies: [...new Set((p.experience || []).map((x) => x.org).filter(Boolean))].slice(0, 6) }; }) });
+      }
+      const hit = same.find((u) => key(u.id) === String(body.key || ""));
+      if (!hit) return res.status(404).json({ error: "That account isn't one of yours" });
+      if (hit.id === uid) return res.status(400).json({ error: "That's the account you're signed in with. Sign in to the one you want to keep, then delete the other." });
+      if (body.confirm !== "DELETE") return res.status(400).json({ error: "Confirm by typing DELETE" });
+      const row = await loadRow(hit.id);
+      if (row?.resume_path) await deletePdf(row.resume_path);
+      await deleteOrbitData(hit.id);
+      await dbDelete(`user_jobs?clerk_user_id=eq.${encodeURIComponent(hit.id)}`);
+      await dbDelete(`user_home?clerk_user_id=eq.${encodeURIComponent(hit.id)}`);
+      await dbDelete(`employers?clerk_user_id=eq.${encodeURIComponent(hit.id)}`).catch(() => {});
+      const del = await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(hit.id)}`, { method: "DELETE", headers: CK });
+      if (!del.ok) return res.status(502).json({ error: "Deleted the data, but the sign-in itself couldn't be removed. Try again." });
+      console.log("[admin] deleted duplicate account", key(hit.id));
+      return res.status(200).json({ ok: true, deleted: true });
+    }
+
     // ── Orbit (/orbit/): read-only, public profiles only ──
     if (action === "orbit") {
       if (!(await rateOk(`orbit:${uid}`, 60, 30))) return res.status(429).json({ error: "Slow down a little and try again" });

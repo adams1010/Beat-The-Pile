@@ -77,7 +77,24 @@
       b.disabled = true; try { await biz.api({ action: "staff_admin_review", key: b.dataset.sk, status: b.dataset.s, note }); await loadStaff(); } catch (e) { b.disabled = false; alert(e.message); }
     });
   }
-  async function loadStaff(){ try { SL = (await biz.api({ action: "staff_admin_list" })).staff || []; } catch (e) { SL = []; } renderStaff(); }
+  // Nov 16: your duplicate sign-ins (accounts with your name). Delete the extras; never the one you're signed in with.
+  async function loadAccounts(){
+    let box = document.getElementById("myAccts");
+    if (!box) { document.getElementById("staffAdmin").insertAdjacentHTML("afterend", '<div id="myAccts" style="max-width:1100px;margin:0 auto 40px;padding:0 16px"></div>'); box = document.getElementById("myAccts"); }
+    let A = []; try { A = (await biz.api({ action: "admin_my_accounts" })).accounts || []; } catch (e) { box.innerHTML = ""; return; }
+    box.innerHTML = `<section class="card"><h2>Your accounts</h2><p class="sub">Every sign-in with your name. Keep the one you use; delete the extras (their profile, tracker, messages and the sign-in itself).</p>
+      <div class="wrapt"><table><tr><th>Account</th><th>Email</th><th>Profile</th><th>Created</th><th></th></tr>
+      ${A.map((a) => `<tr><td><b>${esc(a.name || "(no name)")}</b>${a.you ? ' <span class="ok">You’re signed in with this one</span>' : ""}<br><span class="small muted">${esc([a.role, a.founding ? "Founding member #" + a.founding : "No founding number"].filter(Boolean).join(" · "))}</span></td>
+        <td class="small">${a.emails.map(esc).join("<br>")}${a.signIn.length ? `<br><span class="muted">via ${esc(a.signIn.join(", "))}</span>` : ""}</td>
+        <td class="small">${a.handle ? "@" + esc(a.handle) : "No profile"}${a.companies.length ? `<br>${esc(a.companies.join(", "))}` : ""}</td>
+        <td class="small">${esc(a.created || "")}${a.lastSignIn ? `<br><span class="muted">last in ${esc(a.lastSignIn)}</span>` : ""}</td>
+        <td>${a.you ? "" : `<button class="btn" data-del="${esc(a.key)}">Delete</button>`}</td></tr>`).join("")}</table></div></section>`;
+    box.querySelectorAll("[data-del]").forEach((b) => b.onclick = async () => {
+      const t = prompt("This deletes that account's profile, tracker, messages and the sign-in itself. It can't be undone. Type DELETE to confirm."); if (t !== "DELETE") return;
+      b.disabled = true; try { await biz.api({ action: "admin_delete_account", key: b.dataset.del, confirm: "DELETE" }); await loadAccounts(); } catch (e) { b.disabled = false; alert(e.message); }
+    });
+  }
+  async function loadStaff(){ try { SL = (await biz.api({ action: "staff_admin_list" })).staff || []; } catch (e) { SL = []; } renderStaff(); loadAccounts(); }
   async function load(){ L = (await biz.api({ action: "biz_admin_list" })).employers; render(); if (!document.getElementById("staffAdmin")) $("main").insertAdjacentHTML("afterend", '<div id="staffAdmin" style="max-width:1100px;margin:0 auto 40px;padding:0 16px"></div>'); loadStaff(); }
   biz.start(async (u) => {
     if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable.</div>'; return; }

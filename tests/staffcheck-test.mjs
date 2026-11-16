@@ -51,3 +51,7 @@ assert.equal(E.workEmailProblem("jane@boeing.com"), null);
 const emp = readFileSync(new URL("../lib/employer.js", import.meta.url), "utf8");
 assert.ok(emp.includes("already has a company page at") && emp.includes('doesn\'t match their website') && emp.includes("is a school's domain") && emp.includes("doesn't receive email"), "review rules");
 console.log("✓ verification: staff need a school-domain email + directory page + owner approval; companies need matching domains, real mail, one page per domain");
+// owner: duplicate accounts (Nov 16)
+assert.ok(me.includes('action === "admin_delete_account"') && me.includes("That's the account you're signed in with") && me.includes('body.confirm !== "DELETE"') && me.includes("isAdmin(uid, { clerkUser })"), "owner-only, never yourself, typed confirm");
+assert.ok(readFileSync(new URL("../business/admin/index.html", import.meta.url), "utf8").includes("admin_my_accounts"));
+console.log("✓ owners can see and delete their own duplicate accounts (never the signed-in one)");
