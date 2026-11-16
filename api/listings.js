@@ -78,11 +78,12 @@ async function dots(p, res) {
       const xy = Array.isArray(pt) ? project(pt[0], pt[1]) : null; if (!xy) continue;
       any = true;
       const k = `${Math.round(xy[0] / 6)},${Math.round(xy[1] / 6)}`;
-      const c = cells.get(k); if (c) { c[0] += xy[0]; c[1] += xy[1]; c[2]++; } else cells.set(k, [xy[0], xy[1], 1]);
+      const c = cells.get(k); if (c) { c[0] += xy[0]; c[1] += xy[1]; c[2]++; c[3] += pt[0]; c[4] += pt[1]; } else cells.set(k, [xy[0], xy[1], 1, pt[0], pt[1]]);
     }
     if (any) placed++;
   }
-  const out = [...cells.values()].map(([x, y, n]) => [Math.round((x / n) * 10) / 10, Math.round((y / n) * 10) / 10, n]).sort((a, b) => a[2] - b[2]);
+  // [x, y, jobs, lat, lng]: lat/lng (Nov 15) let the homepage map open the jobs at a dot (?near=lat,lng)
+  const out = [...cells.values()].map(([x, y, n, la, ln]) => [Math.round((x / n) * 10) / 10, Math.round((y / n) * 10) / 10, n, Math.round((la / n) * 1e3) / 1e3, Math.round((ln / n) * 1e3) / 1e3]).sort((a, b) => a[2] - b[2]);
   const total = await db.count(`listings?${LIVE}${majorFilter(p)}`);
   res.setHeader("Cache-Control", "s-maxage=3600, stale-while-revalidate=86400");
   return res.status(200).json({ w: 975, h: 610, dots: out, placed, spots: out.reduce((n, d) => n + d[2], 0), total });

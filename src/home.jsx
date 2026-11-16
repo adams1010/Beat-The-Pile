@@ -115,33 +115,84 @@ const FEATURES=[
 // The hero map: every dot is a real open job (internships, entry-level and part-time since Nov 14) whose location text names a real US city (api/listings ?dots=1).
 // Type a city ("Blacksburg, VA") or ZIP in the search and a circle shows how many are within 50 miles (the same numbers /jobs will show).
 const MILES_PX=1.609*1300/6371;   // Albers USA at scale 1300: ~0.33 px per mile (lower 48)
+// Nov 15 (owner): the map is interactive. Zoom (buttons, double-click, pinch / ctrl+wheel), drag to pan, quick city buttons,
+// a job-type filter, and tapping a dot opens the real jobs there (/api/listings?near=lat,lng, named after the nearest city).
+const MAP_CITIES=[["New York",869.8,215.8],["DC",827.6,267.5],["Boston",908.7,167.1],["Chicago",638.2,226.1],["Atlanta",714.9,405.1],["Dallas",482.9,440.5],["Houston",510.4,509.2],["Austin",464,497.4],["Denver",342.9,273.9],["Seattle",97.7,46.2],["Bay Area",37.5,266.4],["Los Angeles",86.9,363.2]];
+const MAP_KINDS=[["all","All"],["intern","Internships"],["fulltime","Entry-level"],["hourly","Part-time"]];
+const MAP_W=975,MAP_H=610;
 function HeroMap({near,fresh,sum,sumErr}){
   const [geo,setGeo]=React.useState(null),[pts,setPts]=React.useState(null),[err,setErr]=React.useState(false);
-  React.useEffect(()=>{
-    const get=(u)=>fetch(u).then(r=>{if(!r.ok)throw 0;return r.json();});
-    Promise.all([get("/map/us.json"),get("/api/listings?dots=1&field=all&kind=all")]).then(([g,d])=>{setGeo(g);setPts(d);}).catch(()=>setErr(true));
-  },[]);
+  const [kind,setKind]=React.useState("all"),[vb,setVb]=React.useState([0,0,MAP_W,MAP_H]),[sel,setSel]=React.useState(null),[spot,setSpot]=React.useState(null);
+  const svgRef=React.useRef(null),drag=React.useRef(null),pinch=React.useRef(null);
+  React.useEffect(()=>{fetch("/map/us.json").then(r=>{if(!r.ok)throw 0;return r.json();}).then(setGeo).catch(()=>setErr(true));},[]);
+  React.useEffect(()=>{setPts(null);fetch(`/api/listings?dots=1&field=all&kind=${kind}`).then(r=>{if(!r.ok)throw 0;return r.json();}).then(setPts).catch(()=>setErr(true));},[kind]);
+  React.useEffect(()=>{const xy=near?.meta?.near?.xy;if(xy){const z=MAP_W/3.2;setVb(clampVb([xy[0]-z/2,xy[1]-z*MAP_H/MAP_W/2,z,z*MAP_H/MAP_W]));}},[near]);
   const fmt=(n)=>n==null?"—":Number(n).toLocaleString();
   const xy=near?.meta?.near?.xy, r=near?.meta?near.meta.near.mi*MILES_PX:0;
+  const zoom=MAP_W/vb[2];
+  function clampVb([x,y,w,h]){w=Math.max(MAP_W/12,Math.min(MAP_W,w));h=w*MAP_H/MAP_W;return [Math.max(0,Math.min(MAP_W-w,x)),Math.max(0,Math.min(MAP_H-h,y)),w,h];}
+  function toMap(cx,cy){const b=svgRef.current.getBoundingClientRect();return [vb[0]+(cx-b.left)/b.width*vb[2],vb[1]+(cy-b.top)/b.height*vb[3]];}
+  function zoomAt(f,mx,my){setVb(v=>{if(mx==null){mx=v[0]+v[2]/2;my=v[1]+v[3]/2;}const w=v[2]/f,h=w*MAP_H/MAP_W;return clampVb([mx-(mx-v[0])*(w/v[2]),my-(my-v[1])*(h/v[3]),w,h]);});}
+  function flyTo(x,y,z=4){const w=MAP_W/z,h=w*MAP_H/MAP_W;setVb(clampVb([x-w/2,y-h/2,w,h]));}
+  React.useEffect(()=>{const el=svgRef.current;if(!el)return;const onWheel=e=>{if(!e.ctrlKey&&!e.metaKey)return;e.preventDefault();const [mx,my]=toMap(e.clientX,e.clientY);zoomAt(e.deltaY<0?1.25:0.8,mx,my);};el.addEventListener("wheel",onWheel,{passive:false});return()=>el.removeEventListener("wheel",onWheel);});
+  function down(e){if(e.pointerType==="touch"){const t=pinch.current||(pinch.current=new Map());t.set(e.pointerId,[e.clientX,e.clientY]);}drag.current={x:e.clientX,y:e.clientY,vb,moved:false};}
+  function move(e){const d=drag.current;if(!d)return;
+    if(pinch.current&&pinch.current.size>=2&&pinch.current.has(e.pointerId)){const t=pinch.current;const [a,b]=[...t.values()];const before=Math.hypot(a[0]-b[0],a[1]-b[1]);t.set(e.pointerId,[e.clientX,e.clientY]);const [c,dd]=[...t.values()];const after=Math.hypot(c[0]-dd[0],c[1]-dd[1]);if(before>0){const [mx,my]=toMap((c[0]+dd[0])/2,(c[1]+dd[1])/2);zoomAt(after/before,mx,my);}d.moved=true;return;}
+    const b=svgRef.current.getBoundingClientRect(),dx=(e.clientX-d.x)/b.width*d.vb[2],dy=(e.clientY-d.y)/b.height*d.vb[3];
+    if(Math.abs(e.clientX-d.x)+Math.abs(e.clientY-d.y)>4)d.moved=true;
+    if(d.moved&&zoom>1.01)setVb(clampVb([d.vb[0]-dx,d.vb[1]-dy,d.vb[2],d.vb[3]]));}
+  function up(e){if(pinch.current)pinch.current.delete(e.pointerId);const d=drag.current;drag.current=null;return d&&d.moved;}
+  async function openDot(dt){
+    setSel(dt);setSpot({loading:true});analytics.track("map_dot_opened",{jobs:dt[2],kind});
+    if(zoom<2.5)flyTo(dt[0],dt[1],3);
+    try{const r=await fetch(`/api/listings?near=${dt[3]},${dt[4]}&mi=10&field=all&kind=${kind==="all"?"all":kind}&limit=6`);const j=await r.json();if(!r.ok)throw 0;setSpot({list:j.listings||[],count:j.meta?.count||0,place:j.meta?.near?.q||""});}
+    catch{setSpot({error:true});}
+  }
+  const dr=(n)=>(1.6+Math.sqrt(n)*1.05)/Math.pow(zoom,0.65);
+  const btn={font:"inherit",fontSize:13,fontWeight:600,background:"#0E1440",color:"#fff",border:"1px solid #2A3B5C",borderRadius:8,minWidth:34,height:34,cursor:"pointer"};
   return(<aside style={{position:"relative",boxSizing:"border-box",background:"#0E1440",border:"1px solid #2A3B5C",borderRadius:10,padding:"18px 18px 14px",boxShadow:"none",...DM}}>
     {/* One live number for the whole hero (Nov 15): the same "open jobs" total as /api/listings?summary=1, no second count above the headline */}
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",flexWrap:"wrap",gap:"4px 12px",fontFamily:"Geist,sans-serif"}}>
       <span style={{fontSize:14,fontWeight:600,color:"#fff"}}><span style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#B0F701",marginRight:8,verticalAlign:1}}/>
         {sum&&sum.allMajors!=null&&sum.fulltime!=null?`${fmt((sum.allMajors||0)+(sum.fulltime||0)+(sum.hourly||0)+(sum.shadow||0))} open jobs and internships`:sumErr?"Live numbers unavailable right now":"Loading the latest numbers…"}</span>
       <span style={{fontSize:12,color:"#8D9AB3"}}>{sum?`from ${fmt(sum.companies)} company job boards${sum.lastSync?`, checked ${dAgoLong(sum.lastSync)}`:""}`:""}</span></div>
-    <div style={{fontSize:12,color:"#8D9AB3",marginTop:2,fontFamily:"Geist,sans-serif"}}>Every dot is a real job or internship</div>
+    <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:8,fontFamily:"Geist,sans-serif"}}>
+      {MAP_KINDS.map(([k,l])=><button key={k} type="button" aria-pressed={kind===k} onClick={()=>{setKind(k);setSel(null);setSpot(null);}} style={{font:"inherit",fontSize:12.5,fontWeight:600,borderRadius:999,padding:"5px 11px",cursor:"pointer",border:`1px solid ${kind===k?"#B0F701":"#2A3B5C"}`,background:kind===k?"#B0F701":"transparent",color:kind===k?"#060A2C":"#CFD7E6"}}>{l}</button>)}
+    </div>
+    <div style={{fontSize:12,color:"#8D9AB3",marginTop:6,fontFamily:"Geist,sans-serif"}}>Every dot is a real job. Tap one to see what's there{zoom>1.01?", drag to move":""}.</div>
     <div style={{position:"relative",marginTop:8}}>
       {err?<p style={{fontSize:13,color:"#8D9AB3",padding:"40px 0",textAlign:"center",fontFamily:"Geist,sans-serif"}}>Map didn't load. <a href="/jobs/" style={{color:"#B0F701"}}>See the internships →</a></p>:
-      <svg viewBox="0 0 975 610" role="img" aria-label={pts?`Map of the US with ${fmt(pts.placed)} open jobs and internships, one dot per city`:"Loading map"} style={{width:"100%",height:"auto",display:"block"}}>
-        {geo&&<path d={geo.nation} fill="#11203A" stroke="#2A3B5C" strokeWidth="1"/>}
-        {geo&&<path d={geo.borders} fill="none" stroke="#1C2C48" strokeWidth=".8"/>}
-        {pts&&pts.dots.map(([x,y,n],i)=><circle key={i} cx={x} cy={y} r={1.6+Math.sqrt(n)*1.05} fill="#B0F701" fillOpacity={n>20?.8:.55}/>)}
-        {xy&&<g><circle cx={xy[0]} cy={xy[1]} r={r} fill="#B0F701" fillOpacity=".1" stroke="#fff" strokeWidth="3" strokeDasharray="7 5"/><circle cx={xy[0]} cy={xy[1]} r="5" fill="#fff"/></g>}
+      <svg ref={svgRef} viewBox={vb.join(" ")} role="img" aria-label={pts?`Map of the US with ${fmt(pts.placed)} open jobs, one dot per city. Use the zoom buttons or the city list to look closer.`:"Loading map"}
+        onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onPointerLeave={(e)=>{if(e.pointerType!=="touch")drag.current=null;}}
+        onDoubleClick={e=>{const [mx,my]=toMap(e.clientX,e.clientY);zoomAt(2,mx,my);}}
+        style={{width:"100%",height:"auto",display:"block",touchAction:zoom>1.01?"none":"pan-y",cursor:zoom>1.01?"grab":"default",userSelect:"none"}}>
+        {geo&&<path d={geo.nation} fill="#11203A" stroke="#2A3B5C" strokeWidth={1/zoom}/>}
+        {geo&&<path d={geo.borders} fill="none" stroke="#1C2C48" strokeWidth={.8/zoom}/>}
+        {pts&&pts.dots.map((dt,i)=>{const on=sel&&sel[0]===dt[0]&&sel[1]===dt[1];return <circle key={i} cx={dt[0]} cy={dt[1]} r={dr(dt[2])*(on?1.6:1)} fill={on?"#fff":"#B0F701"} fillOpacity={on?1:dt[2]>20?.8:.55} style={{cursor:"pointer"}}
+          onClick={e=>{if(drag.current&&drag.current.moved)return;e.stopPropagation();dt.length>3&&openDot(dt);}}><title>{`${dt[2]} ${dt[2]===1?"job":"jobs"} here`}</title></circle>;})}
+        {zoom>=2.5&&MAP_CITIES.filter(([,x,y])=>x>=vb[0]&&x<=vb[0]+vb[2]&&y>=vb[1]&&y<=vb[1]+vb[3]).map(([n,x,y])=><text key={n} x={x+6/zoom} y={y-6/zoom} fontSize={11/zoom} fill="#fff" fontFamily="Geist,sans-serif" pointerEvents="none">{n}</text>)}
+        {xy&&<g pointerEvents="none"><circle cx={xy[0]} cy={xy[1]} r={r} fill="#B0F701" fillOpacity=".1" stroke="#fff" strokeWidth={3/zoom} strokeDasharray={`${7/zoom} ${5/zoom}`}/><circle cx={xy[0]} cy={xy[1]} r={5/zoom} fill="#fff"/></g>}
       </svg>}
-      {near?.meta&&<div className="d-mapbadge" style={{position:"absolute",left:8,bottom:6,background:"rgba(6,10,44,.88)",border:"1px solid #2A3B5C",borderRadius:10,padding:"8px 12px",fontFamily:"Geist,sans-serif"}}>
+      {!err&&<div style={{position:"absolute",right:6,top:6,display:"flex",flexDirection:"column",gap:4}}>
+        <button type="button" aria-label="Zoom in" onClick={()=>zoomAt(1.6)} style={btn}>+</button>
+        <button type="button" aria-label="Zoom out" onClick={()=>zoomAt(1/1.6)} style={btn}>−</button>
+        {zoom>1.01&&<button type="button" aria-label="Show the whole US" onClick={()=>{setVb([0,0,MAP_W,MAP_H]);setSel(null);setSpot(null);}} style={{...btn,fontSize:11}}>US</button>}
+      </div>}
+      {near?.meta&&!spot&&<div className="d-mapbadge" style={{position:"absolute",left:8,bottom:6,background:"rgba(6,10,44,.88)",border:"1px solid #2A3B5C",borderRadius:10,padding:"8px 12px",fontFamily:"Geist,sans-serif"}}>
         <span style={{fontSize:20,fontWeight:600,color:"#fff"}}>{fmt(near.meta.count)}</span> <span style={{fontSize:13,color:"#CFD7E6"}}>within {near.meta.near.mi} mi of {near.meta.near.q}</span></div>}
       {near?.bad&&<div style={{position:"absolute",left:8,bottom:6,fontSize:13,color:"#F2B8A2",fontFamily:"Geist,sans-serif"}}>We couldn't find that city. Try “Blacksburg, VA”.</div>}
     </div>
+    <div style={{display:"flex",gap:6,flexWrap:"wrap",marginTop:8,fontFamily:"Geist,sans-serif"}}>
+      {MAP_CITIES.map(([n,x,y])=><button key={n} type="button" onClick={()=>{flyTo(x,y,4.5);setSel(null);setSpot(null);analytics.track("map_city",{city:n});}} style={{font:"inherit",fontSize:12,color:"#CFD7E6",background:"transparent",border:"1px solid #22304D",borderRadius:999,padding:"4px 10px",cursor:"pointer"}}>{n}</button>)}
+    </div>
+    {spot&&<div role="region" aria-label="Jobs at this spot" style={{marginTop:10,border:"1px solid #2A3B5C",borderRadius:10,padding:"10px 12px",fontFamily:"Geist,sans-serif",background:"#0A1035"}}>
+      <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",gap:10}}>
+        <b style={{color:"#fff",fontSize:14}}>{spot.loading?"Loading jobs here…":spot.error?"Couldn't load the jobs here":`${fmt(spot.count)} ${spot.count===1?"job":"jobs"} within 10 mi of ${spot.place}`}</b>
+        <button type="button" aria-label="Close" onClick={()=>{setSel(null);setSpot(null);}} style={{background:"none",border:0,color:"#8D9AB3",fontSize:18,cursor:"pointer",lineHeight:1}}>×</button></div>
+      {(spot.list||[]).map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"block",padding:"7px 0",borderTop:"1px solid #1A2640",textDecoration:"none",fontSize:13}}>
+        <span style={{color:"#fff"}}>{j.title}</span><span style={{color:"#8D9AB3"}}> · {j.company}{j.kind&&j.kind!=="intern"?` · ${{fulltime:"Entry-level",hourly:"Part-time",shadow:"Shadowing"}[j.kind]||""}`:" · Internship"}</span></a>))}
+      {spot.count>0&&<a href={`/jobs/?near=${encodeURIComponent(spot.place)}&mi=10&major=all${kind==="all"?"&kind=all":`&kind=${kind}`}`} style={{display:"inline-block",marginTop:6,color:"#B0F701",fontWeight:600,fontSize:13,textDecoration:"none"}}>See all {fmt(spot.count)} on the Jobs page →</a>}
+    </div>}
     <div style={{borderTop:"1px solid #22304D",marginTop:10,paddingTop:8}}>
       <div style={{display:"flex",justifyContent:"space-between",fontSize:12,color:"#8D9AB3",fontFamily:"Geist,sans-serif",marginBottom:2}}><span>Just found</span><span>{sum?`${fmt(sum.allMajors)} internships · ${fmt((sum.fulltime||0)+(sum.hourly||0))} jobs${sum.shadow?` · ${fmt(sum.shadow)} shadowing`:""} · ${fmt(sum.hiringNow)} companies`:""}</span></div>
       {(fresh||[]).slice(0,3).map(j=>(<a key={j.id} href={j.url} target="_blank" rel="noopener noreferrer" style={{display:"flex",justifyContent:"space-between",gap:12,padding:"7px 0",borderTop:"1px solid #1A2640",textDecoration:"none",fontSize:13}}>

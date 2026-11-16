@@ -105,3 +105,9 @@ console.log("\nGEO RADIUS TESTS PASSED");
   assert.deepEqual(cityMatches("Notarealplaceville"), []);
   console.log("✓ bare city names: one match is used, several ask which state");
 }
+{ // Nov 15: a dot on the homepage map → that exact point, named after the nearest (big) city
+  const { resolvePlace } = await import("../lib/geocode.js");
+  const a = resolvePlace("37.23,-80.414"); assert.deepEqual(a.pt, [37.23, -80.414]); assert.equal(a.q, "Blacksburg, VA");
+  assert.equal(resolvePlace("41.88,-87.63").q, "Chicago, IL"); assert.equal(resolvePlace("95,10"), null);
+  console.log("✓ map dots: lat,lng → nearest city name");
+}
