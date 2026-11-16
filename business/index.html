@@ -113,7 +113,7 @@
     <div class="wrap">
       <div><b id="nOpen">—</b><span>open internships on Beat the Pile right now</span></div>
       <div><b id="nCos">—</b><span>companies hiring interns right now</span></div>
-      <div><b id="nFairs">—</b><span>Virginia Tech career fairs in Career Fair Mode</span></div>
+      <div><b id="nFairs">—</b><span id="nFairsL">career fairs in Career Fair Mode</span></div>
     </div>
   </div>
 
@@ -189,7 +189,8 @@
     document.getElementById("nOpen").textContent = fmt(s.allMajors ?? s.listings);
     document.getElementById("nCos").textContent = fmt(s.hiringNow ?? s.companies);
   }).catch(() => {});
-  fetch("/fair/fairs.json").then((r) => r.json()).then((d) => { document.getElementById("nFairs").textContent = fmt((d.fairs || []).length); }).catch(() => {});
+  fetch("/fair/fairs.json").then((r) => r.json()).then((d) => { const f = d.fairs || [], schools = new Set(f.map((x) => x.unitid || x.school).filter(Boolean)).size;
+    document.getElementById("nFairs").textContent = fmt(f.length); if (schools > 1) document.getElementById("nFairsL").textContent = `career fairs at ${schools} schools in Career Fair Mode`; }).catch(() => {});
 })();
 </script>
 <script src="/ph.js" defer></script>

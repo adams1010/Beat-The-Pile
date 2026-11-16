@@ -138,7 +138,7 @@
       ${verified ? `<div class="banner ok"><b>You're verified.</b> You can search students, add them to your orbit and message them.</div>`
         : B.status === "rejected" ? `<div class="banner bad"><b>We couldn't verify your company.</b> ${esc(B.reviewNote || "Use Report a problem if you think this is a mistake.")}</div>`
         : `<div class="banner"><b>We're checking your company.</b> We look at every company before it can contact students, usually within a day.</div>`}
-      <h2 style="margin-top:8px">While you wait</h2>
+      <h2 style="margin-top:8px">${verified ? "Next steps" : "While you wait"}</h2>
       <ul class="next">${KIND() === "recruiter" ? `<li><a href="/business/company/">Finish your profile</a>: what you hire for, where. Students see it when you reach out.</li><li><a href="/orbit/">Open your orbit</a>: students close to your company, and your messages.</li>` : `<li><a href="/business/company/">Build your company page</a>: about, what you hire for, perks. Students see it when you reach out.</li>`}
         <li><a href="/business/fairs/">Pick the career fairs you'll be at</a>.</li>
         <li><a href="/business/home/">Go to your home</a> to see how many students are open to employers right now.</li></ul>

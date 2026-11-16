@@ -1862,7 +1862,9 @@
   "Your school email": "Deine Hochschul-E-Mail",
   "Send for review": "Zur Prüfung senden",
   "Email confirmed.": "E-Mail bestätigt.",
-  "Thanks. We're checking your directory page now. Your tag shows as soon as it's approved, usually within 2 days.": "Danke. Wir prüfen gerade deine Verzeichnisseite. Dein Tag erscheint, sobald er bestätigt ist, meist innerhalb von 2 Tagen."
+  "Thanks. We're checking your directory page now. Your tag shows as soon as it's approved, usually within 2 days.": "Danke. Wir prüfen gerade deine Verzeichnisseite. Dein Tag erscheint, sobald er bestätigt ist, meist innerhalb von 2 Tagen.",
+  "Next steps": "Nächste Schritte",
+  "career fairs in Career Fair Mode": "Karrieremessen im Messe-Modus"
  },
  "patterns": [
   ["^(.+) career fair page ↗$", "Karrieremessen-Seite von $1 ↗"],
@@ -1991,6 +1993,7 @@
   ["^([\\d,]+) new drops?, show$", "$1 neue, anzeigen"],
   ["^(\\d+) (min|h|d) ago$", "vor $1 $2"],
   ["^See the job up close first: ([\\d,]+) shadowing & volunteer spots, many unpaid\\.$", "Sieh dir den Job erst aus der Nähe an: $1 Hospitations- und Ehrenamtsplätze, viele unbezahlt."],
-  ["^([\\d,]+) open jobs?$", "$1 offene Jobs"]
+  ["^([\\d,]+) open jobs?$", "$1 offene Jobs"],
+  ["^career fairs at (\\d+) schools in Career Fair Mode$", "Karrieremessen an $1 Hochschulen im Messe-Modus"]
  ]
 }

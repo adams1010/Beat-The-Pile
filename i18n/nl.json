@@ -1862,7 +1862,9 @@
   "Your school email": "Je school-e-mail",
   "Send for review": "Ter controle sturen",
   "Email confirmed.": "E-mail bevestigd.",
-  "Thanks. We're checking your directory page now. Your tag shows as soon as it's approved, usually within 2 days.": "Bedankt. We controleren nu je pagina in de gids. Je label verschijnt zodra het is goedgekeurd, meestal binnen 2 dagen."
+  "Thanks. We're checking your directory page now. Your tag shows as soon as it's approved, usually within 2 days.": "Bedankt. We controleren nu je pagina in de gids. Je label verschijnt zodra het is goedgekeurd, meestal binnen 2 dagen.",
+  "Next steps": "Volgende stappen",
+  "career fairs in Career Fair Mode": "banenbeurzen in Beursmodus"
  },
  "patterns": [
   ["^(.+) career fair page ↗$", "Banenbeurspagina van $1 ↗"],
@@ -1991,6 +1993,7 @@
   ["^([\\d,]+) new drops?, show$", "$1 nieuw, tonen"],
   ["^(\\d+) (min|h|d) ago$", "$1 $2 geleden"],
   ["^See the job up close first: ([\\d,]+) shadowing & volunteer spots, many unpaid\\.$", "Bekijk het werk eerst van dichtbij: $1 meeloop- en vrijwilligersplekken, veel onbetaald."],
-  ["^([\\d,]+) open jobs?$", "$1 open vacatures"]
+  ["^([\\d,]+) open jobs?$", "$1 open vacatures"],
+  ["^career fairs at (\\d+) schools in Career Fair Mode$", "banenbeurzen op $1 scholen in Beursmodus"]
  ]
 }
