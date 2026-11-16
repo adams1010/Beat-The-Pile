@@ -215,10 +215,14 @@ async function autoHandle(uid, profile) {
   }
   return `student-${crypto.randomBytes(3).toString("hex")}`;
 }
+// Nov 15: "Get to know me" prompts (fixed list so profiles stay comparable and nothing free-form becomes a heading)
+export const PROMPTS = ["How I got my first internship", "Best recruiting advice I ever got", "What I wish I knew as a freshman", "A project I'm proud of, and why",
+  "Something I'm working on right now", "Why I picked my major", "My go-to interview tip", "Outside of class, you'll find me"];
 const STAFF_ROLES = ["Professor", "Lecturer or instructor", "Academic advisor", "Career center", "Department staff", "Other school staff"];
 function cleanProfile(p) {
   p = p && typeof p === "object" ? p : {};
   const arr = (a, n) => (Array.isArray(a) ? a : []).slice(0, n);
+  const tags = (a, n, len) => { const seen = new Set(); return arr(a, n * 2).map((x) => txt(x, len)).filter((x) => x && !seen.has(x.toLowerCase()) && seen.add(x.toLowerCase())).slice(0, n); };
   const year = Number(p.gradYear); 
   return {
     name: txt(p.name, 80), headline: txt(p.headline, 140), school: txt(p.school, 100), major: txt(p.major, 80),
@@ -228,8 +232,13 @@ function cleanProfile(p) {
     education: arr(p.education, 20).map((x) => ({ school: txt(x?.school, 100), degree: txt(x?.degree, 60), major: txt(x?.major, 80), when: txt(x?.when, 40) })).filter((x) => x.school).slice(0, 5),
     location: txt(p.location, 80), lookingFor: txt(p.lookingFor, 140), about: txt(p.about, 1200),
     skills: [...new Set(arr(p.skills, 30).map((x) => txt(x, 40)).filter(Boolean))],
+    // Nov 15: the personal side (Orbit, coffee chats): hometown, "ask me about", "I can help with", interests, courses, prompts
+    hometown: txt(p.hometown, 80), coffee: p.coffee === true,
+    askMe: tags(p.askMe, 6, 40), canHelp: tags(p.canHelp, 6, 40), interests: tags(p.interests, 10, 30), courses: tags(p.courses, 12, 60),
+    prompts: arr(p.prompts, 6).map((x) => ({ q: PROMPTS.includes(x?.q) ? x.q : "", a: txt(x?.a, 300) })).filter((x) => x.q && x.a)
+      .filter((x, i, a) => a.findIndex((y) => y.q === x.q) === i).slice(0, 3),
     // Nov 14: experience timeline — real dates ("YYYY-MM", end may be "present"), a type and a place; `when` stays for old profiles
-    experience: arr(p.experience, 12).map((x) => ({ title: txt(x?.title, 100), org: txt(x?.org, 100), when: txt(x?.when, 40), desc: txt(x?.desc, 600),
+    experience: arr(p.experience, 12).map((x) => ({ title: txt(x?.title, 100), org: txt(x?.org, 100), when: txt(x?.when, 40), desc: txt(x?.desc, 600), story: txt(x?.story, 600),
       start: YM(x?.start), end: x?.end === "present" ? "present" : YM(x?.end), type: EXP_TYPES.includes(x?.type) ? x.type : "", location: txt(x?.location, 80) })).filter((x) => x.title || x.org),
     projects: arr(p.projects, 8).map((x) => ({ name: txt(x?.name, 100), desc: txt(x?.desc, 600), link: httpsUrl(x?.link) })).filter((x) => x.name),
     links: { linkedin: httpsUrl(p.links?.linkedin), github: httpsUrl(p.links?.github), portfolio: httpsUrl(p.links?.portfolio) },

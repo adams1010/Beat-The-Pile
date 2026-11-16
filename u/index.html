@@ -167,6 +167,21 @@
   .tl-role::before{content:"";position:absolute;left:-6px;top:9px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid #4A7000}
   .hire a{display:inline-block;margin-top:6px;font-size:13px;font-weight:600;color:#4A7000}
   @media (max-width:560px){.tl{padding-left:22px}.tl-node{left:-22px}.tl-year{margin-left:-22px}.tl-body,.tl-roles{margin-left:0}.tl-head{grid-template-columns:38px 1fr;gap:10px}.tl-logo{width:38px;height:38px}.tl-card{padding:12px}}
+  /* Nov 15: the personal side */
+  .know .tagbox{margin-top:14px}.know .kh{font-size:15px;margin:18px 0 6px}
+  .sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.sug button{font:inherit;font-size:12.5px;border:1px dashed #9AA6B8;background:#fff;color:#2B3446;border-radius:999px;padding:4px 10px;cursor:pointer}
+  .sug button:hover{border-color:#4A7000;color:#3A5800;background:#F7FBEC}
+  .prompt{border:1px solid var(--line);border-radius:10px;padding:10px;margin-top:8px;background:#fff}.prompt select{margin:0}.prompt textarea{margin-top:8px}
+  .know-card .pq{border-left:3px solid #B0F701;background:#F7FBEC;border-radius:0 10px 10px 0;padding:10px 14px;margin:0 0 10px}
+  .know-card .pq .q{font-size:12.5px;font-weight:700;color:#3A5800}.know-card .pq p{margin:4px 0 0;font-size:15px;line-height:1.5;color:#060A2C}
+  .know-card .kb{margin-top:12px}.know-card h3{font-size:13px;color:var(--muted);margin:0 0 6px;font-weight:600}
+  .chip.ask{background:#060A2C;color:#B0F701;border-color:#060A2C}.chip.help{background:#F2FADF;color:#3A5800;border-color:#DDF3A8}
+  .know-empty{border:1.5px dashed #9AA6B8;background:#FBFCFD}
+  .opento span.cof{background:#F2FADF;color:#3A5800}.opento span.cof::before{background:#4A7000}
+  .both{margin-top:12px;background:#F5F7FA;border-radius:10px;padding:10px 12px;font-size:14px;line-height:1.5}.both b{color:#060A2C}.both span{color:#2B3446}
+  .both .starter{margin-top:4px;font-size:13px;color:#3A5800;font-weight:600}
+  .tl-story{margin-top:10px;background:#F7FBEC;border-radius:8px;padding:8px 12px}.tl-story b{font-size:12.5px;color:#3A5800}.tl-story p{margin:2px 0 0;font-size:14px;line-height:1.5}
+  #know{scroll-margin-top:84px}
   .chkrow{display:flex;gap:6px;align-items:center;font-weight:400;font-size:13.5px;margin-top:6px}
   .chkrow input{width:auto;margin:0}
 </style>
@@ -199,10 +214,25 @@
       ["Write an About", (p.about || "").length >= 40], ["Add an experience", (p.experience || []).length > 0], ["List 5+ skills", (p.skills || []).length >= 5],
       ["Save a resume (for cover letters and auto-fill)", (S.resumes || []).some((r) => (r.text || "").length > 200)],
       ["Add phone + email for applications", !!(k.phone && k.email)], ["Turn on your public link", !!(me.handle && me.profilePublic)],
+      ["Add 2+ \"Ask me about\" topics", (p.askMe || []).length >= 2], ["Answer a Get to know me prompt", (p.prompts || []).some((x) => x.q && (x.a || "").trim().length >= 20)],
+      ["Add your hometown and 3+ interests", !!p.hometown && (p.interests || []).length >= 3],
+      ["Tell how you got one of your roles", (p.experience || []).some((x) => (x.story || "").trim().length >= 30)],
     ];
     return { items, pct: Math.round(100 * items.filter((x) => x[1]).length / items.length) };
   }
   const OPEN_TO = { intern: "Internships", fulltime: "Full-time jobs" };
+  // Nov 15: the personal side. Same prompt list as api/me.js PROMPTS (the server drops anything else).
+  const PROMPTS = ["How I got my first internship", "Best recruiting advice I ever got", "What I wish I knew as a freshman", "A project I'm proud of, and why",
+    "Something I'm working on right now", "Why I picked my major", "My go-to interview tip", "Outside of class, you'll find me"];
+  const TAGS = {
+    askMe: { label: "Ask me about", hint: "Topics you're happy to talk about. These show on your Orbit card.", ph: "Type a topic, then Enter", max: 6,
+      sug: ["Getting my internship", "Career fairs", "Switching majors", "Co-ops", "Research with professors", "Study abroad", "Clubs worth joining", "Transferring"] },
+    canHelp: { label: "I can help with", hint: "What you'd help a classmate or younger student with.", ph: "Type something, then Enter", max: 6,
+      sug: ["Resume reviews", "Interview prep", "Intro classes in my major", "Finding research", "Picking classes", "SolidWorks", "Excel", "Moving to a new city"] },
+    interests: { label: "Outside of class", hint: "Sports, music, hobbies. Shared interests start the best conversations.", ph: "Type an interest, then Enter", max: 10,
+      sug: ["Soccer", "Gym", "Running", "Music", "Gaming", "Cooking", "Hiking", "Startups", "Investing", "Photography"] },
+    courses: { label: "Courses I've taken", hint: "Students taking them next can ask you how it went.", ph: "e.g. ME 2004 Dynamics, then Enter", max: 12, sug: [] },
+  };
   const LEVELS = [[0, "Getting started"], [40, "Taking shape"], [70, "Strong"], [100, "Ready for recruiters"]];
   const ringSvg = (pct) => { const r = 40, c = 2 * Math.PI * r;
     return `<div class="ring"><svg width="96" height="96" viewBox="0 0 96 96" aria-hidden="true"><circle cx="48" cy="48" r="${r}" fill="none" stroke="#EEF1F6" stroke-width="9"/>
@@ -225,7 +255,7 @@
       <section class="card"><div class="ptag">Only you see this</div>
         <div class="strong">${ringSvg(st.pct)}<div><span class="lvl">${esc(lvl)}</span><h2 style="margin:2px 0 2px">Profile strength</h2>
           <p class="small muted" style="margin:0">${todo.length ? `${todo.length} step${todo.length === 1 ? "" : "s"} to go. Complete profiles get found in Orbit and by employers.` : "Every step done. Recruiters see your best side."}</p></div></div>
-        ${todo.length ? `<div class="next">${todo.slice(0, 3).map(([t]) => `<button type="button" data-tab="edit" data-jump="${/resume|phone/i.test(t) ? "kit" : ""}">${esc(t)}<i>Do it →</i></button>`).join("")}</div>` : ""}</section>
+        ${todo.length ? `<div class="next">${todo.slice(0, 3).map(([t]) => `<button type="button" data-tab="edit" data-jump="${/resume|phone/i.test(t) ? "kit" : /ask me|prompt|hometown/i.test(t) ? "know" : /how you got/i.test(t) ? "experience" : ""}">${esc(t)}<i>Do it →</i></button>`).join("")}</div>` : ""}</section>
       <section class="card"><div class="ptag">Only you see this</div><h2>Who can see you</h2>
         <div class="who">
           <div>${WHO_IC.link}<span>Anyone with your link</span><span class="st${pub ? " on" : ""}">${pub ? "On" : "Off"}</span></div>
@@ -301,23 +331,51 @@
         ${founding ? `<p class="founding" title="One of the first 150 students on Beat the Pile">Founding member #${+founding}</p>` : ""}
         ${p.staff ? `<p class="founding">Faculty &amp; staff · ${esc(p.staff)}</p>` : ""}
         ${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
-        <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}</div>
-        ${(p.openTo || []).length ? `<div class="opento">${p.openTo.map((k) => `<span>Open to ${esc(OPEN_TO[k] || k)}</span>`).join("")}</div>` : ""}
+        <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}${p.hometown ? `<span>From ${esc(p.hometown)}</span>` : ""}</div>
+        ${(p.openTo || []).length || p.coffee ? `<div class="opento">${(p.openTo || []).map((k) => `<span>Open to ${esc(OPEN_TO[k] || k)}</span>`).join("")}${p.coffee ? `<span class="cof">Open to coffee chats</span>` : ""}</div>` : ""}
         ${p.lookingFor ? `<div class="looking">Looking for: ${esc(p.lookingFor)}</div>` : ""}
-        ${isPreview ? "" : `<div class="orbitact" id="orbitAct"></div>`}
+        ${isPreview ? "" : `<div class="orbitact" id="orbitAct"></div><div id="both"></div>`}
         <div class="btns">${contactBtns}${resume ? `<a class="btn pri" href="${esc(resume)}" target="_blank" rel="noopener">View resume</a>` : isPreview && p.showResume ? `<span class="btn pri" title="Shows when your resume QR link is on">View resume</span>` : ""}${links}</div>${contactNote}
         ${isPreview && S.me ? `<div class="vis"><span class="dotv${S.me.profilePublic && S.me.handle ? " on" : ""}" aria-hidden="true"></span>${S.me.profilePublic && S.me.handle ? `Public · <a href="/u/${esc(S.me.handle)}" target="_blank" style="color:var(--muted)">beatthepile.com/u/${esc(S.me.handle)}</a>` : "Private · only you can see this"}</div>` : ""}
         ${((p.experience || []).length + (p.projects || []).length + (p.skills || []).length) ? `<div class="hl"><div><b>${(p.experience || []).length}</b><span>Experience</span></div><div><b>${(p.projects || []).length}</b><span>Projects</span></div><div><b>${(p.skills || []).length}</b><span>Skills</span></div></div>` : ""}
       </div></section>
       ${isPreview ? ownerCards(p) : ""}
       ${p.about ? `<section class="card"><h2>About</h2><p class="about">${esc(p.about)}</p></section>` : ""}
+      ${knowHtml(p, isPreview)}
       ${edu ? `<section class="card"><h2>Education</h2>${edu}</section>` : ""}
       ${exp ? `<section class="card xp"><h2>Experience</h2>${exp}</section>` : ""}
       ${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}
+      ${(p.courses || []).length ? `<section class="card"><h2>Courses</h2><div class="chips">${p.courses.map((c) => `<span class="chip">${esc(c)}</span>`).join("")}</div></section>` : ""}
       ${(p.skills || []).length ? `<section class="card"><h2>Skills</h2><div class="chips">${p.skills.map((s, i) => `<span class="chip${i < 3 ? " top" : ""}">${esc(s)}</span>`).join("")}</div>${p.skills.length > 3 ? `<p class="small muted" style="margin:8px 0 0">Top skills first.</p>` : ""}</section>` : ""}
       ${isPreview ? kitCard(p) : ""}
       ${isPreview || seenMe() ? "" : `<section class="card cta"><h2>Make your own profile</h2><p class="small" style="margin:0 0 12px">One page for your experience, projects and skills, plus a QR code for career fairs. Free.</p><a class="btn pri" href="/start/" style="background:#B0F701;border-color:#B0F701;color:#060A2C">Get started</a></section>`}
       <p class="small muted" style="text-align:center">Profile on <a href="/" style="color:var(--green-dark)">Beat the Pile</a>${isPreview ? "" : ` · <a href="#" id="rep" style="color:var(--muted)">Report this profile</a>`}</p>`;
+  }
+  // "Get to know <name>": prompts, Ask me about, I can help with, interests (Nov 15)
+  function knowHtml(p, isPreview){
+    const first = String(p.name || "").split(/\s+/)[0] || "them";
+    const box = (title, list, cls) => (list || []).length ? `<div class="kb"><h3>${title}</h3><div class="chips">${list.map((x) => `<span class="chip ${cls}">${esc(x)}</span>`).join("")}</div></div>` : "";
+    const prompts = (p.prompts || []).filter((x) => x.q && x.a);
+    const inner = prompts.map((x) => `<div class="pq"><div class="q">${esc(x.q)}</div><p>${esc(x.a)}</p></div>`).join("") + box("Ask me about", p.askMe, "ask") + box("I can help with", p.canHelp, "help") + box("Outside of class", p.interests, "");
+    if (!inner) return isPreview ? `<section class="card know-empty"><h2>Get to know me</h2><p class="small muted" style="margin:0 0 10px">Prompts, "Ask me about" topics and interests make people want to reach out. Takes two minutes.</p><button class="btn pri" type="button" data-tab="edit" data-jump="know">Add the personal side</button></section>` : "";
+    return `<section class="card know-card"><h2>Get to know ${isPreview ? "me" : esc(first)}</h2>${inner}</section>`;
+  }
+  // "You both": what a signed-in visitor shares with this person (same school, major, hometown, interests, courses, companies, skills)
+  async function bothCard(p){
+    const el = document.getElementById("both"); if (!el || !window.Clerk?.session) return;
+    let me; try { const tk = await window.Clerk.session.getToken(); const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + tk } }); if (!r.ok) return; me = (await r.json()).profile || {}; } catch { return; }
+    const low = (a) => (a || []).map((x) => String(x).toLowerCase().trim());
+    const inter = (a, b) => { const B = new Set(low(b)); return (a || []).filter((x) => B.has(String(x).toLowerCase().trim())); };
+    const sameSchool = me.schoolId && p.schoolId ? +me.schoolId === +p.schoolId : !!me.school && String(me.school).toLowerCase() === String(p.school || "").toLowerCase();
+    const town = (x) => String(x || "").toLowerCase().split(",")[0].trim();
+    const orgs = inter((p.experience || []).map((x) => x.org).filter(Boolean), (me.experience || []).map((x) => x.org).filter(Boolean));
+    const out = [sameSchool ? (p.schoolShort || p.school) : "", sameSchool && me.major && String(me.major).toLowerCase() === String(p.major || "").toLowerCase() ? p.major : "",
+      me.hometown && town(me.hometown) === town(p.hometown) ? "from " + p.hometown.split(",")[0] : "", ...orgs.map((o) => "worked at " + o),
+      ...inter(p.interests, me.interests), ...inter(p.courses, me.courses).map((c) => "took " + c), ...inter(p.skills, me.skills).slice(0, 3)].filter(Boolean);
+    const first = String(p.name || "").split(/\s+/)[0] || "them";
+    const ask = (p.askMe || [])[0];
+    if (!out.length && !ask) return;
+    el.innerHTML = `<div class="both">${out.length ? `<b>You both</b> <span>${[...new Set(out)].slice(0, 7).map(esc).join(" · ")}</span>` : ""}${ask ? `<div class="starter">Conversation starter: ask ${esc(first)} about ${esc(ask.charAt(0).toLowerCase() + ask.slice(1))}.</div>` : ""}</div>`;
   }
   async function showPublic(h){
     document.querySelector("main").innerHTML = '<div class="card center muted">Loading…</div>';
@@ -330,7 +388,7 @@
     document.title = (d.profile.name || "Profile") + " | Beat the Pile";
     await TL_READY;
     document.querySelector("main").innerHTML = profileHtml(d.profile, d.resume, false, d.founding);
-    orbitButtons(d.handle, d.profile.name);
+    orbitButtons(d.handle, d.profile.name); bothCard(d.profile);
     $("#rep")?.addEventListener("click", (e) => { e.preventDefault(); window.iqReport ? window.iqReport({ message: "Report profile /u/" + d.handle + "\n" }) : alert("Use the Feedback button to report."); });
   }
 
@@ -355,7 +413,16 @@
     return [...new Set(((m && m[id]) || []).map((c) => names[c]).filter(Boolean))].sort((a, b) => a.localeCompare(b)); }
   async function findSchool(name){ const n = sNorm(name); if (n.length < 2) return null;
     return (await schools()).find((x) => sNorm(x[1]) === n || String(x[2] || "").split("|").some((a) => sNorm(a) === n)) || null; }
-  const blank = () => ({ photo: null, name: "", headline: "", school: "", major: "", gradYear: "", gradTerm: "", schoolId: null, education: [], location: "", lookingFor: "", about: "", skills: [], experience: [], projects: [], links: {}, showResume: false, openToEmployers: false, openTo: [] });
+  const blank = () => ({ photo: null, name: "", headline: "", school: "", major: "", gradYear: "", gradTerm: "", schoolId: null, education: [], location: "", lookingFor: "", about: "", skills: [], experience: [], projects: [], links: {}, showResume: false, openToEmployers: false, openTo: [],
+    hometown: "", coffee: false, askMe: [], canHelp: [], interests: [], courses: [], prompts: [] });
+  function tagBox(d, k){
+    const t = TAGS[k], list = d.p[k] || [], low = list.map((x) => x.toLowerCase());
+    const sug = t.sug.filter((x) => !low.includes(x.toLowerCase())).slice(0, 6);
+    return `<div class="tagbox"><label for="t_${k}">${t.label}</label><p class="muted small" style="margin:-2px 0 6px">${t.hint}</p>
+      ${list.length ? `<div class="chips">${list.map((x, i) => `<span class="chip">${esc(x)} <button type="button" data-rmtag="${k}" data-i="${i}" aria-label="Remove ${esc(x)}" style="border:0;background:none;cursor:pointer;color:var(--muted);padding:0 0 0 4px">×</button></span>`).join("")}</div>` : ""}
+      ${list.length < t.max ? `<input id="t_${k}" data-tagin="${k}" placeholder="${esc(t.ph)}" maxlength="${k === "courses" ? 60 : 40}" autocomplete="off">
+        ${sug.length ? `<div class="sug">${sug.map((x) => `<button type="button" data-sugtag="${k}" data-v="${esc(x)}">+ ${esc(x)}</button>`).join("")}</div>` : ""}` : ""}</div>`;
+  }
   function editor(){
     const d = S.draft, me = S.me;
     const field = (k, label, ph, attrs = "") => `<div><label for="f_${k}">${label}</label><input id="f_${k}" data-k="${k}" value="${esc(d.p[k] ?? "")}" placeholder="${esc(ph)}" ${attrs}></div>`;
@@ -388,6 +455,16 @@
         <div><label>Open to</label><div style="display:flex;gap:16px;flex-wrap:wrap">${Object.entries(OPEN_TO).map(([k, t]) => `<label class="switch" style="margin:0;font-weight:500"><input type="checkbox" data-opento="${k}" ${(d.p.openTo || []).includes(k) ? "checked" : ""}><span>${t}</span></label>`).join("")}</div></div>
         <label for="f_about">About</label><textarea id="f_about" data-k="about" maxlength="1200" placeholder="A few sentences about what you build and what you want to learn.">${esc(d.p.about)}</textarea>
       </section>
+      <section class="card know" id="know"><h2>Get to know me</h2>
+        <p class="small muted" style="margin:-4px 0 8px">The part LinkedIn skips. This is what makes people actually reach out.</p>
+        <label class="switch"><input type="checkbox" id="f_coffee" ${d.p.coffee ? "checked" : ""}><span><b>Open to coffee chats</b><br><span class="muted small">A badge on your profile and Orbit card saying students can message you to talk.</span></span></label>
+        ${field("hometown", "Hometown", "Philadelphia, PA")}
+        ${Object.keys(TAGS).map((k) => tagBox(d, k)).join("")}
+        <h3 class="kh">Prompts <span class="muted small">(pick up to 3)</span></h3>
+        ${[0, 1, 2].map((i) => { const x = d.p.prompts[i] || { q: "", a: "" }; const used = d.p.prompts.filter((y, j) => j !== i).map((y) => y.q);
+          return `<div class="prompt"><select data-pq="${i}" aria-label="Prompt ${i + 1}"><option value="">${i ? "Add another prompt" : "Pick a prompt"}</option>${PROMPTS.filter((q) => !used.includes(q) || q === x.q).map((q) => `<option${x.q === q ? " selected" : ""}>${esc(q)}</option>`).join("")}</select>
+            ${x.q ? `<textarea data-pa="${i}" maxlength="300" placeholder="Keep it real, 1 to 3 sentences.">${esc(x.a || "")}</textarea>` : ""}</div>`; }).join("")}
+      </section>
       <section class="card" id="edu"><h2>Education</h2>
         <p class="small muted" style="margin:0 0 4px">Your main school. Students at the same school and major are your inner orbit.</p>
         <div class="row"><div><label for="f_school">School</label><input id="f_school" list="schoollist" value="${esc(d.p.school)}" placeholder="Start typing, e.g. Virginia Tech" autocomplete="off"><datalist id="schoollist"></datalist></div>
@@ -414,7 +491,8 @@
           <div class="row"><div><label>Start</label><input type="month" data-list="experience" data-i="${i}" data-f="start" value="${esc(st)}" placeholder="2025-05"></div>
           <div><label>End</label><input type="month" data-list="experience" data-i="${i}" data-f="end" value="${esc(en === "present" ? "" : en)}" placeholder="2025-08"${en === "present" ? " disabled" : ""}>
             <label class="chkrow"><input type="checkbox" data-now="${i}"${en === "present" ? " checked" : ""}> I work here now</label></div></div>
-          <label>What you did</label><textarea data-list="experience" data-i="${i}" data-f="desc" maxlength="600">${esc(x.desc)}</textarea></div>`; }).join("")}</div>
+          <label>What you did</label><textarea data-list="experience" data-i="${i}" data-f="desc" maxlength="600">${esc(x.desc)}</textarea>
+          <label>How you got it <span class="muted small">(optional, shown to students who want the same role)</span></label><textarea data-list="experience" data-i="${i}" data-f="story" maxlength="600" placeholder="Career fair? Cold email? A professor's intro? What would you tell someone applying next year?">${esc(x.story || "")}</textarea></div>`; }).join("")}</div>
         ${d.p.experience.length < 12 ? `<button class="btn" data-add="experience" style="margin-top:12px">+ Add experience</button>` : ""}</section>
       <section class="card"><h2>Projects</h2><div>${d.p.projects.map((x, i) => `
         <div class="rep"><button class="rm" data-rm="projects" data-i="${i}">Remove</button>
@@ -518,6 +596,17 @@
     if (sk) { const add = () => { const v = sk.value.trim().slice(0, 40); if (v && !d.p.skills.some((s) => s.toLowerCase() === v.toLowerCase()) && d.p.skills.length < 30) { d.p.skills.push(v); editor(); $("#f_skill")?.focus(); } };
       sk.onkeydown = (e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); add(); } };
       sk.onchange = () => { if (SKILLS.includes(sk.value.trim())) add(); }; }
+    // Nov 15: tag boxes (Ask me about, I can help with, interests, courses) + prompts + coffee chats
+    const addTag = (k, v) => { v = String(v || "").trim().slice(0, k === "courses" ? 60 : 40); const L = d.p[k];
+      if (v && !L.some((x) => x.toLowerCase() === v.toLowerCase()) && L.length < TAGS[k].max) { L.push(v); editor(); $("#t_" + k)?.focus(); } };
+    main.querySelectorAll("[data-tagin]").forEach((el) => { el.onkeydown = (e) => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(el.dataset.tagin, el.value); } };
+      el.onblur = () => { if (el.value.trim()) addTag(el.dataset.tagin, el.value); }; });
+    main.querySelectorAll("[data-sugtag]").forEach((b) => b.onclick = () => addTag(b.dataset.sugtag, b.dataset.v));
+    main.querySelectorAll("[data-rmtag]").forEach((b) => b.onclick = () => { d.p[b.dataset.rmtag].splice(+b.dataset.i, 1); editor(); $("#t_" + b.dataset.rmtag)?.focus(); });
+    main.querySelectorAll("[data-pq]").forEach((el) => el.onchange = () => { const i = +el.dataset.pq; const P = d.p.prompts; while (P.length <= i) P.push({ q: "", a: "" });
+      P[i].q = el.value; if (!el.value) P.splice(i, 1); editor(); main.querySelector(`[data-pa="${i}"]`)?.focus(); });
+    main.querySelectorAll("[data-pa]").forEach((el) => el.oninput = () => { const P = d.p.prompts[+el.dataset.pa]; if (P) P.a = el.value; });
+    const cf = $("#f_coffee"); if (cf) cf.onchange = () => { d.p.coffee = cf.checked; };
     const h = $("#f_handle"); if (h) h.oninput = () => { h.value = h.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").slice(0, 30); d.handle = h.value; };
     const pub = $("#f_public"); if (pub) pub.onchange = () => { d.pub = pub.checked; };
     const rs = $("#f_resume"); if (rs) rs.onchange = () => { d.p.showResume = rs.checked; };
@@ -613,6 +702,7 @@
     };
     const meta = (r) => [r.sp ? T.rangeText(r.sp).replace(/ · [^·]+$/, "") : r.when || "", r.location].filter(Boolean).map(esc).join(" · ");
     const len = (r) => r.sp ? T.duration(r.sp.a, r.sp.b) : "";
+    const story = (r) => r.story ? `<div class="tl-story"><b>How I got it</b><p>${esc(r.story)}</p></div>` : "";
     const chip = (t) => t ? `<span class="tl-type t-${esc(t)}">${esc(T.TYPES[t] || t)}</span>` : "";
     const cards = groups.map((g) => {
       const multi = g.roles.length > 1, cur = g.roles.some((r) => r.sp?.current), top = g.roles[0];
@@ -621,10 +711,10 @@
       const body = multi
         ? `<div class="tl-head">${tile}<div class="tl-main"><div class="tl-co">${esc(g.org)}</div><div class="sm">${g.roles.length} roles${g.span ? " · " + T.duration(g.span.a, g.span.b) : ""}</div>${hire}</div></div>
            <div class="tl-roles">${g.roles.map((r) => `<div class="tl-role" id="xp${r.i}"><div class="tl-row"><b>${esc(r.title)}</b>${len(r) ? `<span class="tl-len">${esc(len(r))}</span>` : ""}</div>
-             <div class="sm">${meta(r)}</div><div class="tl-chips">${chip(r.type)}${r.sp?.current ? '<span class="tl-now">Current</span>' : ""}</div>${bullets(r.desc)}</div>`).join("")}</div>`
+             <div class="sm">${meta(r)}</div><div class="tl-chips">${chip(r.type)}${r.sp?.current ? '<span class="tl-now">Current</span>' : ""}</div>${bullets(r.desc)}${story(r)}</div>`).join("")}</div>`
         : `<div class="tl-head" id="xp${top.i}">${tile}<div class="tl-main"><div class="tl-row"><b class="tl-title">${esc(top.title)}</b>${len(top) ? `<span class="tl-len">${esc(len(top))}</span>` : ""}</div>
              <div class="tl-co">${esc(g.org || "")}</div><div class="sm">${meta(top)}</div><div class="tl-chips">${chip(top.type)}${cur ? '<span class="tl-now">Current</span>' : ""}</div>${hire}</div></div>
-           <div class="tl-body">${bullets(top.desc)}</div>`;
+           <div class="tl-body">${bullets(top.desc)}${story(top)}</div>`;
       return `${yearTag(g.span ? g.span.b : null)}<div class="tl-item${cur ? " cur" : ""}"><span class="tl-node" aria-hidden="true"></span><div class="tl-card">${body}</div></div>`;
     }).join("");
     setTimeout(hiringNow, 0);
@@ -755,6 +845,7 @@
     p.links = { ...(p.links || {}) }; p.skills = [...(p.skills || [])];
     p.experience = (p.experience || []).map((x) => ({ ...x })); p.projects = (p.projects || []).map((x) => ({ ...x })); p.openTo = [...(p.openTo || [])];
     p.education = (p.education || []).map((x) => ({ ...x })); p.gradTerm = p.gradTerm || "";
+    for (const k of Object.keys(TAGS)) p[k] = [...(p[k] || [])]; p.prompts = (p.prompts || []).map((x) => ({ ...x })); p.hometown = p.hometown || "";
     if (!p.name && S.user) p.name = [S.user.firstName, S.user.lastName].filter(Boolean).join(" ");
     // First visit after the old homepage profile: start from what's already in the application kit
     const k = S.kit || {}; const https = (u) => (u && !/^https?:\/\//i.test(u) ? "https://" + u : u || "");

@@ -65,6 +65,7 @@
   .btn[disabled]{opacity:.6;cursor:default;background:#fff}
   .nudge{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#F2FADF;border:1px solid #DDF3A8}
   .nudge p{margin:4px 0 0;font-size:13.5px;color:#334}.nudge .nb{display:flex;gap:8px}
+  .p .ask{font-size:12px;color:#334;margin-top:6px}
   .p .role{font-size:12px;color:var(--faint);margin-top:2px}
   .want{margin:4px 0 16px;padding:12px;border:1px solid var(--line,#E2E7EF);border-radius:10px}.want .wl{font-weight:600;font-size:13.5px;margin-bottom:8px}
   .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.chip{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;background:#F2FADF;color:#2F4A00;border-radius:999px;padding:3px 10px;font-weight:600}
@@ -140,6 +141,8 @@
   const person = (p) => `<div class="p">${av(p)}<div class="nm" title="${esc(p.name)}">${esc(p.name)}</div>
     <div class="hl">${esc(p.headline || [p.major, p.school].filter(Boolean).join(" · ") + yr(p.gradYear))}</div>
     ${p.staff ? `<div class="at">Faculty &amp; staff · ${esc(p.staff)}</div>` : ""}
+    ${p.coffee ? `<div class="tag">Open to coffee chats</div>` : ""}
+    ${(p.askMe || []).length ? `<div class="ask">Ask me about ${esc(p.askMe.slice(0, 2).join(", "))}</div>` : ""}
     ${p.at ? `<div class="at">${esc(atLine(p))}</div>${p.role ? `<div class="role">${esc(p.role)}${p.when ? " · " + esc(p.when) : ""}</div>` : ""}` : ""}
     ${p.link === "connected" ? `<div class="tag">In orbit</div>` : p.link === "incoming" ? `<div class="tag">${esc(first(p.name))} wants to join your orbit</div>` : ""}
     <div class="acts">${linkBtns(p)}</div>

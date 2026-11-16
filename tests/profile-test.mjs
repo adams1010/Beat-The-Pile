@@ -82,3 +82,18 @@ console.log("PROFILE TESTS PASSED");
   assert.equal(r.body.profile.contact, null, "junk refused");
   console.log("✓ profile contact: members only, opt-out respected, junk refused");
 }
+
+// Nov 15: the personal side (Get to know me): tags de-duplicated and capped, only listed prompts, "how I got it" stories
+{
+  const r = await call("POST", "pk", { action: "profile", handle: "kim-k", public: true, profile: { name: "Kim K", hometown: "Philadelphia, PA", coffee: true,
+    askMe: ["Co-ops", "co-ops", "Career fairs", "a", "b", "c", "d", "e"], canHelp: ["Resume reviews"], interests: ["Soccer", "Gym"], courses: ["ME 2004"],
+    prompts: [{ q: "How I got my first internship", a: "Career fair, then a follow-up email." }, { q: "Write anything as a heading", a: "nope" }, { q: "How I got my first internship", a: "dupe" }, { q: "Why I picked my major", a: "" }],
+    experience: [{ title: "Intern", org: "HITT", story: "Met them at the fall fair." }] } });
+  assert.equal(r.code, 200);
+  const g = (await call("GET", null, null, { u: "kim-k" })).body.profile;
+  assert.equal(g.hometown, "Philadelphia, PA"); assert.equal(g.coffee, true);
+  assert.deepEqual(g.askMe, ["Co-ops", "Career fairs", "a", "b", "c", "d"], "case-insensitive de-dupe, max 6");
+  assert.deepEqual(g.prompts, [{ q: "How I got my first internship", a: "Career fair, then a follow-up email." }], "only listed prompts, answered, once each");
+  assert.equal(g.experience[0].story, "Met them at the fall fair.");
+  console.log("✓ profile personal side: hometown, coffee chats, tags, prompts, stories");
+}
