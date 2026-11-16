@@ -19,6 +19,11 @@ jobs:
           USAJOBS_KEY: ${{ secrets.USAJOBS_KEY }}
           USAJOBS_EMAIL: ${{ secrets.USAJOBS_EMAIL }}
           USAJOBS_DEBUG: "1"
+      - name: Count what's on USAJOBS
+        run: node scripts/usajobs-count.mjs
+        env:
+          USAJOBS_KEY: ${{ secrets.USAJOBS_KEY }}
+          USAJOBS_EMAIL: ${{ secrets.USAJOBS_EMAIL }}
       - run: node scripts/turbo-sync.mjs --only=usajobs --minutes=10
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
