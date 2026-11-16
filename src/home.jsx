@@ -1547,7 +1547,7 @@ function App(){
     if(cur?.type==="slider")return true;
     if(cur?.type==="resume")return true; // resume is optional — always can proceed
     if(cur?.type==="zip")return /^\d{5}$/.test(ans.zip);
-    if(cur?.type==="extracurricular")return extPicks.length>0;
+    if(cur?.type==="extracurricular")return true;   // Nov 16: optional (freshmen often have nothing yet; a required step made people quit)
     return !!ans[cur?.key];
   }
   // Advance the quiz (used by Continue button and the Enter key)

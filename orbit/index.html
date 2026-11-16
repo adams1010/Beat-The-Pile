@@ -222,7 +222,7 @@
   }
   function render(o){
     S.o = o; const m = o.me, ring = R[S.ring] && S.ring !== "everyone" ? S.ring : "all";
-    const sets = { all: uniq(o.classmates, o.schoolmates, o.everyone), inner: o.classmates, campus: o.schoolmates, insiders: o.insiders || [], conn: o.connections || [] };
+    const sets = { all: uniq(o.connections, o.classmates, o.schoolmates, o.everyone), inner: o.classmates, campus: o.schoolmates, insiders: o.insiders || [], conn: o.connections || [] };
     const gravity = !m.hasSchool || !m.hasMajor ? `<span>Add your school and major to <a href="/u/">your profile</a> to fill your orbit.</span>`
       : !m.isPublic ? `<span>You're hidden, so classmates can't see you or join your orbit.</span><button type="button" class="btn pri" id="goPublic">Show me in Orbit</button>`
       : `<span>You're visible in other students' orbits.</span>`;

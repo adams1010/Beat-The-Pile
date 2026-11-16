@@ -23,3 +23,9 @@ const walk = (d) => { for (const f of fs.readdirSync(d, { withFileTypes: true })
 walk(root.replace(/\/$/, ""));
 assert.deepEqual(bad, [], "inline scripts that don't parse:\n" + bad.join("\n"));
 console.log(`✓ ${n} inline/page scripts parse`);
+{ // Nov 16: a new account's "Show me in Orbit" box starts ticked (no row yet ≠ chose private)
+  const { readFileSync } = await import("node:fs");
+  const st = readFileSync(new URL("../start/index.html", import.meta.url), "utf8");
+  if (!/pubNow = j\.handle \? j\.profilePublic : null/.test(st)) throw new Error("start: new accounts must default to public");
+  console.log("✓ sign-up: Show me in Orbit starts ticked for new accounts");
+}

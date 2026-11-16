@@ -1,4 +1,4 @@
-/* built from src/home.jsx bb5076da7f7d4948 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx e1557cd4ff34e654 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -4746,7 +4746,7 @@ function App() {
     if (cur?.type === "slider") return true;
     if (cur?.type === "resume") return true;
     if (cur?.type === "zip") return /^\d{5}$/.test(ans.zip);
-    if (cur?.type === "extracurricular") return extPicks.length > 0;
+    if (cur?.type === "extracurricular") return true;
     return !!ans[cur?.key];
   }
   function nextStepIndex(fromStep) {
