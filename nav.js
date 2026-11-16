@@ -305,7 +305,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   }
   function startBadge(C){
     orbitBadge(C);
-    setInterval(() => { if (document.visibilityState === "visible") orbitBadge(C, true); }, 15000);
+    setInterval(() => { if (document.visibilityState === "visible") orbitBadge(C, true); }, 60000);   // Nov 15: was 15 s; every check is a Vercel call (free tier: 4 h CPU/month)
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") orbitBadge(C); });
     addEventListener("focus", () => orbitBadge(C));
   }

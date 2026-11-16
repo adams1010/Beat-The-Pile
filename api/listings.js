@@ -143,7 +143,7 @@ async function nearby(p, res) {
     db.select("feed_runs?select=ran_at&order=ran_at.desc&limit=1"),
   ]);
   const page = p.limit != null ? hits.slice(p.offset, p.offset + p.limit) : hits;
-  res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=3600");
+  res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=86400");
   return res.status(200).json({ listings: withKind(page), meta: { count: hits.length, kind: p.kind, lastSync: lastRun?.[0]?.ran_at || null,
     near: { q: p.near, typed, fixedTo, others: others.slice(0, 12), mi: p.mi, lat: center[0], lng: center[1], state: st, xy: project(center[0], center[1]) }, remote, unplacedInState: unplaced,
     ...(p.limit != null ? { limit: p.limit, offset: p.offset, more: p.offset + p.limit < hits.length } : {}) } });
@@ -225,7 +225,7 @@ export default async function handler(req, res) {
 
   try {
     if (p.summary) {
-      res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate=1800");
+      res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=86400");
       const scan = await liveScan();
       const hiringNow = scan ? scan.seen.size : null;
       const top = scan ? [...scan.seen].sort((a, b) => b[1].n - a[1].n).slice(0, 8).map(([id, v]) => ({ id, company: v.company, n: v.n })) : [];
@@ -258,7 +258,7 @@ export default async function handler(req, res) {
     if (p.near) return await nearby(p, res);
     if (req.query?.dots === "1") return await dots(p, res);
 
-    res.setHeader("Cache-Control", "s-maxage=600, stale-while-revalidate=3600");
+    res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=86400");
     let q = `listings?select=${COLS}&${LIVE}${KIND_Q[p.kind]}&order=first_seen.desc,id.asc`;
     // state column holds "VA" or "WA,VA,PA" — match any requested state inside it (re-checked exactly below)
     if (p.states.length) q += `&and=(or(${[...p.states.map((s) => `state.ilike.*${s}*`), "state.eq.US"].join(",")})${hasGroups(p) ? "," + wordGroups(p).join(",") : ""})`;

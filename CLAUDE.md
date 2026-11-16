@@ -61,7 +61,7 @@ Every page (homepage too) includes **`/nav.js`** (one shared top bar — student
 (`btpResumeFile.read(file)` → text; real .docx unzip via DecompressionStream; pdf.js from cdnjs) — no paste boxes. /u/ "Fill your
 profile from your resume" → `/api/generate` feature `profile_fill` (copy-only JSON) → fills only EMPTY fields + adds new
 experience/projects/skills, and keeps the file in the kit (`resumes.list[].file` = name/size/pages/kind). Photo upload has a
-crop + zoom dialog. The Orbit/Talent tab badge (`orbit_count` = unread + requests, "10+") loads on every page, re-checks every 30 s
+crop + zoom dialog. The Orbit/Talent tab badge (`orbit_count` = unread + requests, "10+") loads on every page, re-checks every 60 s (Nov 15: Vercel CPU)
 and on tab focus; nav.js loads Clerk itself on pages that don't, if this browser was signed in before.
 **Languages (Nov 8): English, Español, Français, Deutsch, Nederlands.** `nav.js` loads **`/i18n.js`**; the account menu (your picture) →
 Language (and a Language card on `/u/`) sets localStorage `btp_lang` (`en`|`es`|`fr`|`de`|`nl`). Non-English swaps whole text nodes /
