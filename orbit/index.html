@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Orbit | Beat the Pile</title>
-<meta name="description" content="Orbit: classmates in your major, everyone else on Beat the Pile, and what's new at the companies you follow.">
+<meta name="description" content="Orbit: classmates in your major, everyone at your school, people at the companies you want, and what&#39;s new there.">
 <link rel="canonical" href="https://www.beatthepile.com/orbit/">
 <link rel="icon" href="/icons/icon-192.png">
 <meta name="theme-color" content="#060A2C">
@@ -63,6 +63,12 @@
   .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:10px}.acts .btn{margin-top:0}
   .lnk{font-size:12.5px;color:var(--muted);margin-top:8px;text-decoration:none}.lnk:hover{text-decoration:underline;color:var(--ink)}
   .btn[disabled]{opacity:.6;cursor:default;background:#fff}
+  .p .role{font-size:12px;color:var(--faint);margin-top:2px}
+  .want{margin:4px 0 16px;padding:12px;border:1px solid var(--line,#E2E7EF);border-radius:10px}.want .wl{font-weight:600;font-size:13.5px;margin-bottom:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.chip{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;background:#F2FADF;color:#2F4A00;border-radius:999px;padding:3px 10px;font-weight:600}
+  .chip.auto{background:#EEF1F6;color:#334}.chip button{border:0;background:none;font:inherit;font-size:15px;line-height:1;cursor:pointer;color:inherit;padding:0 2px}
+  .sugg{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.sugg button{font:inherit;font-size:12.5px;border:1px solid #D5DCE6;background:#fff;border-radius:999px;padding:4px 10px;cursor:pointer}
+  .want .hint{font-size:12px;color:var(--faint);margin:8px 0 0}
   .tag{font-size:11.5px;color:var(--green);background:var(--green-l);border-radius:999px;padding:1px 8px;margin-top:6px;font-weight:600}
   .reqs{border-left:3px solid var(--green)} .reqs .row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid #EEF1F6}.reqs .row:first-of-type{border-top:0}
   .reqs .av{width:40px;height:40px;font-size:14px}.reqs .who{flex:1;min-width:0}.reqs .who b{display:block}.reqs .who span{color:var(--muted);font-size:12.5px}
@@ -132,19 +138,33 @@
   const person = (p) => `<div class="p">${av(p)}<div class="nm" title="${esc(p.name)}">${esc(p.name)}</div>
     <div class="hl">${esc(p.headline || [p.major, p.school].filter(Boolean).join(" · ") + yr(p.gradYear))}</div>
     ${p.staff ? `<div class="at">Faculty &amp; staff · ${esc(p.staff)}</div>` : ""}
-    ${p.at ? `<div class="at">${esc(p.role ? p.role + " at " : "Worked at ")}${esc(p.at)}</div>` : ""}
+    ${p.at ? `<div class="at">${esc(atLine(p))}</div>${p.role ? `<div class="role">${esc(p.role)}${p.when ? " · " + esc(p.when) : ""}</div>` : ""}` : ""}
     ${p.link === "connected" ? `<div class="tag">In orbit</div>` : p.link === "incoming" ? `<div class="tag">${esc(first(p.name))} wants to join your orbit</div>` : ""}
     <div class="acts">${linkBtns(p)}</div>
     ${p.handle ? `<a class="lnk" href="/u/${encodeURIComponent(p.handle)}">View profile</a>` : ""}</div>`;
+  // "Interned at Northrop Grumman" / "Works at Northrop Grumman" (insiders: people at companies you want)
+  const atLine = (p) => (p.type === "internship" ? (p.now ? "Interning at " : "Interned at ") : (p.now ? "Works at " : "Worked at ")) + p.at;
   const people = (list, none) => list.length ? `<div class="people">${list.map(person).join("")}</div>` : `<p class="empty">${none}</p>`;
 
+  // Nov 15 pm (owner): tabs = All · Inner orbit · Campus · Insiders (+ In orbit). Tapping one shows ONLY those people, in the list and the sky.
   const RINGS = [
     ["inner", "Inner orbit", "Your major, your school", "#B0F701"],
-    ["campus", "Campus", "Other majors at your school", "#7FB2FF"],
+    ["campus", "Campus", "Everyone at your school", "#7FB2FF"],
     ["everyone", "Everyone else", "Other students on Beat the Pile", "#FFB86B"],
     ["conn", "In orbit", "People who joined your orbit", "#FFFFFF"],
+    ["all", "All", "Everyone on Beat the Pile", "#FFB86B"],
+    ["insiders", "Insiders", "Interned or work where you want to be", "#FF8FB1"],
   ];
-  const LEGEND = [RINGS[3], RINGS[0], RINGS[1], RINGS[2]];   // Nov 9: the people already in your orbit come first
+  const R = Object.fromEntries(RINGS.map((r) => [r[0], r]));
+  const LEGEND = [R.all, R.inner, R.campus, R.insiders, R.conn];
+  const uniq = (...lists) => { const seen = new Set(), out = []; for (const l of lists) for (const p of l || []) { const k = p.handle || p.key; if (k && !seen.has(k)) { seen.add(k); out.push(p); } } return out; };
+  // The sky for one tab: each person sits on their own ring (inner = your major, middle = your school, outer = everyone else).
+  function skySets(o, list){
+    const inner = new Set((o.classmates || []).map((p) => p.handle)), school = new Set((o.schoolmates || []).map((p) => p.handle));
+    const sets = { inner: [], campus: [], everyone: [] };
+    for (const p of list) (inner.has(p.handle) ? sets.inner : school.has(p.handle) ? sets.campus : sets.everyone).push(p);
+    return sets;
+  }
   const photoOk = (u) => typeof u === "string" && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(u);   // only real image data, never a link
   function sky(o, sets = { inner: o.classmates, campus: o.schoolmates, everyone: o.everyone }, rings3 = RINGS.slice(0, 3), center = { text: initials(o.me.name) || "You", label: "You", photo: o.me.photo }){
     const RAD = [92, 150, 205], C = 230;
@@ -196,28 +216,30 @@
     if (S.findQ && !S.findHtml) { go(); if (!S.findScrolled) { S.findScrolled = true; setTimeout(() => $(".find")?.scrollIntoView({ block: "start", behavior: "smooth" }), 60); } }   // came from the top-bar search
   }
   function render(o){
-    S.o = o; const m = o.me, ring = S.ring || ((o.connections || []).length ? "conn" : "inner");
-    const sets = { inner: o.classmates, campus: o.schoolmates, everyone: o.everyone, conn: o.connections || [] };
+    S.o = o; const m = o.me, ring = R[S.ring] && S.ring !== "everyone" ? S.ring : "all";
+    const sets = { all: uniq(o.classmates, o.schoolmates, o.everyone), inner: o.classmates, campus: o.schoolmates, insiders: o.insiders || [], conn: o.connections || [] };
     const gravity = !m.hasSchool || !m.hasMajor ? `<span>Add your school and major to <a href="/u/">your profile</a> to fill your orbit.</span>`
       : !m.isPublic ? `<span>You're hidden, so classmates can't see you or join your orbit.</span><button type="button" class="btn pri" id="goPublic">Show me in Orbit</button>`
       : `<span>You're visible in other students' orbits.</span>`;
     const empty = { inner: m.hasSchool ? "No one in your major has a public profile yet. Invite a classmate." : `<a href="/u/">Add your school and major</a> first.`,
       campus: m.hasSchool ? "No one else at your school has a public profile yet." : `<a href="/u/">Add your school</a> first.`,
-      everyone: "No one else has a public profile yet. Invite a friend.",
+      all: "No one else has a public profile yet. Invite a friend.",
+      insiders: (o.targets || []).length ? `No one on Beat the Pile has listed ${esc((o.targets || []).slice(0, 3).join(", "))}${(o.targets || []).length > 3 ? " or the others" : ""} on their profile yet. Add more companies above.`
+        : "Add a company you want to work at, and we'll show people who interned or work there.",
       conn: "No one's in your orbit yet. Tap Join orbit on anyone above." };
-    const [, title, desc] = RINGS.find((r) => r[0] === ring);
+    const [, title, desc] = R[ring];
     const feed = o.feed.length ? o.feed.map((f) => f.kind === "job"
       ? `<div class="it"><div class="k">New opening · ${esc(ago(f.at))}</div><a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">${esc(f.title)}</a><div>${esc(f.company)}${f.location ? " · " + esc(f.location) : ""}</div></div>`
       : `<div class="it"><div class="k">${esc(f.name)} posted${f.category ? " in " + esc(f.category) : ""} · ${esc(ago(f.at))}</div><div class="tx">${esc(f.text)}</div></div>`).join("")
       : `<p class="empty">Quiet for now. Follow companies with ☆ on <a href="/jobs/">Jobs</a> and their new openings land here.</p>`;
     $("main").innerHTML = `
-      <div class="sky"><div><h1>Your orbit</h1><p class="sub">The people around your search, closest first. Tap anyone to see their profile.</p>${sky(o)}</div>
+      <div class="sky"><div><h1>Your orbit</h1><p class="sub">The people around your search, closest first. Tap anyone to see their profile.</p>${sky(o, skySets(o, sets[ring]))}</div>
         <div><div class="legend">${LEGEND.map(([k, t, d, col]) => `<button type="button" data-ring="${k}" aria-pressed="${k === ring}"><i style="border-color:${col}"></i><span>${t}<small>${d}</small></span><b>${sets[k].length}</b></button>`).join("")}</div>
           <div class="gravity">${gravity}</div>
           </div></div>
       <div class="grid grid2">
         <div>${findBox()}${requests(o)}
-        <section class="card" id="ringList"><h2>${title}</h2><p class="sub">${desc}${ring === "inner" && m.hasSchool ? ` · ${esc(m.major || "")} at ${esc(m.school)}` : ""}</p>${people(sets[ring], empty[ring])}</section></div>
+        <section class="card" id="ringList"><h2>${title}</h2><p class="sub">${desc}${ring === "inner" && m.hasSchool ? ` · ${esc(m.major || "")} at ${esc(m.school)}` : ring === "campus" && m.hasSchool ? ` · ${esc(m.school)}` : ""}</p>${ring === "insiders" ? wantBox(o) : ""}${people(sets[ring], empty[ring])}</section></div>
         <aside class="feedcol">
           <section class="card" id="messages"><h2>Messages${o.unread ? `<span class="count">${o.unread}</span>` : ""}</h2><p class="sub">Students in your orbit, plus employers if you turned on “Let employers find me”.</p><div id="threads"><p class="empty">Loading…</p></div></section>
           ${fairBox(o)}
@@ -228,11 +250,44 @@
       gp.disabled = true;
       try { await api({ action: "onboard", show: true }); await refresh(); }
       catch { location.href = "/u/#visibility"; } };
-    wire($("main")); wireFind(); loadThreads(); loadFairs();
+    wire($("main")); wireFind(); wireWant(); loadThreads(); loadFairs();
     try { window.btpOrbitBadge && window.btpOrbitBadge((o.unread || 0) + (o.requests || []).length); } catch {}
   }
 
-  async function refresh(){ if (S.biz) renderBiz(await api({ action: "biz_orbit" })); else render(await api({ action: "orbit" })); }
+  // ── Insiders: companies you want. Followed ★ and your Tracker count on their own; ones typed here stay on this device. ──
+  const TKEY = "btp_orbit_targets";
+  const typed = () => { try { const v = JSON.parse(localStorage.getItem(TKEY) || "[]"); return Array.isArray(v) ? v.filter((x) => typeof x === "string").slice(0, 10) : []; } catch { return []; } };
+  const setTyped = (v) => { try { localStorage.setItem(TKEY, JSON.stringify(v.slice(0, 10))); } catch {} };
+  function wantBox(o){
+    const mine = typed(), low = new Set(mine.map((x) => x.toLowerCase()));
+    const auto = (o.targets || []).filter((t) => !low.has(t.toLowerCase()));
+    return `<div class="want"><div class="wl">Companies you want</div><div class="chips">
+      ${mine.map((t) => `<span class="chip">${esc(t)}<button type="button" data-unwant="${esc(t)}" aria-label="Remove ${esc(t)}">×</button></span>`).join("")}
+      ${auto.slice(0, 12).map((t) => `<span class="chip auto" title="From companies you follow or your Tracker">${esc(t)}</span>`).join("")}</div>
+      <form id="wantF" class="findf" autocomplete="off"><input id="wantQ" type="text" maxlength="80" placeholder="Add a company, e.g. Northrop Grumman" aria-label="Add a company you want to work at"><button class="btn pri" type="submit">Add</button></form>
+      <div id="wantS" class="sugg"></div>
+      <p class="hint">Companies you follow on Jobs and the ones in your Tracker are added for you.</p></div>`;
+  }
+  let NAMES = null;
+  async function names(){ if (!NAMES) NAMES = fetch("/companies/names.json").then((r) => r.json()).then((a) => a.map((x) => x[0])).catch(() => []); return NAMES; }
+  function wireWant(){
+    const f = $("#wantF"); if (!f) return;
+    const add = (name) => { const t = String(name || "").trim().slice(0, 80); if (t.length < 2) return;
+      const v = typed().filter((x) => x.toLowerCase() !== t.toLowerCase()); v.unshift(t); setTyped(v); pickRing("insiders", render); };
+    f.onsubmit = (e) => { e.preventDefault(); add($("#wantQ").value); };
+    document.querySelectorAll("[data-unwant]").forEach((b) => b.onclick = () => { setTyped(typed().filter((x) => x !== b.dataset.unwant)); pickRing("insiders", render); });
+    $("#wantQ").onfocus = () => names();
+    $("#wantQ").oninput = async () => {
+      const q = $("#wantQ").value.trim().toLowerCase(), box = $("#wantS"); if (q.length < 2) { box.innerHTML = ""; return; }
+      const all = await names(); if ($("#wantQ").value.trim().toLowerCase() !== q) return;
+      const hit = all.filter((n) => n.toLowerCase().startsWith(q)).slice(0, 6);
+      const more = hit.length < 6 ? all.filter((n) => !n.toLowerCase().startsWith(q) && n.toLowerCase().includes(" " + q)).slice(0, 6 - hit.length) : [];
+      box.innerHTML = [...hit, ...more].map((n) => `<button type="button" data-sugg="${esc(n)}">${esc(n)}</button>`).join("");
+      box.querySelectorAll("[data-sugg]").forEach((b) => b.onclick = () => add(b.dataset.sugg));
+    };
+  }
+
+  async function refresh(){ if (S.biz) renderBiz(await api({ action: "biz_orbit" })); else render(await api({ action: "orbit", targets: typed() })); }
   // Nov 13: tapping a ring shows it at once, then reloads fresh people for it (new classmates, new requests) and, on phones,
   // scrolls down to the list. Coming back to the tab reloads too (at most every 20 s).
   let lastLoad = Date.now(), loading = false;

@@ -397,7 +397,7 @@ export default async function handler(req, res) {
     // ── Orbit (/orbit/): read-only, public profiles only ──
     if (action === "orbit") {
       if (!(await rateOk(`orbit:${uid}`, 60, 30))) return res.status(429).json({ error: "Slow down a little and try again" });
-      return res.status(200).json(await orbitFor(uid, await loadRow(uid), orbitExtras));
+      return res.status(200).json(await orbitFor(uid, await loadRow(uid), orbitExtras, body?.targets));
     }
     // ── Orbit part 2: connect / accept / remove, messages, same fair (lib/orbitnet.js) ──
     if (typeof action === "string" && /^orbit_(connect|accept|remove|thread|send|inbox|fair|count|state|search)$/.test(action)) {
