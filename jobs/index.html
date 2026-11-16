@@ -143,6 +143,19 @@
   .skel{height:112px;border-radius:var(--r);background:linear-gradient(90deg,#E4E9F1 0%,#F3F5F9 50%,#E4E9F1 100%);background-size:200% 100%;animation:sh 1.2s infinite}
   @keyframes sh{to{background-position:-200% 0}}
   @media (prefers-reduced-motion:reduce){.skel{animation:none}}
+  /* Nov 16 (owner): phones = jobs on the first screen. Short header, filters behind one "Filters" button, a one-line summary. */
+  .fbar{display:none}
+  @media (max-width:640px){
+    header{padding:14px 0 12px}header h1{font-size:21px;margin:0}header .sub,header .fairlink,header #trust{display:none!important}
+    .welcome{padding:14px 14px 12px}.welcome h2{font-size:16px}.welcome p{display:none}
+    .wchips{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:0 -14px;padding:0 14px}.wchips::-webkit-scrollbar{display:none}.wchips button{flex:none;font-size:13px;padding:7px 12px}
+    .fbar{display:flex;align-items:center;gap:10px;margin:8px 0 2px}
+    .fbtn{flex:none;font:inherit;font-size:13.5px;font-weight:600;border:1px solid #C9D1DE;background:#fff;color:var(--ink);border-radius:999px;padding:7px 14px;cursor:pointer}
+    .fbtn[aria-expanded="true"]{border-color:var(--green);color:var(--green)}
+    .fbtn b{display:inline-block;min-width:18px;margin-left:4px;padding:0 5px;border-radius:999px;background:var(--green);color:#fff;font-size:11.5px;line-height:18px;text-align:center}
+    .fsum{font-size:12.5px;color:var(--muted);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .controls:not(.fopen) .near,.controls:not(.fopen) .cats,.controls:not(.fopen) .row{display:none!important}
+  }
 
   .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
   .acct{display:flex;align-items:center;gap:8px;font-size:13px}
@@ -265,6 +278,7 @@
       <form class="sform" id="qForm" role="search"><input class="search" id="q" type="search" enterkeyhint="search" placeholder="Job title, keyword or company" aria-label="Job title, keyword or company"><button class="sbtn" type="submit">Search</button></form>
       <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
     </div>
+    <div class="fbar"><button type="button" class="fbtn" id="fBtn" aria-expanded="false" aria-controls="cats">Filters</button><span class="fsum" id="fSum" data-noi18n></span></div>
     <div class="cats" id="cats" role="group" aria-label="Job category"></div>
     <div class="kindseg" role="group" aria-label="Job type"><button type="button" data-kind="intern" aria-pressed="true">Internships</button><button type="button" data-kind="fulltime" aria-pressed="false">Entry-level</button><button type="button" data-kind="hourly" aria-pressed="false">Part-time &amp; hourly</button><button type="button" data-kind="shadow" aria-pressed="false">Shadowing &amp; volunteer</button><button type="button" data-kind="all" aria-pressed="false">All</button></div>
     <div class="row">
@@ -651,7 +665,18 @@
     if (state.savedOnly) p.set("view", "saved"); else if (state.followOnly) p.set("view", "following");
     const url = location.pathname + (p.toString() ? "?" + p : "");
     if (url !== location.pathname + location.search) history.replaceState(null, "", url);
+    phoneSummary();
   }
+  // Nov 16: the phone "Filters" button: how many filters are on + a one-line summary of the view
+  function phoneSummary(){
+    const b = $("fBtn"), sum = $("fSum"); if (!b || !sum) return;
+    const ms = $("majorSel"), majorTxt = state.major !== "all" && ms && ms.selectedOptions[0] ? ms.selectedOptions[0].textContent : "Any major";
+    const where = state.near ? "near " + state.near.q : state.st === "ALL" ? "all of the US" : state.st.join(", ");
+    const n = (state.major !== "all") + (state.near || state.st !== "ALL" ? 1 : 0) + (state.work !== "any") + !!state.cat + !!state.meOnly + (state.savedOnly || state.followOnly ? 1 : 0);
+    b.innerHTML = "Filters" + (n ? ` <b data-noi18n>${n}</b>` : "");
+    sum.textContent = [majorTxt, where, state.work !== "any" ? state.work : ""].filter(Boolean).join(" · ");
+  }
+  document.addEventListener("click", (e) => { if (e.target.closest && e.target.closest("#fBtn")) { const c = document.querySelector(".controls"); const on = !c.classList.contains("fopen"); c.classList.toggle("fopen", on); $("fBtn").setAttribute("aria-expanded", String(on)); } });
   function readUrl(){
     const p = new URLSearchParams(location.search);
     const st = (p.get("state") || "").toUpperCase();
@@ -1053,7 +1078,7 @@
         state.all = rows.slice().sort(order());
         state.loaded = true; state.partial = partial;
         if (state.lastSync) { $("trustText").textContent = `Job boards last re-read ${timeOfDay(state.lastSync)}`; $("trust").hidden = false; }
-        urlReady = true;
+        urlReady = true; phoneSummary(); phoneSummary();
         render();
       };
       const rows = cache.get(qs) || await getAll(qs, (firstRows) => show(firstRows, true));   // newest 1,000 show right away
@@ -1063,7 +1088,7 @@
       state.loaded = true; state.partial = false; state.capped = !!rows.capped;
       if (state.capped && !state.sum) fetch("/api/listings?summary=1").then((r) => r.ok ? r.json() : null).then((d) => { if (d) { state.sum = d; render(); } }).catch(() => {});
       if (state.lastSync) { $("trustText").textContent = `Job boards last re-read ${timeOfDay(state.lastSync)}`; $("trust").hidden = false; }
-      urlReady = true;
+      urlReady = true; phoneSummary();
       render();
     } catch (e) {
       if (seq !== loadSeq) return;
