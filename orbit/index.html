@@ -63,6 +63,8 @@
   .acts{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:10px}.acts .btn{margin-top:0}
   .lnk{font-size:12.5px;color:var(--muted);margin-top:8px;text-decoration:none}.lnk:hover{text-decoration:underline;color:var(--ink)}
   .btn[disabled]{opacity:.6;cursor:default;background:#fff}
+  .nudge{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#F2FADF;border:1px solid #DDF3A8}
+  .nudge p{margin:4px 0 0;font-size:13.5px;color:#334}.nudge .nb{display:flex;gap:8px}
   .p .role{font-size:12px;color:var(--faint);margin-top:2px}
   .want{margin:4px 0 16px;padding:12px;border:1px solid var(--line,#E2E7EF);border-radius:10px}.want .wl{font-weight:600;font-size:13.5px;margin-bottom:8px}
   .chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}.chip{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;background:#F2FADF;color:#2F4A00;border-radius:999px;padding:3px 10px;font-weight:600}
@@ -239,6 +241,7 @@
           </div></div>
       <div class="grid grid2">
         <div>${findBox()}${requests(o)}
+        ${expNudge(m)}
         <section class="card" id="ringList"><h2>${title}</h2><p class="sub">${desc}${ring === "inner" && m.hasSchool ? ` · ${esc(m.major || "")} at ${esc(m.school)}` : ring === "campus" && m.hasSchool ? ` · ${esc(m.school)}` : ""}</p>${ring === "insiders" ? wantBox(o) : ""}${people(sets[ring], empty[ring])}</section></div>
         <aside class="feedcol">
           <section class="card" id="messages"><h2>Messages${o.unread ? `<span class="count">${o.unread}</span>` : ""}</h2><p class="sub">Students in your orbit, plus employers if you turned on “Let employers find me”.</p><div id="threads"><p class="empty">Loading…</p></div></section>
@@ -286,6 +289,16 @@
       box.querySelectorAll("[data-sugg]").forEach((b) => b.onclick = () => add(b.dataset.sugg));
     };
   }
+
+  // Nov 15: Insiders only works if students list where they've been. Students with no experience on their profile get one nudge (dismissable).
+  const NKEY = "btp_exp_nudge";
+  function expNudge(m){
+    if (m.hasExperience || !m.isPublic) return "";
+    try { if (Date.now() - Number(localStorage.getItem(NKEY) || 0) < 14 * 864e5) return ""; } catch {}
+    return `<section class="card nudge" id="expNudge"><div><b>Add your internships and jobs</b><p>Younger students looking at those companies will find you under Insiders, and can ask you how you got in.</p></div>
+      <div class="nb"><a class="btn pri" href="/u/#experience">Add experience</a><button type="button" class="btn" id="expLater">Not now</button></div></section>`;
+  }
+  document.addEventListener("click", (e) => { if (e.target && e.target.id === "expLater") { try { localStorage.setItem(NKEY, String(Date.now())); } catch {} document.getElementById("expNudge")?.remove(); } });
 
   async function refresh(){ if (S.biz) renderBiz(await api({ action: "biz_orbit" })); else render(await api({ action: "orbit", targets: typed() })); }
   // Nov 13: tapping a ring shows it at once, then reloads fresh people for it (new classmates, new requests) and, on phones,

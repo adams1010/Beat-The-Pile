@@ -404,7 +404,7 @@
         <datalist id="degreelist">${["Bachelor's", "Associate", "Master's", "PhD", "Minor", "Certificate", "Study abroad", "Transfer", "High school"].map((x) => `<option value="${x}">`).join("")}</datalist>
         <datalist id="majorlist"></datalist>
       </section>
-      <section class="card"><h2>Experience</h2><p class="small muted" style="margin:-4px 0 10px">Real dates put each role on your career line.</p><div id="exp">${d.p.experience.map((x, i) => { const sp = window.btpTL ? window.btpTL.parseWhen(x.when) : { start: "", end: "" }; const st = x.start || sp.start || "", en = x.end || sp.end || ""; return `
+      <section class="card" id="experience"><h2>Experience</h2><p class="small muted" style="margin:-4px 0 10px">Real dates put each role on your career line.</p><div id="exp">${d.p.experience.map((x, i) => { const sp = window.btpTL ? window.btpTL.parseWhen(x.when) : { start: "", end: "" }; const st = x.start || sp.start || "", en = x.end || sp.end || ""; return `
         <div class="rep"><button class="rm" data-rm="experience" data-i="${i}">Remove</button>
           <div class="row"><div><label>Role</label><input data-list="experience" data-i="${i}" data-f="title" value="${esc(x.title)}" placeholder="Marketing Intern"></div>
           <div><label>Company / team</label><input data-list="experience" data-i="${i}" data-f="org" value="${esc(x.org)}" placeholder="Acme Corp"></div></div>
@@ -783,6 +783,7 @@
       if (home) { const d = home.data || {}; S.kit = d.profile || {}; S.resumes = Array.isArray(d.resumes?.list) ? d.resumes.list : Array.isArray(S.kit.resumes) ? S.kit.resumes : []; }
       load(); remember(); await TL_READY;
       if (location.hash === "#kit") { S.tab = "edit"; editor(); jump("kit"); }
+      else if (location.hash === "#experience") { S.tab = "edit"; editor(); jump("experience"); }   // Nov 15: Orbit's "add your internships" nudge
       else if (location.hash === "#photo") { S.tab = "edit"; editor(); const ph = document.getElementById("f_photo"); if (ph) { ph.closest("div")?.scrollIntoView({ block: "center" }); ph.click(); } }   // Nov 14: "Add a profile photo" links
       else editor();
     }
