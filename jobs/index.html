@@ -213,6 +213,8 @@
   .tourban{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#F2FADF;border:1px solid #DDF3A8;border-radius:10px;padding:10px 14px;margin-top:14px;font-size:15px}
   .tourban span{flex:1 1 220px}.tourban a{background:#4A7000;color:#fff;border-radius:999px;padding:0 18px;min-height:44px;display:inline-flex;align-items:center;font-weight:600;text-decoration:none}
   .tourban button{background:none;border:0;font:inherit;color:#3A4560;min-height:44px;padding:0 8px;cursor:pointer;text-decoration:underline}
+  .shpromo{margin:6px 0 10px;padding:10px 14px;border:1px solid #DDF3A8;background:#F2FADF;border-radius:10px;font-size:14px;color:#2B3446}
+  .shpromo .linkbtn{font-weight:600;color:#4A7000}
 </style>
 </head>
 <body>
@@ -280,6 +282,7 @@
       <button class="chip" id="followOnly" aria-pressed="false" title="Companies you follow with ☆, you get flagged when they post">Following <span id="followN"></span></button>
     </div>
     <div class="count" id="count" aria-live="polite"></div>
+    <div class="shpromo" id="shPromo" hidden></div>
     <div class="note" id="note"></div>
   </div>
       <div id="alert"></div>
@@ -551,6 +554,12 @@
         (state.savedOnly || state.followOnly ? "" : ` · ${MAJOR_LABEL()}`) + (simRows.length ? ` · plus ${simRows.length} similar` : "") + (relRows.length ? ` · ${relRows.length.toLocaleString("en-US")} more ${window.btpCats?.CAT?.[state.relCat]?.label || ""} jobs below` : "") + (state.partial && !state.savedOnly && !state.followOnly ? " so far · loading the rest…" : "")
       : simRows.length ? `${simRows.length} similar ${state.kind === "intern" ? "internship" : "job"}${simRows.length === 1 ? "" : "s"} ${where}` : "";
 
+    // Nov 15 pm: point people at Shadowing & volunteer (see a job up close, often unpaid) once there are enough to browse
+    const nSh = state.sum?.shadow || 0, shp = $("shPromo");
+    if (shp) { const show = nSh >= 20 && (state.kind === "intern" || state.kind === "fulltime") && !state.savedOnly && !state.followOnly && !state.company;
+      shp.hidden = !show;
+      if (show) { shp.innerHTML = `<b>Not sure yet?</b> See the job up close first: ${nSh.toLocaleString("en-US")} shadowing & volunteer spots, many unpaid. <button type="button" class="linkbtn" id="shGo">See them</button>`;
+        $("shGo").onclick = () => document.querySelector('[data-kind="shadow"]')?.click(); } }
     renderMailme(rows.length);
     const allMaj = state.major !== "all" && !state.savedOnly && !state.followOnly && !state.company;
     const widen = allMaj ? ` <button class="linkbtn" id="qAllMaj">Search every major</button>` : "";

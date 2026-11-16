@@ -1747,410 +1747,113 @@
   "Up next": "Hierna",
   "Find openings": "Vacatures zoeken",
   "Companies": "Bedrijven",
-  "What's next": "Wat komt er"
+  "What's next": "Wat komt er",
+  "Not sure yet?": "Nog niet zeker?",
+  "See them": "Bekijken"
  },
  "patterns": [
   ["^(.+) career fair page ↗$", "Banenbeurspagina van $1 ↗"],
   ["^See everything \\((\\d+) chapters\\)$", "Alles bekijken ($1 hoofdstukken)"],
-  [
-   "^([\\d,]+) open jobs from ([\\d,]+) company job boards$",
-   "$1 open vacatures van $2 vacaturesites van bedrijven"
-  ],
-  [
-   "^([\\d,]+) open jobs from ([\\d,]+) company job boards, last checked (.+)$",
-   "$1 open vacatures van $2 vacaturesites van bedrijven, laatst bekeken $3"
-  ],
-  [
-   "^([\\d,]+) open jobs across the US · newest ([\\d,]+) shown\\. Pick a state or search to see the rest$",
-   "$1 open vacatures in de VS · de nieuwste $2 worden getoond. Kies een staat of zoek om de rest te zien"
-  ],
-  [
-   "^Show ([\\d,]+) more \\(([\\d,]+) left\\)$",
-   "Nog $1 tonen ($2 over)"
-  ],
-  [
-   "^([\\d,]+) full-time jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
-   "$1 fulltime banen bij $2 bedrijven$3"
-  ],
-  [
-   "^([\\d,]+) jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
-   "$1 banen bij $2 bedrijven$3"
-  ],
-  [
-   "^Found (today|yesterday|\\d+ days? ago) \\(posting date not shown by employer\\)$",
-   "Gevonden $1 (werkgever toont geen datum)"
-  ],
-  [
-   "^(\\d+) days? ago$",
-   "$1 dagen geleden"
-  ],
-  [
-   "^Posted ~(.+)$",
-   "Geplaatst ~$1"
-  ],
-  [
-   "^Posted (.+)$",
-   "Geplaatst $1"
-  ],
-  [
-   "^☆ Follow (.+)$",
-   "☆ $1 volgen"
-  ],
-  [
-   "^New (.+) internships (.+), once a week\\. Only when there's something new\\.$",
-   "Nieuwe stages ($1) $2, eens per week. Alleen als er iets nieuws is."
-  ],
-  [
-   "^in ([A-Z]{2}(?: & [A-Z]{2})*)$",
-   "in $1"
-  ],
-  [
-   "^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies) (.+) · (.+) · plus ([\\d,]+) similar$",
-   "$1 stages bij $2 bedrijven $3 · $4 · plus $5 vergelijkbare"
-  ],
-  [
-   "^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies) across the US · every major$",
-   "$1 stages bij $2 bedrijven in de VS · elke studierichting"
-  ],
-  [
-   "^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies) across the US$",
-   "$1 stages bij $2 bedrijven in de VS"
-  ],
-  [
-   "^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies)(.*)$",
-   "$1 stages bij $2 bedrijven$3"
-  ],
-  [
-   "^([\\d,]+) open$",
-   "$1 open"
-  ],
-  [
-   "^([\\d,]+) internships?$",
-   "$1 stages"
-  ],
-  [
-   "^([\\d,]+) internships? · ([\\d,]+) in your major$",
-   "$1 stages · $2 in je richting"
-  ],
-  [
-   "^([\\d,]+) employers$",
-   "$1 werkgevers"
-  ],
-  [
-   "^booth numbers for ([\\d,]+)$",
-   "standnummers voor $1"
-  ],
-  [
-   "^booth numbers not published yet$",
-   "standnummers nog niet gepubliceerd"
-  ],
-  [
-   "^employer list not posted yet$",
-   "lijst met werkgevers nog niet gepubliceerd"
-  ],
-  [
-   "^All ([\\d,]+)$",
-   "Alle $1"
-  ],
-  [
-   "^★ My plan ([\\d,]+)$",
-   "★ Mijn plan $1"
-  ],
-  [
-   "^Open internships ([\\d,]+)$",
-   "Openstaande stages $1"
-  ],
-  [
-   "^Talked to ([\\d,]+)$",
-   "Gesproken met $1"
-  ],
-  [
-   "^(.+) · Spring (\\d{4})$",
-   "$1 · Voorjaar $2"
-  ],
-  [
-   "^(.+) · Fall (\\d{4})$",
-   "$1 · Najaar $2"
-  ],
-  [
-   "^Spring (\\d{4})$",
-   "Voorjaar $1"
-  ],
-  [
-   "^Fall (\\d{4})$",
-   "Najaar $1"
-  ],
-  [
-   "^today$",
-   "vandaag"
-  ],
-  [
-   "^yesterday$",
-   "gisteren"
-  ],
-  [
-   "^New internship · (.+)$",
-   "Nieuwe stage · $1"
-  ],
-  [
-   "^Also at (.+)$",
-   "Ook bij $1"
-  ],
-  [
-   "^Students at (.+) studying (.+) who made their profile public\\.$",
-   "Studenten van $1 die $2 studeren met een openbaar profiel."
-  ],
-  [
-   "^Major: (.+) \\(change it above\\)\\.$",
-   "Studierichting: $1 (wijzig hierboven)."
-  ],
-  [
-   "^every major$",
-   "elke studierichting"
-  ],
-  [
-   "^([\\d,]+) students? found$",
-   "$1 studenten gevonden"
-  ],
-  [
-   "^(\\d+) steps? to go\\. Complete profiles get found in Orbit and by employers\\.$",
-   "Nog $1 stappen. Volledige profielen worden gevonden in Orbit en door werkgevers."
-  ],
-  [
-   "^New opening · (.+)$",
-   "Nieuwe vacature · $1"
-  ],
-  [
-   "^([\\d,]+) going$",
-   "$1 gaan"
-  ],
-  [
-   "^Show more \\(([\\d,]+) left\\)$",
-   "Meer tonen (nog $1)"
-  ],
-  [
-   "^(.+) wants to join your orbit$",
-   "$1 wil in je orbit komen"
-  ],
-  [
-   "^([\\d,]+) words read$",
-   "$1 woorden gelezen"
-  ],
-  [
-   "^Show within (\\d+) mi$",
-   "Toon binnen $1 mijl"
-  ],
-  [
-   "^Following (.+)$",
-   "Volgen $1"
-  ],
-  [
-   "^(.+)'s orbit$",
-   "Orbit van $1"
-  ],
-  [
-   "^Message (.+)$",
-   "Bericht aan $1"
-  ],
-  [
-   "^([\\d,]+) employees$",
-   "$1 medewerkers"
-  ],
-  [
-   "^Work email confirmed · (.+)$",
-   "Werkmail bevestigd · $1"
-  ],
-  [
-   "^Code sent to (.+)$",
-   "Code verstuurd naar $1"
-  ],
-  [
-   "^(.+), Beat the Pile$",
-   "$1, Beat the Pile"
-  ],
-  [
-   "^Filled in (.+)\\. Check it over, then tap Save profile\\.$",
-   "Ingevuld: $1. Controleer het en tik op Profiel opslaan."
-  ],
-  [
-   "^([\\d,]+) more applications? to hit this week's goal$",
-   "Nog $1 sollicitaties om je weekdoel te halen"
-  ],
-  [
-   "^(\\d+)/week$",
-   "$1/week"
-  ],
-  [
-   "^\\. Only (\\d+%) opened later \\(([\\d,]+) companies compared, from the opening history below\\)\\.$",
-   ". Slechts $1 opende later ($2 bedrijven vergeleken, uit de geschiedenis hieronder)."
-  ],
-  [
-   "^([\\d,]+) companies haven't posted (.+) internships yet\\. Here's when they usually do\\.$",
-   "$1 bedrijven hebben nog geen stages voor $2 geplaatst. Zo doen ze het meestal."
-  ],
-  [
-   "^means we see internships on their job board today\\. Updated (.+)\\.$",
-   "betekent dat we vandaag stages op hun vacaturesite zien. Bijgewerkt op $1."
-  ],
-  [
-   "^(\\d+) of (\\d+) done · the dot marks where you are now$",
-   "$1 van $2 klaar · de stip laat zien waar je nu bent"
-  ],
-  [
-   "^week of (\\d+)$",
-   "week van $1"
-  ],
-  [
-   "^Week of (.+)$",
-   "Week van $1"
-  ],
-  [
-   "^From (.+)'s own job board and website\\.$",
-   "Van de eigen vacaturesite en website van $1."
-  ],
-  [
-   "^We don't track (.+)'s job board yet, so we can't write a brief\\. Check their website and news, and ask your manager what to read\\.$",
-   "We volgen de vacaturesite van $1 nog niet, dus we kunnen geen overzicht schrijven. Bekijk hun website en nieuws, en vraag je manager wat je kunt lezen."
-  ],
-  [
-   "^([\\d,]+) of ([\\d,]+) founding spots left\\.?$",
-   "Nog $1 van $2 oprichtersplekken vrij"
-  ],
-  [
-   "^The first (\\d+) students keep every Pro feature free, for life\\.$",
-   "De eerste $1 studenten houden alle Pro-functies gratis, voor altijd."
-  ],
-  [
-   "^Founding member #(\\d+)$",
-   "Oprichtend lid #$1"
-  ],
-  [
-   "^No exact matches for “(.+)”$",
-   "Geen exacte resultaten voor ‘$1’"
-  ],
-  [
-   "^([\\d,]+) similar (?:internships?|jobs?) (.+)$",
-   "$1 vergelijkbare functies $2"
-  ],
-  [
-   "^([\\d,]+) company job boards, last checked (.+)$",
-   "$1 vacaturesites van bedrijven, laatst gecontroleerd $2"
-  ],
-  [
-   "^([\\d,]+) company job boards$",
-   "$1 vacaturesites van bedrijven"
-  ],
-  [
-   "^Showing results for “(.+)”$",
-   "Resultaten voor ‘$1’"
-  ],
-  [
-   "^You typed “(.+)”\\.$",
-   "Je typte ‘$1’."
-  ],
-  [
-   "^Searched every major, (.+) had only a few matches\\.$",
-   "In alle studies gezocht: $1 had maar weinig resultaten."
-  ],
-  [
-   "^([\\d,]+) jobs and internships on the map$",
-   "$1 vacatures en stages op de kaart"
-  ],
-  [
-   "^([\\d,]+) majors offered there \\(US Dept\\. of Education data\\)\\.$",
-   "$1 studies aangeboden (gegevens van het Amerikaanse ministerie van Onderwijs)."
-  ],
-  [
-   "^(Spring|Summer|Fall|Winter) (\\d{4})$",
-   "$1 $2"
-  ],
-  [
-   "^Not listed, use “(.+)”$",
-   "Staat er niet bij, gebruik “$1”"
-  ],
-  [
-   "^Faculty & staff · (.+)$",
-   "Docenten & medewerkers · $1"
-  ],
-  [
-   "^Start practice with (.+) →$",
-   "Oefenen met $1 starten →"
-  ],
-  [
-   "^(\\d+) mi away$",
-   "$1 mi verderop"
-  ],
-  [
-   "^Search (\\d+) miles$",
-   "Zoeken binnen $1 mijl"
-  ],
-  [
-   "^Join (\\d+) people's orbits$",
-   "Sluit je aan bij de baan van $1 mensen"
-  ],
-  [
-   "^© (\\d{4}) CuzzoCore LLC\\. Beat the Pile is a service of CuzzoCore LLC\\. Job listings come from each employer's own job board\\. Company names and logos belong to their owners\\.$",
-   "© $1 CuzzoCore LLC. Beat the Pile is een dienst van CuzzoCore LLC. Vacatures komen van de eigen vacaturesite van elke werkgever. Bedrijfsnamen en logo's zijn van hun eigenaars."
-  ],
-  [
-   "^([\\d,]+) entry-level jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
-   "$1 startersbanen bij $2 bedrijven$3"
-  ],
-  [
-   "^([\\d,]+) part-time & hourly jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
-   "$1 parttime- en uurbanen bij $2 bedrijven$3"
-  ],
-  [
-   "^Searched every job type, (.+) had only a few matches\\.$",
-   "Alle soorten banen doorzocht, $1 had maar een paar resultaten."
-  ],
-  [
-   "^([\\d,]+) internships$",
-   "$1 stages"
-  ],
-  [
-   "^([\\d,]+) entry-level$",
-   "$1 startersbanen"
-  ],
-  [
-   "^([\\d,]+) part-time$",
-   "$1 bijbanen"
-  ],
-  [
-   "^([\\d,]+) companies$",
-   "$1 bedrijven"
-  ],
-  [
-   "^More (.+) jobs (.+)$",
-   "Meer $1-vacatures $2"
-  ],
-  [
-   "^([\\d,]+) more in the same area of work\\.$",
-   "$1 meer in hetzelfde vakgebied."
-  ],
-  [
-   "^([\\d,]+) more (.+) jobs below$",
-   "$1 meer $2-vacatures hieronder"
-  ],
-  [
-   "^([\\d,]+) drops?$",
-   "$1 nieuw"
-  ],
-  [
-   "^(.+) just dropped ([\\d,]+) roles$",
-   "$1 heeft net $2 vacatures geplaatst"
-  ],
-  [
-   "^See all ([\\d,]+) at (.+)$",
-   "Bekijk alle $1 bij $2"
-  ],
-  [
-   "^([\\d,]+) new drops?, show$",
-   "$1 nieuw, tonen"
-  ],
-  [
-   "^(\\d+) (min|h|d) ago$",
-   "$1 $2 geleden"
-  ]
+  ["^([\\d,]+) open jobs from ([\\d,]+) company job boards$", "$1 open vacatures van $2 vacaturesites van bedrijven"],
+  ["^([\\d,]+) open jobs from ([\\d,]+) company job boards, last checked (.+)$", "$1 open vacatures van $2 vacaturesites van bedrijven, laatst bekeken $3"],
+  ["^([\\d,]+) open jobs across the US · newest ([\\d,]+) shown\\. Pick a state or search to see the rest$", "$1 open vacatures in de VS · de nieuwste $2 worden getoond. Kies een staat of zoek om de rest te zien"],
+  ["^Show ([\\d,]+) more \\(([\\d,]+) left\\)$", "Nog $1 tonen ($2 over)"],
+  ["^([\\d,]+) full-time jobs? at ([\\d,]+) compan(?:y|ies)(.*)$", "$1 fulltime banen bij $2 bedrijven$3"],
+  ["^([\\d,]+) jobs? at ([\\d,]+) compan(?:y|ies)(.*)$", "$1 banen bij $2 bedrijven$3"],
+  ["^Found (today|yesterday|\\d+ days? ago) \\(posting date not shown by employer\\)$", "Gevonden $1 (werkgever toont geen datum)"],
+  ["^(\\d+) days? ago$", "$1 dagen geleden"],
+  ["^Posted ~(.+)$", "Geplaatst ~$1"],
+  ["^Posted (.+)$", "Geplaatst $1"],
+  ["^☆ Follow (.+)$", "☆ $1 volgen"],
+  ["^New (.+) internships (.+), once a week\\. Only when there's something new\\.$", "Nieuwe stages ($1) $2, eens per week. Alleen als er iets nieuws is."],
+  ["^in ([A-Z]{2}(?: & [A-Z]{2})*)$", "in $1"],
+  ["^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies) (.+) · (.+) · plus ([\\d,]+) similar$", "$1 stages bij $2 bedrijven $3 · $4 · plus $5 vergelijkbare"],
+  ["^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies) across the US · every major$", "$1 stages bij $2 bedrijven in de VS · elke studierichting"],
+  ["^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies) across the US$", "$1 stages bij $2 bedrijven in de VS"],
+  ["^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies)(.*)$", "$1 stages bij $2 bedrijven$3"],
+  ["^([\\d,]+) open$", "$1 open"],
+  ["^([\\d,]+) internships?$", "$1 stages"],
+  ["^([\\d,]+) internships? · ([\\d,]+) in your major$", "$1 stages · $2 in je richting"],
+  ["^([\\d,]+) employers$", "$1 werkgevers"],
+  ["^booth numbers for ([\\d,]+)$", "standnummers voor $1"],
+  ["^booth numbers not published yet$", "standnummers nog niet gepubliceerd"],
+  ["^employer list not posted yet$", "lijst met werkgevers nog niet gepubliceerd"],
+  ["^All ([\\d,]+)$", "Alle $1"],
+  ["^★ My plan ([\\d,]+)$", "★ Mijn plan $1"],
+  ["^Open internships ([\\d,]+)$", "Openstaande stages $1"],
+  ["^Talked to ([\\d,]+)$", "Gesproken met $1"],
+  ["^(.+) · Spring (\\d{4})$", "$1 · Voorjaar $2"],
+  ["^(.+) · Fall (\\d{4})$", "$1 · Najaar $2"],
+  ["^Spring (\\d{4})$", "Voorjaar $1"],
+  ["^Fall (\\d{4})$", "Najaar $1"],
+  ["^today$", "vandaag"],
+  ["^yesterday$", "gisteren"],
+  ["^New internship · (.+)$", "Nieuwe stage · $1"],
+  ["^Also at (.+)$", "Ook bij $1"],
+  ["^Students at (.+) studying (.+) who made their profile public\\.$", "Studenten van $1 die $2 studeren met een openbaar profiel."],
+  ["^Major: (.+) \\(change it above\\)\\.$", "Studierichting: $1 (wijzig hierboven)."],
+  ["^every major$", "elke studierichting"],
+  ["^([\\d,]+) students? found$", "$1 studenten gevonden"],
+  ["^(\\d+) steps? to go\\. Complete profiles get found in Orbit and by employers\\.$", "Nog $1 stappen. Volledige profielen worden gevonden in Orbit en door werkgevers."],
+  ["^New opening · (.+)$", "Nieuwe vacature · $1"],
+  ["^([\\d,]+) going$", "$1 gaan"],
+  ["^Show more \\(([\\d,]+) left\\)$", "Meer tonen (nog $1)"],
+  ["^(.+) wants to join your orbit$", "$1 wil in je orbit komen"],
+  ["^([\\d,]+) words read$", "$1 woorden gelezen"],
+  ["^Show within (\\d+) mi$", "Toon binnen $1 mijl"],
+  ["^Following (.+)$", "Volgen $1"],
+  ["^(.+)'s orbit$", "Orbit van $1"],
+  ["^Message (.+)$", "Bericht aan $1"],
+  ["^([\\d,]+) employees$", "$1 medewerkers"],
+  ["^Work email confirmed · (.+)$", "Werkmail bevestigd · $1"],
+  ["^Code sent to (.+)$", "Code verstuurd naar $1"],
+  ["^(.+), Beat the Pile$", "$1, Beat the Pile"],
+  ["^Filled in (.+)\\. Check it over, then tap Save profile\\.$", "Ingevuld: $1. Controleer het en tik op Profiel opslaan."],
+  ["^([\\d,]+) more applications? to hit this week's goal$", "Nog $1 sollicitaties om je weekdoel te halen"],
+  ["^(\\d+)/week$", "$1/week"],
+  ["^\\. Only (\\d+%) opened later \\(([\\d,]+) companies compared, from the opening history below\\)\\.$", ". Slechts $1 opende later ($2 bedrijven vergeleken, uit de geschiedenis hieronder)."],
+  ["^([\\d,]+) companies haven't posted (.+) internships yet\\. Here's when they usually do\\.$", "$1 bedrijven hebben nog geen stages voor $2 geplaatst. Zo doen ze het meestal."],
+  ["^means we see internships on their job board today\\. Updated (.+)\\.$", "betekent dat we vandaag stages op hun vacaturesite zien. Bijgewerkt op $1."],
+  ["^(\\d+) of (\\d+) done · the dot marks where you are now$", "$1 van $2 klaar · de stip laat zien waar je nu bent"],
+  ["^week of (\\d+)$", "week van $1"],
+  ["^Week of (.+)$", "Week van $1"],
+  ["^From (.+)'s own job board and website\\.$", "Van de eigen vacaturesite en website van $1."],
+  ["^We don't track (.+)'s job board yet, so we can't write a brief\\. Check their website and news, and ask your manager what to read\\.$", "We volgen de vacaturesite van $1 nog niet, dus we kunnen geen overzicht schrijven. Bekijk hun website en nieuws, en vraag je manager wat je kunt lezen."],
+  ["^([\\d,]+) of ([\\d,]+) founding spots left\\.?$", "Nog $1 van $2 oprichtersplekken vrij"],
+  ["^The first (\\d+) students keep every Pro feature free, for life\\.$", "De eerste $1 studenten houden alle Pro-functies gratis, voor altijd."],
+  ["^Founding member #(\\d+)$", "Oprichtend lid #$1"],
+  ["^No exact matches for “(.+)”$", "Geen exacte resultaten voor ‘$1’"],
+  ["^([\\d,]+) similar (?:internships?|jobs?) (.+)$", "$1 vergelijkbare functies $2"],
+  ["^([\\d,]+) company job boards, last checked (.+)$", "$1 vacaturesites van bedrijven, laatst gecontroleerd $2"],
+  ["^([\\d,]+) company job boards$", "$1 vacaturesites van bedrijven"],
+  ["^Showing results for “(.+)”$", "Resultaten voor ‘$1’"],
+  ["^You typed “(.+)”\\.$", "Je typte ‘$1’."],
+  ["^Searched every major, (.+) had only a few matches\\.$", "In alle studies gezocht: $1 had maar weinig resultaten."],
+  ["^([\\d,]+) jobs and internships on the map$", "$1 vacatures en stages op de kaart"],
+  ["^([\\d,]+) majors offered there \\(US Dept\\. of Education data\\)\\.$", "$1 studies aangeboden (gegevens van het Amerikaanse ministerie van Onderwijs)."],
+  ["^(Spring|Summer|Fall|Winter) (\\d{4})$", "$1 $2"],
+  ["^Not listed, use “(.+)”$", "Staat er niet bij, gebruik “$1”"],
+  ["^Faculty & staff · (.+)$", "Docenten & medewerkers · $1"],
+  ["^Start practice with (.+) →$", "Oefenen met $1 starten →"],
+  ["^(\\d+) mi away$", "$1 mi verderop"],
+  ["^Search (\\d+) miles$", "Zoeken binnen $1 mijl"],
+  ["^Join (\\d+) people's orbits$", "Sluit je aan bij de baan van $1 mensen"],
+  ["^© (\\d{4}) CuzzoCore LLC\\. Beat the Pile is a service of CuzzoCore LLC\\. Job listings come from each employer's own job board\\. Company names and logos belong to their owners\\.$", "© $1 CuzzoCore LLC. Beat the Pile is een dienst van CuzzoCore LLC. Vacatures komen van de eigen vacaturesite van elke werkgever. Bedrijfsnamen en logo's zijn van hun eigenaars."],
+  ["^([\\d,]+) entry-level jobs? at ([\\d,]+) compan(?:y|ies)(.*)$", "$1 startersbanen bij $2 bedrijven$3"],
+  ["^([\\d,]+) part-time & hourly jobs? at ([\\d,]+) compan(?:y|ies)(.*)$", "$1 parttime- en uurbanen bij $2 bedrijven$3"],
+  ["^Searched every job type, (.+) had only a few matches\\.$", "Alle soorten banen doorzocht, $1 had maar een paar resultaten."],
+  ["^([\\d,]+) internships$", "$1 stages"],
+  ["^([\\d,]+) entry-level$", "$1 startersbanen"],
+  ["^([\\d,]+) part-time$", "$1 bijbanen"],
+  ["^([\\d,]+) companies$", "$1 bedrijven"],
+  ["^More (.+) jobs (.+)$", "Meer $1-vacatures $2"],
+  ["^([\\d,]+) more in the same area of work\\.$", "$1 meer in hetzelfde vakgebied."],
+  ["^([\\d,]+) more (.+) jobs below$", "$1 meer $2-vacatures hieronder"],
+  ["^([\\d,]+) drops?$", "$1 nieuw"],
+  ["^(.+) just dropped ([\\d,]+) roles$", "$1 heeft net $2 vacatures geplaatst"],
+  ["^See all ([\\d,]+) at (.+)$", "Bekijk alle $1 bij $2"],
+  ["^([\\d,]+) new drops?, show$", "$1 nieuw, tonen"],
+  ["^(\\d+) (min|h|d) ago$", "$1 $2 geleden"],
+  ["^See the job up close first: ([\\d,]+) shadowing & volunteer spots, many unpaid\\.$", "Bekijk het werk eerst van dichtbij: $1 meeloop- en vrijwilligersplekken, veel onbetaald."]
  ]
 }

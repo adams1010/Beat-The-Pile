@@ -1,7 +1,7 @@
 {
 "built": "2026-11-15",
-"why": "Big employers that hire for entry-level and part-time jobs (hospital systems, banks, insurers, schools, retailers, restaurants, hotels; since Nov 15 also golf courses, resorts, parks, childcare, pet care) \u2014 the finder proves each board before anything goes live",
-"count": 570,
+"why": "Big employers that hire for entry-level and part-time jobs (hospital systems, banks, insurers, schools, retailers, restaurants, hotels; since Nov 15 also golf courses, resorts, parks, childcare, pet care) — the finder proves each board before anything goes live",
+"count": 601,
 "companies": [
 {
 "company": "Athletico Physical Therapy",
@@ -2852,6 +2852,161 @@
 "company": "College Hunks Hauling Junk",
 "domain": "collegehunkshaulingjunk.com",
 "priority": 60
+},
+{
+"company": "Landscapes Golf Management",
+"domain": "landscapesgolf.com",
+"priority": 45
+},
+{
+"company": "Escalante Golf",
+"domain": "escalantegolf.com",
+"priority": 45
+},
+{
+"company": "Heritage Golf Group",
+"domain": "heritagegolfgroup.com",
+"priority": 45
+},
+{
+"company": "Kiawah Island Golf Resort",
+"domain": "kiawahresort.com",
+"priority": 45
+},
+{
+"company": "Sea Island",
+"domain": "seaisland.com",
+"priority": 45
+},
+{
+"company": "Omni Hotels & Resorts",
+"domain": "omnihotels.com",
+"priority": 45
+},
+{
+"company": "Four Seasons",
+"domain": "fourseasons.com",
+"priority": 45
+},
+{
+"company": "ASM Global",
+"domain": "asmglobal.com",
+"priority": 45
+},
+{
+"company": "AEG",
+"domain": "aegworldwide.com",
+"priority": 45
+},
+{
+"company": "Ticketmaster",
+"domain": "ticketmaster.com",
+"priority": 45
+},
+{
+"company": "Round1 Bowling & Amusement",
+"domain": "round1usa.com",
+"priority": 45
+},
+{
+"company": "Cinemark",
+"domain": "cinemark.com",
+"priority": 45
+},
+{
+"company": "Patagonia",
+"domain": "patagonia.com",
+"priority": 45
+},
+{
+"company": "iD Tech",
+"domain": "idtech.com",
+"priority": 45
+},
+{
+"company": "Code Ninjas",
+"domain": "codeninjas.com",
+"priority": 45
+},
+{
+"company": "Girl Scouts of the USA",
+"domain": "girlscouts.org",
+"priority": 45
+},
+{
+"company": "Outward Bound",
+"domain": "outwardbound.org",
+"priority": 45
+},
+{
+"company": "NOLS",
+"domain": "nols.edu",
+"priority": 45
+},
+{
+"company": "Student Conservation Association",
+"domain": "thesca.org",
+"priority": 45
+},
+{
+"company": "Habitat for Humanity",
+"domain": "habitat.org",
+"priority": 45
+},
+{
+"company": "Best Friends Animal Society",
+"domain": "bestfriends.org",
+"priority": 45
+},
+{
+"company": "The Little Gym",
+"domain": "thelittlegym.com",
+"priority": 45
+},
+{
+"company": "Bass Pro Shops",
+"domain": "basspro.com",
+"priority": 45
+},
+{
+"company": "Golf Galaxy",
+"domain": "golfgalaxy.com",
+"priority": 45
+},
+{
+"company": "Callaway",
+"domain": "callawaygolf.com",
+"priority": 45
+},
+{
+"company": "Acushnet",
+"domain": "acushnetcompany.com",
+"priority": 45
+},
+{
+"company": "Smithsonian Institution",
+"domain": "si.edu",
+"priority": 45
+},
+{
+"company": "The Walt Disney Company",
+"domain": "disney.com",
+"priority": 45
+},
+{
+"company": "Merlin Entertainments",
+"domain": "merlinentertainments.biz",
+"priority": 45
+},
+{
+"company": "The Princeton Review",
+"domain": "princetonreview.com",
+"priority": 45
+},
+{
+"company": "Kaplan",
+"domain": "kaplan.com",
+"priority": 45
 }
 ]
 }

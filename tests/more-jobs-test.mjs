@@ -53,4 +53,15 @@ const { fetchCompany } = await import("../lib/fetchers/index.js");
 const { listings } = await fetchCompany({ id: "g-test", ats: "greenhouse", token: "test", company: "Test Co" });
 const kinds = Object.fromEntries(listings.map((l) => [l.title, l.kind]));
 assert.deepEqual(kinds, { "Caddie": "hourly", "Job Shadow - Physical Therapy": "shadow", "Software Engineer Intern": "intern" }, "kept with the right kind; staff jobs dropped");
+// Nov 15 pm: more part-time, apprenticeships, more ways to shadow
+const more = { "Test Proctor": "education_social", "Library Page": "education_social", "Dance Instructor": "education_social", "Poll Worker": "legal_policy",
+  "Canvasser": "legal_policy", "Stagehand": "marketing", "Production Assistant": "marketing", "Box Office Associate": "hospitality", "Skate Guard": "hospitality",
+  "Climbing Wall Attendant": "hospitality", "Raft Guide": "hospitality", "Spa Attendant": "hospitality", "Barback": "hospitality", "Farm Hand": "science_health",
+  "Barn Hand": "science_health", "Wildland Firefighter": "legal_policy" };
+for (const [t, f] of Object.entries(more)) { assert.equal(kindOf(t), "hourly", "part-time: " + t); assert.equal(fieldOf(t), f, "area: " + t); }
+for (const t of ["Lead Stagehand", "Production Assistant Manager", "Park Ranger Supervisor"]) assert.notEqual(kindOf(t), "hourly", "not part-time: " + t);
+for (const t of ["Electrician Apprentice", "Apprentice Plumber", "Apprenticeship Program"]) assert.equal(kindOf(t), "fulltime", "apprentice = entry-level: " + t);
+assert.equal(kindOf("Senior Electrician Apprentice"), null);
+for (const t of ["Junior Volunteer", "Teen Volunteer", "Student Observer", "Police Explorer Program", "Ride Along", "Docent", "Pre-Apprenticeship Program", "Mentorship Program"]) assert.equal(kindOf(t), "shadow", "shadow: " + t);
+assert.ok(EARLY_QUERIES.includes("apprentice") && EARLY_QUERIES.includes("observer"));
 console.log("✓ more jobs: golf, recreation, childcare, pets (part-time) + Shadowing & volunteer kind, categories, sync keeps them");

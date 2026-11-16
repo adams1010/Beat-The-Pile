@@ -1747,410 +1747,113 @@
   "Up next": "À venir",
   "Find openings": "Trouver des offres",
   "Companies": "Entreprises",
-  "What's next": "La suite"
+  "What's next": "La suite",
+  "Not sure yet?": "Pas encore sûr ?",
+  "See them": "Les voir"
  },
  "patterns": [
   ["^(.+) career fair page ↗$", "Page des salons de $1 ↗"],
   ["^See everything \\((\\d+) chapters\\)$", "Tout voir ($1 chapitres)"],
-  [
-   "^([\\d,]+) open jobs from ([\\d,]+) company job boards$",
-   "$1 offres ouvertes issues de $2 sites carrières d'entreprises"
-  ],
-  [
-   "^([\\d,]+) open jobs from ([\\d,]+) company job boards, last checked (.+)$",
-   "$1 offres ouvertes issues de $2 sites carrières d'entreprises, vérifiés $3"
-  ],
-  [
-   "^([\\d,]+) open jobs across the US · newest ([\\d,]+) shown\\. Pick a state or search to see the rest$",
-   "$1 offres ouvertes aux États-Unis · les $2 plus récentes sont affichées. Choisissez un État ou cherchez pour voir le reste"
-  ],
-  [
-   "^Show ([\\d,]+) more \\(([\\d,]+) left\\)$",
-   "Afficher $1 de plus ($2 restants)"
-  ],
-  [
-   "^([\\d,]+) full-time jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
-   "$1 emplois à temps plein dans $2 entreprises$3"
-  ],
-  [
-   "^([\\d,]+) jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
-   "$1 emplois dans $2 entreprises$3"
-  ],
-  [
-   "^Found (today|yesterday|\\d+ days? ago) \\(posting date not shown by employer\\)$",
-   "Trouvée $1 (date non affichée par l'employeur)"
-  ],
-  [
-   "^(\\d+) days? ago$",
-   "il y a $1 jours"
-  ],
-  [
-   "^Posted ~(.+)$",
-   "Publiée ~$1"
-  ],
-  [
-   "^Posted (.+)$",
-   "Publiée $1"
-  ],
-  [
-   "^☆ Follow (.+)$",
-   "☆ Suivre $1"
-  ],
-  [
-   "^New (.+) internships (.+), once a week\\. Only when there's something new\\.$",
-   "Nouveaux stages ($1) $2, une fois par semaine. Seulement s'il y a du neuf."
-  ],
-  [
-   "^in ([A-Z]{2}(?: & [A-Z]{2})*)$",
-   "en $1"
-  ],
-  [
-   "^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies) (.+) · (.+) · plus ([\\d,]+) similar$",
-   "$1 stages dans $2 entreprises $3 · $4 · plus $5 similaires"
-  ],
-  [
-   "^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies) across the US · every major$",
-   "$1 stages dans $2 entreprises aux États-Unis · toutes filières"
-  ],
-  [
-   "^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies) across the US$",
-   "$1 stages dans $2 entreprises aux États-Unis"
-  ],
-  [
-   "^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies)(.*)$",
-   "$1 stages dans $2 entreprises$3"
-  ],
-  [
-   "^([\\d,]+) open$",
-   "$1 ouverts"
-  ],
-  [
-   "^([\\d,]+) internships?$",
-   "$1 stages"
-  ],
-  [
-   "^([\\d,]+) internships? · ([\\d,]+) in your major$",
-   "$1 stages · $2 dans votre filière"
-  ],
-  [
-   "^([\\d,]+) employers$",
-   "$1 employeurs"
-  ],
-  [
-   "^booth numbers for ([\\d,]+)$",
-   "numéros de stand pour $1"
-  ],
-  [
-   "^booth numbers not published yet$",
-   "numéros de stand pas encore publiés"
-  ],
-  [
-   "^employer list not posted yet$",
-   "liste des employeurs pas encore publiée"
-  ],
-  [
-   "^All ([\\d,]+)$",
-   "Tous $1"
-  ],
-  [
-   "^★ My plan ([\\d,]+)$",
-   "★ Mon plan $1"
-  ],
-  [
-   "^Open internships ([\\d,]+)$",
-   "Stages ouverts $1"
-  ],
-  [
-   "^Talked to ([\\d,]+)$",
-   "Discuté avec $1"
-  ],
-  [
-   "^(.+) · Spring (\\d{4})$",
-   "$1 · Printemps $2"
-  ],
-  [
-   "^(.+) · Fall (\\d{4})$",
-   "$1 · Automne $2"
-  ],
-  [
-   "^Spring (\\d{4})$",
-   "Printemps $1"
-  ],
-  [
-   "^Fall (\\d{4})$",
-   "Automne $1"
-  ],
-  [
-   "^today$",
-   "aujourd'hui"
-  ],
-  [
-   "^yesterday$",
-   "hier"
-  ],
-  [
-   "^New internship · (.+)$",
-   "Nouveau stage · $1"
-  ],
-  [
-   "^Also at (.+)$",
-   "Aussi chez $1"
-  ],
-  [
-   "^Students at (.+) studying (.+) who made their profile public\\.$",
-   "Étudiants de $1 en $2 au profil public."
-  ],
-  [
-   "^Major: (.+) \\(change it above\\)\\.$",
-   "Filière : $1 (modifiez-la ci-dessus)."
-  ],
-  [
-   "^every major$",
-   "toutes les filières"
-  ],
-  [
-   "^([\\d,]+) students? found$",
-   "$1 étudiants trouvés"
-  ],
-  [
-   "^(\\d+) steps? to go\\. Complete profiles get found in Orbit and by employers\\.$",
-   "Encore $1 étapes. Les profils complets sont trouvés dans Orbit et par les employeurs."
-  ],
-  [
-   "^New opening · (.+)$",
-   "Nouvelle offre · $1"
-  ],
-  [
-   "^([\\d,]+) going$",
-   "$1 y vont"
-  ],
-  [
-   "^Show more \\(([\\d,]+) left\\)$",
-   "Voir plus ($1 restants)"
-  ],
-  [
-   "^(.+) wants to join your orbit$",
-   "$1 veut rejoindre votre orbite"
-  ],
-  [
-   "^([\\d,]+) words read$",
-   "$1 mots lus"
-  ],
-  [
-   "^Show within (\\d+) mi$",
-   "Voir dans un rayon de $1 mi"
-  ],
-  [
-   "^Following (.+)$",
-   "Suivent $1"
-  ],
-  [
-   "^(.+)'s orbit$",
-   "L'orbite de $1"
-  ],
-  [
-   "^Message (.+)$",
-   "Écrire à $1"
-  ],
-  [
-   "^([\\d,]+) employees$",
-   "$1 employés"
-  ],
-  [
-   "^Work email confirmed · (.+)$",
-   "E-mail professionnel confirmé · $1"
-  ],
-  [
-   "^Code sent to (.+)$",
-   "Code envoyé à $1"
-  ],
-  [
-   "^(.+), Beat the Pile$",
-   "$1, Beat the Pile"
-  ],
-  [
-   "^Filled in (.+)\\. Check it over, then tap Save profile\\.$",
-   "Rempli : $1. Vérifiez, puis appuyez sur Enregistrer le profil."
-  ],
-  [
-   "^([\\d,]+) more applications? to hit this week's goal$",
-   "Encore $1 candidatures pour atteindre l'objectif de la semaine"
-  ],
-  [
-   "^(\\d+)/week$",
-   "$1/semaine"
-  ],
-  [
-   "^\\. Only (\\d+%) opened later \\(([\\d,]+) companies compared, from the opening history below\\)\\.$",
-   ". Seulement $1 ont ouvert plus tard ($2 entreprises comparées, d'après l'historique ci-dessous)."
-  ],
-  [
-   "^([\\d,]+) companies haven't posted (.+) internships yet\\. Here's when they usually do\\.$",
-   "$1 entreprises n'ont pas encore publié leurs stages $2. Voici quand elles le font d'habitude."
-  ],
-  [
-   "^means we see internships on their job board today\\. Updated (.+)\\.$",
-   "signifie que nous voyons des stages sur leur page carrières aujourd'hui. Mis à jour le $1."
-  ],
-  [
-   "^(\\d+) of (\\d+) done · the dot marks where you are now$",
-   "$1 sur $2 faites · le point indique où vous en êtes"
-  ],
-  [
-   "^week of (\\d+)$",
-   "semaine sur $1"
-  ],
-  [
-   "^Week of (.+)$",
-   "Semaine du $1"
-  ],
-  [
-   "^From (.+)'s own job board and website\\.$",
-   "Depuis le site carrières et le site web de $1."
-  ],
-  [
-   "^We don't track (.+)'s job board yet, so we can't write a brief\\. Check their website and news, and ask your manager what to read\\.$",
-   "Nous ne suivons pas encore le site carrières de $1 : pas de fiche possible. Consultez leur site et l'actualité, et demandez à votre manager quoi lire."
-  ],
-  [
-   "^([\\d,]+) of ([\\d,]+) founding spots left\\.?$",
-   "Plus que $1 places fondatrices sur $2"
-  ],
-  [
-   "^The first (\\d+) students keep every Pro feature free, for life\\.$",
-   "Les $1 premiers étudiants gardent toutes les fonctions Pro gratuitement, à vie."
-  ],
-  [
-   "^Founding member #(\\d+)$",
-   "Membre fondateur n° $1"
-  ],
-  [
-   "^No exact matches for “(.+)”$",
-   "Aucun résultat exact pour « $1 »"
-  ],
-  [
-   "^([\\d,]+) similar (?:internships?|jobs?) (.+)$",
-   "$1 postes similaires $2"
-  ],
-  [
-   "^([\\d,]+) company job boards, last checked (.+)$",
-   "$1 sites carrières d'entreprises, vérifiés $2"
-  ],
-  [
-   "^([\\d,]+) company job boards$",
-   "$1 sites carrières d'entreprises"
-  ],
-  [
-   "^Showing results for “(.+)”$",
-   "Résultats pour « $1 »"
-  ],
-  [
-   "^You typed “(.+)”\\.$",
-   "Vous avez tapé « $1 »."
-  ],
-  [
-   "^Searched every major, (.+) had only a few matches\\.$",
-   "Recherche dans toutes les filières : $1 avait peu de résultats."
-  ],
-  [
-   "^([\\d,]+) jobs and internships on the map$",
-   "$1 offres et stages sur la carte"
-  ],
-  [
-   "^([\\d,]+) majors offered there \\(US Dept\\. of Education data\\)\\.$",
-   "$1 filières proposées (données du ministère américain de l'Éducation)."
-  ],
-  [
-   "^(Spring|Summer|Fall|Winter) (\\d{4})$",
-   "$1 $2"
-  ],
-  [
-   "^Not listed, use “(.+)”$",
-   "Absent de la liste, utiliser « $1 »"
-  ],
-  [
-   "^Faculty & staff · (.+)$",
-   "Enseignants et personnel · $1"
-  ],
-  [
-   "^Start practice with (.+) →$",
-   "Commencer l'entraînement avec $1 →"
-  ],
-  [
-   "^(\\d+) mi away$",
-   "à $1 mi"
-  ],
-  [
-   "^Search (\\d+) miles$",
-   "Chercher à $1 miles"
-  ],
-  [
-   "^Join (\\d+) people's orbits$",
-   "Rejoignez l'orbite de $1 personnes"
-  ],
-  [
-   "^© (\\d{4}) CuzzoCore LLC\\. Beat the Pile is a service of CuzzoCore LLC\\. Job listings come from each employer's own job board\\. Company names and logos belong to their owners\\.$",
-   "© $1 CuzzoCore LLC. Beat the Pile est un service de CuzzoCore LLC. Les offres viennent du site carrières de chaque employeur. Les noms et logos appartiennent à leurs propriétaires."
-  ],
-  [
-   "^([\\d,]+) entry-level jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
-   "$1 emplois débutants dans $2 entreprises$3"
-  ],
-  [
-   "^([\\d,]+) part-time & hourly jobs? at ([\\d,]+) compan(?:y|ies)(.*)$",
-   "$1 emplois à temps partiel et horaires dans $2 entreprises$3"
-  ],
-  [
-   "^Searched every job type, (.+) had only a few matches\\.$",
-   "Recherche dans tous les types d'emploi, $1 avait peu de résultats."
-  ],
-  [
-   "^([\\d,]+) internships$",
-   "$1 stages"
-  ],
-  [
-   "^([\\d,]+) entry-level$",
-   "$1 premier emploi"
-  ],
-  [
-   "^([\\d,]+) part-time$",
-   "$1 temps partiel"
-  ],
-  [
-   "^([\\d,]+) companies$",
-   "$1 entreprises"
-  ],
-  [
-   "^More (.+) jobs (.+)$",
-   "Plus d'offres $1 $2"
-  ],
-  [
-   "^([\\d,]+) more in the same area of work\\.$",
-   "$1 de plus dans le même domaine."
-  ],
-  [
-   "^([\\d,]+) more (.+) jobs below$",
-   "$1 autres offres $2 plus bas"
-  ],
-  [
-   "^([\\d,]+) drops?$",
-   "$1 nouveautés"
-  ],
-  [
-   "^(.+) just dropped ([\\d,]+) roles$",
-   "$1 vient de publier $2 postes"
-  ],
-  [
-   "^See all ([\\d,]+) at (.+)$",
-   "Voir les $1 chez $2"
-  ],
-  [
-   "^([\\d,]+) new drops?, show$",
-   "$1 nouveautés, afficher"
-  ],
-  [
-   "^(\\d+) (min|h|d) ago$",
-   "il y a $1 $2"
-  ]
+  ["^([\\d,]+) open jobs from ([\\d,]+) company job boards$", "$1 offres ouvertes issues de $2 sites carrières d'entreprises"],
+  ["^([\\d,]+) open jobs from ([\\d,]+) company job boards, last checked (.+)$", "$1 offres ouvertes issues de $2 sites carrières d'entreprises, vérifiés $3"],
+  ["^([\\d,]+) open jobs across the US · newest ([\\d,]+) shown\\. Pick a state or search to see the rest$", "$1 offres ouvertes aux États-Unis · les $2 plus récentes sont affichées. Choisissez un État ou cherchez pour voir le reste"],
+  ["^Show ([\\d,]+) more \\(([\\d,]+) left\\)$", "Afficher $1 de plus ($2 restants)"],
+  ["^([\\d,]+) full-time jobs? at ([\\d,]+) compan(?:y|ies)(.*)$", "$1 emplois à temps plein dans $2 entreprises$3"],
+  ["^([\\d,]+) jobs? at ([\\d,]+) compan(?:y|ies)(.*)$", "$1 emplois dans $2 entreprises$3"],
+  ["^Found (today|yesterday|\\d+ days? ago) \\(posting date not shown by employer\\)$", "Trouvée $1 (date non affichée par l'employeur)"],
+  ["^(\\d+) days? ago$", "il y a $1 jours"],
+  ["^Posted ~(.+)$", "Publiée ~$1"],
+  ["^Posted (.+)$", "Publiée $1"],
+  ["^☆ Follow (.+)$", "☆ Suivre $1"],
+  ["^New (.+) internships (.+), once a week\\. Only when there's something new\\.$", "Nouveaux stages ($1) $2, une fois par semaine. Seulement s'il y a du neuf."],
+  ["^in ([A-Z]{2}(?: & [A-Z]{2})*)$", "en $1"],
+  ["^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies) (.+) · (.+) · plus ([\\d,]+) similar$", "$1 stages dans $2 entreprises $3 · $4 · plus $5 similaires"],
+  ["^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies) across the US · every major$", "$1 stages dans $2 entreprises aux États-Unis · toutes filières"],
+  ["^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies) across the US$", "$1 stages dans $2 entreprises aux États-Unis"],
+  ["^([\\d,]+) internships? at ([\\d,]+) compan(?:y|ies)(.*)$", "$1 stages dans $2 entreprises$3"],
+  ["^([\\d,]+) open$", "$1 ouverts"],
+  ["^([\\d,]+) internships?$", "$1 stages"],
+  ["^([\\d,]+) internships? · ([\\d,]+) in your major$", "$1 stages · $2 dans votre filière"],
+  ["^([\\d,]+) employers$", "$1 employeurs"],
+  ["^booth numbers for ([\\d,]+)$", "numéros de stand pour $1"],
+  ["^booth numbers not published yet$", "numéros de stand pas encore publiés"],
+  ["^employer list not posted yet$", "liste des employeurs pas encore publiée"],
+  ["^All ([\\d,]+)$", "Tous $1"],
+  ["^★ My plan ([\\d,]+)$", "★ Mon plan $1"],
+  ["^Open internships ([\\d,]+)$", "Stages ouverts $1"],
+  ["^Talked to ([\\d,]+)$", "Discuté avec $1"],
+  ["^(.+) · Spring (\\d{4})$", "$1 · Printemps $2"],
+  ["^(.+) · Fall (\\d{4})$", "$1 · Automne $2"],
+  ["^Spring (\\d{4})$", "Printemps $1"],
+  ["^Fall (\\d{4})$", "Automne $1"],
+  ["^today$", "aujourd'hui"],
+  ["^yesterday$", "hier"],
+  ["^New internship · (.+)$", "Nouveau stage · $1"],
+  ["^Also at (.+)$", "Aussi chez $1"],
+  ["^Students at (.+) studying (.+) who made their profile public\\.$", "Étudiants de $1 en $2 au profil public."],
+  ["^Major: (.+) \\(change it above\\)\\.$", "Filière : $1 (modifiez-la ci-dessus)."],
+  ["^every major$", "toutes les filières"],
+  ["^([\\d,]+) students? found$", "$1 étudiants trouvés"],
+  ["^(\\d+) steps? to go\\. Complete profiles get found in Orbit and by employers\\.$", "Encore $1 étapes. Les profils complets sont trouvés dans Orbit et par les employeurs."],
+  ["^New opening · (.+)$", "Nouvelle offre · $1"],
+  ["^([\\d,]+) going$", "$1 y vont"],
+  ["^Show more \\(([\\d,]+) left\\)$", "Voir plus ($1 restants)"],
+  ["^(.+) wants to join your orbit$", "$1 veut rejoindre votre orbite"],
+  ["^([\\d,]+) words read$", "$1 mots lus"],
+  ["^Show within (\\d+) mi$", "Voir dans un rayon de $1 mi"],
+  ["^Following (.+)$", "Suivent $1"],
+  ["^(.+)'s orbit$", "L'orbite de $1"],
+  ["^Message (.+)$", "Écrire à $1"],
+  ["^([\\d,]+) employees$", "$1 employés"],
+  ["^Work email confirmed · (.+)$", "E-mail professionnel confirmé · $1"],
+  ["^Code sent to (.+)$", "Code envoyé à $1"],
+  ["^(.+), Beat the Pile$", "$1, Beat the Pile"],
+  ["^Filled in (.+)\\. Check it over, then tap Save profile\\.$", "Rempli : $1. Vérifiez, puis appuyez sur Enregistrer le profil."],
+  ["^([\\d,]+) more applications? to hit this week's goal$", "Encore $1 candidatures pour atteindre l'objectif de la semaine"],
+  ["^(\\d+)/week$", "$1/semaine"],
+  ["^\\. Only (\\d+%) opened later \\(([\\d,]+) companies compared, from the opening history below\\)\\.$", ". Seulement $1 ont ouvert plus tard ($2 entreprises comparées, d'après l'historique ci-dessous)."],
+  ["^([\\d,]+) companies haven't posted (.+) internships yet\\. Here's when they usually do\\.$", "$1 entreprises n'ont pas encore publié leurs stages $2. Voici quand elles le font d'habitude."],
+  ["^means we see internships on their job board today\\. Updated (.+)\\.$", "signifie que nous voyons des stages sur leur page carrières aujourd'hui. Mis à jour le $1."],
+  ["^(\\d+) of (\\d+) done · the dot marks where you are now$", "$1 sur $2 faites · le point indique où vous en êtes"],
+  ["^week of (\\d+)$", "semaine sur $1"],
+  ["^Week of (.+)$", "Semaine du $1"],
+  ["^From (.+)'s own job board and website\\.$", "Depuis le site carrières et le site web de $1."],
+  ["^We don't track (.+)'s job board yet, so we can't write a brief\\. Check their website and news, and ask your manager what to read\\.$", "Nous ne suivons pas encore le site carrières de $1 : pas de fiche possible. Consultez leur site et l'actualité, et demandez à votre manager quoi lire."],
+  ["^([\\d,]+) of ([\\d,]+) founding spots left\\.?$", "Plus que $1 places fondatrices sur $2"],
+  ["^The first (\\d+) students keep every Pro feature free, for life\\.$", "Les $1 premiers étudiants gardent toutes les fonctions Pro gratuitement, à vie."],
+  ["^Founding member #(\\d+)$", "Membre fondateur n° $1"],
+  ["^No exact matches for “(.+)”$", "Aucun résultat exact pour « $1 »"],
+  ["^([\\d,]+) similar (?:internships?|jobs?) (.+)$", "$1 postes similaires $2"],
+  ["^([\\d,]+) company job boards, last checked (.+)$", "$1 sites carrières d'entreprises, vérifiés $2"],
+  ["^([\\d,]+) company job boards$", "$1 sites carrières d'entreprises"],
+  ["^Showing results for “(.+)”$", "Résultats pour « $1 »"],
+  ["^You typed “(.+)”\\.$", "Vous avez tapé « $1 »."],
+  ["^Searched every major, (.+) had only a few matches\\.$", "Recherche dans toutes les filières : $1 avait peu de résultats."],
+  ["^([\\d,]+) jobs and internships on the map$", "$1 offres et stages sur la carte"],
+  ["^([\\d,]+) majors offered there \\(US Dept\\. of Education data\\)\\.$", "$1 filières proposées (données du ministère américain de l'Éducation)."],
+  ["^(Spring|Summer|Fall|Winter) (\\d{4})$", "$1 $2"],
+  ["^Not listed, use “(.+)”$", "Absent de la liste, utiliser « $1 »"],
+  ["^Faculty & staff · (.+)$", "Enseignants et personnel · $1"],
+  ["^Start practice with (.+) →$", "Commencer l'entraînement avec $1 →"],
+  ["^(\\d+) mi away$", "à $1 mi"],
+  ["^Search (\\d+) miles$", "Chercher à $1 miles"],
+  ["^Join (\\d+) people's orbits$", "Rejoignez l'orbite de $1 personnes"],
+  ["^© (\\d{4}) CuzzoCore LLC\\. Beat the Pile is a service of CuzzoCore LLC\\. Job listings come from each employer's own job board\\. Company names and logos belong to their owners\\.$", "© $1 CuzzoCore LLC. Beat the Pile est un service de CuzzoCore LLC. Les offres viennent du site carrières de chaque employeur. Les noms et logos appartiennent à leurs propriétaires."],
+  ["^([\\d,]+) entry-level jobs? at ([\\d,]+) compan(?:y|ies)(.*)$", "$1 emplois débutants dans $2 entreprises$3"],
+  ["^([\\d,]+) part-time & hourly jobs? at ([\\d,]+) compan(?:y|ies)(.*)$", "$1 emplois à temps partiel et horaires dans $2 entreprises$3"],
+  ["^Searched every job type, (.+) had only a few matches\\.$", "Recherche dans tous les types d'emploi, $1 avait peu de résultats."],
+  ["^([\\d,]+) internships$", "$1 stages"],
+  ["^([\\d,]+) entry-level$", "$1 premier emploi"],
+  ["^([\\d,]+) part-time$", "$1 temps partiel"],
+  ["^([\\d,]+) companies$", "$1 entreprises"],
+  ["^More (.+) jobs (.+)$", "Plus d'offres $1 $2"],
+  ["^([\\d,]+) more in the same area of work\\.$", "$1 de plus dans le même domaine."],
+  ["^([\\d,]+) more (.+) jobs below$", "$1 autres offres $2 plus bas"],
+  ["^([\\d,]+) drops?$", "$1 nouveautés"],
+  ["^(.+) just dropped ([\\d,]+) roles$", "$1 vient de publier $2 postes"],
+  ["^See all ([\\d,]+) at (.+)$", "Voir les $1 chez $2"],
+  ["^([\\d,]+) new drops?, show$", "$1 nouveautés, afficher"],
+  ["^(\\d+) (min|h|d) ago$", "il y a $1 $2"],
+  ["^See the job up close first: ([\\d,]+) shadowing & volunteer spots, many unpaid\\.$", "Vois le métier de près d'abord : $1 places d'observation et de bénévolat, souvent non rémunérées."]
  ]
 }
