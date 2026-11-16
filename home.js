@@ -1,4 +1,4 @@
-/* built from src/home.jsx e1557cd4ff34e654 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx c33a4feffa6796bd — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -9648,7 +9648,7 @@ function App() {
         icon: "",
         text: ans.type === "Remote" ? React.createElement(React.Fragment, null, "Real openings that say ", React.createElement("strong", null, "remote"), ", from companies' own job boards.") : React.createElement(React.Fragment, null, "Real openings within ", React.createElement("strong", null, metaRef.current?.radius || ans.radius || 50, " miles of ", ans.zip), ", from companies' own job boards", ans.type === "Any" ? ", plus remote roles (marked Remote)" : "", ". Each one was open when our robot last checked.")
       });
-      if (ans.type !== "Remote" && metaRef.current && metaRef.current.nearby < 10 && (ans.radius || 50) < 200) lines.push({
+      if (ans.type !== "Remote" && metaRef.current && typeof metaRef.current.strong !== "number" && metaRef.current.nearby < 10 && (ans.radius || 50) < 200) lines.push({
         icon: "",
         text: React.createElement(React.Fragment, null, "Only ", React.createElement("strong", null, metaRef.current.nearby), " ", metaRef.current.nearby === 1 ? "opening" : "openings", " for your major within ", metaRef.current.radius || ans.radius || 50, " miles. ", React.createElement("button", {
           onClick: () => {
