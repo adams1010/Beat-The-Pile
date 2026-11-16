@@ -42,7 +42,7 @@ import { mutate, loadRow, Conflict } from "../lib/userdata.js";
 import { postedInfo } from "../lib/dates.js";
 import { isAuthorizedCron } from "../lib/db.js";
 import { runReminders, emailFor, sendEmail, buildEmail } from "../lib/remind.js";
-import { runAlerts, cleanMajor, cleanStates, buildAlert, freshListings, matchesFor } from "../lib/alerts.js";
+import { runAlerts, cleanMajor, cleanStates, buildAlert, freshListings, matchesFor, defaultAlertMajor } from "../lib/alerts.js";
 import { dueFollowUps } from "../lib/followups.js";
 import { botOn, logRun } from "../lib/bots.js";
 import { orbitFor, schoolKey, majorKey, sameSchool, sameMajor } from "../lib/orbit.js";
@@ -564,7 +564,11 @@ export default async function handler(req, res) {
       const handle = cur?.handle || (await autoHandle(uid, profile));
       // Nov 10: public by default — only an explicit "no" (show:false) keeps a profile private
       const pub = body.show === false ? false : body.show === true ? true : cur?.handle ? cur?.profile_public === true : true;
-      try { return send(await mutate(uid, (r) => ({ profile: { ...profile, ...keepStaffVerified(r.profile, profile) }, handle, profile_public: pub }))); }
+      // Nov 16: weekly job alerts are on by default for students (one-click unsubscribe in every email). Only for accounts that
+      // never set alerts up (alert_major null), so an unsubscribe or a /jobs choice is never overridden; an explicit untick wins.
+      const alertsOn = (r) => !profile.staff && body.alerts !== false && !r?.alert_major;
+      const alertPatch = (r) => (alertsOn(r) ? { alert_on: true, alert_major: defaultAlertMajor(profile.major), remind_unsub: r?.remind_unsub || crypto.randomBytes(18).toString("base64url") } : {});
+      try { return send(await mutate(uid, (r) => ({ profile: { ...profile, ...keepStaffVerified(r.profile, profile) }, handle, profile_public: pub, ...alertPatch(r) }))); }
       catch (e) { if (/23505|duplicate key/i.test(String(e?.message))) return res.status(409).json({ error: "Try again in a moment" }); throw e; }
     }
     if (action === "remind_test") {            // send yourself one sample reminder (3 a day)

@@ -141,7 +141,7 @@
           <div><label for="o_gy">Year</label><select id="o_gy"><option value="">Year</option>${Array.from({ length: 8 }, (_, i) => Y + i - 1).map((y) => `<option${+mine.gradYear === y ? " selected" : ""}>${y}</option>`).join("")}</select></div></div>
         ${staff ? "" : `<div class="ph"><span class="phav" id="o_phv" aria-hidden="true">${esc((nm || "?").trim().slice(0, 1).toUpperCase())}</span><div><b>Add a profile photo</b> <span class="muted">(optional)</span><br><span class="muted">Classmates and recruiters recognize you faster.</span><br><label class="phbtn" for="o_ph">Choose a photo</label><input type="file" id="o_ph" accept="image/*" hidden></div></div>`}
         <label class="chk"><input type="checkbox" id="o_show"${pubNow === false ? "" : " checked"}> <span>${staff ? "Show me to students at my school in Orbit (your name, school, role and photo). You can turn this off any time on your profile." : "Show me to students at my school in Orbit (your name, school, major and photo). You can turn this off any time on your profile."}</span></label>
-        ${staff ? "" : `<label class="chk"><input type="checkbox" id="o_emp" checked> <span>Let verified employers find me. Only companies we've checked can see your public profile and message you about real jobs and internships. You can turn this off any time on your profile.</span></label>`}
+        ${staff ? "" : `<label class="chk"><input type="checkbox" id="o_emp" checked> <span>Let verified employers find me. Only companies we've checked can see your public profile and message you about real jobs and internships. You can turn this off any time on your profile.</span></label><label class="chk"><input type="checkbox" id="o_alerts" checked> <span>Email me new jobs for my major once a week. One-click unsubscribe in every email.</span></label>`}
         <div class="go"><button id="o_go">Continue</button><a href="#" id="o_skip">Skip for now</a><span class="msg" id="o_msg" role="status"></span></div>
       </div>`;
     const majorBox = async () => {
@@ -176,7 +176,7 @@
       if (staff && !$("#o_rl").value) { $("#o_msg").textContent = "Pick your role."; return; }
       b.disabled = true;
       try { await api({ action: "onboard", name: $("#o_nm").value, school: st.school || $("#o_sc").value, schoolId: st.schoolId, major: st.major || ($("#o_mj") && $("#o_mj").value) || "",
-          gradTerm: $("#o_gt").value, gradYear: $("#o_gy").value ? +$("#o_gy").value : null, show: $("#o_show").checked, ...(staff ? { staff: $("#o_rl").value } : { employers: !!$("#o_emp")?.checked, ...(st.photo ? { photo: st.photo } : {}) }) });
+          gradTerm: $("#o_gt").value, gradYear: $("#o_gy").value ? +$("#o_gy").value : null, show: $("#o_show").checked, ...(staff ? { staff: $("#o_rl").value } : { employers: !!$("#o_emp")?.checked, alerts: !!$("#o_alerts")?.checked, ...(st.photo ? { photo: st.photo } : {}) }) });
         // Nov 10: right after sign-up, the "build your orbit" checklist (join classmates' orbits) — then on to the site
         if (window.btpOrbitStart) return window.btpOrbitStart.show({ getToken: () => C.session.getToken(), done: tour, force: true });
         tour(); }

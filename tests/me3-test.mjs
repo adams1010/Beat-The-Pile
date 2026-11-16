@@ -43,3 +43,16 @@ console.log("✓ My Season: applies flow in, employer date vs first-seen kept ap
   assert.equal(d.pay, null); assert.equal(d.payUnit, null); assert.equal(d.kind, null, "junk refused");
   console.log("✓ tracker: pay + per hour/year, type, place, deadline, contact, notes, tick boxes saved; junk refused");
 }
+
+// Nov 16: job alerts on by default at sign-up (students), never overriding an unsubscribe or a /jobs choice
+{
+  const { defaultAlertMajor } = await import("../lib/alerts.js");
+  const assert = (await import("node:assert/strict")).default;
+  assert.equal(defaultAlertMajor("Mechanical Engineering"), "mechanical");
+  assert.equal(defaultAlertMajor("Nursing"), "science_health");
+  assert.equal(defaultAlertMajor("Psychology"), "all");
+  assert.equal(defaultAlertMajor(""), "all");
+  const src = (await import("node:fs")).readFileSync(new URL("../api/me.js", import.meta.url), "utf8");
+  assert.match(src, /!profile\.staff && body\.alerts !== false && !r\?\.alert_major/);
+  console.log("✓ job alerts default on at sign-up");
+}

@@ -1,6 +1,7 @@
 {
  "_about": "Spanish UI strings (Nov 2026). Key = the English text exactly as shown (whitespace collapsed). Used by /i18n.js when the student picks Español. Job titles, company names and places are data and stay as-is.",
  "strings": {
+  "Email me new jobs for my major once a week. One-click unsubscribe in every email.": "Envíame nuevos empleos de mi carrera una vez por semana. Puedes darte de baja con un clic en cada correo.",
   "Jobs": "Empleos",
   "Career Fair": "Feria de empleo",
   "Orbit": "Orbit",
