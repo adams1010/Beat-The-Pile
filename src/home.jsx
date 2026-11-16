@@ -517,7 +517,7 @@ function Confetti(){
 function coInitials(n){const w=String(n||"").replace(/[^A-Za-z0-9& ]/g," ").split(/\s+/).filter(x=>x&&!/^(and|of|the|&|inc|llc|corp|co)$/i.test(x));if(!w.length)return"·";return(w.length===1?w[0].slice(0,2):w[0][0]+w[1][0]).toUpperCase();}
 
 function BlurCard({company}){
-  const accent=company?.match>=70?G:company?.match>=50?AM:CR;
+  const accent=company?.match>=15?G:company?.match>=8?AM:CR;
   return(
     <div style={{position:"relative",borderRadius:var_rl,border:`1px solid ${GL}`,overflow:"hidden",background:"#fff",minHeight:240}}>
       <div style={{filter:"blur(8px)",opacity:0.3,padding:"1.5rem",pointerEvents:"none",userSelect:"none"}}>
@@ -728,6 +728,30 @@ function generateReason(c,ans,extPicks){
 
   return `${opener} ${assessment}${extra}`.trim();
 }
+// Nov 15 (owner: "it has to be realistic"): two separate numbers per job.
+//  1. Resume match (0–100): how well you line up with what the role screens for, like an ATS match rate (Jobscan says aim for
+//     75%+). With a resume it's the AI resume check; without one it's a profile match from the title, your skills and class year.
+//  2. Interview chance: realistic odds that one cold application gets an interview. Cold applications convert at roughly
+//     3–5% (career-services estimates), so the base is 5% and real signals move it up or down. Capped at 35%. Always an estimate.
+function resumeMatchOf(c){
+  if(c.resumeCheck&&typeof c.resumeCheck.score==="number")return c.resumeCheck.score;
+  const w=c.why||[];
+  return Math.min(78,38+(w.some(x=>/^Title fits/.test(x))?24:0)+(w.some(x=>/^Mentions/.test(x))?10:0)+(w.some(x=>/^Open to your class year/.test(x))?6:0));
+}
+function interviewOdds(c,ans,extPicks,national){
+  const rm=resumeMatchOf(c),w=c.why||[],gpa=parseFloat(ans.gpa)||0;
+  const tt=ans.targetTerm?termTiming(ans.targetTerm):null;
+  let p=0.05;
+  p*=rm>=80?2.2:rm>=75?1.9:rm>=65?1.4:rm>=50?1.0:0.6;                 // the screen: fit to what the role asks for
+  p*=w.includes("New this week")?1.3:1;                                   // early applicants get read first
+  p*=c.mi!=null&&c.mi<=25?1.2:c.remote?0.7:1;                             // remote roles draw far more applicants
+  p*=gpa>=3.5?1.15:gpa>0&&gpa<3.0?0.8:1;
+  p*=exceptionalPicks(extPicks||[]).length?1.1:1;
+  p*=national?0.6:1;                                                      // big names get thousands of applications
+  p*=tt&&tt.mult?Math.min(1.1,Math.max(0.6,tt.mult)):1;                   // applying late in the season
+  const pct=Math.max(2,Math.min(35,Math.round(p*100)));
+  return {pct,rm,low:Math.max(1,Math.round(pct*0.6)),high:Math.min(45,Math.round(pct*1.6))};
+}
 function applyHonest(list,ans,extPicks){
   return list.map(c=>{
     const h=honestScore(c,ans,extPicks);
@@ -737,8 +761,9 @@ function applyHonest(list,ans,extPicks){
     const bandBonus={"in-town":6,"nearby":4,"metro":2,"regional":0,"remote":1}[c.locationBand]||0;
     const tierPenalty=c.tier==="national"?-3:0; // nationals are harder to get
     const sortScore=h.pct+bandBonus+tierPenalty;
-    return{...c,match:h.pct,low:h.low,high:h.high,_profile:h._profile,_timing:h._timing,_fit:h._fit,_exp:h._exp,_lead:h._lead,reason,_sortScore:sortScore};
-  }).sort((a,b)=>(a.mi??(a.remote?1e4:1e5))-(b.mi??(b.remote?1e4:1e5))); // Nov 15: nearest first, remote after (the estimate used to reshuffle the list)
+    const o=interviewOdds(c,ans,extPicks,c.tier==="national");
+    return{...c,match:o.pct,rmatch:o.rm,low:o.low,high:o.high,_profile:h._profile,_timing:h._timing,_fit:h._fit,_exp:h._exp,_lead:h._lead,reason,_sortScore:sortScore};
+  }); // Nov 15: keep the server's order (best fit first)
 }
 
 // PROFILE STORAGE — single abstraction. Swap these 3 methods for a real backend later; nothing else changes.
@@ -901,7 +926,7 @@ function ScoreExplainerCard({ job, profile, isPro, setShowProModal, isExpanded, 
   const downCount=failing+partial;
 
   const potentialGain=factors.reduce((s,f)=>s+(f.scoreGain||0),0);
-  const currentScore=job.matchScore||job.match||50;
+  const currentScore=job.rmatch||job.matchScore||job.match||50;
   const improvedScore=Math.min(95,currentScore+potentialGain);
 
   // Pro users: log which fixes were surfaced, once per expand.
@@ -1597,8 +1622,10 @@ function App(){
       const ids=new Map(top.map((c,n)=>[c.listingId||c.name+c.role,n+1]));
       setResults(prev=>prev.map(c=>{const n=ids.get(c.listingId||c.name+c.role);const x=n&&g.find(y=>+y.i===n);
         if(!x||typeof x.score!=="number")return c;
-        const sc=Math.max(1,Math.min(99,Math.round(x.score)));const m=Math.round(c.match*0.6+sc*0.4);
-        return {...c,match:m,low:Math.max(1,m-8),high:Math.min(99,m+6),resumeCheck:{score:sc,matched:(x.matched||[]).slice(0,4),missing:(x.missing||[]).slice(0,3)},reason:x.note?String(x.note):c.reason,personalized:true};}));
+        const sc=Math.max(1,Math.min(99,Math.round(x.score)));
+        const nc={...c,resumeCheck:{score:sc,matched:(x.matched||[]).slice(0,4),missing:(x.missing||[]).slice(0,3)},reason:x.note?String(x.note):c.reason,personalized:true};
+        const o=interviewOdds(nc,ans,extPicks,c.tier==="national");
+        return {...nc,match:o.pct,rmatch:o.rm,low:o.low,high:o.high};}));
       analytics.track("results_resume_checked",{count:g.length});
     }catch(e){console.warn("[iq] resume check skipped:",e&&e.message);}
     setGrading(false);
@@ -3425,7 +3452,7 @@ function App(){
     // safest bets — they're "strong shots + a couple of standout names."
     const pickScore=c=>c.match+(c.tier==="national"?12:0);
     const topPicks=[...results]
-      .filter(c=>c.match>=42) // exclude true long-shots
+      .filter(c=>c.match>=8) // exclude true long-shots
       .sort((a,b)=>pickScore(b)-pickScore(a))
       .slice(0,3);
     const topNames=topPicks.map(c=>c.name);
@@ -3499,13 +3526,13 @@ function App(){
               {/* Rewarding payoff summary */}
               {results.length>0&&(()=>{
                 const top=results[0]?.match||0;
-                const strong=results.filter(r=>r.match>=70).length;
-                const decent=results.filter(r=>r.match>=50&&r.match<70).length;
+                const strong=results.filter(r=>r.match>=15).length;
+                const decent=results.filter(r=>r.match>=8&&r.match<15).length;
                 return(
                   <div style={{background:"#fff",border:"1px solid #E3E7ED",borderRadius:var_rl,padding:"14px 18px",marginBottom:16,display:"flex",alignItems:"baseline",gap:22,flexWrap:"wrap"}}>
                     <div><span style={{fontSize:26,fontWeight:700,letterSpacing:"-0.03em",color:"#060A2C"}}>{results.length}</span><span style={{fontSize:13,color:"#5B6675",marginLeft:6}}>open {results.length===1?"internship":"internships"} for you</span></div>
-                    <div><span style={{fontSize:18,fontWeight:650,color:"#060A2C"}}>{top}%</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>top match (estimate)</span></div>
-                    {strong>0&&<div><span style={{fontSize:18,fontWeight:650,color:"#060A2C"}}>{strong}</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>strong {strong===1?"match":"matches"}</span></div>}
+                    <div><span style={{fontSize:18,fontWeight:650,color:"#060A2C"}}>{top}%</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>best interview chance (estimate)</span></div>
+                    {strong>0&&<div><span style={{fontSize:18,fontWeight:650,color:"#060A2C"}}>{strong}</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>good {strong===1?"shot":"shots"}</span></div>}
                     {decent>0&&<div><span style={{fontSize:18,fontWeight:650,color:"#060A2C"}}>{decent}</span><span style={{fontSize:12.5,color:"#5B6675",marginLeft:5}}>worth a shot</span></div>}
                   </div>
                 );
@@ -3560,7 +3587,7 @@ function App(){
                               <span style={{flex:1}}>{l.text}</span>
                             </div>
                           ))}
-                          <p style={{fontSize:11,color:"#6B7280",lineHeight:1.55,paddingTop:8,borderTop:`1px solid #E2E8F0`,marginTop:2}}>Match % is our estimate, built only from real signals: how the job title fits your major and skills, the class year and term it asks for, distance, how new the posting is, plus your GPA, activities and timing. With a resume, 40% comes from an AI resume check against the job title. It is not from the employer and is not a prediction of an offer.</p>
+                          <p style={{fontSize:11,color:"#6B7280",lineHeight:1.55,paddingTop:8,borderTop:`1px solid #E2E8F0`,marginTop:2}}>Two estimates, built only from real signals. Resume match works like the scores screening software gives (75%+ is the usual target): with a resume it's an AI check against the job title, without one it's a profile match from the title, your skills and class year. Interview chance starts at 5%, about what a cold application gets, and moves with your match, how new the posting is, distance, GPA, activities, timing and how many people likely apply. Most will be under 20%. That's normal: plan on applying to many.</p>
                         </div>
                       </div>
                     )}
@@ -3614,6 +3641,18 @@ function App(){
                 );
               })()}
 
+              {/* Nov 15 (owner): few real fits nearby → say it plainly, offer a wider radius, and show where the jobs are */}
+              {(()=>{const m=metaRef.current;if(!m||ans.type==="Remote"||typeof m.strong!=="number"||m.strong>=8)return null;
+                const r=ans.radius||50,maj=(ans.major||"your major").split(",")[0];
+                return <div style={{background:"#FFF8E6",border:"1px solid #F3D48B",borderRadius:var_rl,padding:"14px 16px",marginBottom:16}}>
+                  <p style={{fontSize:15,fontWeight:700,color:"#060A2C",marginBottom:4}}>{m.strong===0?`No internships within ${r} miles of ${ans.zip} name ${maj} right now.`:`Only ${m.strong} ${m.strong===1?"internship":"internships"} within ${r} miles of ${ans.zip} really fit ${maj}.`}</p>
+                  <p style={{fontSize:13.5,color:"#4A5568",lineHeight:1.55,marginBottom:10}}>The rest below are related roles. For more real options, widen your search, or consider a summer somewhere else: lots of students relocate for an internship, and some postings list housing or relocation help.</p>
+                  <div style={{display:"flex",gap:8,flexWrap:"wrap",alignItems:"center"}}>
+                    {[100,200].filter(x=>x>r).map(x=><button key={x} onClick={()=>{setA("radius",x);calcResults({radius:x});}} style={{background:G,color:"#fff",border:"none",borderRadius:99,padding:"8px 14px",fontFamily:"var(--font)",fontSize:13,fontWeight:700,cursor:"pointer"}}>Search {x} miles</button>)}
+                    {(m.where||[]).length>0&&<span style={{fontSize:13,color:"#4A5568",marginLeft:4}}>Most {maj} internships right now:</span>}
+                    {(m.where||[]).map(w=><a key={w.state} href={`/jobs/?major=${encodeURIComponent(m.field||"all")}&state=${w.state}`} style={{fontSize:13,fontWeight:600,color:GD,background:"#fff",border:`1px solid ${GM}`,borderRadius:99,padding:"6px 12px",textDecoration:"none"}}>{w.state} · {w.count}</a>)}
+                  </div>
+                </div>;})()}
               {grading&&<div role="status" style={{background:GL,border:`1px solid ${GM}`,borderRadius:var_rl,padding:"10px 14px",marginBottom:14,fontSize:13.5,color:GD,fontWeight:600}}>Checking your resume against each job, the way screening software does. Scores update in a few seconds.</div>}
               {/* TOP PICKS — highlighted best matches worth your energy first */}
               {topPicks.length>0&&(
@@ -3660,9 +3699,9 @@ function App(){
               {/* Free cards — original front design, flips to company intel on back */}
               <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(320px,1fr))",gap:14,marginBottom:16}}>
                 {free.map((c,i)=>{
-                  const isStr=c.match>=70,isDec=c.match>=50&&c.match<70;
+                  const isStr=c.match>=15,isDec=c.match>=8&&c.match<15;
                   const accent=isStr?G:isDec?AM:CR;
-                  const label=isStr?"Strong Match":isDec?"Decent Shot":"Reach";
+                  const label=isStr?"Good shot":isDec?"Worth applying":"Long shot";
                   const isTracked=trackedNames.includes(c.name);
                   const saved=isJobSaved(c.name);
                   const isFlipped=expandedCard===i;
@@ -3710,12 +3749,13 @@ function App(){
                             </div>
                             <div style={{textAlign:"right",flexShrink:0}}>
                               <AnimatedPct target={c.match} color={accent}/>
-                              {typeof c.low==="number"&&<p style={{fontSize:11,color:"#6B7280",fontWeight:600,marginTop:-2}}>range {c.low}–{c.high}%</p>}
+                              <p style={{fontSize:11,color:"#6B7280",fontWeight:600,marginTop:-2}}>interview chance</p>
+                              {typeof c.rmatch==="number"&&<p style={{fontSize:11.5,color:"#060A2C",fontWeight:600,marginTop:4}}>{c.resumeCheck?"Resume":"Profile"} match {c.rmatch}%</p>}
                               <div style={{marginTop:4}}><MatchChip label={label} accent={accent}/></div>
                             </div>
                           </div>
                           {/* Match bar + breakdown */}
-                          <MatchBar pct={c.match} color={accent} delay={0}/>
+                          <MatchBar pct={typeof c.rmatch==="number"?c.rmatch:c.match} color={accent} delay={0}/>
                           {/* Nov 15: the real reasons this job ranks here (from /api/results), not made-up percentages */}
                           {(c.why||[]).length>0&&<div style={{display:"flex",gap:6,flexWrap:"wrap"}}>{c.why.map(w=><span key={w} style={{fontSize:11.5,fontWeight:600,color:/^Title fits|^Open to your|^Mentions|^For /.test(w)?GD:"#334155",background:/^Title fits|^Open to your|^Mentions|^For /.test(w)?GL:"#F1F5F9",padding:"3px 9px",borderRadius:99}}>{w}</span>)}</div>}
                           {c.resumeCheck&&<div style={{border:"1px solid #E2E8F0",borderRadius:var_r,padding:"9px 11px"}}>
@@ -4586,7 +4626,7 @@ Thank you for your time,
                   <p style={{fontWeight:700,fontSize:14,color:"#060A2C",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{j.name}</p>
                   <p style={{fontSize:12.5,color:"#6B7280",marginTop:2}}>{j.role} · {j.location}</p>
                 </div>
-                <span style={{fontSize:12,fontWeight:700,color:"#1E3A8A",background:"#E3E9F6",padding:"3px 10px",borderRadius:99,flexShrink:0}}>{j.match}% match</span>
+                <span style={{fontSize:12,fontWeight:700,color:"#1E3A8A",background:"#E3E9F6",padding:"3px 10px",borderRadius:99,flexShrink:0}}>{j.match}% interview chance</span>
                 <button onClick={()=>{
                   const today=new Date().toISOString().split("T")[0];
                   setTracked(p=>[...p,{company:j.name,role:j.role,date:today,status:"Applied"}]);

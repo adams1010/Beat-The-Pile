@@ -63,7 +63,13 @@ Rules: gradYear is the expected graduation year as a number, or null. Experience
     if (resume.length < 80 || !jobs.length) throw new AIError("Add a resume first", 400);
     return { maxTokens: 3200, temperature: 0, prompt: `You screen internship applications the way applicant tracking software and a recruiter's 30-second skim do: keyword and skill match, relevant experience, major and coursework fit, and clear evidence (numbers, results, tools). The student is a ${major || "college"} student graduating ${year || "soon"}.
 
-For each job below you only know the title and company. Judge what that kind of role at that kind of company usually screens for, and score how well THIS resume would do, 0 to 100. Be honest: most students land 40 to 75; reserve 85+ for a resume that clearly shows the skills and experience the role usually needs. Never invent anything that is not in the resume.
+For each job below you only know the title and company. Judge what that kind of role at that kind of company usually screens for, then score THIS resume 0 to 100 the way match-rate tools do, with these weights:
+- Hard skills and tools the role usually lists (40)
+- Relevant experience: internships, jobs, research, projects in this area (25)
+- Job title / role alignment: does the resume already read like this role (15)
+- Education: major, coursework, class year fit (10)
+- Evidence: numbers, results, clear bullets a parser can read (10)
+Be strict: most students land 35 to 70; 75+ means the resume clearly shows what the role usually asks for (screening tools treat 75% as the usual target); 85+ is rare. Never invent anything that is not in the resume.
 
 RESUME:
 ${resume}

@@ -33,6 +33,7 @@
 //                                                    (vercel.json maps /r/<token> here)
 // Requires a genuine Clerk session token (signature-checked in lib/auth.js) for everything except ?r=.
 // Every write goes through lib/userdata.js mutate(): versioned, so two tabs saving at once can't erase each other.
+import { achievementsFrom } from "../lib/achievements.js";
 import crypto from "node:crypto";
 import { verifyClerkJWT, bearer } from "../lib/auth.js";
 import { db } from "../lib/db.js";
@@ -233,7 +234,7 @@ function cleanProfile(p) {
     location: txt(p.location, 80), lookingFor: txt(p.lookingFor, 140), about: txt(p.about, 1200),
     skills: [...new Set(arr(p.skills, 30).map((x) => txt(x, 40)).filter(Boolean))],
     // Nov 15: the personal side (Orbit, coffee chats): hometown, "ask me about", "I can help with", interests, courses, prompts
-    hometown: txt(p.hometown, 80), coffee: p.coffee === true,
+    hometown: txt(p.hometown, 80), coffee: p.coffee === true, hideAchievements: p.hideAchievements === true,
     askMe: tags(p.askMe, 6, 40), canHelp: tags(p.canHelp, 6, 40), interests: tags(p.interests, 10, 30), courses: tags(p.courses, 12, 60),
     prompts: arr(p.prompts, 6).map((x) => ({ q: PROMPTS.includes(x?.q) ? x.q : "", a: txt(x?.a, 300) })).filter((x) => x.q && x.a)
       .filter((x, i, a) => a.findIndex((y) => y.q === x.q) === i).slice(0, 3),
@@ -262,7 +263,7 @@ async function clerkUser(uid) {
 async function publicProfile(req, res) {
   const h = String(req.query.u || "").toLowerCase();
   if (!HANDLE_OK.test(h)) return res.status(404).json({ error: "No profile here" });
-  const rows = await db.selectAsAdmin(`user_jobs?select=clerk_user_id,profile,handle,profile_public,resume_token,resume_share,resume_path&handle=eq.${encodeURIComponent(h)}&limit=1`);
+  const rows = await db.selectAsAdmin(`user_jobs?select=clerk_user_id,profile,handle,profile_public,resume_token,resume_share,resume_path,apps&handle=eq.${encodeURIComponent(h)}&limit=1`);
   const r = rows[0];
   if (!r || r.profile_public !== true || !r.profile) return res.status(404).json({ error: "No profile here" });
   const p = cleanProfile(r.profile);          // re-cleaned on the way out, too
@@ -273,7 +274,9 @@ async function publicProfile(req, res) {
   if (!member || !p.contact || !p.contact.show) delete p.contact; else delete p.contact.show;
   res.setHeader("Cache-Control", member ? "private, no-store" : "public, max-age=60"); res.setHeader("Vary", "Authorization");
   const founding = await foundingFor(r.clerk_user_id).catch(() => null);
-  return res.status(200).json({ handle: r.handle, profile: p && p.school ? { ...p, schoolShort: shortSchool(p.schoolId || p.school) } : p, resume, founding });
+  // Nov 15: stacking badges (tiers only, never exact counts), unless the student hid them
+  const achievements = p.hideAchievements ? [] : achievementsFrom(r.apps); delete p.hideAchievements;
+  return res.status(200).json({ handle: r.handle, profile: p && p.school ? { ...p, schoolShort: shortSchool(p.schoolId || p.school) } : p, resume, founding, achievements });
 }
 async function unsubscribe(req, res) {
   const t = String(req.query.unsub || "");
@@ -362,7 +365,8 @@ export default async function handler(req, res) {
                             profile: row?.profile ? { ...row.profile, schoolId: row.profile.schoolId || schoolIdFor(row.profile.school) || null, schoolShort: shortSchool(row.profile.schoolId || row.profile.school) } : null, handle: row?.handle || null, profilePublic: row?.profile_public === true,
                             remindEmail: row?.remind_email === true,
                             alerts: row?.alert_on === true ? { major: row.alert_major || "all", states: row.alert_states || "" } : null, emailReady: !!process.env.RESEND_API_KEY,
-                            internship: row?.internship || null, internshipReady: row ? "internship" in row : true });
+                            internship: row?.internship || null, internshipReady: row ? "internship" in row : true,
+                            achievements: achievementsFrom(row?.apps, { owner: true }) });
   const send = (out) => out.error ? res.status(out.status || 400).json({ error: out.error }) : res.status(200).json(view(out.row));
   const stop = (error, status = 400) => ({ error, status });
 

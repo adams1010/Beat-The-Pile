@@ -56,6 +56,7 @@
 </style>
 </head>
 <body>
+<script src="/badge.js" defer></script>
 <script src="/nav.js"></script>
 <main id="main"><div class="card center">Loading…</div></main>
 <script src="/business/biz.js"></script>
@@ -95,6 +96,7 @@
       const { fresh, ...app } = a;
       const r = await biz.api({ action: "app", app });
       const back = (r.apps || []).find((x) => x.id === a.id); if (back) Object.assign(a, norm(back), { fresh: false });
+      window.btpBadges?.seen(r.achievements);
       flash(a.id, "Saved");
     } catch (e) { flash(a.id, e.message); }
   }
@@ -218,7 +220,7 @@
     let me = {};
     try { const t = await biz.clerk().session.getToken(); const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + t } }); me = await r.json(); if (!r.ok) throw new Error(me.error || "Couldn't load your tracker"); }
     catch (e) { $("#main").innerHTML = `<div class="card center"><h1>Couldn't load your tracker</h1><p class="sub">${esc(e.message)}. Try again in a minute.</p></div>`; return; }
-    S.apps = (me.apps || []).map(norm);
+    S.apps = (me.apps || []).map(norm); window.btpBadges?.seen(me.achievements);
     // rows you added while signed out move into your account once
     const local = readLocal().filter((a) => a.company);
     if (local.length) {

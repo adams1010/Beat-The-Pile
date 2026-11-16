@@ -79,9 +79,22 @@ export default async function handler(req, res) {
     for (const l of rows) (seen.has(l.company_id) ? rest : (seen.add(l.company_id), first)).push(l);
     const results = [...first, ...rest].slice(0, MAX).map(toCard);
     const nearby = results.filter((c) => c.mi != null).length;
+    // Nov 15 (owner): when few jobs near you really fit your major, say so plainly and show where they are instead.
+    // strong = inside the radius AND the title fits the major. Where = states with the most title-fit internships right now.
+    const strong = rows.filter((l) => l.mi != null && l.why?.some((w) => w.startsWith("Title fits"))).length;
+    let where = [];
+    if (!remote && strong < 8 && ctx.words.length) {
+      try {
+        const ws = ctx.words.filter((w) => /^[a-z &]+$/.test(w)).slice(0, 8);
+        const q = `listings?select=state,title,id&closed_at=is.null&kind=eq.intern${fields ? `&field=in.(${fields.join(",")})` : ""}&and=(or(link_ok.is.null,link_ok.eq.true),or(${ws.map((w) => `title.ilike.*${encodeURIComponent(w)}*`).join(",")}))&order=first_seen.desc&limit=1000`;
+        const by = {};
+        for (const l of await db.select(q)) if (l.state && l.state.length === 2 && l.state !== "US" && fits(l)) by[l.state] = (by[l.state] || 0) + 1;
+        where = Object.entries(by).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([st, n]) => ({ state: st, count: n }));
+      } catch (e) { console.warn("[results] where", e.message); }
+    }
     return res.status(200).json({
       results,
-      meta: { studentState: state, zip: remote ? null : zip, radius: remote ? null : radius, nearby, radiusExpanded: false, expansionLabel: null, remote,
+      meta: { strong, where, field: fields ? fields[0] : "all", studentState: state, zip: remote ? null : zip, radius: remote ? null : radius, nearby, radiusExpanded: false, expansionLabel: null, remote,
               fields: fields || ["all"], dbCount: results.length, total: results.length, aiUsed: false, aiCount: 0 },
     });
   } catch (e) {

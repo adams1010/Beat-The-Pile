@@ -167,6 +167,14 @@
   .tl-role::before{content:"";position:absolute;left:-6px;top:9px;width:10px;height:10px;border-radius:50%;background:#fff;border:2px solid #4A7000}
   .hire a{display:inline-block;margin-top:6px;font-size:13px;font-weight:600;color:#4A7000}
   @media (max-width:560px){.tl{padding-left:22px}.tl-node{left:-22px}.tl-year{margin-left:-22px}.tl-body,.tl-roles{margin-left:0}.tl-head{grid-template-columns:38px 1fr;gap:10px}.tl-logo{width:38px;height:38px}.tl-card{padding:12px}}
+  /* Nov 15: achievements */
+  .achs{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+  .ach{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:#fff}
+  .ach .medal{width:38px;height:38px;border-radius:50%;background:#060A2C;color:#B0F701;display:grid;place-items:center;font-weight:700;font-size:15px;flex-shrink:0;border:3px solid #DDF3A8;font-variant-numeric:tabular-nums}
+  .ach.off .medal{background:#EEF1F6;border-color:#E2E7EF}.ach.off .an{color:#5E6A80}
+  .ach .an{font-weight:600;font-size:14px;color:#060A2C}
+  .ach .dots{display:flex;gap:3px;margin-top:5px}.ach .dots i{width:10px;height:4px;border-radius:2px;background:#E2E7EF}.ach .dots i.on{background:#4A7000}
+  .ach .nx{font-size:12px;color:#5E6A80;margin-top:6px}.ach .bar{height:4px;background:#EEF1F6;border-radius:2px;margin-top:4px;overflow:hidden}.ach .bar span{display:block;height:100%;background:#4A7000}
   /* Nov 15: the personal side */
   .know .tagbox{margin-top:14px}.know .kh{font-size:15px;margin:18px 0 6px}
   .sug{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.sug button{font:inherit;font-size:12.5px;border:1px dashed #9AA6B8;background:#fff;color:#2B3446;border-radius:999px;padding:4px 10px;cursor:pointer}
@@ -324,7 +332,7 @@
   const seenMe = () => { try { return !!localStorage.getItem("btp_me"); } catch { return false; } };
   // ── Public view (anyone, no sign-in) ──
   const STAFF_ROLES = ["Professor", "Lecturer or instructor", "Academic advisor", "Career center", "Department staff", "Other school staff"];
-  function profileHtml(p, resume, isPreview, founding){
+  function profileHtml(p, resume, isPreview, founding, ach){
     const where = [p.schoolShort || p.school, p.major, gradLabel(p)].filter(Boolean).join(" · ");
     const edu = [{ school: p.school, degree: "", major: p.major, when: gradLabel(p) }, ...(p.education || [])].filter((x) => x.school)
       .map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.school))}</div><div><b>${esc(x.school)}</b><div class="sm">${esc([x.degree, x.major, x.when].filter(Boolean).join(" · "))}</div></div></div>`).join("");
@@ -357,6 +365,7 @@
       ${isPreview ? ownerCards(p) : ""}
       ${p.about ? `<section class="card"><h2>About</h2><p class="about">${esc(p.about)}</p></section>` : ""}
       ${knowHtml(p, isPreview)}
+      ${achHtml(ach, isPreview, p)}
       ${edu ? `<section class="card"><h2>Education</h2>${edu}</section>` : ""}
       ${exp ? `<section class="card xp"><h2>Experience</h2>${exp}</section>` : ""}
       ${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}
@@ -365,6 +374,19 @@
       ${isPreview ? kitCard(p) : ""}
       ${isPreview || seenMe() ? "" : `<section class="card cta"><h2>Make your own profile</h2><p class="small" style="margin:0 0 12px">One page for your experience, projects and skills, plus a QR code for career fairs. Free.</p><a class="btn pri" href="/start/" style="background:#B0F701;border-color:#B0F701;color:#060A2C">Get started</a></section>`}
       <p class="small muted" style="text-align:center">Profile on <a href="/" style="color:var(--green-dark)">Beat the Pile</a>${isPreview ? "" : ` · <a href="#" id="rep" style="color:var(--muted)">Report this profile</a>`}</p>`;
+  }
+  // Achievements (Nov 15): stacking badges from the student's own Tracker. Public = tiers reached; owner = progress to the next one.
+  function achHtml(list, isPreview, p){
+    list = Array.isArray(list) ? list : [];
+    const earned = list.filter((a) => a.level > 0);
+    if (!isPreview && !earned.length) return "";
+    const tile = (a) => `<div class="ach${a.level ? "" : " off"}"><div class="medal" aria-hidden="true">${a.level || ""}</div><div style="min-width:0">
+        <div class="an">${esc(a.level ? a.label : a.name)}</div>
+        <div class="dots" aria-label="Level ${a.level} of ${a.levels}">${Array.from({ length: a.levels }, (_, i) => `<i class="${i < a.level ? "on" : ""}"></i>`).join("")}</div>
+        ${isPreview && a.next ? `<div class="nx">${a.count} of ${a.next} to “${esc(a.nextLabel)}”</div><div class="bar"><span style="width:${Math.min(100, Math.round(100 * a.count / a.next))}%"></span></div>` : ""}</div></div>`;
+    return `<section class="card"><h2>Achievements</h2>
+      ${isPreview ? `<p class="small muted" style="margin:-4px 0 10px">Earned from your Tracker. Badges stack as you go${p && p.hideAchievements ? ". Hidden from your public profile" : ". Your public profile shows the level, never exact counts"}. <a href="/tracker/">Open Tracker</a></p>` : ""}
+      <div class="achs">${(isPreview ? list : earned).map(tile).join("")}</div></section>`;
   }
   // "Get to know <name>": prompts, Ask me about, I can help with, interests (Nov 15)
   function knowHtml(p, isPreview){
@@ -402,7 +424,7 @@
     const d = await r.json();
     document.title = (d.profile.name || "Profile") + " | Beat the Pile";
     await TL_READY;
-    document.querySelector("main").innerHTML = profileHtml(d.profile, d.resume, false, d.founding);
+    document.querySelector("main").innerHTML = profileHtml(d.profile, d.resume, false, d.founding, d.achievements);
     orbitButtons(d.handle, d.profile.name); bothCard(d.profile);
     $("#rep")?.addEventListener("click", (e) => { e.preventDefault(); window.iqReport ? window.iqReport({ message: "Report profile /u/" + d.handle + "\n" }) : alert("Use the Feedback button to report."); });
   }
@@ -445,7 +467,7 @@
     app.className = "";
     document.querySelector("main").innerHTML = `
       ${S.tab === "preview" ? "" : `<div class="edhead"><button type="button" class="linkbtn" data-tab="preview">← Back to profile</button><b>Edit profile</b><span style="width:110px"></span></div>`}
-      ${S.tab === "preview" ? profileHtml(d.p, resumeOn && d.p.showResume ? "/r/" + me.resume.token : null, true, me.founding) : `
+      ${S.tab === "preview" ? profileHtml(d.p, resumeOn && d.p.showResume ? "/r/" + me.resume.token : null, true, me.founding, me.achievements) : `
       <section class="card fill" id="fill"><div class="fi">${FILE_IC}</div><div style="flex:1;min-width:0"><h2 style="margin:0 0 2px">Fill your profile from your resume</h2>
         <p class="small muted" style="margin:0">Upload your resume (PDF or Word) and we'll fill in your school, major, experience, projects, skills and links. Nothing is saved until you check it and tap Save profile.</p></div>
         <label class="btn pri" style="cursor:pointer;margin:0;flex-shrink:0">Upload resume<input type="file" id="fillRes" accept="${btpResumeFile.accept}" style="position:absolute;left:-9999px"></label></section>
@@ -473,6 +495,7 @@
       <section class="card know" id="know"><h2>Get to know me</h2>
         <p class="small muted" style="margin:-4px 0 8px">The part LinkedIn skips. This is what makes people actually reach out.</p>
         <label class="switch"><input type="checkbox" id="f_coffee" ${d.p.coffee ? "checked" : ""}><span><b>Open to coffee chats</b><br><span class="muted small">A badge on your profile and Orbit card saying students can message you to talk.</span></span></label>
+        <label class="switch"><input type="checkbox" id="f_ach" ${d.p.hideAchievements ? "" : "checked"}><span><b>Show my achievements</b><br><span class="muted small">Badges for applications, follow-ups and interviews from your Tracker. Others see the level, never exact counts.</span></span></label>
         ${field("hometown", "Hometown", "Philadelphia, PA")}
         ${Object.keys(TAGS).map((k) => tagBox(d, k)).join("")}
         <h3 class="kh">Prompts <span class="muted small">(pick up to 3)</span></h3>
@@ -623,6 +646,7 @@
       P[i].q = el.value; if (!el.value) P.splice(i, 1); editor(); main.querySelector(`[data-pa="${i}"]`)?.focus(); });
     main.querySelectorAll("[data-pa]").forEach((el) => el.oninput = () => { const P = d.p.prompts[+el.dataset.pa]; if (P) P.a = el.value; });
     const cf = $("#f_coffee"); if (cf) cf.onchange = () => { d.p.coffee = cf.checked; };
+    const ah = $("#f_ach"); if (ah) ah.onchange = () => { d.p.hideAchievements = !ah.checked; };
     const h = $("#f_handle"); if (h) h.oninput = () => { h.value = h.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").slice(0, 30); d.handle = h.value; };
     const pub = $("#f_public"); if (pub) pub.onchange = () => { d.pub = pub.checked; };
     const rs = $("#f_resume"); if (rs) rs.onchange = () => { d.p.showResume = rs.checked; };

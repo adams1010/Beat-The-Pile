@@ -1,4 +1,4 @@
-/* built from src/home.jsx 9be3e0ef3d2acd41 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 2f2c598b03da48fa — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -1822,7 +1822,7 @@ function coInitials(n) {
 function BlurCard({
   company
 }) {
-  const accent = company?.match >= 70 ? G : company?.match >= 50 ? AM : CR;
+  const accent = company?.match >= 15 ? G : company?.match >= 8 ? AM : CR;
   return React.createElement("div", {
     style: {
       position: "relative",
@@ -2124,6 +2124,32 @@ function generateReason(c, ans, extPicks) {
   }
   return `${opener} ${assessment}${extra}`.trim();
 }
+function resumeMatchOf(c) {
+  if (c.resumeCheck && typeof c.resumeCheck.score === "number") return c.resumeCheck.score;
+  const w = c.why || [];
+  return Math.min(78, 38 + (w.some(x => /^Title fits/.test(x)) ? 24 : 0) + (w.some(x => /^Mentions/.test(x)) ? 10 : 0) + (w.some(x => /^Open to your class year/.test(x)) ? 6 : 0));
+}
+function interviewOdds(c, ans, extPicks, national) {
+  const rm = resumeMatchOf(c),
+    w = c.why || [],
+    gpa = parseFloat(ans.gpa) || 0;
+  const tt = ans.targetTerm ? termTiming(ans.targetTerm) : null;
+  let p = 0.05;
+  p *= rm >= 80 ? 2.2 : rm >= 75 ? 1.9 : rm >= 65 ? 1.4 : rm >= 50 ? 1.0 : 0.6;
+  p *= w.includes("New this week") ? 1.3 : 1;
+  p *= c.mi != null && c.mi <= 25 ? 1.2 : c.remote ? 0.7 : 1;
+  p *= gpa >= 3.5 ? 1.15 : gpa > 0 && gpa < 3.0 ? 0.8 : 1;
+  p *= exceptionalPicks(extPicks || []).length ? 1.1 : 1;
+  p *= national ? 0.6 : 1;
+  p *= tt && tt.mult ? Math.min(1.1, Math.max(0.6, tt.mult)) : 1;
+  const pct = Math.max(2, Math.min(35, Math.round(p * 100)));
+  return {
+    pct,
+    rm,
+    low: Math.max(1, Math.round(pct * 0.6)),
+    high: Math.min(45, Math.round(pct * 1.6))
+  };
+}
 function applyHonest(list, ans, extPicks) {
   return list.map(c => {
     const h = honestScore(c, ans, extPicks);
@@ -2137,11 +2163,13 @@ function applyHonest(list, ans, extPicks) {
     }[c.locationBand] || 0;
     const tierPenalty = c.tier === "national" ? -3 : 0;
     const sortScore = h.pct + bandBonus + tierPenalty;
+    const o = interviewOdds(c, ans, extPicks, c.tier === "national");
     return {
       ...c,
-      match: h.pct,
-      low: h.low,
-      high: h.high,
+      match: o.pct,
+      rmatch: o.rm,
+      low: o.low,
+      high: o.high,
       _profile: h._profile,
       _timing: h._timing,
       _fit: h._fit,
@@ -2150,7 +2178,7 @@ function applyHonest(list, ans, extPicks) {
       reason,
       _sortScore: sortScore
     };
-  }).sort((a, b) => (a.mi ?? (a.remote ? 1e4 : 1e5)) - (b.mi ?? (b.remote ? 1e4 : 1e5)));
+  });
 }
 let memProfile = null;
 const profileStore = {
@@ -2385,7 +2413,7 @@ function ScoreExplainerCard({
   const partial = factors.filter(f => f.status === 'partial').length;
   const downCount = failing + partial;
   const potentialGain = factors.reduce((s, f) => s + (f.scoreGain || 0), 0);
-  const currentScore = job.matchScore || job.match || 50;
+  const currentScore = job.rmatch || job.matchScore || job.match || 50;
   const improvedScore = Math.min(95, currentScore + potentialGain);
   React.useEffect(() => {
     if (isExpanded && isPro) {
@@ -4596,12 +4624,8 @@ function App() {
         const x = n && g.find(y => +y.i === n);
         if (!x || typeof x.score !== "number") return c;
         const sc = Math.max(1, Math.min(99, Math.round(x.score)));
-        const m = Math.round(c.match * 0.6 + sc * 0.4);
-        return {
+        const nc = {
           ...c,
-          match: m,
-          low: Math.max(1, m - 8),
-          high: Math.min(99, m + 6),
           resumeCheck: {
             score: sc,
             matched: (x.matched || []).slice(0, 4),
@@ -4609,6 +4633,14 @@ function App() {
           },
           reason: x.note ? String(x.note) : c.reason,
           personalized: true
+        };
+        const o = interviewOdds(nc, ans, extPicks, c.tier === "national");
+        return {
+          ...nc,
+          match: o.pct,
+          rmatch: o.rm,
+          low: o.low,
+          high: o.high
         };
       }));
       analytics.track("results_resume_checked", {
@@ -8986,7 +9018,7 @@ function App() {
   if (page === "results") {
     const trackedNames = tracked.map(t => t.company);
     const pickScore = c => c.match + (c.tier === "national" ? 12 : 0);
-    const topPicks = [...results].filter(c => c.match >= 42).sort((a, b) => pickScore(b) - pickScore(a)).slice(0, 3);
+    const topPicks = [...results].filter(c => c.match >= 8).sort((a, b) => pickScore(b) - pickScore(a)).slice(0, 3);
     const topNames = topPicks.map(c => c.name);
     const bandLabel = (b, mi) => mi != null ? {
       text: mi <= 1 ? "In your area" : `${mi} mi away`,
@@ -9197,8 +9229,8 @@ function App() {
       }
     }, "\u21BA Redo quiz"))), results.length > 0 && (() => {
       const top = results[0]?.match || 0;
-      const strong = results.filter(r => r.match >= 70).length;
-      const decent = results.filter(r => r.match >= 50 && r.match < 70).length;
+      const strong = results.filter(r => r.match >= 15).length;
+      const decent = results.filter(r => r.match >= 8 && r.match < 15).length;
       return React.createElement("div", {
         style: {
           background: "#fff",
@@ -9236,7 +9268,7 @@ function App() {
           color: "#5B6675",
           marginLeft: 5
         }
-      }, "top match (estimate)")), strong > 0 && React.createElement("div", null, React.createElement("span", {
+      }, "best interview chance (estimate)")), strong > 0 && React.createElement("div", null, React.createElement("span", {
         style: {
           fontSize: 18,
           fontWeight: 650,
@@ -9248,7 +9280,7 @@ function App() {
           color: "#5B6675",
           marginLeft: 5
         }
-      }, "strong ", strong === 1 ? "match" : "matches")), decent > 0 && React.createElement("div", null, React.createElement("span", {
+      }, "good ", strong === 1 ? "shot" : "shots")), decent > 0 && React.createElement("div", null, React.createElement("span", {
         style: {
           fontSize: 18,
           fontWeight: 650,
@@ -9417,7 +9449,7 @@ function App() {
           borderTop: `1px solid #E2E8F0`,
           marginTop: 2
         }
-      }, "Match % is our estimate, built only from real signals: how the job title fits your major and skills, the class year and term it asks for, distance, how new the posting is, plus your GPA, activities and timing. With a resume, 40% comes from an AI resume check against the job title. It is not from the employer and is not a prediction of an offer."))));
+      }, "Two estimates, built only from real signals. Resume match works like the scores screening software gives (75%+ is the usual target): with a resume it's an AI check against the job title, without one it's a profile match from the title, your skills and class year. Interview chance starts at 5%, about what a cold application gets, and moves with your match, how new the posting is, distance, GPA, activities, timing and how many people likely apply. Most will be under 20%. That's normal: plan on applying to many."))));
     })(), showResultsHint && topPicks.length > 0 && React.createElement("div", {
       style: {
         position: "relative",
@@ -9593,6 +9625,79 @@ function App() {
           boxShadow: "none"
         }
       }, "Build my resume \u2197"));
+    })(), (() => {
+      const m = metaRef.current;
+      if (!m || ans.type === "Remote" || typeof m.strong !== "number" || m.strong >= 8) return null;
+      const r = ans.radius || 50,
+        maj = (ans.major || "your major").split(",")[0];
+      return React.createElement("div", {
+        style: {
+          background: "#FFF8E6",
+          border: "1px solid #F3D48B",
+          borderRadius: var_rl,
+          padding: "14px 16px",
+          marginBottom: 16
+        }
+      }, React.createElement("p", {
+        style: {
+          fontSize: 15,
+          fontWeight: 700,
+          color: "#060A2C",
+          marginBottom: 4
+        }
+      }, m.strong === 0 ? `No internships within ${r} miles of ${ans.zip} name ${maj} right now.` : `Only ${m.strong} ${m.strong === 1 ? "internship" : "internships"} within ${r} miles of ${ans.zip} really fit ${maj}.`), React.createElement("p", {
+        style: {
+          fontSize: 13.5,
+          color: "#4A5568",
+          lineHeight: 1.55,
+          marginBottom: 10
+        }
+      }, "The rest below are related roles. For more real options, widen your search, or consider a summer somewhere else: lots of students relocate for an internship, and some postings list housing or relocation help."), React.createElement("div", {
+        style: {
+          display: "flex",
+          gap: 8,
+          flexWrap: "wrap",
+          alignItems: "center"
+        }
+      }, [100, 200].filter(x => x > r).map(x => React.createElement("button", {
+        key: x,
+        onClick: () => {
+          setA("radius", x);
+          calcResults({
+            radius: x
+          });
+        },
+        style: {
+          background: G,
+          color: "#fff",
+          border: "none",
+          borderRadius: 99,
+          padding: "8px 14px",
+          fontFamily: "var(--font)",
+          fontSize: 13,
+          fontWeight: 700,
+          cursor: "pointer"
+        }
+      }, "Search ", x, " miles")), (m.where || []).length > 0 && React.createElement("span", {
+        style: {
+          fontSize: 13,
+          color: "#4A5568",
+          marginLeft: 4
+        }
+      }, "Most ", maj, " internships right now:"), (m.where || []).map(w => React.createElement("a", {
+        key: w.state,
+        href: `/jobs/?major=${encodeURIComponent(m.field || "all")}&state=${w.state}`,
+        style: {
+          fontSize: 13,
+          fontWeight: 600,
+          color: GD,
+          background: "#fff",
+          border: `1px solid ${GM}`,
+          borderRadius: 99,
+          padding: "6px 12px",
+          textDecoration: "none"
+        }
+      }, w.state, " \xB7 ", w.count))));
     })(), grading && React.createElement("div", {
       role: "status",
       style: {
@@ -9808,10 +9913,10 @@ function App() {
         marginBottom: 16
       }
     }, free.map((c, i) => {
-      const isStr = c.match >= 70,
-        isDec = c.match >= 50 && c.match < 70;
+      const isStr = c.match >= 15,
+        isDec = c.match >= 8 && c.match < 15;
       const accent = isStr ? G : isDec ? AM : CR;
-      const label = isStr ? "Strong Match" : isDec ? "Decent Shot" : "Reach";
+      const label = isStr ? "Good shot" : isDec ? "Worth applying" : "Long shot";
       const isTracked = trackedNames.includes(c.name);
       const saved = isJobSaved(c.name);
       const isFlipped = expandedCard === i;
@@ -10029,14 +10134,21 @@ function App() {
       }, React.createElement(AnimatedPct, {
         target: c.match,
         color: accent
-      }), typeof c.low === "number" && React.createElement("p", {
+      }), React.createElement("p", {
         style: {
           fontSize: 11,
           color: "#6B7280",
           fontWeight: 600,
           marginTop: -2
         }
-      }, "range ", c.low, "\u2013", c.high, "%"), React.createElement("div", {
+      }, "interview chance"), typeof c.rmatch === "number" && React.createElement("p", {
+        style: {
+          fontSize: 11.5,
+          color: "#060A2C",
+          fontWeight: 600,
+          marginTop: 4
+        }
+      }, c.resumeCheck ? "Resume" : "Profile", " match ", c.rmatch, "%"), React.createElement("div", {
         style: {
           marginTop: 4
         }
@@ -10044,7 +10156,7 @@ function App() {
         label: label,
         accent: accent
       })))), React.createElement(MatchBar, {
-        pct: c.match,
+        pct: typeof c.rmatch === "number" ? c.rmatch : c.match,
         color: accent,
         delay: 0
       }), (c.why || []).length > 0 && React.createElement("div", {
@@ -13109,7 +13221,7 @@ Thank you for your time,
       borderRadius: 99,
       flexShrink: 0
     }
-  }, j.match, "% match"), React.createElement("button", {
+  }, j.match, "% interview chance"), React.createElement("button", {
     onClick: () => {
       const today = new Date().toISOString().split("T")[0];
       setTracked(p => [...p, {
