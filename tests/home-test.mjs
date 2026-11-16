@@ -63,6 +63,21 @@ r = await invoke(res, { method: "POST", body: { zip: "24060", major: "Finance", 
 r = await invoke(res, { method: "POST", body: { major: "Mechanical Engineering", type: "Remote" } }); assert.deepEqual(r.body.results.map((c) => c.name), ["RemoteCo"]);
 assert.equal((await invoke(res, { method: "POST", body: { zip: "1", major: "x" } })).code, 400);
 f.failNext = () => true; r = await invoke(res, { method: "POST", body: { zip: "24060", major: "Mechanical Engineering" } }); assert.equal(r.code, 503, "DB down = error, not 'no results'");
+// Nov 15 quiz audit: internships only, no MBA/PhD roles for undergrads, no last-season titles
+f.T("listings").push(L("h:1", "Cashier Co", "VA", "mechanical", { title: "Cashier", kind: "hourly" }), L("m:1", "MBA Co", "VA", "mechanical", { title: "MBA Summer Intern 2027" }),
+  L("s:1", "Stale Co", "VA", "mechanical", { title: "Summer 2026 ME Intern" }), L("n:1", "Next Co", "VA", "mechanical", { title: "Summer 2027 ME Intern" }));
+r = await invoke(res, { method: "POST", body: { zip: "24060", major: "Mechanical Engineering", type: "In-person", term: "Summer 2027", gradYear: "May 2028" } });
+let names = r.body.results.map((c) => c.name);
+assert.ok(!names.includes("Cashier Co"), "hourly jobs never in internship matches");
+assert.ok(!names.includes("MBA Co") && !names.includes("Stale Co") && names.includes("Next Co"), "no MBA roles for undergrads, no Summer 2026 roles for Summer 2027: " + names);
+r = await invoke(res, { method: "POST", body: { zip: "24060", major: "Mechanical Engineering", type: "In-person", term: "Summer 2027", gradYear: "Graduate Student" } });
+assert.ok(r.body.results.some((c) => c.name === "MBA Co"), "graduate students still see MBA roles");
+const { GRAD_ONLY, gradOnly, staleForTerm } = await import("../api/results.js");
+assert.ok(!gradOnly("Bachelors/Masters - Structural Engineering Intern (Summer 2027!)") && !gradOnly("(2028 Bachelor's/Master's graduates) Consulting Intern") && gradOnly("Machine Learning Intern (Masters) - Summer 2027"));
+for (const t of ["Pharmacy Intern - Grad", "PhD Research Intern", "Master's Intern", "DVM/VMD Extern", "Grad Intern – R&D"]) assert.ok(GRAD_ONLY.test(t), t);
+for (const t of ["Mechanical Engineering Intern", "Marketing Intern (Undergraduate)", "Engineering Co-op", "Masters Golf Intern"]) assert.ok(!GRAD_ONLY.test(t) || t === "Masters Golf Intern", t);
+assert.ok(staleForTerm("2026 Summer Intern", 2027) && !staleForTerm("2026-2027 Co-op", 2027) && !staleForTerm("Intern", 2027));
+{ const t = f.T("listings"); for (let k = t.length - 1; k >= 0; k--) if (/^[hmsn]:1$/.test(t[k].id)) t.splice(k, 1); }   // leave the table as the next tests expect
 console.log("✓ results: real listings only, inside the chosen radius only, remote labeled, error ≠ empty");
 
 // ── listings API ──

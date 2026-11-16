@@ -1,4 +1,4 @@
-/* built from src/home.jsx 1bae5ea286723050 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 38b65f9bbbed9319 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -1495,10 +1495,20 @@ function fieldForMajor(major) {
 function skillsForMajor(major) {
   return SKILLS_BY_FIELD[fieldForMajor(major)] || SKILLS_BY_FIELD.default;
 }
-const GRAD_YEARS = ["May 2026", "Dec 2026", "May 2027", "Dec 2027", "May 2028", "Dec 2028", "May 2029", "Dec 2029", "May 2030", "Dec 2030", "Graduate Student"];
+const GRAD_YEARS = (() => {
+  const n = new Date(),
+    out = [];
+  for (let y = n.getFullYear(); y <= n.getFullYear() + 5 && out.length < 10; y++) for (const [m, mi] of [["May", 4], ["Dec", 11]]) if (new Date(y, mi, 1) >= new Date(n.getFullYear(), n.getMonth(), 1)) out.push(`${m} ${y}`);
+  return [...out.slice(0, 10), "Graduate Student"];
+})();
 const GPA_OPTS = ["4.0", "3.7–3.9", "3.5–3.6", "3.0–3.4", "2.5–2.9", "Below 2.5"];
 const TYPE_OPTS = ["Any", "Hybrid", "In-person", "Remote"];
-const TERM_OPTS = ["Summer 2026", "Fall 2026", "Spring 2027", "Summer 2027"];
+const TERM_OPTS = (() => {
+  const n = new Date(),
+    out = [];
+  for (let y = n.getFullYear(); out.length < 4; y++) for (const [t, mi] of [["Spring", 0], ["Summer", 5], ["Fall", 8]]) if (new Date(y, mi, 1) > n && out.length < 4) out.push(`${t} ${y}`);
+  return out;
+})();
 const STEP_HINTS = {
   university: "Your school's reputation and alumni network directly affect which companies recruit you.",
   gradYear: "Hiring timelines vary, we match you to companies currently recruiting for your graduation date.",
@@ -1926,7 +1936,7 @@ function experienceFromGrad(gradYear) {
     factor: 1.0,
     label: "As a graduate student, you bring the most experience, lean into that in applications."
   };
-  const now = new Date(2026, 4, 21);
+  const now = new Date();
   const m = gradYear.match(/(May|Dec)\s+(\d{4})/i);
   if (!m) return {
     factor: 0.6,
@@ -1958,7 +1968,7 @@ function experienceFromGrad(gradYear) {
   };
 }
 function termTiming(targetTerm) {
-  const now = new Date(2026, 4, 21);
+  const now = new Date();
   const parts = (targetTerm || "").split(" ");
   const season = parts[0],
     yr = parseInt(parts[1], 10);
@@ -2131,7 +2141,7 @@ function applyHonest(list, ans, extPicks) {
       reason,
       _sortScore: sortScore
     };
-  }).sort((a, b) => b._sortScore - a._sortScore);
+  }).sort((a, b) => (a.mi ?? (a.remote ? 1e4 : 1e5)) - (b.mi ?? (b.remote ? 1e4 : 1e5)));
 }
 let memProfile = null;
 const profileStore = {
@@ -4477,7 +4487,9 @@ function App() {
           zip: ans.zip,
           major: ans.major,
           type: ans.type || "Any",
-          radius: over && over.radius || ans.radius || 50
+          radius: over && over.radius || ans.radius || 50,
+          term: ans.targetTerm || "",
+          gradYear: ans.gradYear || ""
         }),
         signal: ctrl.signal
       });

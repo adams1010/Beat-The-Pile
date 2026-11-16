@@ -400,10 +400,11 @@ function fieldForMajor(major){
 }
 function skillsForMajor(major){return SKILLS_BY_FIELD[fieldForMajor(major)]||SKILLS_BY_FIELD.default;}
 
-const GRAD_YEARS=["May 2026","Dec 2026","May 2027","Dec 2027","May 2028","Dec 2028","May 2029","Dec 2029","May 2030","Dec 2030","Graduate Student"];
+// Nov 15: built from today's date, so past terms and graduation dates never show.
+const GRAD_YEARS=(()=>{const n=new Date(),out=[];for(let y=n.getFullYear();y<=n.getFullYear()+5&&out.length<10;y++)for(const [m,mi] of [["May",4],["Dec",11]])if(new Date(y,mi,1)>=new Date(n.getFullYear(),n.getMonth(),1))out.push(`${m} ${y}`);return [...out.slice(0,10),"Graduate Student"];})();
 const GPA_OPTS=["4.0","3.7–3.9","3.5–3.6","3.0–3.4","2.5–2.9","Below 2.5"];
 const TYPE_OPTS=["Any","Hybrid","In-person","Remote"];
-const TERM_OPTS=["Summer 2026","Fall 2026","Spring 2027","Summer 2027"];
+const TERM_OPTS=(()=>{const n=new Date(),out=[];for(let y=n.getFullYear();out.length<4;y++)for(const [t,mi] of [["Spring",0],["Summer",5],["Fall",8]])if(new Date(y,mi,1)>n&&out.length<4)out.push(`${t} ${y}`);return out;})();
 
 const STEP_HINTS={
   university:"Your school's reputation and alumni network directly affect which companies recruit you.",
@@ -549,7 +550,7 @@ const var_r="8px",var_rl="10px",var_rxl="14px";
 function experienceFromGrad(gradYear){
   if(!gradYear) return {factor:0.6,label:""};
   if(/grad/i.test(gradYear)) return {factor:1.0,label:"As a graduate student, you bring the most experience, lean into that in applications."};
-  const now=new Date(2026,4,21);
+  const now=new Date();
   const m=gradYear.match(/(May|Dec)\s+(\d{4})/i);
   if(!m) return {factor:0.6,label:""};
   const gradMonth=/may/i.test(m[1])?4:11; // May or December
@@ -565,7 +566,7 @@ function experienceFromGrad(gradYear){
   return {factor,label};
 }
 function termTiming(targetTerm){
-  const now=new Date(2026,4,21); // May 21, 2026
+  const now=new Date(); // Nov 15: was stuck on May 21, 2026, so every timing note was wrong
   const parts=(targetTerm||"").split(" ");
   const season=parts[0], yr=parseInt(parts[1],10);
   const startMonth={Summer:5,Fall:8,Spring:0,Winter:11}[season];
@@ -734,7 +735,7 @@ function applyHonest(list,ans,extPicks){
     const tierPenalty=c.tier==="national"?-3:0; // nationals are harder to get
     const sortScore=h.pct+bandBonus+tierPenalty;
     return{...c,match:h.pct,low:h.low,high:h.high,_profile:h._profile,_timing:h._timing,_fit:h._fit,_exp:h._exp,_lead:h._lead,reason,_sortScore:sortScore};
-  }).sort((a,b)=>b._sortScore-a._sortScore);
+  }).sort((a,b)=>(a.mi??(a.remote?1e4:1e5))-(b.mi??(b.remote?1e4:1e5))); // Nov 15: nearest first, remote after (the estimate used to reshuffle the list)
 }
 
 // PROFILE STORAGE — single abstraction. Swap these 3 methods for a real backend later; nothing else changes.
@@ -1548,7 +1549,7 @@ function App(){
     // board. No AI-made company lists and no placeholder companies: if nothing matches, we say so.
     try{
       const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),20000);
-      const r=await fetch("/api/results",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({zip:ans.zip,major:ans.major,type:ans.type||"Any",radius:(over&&over.radius)||ans.radius||50}),signal:ctrl.signal});
+      const r=await fetch("/api/results",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({zip:ans.zip,major:ans.major,type:ans.type||"Any",radius:(over&&over.radius)||ans.radius||50,term:ans.targetTerm||"",gradYear:ans.gradYear||""}),signal:ctrl.signal});
       clearTimeout(timer);
       const d=await r.json().catch(()=>({}));
       if(!r.ok)throw new Error(d.error||"Couldn't load internships right now, try again in a minute");

@@ -9,6 +9,17 @@ import { zipToState, fieldsForMajor } from "../lib/geo.js";
 import { lookupPlace, miles } from "../lib/geocode.js";
 
 const MAX = 60;
+// Nov 15 (quiz audit): undergrads were shown MBA, PhD, PharmD and DVM roles. These only show for "Graduate Student".
+export const GRAD_ONLY = /\b(mba|ph\.?\s?d|doctoral|doctorate|post-?doc|master'?s|ms\/phd|pharm\.?\s?d|dvm|vmd|jd|law clerk|juris|grad(uate)? (intern|student)|(intern|internship)\W+grad\b|residency)\b/i;
+/** Grad-degree only, unless the title also invites undergrads ("Bachelors/Masters - Structural Engineering Intern"). */
+export const gradOnly = (t) => GRAD_ONLY.test(t || "") && !/bachelor|undergrad|\bbs\/ms\b|\bb\.?s\.?\s*\/\s*m\.?s\b/i.test(t || "");
+const YEAR = /\b(20\d\d)\b/g;
+/** A title that names only years before the term you're applying for ("Summer 2026 Intern" for a Summer 2027 search) is last season's. */
+export function staleForTerm(title, termYear) {
+  if (!termYear) return false;
+  const ys = [...String(title || "").matchAll(YEAR)].map((m) => +m[1]);
+  return ys.length > 0 && ys.every((y) => y < termYear);
+}
 
 export function toCard(l) {
   return {
@@ -27,6 +38,9 @@ export default async function handler(req, res) {
   let body = req.body;
   if (typeof body === "string") { try { body = JSON.parse(body); } catch { body = {}; } }
   const zip = String(body?.zip || "").trim(), major = String(body?.major || "").slice(0, 300), type = String(body?.type || "Any");
+  const grad = /graduate/i.test(String(body?.gradYear || ""));
+  const termYear = +(String(body?.term || "").match(/20\d\d/) || [0])[0] || 0;
+  const fits = (l) => (grad || !gradOnly(l.title)) && !staleForTerm(l.title, termYear);
   if (!major) return res.status(400).json({ error: "Missing major" });
   const remote = type === "Remote";
   const radius = Math.min(200, Math.max(10, Math.round(Number(body?.radius) || 50)));
@@ -35,12 +49,12 @@ export default async function handler(req, res) {
 
   const fields = fieldsForMajor(major);
   let base = "listings?select=id,company_id,company,title,location,state,url,posted_on,first_seen,geo_pts"
-           + "&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)&order=first_seen.desc,id.asc";
+           + "&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)&kind=eq.intern&order=first_seen.desc,id.asc";   // internships only (Nov 15: hourly/full-time were leaking in)
   if (fields) base += `&field=in.(${fields.join(",")})`;      // unknown major ("Other") → every major
-  const remoteQ = `${base}&location=ilike.*remote*&limit=400`;
+  const remoteQ = `${base}&and=(or(location.ilike.*remote*,geo_kind.eq.remote))&limit=400`;
   try {
     let rows = [];
-    if (remote) rows = await db.select(remoteQ);
+    if (remote) rows = (await db.select(remoteQ)).filter(fits);
     else {
       const dLat = radius / 69, dLng = radius / (69 * Math.cos((center[0] * Math.PI) / 180)), r4 = (x) => Math.round(x * 1e4) / 1e4;
       const box = `and(geo_lat.gte.${r4(center[0] - dLat)},geo_lat.lte.${r4(center[0] + dLat)},geo_lng.gte.${r4(center[1] - dLng)},geo_lng.lte.${r4(center[1] + dLng)})`;
@@ -49,10 +63,10 @@ export default async function handler(req, res) {
       for (const l of cand) {
         const pts = Array.isArray(l.geo_pts) ? l.geo_pts : [];
         const d = pts.length ? Math.min(...pts.map((pt) => miles(center, pt))) : Infinity;
-        if (d <= radius) rows.push({ ...l, mi: Math.round(d) });        // the hard rule: inside the radius, no exceptions
+        if (d <= radius && fits(l)) rows.push({ ...l, mi: Math.round(d) });        // the hard rule: inside the radius, no exceptions
       }
       rows.sort((x, y) => x.mi - y.mi || (x.first_seen < y.first_seen ? 1 : -1));
-      if (type === "Any") rows.push(...(await db.select(remoteQ)).filter((l) => !rows.some((x) => x.id === l.id)).map((l) => ({ ...l, remote: true })));
+      if (type === "Any") rows.push(...(await db.select(remoteQ)).filter((l) => fits(l) && !rows.some((x) => x.id === l.id)).map((l) => ({ ...l, remote: true })));
     }
     // One card per company first (most variety), then fill with extra roles
     const seen = new Set(), first = [], rest = [];
