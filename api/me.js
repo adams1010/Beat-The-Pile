@@ -316,6 +316,15 @@ export default async function handler(req, res) {
       res.setHeader("Cache-Control", "public, max-age=120"); return res.status(200).json(c);
     } catch { return res.status(503).json({ error: "Company pages are temporarily unavailable" }); }
   }
+  // Nov 15: company search (any company: tracked, business pages, or new to us) + names for followed keys (/companies/)
+  if (req.method === "GET" && (req.query?.cosearch !== undefined || req.query?.cokeys !== undefined)) {
+    try {
+      const { searchCompanies, namesForKeys } = await import("../lib/cosearch.js");
+      res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=900");
+      if (req.query.cosearch !== undefined) return res.status(200).json({ companies: await searchCompanies(String(req.query.cosearch || "")) });
+      return res.status(200).json({ companies: await namesForKeys(String(req.query.cokeys || "").split(",")) });
+    } catch (e) { console.error("[cosearch]", e?.message); return res.status(503).json({ error: "Company search is temporarily unavailable" }); }
+  }
   // Founding members counter (homepage, /start/): real count of student sign-ups, capped at 150
   if (req.method === "GET" && req.query?.founding !== undefined) {
     try { res.setHeader("Cache-Control", "public, max-age=30, s-maxage=120, stale-while-revalidate=600"); return res.status(200).json(await foundingCount()); }
@@ -538,6 +547,16 @@ export default async function handler(req, res) {
         if (set.size > MAX_STARS) return stop(`You can follow up to ${MAX_STARS} companies`);
         return { starred: [...set] };
       }));
+    }
+    // follow a company by name (one we may not track yet: it goes on the Company Finder's list)
+    if (action === "co_follow") {
+      if (!(await rateOk(`cofollow:${uid}`, 86400, 30))) return res.status(429).json({ error: "That's a lot of new companies for one day, try again tomorrow" });
+      const { keyForName } = await import("../lib/cosearch.js");
+      const hit = await keyForName(body.name); if (!hit || !CO_OK.test(hit.key)) return res.status(400).json({ error: "Type the company's name" });
+      const out = await mutate(uid, (r) => { const set = new Set(r.starred || []); set.add(hit.key);
+        if (set.size > MAX_STARS) return stop(`You can follow up to ${MAX_STARS} companies`); return { starred: [...set] }; });
+      if (out.error) return send(out);
+      return res.status(200).json({ ok: true, key: hit.key, name: hit.name, queued: !!hit.queued, starred: out.row?.starred || [] });
     }
     if (action === "seen") {
       await mutate(uid, () => ({ seen_at: new Date().toISOString() }));

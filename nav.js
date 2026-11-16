@@ -36,6 +36,7 @@
   // menu behind your picture on the right — like Instagram's "switch to professional account".
   const TOOLS = BIZ ? [] : [
     ["/internship/", "My Internship", "Got an offer? Prep, first weeks, wrap-up"],
+    ["/companies/", "Companies", "Look up any company and follow it"],
     ["/radar/", "Opening Radar", "When each company usually opens internships"],
     ["/#quiz", "Match quiz", "Real openings matched to your major"],
     ["/#interview", "Interview practice", "Talk it out against a timer, get graded"],
@@ -173,14 +174,14 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     const f = nav.querySelector("form.q[action='/jobs/']"); if (!f) return;
     const i = f.querySelector("input[name=q]"), box = f.querySelector(".qs"); let sel = 0;
     const esc2 = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-    const opts = (v) => [["/jobs/?state=all&q=" + encodeURIComponent(v), "Jobs and internships", v], ["/orbit/?q=" + encodeURIComponent(v.replace(/^@/, "")), "People", v]];
+    const opts = (v) => [["/jobs/?state=all&q=" + encodeURIComponent(v), "Jobs and internships", v], ["/orbit/?q=" + encodeURIComponent(v.replace(/^@/, "")), "People", v], ["/companies/?q=" + encodeURIComponent(v), "Companies", v]];   // Nov 15: + Companies (follow any company)
     const paint = () => { const v = i.value.trim(); if (!v) { box.hidden = true; return; }
       if (v.startsWith("@")) sel = 1;
       box.innerHTML = opts(v).map(([h, t, q], k) => `<a role="option" href="${h}" aria-selected="${k === sel}"><span>${t}</span><small data-noi18n>“${esc2(q.slice(0, 40))}”</small></a>`).join(""); box.hidden = false; };
     i.addEventListener("input", () => { sel = 0; paint(); });
     i.addEventListener("focus", paint);
     i.addEventListener("keydown", (e) => { if (box.hidden) return;
-      if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); sel = sel ? 0 : 1; paint(); }
+      if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); sel = (sel + (e.key === "ArrowDown" ? 1 : 2)) % 3; paint(); }
       else if (e.key === "Escape") box.hidden = true; });
     f.addEventListener("submit", (e) => { const v = i.value.trim(); if (!v) return; e.preventDefault(); location.href = opts(v)[sel][0]; });
     document.addEventListener("click", (e) => { if (!f.contains(e.target)) box.hidden = true; });

@@ -83,7 +83,7 @@
     const hiringNow = !!c.domain && ((p.hiring?.types || []).length > 0 || (c.jobs || []).length > 0 || !preview);
     return `<section class="hero"><div class="ban"></div><div class="bd"><div class="lgw">${biz.logo(p, 96)}${hiringNow ? '<span class="hiring">Hiring</span>' : ""}</div>
         <div style="min-width:0"><h1>${esc(p.company || "Your company")}</h1>${p.tagline ? `<div class="tl">${esc(p.tagline)}</div>` : ""}<div class="facts">${esc(facts)}</div></div>
-        <div class="btns">${!preview && c.ownerKey && !isBiz() ? `<button class="btn pri" data-join="${esc(c.ownerKey)}">Join orbit</button>` : ""}${p.careers ? `<a class="btn pri" href="${esc(p.careers)}" target="_blank" rel="noopener nofollow">Careers site</a>` : ""}${p.website ? `<a class="btn" href="${esc(p.website)}" target="_blank" rel="noopener nofollow">Website</a>` : ""}${p.linkedin ? `<a class="btn" href="${esc(p.linkedin)}" target="_blank" rel="noopener nofollow">LinkedIn</a>` : ""}</div></div>
+        <div class="btns">${!preview && c.ownerKey && !isBiz() ? `<button class="btn pri" data-join="${esc(c.ownerKey)}">Join orbit</button>` : ""}${!preview && c.followKey && !isBiz() ? `<button class="btn" data-follow="${esc(c.followKey)}" aria-pressed="false">Follow</button>` : ""}${p.careers ? `<a class="btn pri" href="${esc(p.careers)}" target="_blank" rel="noopener nofollow">Careers site</a>` : ""}${p.website ? `<a class="btn" href="${esc(p.website)}" target="_blank" rel="noopener nofollow">Website</a>` : ""}${p.linkedin ? `<a class="btn" href="${esc(p.linkedin)}" target="_blank" rel="noopener nofollow">LinkedIn</a>` : ""}</div></div>
       <div class="tabs" role="tablist">${T.map(([k, l]) => `<button role="tab" data-ctab="${k}" aria-selected="${k === tab}">${esc(l)}</button>`).join("")}</div></section>${body}`;
   }
 
@@ -95,7 +95,7 @@
     return `<section class="hero"><div class="ban"></div><div class="bd"><div class="lgw">${pic}${c.domain ? '<span class="hiring">Hiring</span>' : ""}</div>
         <div style="min-width:0"><h1>${esc(me.name || "Recruiter")}</h1><div class="tl">${esc(me.title || "Recruiter")}${p.company ? " at " : ""}${coLink}</div>
           <div class="facts">${c.domain ? `Work email confirmed at ${esc(c.domain)}` : ""}</div></div>
-        <div class="btns">${!preview && c.ownerKey && !isBiz() ? `<button class="btn pri" data-join="${esc(c.ownerKey)}">Join orbit</button>` : ""}${c.companySlug ? `<a class="btn" href="/co/${encodeURIComponent(c.companySlug)}">Company page</a>` : p.website ? `<a class="btn" href="${esc(p.website)}" target="_blank" rel="noopener nofollow">${esc(host(p.website))}</a>` : ""}</div></div></section>
+        <div class="btns">${!preview && c.ownerKey && !isBiz() ? `<button class="btn pri" data-join="${esc(c.ownerKey)}">Join orbit</button>` : ""}${!preview && c.followKey && !isBiz() ? `<button class="btn" data-follow="${esc(c.followKey)}" aria-pressed="false">Follow</button>` : ""}${c.companySlug ? `<a class="btn" href="/co/${encodeURIComponent(c.companySlug)}">Company page</a>` : p.website ? `<a class="btn" href="${esc(p.website)}" target="_blank" rel="noopener nofollow">${esc(host(p.website))}</a>` : ""}</div></div></section>
       <div class="grid"><div>
         <section class="card"><h2>About</h2>${me.bio ? `<p class="about">${esc(me.bio)}</p>` : `<p class="empty">${preview ? "Add a line about what you hire for." : "No description yet."}</p>`}</section>
         <section class="card"><h2>Hiring for</h2>${(h.types || []).length || (h.majors || []).length || h.locations ? `<dl class="kv">
@@ -126,6 +126,25 @@
     });
   }
 
+  // Nov 15: Follow (same list as ★ on Jobs: new-job alerts, fair plans, Orbit insiders). Signed out → sign in first.
+  let MINE = null;
+  async function myStars(){ if (MINE) return MINE; const u = await signedIn(); if (!u) return null;
+    try { const t = await biz.clerk()?.session?.getToken(); const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + t } }); const d = await r.json(); MINE = new Set(d.starred || []); } catch { MINE = new Set(); }
+    return MINE; }
+  function paintFollow(){ document.querySelectorAll("[data-follow]").forEach((b) => { const on = !!MINE?.has(b.dataset.follow);
+    b.textContent = on ? "Following" : "Follow"; b.setAttribute("aria-pressed", String(on)); }); }
+  function wireFollow(){
+    if (!document.querySelector("[data-follow]")) return;
+    myStars().then(paintFollow);
+    document.querySelectorAll("[data-follow]").forEach((b) => b.onclick = async () => {
+      const u = await signedIn();
+      if (!u) { window.Clerk ? window.Clerk.openSignIn({}) : (location.href = "/start/?next=" + encodeURIComponent(location.pathname)); return; }
+      await myStars(); const k = b.dataset.follow, on = !MINE.has(k); b.disabled = true;
+      try { const d = await biz.api({ action: "star", company: k, on }); MINE = new Set(d.starred || []); paintFollow(); }
+      catch (e) { alert(e.message); } finally { b.disabled = false; }
+    });
+  }
+
   // ── public: /co/<slug> ──
   async function publicView(){
     try {
@@ -133,9 +152,9 @@
       if (r.status === 404) { $("main").innerHTML = `<div class="card center"><h1>No company page here</h1><p class="sub">This company hasn't set up a verified page on Beat the Pile yet.</p><a class="btn pri" href="/jobs/">Browse internships</a></div>`; return; }
       if (!r.ok) throw new Error(c.error || "Couldn't load this company");
       await fairsP;
-      if (c.kind === "recruiter") { document.title = `${c.person?.name || "Recruiter"} | Beat the Pile`; $("main").innerHTML = personPage(c, false); wireJoin(); return; }
+      if (c.kind === "recruiter") { document.title = `${c.person?.name || "Recruiter"} | Beat the Pile`; $("main").innerHTML = personPage(c, false); wireJoin(); wireFollow(); return; }
       document.title = `${c.company.company} | Beat the Pile`;
-      let tab = "about"; const draw = () => { $("main").innerHTML = page(c, tab, false); document.querySelectorAll("[data-ctab]").forEach((b) => b.onclick = () => { tab = b.dataset.ctab; draw(); }); wireJoin(); };
+      let tab = "about"; const draw = () => { $("main").innerHTML = page(c, tab, false); document.querySelectorAll("[data-ctab]").forEach((b) => b.onclick = () => { tab = b.dataset.ctab; draw(); }); wireJoin(); wireFollow(); };
       draw();
     } catch (e) { $("main").innerHTML = `<div class="card center">${esc(e.message)}</div>`; }
   }

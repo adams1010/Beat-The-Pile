@@ -1815,7 +1815,22 @@
   "Companies": "Empresas",
   "What's next": "Lo que sigue",
   "Not sure yet?": "¿Aún no estás seguro?",
-  "See them": "Verlos"
+  "See them": "Verlos",
+  "Look up any company and follow it": "Busca cualquier empresa y síguela",
+  "Look up any company and follow it. You'll see their new jobs first, get them in your weekly job alert, and find students who worked there in Orbit.": "Busca cualquier empresa y síguela. Verás primero sus nuevos empleos, los recibirás en tu alerta semanal y encontrarás en Orbit a estudiantes que trabajaron allí.",
+  "Company name, like Boeing or Beat the Pile": "Nombre de la empresa, como Boeing o Beat the Pile",
+  "Hiring the most right now": "Las que más contratan ahora",
+  "On Beat the Pile": "En Beat the Pile",
+  "Not on Beat the Pile yet": "Aún no está en Beat the Pile",
+  "No open jobs right now": "Sin empleos abiertos ahora",
+  "Follow": "Seguir",
+  "Company search couldn’t load right now. Try again in a minute.": "La búsqueda de empresas no cargó. Inténtalo en un minuto.",
+  "We don’t track this company yet. Follow it and we’ll look for their job board.": "Aún no seguimos esta empresa. Síguela y buscaremos su bolsa de empleo.",
+  "Added. We’ll look for their job board.": "Listo. Buscaremos su bolsa de empleo.",
+  "Couldn’t load the companies you follow right now.": "No se pudieron cargar las empresas que sigues.",
+  "Looking for the company itself?": "¿Buscas la empresa en sí?",
+  "in Companies": "en Empresas",
+  "to follow them.": "para seguirla."
  },
  "patterns": [
   ["^(.+) career fair page ↗$", "Página de ferias de empleo de $1 ↗"],
@@ -1934,6 +1949,7 @@
   ["^See all ([\\d,]+) at (.+)$", "Ver los $1 en $2"],
   ["^([\\d,]+) new drops?, show$", "$1 novedades, ver"],
   ["^(\\d+) (min|h|d) ago$", "hace $1 $2"],
-  ["^See the job up close first: ([\\d,]+) shadowing & volunteer spots, many unpaid\\.$", "Mira el trabajo de cerca primero: $1 puestos de observación y voluntariado, muchos sin pago."]
+  ["^See the job up close first: ([\\d,]+) shadowing & volunteer spots, many unpaid\\.$", "Mira el trabajo de cerca primero: $1 puestos de observación y voluntariado, muchos sin pago."],
+  ["^([\\d,]+) open jobs?$", "$1 empleos abiertos"]
  ]
 }

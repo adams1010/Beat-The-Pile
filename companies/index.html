@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Companies | Beat the Pile</title>
+<meta name="description" content="Look up any company and follow it: see their new jobs and internships first and find students who worked there.">
+<link rel="canonical" href="https://www.beatthepile.com/companies/">
+<link rel="icon" href="/icons/icon-192.png">
+<meta name="theme-color" content="#060A2C">
+<style>
+  /* /companies/ (Nov 15): look up ANY company and follow it. Server search (GET /api/me?cosearch=) = companies we track +
+     verified business pages (/co/<slug>); /companies/names.json adds every other known company ("Not on Beat the Pile
+     yet": following one puts it on the Company Finder's list, POST {action:"co_follow", name}). */
+  :root{--green:#4A7000;--navy:#060A2C;--ink:#060A2C;--muted:#55627A;--faint:#5E6A80;--line:#DCE2EC;--bg:#EEF1F6;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}
+  html,body{overflow-x:clip}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5}
+  main{max-width:860px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px))}
+  h1{font-size:30px;letter-spacing:-.02em;margin:4px 0 6px}
+  h2{font-size:18px;margin:26px 0 10px}
+  .lead{color:var(--muted);margin:0 0 18px;max-width:62ch}
+  .search{display:flex;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px}
+  .search:focus-within{border-color:var(--green)}
+  .search input{flex:1;min-width:0;border:0;font:inherit;font-size:16px;padding:10px 12px;outline:none;background:transparent}
+  .search button{border:0;background:var(--green);color:#fff;font:inherit;font-weight:600;border-radius:999px;padding:8px 18px;cursor:pointer}
+  .list{display:grid;gap:8px}
+  .co{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+  .tile{width:44px;height:44px;border-radius:8px;background:#EEF1F6;color:#1E3A8A;display:grid;place-items:center;font-weight:700;font-size:14px;overflow:hidden}
+  .tile img{width:100%;height:100%;object-fit:contain;background:#fff}
+  .nm{font-weight:600;font-size:16px;overflow-wrap:anywhere}
+  .sub{font-size:13.5px;color:var(--faint);display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-variant-numeric:tabular-nums}
+  .sub a{color:var(--green);font-weight:600;text-decoration:none}.sub a:hover{text-decoration:underline}
+  .tag{font-size:11.5px;font-weight:600;border-radius:999px;padding:1px 8px;background:#F2FADF;color:#3A5800}
+  .tag.new{background:#EEF1F6;color:#1E3A8A}
+  .fol{border:1px solid var(--green);background:#fff;color:var(--green);font:inherit;font-size:14px;font-weight:600;border-radius:999px;padding:7px 16px;cursor:pointer;white-space:nowrap}
+  .fol[aria-pressed="true"]{background:var(--green);color:#fff}
+  .fol:disabled{opacity:.6;cursor:default}
+  .note{color:var(--muted);font-size:14px;margin:10px 2px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:6px 14px;font:inherit;font-size:14px;cursor:pointer;color:var(--ink)}
+  .chip:hover{border-color:var(--green)}
+  .sk{height:70px;border-radius:10px;background:linear-gradient(90deg,#E4E8EF 25%,#EEF1F6 50%,#E4E8EF 75%);background-size:200% 100%;animation:sh 1.2s infinite}
+  @keyframes sh{to{background-position:-200% 0}}
+  @media (max-width:560px){.co{grid-template-columns:38px 1fr;}.tile{width:38px;height:38px}.co .fol{grid-column:1/-1;justify-self:start;margin-left:50px}}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main">
+  <h1>Companies</h1>
+  <p class="lead">Look up any company and follow it. You'll see their new jobs first, get them in your weekly job alert, and find students who worked there in Orbit.</p>
+  <form class="search" id="f" role="search"><input id="q" type="search" placeholder="Company name, like Boeing or Beat the Pile" autocomplete="off" aria-label="Company name"><button type="submit">Search</button></form>
+  <div id="out"></div>
+  <section id="mineBox" hidden><h2>Companies you follow</h2><div class="list" id="mine"></div></section>
+  <section id="popBox" hidden><h2>Hiring the most right now</h2><div class="chips" id="pop"></div></section>
+</main>
+<script src="/business/biz.js"></script>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const norm = (s) => String(s || "").toLowerCase().replace(/&/g, "and").replace(/\b(inc|llc|ltd|corp|corporation|company|co|the|group|plc|holdings|incorporated)\b\.?/g, "").replace(/[^a-z0-9]/g, "");
+  const ini = (n) => String(n || "?").replace(/[^A-Za-z0-9 ]/g, " ").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";
+  let USER = undefined, STARS = null, NAMES = null, last = "";
+
+  async function token(){ try { return await biz.clerk()?.session?.getToken(); } catch { return null; } }
+  async function loadStars(){
+    if (!USER) { STARS = null; return; }
+    try { const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + (await token()) } }); const d = await r.json(); STARS = new Set(d.starred || []); } catch { STARS = new Set(); }
+  }
+  const following = (k) => !!STARS?.has(k);
+  const btn = (c) => `<button type="button" class="fol" data-key="${esc(c.key || "")}" data-name="${esc(c.name)}" aria-pressed="${c.key ? following(c.key) : false}">${c.key && following(c.key) ? "Following" : "Follow"}</button>`;
+  function card(c){
+    const tile = c.logo ? `<img alt="" src="${esc(c.logo)}" loading="lazy" onerror="this.replaceWith(document.createTextNode('${esc(ini(c.name))}'))">` : esc(ini(c.name));
+    const bits = [];
+    if (c.verified) bits.push('<span class="tag">On Beat the Pile</span>');
+    if (!c.key || c.queued) bits.push('<span class="tag new">Not on Beat the Pile yet</span>');
+    if (c.tracked) bits.push(c.open ? `<a href="/jobs/?company=${encodeURIComponent(c.key)}&kind=all&state=all">${Number(c.open).toLocaleString("en-US")} open job${c.open === 1 ? "" : "s"}</a>` : "<span>No open jobs right now</span>");
+    if (c.page) bits.push(`<a href="${esc(c.page)}">Company page</a>`);
+    if (c.tagline) bits.push(`<span>${esc(c.tagline)}</span>`);
+    return `<div class="co"><div class="tile" aria-hidden="true">${tile}</div><div style="min-width:0"><div class="nm" data-noi18n>${esc(c.name || "Company")}</div><div class="sub">${bits.join("")}</div></div>${btn(c)}</div>`;
+  }
+
+  async function names(){ if (NAMES) return NAMES; try { NAMES = (await (await fetch("/companies/names.json")).json()).map((x) => [x[0], norm(x[0])]); } catch { NAMES = []; } return NAMES; }
+  async function search(q){
+    q = q.trim(); last = q;
+    const u = new URL(location.href); q ? u.searchParams.set("q", q) : u.searchParams.delete("q"); history.replaceState(null, "", u);
+    if (q.length < 2) { $("out").innerHTML = ""; return; }
+    $("out").innerHTML = '<div class="list"><div class="sk"></div><div class="sk"></div><div class="sk"></div></div>';
+    let found = [], err = false;
+    try { const r = await fetch("/api/me?cosearch=" + encodeURIComponent(q)); if (!r.ok) throw 0; found = (await r.json()).companies || []; } catch { err = true; }
+    if (q !== last) return;
+    // every other company we know the name of (SEC-listed, aliases…): followable, and we'll go look for their jobs
+    const k = norm(q), have = new Set(found.map((c) => norm(c.name)));
+    const extra = (await names()).filter(([n, nn]) => nn && !have.has(nn) && (nn.startsWith(k) || n.toLowerCase().includes(q.toLowerCase()))).slice(0, 8).map(([n]) => ({ name: n }));
+    if (!extra.some((c) => norm(c.name) === k) && !found.some((c) => norm(c.name) === k) && k.length >= 2) extra.push({ name: q.replace(/\s+/g, " ").slice(0, 80) });
+    const all = [...found, ...extra];
+    $("out").innerHTML = (err ? '<p class="note">Company search couldn’t load right now. Try again in a minute.</p>' : "")
+      + (all.length ? `<p class="note">${found.length ? "" : "We don’t track this company yet. Follow it and we’ll look for their job board."}</p><div class="list">${all.map(card).join("")}</div>` : "");
+    wire($("out"));
+  }
+
+  function wire(box){
+    box.querySelectorAll(".fol").forEach((b) => b.onclick = async () => {
+      if (!USER) { location.href = "/start/?next=" + encodeURIComponent(location.pathname + location.search); return; }
+      if (!STARS) await loadStars();
+      b.disabled = true;
+      try {
+        let key = b.dataset.key, on = !key || !following(key);
+        if (key) { const d = await biz.api({ action: "star", company: key, on }); STARS = new Set(d.starred || []); }
+        else { const d = await biz.api({ action: "co_follow", name: b.dataset.name }); STARS = new Set(d.starred || []); key = d.key; b.dataset.key = key;
+          const s = b.closest(".co")?.querySelector(".sub"); if (s && d.queued) s.insertAdjacentHTML("beforeend", "<span>Added. We’ll look for their job board.</span>"); }
+        document.querySelectorAll(`.fol[data-key="${CSS.escape(key)}"]`).forEach((x) => { const f = following(key); x.textContent = f ? "Following" : "Follow"; x.setAttribute("aria-pressed", String(f)); });
+        mine();
+      } catch (e) { alert(e.message || "Couldn't save that, try again"); }
+      finally { b.disabled = false; }
+    });
+  }
+
+  async function mine(){
+    const keys = STARS ? [...STARS] : [];
+    $("mineBox").hidden = !keys.length; if (!keys.length) return;
+    try { const r = await fetch("/api/me?cokeys=" + encodeURIComponent(keys.slice(0, 120).join(","))); const d = await r.json();
+      const list = (d.companies || []).map((c) => ({ ...c, name: c.name || c.key.replace(/^(co|s|b|x|g)-/, "").replace(/-/g, " ") }));
+      $("mine").innerHTML = list.map(card).join(""); wire($("mine"));
+    } catch { $("mine").innerHTML = '<p class="note">Couldn’t load the companies you follow right now.</p>'; }
+  }
+
+  async function popular(){
+    try { const d = await (await fetch("/api/listings?summary=1&field=all&kind=all")).json();
+      const top = (d.top || []).slice(0, 10); if (!top.length) return;
+      $("pop").innerHTML = top.map((t) => `<button type="button" class="chip" data-q="${esc(t.company)}" data-noi18n>${esc(t.company)}</button>`).join("");
+      $("pop").querySelectorAll(".chip").forEach((c) => c.onclick = () => { $("q").value = c.dataset.q; search(c.dataset.q); });
+      $("popBox").hidden = false;
+    } catch {}
+  }
+
+  let t = null;
+  $("q").addEventListener("input", () => { clearTimeout(t); t = setTimeout(() => search($("q").value), 300); });
+  $("f").addEventListener("submit", (e) => { e.preventDefault(); clearTimeout(t); search($("q").value); });
+  const q0 = new URLSearchParams(location.search).get("q") || "";
+  if (q0) { $("q").value = q0; } else $("q").focus();
+  popular();
+  biz.start(async (u) => { USER = u || null; await loadStars(); if ($("q").value.trim()) search($("q").value); mine(); });
+  if (q0) search(q0);
+})();
+</script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

@@ -1815,7 +1815,22 @@
   "Companies": "Bedrijven",
   "What's next": "Wat komt er",
   "Not sure yet?": "Nog niet zeker?",
-  "See them": "Bekijken"
+  "See them": "Bekijken",
+  "Look up any company and follow it": "Zoek elk bedrijf op en volg het",
+  "Look up any company and follow it. You'll see their new jobs first, get them in your weekly job alert, and find students who worked there in Orbit.": "Zoek elk bedrijf op en volg het. Je ziet hun nieuwe banen als eerste, krijgt ze in je wekelijkse vacaturemail en vindt in Orbit studenten die er hebben gewerkt.",
+  "Company name, like Boeing or Beat the Pile": "Bedrijfsnaam, zoals Boeing of Beat the Pile",
+  "Hiring the most right now": "Nemen nu het meest aan",
+  "On Beat the Pile": "Op Beat the Pile",
+  "Not on Beat the Pile yet": "Nog niet op Beat the Pile",
+  "No open jobs right now": "Nu geen open vacatures",
+  "Follow": "Volgen",
+  "Company search couldn’t load right now. Try again in a minute.": "Bedrijven zoeken kon niet laden. Probeer het over een minuut opnieuw.",
+  "We don’t track this company yet. Follow it and we’ll look for their job board.": "We volgen dit bedrijf nog niet. Volg het en we zoeken hun vacaturesite.",
+  "Added. We’ll look for their job board.": "Toegevoegd. We zoeken hun vacaturesite.",
+  "Couldn’t load the companies you follow right now.": "De bedrijven die je volgt konden niet laden.",
+  "Looking for the company itself?": "Zoek je het bedrijf zelf?",
+  "in Companies": "in Bedrijven",
+  "to follow them.": "om het te volgen."
  },
  "patterns": [
   ["^(.+) career fair page ↗$", "Banenbeurspagina van $1 ↗"],
@@ -1934,6 +1949,7 @@
   ["^See all ([\\d,]+) at (.+)$", "Bekijk alle $1 bij $2"],
   ["^([\\d,]+) new drops?, show$", "$1 nieuw, tonen"],
   ["^(\\d+) (min|h|d) ago$", "$1 $2 geleden"],
-  ["^See the job up close first: ([\\d,]+) shadowing & volunteer spots, many unpaid\\.$", "Bekijk het werk eerst van dichtbij: $1 meeloop- en vrijwilligersplekken, veel onbetaald."]
+  ["^See the job up close first: ([\\d,]+) shadowing & volunteer spots, many unpaid\\.$", "Bekijk het werk eerst van dichtbij: $1 meeloop- en vrijwilligersplekken, veel onbetaald."],
+  ["^([\\d,]+) open jobs?$", "$1 open vacatures"]
  ]
 }

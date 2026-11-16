@@ -215,6 +215,7 @@
   .tourban button{background:none;border:0;font:inherit;color:#3A4560;min-height:44px;padding:0 8px;cursor:pointer;text-decoration:underline}
   .shpromo{margin:6px 0 10px;padding:10px 14px;border:1px solid #DDF3A8;background:#F2FADF;border-radius:10px;font-size:14px;color:#2B3446}
   .shpromo .linkbtn{font-weight:600;color:#4A7000}
+  .cohint{margin:0 0 10px;font-size:14px;color:#55627A}.cohint a{color:#4A7000;font-weight:600}
 </style>
 </head>
 <body>
@@ -283,6 +284,7 @@
     </div>
     <div class="count" id="count" aria-live="polite"></div>
     <div class="shpromo" id="shPromo" hidden></div>
+    <div class="cohint" id="coHint" hidden></div>
     <div class="note" id="note"></div>
   </div>
       <div id="alert"></div>
@@ -560,6 +562,10 @@
       shp.hidden = !show;
       if (show) { shp.innerHTML = `<b>Not sure yet?</b> See the job up close first: ${nSh.toLocaleString("en-US")} shadowing & volunteer spots, many unpaid. <button type="button" class="linkbtn" id="shGo">See them</button>`;
         $("shGo").onclick = () => document.querySelector('[data-kind="shadow"]')?.click(); } }
+    // Nov 15: a search can be a company name (one with no open jobs, or a business page): offer the company search to follow it
+    const ch = $("coHint");
+    if (ch) { const qq = (state.q || "").trim(); ch.hidden = !(qq.length >= 2 && qq.split(/\s+/).length <= 4 && !state.company);
+      if (!ch.hidden) ch.innerHTML = `Looking for the company itself? <a href="/companies/?q=${encodeURIComponent(qq)}">Find <span data-noi18n>${esc(qq)}</span> in Companies</a> to follow them.`; }
     renderMailme(rows.length);
     const allMaj = state.major !== "all" && !state.savedOnly && !state.followOnly && !state.company;
     const widen = allMaj ? ` <button class="linkbtn" id="qAllMaj">Search every major</button>` : "";
