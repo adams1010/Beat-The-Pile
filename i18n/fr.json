@@ -1,6 +1,10 @@
 {
  "lang": "fr",
  "strings": {
+  "More": "Plus",
+  "Fair": "Salon",
+  "Season": "Saison",
+  "Fairs": "Salons",
   "Invite classmates": "Inviter des camarades",
   "Save your profile first to get your own invite link.": "Enregistrez d'abord votre profil pour obtenir votre lien d'invitation.",
   "Set up my profile": "Configurer mon profil",

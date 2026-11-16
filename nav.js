@@ -129,6 +129,27 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   .btpnav #acct span,.btpnav #acct .who{display:none}
   .btpnav .links{display:none}.btpnav .mob{display:block;margin-left:auto}.btpnav .mob summary{color:#fff;border:1px solid rgba(255,255,255,.18);padding:7px 10px}
   .btpnav .mob .menu{left:8px!important;right:8px;min-width:0}}
+/* Nov 16: phones get a LinkedIn-style bottom tab bar; the top bar keeps only the logo and your picture */
+.btptab{display:none}
+@media (max-width:640px){
+  .btpnav .mob{display:none}.btpnav .right{margin-left:auto}
+  body.btp-has-nav{padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
+  .btptab{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:75;background:#060A2C;border-top:1px solid #1A2640;
+    padding:0 env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px);font:500 11px/1.1 "Geist",-apple-system,sans-serif}
+  .btptab>a,.btptab>details>summary{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:58px;color:#AEB9CC;text-decoration:none;list-style:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+  .btptab>details{flex:1;display:flex}.btptab>details>summary::-webkit-details-marker{display:none}
+  .btptab>a[aria-current="page"],.btptab>details[open]>summary{color:#B0F701}
+  .btptab .btpic{width:23px;height:23px}
+  .btptab .btpbw{position:relative;display:block;height:23px}.btptab .btpbw .btpbadge{position:absolute;top:-5px;left:13px}
+  .btptab .btpbadge{font:700 10.5px/16px "Geist",sans-serif;font-style:normal;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#B0F701;color:#060A2C;text-align:center}
+  .btptab .btpbadge[hidden]{display:none!important}
+  .btptab .more{position:fixed;left:8px;right:8px;bottom:calc(66px + env(safe-area-inset-bottom,0px));max-height:70vh;overflow:auto;background:#fff;color:#060A2C;border:1px solid #DCE2EC;border-radius:10px;padding:6px;font-size:14px}
+  .btptab .more{display:block!important;flex-direction:column}.btptab .more a{display:block!important;width:auto!important;padding:11px 12px;border-radius:8px;color:#060A2C;text-decoration:none}.btptab .more a:active{background:#EEF1F6}
+  .btptab .more b{display:block;font-weight:600}.btptab .more small{display:block;color:#55627A;font-size:12px;margin-top:2px}
+  .btptab .more .sep{height:1px;background:#E3E7ED;margin:6px 4px}
+  .iqfb-btn{bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}.iqp{bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}
+  .btpcookie{bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}
+  .toast,.totop{bottom:calc(74px + env(safe-area-inset-bottom,0px))!important}.sheet{z-index:80!important}}
 .btpnav .menu .sep{height:1px;background:#E3E7ED;margin:6px 4px}
 @media print{.btpnav{display:none}}
 /* Nov 13 mobile pass: iPhone zooms the page into any field under 16px; Clerk's sign-in boxes were 30px tall and grey */
@@ -214,8 +235,18 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     const main = document.querySelector("main"); if (main && !main.id) main.id = "main";
     const acct = document.getElementById("acct"); if (acct && !nav.contains(acct)) nav.querySelector("#btpRight").appendChild(acct);
   };
+  // Nov 16: phone bottom bar = the 4 most-used pages + More (everything else). Desktop is unchanged.
+  const BAR = BIZ ? ["/business/home/", "/business/talent/", "/orbit/", "/business/fairs/"] : ["/", "/jobs/", "/orbit/", "/tracker/"];
+  const tab = document.createElement("nav"); tab.className = "btptab"; tab.setAttribute("aria-label", "Main (phone)");
+  const rest = MAIN.filter(([h]) => !BAR.includes(h));
+  const SHORT = { "Career Fairs": "Fairs", "Career Fair": "Fair", "My Season": "Season" };
+  tab.innerHTML = MAIN.filter(([h]) => BAR.includes(h)).map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${k === "orbit" || k === "talent" ? `<span class="btpbw">${svg(k)}<i class="btpbadge" data-noi18n hidden></i></span>` : svg(k)}<span>${SHORT[t] || t}</span></a>`).join("") +
+    `<details><summary>${svg("tools")}<span>More</span></summary><div class="more" role="menu">${rest.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}${BIZ ? `<a role="menuitem" href="/business/company/"><b>Company</b></a>` : ""}${TOOLS.length ? `<div class="sep"></div>${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}` : ""}</div></details>`;
+  tab.querySelector(".more").addEventListener("click", (e) => { if (e.target.closest("a")) tab.querySelector("details").open = false; });
+  document.addEventListener("click", (e) => { const d = tab.querySelector("details"); if (d.open && !tab.contains(e.target)) d.open = false; });
   const mount = () => {
     document.body.insertBefore(nav, document.body.firstChild);
+    document.body.appendChild(tab);
     document.body.classList.add("btp-has-nav");
     nav.querySelector(".btpskip").addEventListener("click", (e) => {   // pages without a <main>: jump to whatever follows the bar
       let t = document.getElementById("main"); if (!t) { t = nav.nextElementSibling; while (t && /^(SCRIPT|STYLE)$/.test(t.tagName)) t = t.nextElementSibling; }
@@ -279,7 +310,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   document.addEventListener("click", (e) => { const c = e.target.closest && e.target.closest(".btprole-card"); if (c) { c.disabled = true; saveRole(c.dataset.role, roleDest(c)); } });
   // Orbit tab badge (Talent tab for employers): unread messages + people asking to join your orbit ("10+" past 9).
   const paintBadge = (n) => { n = Number(n) || 0;
-    nav.querySelectorAll(".btpbadge").forEach((b) => { b.hidden = n <= 0; b.textContent = n >= 10 ? "10+" : String(n); });
+    document.querySelectorAll(".btpnav .btpbadge,.btptab .btpbadge").forEach((b) => { b.hidden = n <= 0; b.textContent = n >= 10 ? "10+" : String(n); });
     const a = nav.querySelector('.links a[href="/orbit/"],.links a[href="/business/talent/"]');
     if (a) { const t = (a.querySelector(":scope > span:last-child") || a).textContent.trim(); a.setAttribute("aria-label", n > 0 ? `${t}, ${n >= 10 ? "10 or more" : n} new` : t); } };
   window.btpOrbitBadge = (n) => { try { sessionStorage.setItem("btp_orbit_n", JSON.stringify({ n, at: Date.now() })); } catch {} paintBadge(n); };
