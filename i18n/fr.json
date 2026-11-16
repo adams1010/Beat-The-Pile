@@ -1,6 +1,12 @@
 {
  "lang": "fr",
  "strings": {
+  "Edit bar": "Modifier la barre",
+  "Pick up to 4 for your bar": "Choisissez jusqu'à 4 pour votre barre",
+  "Reset": "Réinitialiser",
+  "Radar": "Radar",
+  "Quiz": "Quiz",
+  "Demo": "Démo",
   "More": "Plus",
   "Fair": "Salon",
   "Season": "Saison",
@@ -1882,6 +1888,7 @@
   "career fairs in Career Fair Mode": "salons de l'emploi en mode Salon"
  },
  "patterns": [
+  ["^(\\d) of 4 pinned$", "$1 sur 4 épinglées"],
   ["^(.+) career fair page ↗$", "Page des salons de $1 ↗"],
   ["^See everything \\((\\d+) chapters\\)$", "Tout voir ($1 chapitres)"],
   ["^([\\d,]+) open jobs from ([\\d,]+) company job boards$", "$1 offres ouvertes issues de $2 sites carrières d'entreprises"],

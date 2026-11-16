@@ -1,6 +1,12 @@
 {
  "_about": "Spanish UI strings (Nov 2026). Key = the English text exactly as shown (whitespace collapsed). Used by /i18n.js when the student picks Español. Job titles, company names and places are data and stay as-is.",
  "strings": {
+  "Edit bar": "Editar barra",
+  "Pick up to 4 for your bar": "Elige hasta 4 para tu barra",
+  "Reset": "Restablecer",
+  "Radar": "Radar",
+  "Quiz": "Test",
+  "Demo": "Demo",
   "More": "Más",
   "Fair": "Feria",
   "Season": "Temporada",
@@ -1882,6 +1888,7 @@
   "career fairs in Career Fair Mode": "ferias de empleo en Modo Feria"
  },
  "patterns": [
+  ["^(\\d) of 4 pinned$", "$1 de 4 fijadas"],
   ["^(.+) career fair page ↗$", "Página de ferias de empleo de $1 ↗"],
   ["^See everything \\((\\d+) chapters\\)$", "Ver todo ($1 capítulos)"],
   ["^([\\d,]+) open jobs from ([\\d,]+) company job boards$", "$1 empleos abiertos de $2 bolsas de empleo de empresas"],

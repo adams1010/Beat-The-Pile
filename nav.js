@@ -147,6 +147,14 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   .btptab .more{display:block!important;flex-direction:column}.btptab .more a{display:block!important;width:auto!important;padding:11px 12px;border-radius:8px;color:#060A2C;text-decoration:none}.btptab .more a:active{background:#EEF1F6}
   .btptab .more b{display:block;font-weight:600}.btptab .more small{display:block;color:#55627A;font-size:12px;margin-top:2px}
   .btptab .more .sep{height:1px;background:#E3E7ED;margin:6px 4px}
+  .btptab .more button{font:inherit;background:none;border:0;color:#060A2C;cursor:pointer;text-align:left}
+  .btptab .more .edit{display:block;width:100%;padding:11px 12px;font-weight:600;color:#4A7000}
+  .btptab .more .edhd{padding:10px 12px 6px}.btptab .more .edhd b{display:block}.btptab .more .edhd small{color:#55627A;font-size:12px}
+  .btptab .more .pin{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:8px}
+  .btptab .more .pin[aria-pressed="true"]{background:#F2FADF;font-weight:600}
+  .btptab .more .edrow{display:flex;gap:8px;padding:6px 8px}
+  .btptab .more .eddone{background:#4A7000!important;color:#fff!important;border-radius:999px!important;padding:8px 18px!important;font-weight:600}
+  .btptab .more .edreset{border:1px solid #C9D2E3!important;border-radius:999px!important;padding:8px 14px!important}
   .iqfb-btn{bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}.iqp{bottom:calc(120px + env(safe-area-inset-bottom,0px))!important}
   .btpcookie{bottom:calc(72px + env(safe-area-inset-bottom,0px))!important}
   .toast,.totop{bottom:calc(74px + env(safe-area-inset-bottom,0px))!important}.sheet{z-index:80!important}}
@@ -235,14 +243,37 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     const main = document.querySelector("main"); if (main && !main.id) main.id = "main";
     const acct = document.getElementById("acct"); if (acct && !nav.contains(acct)) nav.querySelector("#btpRight").appendChild(acct);
   };
-  // Nov 16: phone bottom bar = the 4 most-used pages + More (everything else). Desktop is unchanged.
-  const BAR = BIZ ? ["/business/home/", "/business/talent/", "/orbit/", "/business/fairs/"] : ["/", "/jobs/", "/orbit/", "/tracker/"];
+  // Nov 16: phone bottom bar = 4 pinned pages + More (everything else). Students and employers pick their own 4
+  // ("Edit bar" in More → tap to pin/unpin); saved on this device in localStorage btp_tabs[_biz]. Desktop is unchanged.
+  const TOOL_ICON = { "/internship/": "jobs", "/companies/": "business", "/radar/": "season", "/#quiz": "tracker", "/#interview": "talent", "/#resumebuilder": "profile", "/#score": "tracker", "/#wall": "orbit", "/demo/": "home" };
+  const SHORT = { "Career Fairs": "Fairs", "Career Fair": "Fair", "My Season": "Season", "My Internship": "Internship", "Opening Radar": "Radar", "Match quiz": "Quiz", "Interview practice": "Interview", "Resume builder": "Resume", "Resume check": "Resume check", "Community": "Community", "Try it": "Demo", "My profile": "Profile", "Company": "Company" };
+  const PICKS = [...MAIN, ...(BIZ ? [["/business/company/", "Company", "business"]] : [["/u/", "My profile", "profile"]]), ...TOOLS.map(([h, t]) => [h, t, TOOL_ICON[h] || "tools"])];
+  const TKEY = BIZ ? "btp_tabs_biz" : "btp_tabs";
+  const DEF = BIZ ? ["/business/home/", "/business/talent/", "/orbit/", "/business/fairs/"] : ["/", "/jobs/", "/orbit/", "/tracker/"];
+  const readPins = () => { try { const v = JSON.parse(localStorage.getItem(TKEY) || "null"); const ok = Array.isArray(v) ? v.filter((h) => PICKS.some(([x]) => x === h)).slice(0, 4) : []; return ok.length ? ok : DEF; } catch { return DEF; } };
+  let PINS = readPins(), editing = false;
   const tab = document.createElement("nav"); tab.className = "btptab"; tab.setAttribute("aria-label", "Main (phone)");
-  const rest = MAIN.filter(([h]) => !BAR.includes(h));
-  const SHORT = { "Career Fairs": "Fairs", "Career Fair": "Fair", "My Season": "Season" };
-  tab.innerHTML = MAIN.filter(([h]) => BAR.includes(h)).map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${k === "orbit" || k === "talent" ? `<span class="btpbw">${svg(k)}<i class="btpbadge" data-noi18n hidden></i></span>` : svg(k)}<span>${SHORT[t] || t}</span></a>`).join("") +
-    `<details><summary>${svg("tools")}<span>More</span></summary><div class="more" role="menu">${rest.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}${BIZ ? `<a role="menuitem" href="/business/company/"><b>Company</b></a>` : ""}${TOOLS.length ? `<div class="sep"></div>${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}` : ""}</div></details>`;
-  tab.querySelector(".more").addEventListener("click", (e) => { if (e.target.closest("a")) tab.querySelector("details").open = false; });
+  const pinIcon = (on) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="${on ? "#4A7000" : "none"}" stroke="${on ? "#4A7000" : "#8090A8"}" stroke-width="1.8" aria-hidden="true"><path d="M12 17v5"/><path d="M9 3h6l-1 6 3 3v2H7v-2l3-3z"/></svg>`;
+  const drawTab = () => {
+    const pinned = PINS.map((h) => PICKS.find(([x]) => x === h)).filter(Boolean);
+    const rest = PICKS.filter(([h]) => !PINS.includes(h));
+    const wasOpen = tab.querySelector("details")?.open;
+    tab.innerHTML = pinned.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${k === "orbit" || k === "talent" ? `<span class="btpbw">${svg(k)}<i class="btpbadge" data-noi18n hidden></i></span>` : svg(k)}<span>${SHORT[t] || t}</span></a>`).join("") +
+      `<details${wasOpen ? " open" : ""}><summary>${svg("tools")}<span>More</span></summary><div class="more" role="menu">` +
+      (editing
+        ? `<div class="edhd"><b>Pick up to 4 for your bar</b><small>${PINS.length} of 4 pinned</small></div>${PICKS.map(([h, t]) => `<button type="button" class="pin" data-pin="${h}" aria-pressed="${PINS.includes(h)}">${pinIcon(PINS.includes(h))}<span>${t}</span></button>`).join("")}<div class="sep"></div><div class="edrow"><button type="button" class="eddone" data-tabedit="done">Done</button><button type="button" class="edreset" data-tabedit="reset">Reset</button></div>`
+        : `${rest.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div><button type="button" class="edit" data-tabedit="edit">Edit bar</button>`) +
+      `</div></details>`;
+    try { window.btpBadgeRepaint && window.btpBadgeRepaint(); } catch {}
+  };
+  const savePins = () => { try { localStorage.setItem(TKEY, JSON.stringify(PINS)); } catch {} };
+  tab.addEventListener("click", (e) => {
+    const p = e.target.closest("[data-pin]"), ed = e.target.closest("[data-tabedit]");
+    if (p) { e.preventDefault(); e.stopPropagation(); const h = p.dataset.pin; PINS = PINS.includes(h) ? PINS.filter((x) => x !== h) : PINS.length < 4 ? [...PINS, h] : [...PINS.slice(1), h]; if (!PINS.length) PINS = [h]; savePins(); drawTab(); return; }
+    if (ed) { e.preventDefault(); e.stopPropagation(); const a = ed.dataset.tabedit; if (a === "edit") editing = true; else if (a === "done") editing = false; else { PINS = DEF.slice(); savePins(); } drawTab(); return; }
+    if (e.target.closest(".more a")) tab.querySelector("details").open = false;
+  });
+  drawTab();
   document.addEventListener("click", (e) => { const d = tab.querySelector("details"); if (d.open && !tab.contains(e.target)) d.open = false; });
   const mount = () => {
     document.body.insertBefore(nav, document.body.firstChild);
@@ -309,7 +340,8 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   const sc = document.createElement("style"); sc.textContent = sheetCss; document.head.appendChild(sc);
   document.addEventListener("click", (e) => { const c = e.target.closest && e.target.closest(".btprole-card"); if (c) { c.disabled = true; saveRole(c.dataset.role, roleDest(c)); } });
   // Orbit tab badge (Talent tab for employers): unread messages + people asking to join your orbit ("10+" past 9).
-  const paintBadge = (n) => { n = Number(n) || 0;
+  let lastBadge = 0; window.btpBadgeRepaint = () => paintBadge(lastBadge);
+  const paintBadge = (n) => { n = Number(n) || 0; lastBadge = n;
     document.querySelectorAll(".btpnav .btpbadge,.btptab .btpbadge").forEach((b) => { b.hidden = n <= 0; b.textContent = n >= 10 ? "10+" : String(n); });
     const a = nav.querySelector('.links a[href="/orbit/"],.links a[href="/business/talent/"]');
     if (a) { const t = (a.querySelector(":scope > span:last-child") || a).textContent.trim(); a.setAttribute("aria-label", n > 0 ? `${t}, ${n >= 10 ? "10 or more" : n} new` : t); } };

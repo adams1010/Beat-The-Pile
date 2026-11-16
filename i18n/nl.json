@@ -1,6 +1,12 @@
 {
  "lang": "nl",
  "strings": {
+  "Edit bar": "Balk bewerken",
+  "Pick up to 4 for your bar": "Kies er maximaal 4 voor je balk",
+  "Reset": "Herstellen",
+  "Radar": "Radar",
+  "Quiz": "Quiz",
+  "Demo": "Demo",
   "More": "Meer",
   "Fair": "Beurs",
   "Season": "Seizoen",
@@ -1882,6 +1888,7 @@
   "career fairs in Career Fair Mode": "banenbeurzen in Beursmodus"
  },
  "patterns": [
+  ["^(\\d) of 4 pinned$", "$1 van 4 vastgezet"],
   ["^(.+) career fair page ↗$", "Banenbeurspagina van $1 ↗"],
   ["^See everything \\((\\d+) chapters\\)$", "Alles bekijken ($1 hoofdstukken)"],
   ["^([\\d,]+) open jobs from ([\\d,]+) company job boards$", "$1 open vacatures van $2 vacaturesites van bedrijven"],
