@@ -20,7 +20,7 @@ export const PAGE_UNCHECKABLE = ["ashby", "smartrecruiters", "oracle", "eightfol
 const TIME_BUDGET_MS = 50000;
 
 const DEAD_PHRASES = [
-  "no longer available", "no longer accepting", "no longer open",
+  "no longer available", "no longer accepting", "no longer open", "this job announcement has closed",
   "position has been filled", "job has expired", "this job is closed",
   "job you are looking for", "page you are looking for", "job not found",
   "posting has been removed", "not currently accepting",

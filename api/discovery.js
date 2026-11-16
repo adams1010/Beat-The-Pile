@@ -117,7 +117,7 @@ export default async function handler(req, res) {
         else {
           // only rows for THIS company, with the company name from our own config (never from the payload)
           const listings = (Array.isArray(r.listings) ? r.listings : []).filter((l) => l && typeof l.id === "string" && l.id.startsWith(cfg.id + ":") && typeof l.title === "string" && typeof l.url === "string")
-            .map((l) => ({ ...l, company_id: cfg.id, company: cfg.listAs || cfg.company }));
+            .map((l) => ({ ...l, company_id: cfg.id, company: cfg.ats === "usajobs" && typeof l.company === "string" && l.company.trim() ? l.company.trim().slice(0, 120) : cfg.listAs || cfg.company }));   // usajobs: the agency
           got = { raw: Math.max(0, +r.raw || 0), listings, partial: r.partial === true };
         }
         const e = await saveResult(cfg, runStart, got);

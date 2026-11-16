@@ -23,6 +23,8 @@ jobs:
       - run: node scripts/turbo-sync.mjs ${{ inputs.args }}
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          USAJOBS_KEY: ${{ secrets.USAJOBS_KEY }}        # Nov 16: federal jobs (lib/fetchers/usajobs.js)
+          USAJOBS_EMAIL: ${{ secrets.USAJOBS_EMAIL }}
           BTP_TURBO: "1"
       - name: Start the next run (about 3 hours after this one began)
         if: always() && !inputs.args
