@@ -1,4 +1,4 @@
-/* built from src/home.jsx 681dd394947293c8 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx bb0e0d435f74be11 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -541,17 +541,36 @@ function HeroMap({
     return () => el.removeEventListener("wheel", onWheel);
   });
   function down(e) {
+    try {
+      e.currentTarget.setPointerCapture && e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {}
     if (e.pointerType === "touch") {
       const t = pinch.current || (pinch.current = new Map());
       t.set(e.pointerId, [e.clientX, e.clientY]);
     }
+    const i = e.target && e.target.getAttribute && e.target.getAttribute("data-i");
     drag.current = {
       x: e.clientX,
       y: e.clientY,
       vb,
-      moved: false
+      moved: false,
+      dot: i != null ? +i : null
     };
   }
+  React.useEffect(() => {
+    const clear = () => {
+      drag.current = null;
+      pinch.current = null;
+    };
+    window.addEventListener("pointerup", clear);
+    window.addEventListener("pointercancel", clear);
+    window.addEventListener("blur", clear);
+    return () => {
+      window.removeEventListener("pointerup", clear);
+      window.removeEventListener("pointercancel", clear);
+      window.removeEventListener("blur", clear);
+    };
+  }, []);
   function move(e) {
     const d = drag.current;
     if (!d) return;
@@ -579,6 +598,7 @@ function HeroMap({
     if (pinch.current) pinch.current.delete(e.pointerId);
     const d = drag.current;
     drag.current = null;
+    if (d && !d.moved && d.dot != null && e.type === "pointerup" && pts && pts.dots[d.dot] && pts.dots[d.dot].length > 3) openDot(pts.dots[d.dot]);
     return d && d.moved;
   }
   async function openDot(dt) {
@@ -615,15 +635,16 @@ function HeroMap({
   const dr = n => (1.6 + Math.sqrt(n) * 1.05) / Math.pow(zoom, 0.85);
   const btn = {
     font: "inherit",
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: 600,
     background: "#0E1440",
     color: "#fff",
     border: "1px solid #2A3B5C",
     borderRadius: 8,
-    minWidth: 34,
-    height: 34,
-    cursor: "pointer"
+    minWidth: 40,
+    height: 40,
+    cursor: "pointer",
+    touchAction: "manipulation"
   };
   return React.createElement("aside", {
     style: {
@@ -765,11 +786,7 @@ function HeroMap({
       style: {
         cursor: "pointer"
       },
-      onClick: e => {
-        if (drag.current && drag.current.moved) return;
-        e.stopPropagation();
-        dt.length > 3 && openDot(dt);
-      }
+      "data-i": i
     }, React.createElement("title", null, `${dt[2]} ${dt[2] === 1 ? "job" : "jobs"} here`));
   }), zoom >= 2.5 && MAP_CITIES.filter(([, x, y]) => x >= vb[0] && x <= vb[0] + vb[2] && y >= vb[1] && y <= vb[1] + vb[3]).map(([n, x, y]) => React.createElement("text", {
     key: n,
@@ -797,13 +814,15 @@ function HeroMap({
     r: 5 / zoom,
     fill: "#fff"
   }))), !err && React.createElement("div", {
+    onPointerDown: e => e.stopPropagation(),
     style: {
       position: "absolute",
       right: 6,
       top: 6,
       display: "flex",
       flexDirection: "column",
-      gap: 4
+      gap: 4,
+      zIndex: 2
     }
   }, React.createElement("button", {
     type: "button",
