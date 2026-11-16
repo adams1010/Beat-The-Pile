@@ -1,4 +1,4 @@
-/* built from src/home.jsx c33a4feffa6796bd — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 681dd394947293c8 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -480,10 +480,15 @@ function HeroMap({
   }, []);
   React.useEffect(() => {
     setPts(null);
-    fetch(`/api/listings?dots=1&field=all&kind=${kind}&v=2`).then(r => {
+    const ok = r => {
       if (!r.ok) throw 0;
       return r.json();
-    }).then(setPts).catch(() => setErr(true));
+    };
+    const good = d => {
+      if (!d || !Array.isArray(d.dots) || !d.dots.length) throw 0;
+      return d;
+    };
+    fetch(`/map/dots-${kind}.json`).then(ok).then(good).catch(() => fetch(`/api/listings?dots=1&field=all&kind=${kind}&v=2`).then(ok)).then(setPts).catch(() => setErr(true));
   }, [kind]);
   React.useEffect(() => {
     const xy = near?.meta?.near?.xy;

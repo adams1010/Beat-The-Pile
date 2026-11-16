@@ -269,7 +269,7 @@
         <div class="pills">${MAPC.map(([n]) => `<button class="pill" data-city="${n}">${n}</button>`).join("")}<button class="pill" data-city="">All of the US</button></div>
         <div style="background:var(--navy);border-radius:10px;padding:8px;margin-top:8px"><svg id="dm" viewBox="0 0 975 610" style="width:100%;height:auto;display:block" aria-label="Map of open jobs"></svg></div><div class="stack" id="dotL" style="margin-top:10px"></div>`;
       let geo = null, pts = null;
-      try { [geo, pts] = await Promise.all([fetch("/map/us.json").then((r) => r.json()), fetch("/api/listings?dots=1&field=all&kind=all&v=2").then((r) => r.json())]); } catch {}
+      try { [geo, pts] = await Promise.all([fetch("/map/us.json").then((r) => r.json()), fetch("/map/dots-all.json").then((r) => r.ok ? r.json() : fetch("/api/listings?dots=1&field=all&kind=all&v=2").then((x) => x.json()))]); } catch {}
       if (!geo || !pts) { $("mapN").innerHTML = `Map didn't load. <a href="/">Open the homepage map</a>`; return; }
       $("mapN").textContent = `${Number(pts.placed).toLocaleString()} open jobs on the map · one dot per city`;
       let z = 1;

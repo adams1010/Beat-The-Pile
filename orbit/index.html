@@ -104,6 +104,24 @@
   @media (max-width:860px){.sky{grid-template-columns:1fr}}
   @media (max-width:1060px){.grid{grid-template-columns:240px minmax(0,1fr)}.feedcol{grid-column:1/-1}}
   @media (max-width:720px){.grid{grid-template-columns:minmax(0,1fr)}.grid>*{min-width:0}.side{position:static}.people{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  /* Nov 16 (owner): phones get a compact list, one row per person, so the page stays short as Orbit grows */
+  .pmore{display:block;width:100%;margin-top:12px;font:inherit;font-size:13.5px;font-weight:600;color:var(--green);background:#fff;border:1px solid var(--line);border-radius:999px;padding:9px;cursor:pointer}
+  #invSlotM{display:none}
+  @media (max-width:720px){
+    #invSlotM{display:block}#invSlot{display:none}
+    .sky{padding:14px;gap:10px}.sky>*,.sky>*>*{min-width:0}.sky h1{font-size:20px}.sky svg{max-height:230px}.legend small{display:none}
+    .legend{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 -2px;padding:0 2px}.legend::-webkit-scrollbar{display:none}
+    .legend button{flex:none;padding:7px 12px;border-radius:999px;gap:7px;font-size:13px}.legend b{font-size:13px;margin-left:2px}.legend i{width:9px;height:9px}
+    .p .tag{justify-self:start}
+    .people{grid-template-columns:minmax(0,1fr)!important;gap:0}
+    .p{display:grid;grid-template-columns:44px minmax(0,1fr) auto;column-gap:12px;align-items:center;text-align:left;border:0;border-top:1px solid var(--line);border-radius:0;padding:10px 0}
+    .p:first-child{border-top:0}
+    .p>*{grid-column:2;margin-top:0!important;min-width:0}
+    .p>.avw{grid-column:1;grid-row:1/span 3;align-self:start}.p .av{width:44px;height:44px;font-size:14px}
+    .p .nm{margin-top:0}.p .hl{min-height:0;-webkit-line-clamp:1;font-size:12.5px}
+    .p .ask,.p .role,.p .lnk{display:none}
+    .p .acts{grid-column:3;grid-row:1/span 2;justify-content:flex-end;margin:0!important}.p .acts .btn{padding:6px 12px}
+    .p .tag,.p .at{font-size:12px}}
   #ringList,#bizRingList{scroll-margin-top:72px}#ringList.updating h2::after,#bizRingList.updating h2::after{content:" · updating";font-size:13px;font-weight:500;color:var(--muted,#55627A)}
 </style>
 </head>
@@ -150,7 +168,17 @@
     ${p.handle ? `<a class="lnk" href="/u/${encodeURIComponent(p.handle)}">View profile</a>` : ""}</div>`;
   // "Interned at Northrop Grumman" / "Works at Northrop Grumman" (insiders: people at companies you want)
   const atLine = (p) => (p.type === "internship" ? (p.now ? "Interning at " : "Interned at ") : (p.now ? "Works at " : "Worked at ")) + p.at;
-  const people = (list, none) => list.length ? `<div class="people">${list.map(person).join("")}</div>` : `<p class="empty">${none}</p>`;
+  // Nov 16: show a first batch and a "Show more" button, so thousands of people never become one endless page.
+  const MORE = {}; let moreN = 0;
+  const batch = () => (matchMedia("(max-width:720px)").matches ? 8 : 12);
+  const moreBtn = (k) => { const m = MORE[k], left = m.list.length - m.shown; return left > 0 ? `<button type="button" class="pmore" data-more="${k}">Show ${Math.min(left, batch())} more · ${m.list.length} in all</button>` : ""; };
+  const people = (list, none) => { if (!list.length) return `<p class="empty">${none}</p>`;
+    const k = "m" + (++moreN), n = batch(); MORE[k] = { list, shown: Math.min(n, list.length) };
+    return `<div class="people" data-list="${k}">${list.slice(0, n).map(person).join("")}</div>${moreBtn(k)}`; };
+  document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest("[data-more]"); if (!b) return;
+    const m = MORE[b.dataset.more]; if (!m) return; const grid = document.querySelector(`[data-list="${b.dataset.more}"]`); if (!grid) return;
+    const next = m.list.slice(m.shown, m.shown + batch()); m.shown += next.length; grid.insertAdjacentHTML("beforeend", next.map(person).join(""));
+    b.insertAdjacentHTML("afterend", moreBtn(b.dataset.more)); b.remove(); });
 
   // Nov 15 pm (owner): tabs = All · Inner orbit · Campus · Insiders (+ In orbit). Tapping one shows ONLY those people, in the list and the sky.
   const RINGS = [
@@ -244,7 +272,7 @@
           <div class="gravity">${gravity}</div>
           </div></div>
       <div class="grid grid2">
-        <div>${findBox()}${requests(o)}
+        <div><div id="invSlotM"></div>${findBox()}${requests(o)}
         ${expNudge(m)}
         <section class="card" id="ringList"><h2>${title}</h2><p class="sub">${desc}${ring === "inner" && m.hasSchool ? ` · ${esc(m.major || "")} at ${esc(m.school)}` : ring === "campus" && m.hasSchool ? ` · ${esc(m.school)}` : ""}</p>${ring === "insiders" ? wantBox(o) : ""}${people(sets[ring], empty[ring])}</section></div>
         <aside class="feedcol"><div id="invSlot"></div>
@@ -252,7 +280,7 @@
           ${fairBox(o)}
           <section class="card feed"><h2>Signals</h2><p class="sub">New openings at companies you follow, and posts from students.</p>${feed}</section></aside>
       </div>`;
-    if (window.btpInvite) window.btpInvite.mount(document.getElementById("invSlot"), token);   // Nov 16: invite classmates
+    if (window.btpInvite) window.btpInvite.mount(document.getElementById(matchMedia("(max-width:720px)").matches ? "invSlotM" : "invSlot"), token);   // Nov 16: invite classmates (top of the page on phones)
     document.querySelectorAll("[data-ring]").forEach((b) => b.onclick = () => pickRing(b.dataset.ring, render));
     const gp = $("#goPublic"); if (gp) gp.onclick = async () => {   // Nov 9: one tap — gives you a link name and a public profile (name, school, major, photo)
       gp.disabled = true;

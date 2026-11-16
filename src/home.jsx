@@ -125,7 +125,9 @@ function HeroMap({near,fresh,sum,sumErr}){
   const [kind,setKind]=React.useState("all"),[vb,setVb]=React.useState([0,0,MAP_W,MAP_H]),[sel,setSel]=React.useState(null),[spot,setSpot]=React.useState(null);
   const svgRef=React.useRef(null),drag=React.useRef(null),pinch=React.useRef(null);
   React.useEffect(()=>{fetch("/map/us.json").then(r=>{if(!r.ok)throw 0;return r.json();}).then(setGeo).catch(()=>setErr(true));},[]);
-  React.useEffect(()=>{setPts(null);fetch(`/api/listings?dots=1&field=all&kind=${kind}&v=2`).then(r=>{if(!r.ok)throw 0;return r.json();}).then(setPts).catch(()=>setErr(true));},[kind]);
+  // Nov 16: a ready-made file (built daily by GitHub map-dots.yml) loads instantly; the live API (≈14 s when its cache is cold) is only the fallback
+  React.useEffect(()=>{setPts(null);const ok=r=>{if(!r.ok)throw 0;return r.json();};const good=d=>{if(!d||!Array.isArray(d.dots)||!d.dots.length)throw 0;return d;};
+    fetch(`/map/dots-${kind}.json`).then(ok).then(good).catch(()=>fetch(`/api/listings?dots=1&field=all&kind=${kind}&v=2`).then(ok)).then(setPts).catch(()=>setErr(true));},[kind]);
   React.useEffect(()=>{const xy=near?.meta?.near?.xy;if(xy){const z=MAP_W/3.2;setVb(clampVb([xy[0]-z/2,xy[1]-z*MAP_H/MAP_W/2,z,z*MAP_H/MAP_W]));}},[near]);
   const fmt=(n)=>n==null?"—":Number(n).toLocaleString();
   const xy=near?.meta?.near?.xy, r=near?.meta?near.meta.near.mi*MILES_PX:0;

@@ -1,0 +1,35 @@
+# Nov 16: the homepage map loads a ready-made file (map/dots-<kind>.json) instead of asking /api/listings?dots=1, which
+# takes ~14 s to build whenever Vercel's cache is empty (after every deploy). This rebuilds the 4 files once a day and
+# commits them only when they changed. The homepage falls back to the live API if a file is missing.
+name: map-dots
+on:
+  schedule:
+    - cron: "15 6 * * *"
+  workflow_dispatch: {}
+permissions: { contents: write }
+concurrency: { group: map-dots, cancel-in-progress: false }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch dots for each kind
+        run: |
+          set -e
+          for k in all intern fulltime hourly; do
+            ok=0
+            for t in 1 2 3; do
+              if curl -sf --max-time 90 -o /tmp/d.json "https://www.beatthepile.com/api/listings?dots=1&field=all&kind=$k&v=2&fresh=$(date +%s)"; then
+                node -e 'const d=JSON.parse(require("fs").readFileSync("/tmp/d.json","utf8")); if(!Array.isArray(d.dots)||d.dots.length<50) process.exit(1)' && { cp /tmp/d.json "map/dots-$k.json"; ok=1; break; }
+              fi
+              sleep 20
+            done
+            echo "$k: $ok"
+          done
+      - name: Commit if changed
+        run: |
+          git config user.name "btp-map"; git config user.email "btp-map@users.noreply.github.com"
+          git add map/dots-*.json
+          git diff --cached --quiet && { echo "no change"; exit 0; }
+          git commit -m "Map dots refresh" && git pull --rebase && git push
