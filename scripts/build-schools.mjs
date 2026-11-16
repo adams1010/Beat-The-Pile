@@ -45,11 +45,12 @@ const cip = {};
 // 2) which programs each school awards (associate 3, bachelor's 5, master's 7; any graduate in the last year counts).
 // Nov 14: a school that awards bachelor's degrees lists ONLY its bachelor's majors (no grad-only programs or certificates in an
 // undergrad's dropdown); a two-year college lists its associate programs; a graduate-only school its master's programs.
-const progs = new Map(), byLevel = new Map();
+const progs = new Map(), byLevel = new Map(), size = new Map();   // size (Nov 16) = degrees awarded last year, so search shows the big, real schools first
 { const { ix, it } = table(find(/^c20\d\d_a(_rv)?\.csv$/i));
   const u = ix("UNITID"), c = ix("CIPCODE"), a = ix("AWLEVEL"), n = ix("CTOTALT");
   for (const r of it) {
     const code = String(r[c] || "").trim(); if (!/^\d{2}\.\d{4}$/.test(code) || !cip[code]) continue;
+    if (+r[n] > 0) size.set(+r[u], (size.get(+r[u]) || 0) + +r[n]);
     if (!["3", "5", "7"].includes(String(r[a]).trim()) || !(+r[n] > 0)) continue;
     const id = +r[u], lv = String(r[a]).trim();
     if (!byLevel.has(id)) byLevel.set(id, { 3: new Set(), 5: new Set(), 7: new Set() });
@@ -57,14 +58,21 @@ const progs = new Map(), byLevel = new Map();
   }
   for (const [id, L] of byLevel) progs.set(id, L[5].size ? L[5] : L[3].size ? L[3] : L[7]);
 }
-// 3) the schools
+// 3) the schools. NICK = what students actually type, for big schools IPEDS has no alias for (Nov 16)
+const NICK = { 199120: "UNC|UNC Chapel Hill", 170976: "UMich|University of Michigan|Michigan", 228778: "UT Austin|UT", 228723: "Texas A&M|TAMU", 139755: "Georgia Tech|GT",
+  134130: "UF|University of Florida", 134097: "FSU", 204796: "Ohio State|OSU", 214777: "Penn State|PSU", 240444: "UW Madison|Wisconsin", 236948: "UW|University of Washington",
+  110662: "UCLA", 110635: "UC Berkeley|Berkeley|Cal", 123961: "USC", 145637: "UIUC|Illinois", 243780: "Purdue", 174066: "UMN|Minnesota", 233921: "Virginia Tech|VT",
+  234076: "UVA", 199193: "NC State", 163286: "UMD|Maryland", 186380: "Rutgers", 166629: "UMass|UMass Amherst", 171100: "MSU|Michigan State", 104151: "ASU", 100751: "Alabama|Bama",
+  126614: "CU Boulder|Colorado", 218663: "South Carolina|USC Columbia", 139959: "UGA|Georgia", 157085: "UK|Kentucky", 151351: "IU|Indiana", 153658: "Iowa", 221759: "Tennessee|UT Knoxville",
+  132903: "UCF", 196088: "Buffalo|UB", 190150: "Columbia", 193900: "NYU", 166027: "Harvard", 166683: "MIT", 243744: "Stanford", 130794: "Yale", 186131: "Princeton" };
 const index = [];
 { const { ix, it } = table(find(/^hd20\d\d(_rv)?\.csv$/i));
   const u = ix("UNITID"), nm = ix("INSTNM"), al = ix("IALIAS"), city = ix("CITY"), st = ix("STABBR");
   for (const r of it) {
     const id = +r[u]; if (!progs.has(id) || !STATES.has(String(r[st]).trim())) continue;
     const aliases = String(r[al] || "").split(/[|,;]/).map((x) => x.trim()).filter((x) => x.length >= 2 && x.length <= 60).slice(0, 4).join("|");
-    index.push([id, String(r[nm]).trim(), aliases, String(r[city]).trim(), String(r[st]).trim()]);
+    const nick = NICK[id] ? [NICK[id], aliases].filter(Boolean).join("|") : aliases;
+    index.push([id, String(r[nm]).trim(), nick, String(r[city]).trim(), String(r[st]).trim(), size.get(id) || 0]);
   } }
 index.sort((a, b) => a[1].localeCompare(b[1]));
 const used = new Set(); for (const s of progs.values()) for (const c of s) used.add(c);
