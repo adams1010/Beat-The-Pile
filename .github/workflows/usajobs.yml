@@ -1,0 +1,20 @@
+# On demand: read ONLY the federal jobs (USAJOBS) and save them — a quick check after changing the key or the reader.
+# Turbo Sync also reads USAJOBS on every normal run; this one has its own queue so it never bumps that chain.
+name: usajobs
+on: { workflow_dispatch: {} }
+concurrency: { group: usajobs, cancel-in-progress: false }
+permissions: { contents: read }
+jobs:
+  read:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/turbo-sync.mjs --only=usajobs --minutes=10
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          USAJOBS_KEY: ${{ secrets.USAJOBS_KEY }}
+          USAJOBS_EMAIL: ${{ secrets.USAJOBS_EMAIL }}
+          BTP_TURBO: "1"
