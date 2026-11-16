@@ -123,6 +123,8 @@
     .p .acts{grid-column:3;grid-row:1/span 2;justify-content:flex-end;margin:0!important}.p .acts .btn{padding:6px 12px}
     .p .tag,.p .at{font-size:12px}}
   #ringList,#bizRingList{scroll-margin-top:72px}#ringList.updating h2::after,#bizRingList.updating h2::after{content:" · updating";font-size:13px;font-weight:500;color:var(--muted,#55627A)}
+  .bdgs{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0}.bdg{font-size:12px;font-weight:600;border-radius:999px;padding:2px 9px}
+  .bdg.rec{background:#E8EDFB;color:#1E3A8A}.bdg.staff{background:#F2FADF;color:#3A5800}
 </style>
 </head>
 <body>
@@ -159,7 +161,7 @@
   }
   const person = (p) => `<div class="p">${av(p)}<div class="nm" title="${esc(p.name)}">${esc(p.name)}</div>
     <div class="hl">${esc(p.headline || [p.major, p.school].filter(Boolean).join(" · ") + yr(p.gradYear))}</div>
-    ${p.staff ? `<div class="at">Faculty &amp; staff · ${esc(p.staff)}</div>` : ""}
+    ${(p.badges || []).length ? `<div class="bdgs">${p.badges.map((b) => `<span class="bdg ${b.kind === "staff" ? "staff" : "rec"}">${esc(b.label)} · <span data-noi18n>${esc(b.org)}</span></span>`).join("")}</div>` : p.staff ? `<div class="at">Faculty &amp; staff · ${esc(p.staff)}</div>` : ""}
     ${p.coffee ? `<div class="tag">Open to coffee chats</div>` : ""}
     ${(p.askMe || []).length ? `<div class="ask">Ask me about ${esc(p.askMe.slice(0, 2).join(", "))}</div>` : ""}
     ${p.at ? `<div class="at">${esc(atLine(p))}</div>${p.role ? `<div class="role">${esc(p.role)}${p.when ? " · " + esc(p.when) : ""}</div>` : ""}` : ""}

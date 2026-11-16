@@ -53,6 +53,7 @@ import { foundingCount, foundingFor } from "../lib/founding.js";
 import { schoolIdFor, shortSchool } from "../lib/schools.js";
 import { talentFor, roleOf } from "../lib/talent.js";
 import { staffAction, staffAdmin, keepStaffVerified, shownStaff } from "../lib/staffcheck.js";
+import { loadRecruiters, badgesOf } from "../lib/badges.js";
 
 const LISTS = ["saved", "applied"];
 const MAX = 500;
@@ -278,7 +279,9 @@ async function publicProfile(req, res) {
   const founding = await foundingFor(r.clerk_user_id).catch(() => null);
   // Nov 15: stacking badges (tiers only, never exact counts), unless the student hid them
   const achievements = p.hideAchievements ? [] : achievementsFrom(r.apps); delete p.hideAchievements;
-  return res.status(200).json({ handle: r.handle, profile: p && p.school ? { ...p, schoolShort: shortSchool(p.schoolId || p.school) } : p, resume, founding, achievements });
+  await loadRecruiters().catch(() => null);   // Nov 16: earned badges (Recruiter · Company, Professor · School), never self-declared
+  const badges = badgesOf(r.clerk_user_id, r.profile).map((b) => ({ ...b, org: b.kind === "staff" ? shortSchool(r.profile?.staffVerified?.schoolId || b.org) || b.org : b.org }));
+  return res.status(200).json({ handle: r.handle, profile: p && p.school ? { ...p, schoolShort: shortSchool(p.schoolId || p.school) } : p, resume, founding, achievements, badges });
 }
 async function unsubscribe(req, res) {
   const t = String(req.query.unsub || "");
@@ -513,8 +516,12 @@ export default async function handler(req, res) {
 
     // ── Find talent (/business/talent/): VERIFIED employer accounts only; students who opted in only ──
     if (action === "talent") {
-      if ((await roleOf(uid)) !== "employer") return res.status(403).json({ error: "Find talent is for employer accounts." });
-      if (!(await isVerifiedEmployer(uid))) return res.status(403).json({ error: "Your company is still being verified. You can search students once it's approved.", pending: true });
+      // Nov 16: company page accounts OR personal accounts with a verified Recruiter badge
+      if (!(await isVerifiedEmployer(uid))) {
+        const mine = (await db.selectAsAdmin(`employers?select=status&clerk_user_id=eq.${encodeURIComponent(uid)}&limit=1`).catch(() => []))[0];
+        return res.status(403).json(mine ? { error: "Your Recruiter badge is still being verified. You can search students once it's approved.", pending: true }
+          : { error: "Find talent is for recruiters. Add a Recruiter badge from your profile, or set up your company page.", badge: true });
+      }
       if (!(await rateOk(`talent:${uid}`, 3600, 120))) return res.status(429).json({ error: "That's a lot of searches, try again in a bit" });
       const t = (v, n) => String(v ?? "").slice(0, n);
       return res.status(200).json(await talentFor({ q: t(body.q, 120), major: t(body.major, 80), school: t(body.school, 100), gradYear: Number(body.gradYear) || null }));

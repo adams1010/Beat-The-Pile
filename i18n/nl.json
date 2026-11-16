@@ -1886,7 +1886,26 @@
   "Email confirmed.": "E-mail bevestigd.",
   "Thanks. We're checking your directory page now. Your tag shows as soon as it's approved, usually within 2 days.": "Bedankt. We controleren nu je pagina in de gids. Je label verschijnt zodra het is goedgekeurd, meestal binnen 2 dagen.",
   "Next steps": "Volgende stappen",
-  "career fairs in Career Fair Mode": "banenbeurzen in Beursmodus"
+  "career fairs in Career Fair Mode": "banenbeurzen in Beursmodus",
+  "Personal account": "Persoonlijk account",
+  "Set up my company page": "Mijn bedrijfspagina maken",
+  "Create my account →": "Mijn account maken →",
+  "Find internships and jobs from company job boards, build your profile and join your school's orbit. Recruit or work at a school? Add a Recruiter or Faculty badge from your profile.": "Vind stages en banen van de vacaturesites van bedrijven, maak je profiel en sluit je aan bij de orbit van je school. Werk je als recruiter of op een school? Voeg een Recruiter- of Personeel-badge toe vanaf je profiel.",
+  "Your company's page: about, who you hire, perks, live jobs, career fairs. We confirm your work email before it goes live.": "De pagina van je bedrijf: over ons, wie jullie zoeken, extra's, vacatures, beurzen. We bevestigen je werk-e-mail voordat hij live gaat.",
+  "Badges": "Badges",
+  "Recruit or work at a school? Earn a badge. Each one is checked by our team, so students and schools know it's real.": "Werk je als recruiter of op een school? Verdien een badge. Ons team controleert elke badge, zodat studenten en scholen weten dat hij echt is.",
+  "Faculty & staff": "Docenten en personeel",
+  "Not school staff": "Geen schoolpersoneel",
+  "Add Recruiter badge": "Recruiter-badge toevoegen",
+  "Finish verifying": "Verificatie afronden",
+  "Not approved": "Niet goedgekeurd",
+  "Try again": "Opnieuw proberen",
+  "Back to your profile": "Terug naar je profiel",
+  "Tap Save profile, then verify here.": "Tik op Profiel opslaan en verifieer dan hier.",
+  "Find talent is for recruiters": "Talent zoeken is voor recruiters",
+  "Add a Recruiter badge": "Een Recruiter-badge toevoegen",
+  "Set up a company page": "Een bedrijfspagina maken",
+  "Your Recruiter badge is being verified": "Je Recruiter-badge wordt gecontroleerd"
  },
  "patterns": [
   ["^(\\d) of 4 pinned$", "$1 van 4 vastgezet"],
@@ -2017,6 +2036,7 @@
   ["^(\\d+) (min|h|d) ago$", "$1 $2 geleden"],
   ["^See the job up close first: ([\\d,]+) shadowing & volunteer spots, many unpaid\\.$", "Bekijk het werk eerst van dichtbij: $1 meeloop- en vrijwilligersplekken, veel onbetaald."],
   ["^([\\d,]+) open jobs?$", "$1 open vacatures"],
-  ["^career fairs at (\\d+) schools in Career Fair Mode$", "banenbeurzen op $1 scholen in Beursmodus"]
+  ["^career fairs at (\\d+) schools in Career Fair Mode$", "banenbeurzen op $1 scholen in Beursmodus"],
+  ["^Being verified · (.+)$", "Wordt gecontroleerd · $1"]
  ]
 }

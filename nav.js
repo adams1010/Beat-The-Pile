@@ -314,23 +314,21 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   }
   window.btpSaveRole = saveRole;
   function bizKind(){ try { return localStorage.getItem("btp_bizkind") || "company"; } catch { return "company"; } }
-  window.btpRoleCards = (pre) => `<div class="btprole-cards">
-      <button class="btprole-card${pre === "student" ? " on" : ""}" data-role="student"><span class="btprole-ic">${svg("jobs")}</span><b>I'm looking for an internship or job</b>
-        <small>Internships first, plus new-grad jobs, from company job boards. Every major. Career Fair Mode, My Season, Orbit.</small><span class="btprole-go">Find internships and jobs →</span></button>
-      <button class="btprole-card${pre === "employer" ? " on" : ""}" data-role="employer" data-kind="recruiter"><span class="btprole-ic">${svg("orbit")}</span><b>I'm a recruiter</b>
-        <small>Your own profile and orbit, under your company. Find students by major and school, message them, meet them at fairs.</small><span class="btprole-go">Set up my recruiter profile →</span></button>
-      <button class="btprole-card" data-role="employer" data-kind="company"><span class="btprole-ic">${svg("talent")}</span><b>I'm setting up our company page</b>
-        <small>Your company's page: about, who you hire, perks, live jobs. Your recruiters link to it from their own profiles.</small><span class="btprole-go">Set up the company page →</span></button>
-      <button class="btprole-card${pre === "educator" ? " on" : ""}" data-role="educator"><span class="btprole-ic">${svg("fair")}</span><b>I work at a school</b>
-        <small>Professors, advisors and career center staff. Browse real internships for your students, see career fairs, and join your school's orbit.</small><span class="btprole-go">Set up my school profile →</span></button></div>`;
+  // Nov 16 (owner): two ways in. Everyone is a person first (personal account); recruiters and school staff EARN badges from
+  // their profile (/u/#badges): Recruiter · Company (work-email code + approval) and Professor · School (school email + directory + approval).
+  window.btpRoleCards = (pre) => `<div class="btprole-cards two">
+      <button class="btprole-card${pre !== "employer" ? " on" : ""}" data-role="student"><span class="btprole-ic">${svg("jobs")}</span><b>Personal account</b>
+        <small>Find internships and jobs from company job boards, build your profile and join your school's orbit. Recruit or work at a school? Add a Recruiter or Faculty badge from your profile.</small><span class="btprole-go">Create my account →</span></button>
+      <button class="btprole-card${pre === "employer" ? " on" : ""}" data-role="employer" data-kind="company"><span class="btprole-ic">${svg("talent")}</span><b>Set up my company page</b>
+        <small>Your company's page: about, who you hire, perks, live jobs, career fairs. We confirm your work email before it goes live.</small><span class="btprole-go">Set up the company page →</span></button></div>`;
   // Nov 9: three ways in — student, recruiter (a person, own orbit), company page. Both business kinds are role "employer";
   // the kind decides which setup they see.
   const roleDest = (c, next) => c.dataset.kind ? `/business/setup/?kind=${c.dataset.kind}` + (next ? `&next=${encodeURIComponent(next)}` : "") : next;
   window.btpRoleDest = roleDest;
   const sheetCss = `.btprole{position:fixed;inset:0;z-index:200;background:rgba(6,10,44,.72);display:grid;place-items:center;padding:16px;font-family:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
-.btprole .box{background:#fff;border-radius:10px;max-width:1180px;width:100%;padding:28px;box-shadow:none}
+.btprole .box{background:#fff;border-radius:10px;max-width:900px;width:100%;padding:28px;box-shadow:none}
 .btprole h2{margin:0 0 4px;font-size:24px;color:#060A2C;letter-spacing:-.01em}.btprole p{margin:0 0 18px;color:#55627A}
-.btprole-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}@media (max-width:1020px){.btprole-cards{grid-template-columns:repeat(2,1fr)}}
+.btprole-cards{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;max-width:820px;margin:0 auto}
 .btprole-card{font:inherit;text-align:left;cursor:pointer;background:#fff;border:2px solid #DCE2EC;border-radius:10px;padding:20px;display:flex;flex-direction:column;gap:8px;color:#060A2C;transition:border-color .12s,box-shadow .12s}
 .btprole-card:hover,.btprole-card:focus-visible,.btprole-card.on{border-color:#4A7000;box-shadow:0 0 0 4px #F2FADF;outline:0}
 .btprole-card b{font-size:18px}.btprole-card small{color:#55627A;font-size:14px;line-height:1.45}

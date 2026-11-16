@@ -113,8 +113,8 @@
       const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) },
         body: JSON.stringify({ action: "talent", q: $("#q").value, major: $("#major").value, school: $("#school").value, gradYear: $("#yr").value }) });
       const j = await r.json().catch(() => ({}));
-      if (r.status === 403 && j.pending) { $("#out").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">Your company is being verified</h2><p>We check every company before it can search and contact students, usually within a day. Haven't confirmed your work email yet? <a href="/business/setup/">Finish setup</a>.</p><a class="btn lime" href="/business/company/">Build your company page meanwhile</a></div>`; return; }
-      if (r.status === 403) { $("#out").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">Find talent is for employer accounts</h2><p>${esc(j.error || "")}</p><a class="btn lime" href="/start/?role=employer">Set up a company account</a></div>`; return; }
+      if (r.status === 403 && j.pending) { $("#out").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">${esc(/badge/i.test(j.error || "") ? "Your Recruiter badge is being verified" : "Your company is being verified")}</h2><p>We check every company before it can search and contact students, usually within a day. Haven't confirmed your work email yet? <a href="/business/setup/">Finish setup</a>.</p><a class="btn lime" href="/business/company/">Build your company page meanwhile</a></div>`; return; }
+      if (r.status === 403) { $("#out").innerHTML = `<div class="card"><h2 style="margin:0 0 6px">Find talent is for recruiters</h2><p>${esc(j.error || "")}</p><a class="btn lime" href="/u/#badges">Add a Recruiter badge</a> <a class="btn" href="/business/setup/?kind=company">Set up a company page</a></div>`; return; }
       if (!r.ok) throw new Error(j.error || "Search failed");
       render(j);
     } catch (e) { $("#out").innerHTML = `<div class="card">Couldn't search right now (${esc(e.message)}). Try again in a minute.</div>`; }

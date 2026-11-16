@@ -211,6 +211,12 @@
   .stv:empty{display:none}.stv h3{margin:0 0 6px;font-size:15.5px}
   .stv-row{display:flex;gap:8px;align-items:center;margin:4px 0 8px}.stv-row input{flex:1;min-width:0}
   .stv-ok{margin:0;font-size:14px;color:#3A5800}
+  .bdg-row{display:flex;gap:14px;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--line, #DCE2EC)}.bdg-row:first-of-type{border-top:0}
+  .bdg-st{flex:none;text-align:right;font-size:14px}.bdg-st select{min-width:200px}.bdg-st a{color:#4A7000;font-weight:600}
+  .bdgs{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0 2px}
+  .bdg{font-size:13px;font-weight:600;border-radius:999px;padding:3px 11px}.bdg a{color:inherit}
+  .bdg.rec{background:#E8EDFB;color:#1E3A8A}.bdg.staff{background:#F2FADF;color:#3A5800}
+  @media (max-width:560px){.bdg-row{flex-direction:column;align-items:flex-start}.bdg-st{text-align:left}}
 </style>
 <link rel="stylesheet" href="/d.css">
 </head>
@@ -357,7 +363,8 @@
         ${isPreview ? `<div class="own"><button type="button" data-tab="edit">Edit profile</button>${S.me && S.me.handle && S.me.profilePublic ? `<button type="button" id="shareP">Share</button><button type="button" id="qrP" title="A QR code recruiters can scan at a career fair">QR</button>` : ""}</div>` : ""}</div>
         <h1>${esc(p.name || "Your name")}</h1>
         ${founding ? `<p class="founding" title="One of the first 150 students on Beat the Pile">Founding member #${+founding}</p>` : ""}
-        ${p.staff && (!isPreview || p.staffVerified) ? `<p class="founding">Faculty &amp; staff · ${esc(p.staff)}</p>` : p.staff && isPreview ? `<p class="small muted">Your Faculty &amp; staff tag shows here once you're verified (Edit → Verify you work at your school).</p>` : ""}
+        ${(window.__BADGES || []).length ? `<div class="bdgs">${window.__BADGES.map((b) => `<span class="bdg ${b.kind === "staff" ? "staff" : "rec"}">${esc(b.label)} · ${b.page ? `<a href="${esc(b.page)}" data-noi18n>${esc(b.org)}</a>` : `<span data-noi18n>${esc(b.org)}</span>`}</span>`).join("")}</div>`
+          : p.staff && isPreview && !p.staffVerified ? `<p class="small muted">Your ${esc(p.staff)} badge shows here once you're verified (Edit → Badges).</p>` : ""}
         ${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
         <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}${p.hometown ? `<span>From ${esc(p.hometown)}</span>` : ""}</div>
         ${(p.openTo || []).length || p.coffee ? `<div class="opento">${(p.openTo || []).map((k) => `<span>Open to ${esc(OPEN_TO[k] || k)}</span>`).join("")}${p.coffee ? `<span class="cof">Open to coffee chats</span>` : ""}</div>` : ""}
@@ -429,6 +436,7 @@
     const d = await r.json();
     document.title = (d.profile.name || "Profile") + " | Beat the Pile";
     await TL_READY;
+    window.__BADGES = d.badges || [];
     document.querySelector("main").innerHTML = profileHtml(d.profile, d.resume, false, d.founding, d.achievements);
     orbitButtons(d.handle, d.profile.name); bothCard(d.profile);
     $("#rep")?.addEventListener("click", (e) => { e.preventDefault(); window.iqReport ? window.iqReport({ message: "Report profile /u/" + d.handle + "\n" }) : alert("Use the Feedback button to report."); });
@@ -480,10 +488,15 @@
         <label for="f_handle">Profile address</label>
         <div class="handle"><span>beatthepile.com/u/</span><input id="f_handle" value="${esc(d.handle)}" placeholder="jordan-lee" autocomplete="off" spellcheck="false"></div>
         <label class="switch"><input type="checkbox" id="f_public" ${d.pub ? "checked" : ""}><span><b>Public profile</b><br><span class="muted small">Off = only you can see it. On = anyone with the link (recruiters, friends) can view it, and students at your school can find you in Orbit. It's never in search engines.</span></span></label>
-        ${d.p.staff ? `<div><label for="f_staff">Your role at school</label><select id="f_staff">${STAFF_ROLES.map((r) => `<option${d.p.staff === r ? " selected" : ""}>${r}</option>`).join("")}</select>
-          <p class="muted small">Shown as a Faculty &amp; staff tag once we've verified you. School staff aren't listed in employers' Find talent.</p></div>
-          <div class="stv" id="staffVerify" aria-live="polite"></div>` : `<label class="switch"><input type="checkbox" id="f_employers" ${d.p.openToEmployers ? "checked" : ""}><span><b>Let employers find me</b><br><span class="muted small">Companies hiring interns can find your public profile in Find talent by major, school and skills. Needs a public profile. Off unless you turn it on.</span></span></label>`}
+        ${d.p.staff ? `<p class="muted small" style="margin:10px 0 0">School staff aren't listed in employers' Find talent.</p>` : `<label class="switch"><input type="checkbox" id="f_employers" ${d.p.openToEmployers ? "checked" : ""}><span><b>Let employers find me</b><br><span class="muted small">Companies hiring interns can find your public profile in Find talent by major, school and skills. Needs a public profile. Off unless you turn it on.</span></span></label>`}
         ${me.handle && me.profilePublic ? `<p class="small" style="margin:10px 0 0">Live at <a href="/u/${esc(me.handle)}" style="color:var(--green-dark)">beatthepile.com/u/${esc(me.handle)}</a></p>` : ""}
+      </section>
+      <section class="card" id="badges"><h2>Badges</h2>
+        <p class="small muted" style="margin:-4px 0 10px">Recruit or work at a school? Earn a badge. Each one is checked by our team, so students and schools know it's real.</p>
+        <div class="bdg-row"><div><b>Recruiter</b><div class="small muted">Shows "Recruiter · your company" and unlocks Find talent. Needs your work email.</div></div><div id="bdgRec" class="bdg-st">…</div></div>
+        <div class="bdg-row"><div><b>Faculty &amp; staff</b><div class="small muted">Shows "Professor · your school" (or your role). Needs your school email and your page in the school's directory.</div></div>
+          <div class="bdg-st"><select id="f_staff" aria-label="Your role at school"><option value="">Not school staff</option>${STAFF_ROLES.map((r) => `<option${d.p.staff === r ? " selected" : ""}>${r}</option>`).join("")}</select></div></div>
+        ${d.p.staff ? `<div class="stv" id="staffVerify" aria-live="polite"></div>` : ""}
       </section>
       <section class="card"><h2>Basics</h2>
         <div class="photo">
@@ -658,7 +671,9 @@
     const h = $("#f_handle"); if (h) h.oninput = () => { h.value = h.value.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-").slice(0, 30); d.handle = h.value; };
     const pub = $("#f_public"); if (pub) pub.onchange = () => { d.pub = pub.checked; };
     const rs = $("#f_resume"); if (rs) rs.onchange = () => { d.p.showResume = rs.checked; };
-    const sf = $("#f_staff"); if (sf) sf.onchange = () => { d.p.staff = sf.value; };
+    const sf = $("#f_staff"); if (sf) sf.onchange = () => { d.p.staff = sf.value || null;
+      const sv = $("#staffVerify"); if (sv) sv.innerHTML = d.p.staff ? `<p class="small">Tap Save profile, then verify here.</p>` : ""; else if (d.p.staff) sf.closest(".bdg-row").insertAdjacentHTML("afterend", `<div class="stv" id="staffVerify"><p class="small">Tap Save profile, then verify here.</p></div>`); };
+    recruiterBox();
     const oe = $("#f_employers"); if (oe) oe.onchange = () => { d.p.openToEmployers = oe.checked; };
     main.querySelectorAll("[data-opento]").forEach((el) => el.onchange = () => { const k = el.dataset.opento; d.p.openTo = (d.p.openTo || []).filter((x) => x !== k); if (el.checked) d.p.openTo.push(k); });
     const ph = $("#f_photo"); if (ph) ph.onchange = async () => { const f = ph.files && ph.files[0]; if (!f) return;
@@ -723,6 +738,17 @@
   }
   // Nov 15: Faculty & staff verification. The tag only shows after: a code to an email on the school's own domain, a link
   // to their page in the school's directory (same domain), and an owner checking that page (lib/staffcheck.js).
+  // Nov 16: Recruiter badge = a verified business row for this person (work-email code + our check). Lives on the personal account.
+  async function recruiterBox(){
+    const el = $("#bdgRec"); if (!el) return;
+    let b = null; try { b = await api("POST", { action: "biz_get" }); } catch { el.innerHTML = ""; return; }
+    const st = b && b.status;
+    el.innerHTML = st === "verified" ? `<span class="tl-ver">Verified</span> <span data-noi18n>${esc(b.profile?.company || "")}</span><br><a href="/business/talent/">Find talent</a>`
+      : st === "pending" ? `<span class="small">Being verified · <span data-noi18n>${esc(b.profile?.company || "")}</span></span>`
+      : st === "rejected" ? `<span class="small" style="color:#9B2C2C">Not approved</span> <a href="/business/setup/?kind=recruiter&badge=1">Try again</a>`
+      : st === "new" && b.profile?.company ? `<a class="btn" href="/business/setup/?kind=recruiter&badge=1">Finish verifying</a>`
+      : `<a class="btn" href="/business/setup/?kind=recruiter&badge=1">Add Recruiter badge</a>`;
+  }
   async function staffBox(msg){
     const box = $("#staffVerify"); if (!box) return;
     let v; try { v = await api("POST", { action: "staff_status" }); } catch (e) { box.innerHTML = `<p class="small muted">${esc(e.message)}</p>`; return; }
@@ -995,6 +1021,8 @@
       S.me = me; S.kitOk = !!home;
       if (home) { const d = home.data || {}; S.kit = d.profile || {}; S.resumes = Array.isArray(d.resumes?.list) ? d.resumes.list : Array.isArray(S.kit.resumes) ? S.kit.resumes : []; }
       load(); remember(); await TL_READY;
+      // Nov 16: your earned badges (same list visitors see)
+      try { if (me.handle && me.profilePublic) { const pr = await fetch(`/api/me?u=${encodeURIComponent(me.handle)}`, { headers: { Authorization: "Bearer " + (await token()) } }); if (pr.ok) window.__BADGES = (await pr.json()).badges || []; } } catch {}
       if (location.hash === "#kit") { S.tab = "edit"; editor(); jump("kit"); }
       else if (location.hash === "#experience") { S.tab = "edit"; editor(); jump("experience"); }   // Nov 15: Orbit's "add your internships" nudge
       else if (location.hash === "#photo") { S.tab = "edit"; editor(); const ph = document.getElementById("f_photo"); if (ph) { ph.closest("div")?.scrollIntoView({ block: "center" }); ph.click(); } }   // Nov 14: "Add a profile photo" links

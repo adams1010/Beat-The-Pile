@@ -142,7 +142,9 @@
       <ul class="next">${KIND() === "recruiter" ? `<li><a href="/business/company/">Finish your profile</a>: what you hire for, where. Students see it when you reach out.</li><li><a href="/orbit/">Open your orbit</a>: students close to your company, and your messages.</li>` : `<li><a href="/business/company/">Build your company page</a>: about, what you hire for, perks. Students see it when you reach out.</li>`}
         <li><a href="/business/fairs/">Pick the career fairs you'll be at</a>.</li>
         <li><a href="/business/home/">Go to your home</a> to see how many students are open to employers right now.</li></ul>
-      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap"><a class="btn pri" href="/business/company/">${KIND() === "recruiter" ? "Finish your profile" : "Build your company page"}</a><a class="btn" href="/business/home/">Go to home</a></div></section>`;
+      <div style="margin-top:16px;display:flex;gap:8px;flex-wrap:wrap">${KIND() === "recruiter" && (localStorage.getItem("btp_role") || "student") !== "employer"
+        ? `<a class="btn pri" href="/u/#badges">Back to your profile</a>${verified ? `<a class="btn" href="/business/talent/">Find talent</a>` : ""}`
+        : `<a class="btn pri" href="/business/company/">${KIND() === "recruiter" ? "Finish your profile" : "Build your company page"}</a><a class="btn" href="/business/home/">Go to home</a>`}</div></section>`;
   }
 
   biz.start(async (u) => {

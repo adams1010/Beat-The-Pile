@@ -1886,7 +1886,26 @@
   "Email confirmed.": "E-Mail bestätigt.",
   "Thanks. We're checking your directory page now. Your tag shows as soon as it's approved, usually within 2 days.": "Danke. Wir prüfen gerade deine Verzeichnisseite. Dein Tag erscheint, sobald er bestätigt ist, meist innerhalb von 2 Tagen.",
   "Next steps": "Nächste Schritte",
-  "career fairs in Career Fair Mode": "Karrieremessen im Messe-Modus"
+  "career fairs in Career Fair Mode": "Karrieremessen im Messe-Modus",
+  "Personal account": "Persönliches Konto",
+  "Set up my company page": "Unternehmensseite einrichten",
+  "Create my account →": "Konto erstellen →",
+  "Find internships and jobs from company job boards, build your profile and join your school's orbit. Recruit or work at a school? Add a Recruiter or Faculty badge from your profile.": "Finde Praktika und Jobs direkt von den Jobseiten der Unternehmen, erstelle dein Profil und tritt dem Orbit deiner Hochschule bei. Du rekrutierst oder arbeitest an einer Hochschule? Füge in deinem Profil ein Recruiter- oder Lehrkräfte-Badge hinzu.",
+  "Your company's page: about, who you hire, perks, live jobs, career fairs. We confirm your work email before it goes live.": "Die Seite deines Unternehmens: Über uns, wen ihr sucht, Benefits, Jobs, Karrieremessen. Wir bestätigen deine Arbeits-E-Mail, bevor sie online geht.",
+  "Badges": "Badges",
+  "Recruit or work at a school? Earn a badge. Each one is checked by our team, so students and schools know it's real.": "Du rekrutierst oder arbeitest an einer Hochschule? Hol dir ein Badge. Unser Team prüft jedes, damit Studierende und Hochschulen wissen, dass es echt ist.",
+  "Faculty & staff": "Lehrkräfte & Personal",
+  "Not school staff": "Kein Hochschulpersonal",
+  "Add Recruiter badge": "Recruiter-Badge hinzufügen",
+  "Finish verifying": "Verifizierung abschließen",
+  "Not approved": "Nicht bestätigt",
+  "Try again": "Erneut versuchen",
+  "Back to your profile": "Zurück zu deinem Profil",
+  "Tap Save profile, then verify here.": "Tippe auf Profil speichern und verifiziere dann hier.",
+  "Find talent is for recruiters": "Talente finden ist für Recruiter",
+  "Add a Recruiter badge": "Ein Recruiter-Badge hinzufügen",
+  "Set up a company page": "Eine Unternehmensseite einrichten",
+  "Your Recruiter badge is being verified": "Dein Recruiter-Badge wird geprüft"
  },
  "patterns": [
   ["^(\\d) of 4 pinned$", "$1 von 4 angeheftet"],
@@ -2017,6 +2036,7 @@
   ["^(\\d+) (min|h|d) ago$", "vor $1 $2"],
   ["^See the job up close first: ([\\d,]+) shadowing & volunteer spots, many unpaid\\.$", "Sieh dir den Job erst aus der Nähe an: $1 Hospitations- und Ehrenamtsplätze, viele unbezahlt."],
   ["^([\\d,]+) open jobs?$", "$1 offene Jobs"],
-  ["^career fairs at (\\d+) schools in Career Fair Mode$", "Karrieremessen an $1 Hochschulen im Messe-Modus"]
+  ["^career fairs at (\\d+) schools in Career Fair Mode$", "Karrieremessen an $1 Hochschulen im Messe-Modus"],
+  ["^Being verified · (.+)$", "Wird geprüft · $1"]
  ]
 }

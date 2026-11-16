@@ -1886,7 +1886,26 @@
   "Email confirmed.": "Correo confirmado.",
   "Thanks. We're checking your directory page now. Your tag shows as soon as it's approved, usually within 2 days.": "Gracias. Estamos revisando tu página del directorio. Tu etiqueta aparecerá en cuanto se apruebe, normalmente en 2 días.",
   "Next steps": "Próximos pasos",
-  "career fairs in Career Fair Mode": "ferias de empleo en Modo Feria"
+  "career fairs in Career Fair Mode": "ferias de empleo en Modo Feria",
+  "Personal account": "Cuenta personal",
+  "Set up my company page": "Crear la página de mi empresa",
+  "Create my account →": "Crear mi cuenta →",
+  "Find internships and jobs from company job boards, build your profile and join your school's orbit. Recruit or work at a school? Add a Recruiter or Faculty badge from your profile.": "Encuentra prácticas y empleos de las bolsas de empleo de las empresas, crea tu perfil y únete a la órbita de tu universidad. ¿Reclutas o trabajas en una universidad? Añade una insignia de Reclutador o de Personal desde tu perfil.",
+  "Your company's page: about, who you hire, perks, live jobs, career fairs. We confirm your work email before it goes live.": "La página de tu empresa: información, a quién contratas, beneficios, empleos y ferias. Confirmamos tu correo de trabajo antes de publicarla.",
+  "Badges": "Insignias",
+  "Recruit or work at a school? Earn a badge. Each one is checked by our team, so students and schools know it's real.": "¿Reclutas o trabajas en una universidad? Consigue una insignia. Nuestro equipo revisa cada una, para que estudiantes y universidades sepan que es real.",
+  "Faculty & staff": "Profesorado y personal",
+  "Not school staff": "No trabajo en una universidad",
+  "Add Recruiter badge": "Añadir insignia de Reclutador",
+  "Finish verifying": "Terminar la verificación",
+  "Not approved": "No aprobada",
+  "Try again": "Intentar de nuevo",
+  "Back to your profile": "Volver a tu perfil",
+  "Tap Save profile, then verify here.": "Toca Guardar perfil y luego verifica aquí.",
+  "Find talent is for recruiters": "Buscar talento es para reclutadores",
+  "Add a Recruiter badge": "Añadir una insignia de Reclutador",
+  "Set up a company page": "Crear una página de empresa",
+  "Your Recruiter badge is being verified": "Estamos verificando tu insignia de Reclutador"
  },
  "patterns": [
   ["^(\\d) of 4 pinned$", "$1 de 4 fijadas"],
@@ -2017,6 +2036,7 @@
   ["^(\\d+) (min|h|d) ago$", "hace $1 $2"],
   ["^See the job up close first: ([\\d,]+) shadowing & volunteer spots, many unpaid\\.$", "Mira el trabajo de cerca primero: $1 puestos de observación y voluntariado, muchos sin pago."],
   ["^([\\d,]+) open jobs?$", "$1 empleos abiertos"],
-  ["^career fairs at (\\d+) schools in Career Fair Mode$", "ferias de empleo en $1 universidades en Modo Feria"]
+  ["^career fairs at (\\d+) schools in Career Fair Mode$", "ferias de empleo en $1 universidades en Modo Feria"],
+  ["^Being verified · (.+)$", "En verificación · $1"]
  ]
 }
