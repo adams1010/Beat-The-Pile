@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 const U = await import("../lib/fetchers/usajobs.js");
 const { fetchCompany } = await import("../lib/fetchers/index.js");
-const item = (id, title, loc, extra = {}) => ({ MatchedObjectId: id, MatchedObjectDescriptor: { PositionTitle: title, PositionURI: `https://www.usajobs.gov/job/${id}`,
+const item = (id, title, loc, extra = {}) => ({ MatchedObjectId: id, MatchedObjectDescriptor: { PositionTitle: title, PositionURI: `https://www.usajobs.gov:443/job/${id}`,
   OrganizationName: extra.org || "National Aeronautics and Space Administration", PositionLocation: loc, PublicationStartDate: "2026-11-10T00:00:00.0000",
   ApplicationCloseDate: extra.close || "2027-01-31T23:59:59.9970" } });
 const VA = [{ LocationName: "Hampton, Virginia", CityName: "Hampton, Virginia", CountryCode: "United States", CountrySubDivisionCode: "Virginia" }];
@@ -21,6 +21,8 @@ const raw = await U.fetchUsajobs({}, { fetchImpl: fakeFetch, env: { USAJOBS_KEY:
 assert.equal(calls[0].h["Authorization-Key"], "k"); assert.equal(calls[0].h["User-Agent"], "me@x.com"); assert.equal(calls[0].h.Host, "data.usajobs.gov");
 assert.deepEqual(raw.map((j) => j.sourceId).sort(), ["1", "2", "3", "4", "5"], "merged, closed one dropped");
 assert.equal(raw.find((j) => j.sourceId === "4").location, "Remote, United States");
+assert.equal(raw.find((j) => j.sourceId === "1").url, "https://www.usajobs.gov/job/1", "the :443 USAJOBS adds is dropped");
+assert.equal(U.toJob({ MatchedObjectId: "9", MatchedObjectDescriptor: { PositionTitle: "Intern", PositionURI: "https://usajobs.gov.evil.com/x" } }, ""), null, "only real usajobs.gov links");
 // through the normal pipeline
 process.env.USAJOBS_KEY = "k"; process.env.USAJOBS_EMAIL = "me@x.com";
 globalThis.fetch = fakeFetch;
