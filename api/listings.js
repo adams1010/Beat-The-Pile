@@ -157,13 +157,9 @@ async function nearby(p, res) {
 let scanMemo = null;
 async function scanAll() {
   if (scanMemo && Date.now() - scanMemo.at < 120000) return scanMemo.rows;
-  const rows = []; let last = "";
-  for (let i = 0; i < 200; i++) {
-    const page = await db.select(`listings?select=id,company_id,company,field,match,title,kind&${LIVE}${last ? `&id=gt.${encodeURIComponent(last)}` : ""}&order=id.asc&limit=1000`);
-    for (const r of page) rows.push({ company_id: r.company_id, company: r.company, field: r.field, match: r.match, kind: r.kind || kindFor(r.title) });
-    if (page.length < 1000) break;
-    last = page[page.length - 1].id;
-  }
+  // Nov 16 (Supabase egress over the free 5.5 GB): Postgres counts the groups itself (rpc listing_groups, ~1 MB) instead of
+  // sending every open listing (~15 MB) on each cold cache. Each row = one company × field × match × kind, with n listings.
+  const rows = ((await db.rpc("listing_groups")) || []).map(([company_id, company, field, match, kind, n]) => ({ company_id, company, field, match, kind: kind || "intern", n: n || 0 }));
   scanMemo = { at: Date.now(), rows };
   return rows;
 }
@@ -171,8 +167,8 @@ async function liveScan() {
   const seen = new Map(), byField = {};
   for (const r of await scanAll()) {
     if (r.kind !== "intern") continue;
-    const e = seen.get(r.company_id); if (e) e.n++; else seen.set(r.company_id, { company: r.company, n: 1 });
-    const f = r.field || "other"; byField[f] = (byField[f] || 0) + 1;
+    const e = seen.get(r.company_id); if (e) e.n += r.n; else seen.set(r.company_id, { company: r.company, n: r.n });
+    const f = r.field || "other"; byField[f] = (byField[f] || 0) + r.n;
   }
   return { seen, byField };
 }
@@ -233,7 +229,7 @@ export default async function handler(req, res) {
       // the headline numbers stay internships; full-time / entry-level is counted on its own (all from the one scan above)
       const rows = await scanAll();
       let engineering = 0, me = 0, allMajors = 0, fulltime = 0, hourly = 0, shadow = 0;
-      for (const r of rows) { if (r.kind === "fulltime") { fulltime++; continue; } if (r.kind === "hourly") { hourly++; continue; } if (r.kind === "shadow") { shadow++; continue; } allMajors++; if (r.match) engineering++; if (r.match === "me") me++; }
+      for (const r of rows) { const n = r.n; if (r.kind === "fulltime") { fulltime += n; continue; } if (r.kind === "hourly") { hourly += n; continue; } if (r.kind === "shadow") { shadow += n; continue; } allMajors += n; if (r.match) engineering += n; if (r.match === "me") me += n; }
       const [companies, lastRun] = await Promise.all([
         db.count("company_candidates?status=eq.live"),
         db.select("feed_runs?select=ran_at&order=ran_at.desc&limit=1"),

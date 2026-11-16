@@ -107,7 +107,7 @@ export default async function handler(req, res) {
       const { loadCompanies } = await import("../lib/companies.js");
       const runStart = typeof b.runStart === "string" && !Number.isNaN(Date.parse(b.runStart)) ? new Date(b.runStart).toISOString() : null;
       if (!runStart || !Array.isArray(b.results)) return res.status(400).json({ error: "runStart and results needed" });
-      const byId = new Map((await loadCompanies()).filter((c) => c.enabled).map((c) => [c.id, c]));
+      const byId = new Map((await loadCompanies(b.results.slice(0, 60).map((r) => r && r.id).filter(Boolean))).filter((c) => c.enabled).map((c) => [c.id, c]));
       const out = [];
       for (const r of b.results.slice(0, 60)) {
         const cfg = byId.get(r?.id);
@@ -216,9 +216,8 @@ export default async function handler(req, res) {
         db.selectAsAdmin(`bot_runs?select=bot,ran_at,ok,summary,stats&ran_at=gt.${new Date(Date.now() - 7 * 864e5).toISOString()}&order=ran_at.desc&limit=1500`),
         db.selectAllAsAdmin("company_candidates?select=id,company,status,verified_at,checked_at,detail"),
         aiSummary().catch(() => null),
-        (async () => { const out = []; let last = ""; for (let i = 0; i < 200; i++) {           // ≤1000 rows per request; keyset paging (Nov 13: was capped at 10k)
-          const pg = await db.selectAsAdmin(`listings?select=id,company_id,match,field,first_seen&closed_at=is.null&or=(link_ok.is.null,link_ok.eq.true)${last ? `&id=gt.${encodeURIComponent(last)}` : ""}&order=id.asc&limit=1000`);
-          out.push(...pg); if (pg.length < 1000) break; last = pg[pg.length - 1].id; } return out; })().catch(() => []),
+        // Nov 16: counted in Postgres (rpc listing_groups) instead of pulling every open listing on each /bots refresh (Supabase egress)
+        db.rpc("listing_groups").then((g) => (g || []).map(([company_id, , field, match, kind, n, new24]) => ({ company_id, field, match, kind, n, new24 }))).catch(() => []),
         db.selectAllAsAdmin("user_jobs?select=clerk_user_id,updated_at,apps,starred,resume_path&order=clerk_user_id.asc").catch(() => []),
         db.selectAsAdmin("feedback?select=created_at&limit=10000").catch(() => []),
       ]);
@@ -226,12 +225,12 @@ export default async function handler(req, res) {
       const unsupportedBy = {};
       for (const c of cands) if (c.status === "unsupported") { const m = /Uses (.+?)(?:,| —) needs/.exec(c.detail || ""); const k = m ? m[1] : "Other"; unsupportedBy[k] = (unsupportedBy[k] || 0) + 1; }
       const week = Date.now() - 7 * 864e5;
-      const eng = listings.filter((l) => l.match);
-      const byField = {}; for (const l of listings) byField[l.field || "untagged"] = (byField[l.field || "untagged"] || 0) + 1;
+      const eng = listings.filter((l) => l.match), sum = (a, k = "n") => a.reduce((t, l) => t + (l[k] || 0), 0);
+      const byField = {}; for (const l of listings) byField[l.field || "untagged"] = (byField[l.field || "untagged"] || 0) + l.n;
       const system = {
-        listings: eng.length, me: eng.filter((l) => l.match === "me").length, allMajors: listings.length, byField,
+        listings: sum(eng), me: sum(eng.filter((l) => l.match === "me")), allMajors: sum(listings), byField,
         companiesWithJobs: new Set(eng.map((l) => l.company_id)).size,
-        newListings24h: eng.filter((l) => Date.parse(l.first_seen) > Date.now() - 864e5).length,
+        newListings24h: sum(eng, "new24"),
         users: users.length, activeUsers7d: users.filter((u) => Date.parse(u.updated_at) > week).length,
         applications: users.reduce((n, u) => n + (Array.isArray(u.apps) ? u.apps.length : 0), 0),
         resumes: users.filter((u) => u.resume_path).length,

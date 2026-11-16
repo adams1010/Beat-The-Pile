@@ -332,7 +332,7 @@
     $("#so")?.addEventListener("click", () => S.clerk.signOut()); $("#si")?.addEventListener("click", () => S.clerk.openSignIn());
   }
 
-  load(); loadClerk(); setInterval(load, 60000);
+  load(); loadClerk(); setInterval(() => { if (!document.hidden) load(); }, 300000);   // Nov 16: every 5 min, only while you are looking (each load reads a lot from Supabase)
 })();
 </script>
 </body>

@@ -133,9 +133,9 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
 .btptab{display:none}
 @media (max-width:640px){
   .btpnav .mob{display:none}.btpnav .right{margin-left:auto}
-  body.btp-has-nav{padding-bottom:calc(74px + env(safe-area-inset-bottom,0px))}
+  body.btp-has-nav{padding-bottom:calc(66px + max(8px, calc(env(safe-area-inset-bottom,0px) - 12px)))}
   .btptab{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:75;background:#060A2C;border-top:1px solid #1A2640;
-    padding:0 env(safe-area-inset-right,0px) calc(14px + env(safe-area-inset-bottom,0px)) env(safe-area-inset-left,0px);font:500 11px/1.1 "Geist",-apple-system,sans-serif}
+    padding:0 env(safe-area-inset-right,0px) max(8px, calc(env(safe-area-inset-bottom,0px) - 12px)) env(safe-area-inset-left,0px);font:500 11px/1.1 "Geist",-apple-system,sans-serif}
   .btptab>a,.btptab>details>summary{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:58px;color:#AEB9CC;text-decoration:none;list-style:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
   .btptab>details{flex:1;display:flex}.btptab>details>summary::-webkit-details-marker{display:none}
   .btptab>a[aria-current="page"],.btptab>details[open]>summary{color:#B0F701}
@@ -143,7 +143,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   .btptab .btpbw{position:relative;display:block;height:23px}.btptab .btpbw .btpbadge{position:absolute;top:-5px;left:13px}
   .btptab .btpbadge{font:700 10.5px/16px "Geist",sans-serif;font-style:normal;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#B0F701;color:#060A2C;text-align:center}
   .btptab .btpbadge[hidden]{display:none!important}
-  .btptab .more{position:fixed;left:8px;right:8px;bottom:calc(80px + env(safe-area-inset-bottom,0px));max-height:65vh;overflow:auto;background:#fff;color:#060A2C;border:1px solid #DCE2EC;border-radius:10px;padding:6px;font-size:14px}
+  .btptab .more{position:fixed;left:8px;right:8px;bottom:calc(66px + max(8px, calc(env(safe-area-inset-bottom,0px) - 12px)));max-height:65vh;overflow:auto;background:#fff;color:#060A2C;border:1px solid #DCE2EC;border-radius:10px;padding:6px;font-size:14px}
   .btptab .more{display:block!important;flex-direction:column}.btptab .more a{display:block!important;width:auto!important;padding:11px 12px;border-radius:8px;color:#060A2C;text-decoration:none}.btptab .more a:active{background:#EEF1F6}
   .btptab .more b{display:block;font-weight:600}.btptab .more small{display:block;color:#55627A;font-size:12px;margin-top:2px}
   .btptab .more .sep{height:1px;background:#E3E7ED;margin:6px 4px}
@@ -155,9 +155,9 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   .btptab .more .edrow{display:flex;gap:8px;padding:6px 8px}
   .btptab .more .eddone{background:#4A7000!important;color:#fff!important;border-radius:999px!important;padding:8px 18px!important;font-weight:600}
   .btptab .more .edreset{border:1px solid #C9D2E3!important;border-radius:999px!important;padding:8px 14px!important}
-  .iqfb-btn{bottom:calc(86px + env(safe-area-inset-bottom,0px))!important}.iqp{bottom:calc(134px + env(safe-area-inset-bottom,0px))!important}
-  .btpcookie{bottom:calc(86px + env(safe-area-inset-bottom,0px))!important}
-  .toast,.totop{bottom:calc(88px + env(safe-area-inset-bottom,0px))!important}.sheet{z-index:80!important}}
+  .iqfb-btn{bottom:calc(72px + max(8px, calc(env(safe-area-inset-bottom,0px) - 12px)))!important}.iqp{bottom:calc(120px + max(8px, calc(env(safe-area-inset-bottom,0px) - 12px)))!important}
+  .btpcookie{bottom:calc(72px + max(8px, calc(env(safe-area-inset-bottom,0px) - 12px)))!important}
+  .toast,.totop{bottom:calc(74px + max(8px, calc(env(safe-area-inset-bottom,0px) - 12px)))!important}.sheet{z-index:80!important}}
 .btpnav .menu .sep{height:1px;background:#E3E7ED;margin:6px 4px}
 @media print{.btpnav{display:none}}
 /* Nov 13 mobile pass: iPhone zooms the page into any field under 16px; Clerk's sign-in boxes were 30px tall and grey */

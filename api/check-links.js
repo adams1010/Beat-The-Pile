@@ -58,10 +58,10 @@ export default async function handler(req, res) {
 
   if (!(await botOn("links"))) return res.status(200).json({ off: true, bot: "links" });
   const started = Date.now();
-  const byId = Object.fromEntries((await loadCompanies()).map((c) => [c.id, c]));
   const rows = await db.selectAsAdmin(
     `listings?select=id,company_id,url,ats,external_path,link_fails&closed_at=is.null&ats=not.in.(${PAGE_UNCHECKABLE.join(",")})&order=link_checked_at.asc.nullsfirst&limit=${BATCH}`
   );
+  const byId = Object.fromEntries((await loadCompanies(rows.map((r) => r.company_id))).map((c) => [c.id, c]));   // Nov 16: only this batch's companies
 
   const results = await mapLimit(rows, 16, async (l) => {
     if (Date.now() - started > TIME_BUDGET_MS) return { id: l.id, skipped: true };

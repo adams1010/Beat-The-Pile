@@ -128,6 +128,12 @@ export function installFake({ jwk, anthropic, clerkUsers = {} } = {}) {
         const id = (seq.get("ai_usage") || 0) + 1; seq.set("ai_usage", id);
         T("ai_usage").push({ ...DEFAULTS.ai_usage(), id, feature: a.p_feature, model: a.p_model, cost_usd: Number(a.p_est), reserved: true });
         return resp(200, id); }
+      if (fn === "listing_groups") {   // same grouping as the Postgres function (supabase/listing_groups.sql)
+        const g = new Map(), day = Date.now() - 864e5;
+        for (const l of T("listings")) { if (l.closed_at || l.link_ok === false) continue;
+          const k = [l.company_id, l.field ?? null, l.match ?? null, l.kind ?? null].join("\u0001");
+          const e = g.get(k) || [l.company_id, l.company, l.field ?? null, l.match ?? null, l.kind ?? null, 0, 0]; e[5]++; if (Date.parse(l.first_seen) > day) e[6]++; g.set(k, e); }
+        return resp(200, [...g.values()]); }
       throw new Error("unknown rpc " + fn);
     }
     const rows = T(name), sp = url.searchParams;
