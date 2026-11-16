@@ -207,6 +207,10 @@
   .tl-vrow{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin-top:6px;font-size:13px}.tl-vrow .hire a{margin-top:0}
   .tl-vrow a{color:#4A7000;font-weight:600}
   .tl-ver{font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 9px;background:#F2FADF;color:#3A5800}
+  .stv{margin-top:12px;border:1px solid var(--line, #DCE2EC);border-radius:10px;padding:12px 14px;background:#F9FAFC}
+  .stv:empty{display:none}.stv h3{margin:0 0 6px;font-size:15.5px}
+  .stv-row{display:flex;gap:8px;align-items:center;margin:4px 0 8px}.stv-row input{flex:1;min-width:0}
+  .stv-ok{margin:0;font-size:14px;color:#3A5800}
 </style>
 <link rel="stylesheet" href="/d.css">
 </head>
@@ -352,7 +356,7 @@
         ${isPreview ? `<div class="own"><button type="button" data-tab="edit">Edit profile</button>${S.me && S.me.handle && S.me.profilePublic ? `<button type="button" id="shareP">Share</button><button type="button" id="qrP" title="A QR code recruiters can scan at a career fair">QR</button>` : ""}</div>` : ""}</div>
         <h1>${esc(p.name || "Your name")}</h1>
         ${founding ? `<p class="founding" title="One of the first 150 students on Beat the Pile">Founding member #${+founding}</p>` : ""}
-        ${p.staff ? `<p class="founding">Faculty &amp; staff · ${esc(p.staff)}</p>` : ""}
+        ${p.staff && (!isPreview || p.staffVerified) ? `<p class="founding">Faculty &amp; staff · ${esc(p.staff)}</p>` : p.staff && isPreview ? `<p class="small muted">Your Faculty &amp; staff tag shows here once you're verified (Edit → Verify you work at your school).</p>` : ""}
         ${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
         <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}${p.hometown ? `<span>From ${esc(p.hometown)}</span>` : ""}</div>
         ${(p.openTo || []).length || p.coffee ? `<div class="opento">${(p.openTo || []).map((k) => `<span>Open to ${esc(OPEN_TO[k] || k)}</span>`).join("")}${p.coffee ? `<span class="cof">Open to coffee chats</span>` : ""}</div>` : ""}
@@ -476,7 +480,8 @@
         <div class="handle"><span>beatthepile.com/u/</span><input id="f_handle" value="${esc(d.handle)}" placeholder="jordan-lee" autocomplete="off" spellcheck="false"></div>
         <label class="switch"><input type="checkbox" id="f_public" ${d.pub ? "checked" : ""}><span><b>Public profile</b><br><span class="muted small">Off = only you can see it. On = anyone with the link (recruiters, friends) can view it, and students at your school can find you in Orbit. It's never in search engines.</span></span></label>
         ${d.p.staff ? `<div><label for="f_staff">Your role at school</label><select id="f_staff">${STAFF_ROLES.map((r) => `<option${d.p.staff === r ? " selected" : ""}>${r}</option>`).join("")}</select>
-          <p class="muted small">Shown as a Faculty &amp; staff tag. School staff aren't listed in employers' Find talent.</p></div>` : `<label class="switch"><input type="checkbox" id="f_employers" ${d.p.openToEmployers ? "checked" : ""}><span><b>Let employers find me</b><br><span class="muted small">Companies hiring interns can find your public profile in Find talent by major, school and skills. Needs a public profile. Off unless you turn it on.</span></span></label>`}
+          <p class="muted small">Shown as a Faculty &amp; staff tag once we've verified you. School staff aren't listed in employers' Find talent.</p></div>
+          <div class="stv" id="staffVerify" aria-live="polite"></div>` : `<label class="switch"><input type="checkbox" id="f_employers" ${d.p.openToEmployers ? "checked" : ""}><span><b>Let employers find me</b><br><span class="muted small">Companies hiring interns can find your public profile in Find talent by major, school and skills. Needs a public profile. Off unless you turn it on.</span></span></label>`}
         ${me.handle && me.profilePublic ? `<p class="small" style="margin:10px 0 0">Live at <a href="/u/${esc(me.handle)}" style="color:var(--green-dark)">beatthepile.com/u/${esc(me.handle)}</a></p>` : ""}
       </section>
       <section class="card"><h2>Basics</h2>
@@ -523,7 +528,7 @@
       <section class="card" id="experience"><h2>Experience</h2><p class="small muted" style="margin:-4px 0 10px">Real dates put each role on your career line.</p><div id="exp">${d.p.experience.map((x, i) => { const sp = window.btpTL ? window.btpTL.parseWhen(x.when) : { start: "", end: "" }; const st = x.start || sp.start || "", en = x.end || sp.end || ""; return `
         <div class="rep"><button class="rm" data-rm="experience" data-i="${i}">Remove</button>
           <div class="row"><div><label>Role</label><input data-list="experience" data-i="${i}" data-f="title" value="${esc(x.title)}" placeholder="Marketing Intern"></div>
-          <div class="cpick"><label>Company</label><div class="cpin"><input data-list="experience" data-i="${i}" data-f="org" data-cpick="${i}" value="${esc(x.org)}" placeholder="Start typing, like HITT Contracting" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false"><span class="cpv" data-cpv="${i}"${x.orgId ? "" : " hidden"}>Verified</span></div><div class="cpbox" data-cpbox="${i}" role="listbox" hidden></div></div></div>
+          <div class="cpick"><label>Company</label><div class="cpin"><input data-list="experience" data-i="${i}" data-f="org" data-cpick="${i}" value="${esc(x.org)}" placeholder="Start typing your company" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false"><span class="cpv" data-cpv="${i}"${x.orgId ? "" : " hidden"}>Verified</span></div><div class="cpbox" data-cpbox="${i}" role="listbox" hidden></div></div></div>
           <div class="row"><div><label>Type</label><select data-list="experience" data-i="${i}" data-f="type"><option value="">Pick one</option>${Object.entries(window.btpTL ? window.btpTL.TYPES : {}).map(([k, v]) => `<option value="${k}"${x.type === k ? " selected" : ""}>${v}</option>`).join("")}</select></div>
           <div><label>Location</label><input data-list="experience" data-i="${i}" data-f="location" value="${esc(x.location || "")}" placeholder="Seattle, WA or Remote"></div></div>
           <div class="row"><div><label>Start</label><input type="month" data-list="experience" data-i="${i}" data-f="start" value="${esc(st)}" placeholder="2025-05"></div>
@@ -621,6 +626,7 @@
     main.querySelectorAll("[data-list]").forEach((el) => el.oninput = el.onchange = () => { const it = d.p[el.dataset.list][+el.dataset.i]; it[el.dataset.f] = el.value;
       if (el.dataset.list === "experience" && (el.dataset.f === "start" || el.dataset.f === "end") && window.btpTL) it.when = expWhen(it); });   // Nov 14: keep the text date in step
     wireCompanyPick(main, d);
+    if ($("#staffVerify")) staffBox();
     main.querySelectorAll("[data-now]").forEach((el) => el.onchange = () => { const it = d.p.experience[+el.dataset.now]; const endIn = main.querySelector(`[data-list="experience"][data-i="${el.dataset.now}"][data-f="end"]`);
       it.end = el.checked ? "present" : ""; if (endIn) { endIn.disabled = el.checked; if (el.checked) endIn.value = ""; } if (window.btpTL) it.when = expWhen(it); });
     main.querySelectorAll("[data-link]").forEach((el) => el.oninput = () => { d.p.links[el.dataset.link] = el.value.trim(); });
@@ -713,6 +719,29 @@
     } catch (e) { say(e.message, true); }
     finally { $("#fill")?.classList.remove("busy"); }
   }
+  // Nov 15: Faculty & staff verification. The tag only shows after: a code to an email on the school's own domain, a link
+  // to their page in the school's directory (same domain), and an owner checking that page (lib/staffcheck.js).
+  async function staffBox(msg){
+    const box = $("#staffVerify"); if (!box) return;
+    let v; try { v = await api("POST", { action: "staff_status" }); } catch (e) { box.innerHTML = `<p class="small muted">${esc(e.message)}</p>`; return; }
+    const head = `<h3>Verify you work at <span data-noi18n>${esc(v.school || "your school")}</span></h3>`;
+    const note = msg ? `<p class="small" style="color:#9B2C2C">${esc(msg)}</p>` : "";
+    if (v.verified) { box.innerHTML = `<p class="stv-ok"><b>Verified</b> · your Faculty &amp; staff tag is showing.</p>`; return; }
+    if (v.status === "pending") { box.innerHTML = head + `<p class="small">Thanks. We're checking your directory page now. Your tag shows as soon as it's approved, usually within 2 days.</p>`; return; }
+    if (!v.schoolDomain) { box.innerHTML = head + `<p class="small muted">Pick your school from the list above and save, so we know its website.</p>`; return; }
+    const why = `<p class="small muted">Your Faculty &amp; staff tag stays hidden until you're verified. It takes three steps: an email at <b data-noi18n>${esc(v.schoolDomain)}</b>, your page in the school's directory, and a quick check by our team.</p>`;
+    const rej = v.status === "rejected" ? `<p class="small" style="color:#9B2C2C">We couldn't verify the last request${v.note ? ": " + esc(v.note) : ""}. You can try again.</p>` : "";
+    if (!v.emailOk) {
+      box.innerHTML = head + why + rej + note + `<label for="sv_em">Your school email</label><div class="stv-row"><input id="sv_em" type="email" placeholder="name@${esc(v.schoolDomain)}" autocomplete="email"><button class="btn" id="sv_send" type="button">Send code</button></div>
+        <div id="sv_codeRow" ${v.email ? "" : "hidden"}><label for="sv_code">Code from the email${v.email ? ` (sent to <span data-noi18n>${esc(v.email)}</span>)` : ""}</label><div class="stv-row"><input id="sv_code" inputmode="numeric" maxlength="6" placeholder="6 digits" autocomplete="one-time-code"><button class="btn pri" id="sv_ok" type="button">Confirm</button></div></div>`;
+      $("#sv_send").onclick = async () => { $("#sv_send").disabled = true; try { await api("POST", { action: "staff_email_start", email: $("#sv_em").value }); staffBox(); } catch (e) { staffBox(e.message); } };
+      const ok = $("#sv_ok"); if (ok) ok.onclick = async () => { ok.disabled = true; try { await api("POST", { action: "staff_email_confirm", code: $("#sv_code").value }); staffBox(); } catch (e) { staffBox(e.message); } };
+      return;
+    }
+    box.innerHTML = head + rej + note + `<p class="small"><b>Email confirmed.</b> Last step: paste the link to your page in the school's faculty or staff directory (on ${esc(v.schoolDomain)}).</p>
+      <div class="stv-row"><input id="sv_dir" type="url" placeholder="https://www.${esc(v.schoolDomain)}/people/your-name" value="${esc(v.dir || "")}"><button class="btn pri" id="sv_sub" type="button">Send for review</button></div>`;
+    $("#sv_sub").onclick = async () => { $("#sv_sub").disabled = true; try { await api("POST", { action: "staff_submit", dir: $("#sv_dir").value }); staffBox(); } catch (e) { staffBox(e.message); } };
+  }
   // Nov 15: company picker on each experience. Typing shows real companies (ones we have jobs for + verified business pages)
   // with their logos; picking one saves orgId, which shows as "Verified" with the logo on the profile. Anything else stays as typed.
   const CO_CACHE = new Map();
@@ -728,8 +757,8 @@
       const pick = (c) => { const it = d.p.experience[i]; it.org = c.name; it.orgId = c.key || ""; inp.value = c.name; chip.hidden = !c.key; close(); };
       const paint = () => {
         const typed = inp.value.trim();
-        box.innerHTML = opts.map((c, k) => `<button type="button" class="cpo${k === sel ? " on" : ""}" role="option" data-k="${k}"><span class="cpt" aria-hidden="true">${coTile(c)}</span><span><b data-noi18n>${esc(c.name)}</b><small>${c.verified ? "On Beat the Pile" : c.open ? `${Number(c.open).toLocaleString("en-US")} open jobs` : "Verified company"}</small></span></button>`).join("")
-          + (typed ? `<button type="button" class="cpo plain" role="option" data-k="typed"><span><b>Use “<span data-noi18n>${esc(typed)}</span>”</b><small>Not in our list, so it won’t show as verified</small></span></button>` : "");
+        box.innerHTML = opts.map((c, k) => `<button type="button" class="cpo${k === sel ? " on" : ""}" role="option" data-k="${k}"><span class="cpt" aria-hidden="true">${coTile(c)}</span><span><b data-noi18n>${esc(c.name)}</b><small>Verified company</small></span></button>`).join("")
+          + (typed ? `<button type="button" class="cpo plain" role="option" data-k="typed"><span><b>Use “<span data-noi18n>${esc(typed)}</span>”</b><small>Not a verified company yet, so it shows as plain text</small></span></button>` : "");
         box.hidden = !box.innerHTML; inp.setAttribute("aria-expanded", String(!box.hidden));
         box.querySelectorAll(".cpo").forEach((b) => b.onmousedown = (e) => { e.preventDefault(); pick(b.dataset.k === "typed" ? { name: inp.value.trim() } : opts[+b.dataset.k]); });
       };
@@ -751,8 +780,9 @@
       ids.length ? fetch("/api/me?cokeys=" + encodeURIComponent(ids.join(","))).then((r) => r.ok ? r.json() : {}).catch(() => ({})) : {},
       names.length ? fetch("/api/me?conames=" + encodeURIComponent(names.slice(0, 15).join("|"))).then((r) => r.ok ? r.json() : {}).catch(() => ({})) : {},
     ]);
-    const byId = new Map((got[0].companies || []).filter((c) => c.name).map((c) => [c.key, c]));
-    const byName = new Map((got[1].companies || []).filter((c) => c.key).map((c) => [c.name.toLowerCase(), c]));
+    // only companies a verified person claimed count (Nov 15, owner)
+    const byId = new Map((got[0].companies || []).filter((c) => c.name && c.verified).map((c) => [c.key, c]));
+    const byName = new Map((got[1].companies || []).filter((c) => c.key && c.verified).map((c) => [c.name.toLowerCase(), c]));
     tiles.forEach((el) => {
       const c = (el.dataset.orgId && byId.get(el.dataset.orgId)) || byName.get(el.dataset.orgName.toLowerCase()); if (!c) return;
       if (c.logo && !el.querySelector("img")) { const img = new Image(); img.alt = ""; img.referrerPolicy = "no-referrer";

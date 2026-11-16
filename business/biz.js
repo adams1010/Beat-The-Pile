@@ -39,6 +39,7 @@
   const signInCard = (title, text) => `<div class="card center"><h1>${esc(title)}</h1><p class="sub">${esc(text)}</p><a class="btn pri" href="/start/?role=employer&next=${encodeURIComponent(location.pathname)}">Sign in</a></div>`;
   const statusBanner = (b) => b.status === "verified" ? "" :
     b.status === "rejected" ? `<div class="banner bad"><b>We couldn't verify your company.</b> ${esc(b.reviewNote || "Use Report a problem if you think this is a mistake.")}</div>` :
+    b.domainProblem ? `<div class="banner bad"><b>Your email and website don't match.</b> ${esc(b.domainProblem)} <a href="/business/setup/">Fix it</a></div>` :
     !b.profile?.company || !b.emailVerified ? `<div class="banner"><b>Finish setting up your company.</b> Add your company and confirm your work email so we can verify you. <a href="/business/setup/">Continue setup →</a></div>` :
     `<div class="banner"><b>Your company is being verified.</b> We check every company before it can contact students, usually within a day. Meanwhile, build your company page.</div>`;
   window.biz = { start, api, esc, initials, logo, when, signInCard, statusBanner, $: (s) => document.querySelector(s), clerk: () => S.clerk };

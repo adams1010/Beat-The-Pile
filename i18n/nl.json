@@ -1853,7 +1853,16 @@
   "to follow them.": "om het te volgen.",
   "Start typing, like HITT Contracting": "Begin te typen, zoals HITT Contracting",
   "Not in our list, so it won’t show as verified": "Niet in onze lijst, dus niet als geverifieerd getoond",
-  "Use “": "Gebruik “"
+  "Use “": "Gebruik “",
+  "Every company here is verified: someone who works there set up the page, and we confirmed it. Follow one to see their news and jobs first.": "Elk bedrijf hier is geverifieerd: iemand die er werkt heeft de pagina gemaakt en wij hebben dat bevestigd. Volg er een om hun nieuws en banen als eerste te zien.",
+  "Start typing your company": "Begin je bedrijf te typen",
+  "Not a verified company yet, so it shows as plain text": "Nog geen geverifieerd bedrijf, dus als gewone tekst",
+  "Work there?": "Werk je daar?",
+  "Set up your company page": "Maak de pagina van je bedrijf",
+  "Your school email": "Je school-e-mail",
+  "Send for review": "Ter controle sturen",
+  "Email confirmed.": "E-mail bevestigd.",
+  "Thanks. We're checking your directory page now. Your tag shows as soon as it's approved, usually within 2 days.": "Bedankt. We controleren nu je pagina in de gids. Je label verschijnt zodra het is goedgekeurd, meestal binnen 2 dagen."
  },
  "patterns": [
   ["^(.+) career fair page ↗$", "Banenbeurspagina van $1 ↗"],

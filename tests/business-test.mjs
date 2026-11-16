@@ -68,7 +68,7 @@ r = await call("u_ana", { action: "orbit_inbox" }); assert.equal(r.body.threads[
 console.log("✓ verified employers: talent, join orbit and messages — opted-in students only, named as recruiter at company");
 
 // teammate at the same domain shows on the team ring + company page
-await call("u_emp2", { action: "biz_save", profile: { company: "Boeing", name: "Raj P", title: "Recruiter" } });
+await call("u_emp2", { action: "biz_save", profile: { kind: "recruiter", company: "Boeing", name: "Raj P", title: "Recruiter" } });   // Nov 15: one company page per domain, teammates join as recruiters
 await call("u_emp2", { action: "biz_email_start", email: "raj@boeing.com" });
 await call("u_emp2", { action: "biz_email_confirm", code: f.calls.emails.at(-1).subject.slice(0, 6) });
 const list = (await call("u_adm", { action: "biz_admin_list" })).body.employers;

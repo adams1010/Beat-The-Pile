@@ -52,6 +52,7 @@ import { cleanInternship, internPeers } from "../lib/internship.js";
 import { foundingCount, foundingFor } from "../lib/founding.js";
 import { schoolIdFor, shortSchool } from "../lib/schools.js";
 import { talentFor, roleOf } from "../lib/talent.js";
+import { staffAction, staffAdmin, keepStaffVerified, shownStaff } from "../lib/staffcheck.js";
 
 const LISTS = ["saved", "applied"];
 const MAX = 500;
@@ -267,6 +268,7 @@ async function publicProfile(req, res) {
   const r = rows[0];
   if (!r || r.profile_public !== true || !r.profile) return res.status(404).json({ error: "No profile here" });
   const p = cleanProfile(r.profile);          // re-cleaned on the way out, too
+  p.staff = shownStaff(r.profile);            // Nov 15: the Faculty & staff tag only once an owner verified it
   const resume = p.showResume && r.resume_path && r.resume_share === true && r.resume_token ? `/r/${r.resume_token}` : null;
   delete p.showResume; delete p.openToEmployers;
   // Contact info only for signed-in members (keeps emails/phones away from scrapers), and only if the student shows it
@@ -443,6 +445,22 @@ export default async function handler(req, res) {
       return res.status(200).json(await internPeers(uid, row?.internship).catch(() => ({ alumni: [], incoming: [] })));
     }
 
+    // ── Faculty & staff verification (lib/staffcheck.js): school-domain email code + directory link + owner approval ──
+    if (typeof action === "string" && /^staff_(status|email_start|email_confirm|submit|admin_list|admin_review)$/.test(action)) {
+      if (!(await rateOk(`staff:${uid}`, 60, 40))) return res.status(429).json({ error: "Slow down a little and try again" });
+      if (!process.env.CLERK_SECRET_KEY) return res.status(503).json({ error: "Verification isn't switched on yet" });
+      const CK = { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` };
+      const deps = { rateOk, sendEmail, clerkUser, isAdmin: (id) => isAdmin(id, { clerkUser }),
+        setPrivate: async (id, obj) => { const r = await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(id)}/metadata`, { method: "PATCH", headers: { ...CK, "Content-Type": "application/json" }, body: JSON.stringify({ private_metadata: obj }) });
+          if (!r.ok) throw new Error("couldn't save the check"); },
+        listUsers: async () => { const all = []; for (let off = 0; off < 10000; off += 500) { const r = await fetch(`https://api.clerk.com/v1/users?limit=500&offset=${off}&order_by=-created_at`, { headers: CK });
+          if (!r.ok) throw new Error("couldn't list accounts"); const page = await r.json(); all.push(...page); if (page.length < 500) break; } return all; },
+        loadProfile: async (id) => (await loadRow(id))?.profile || null,
+        setVerified: async (id, v) => { await mutate(id, (r) => { const p = { ...(r.profile || {}) }; if (v) p.staffVerified = v; else delete p.staffVerified; return { profile: p }; }); } };
+      const out = action.startsWith("staff_admin") ? await staffAdmin(uid, action, body || {}, deps) : await staffAction(uid, action, body || {}, deps);
+      return res.status(out.status).json(out.body);
+    }
+
     // ── Business side (lib/employer.js): company setup, work-email code, owner review, dashboard, business Orbit ──
     if (typeof action === "string" && /^biz_(get|save|email_start|email_confirm|fairs|fair_counts|home|orbit|admin_list|admin_review)$/.test(action)) {
       if (!(await rateOk(`biz:${uid}`, 60, 60))) return res.status(429).json({ error: "Slow down a little and try again" });
@@ -471,7 +489,7 @@ export default async function handler(req, res) {
         const taken = await db.selectAsAdmin(`user_jobs?select=clerk_user_id&handle=eq.${encodeURIComponent(handle)}&limit=1`);
         if (taken[0] && taken[0].clerk_user_id !== uid) return res.status(409).json({ error: "That link name is taken, try another" });
       }
-      try { return send(await mutate(uid, () => ({ profile, handle, profile_public: pub }))); }
+      try { return send(await mutate(uid, (r) => ({ profile: { ...profile, ...keepStaffVerified(r.profile, profile) }, handle, profile_public: pub }))); }
       catch (e) { if (/23505|duplicate key/i.test(String(e?.message))) return res.status(409).json({ error: "That link name is taken, try another" }); throw e; }
     }
     // Sign-up step 3 (Nov 9): name, school, major, graduation — and "show me to students at my school" (checked by default,
@@ -503,7 +521,7 @@ export default async function handler(req, res) {
       const handle = cur?.handle || (await autoHandle(uid, profile));
       // Nov 10: public by default — only an explicit "no" (show:false) keeps a profile private
       const pub = body.show === false ? false : body.show === true ? true : cur?.handle ? cur?.profile_public === true : true;
-      try { return send(await mutate(uid, () => ({ profile, handle, profile_public: pub }))); }
+      try { return send(await mutate(uid, (r) => ({ profile: { ...profile, ...keepStaffVerified(r.profile, profile) }, handle, profile_public: pub }))); }
       catch (e) { if (/23505|duplicate key/i.test(String(e?.message))) return res.status(409).json({ error: "Try again in a moment" }); throw e; }
     }
     if (action === "remind_test") {            // send yourself one sample reminder (3 a day)
@@ -553,16 +571,6 @@ export default async function handler(req, res) {
         if (set.size > MAX_STARS) return stop(`You can follow up to ${MAX_STARS} companies`);
         return { starred: [...set] };
       }));
-    }
-    // follow a company by name (one we may not track yet: it goes on the Company Finder's list)
-    if (action === "co_follow") {
-      if (!(await rateOk(`cofollow:${uid}`, 86400, 30))) return res.status(429).json({ error: "That's a lot of new companies for one day, try again tomorrow" });
-      const { keyForName } = await import("../lib/cosearch.js");
-      const hit = await keyForName(body.name); if (!hit || !CO_OK.test(hit.key)) return res.status(400).json({ error: "Type the company's name" });
-      const out = await mutate(uid, (r) => { const set = new Set(r.starred || []); set.add(hit.key);
-        if (set.size > MAX_STARS) return stop(`You can follow up to ${MAX_STARS} companies`); return { starred: [...set] }; });
-      if (out.error) return send(out);
-      return res.status(200).json({ ok: true, key: hit.key, name: hit.name, queued: !!hit.queued, starred: out.row?.starred || [] });
     }
     if (action === "seen") {
       await mutate(uid, () => ({ seen_at: new Date().toISOString() }));

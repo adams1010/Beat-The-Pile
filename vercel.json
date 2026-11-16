@@ -47,7 +47,7 @@
       "includeFiles": "data/us-places.json"
     },
     "api/me.js": {
-      "includeFiles": "{schools/index.json,data/company-aliases.json}"
+      "includeFiles": "{schools/index.json,schools/domains.json,data/company-aliases.json}"
     }
   },
   "headers": [

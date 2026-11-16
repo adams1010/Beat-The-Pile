@@ -1853,7 +1853,16 @@
   "to follow them.": "para seguirla.",
   "Start typing, like HITT Contracting": "Empieza a escribir, como HITT Contracting",
   "Not in our list, so it won’t show as verified": "No está en nuestra lista, así que no aparecerá como verificada",
-  "Use “": "Usar “"
+  "Use “": "Usar “",
+  "Every company here is verified: someone who works there set up the page, and we confirmed it. Follow one to see their news and jobs first.": "Todas las empresas aquí están verificadas: alguien que trabaja allí creó la página y la confirmamos. Sigue una para ver primero sus noticias y empleos.",
+  "Start typing your company": "Empieza a escribir tu empresa",
+  "Not a verified company yet, so it shows as plain text": "Aún no es una empresa verificada, así que se muestra como texto",
+  "Work there?": "¿Trabajas allí?",
+  "Set up your company page": "Crea la página de tu empresa",
+  "Your school email": "Tu correo de la universidad",
+  "Send for review": "Enviar a revisión",
+  "Email confirmed.": "Correo confirmado.",
+  "Thanks. We're checking your directory page now. Your tag shows as soon as it's approved, usually within 2 days.": "Gracias. Estamos revisando tu página del directorio. Tu etiqueta aparecerá en cuanto se apruebe, normalmente en 2 días."
  },
  "patterns": [
   ["^(.+) career fair page ↗$", "Página de ferias de empleo de $1 ↗"],

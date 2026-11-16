@@ -30,14 +30,16 @@
     const rows = L.filter((r) => show === "all" || r.status === show);
     const n = (s) => L.filter((r) => r.status === s).length;
     $("main").innerHTML = `<section class="card"><h1>Verify employers</h1>
-      <p class="sub">Approve a company only when the person clearly works there. Strong signs: work email confirmed at the company's own domain, and that domain matches the website they gave.</p>
+      <p class="sub">Approve only when the person clearly works there. Required: work email confirmed at the company's own domain, that domain matches their website and gets real email, and only one company page per domain (everyone else joins as a recruiter). Anything else needs a written "Override:" reason.</p>
       <div class="filters">${[["pending", `Waiting (${n("pending")})`], ["new", `Not finished (${n("new")})`], ["verified", `Verified (${n("verified")})`], ["rejected", `Rejected (${n("rejected")})`], ["all", "All"]]
         .map(([k, l]) => `<button data-show="${k}" aria-pressed="${k === show}">${esc(l)}</button>`).join("")}</div>
       ${rows.length ? `<div class="wrapt"><table><tr><th>Company</th><th>Person</th><th>Work email</th><th>Checks</th><th>Status</th><th></th></tr>
         ${rows.map((r) => `<tr><td><b>${esc(r.company || "—")}</b><br>${r.website ? `<a href="${esc(r.website)}" target="_blank" rel="noopener nofollow" class="small">${esc(r.website.replace(/^https:\/\//, ""))}</a>` : `<span class="small muted">no website</span>`}</td>
           <td>${esc(r.name || "—")}<br><span class="small muted">${esc(r.title || "")}</span></td>
           <td>${esc(r.workEmail || "—")}</td>
-          <td class="small">${r.emailVerified ? `<span class="ok">Email confirmed</span>` : `<span class="no">Email not confirmed</span>`}<br>${r.domainMatchesWebsite ? `<span class="ok">Domain matches website</span>` : `<span class="no">Domain ≠ website</span>`}</td>
+          <td class="small">${esc(r.kind === "recruiter" ? "Recruiter" : "Company page")}<br>${r.emailVerified ? `<span class="ok">Email confirmed</span>` : `<span class="no">Email not confirmed</span>`}<br>${r.domainMatchesWebsite ? `<span class="ok">Domain matches website</span>` : `<span class="no">Domain ≠ website</span>`}
+            ${r.mail === false ? `<br><span class="no">Domain gets no email</span>` : r.mail ? `<br><span class="ok">Real mail domain</span>` : ""}
+            ${r.schoolDomain ? `<br><span class="no">School domain (students have these)</span>` : ""}${r.sameDomainPage ? `<br><span class="no">Domain already has a page: ${esc(r.sameDomainPage)}</span>` : ""}</td>
           <td>${esc(r.status)}${r.reviewNote ? `<br><span class="small muted">${esc(r.reviewNote)}</span>` : ""}</td>
           <td style="white-space:nowrap">${r.status !== "verified" ? `<button class="btn pri" data-k="${esc(r.key)}" data-s="verified" ${r.emailVerified ? "" : "disabled title='Their work email isn&#39;t confirmed yet'"}>Verify</button>` : ""}
             ${r.status !== "rejected" ? `<button class="btn" data-k="${esc(r.key)}" data-s="rejected">Reject</button>` : ""}</td></tr>`).join("")}</table></div>`
@@ -48,10 +50,35 @@
       if (b.dataset.s === "rejected") { note = prompt("Reason (the employer sees this):", "We couldn't confirm you work at this company.") ?? null; if (note === null) return; }
       b.disabled = true;
       try { await biz.api({ action: "biz_admin_review", key: b.dataset.k, status: b.dataset.s, note }); await load(); }
-      catch (e) { b.disabled = false; alert(e.message); }
+      catch (e) {
+        b.disabled = false;
+        // a failed hard check can be approved only with a written reason ("Override: called their HR line, confirmed …")
+        if (/Override:/.test(e.message)) { const why = prompt(e.message + "\n\nHow did you check? (starts with Override:)", "Override: "); if (why && /^override:\s*\S.{14,}/i.test(why)) {
+          try { await biz.api({ action: "biz_admin_review", key: b.dataset.k, status: b.dataset.s, note: why }); await load(); } catch (e2) { alert(e2.message); } } }
+        else alert(e.message);
+      }
     });
   }
-  async function load(){ L = (await biz.api({ action: "biz_admin_list" })).employers; render(); }
+  // Nov 15: faculty & staff checks (school-domain email + their page in the school's directory; you open it and decide)
+  let SL = [];
+  function renderStaff(){
+    const box = document.getElementById("staffAdmin"); if (!box) return;
+    box.innerHTML = `<section class="card"><h2>Verify faculty &amp; staff</h2>
+      <p class="sub">Open their directory link and approve only if it's clearly the same person at that school. Students have school emails too, so the directory page is the real proof.</p>
+      ${SL.length ? `<div class="wrapt"><table><tr><th>Person</th><th>School</th><th>School email</th><th>Directory page</th><th>Status</th><th></th></tr>
+        ${SL.map((r) => `<tr><td><b>${esc(r.name || "(no name)")}</b><br><span class="small muted">${esc(r.role || "")}</span></td><td>${esc(r.school || "")}<br><span class="small muted">${esc(r.domain || "")}</span></td>
+          <td class="small">${esc(r.email || "")}<br>${r.emailOk ? '<span class="ok">Code confirmed</span>' : '<span class="no">Not confirmed</span>'}</td>
+          <td class="small">${r.dir ? `<a href="${esc(r.dir)}" target="_blank" rel="noopener nofollow">Open page</a><br>${r.dirOnDomain ? '<span class="ok">On the school domain</span>' : '<span class="no">Not on the school domain</span>'}` : '<span class="no">No link yet</span>'}</td>
+          <td>${esc(r.status)}${r.note ? `<br><span class="small muted">${esc(r.note)}</span>` : ""}</td>
+          <td style="white-space:nowrap">${r.status !== "verified" ? `<button class="btn pri" data-sk="${esc(r.key)}" data-s="verified" ${r.emailOk && r.dir && r.dirOnDomain ? "" : "disabled"}>Verify</button>` : ""}${r.status !== "rejected" ? `<button class="btn" data-sk="${esc(r.key)}" data-s="rejected">Reject</button>` : ""}</td></tr>`).join("")}</table></div>`
+        : `<p class="empty">Nobody waiting.</p>`}</section>`;
+    box.querySelectorAll("[data-sk]").forEach((b) => b.onclick = async () => {
+      let note = ""; if (b.dataset.s === "rejected") { note = prompt("Reason (they see this):", "We couldn't match you to your school's directory.") ?? null; if (note === null) return; }
+      b.disabled = true; try { await biz.api({ action: "staff_admin_review", key: b.dataset.sk, status: b.dataset.s, note }); await loadStaff(); } catch (e) { b.disabled = false; alert(e.message); }
+    });
+  }
+  async function loadStaff(){ try { SL = (await biz.api({ action: "staff_admin_list" })).staff || []; } catch (e) { SL = []; } renderStaff(); }
+  async function load(){ L = (await biz.api({ action: "biz_admin_list" })).employers; render(); if (!document.getElementById("staffAdmin")) $("main").insertAdjacentHTML("afterend", '<div id="staffAdmin" style="max-width:1100px;margin:0 auto 40px;padding:0 16px"></div>'); loadStaff(); }
   biz.start(async (u) => {
     if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable.</div>'; return; }
     if (!u) { $("main").innerHTML = biz.signInCard("Owners only", "Sign in with an owner account."); return; }

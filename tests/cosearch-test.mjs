@@ -2,21 +2,19 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 const C = await import("../lib/cosearch.js");
-assert.equal(C.finderId("Evans General Contractor"), "s-evans-general-contractor", "same id the Company Finder gives a queued company");
-assert.equal(C.finderId("AT&T"), "s-atandt");
 assert.equal(C.empKey({ company_id: "x-boeing", slug: "boeing" }), "x-boeing");
 assert.equal(C.empKey({ company_id: null, slug: "beat-the-pile" }), "co-beat-the-pile", "business page with no job board");
 assert.deepEqual(C.empKeys({ company_id: "x-boeing", slug: "boeing" }), ["x-boeing", "co-boeing"]);
 assert.equal(C.cleanQ('  Boeing* (Co),"x" '), "Boeing Co x");
 assert.ok(/^[a-z0-9-]{1,80}$/.test(C.empKey({ slug: "a".repeat(50) })), "fits the follow-key rule");
 const me = readFileSync(new URL("../api/me.js", import.meta.url), "utf8");
-assert.ok(me.includes("req.query?.cosearch") && me.includes('action === "co_follow"'), "API wired");
+assert.ok(me.includes("req.query?.cosearch") && !me.includes('action === "co_follow"'), "API wired; no follow-any-name path (Nov 15: verified companies only)");
 const emp = readFileSync(new URL("../lib/employer.js", import.meta.url), "utf8");
 assert.ok(emp.includes("followKey") && emp.includes('"co-" + row.slug'), "company pages give a follow key; followers counted for co- keys");
 const co = readFileSync(new URL("../business/company/index.html", import.meta.url), "utf8");
 assert.ok(co.includes("data-follow") && co.includes("wireFollow()"), "/co/ Follow button");
 const page = readFileSync(new URL("../companies/index.html", import.meta.url), "utf8");
-assert.ok(page.includes("cosearch=") && page.includes("co_follow") && page.includes("names.json"), "/companies/ page");
+assert.ok(page.includes("cosearch=") && !page.includes("co_follow") && !page.includes("names.json") && page.includes("Set up your company page"), "/companies/ lists verified companies only");
 const nav = readFileSync(new URL("../nav.js", import.meta.url), "utf8");
 assert.ok(nav.includes('"/companies/?q="') && nav.includes('["/companies/", "Companies"'), "top-bar search + Tools");
 // profile experience: pick a real company → orgId saved → logo + "Verified company" on the profile
