@@ -125,7 +125,7 @@ function HeroMap({near,fresh,sum,sumErr}){
   const [kind,setKind]=React.useState("all"),[vb,setVb]=React.useState([0,0,MAP_W,MAP_H]),[sel,setSel]=React.useState(null),[spot,setSpot]=React.useState(null);
   const svgRef=React.useRef(null),drag=React.useRef(null),pinch=React.useRef(null);
   React.useEffect(()=>{fetch("/map/us.json").then(r=>{if(!r.ok)throw 0;return r.json();}).then(setGeo).catch(()=>setErr(true));},[]);
-  React.useEffect(()=>{setPts(null);fetch(`/api/listings?dots=1&field=all&kind=${kind}`).then(r=>{if(!r.ok)throw 0;return r.json();}).then(setPts).catch(()=>setErr(true));},[kind]);
+  React.useEffect(()=>{setPts(null);fetch(`/api/listings?dots=1&field=all&kind=${kind}&v=2`).then(r=>{if(!r.ok)throw 0;return r.json();}).then(setPts).catch(()=>setErr(true));},[kind]);
   React.useEffect(()=>{const xy=near?.meta?.near?.xy;if(xy){const z=MAP_W/3.2;setVb(clampVb([xy[0]-z/2,xy[1]-z*MAP_H/MAP_W/2,z,z*MAP_H/MAP_W]));}},[near]);
   const fmt=(n)=>n==null?"—":Number(n).toLocaleString();
   const xy=near?.meta?.near?.xy, r=near?.meta?near.meta.near.mi*MILES_PX:0;
@@ -145,10 +145,11 @@ function HeroMap({near,fresh,sum,sumErr}){
   async function openDot(dt){
     setSel(dt);setSpot({loading:true});analytics.track("map_dot_opened",{jobs:dt[2],kind});
     if(zoom<2.5)flyTo(dt[0],dt[1],3);
-    try{const r=await fetch(`/api/listings?near=${dt[3]},${dt[4]}&mi=10&field=all&kind=${kind==="all"?"all":kind}&limit=6`);const j=await r.json();if(!r.ok)throw 0;setSpot({list:j.listings||[],count:j.meta?.count||0,place:j.meta?.near?.q||""});}
+    try{const r=await fetch(`/api/listings?near=${dt[3]},${dt[4]}&mi=10&field=all&kind=${kind==="all"?"all":kind}&limit=30`);const j=await r.json();if(!r.ok)throw 0;
+      const rank={intern:0,fulltime:1,shadow:2,hourly:3};setSpot({list:(j.listings||[]).slice().sort((a,b)=>(rank[a.kind]??4)-(rank[b.kind]??4)).slice(0,6),count:j.meta?.count||0,place:j.meta?.near?.q||""});}
     catch{setSpot({error:true});}
   }
-  const dr=(n)=>(1.6+Math.sqrt(n)*1.05)/Math.pow(zoom,0.65);
+  const dr=(n)=>(1.6+Math.sqrt(n)*1.05)/Math.pow(zoom,0.85);
   const btn={font:"inherit",fontSize:13,fontWeight:600,background:"#0E1440",color:"#fff",border:"1px solid #2A3B5C",borderRadius:8,minWidth:34,height:34,cursor:"pointer"};
   return(<aside style={{position:"relative",boxSizing:"border-box",background:"#0E1440",border:"1px solid #2A3B5C",borderRadius:10,padding:"18px 18px 14px",boxShadow:"none",...DM}}>
     {/* One live number for the whole hero (Nov 15): the same "open jobs" total as /api/listings?summary=1, no second count above the headline */}
@@ -170,7 +171,7 @@ function HeroMap({near,fresh,sum,sumErr}){
         {geo&&<path d={geo.borders} fill="none" stroke="#1C2C48" strokeWidth={.8/zoom}/>}
         {pts&&pts.dots.map((dt,i)=>{const on=sel&&sel[0]===dt[0]&&sel[1]===dt[1];return <circle key={i} cx={dt[0]} cy={dt[1]} r={dr(dt[2])*(on?1.6:1)} fill={on?"#fff":"#B0F701"} fillOpacity={on?1:dt[2]>20?.8:.55} style={{cursor:"pointer"}}
           onClick={e=>{if(drag.current&&drag.current.moved)return;e.stopPropagation();dt.length>3&&openDot(dt);}}><title>{`${dt[2]} ${dt[2]===1?"job":"jobs"} here`}</title></circle>;})}
-        {zoom>=2.5&&MAP_CITIES.filter(([,x,y])=>x>=vb[0]&&x<=vb[0]+vb[2]&&y>=vb[1]&&y<=vb[1]+vb[3]).map(([n,x,y])=><text key={n} x={x+6/zoom} y={y-6/zoom} fontSize={11/zoom} fill="#fff" fontFamily="Geist,sans-serif" pointerEvents="none">{n}</text>)}
+        {zoom>=2.5&&MAP_CITIES.filter(([,x,y])=>x>=vb[0]&&x<=vb[0]+vb[2]&&y>=vb[1]&&y<=vb[1]+vb[3]).map(([n,x,y])=><text key={n} x={x+6/zoom} y={y-6/zoom} fontSize={12/zoom} fontWeight="600" fill="#fff" fontFamily="Geist,sans-serif" pointerEvents="none">{n}</text>)}
         {xy&&<g pointerEvents="none"><circle cx={xy[0]} cy={xy[1]} r={r} fill="#B0F701" fillOpacity=".1" stroke="#fff" strokeWidth={3/zoom} strokeDasharray={`${7/zoom} ${5/zoom}`}/><circle cx={xy[0]} cy={xy[1]} r={5/zoom} fill="#fff"/></g>}
       </svg>}
       {!err&&<div style={{position:"absolute",right:6,top:6,display:"flex",flexDirection:"column",gap:4}}>

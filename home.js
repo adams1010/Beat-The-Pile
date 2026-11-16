@@ -1,4 +1,4 @@
-/* built from src/home.jsx 57f8bab770b06202 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx bb5076da7f7d4948 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -480,7 +480,7 @@ function HeroMap({
   }, []);
   React.useEffect(() => {
     setPts(null);
-    fetch(`/api/listings?dots=1&field=all&kind=${kind}`).then(r => {
+    fetch(`/api/listings?dots=1&field=all&kind=${kind}&v=2`).then(r => {
       if (!r.ok) throw 0;
       return r.json();
     }).then(setPts).catch(() => setErr(true));
@@ -587,11 +587,17 @@ function HeroMap({
     });
     if (zoom < 2.5) flyTo(dt[0], dt[1], 3);
     try {
-      const r = await fetch(`/api/listings?near=${dt[3]},${dt[4]}&mi=10&field=all&kind=${kind === "all" ? "all" : kind}&limit=6`);
+      const r = await fetch(`/api/listings?near=${dt[3]},${dt[4]}&mi=10&field=all&kind=${kind === "all" ? "all" : kind}&limit=30`);
       const j = await r.json();
       if (!r.ok) throw 0;
+      const rank = {
+        intern: 0,
+        fulltime: 1,
+        shadow: 2,
+        hourly: 3
+      };
       setSpot({
-        list: j.listings || [],
+        list: (j.listings || []).slice().sort((a, b) => (rank[a.kind] ?? 4) - (rank[b.kind] ?? 4)).slice(0, 6),
         count: j.meta?.count || 0,
         place: j.meta?.near?.q || ""
       });
@@ -601,7 +607,7 @@ function HeroMap({
       });
     }
   }
-  const dr = n => (1.6 + Math.sqrt(n) * 1.05) / Math.pow(zoom, 0.65);
+  const dr = n => (1.6 + Math.sqrt(n) * 1.05) / Math.pow(zoom, 0.85);
   const btn = {
     font: "inherit",
     fontSize: 13,
@@ -764,7 +770,8 @@ function HeroMap({
     key: n,
     x: x + 6 / zoom,
     y: y - 6 / zoom,
-    fontSize: 11 / zoom,
+    fontSize: 12 / zoom,
+    fontWeight: "600",
     fill: "#fff",
     fontFamily: "Geist,sans-serif",
     pointerEvents: "none"
