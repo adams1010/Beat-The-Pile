@@ -32,7 +32,9 @@ if (sw?.bots?.find((b) => b.id === "turbo")?.enabled === false && !process.argv.
 if (!process.env.CRON_SECRET) { console.log("Add the CRON_SECRET repo secret first"); process.exit(1); }
 
 const { runStart, companies } = await post({ action: "turbo_list" });
-const todo = companies.slice(0, LIMIT);
+// --only=id1,id2 → just those companies (e.g. --only=usajobs to test the federal reader)
+const ONLY = (process.argv.find((x) => x.startsWith("--only=")) || "").slice(7).split(",").filter(Boolean);
+const todo = (ONLY.length ? companies.filter((c) => ONLY.includes(c.id)) : companies).slice(0, LIMIT);
 console.log(`${todo.length} companies to read (of ${companies.length}), ${AT_ONCE} at a time, ${MINUTES} min budget`);
 
 // Results go back in small batches (Vercel takes ≤4.5 MB per request; one big hospital board is ~1 MB).
