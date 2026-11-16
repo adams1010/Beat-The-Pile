@@ -1830,7 +1830,10 @@
   "Couldn’t load the companies you follow right now.": "Impossible de charger les entreprises que tu suis.",
   "Looking for the company itself?": "Tu cherches l'entreprise elle-même ?",
   "in Companies": "dans Entreprises",
-  "to follow them.": "pour la suivre."
+  "to follow them.": "pour la suivre.",
+  "Start typing, like HITT Contracting": "Commence à taper, comme HITT Contracting",
+  "Not in our list, so it won’t show as verified": "Pas dans notre liste, elle ne sera donc pas affichée comme vérifiée",
+  "Use “": "Utiliser « "
  },
  "patterns": [
   ["^(.+) career fair page ↗$", "Page des salons de $1 ↗"],

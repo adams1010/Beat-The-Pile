@@ -184,6 +184,21 @@
   #know{scroll-margin-top:84px}
   .chkrow{display:flex;gap:6px;align-items:center;font-weight:400;font-size:13.5px;margin-top:6px}
   .chkrow input{width:auto;margin:0}
+  /* Nov 15: company picker + verified companies on the profile */
+  .cpick{position:relative}
+  .cpin{position:relative}.cpin input{padding-right:84px}
+  .cpv{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:11.5px;font-weight:700;border-radius:999px;padding:2px 9px;background:#F2FADF;color:#3A5800;pointer-events:none}
+  .cpbox{position:absolute;z-index:30;left:0;right:0;top:100%;margin-top:4px;background:#fff;border:1px solid #DCE2EC;border-radius:10px;padding:4px;max-height:340px;overflow:auto}
+  .cpo{display:flex;gap:10px;align-items:center;width:100%;text-align:left;border:0;background:#fff;border-radius:8px;padding:8px;font:inherit;cursor:pointer;color:#060A2C}
+  .cpo:hover,.cpo.on{background:#F2FADF}
+  .cpo b{display:block;font-weight:600;font-size:14.5px}.cpo small{display:block;color:#5E6A80;font-size:12.5px}
+  .cpo.plain{border-top:1px solid #EEF1F6;border-radius:0 0 8px 8px}
+  .cpt{flex:none;width:32px;height:32px;border-radius:8px;background:#EEF1F6;color:#1E3A8A;display:grid;place-items:center;font-weight:700;font-size:12px;overflow:hidden}
+  .cpt img{width:100%;height:100%;object-fit:contain;background:#fff}
+  .tl-logo.has-img{background:#fff;border:1px solid #DCE2EC;padding:4px;overflow:hidden}.tl-logo img{width:100%;height:100%;object-fit:contain}
+  .tl-vrow{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin-top:6px;font-size:13px}.tl-vrow .hire a{margin-top:0}
+  .tl-vrow a{color:#4A7000;font-weight:600}
+  .tl-ver{font-size:11.5px;font-weight:700;border-radius:999px;padding:1px 9px;background:#F2FADF;color:#3A5800}
 </style>
 <link rel="stylesheet" href="/d.css">
 </head>
@@ -485,7 +500,7 @@
       <section class="card" id="experience"><h2>Experience</h2><p class="small muted" style="margin:-4px 0 10px">Real dates put each role on your career line.</p><div id="exp">${d.p.experience.map((x, i) => { const sp = window.btpTL ? window.btpTL.parseWhen(x.when) : { start: "", end: "" }; const st = x.start || sp.start || "", en = x.end || sp.end || ""; return `
         <div class="rep"><button class="rm" data-rm="experience" data-i="${i}">Remove</button>
           <div class="row"><div><label>Role</label><input data-list="experience" data-i="${i}" data-f="title" value="${esc(x.title)}" placeholder="Marketing Intern"></div>
-          <div><label>Company / team</label><input data-list="experience" data-i="${i}" data-f="org" value="${esc(x.org)}" placeholder="Acme Corp"></div></div>
+          <div class="cpick"><label>Company</label><div class="cpin"><input data-list="experience" data-i="${i}" data-f="org" data-cpick="${i}" value="${esc(x.org)}" placeholder="Start typing, like HITT Contracting" autocomplete="off" role="combobox" aria-autocomplete="list" aria-expanded="false"><span class="cpv" data-cpv="${i}"${x.orgId ? "" : " hidden"}>Verified</span></div><div class="cpbox" data-cpbox="${i}" role="listbox" hidden></div></div></div>
           <div class="row"><div><label>Type</label><select data-list="experience" data-i="${i}" data-f="type"><option value="">Pick one</option>${Object.entries(window.btpTL ? window.btpTL.TYPES : {}).map(([k, v]) => `<option value="${k}"${x.type === k ? " selected" : ""}>${v}</option>`).join("")}</select></div>
           <div><label>Location</label><input data-list="experience" data-i="${i}" data-f="location" value="${esc(x.location || "")}" placeholder="Seattle, WA or Remote"></div></div>
           <div class="row"><div><label>Start</label><input type="month" data-list="experience" data-i="${i}" data-f="start" value="${esc(st)}" placeholder="2025-05"></div>
@@ -582,12 +597,13 @@
     main.querySelectorAll("[data-k]").forEach((el) => el.oninput = () => { d.p[el.dataset.k] = el.value; });
     main.querySelectorAll("[data-list]").forEach((el) => el.oninput = el.onchange = () => { const it = d.p[el.dataset.list][+el.dataset.i]; it[el.dataset.f] = el.value;
       if (el.dataset.list === "experience" && (el.dataset.f === "start" || el.dataset.f === "end") && window.btpTL) it.when = expWhen(it); });   // Nov 14: keep the text date in step
+    wireCompanyPick(main, d);
     main.querySelectorAll("[data-now]").forEach((el) => el.onchange = () => { const it = d.p.experience[+el.dataset.now]; const endIn = main.querySelector(`[data-list="experience"][data-i="${el.dataset.now}"][data-f="end"]`);
       it.end = el.checked ? "present" : ""; if (endIn) { endIn.disabled = el.checked; if (el.checked) endIn.value = ""; } if (window.btpTL) it.when = expWhen(it); });
     main.querySelectorAll("[data-link]").forEach((el) => el.oninput = () => { d.p.links[el.dataset.link] = el.value.trim(); });
     main.querySelectorAll("[data-contact]").forEach((el) => el.oninput = () => { d.p.contact = { ...(d.p.contact || {}), [el.dataset.contact]: el.value.trim() }; });
     const cs = $("#c_show"); if (cs) cs.onchange = () => { d.p.contact = { ...(d.p.contact || {}), show: cs.checked }; };
-    const NEW = { experience: { title: "", org: "", when: "", desc: "", start: "", end: "", type: "", location: "" }, projects: { name: "", link: "", desc: "" }, education: { school: "", degree: "", major: "", when: "" } };
+    const NEW = { experience: { title: "", org: "", orgId: "", when: "", desc: "", start: "", end: "", type: "", location: "" }, projects: { name: "", link: "", desc: "" }, education: { school: "", degree: "", major: "", when: "" } };
     main.querySelectorAll("[data-add]").forEach((b) => b.onclick = () => { (d.p[b.dataset.add] ||= []).push({ ...NEW[b.dataset.add] }); editor(); });
     wireEducation(d);
     main.querySelectorAll("[data-rm]").forEach((b) => b.onclick = () => { d.p[b.dataset.rm].splice(+b.dataset.i, 1); editor(); });
@@ -673,6 +689,54 @@
     } catch (e) { say(e.message, true); }
     finally { $("#fill")?.classList.remove("busy"); }
   }
+  // Nov 15: company picker on each experience. Typing shows real companies (ones we have jobs for + verified business pages)
+  // with their logos; picking one saves orgId, which shows as "Verified" with the logo on the profile. Anything else stays as typed.
+  const CO_CACHE = new Map();
+  async function coSearch(q){ q = q.trim(); if (CO_CACHE.has(q)) return CO_CACHE.get(q);
+    const p = fetch("/api/me?cosearch=" + encodeURIComponent(q)).then((r) => r.ok ? r.json() : { companies: [] }).then((d) => (d.companies || []).slice(0, 8)).catch(() => []);
+    CO_CACHE.set(q, p); return p; }
+  const coTile = (c) => c.logo ? `<img alt="" src="${esc(c.logo)}" referrerpolicy="no-referrer" onerror="this.remove()">` : esc(initials(c.name));
+  function wireCompanyPick(main, d){
+    main.querySelectorAll("[data-cpick]").forEach((inp) => {
+      const i = +inp.dataset.cpick, box = main.querySelector(`[data-cpbox="${i}"]`), chip = main.querySelector(`[data-cpv="${i}"]`);
+      let t = null, opts = [], sel = -1;
+      const close = () => { box.hidden = true; inp.setAttribute("aria-expanded", "false"); };
+      const pick = (c) => { const it = d.p.experience[i]; it.org = c.name; it.orgId = c.key || ""; inp.value = c.name; chip.hidden = !c.key; close(); };
+      const paint = () => {
+        const typed = inp.value.trim();
+        box.innerHTML = opts.map((c, k) => `<button type="button" class="cpo${k === sel ? " on" : ""}" role="option" data-k="${k}"><span class="cpt" aria-hidden="true">${coTile(c)}</span><span><b data-noi18n>${esc(c.name)}</b><small>${c.verified ? "On Beat the Pile" : c.open ? `${Number(c.open).toLocaleString("en-US")} open jobs` : "Verified company"}</small></span></button>`).join("")
+          + (typed ? `<button type="button" class="cpo plain" role="option" data-k="typed"><span><b>Use “<span data-noi18n>${esc(typed)}</span>”</b><small>Not in our list, so it won’t show as verified</small></span></button>` : "");
+        box.hidden = !box.innerHTML; inp.setAttribute("aria-expanded", String(!box.hidden));
+        box.querySelectorAll(".cpo").forEach((b) => b.onmousedown = (e) => { e.preventDefault(); pick(b.dataset.k === "typed" ? { name: inp.value.trim() } : opts[+b.dataset.k]); });
+      };
+      inp.addEventListener("input", () => { d.p.experience[i].orgId = ""; chip.hidden = true; clearTimeout(t);
+        const q = inp.value.trim(); if (q.length < 2) { opts = []; close(); return; }
+        t = setTimeout(async () => { const r = await coSearch(q); if (inp.value.trim() !== q) return; opts = r; sel = r.length ? 0 : -1; paint(); }, 220); });
+      inp.addEventListener("keydown", (e) => { if (box.hidden) return;
+        if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); sel = Math.max(0, Math.min(opts.length - 1, sel + (e.key === "ArrowDown" ? 1 : -1))); paint(); }
+        else if (e.key === "Enter" && opts[sel]) { e.preventDefault(); pick(opts[sel]); }
+        else if (e.key === "Escape") close(); });
+      inp.addEventListener("blur", () => setTimeout(close, 150));
+    });
+  }
+  // On the profile: logo + "Verified" for experiences at real companies (picked from the list, or an exact name match)
+  async function verifyOrgs(xs){
+    const tiles = document.querySelectorAll("[data-org-name]"); if (!tiles.length) return;
+    const ids = [...new Set(xs.map((x) => x.orgId).filter(Boolean))], names = [...new Set(xs.filter((x) => !x.orgId && x.org).map((x) => x.org))];
+    const got = await Promise.all([
+      ids.length ? fetch("/api/me?cokeys=" + encodeURIComponent(ids.join(","))).then((r) => r.ok ? r.json() : {}).catch(() => ({})) : {},
+      names.length ? fetch("/api/me?conames=" + encodeURIComponent(names.slice(0, 15).join("|"))).then((r) => r.ok ? r.json() : {}).catch(() => ({})) : {},
+    ]);
+    const byId = new Map((got[0].companies || []).filter((c) => c.name).map((c) => [c.key, c]));
+    const byName = new Map((got[1].companies || []).filter((c) => c.key).map((c) => [c.name.toLowerCase(), c]));
+    tiles.forEach((el) => {
+      const c = (el.dataset.orgId && byId.get(el.dataset.orgId)) || byName.get(el.dataset.orgName.toLowerCase()); if (!c) return;
+      if (c.logo && !el.querySelector("img")) { const img = new Image(); img.alt = ""; img.referrerPolicy = "no-referrer";
+        img.onload = () => { if (img.naturalWidth <= 16 && /favicons/.test(c.logo)) return; el.textContent = ""; el.appendChild(img); el.classList.add("has-img"); }; img.src = c.logo; }
+      const v = el.closest(".tl-card")?.querySelector("[data-org-v]");
+      if (v && !v.innerHTML) v.innerHTML = `<span class="tl-ver">Verified company</span>${c.page ? ` <a href="${esc(c.page)}">Company page</a>` : ""}`;
+    });
+  }
   // Nov 14: the experience timeline. Twist on LinkedIn: a "career line" across the years (one bar per role, overlapping
   // roles stack, a Now marker, a graduation flag and a dashed "Next" bar for what you're looking for), then roles grouped by
   // company with real dates and length, and a "Hiring now" link when that company has open jobs on Beat the Pile.
@@ -706,8 +770,9 @@
     const chip = (t) => t ? `<span class="tl-type t-${esc(t)}">${esc(T.TYPES[t] || t)}</span>` : "";
     const cards = groups.map((g) => {
       const multi = g.roles.length > 1, cur = g.roles.some((r) => r.sp?.current), top = g.roles[0];
-      const tile = `<div class="tl-logo" aria-hidden="true">${esc(initials(g.org || top.title))}</div>`;
-      const hire = g.org ? `<span class="hire" data-hire="${esc(g.org)}"></span>` : "";
+      const oid = (g.roles.find((r) => r.orgId) || {}).orgId || "";
+      const tile = `<div class="tl-logo" aria-hidden="true" data-org-name="${esc(g.org || "")}" data-org-id="${esc(oid)}">${esc(initials(g.org || top.title))}</div>`;
+      const hire = g.org ? `<div class="tl-vrow"><span data-org-v></span><span class="hire" data-hire="${esc(g.org)}"></span></div>` : "";
       const body = multi
         ? `<div class="tl-head">${tile}<div class="tl-main"><div class="tl-co">${esc(g.org)}</div><div class="sm">${g.roles.length} roles${g.span ? " · " + T.duration(g.span.a, g.span.b) : ""}</div>${hire}</div></div>
            <div class="tl-roles">${g.roles.map((r) => `<div class="tl-role" id="xp${r.i}"><div class="tl-row"><b>${esc(r.title)}</b>${len(r) ? `<span class="tl-len">${esc(len(r))}</span>` : ""}</div>
@@ -717,7 +782,7 @@
            <div class="tl-body">${bullets(top.desc)}${story(top)}</div>`;
       return `${yearTag(g.span ? g.span.b : null)}<div class="tl-item${cur ? " cur" : ""}"><span class="tl-node" aria-hidden="true"></span><div class="tl-card">${body}</div></div>`;
     }).join("");
-    setTimeout(hiringNow, 0);
+    setTimeout(hiringNow, 0); setTimeout(() => verifyOrgs(xs), 0);
     return `<div class="tl-stats">${stats.map(([n, l]) => `<div><b>${esc(n)}</b><span>${esc(l)}</span></div>`).join("")}</div>
       <div class="tl">
         ${nextText || gradText ? `<div class="tl-item next"><span class="tl-node" aria-hidden="true"></span><div class="tl-card"><div class="tl-up">Up next</div>

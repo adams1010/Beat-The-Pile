@@ -239,7 +239,8 @@ function cleanProfile(p) {
       .filter((x, i, a) => a.findIndex((y) => y.q === x.q) === i).slice(0, 3),
     // Nov 14: experience timeline — real dates ("YYYY-MM", end may be "present"), a type and a place; `when` stays for old profiles
     experience: arr(p.experience, 12).map((x) => ({ title: txt(x?.title, 100), org: txt(x?.org, 100), when: txt(x?.when, 40), desc: txt(x?.desc, 600), story: txt(x?.story, 600),
-      start: YM(x?.start), end: x?.end === "present" ? "present" : YM(x?.end), type: EXP_TYPES.includes(x?.type) ? x.type : "", location: txt(x?.location, 80) })).filter((x) => x.title || x.org),
+      start: YM(x?.start), end: x?.end === "present" ? "present" : YM(x?.end), type: EXP_TYPES.includes(x?.type) ? x.type : "", location: txt(x?.location, 80),
+      orgId: /^[a-z0-9-]{1,80}$/.test(String(x?.orgId || "")) ? x.orgId : "" })).filter((x) => x.title || x.org),   // Nov 15: picked from the company list (verified)
     projects: arr(p.projects, 8).map((x) => ({ name: txt(x?.name, 100), desc: txt(x?.desc, 600), link: httpsUrl(x?.link) })).filter((x) => x.name),
     links: { linkedin: httpsUrl(p.links?.linkedin), github: httpsUrl(p.links?.github), portfolio: httpsUrl(p.links?.portfolio) },
     // Nov 10: contact on the profile — shown (clickable) to signed-in Beat the Pile users only, never to anonymous visitors
@@ -317,11 +318,12 @@ export default async function handler(req, res) {
     } catch { return res.status(503).json({ error: "Company pages are temporarily unavailable" }); }
   }
   // Nov 15: company search (any company: tracked, business pages, or new to us) + names for followed keys (/companies/)
-  if (req.method === "GET" && (req.query?.cosearch !== undefined || req.query?.cokeys !== undefined)) {
+  if (req.method === "GET" && (req.query?.cosearch !== undefined || req.query?.cokeys !== undefined || req.query?.conames !== undefined)) {
     try {
       const { searchCompanies, namesForKeys } = await import("../lib/cosearch.js");
       res.setHeader("Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=900");
       if (req.query.cosearch !== undefined) return res.status(200).json({ companies: await searchCompanies(String(req.query.cosearch || "")) });
+      if (req.query.conames !== undefined) { const { matchNames } = await import("../lib/cosearch.js"); return res.status(200).json({ companies: await matchNames(String(req.query.conames || "").split("|")) }); }
       return res.status(200).json({ companies: await namesForKeys(String(req.query.cokeys || "").split(",")) });
     } catch (e) { console.error("[cosearch]", e?.message); return res.status(503).json({ error: "Company search is temporarily unavailable" }); }
   }

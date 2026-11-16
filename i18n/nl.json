@@ -1830,7 +1830,10 @@
   "Couldn’t load the companies you follow right now.": "De bedrijven die je volgt konden niet laden.",
   "Looking for the company itself?": "Zoek je het bedrijf zelf?",
   "in Companies": "in Bedrijven",
-  "to follow them.": "om het te volgen."
+  "to follow them.": "om het te volgen.",
+  "Start typing, like HITT Contracting": "Begin te typen, zoals HITT Contracting",
+  "Not in our list, so it won’t show as verified": "Niet in onze lijst, dus niet als geverifieerd getoond",
+  "Use “": "Gebruik “"
  },
  "patterns": [
   ["^(.+) career fair page ↗$", "Banenbeurspagina van $1 ↗"],

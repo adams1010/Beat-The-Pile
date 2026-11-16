@@ -19,4 +19,10 @@ const page = readFileSync(new URL("../companies/index.html", import.meta.url), "
 assert.ok(page.includes("cosearch=") && page.includes("co_follow") && page.includes("names.json"), "/companies/ page");
 const nav = readFileSync(new URL("../nav.js", import.meta.url), "utf8");
 assert.ok(nav.includes('"/companies/?q="') && nav.includes('["/companies/", "Companies"'), "top-bar search + Tools");
+// profile experience: pick a real company → orgId saved → logo + "Verified company" on the profile
+assert.equal(typeof C.matchNames, "function"); assert.deepEqual(await C.matchNames([]), []);
+assert.equal(C.logoUrl("fav:hitt.net"), "https://www.google.com/s2/favicons?domain=hitt.net&sz=128"); assert.equal(C.logoUrl("none"), null); assert.equal(C.logoUrl("http://x.com/a.png"), null);
+assert.ok(me.includes("orgId: /^[a-z0-9-]{1,80}$/") && me.includes("req.query.conames"), "server keeps orgId, exact-name lookups");
+const u = readFileSync(new URL("../u/index.html", import.meta.url), "utf8");
+assert.ok(u.includes("data-cpick") && u.includes("wireCompanyPick(main, d)") && u.includes("verifyOrgs(xs)") && u.includes("data-org-id"), "/u/ company picker + verified logos");
 console.log("✓ companies: search any company, follow business pages (co-<slug>) and companies we don't track yet (queued for the finder)");
