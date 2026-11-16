@@ -71,4 +71,4 @@ await flush();
 const min = Math.round((Date.now() - t0) / 6e4);
 const summary = `Read ${read} job boards in ${min} min · ${kept.toLocaleString("en-US")} jobs kept${failed ? ` · ${failed} boards didn't answer` : ""}`;
 console.log(summary);
-await botlog(read > 0 && failed < read, summary, { read, stored, kept, failed, busy, minutes: min, of: companies.length });
+if (!ONLY.length) await botlog(read > 0 && failed < read, summary, { read, stored, kept, failed, busy, minutes: min, of: companies.length });
