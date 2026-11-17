@@ -1,12 +1,22 @@
 // Beat the Pile backend — Adzuna search proxy
 // mode=main: runs parallel searches, filters by relevance before returning
 
+import { rateOk } from "../lib/aiusage.js";
+// Nov 17 audit: this was an open proxy (any website, no limit) that could burn the Adzuna quota. Our own pages only now,
+// rate-limited per IP. (The homepage quiz only shows our own proven listings, so it rarely calls this at all.)
+function sameSite(req) {
+  const host = String(req.headers.host || "").toLowerCase();
+  const from = req.headers.origin || req.headers.referer || "";
+  try { return !!host && new URL(from).host.toLowerCase() === host; } catch { return false; }
+}
+
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  if (req.method === "OPTIONS") return res.status(200).end();
+  res.setHeader("Cache-Control", "no-store");
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+  if (!sameSite(req)) return res.status(403).json({ error: "Not allowed" });
+  const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "?";
+  try { if (!(await rateOk(`adzuna:${ip}`, 600, 40))) return res.status(429).json({ error: "Too many lookups, try again in a few minutes" }); }
+  catch { return res.status(503).json({ error: "Try again in a minute" }); }
 
   const appId = process.env.ADZUNA_APP_ID;
   const appKey = process.env.ADZUNA_APP_KEY;

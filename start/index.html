@@ -65,7 +65,7 @@
   if (pre === "employer") { const s2 = document.getElementById("s2"); if (s2) s2.textContent = "2 · Your company"; }
   const roleNow = () => { const u = window.Clerk && window.Clerk.user; return (u && u.unsafeMetadata && u.unsafeMetadata.role) || ""; };
   const wantSchool = qs.get("school") === "1";   // sent here by the top bar / welcome sheet: no school on file yet
-  const next = /^\/[a-z0-9/_#?=&-]*$/i.test(qs.get("next") || "") ? qs.get("next") : null;
+  const next = /^\/(?![\/\\])[a-z0-9/_#?=&.%-]*$/i.test(qs.get("next") || "") ? qs.get("next") : null;   // Nov 17: "//evil.com" is another site, never follow it
   function stepEmail(C){
     $("#s1").className = "on"; $("#s2").className = "";
     $("#view").innerHTML = `<h1>Beat the pile. <em>Start here.</em></h1>

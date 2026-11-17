@@ -12,8 +12,8 @@
   async function loadPdf() {
     if (window.pdfjsLib) return window.pdfjsLib;
     if (!pdfjs) pdfjs = new Promise((ok, bad) => {
-      const s = document.createElement("script"); s.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
-      s.onload = () => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js"; ok(window.pdfjsLib); };
+      const s = document.createElement("script"); s.src = "/vendor/pdf-3.11.174.min.js";
+      s.onload = () => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = "/vendor/pdf.worker-3.11.174.min.js"; ok(window.pdfjsLib); };
       s.onerror = () => { pdfjs = null; bad(new Error("Couldn't load the PDF reader. Check your connection and try again.")); };
       document.head.appendChild(s);
     });

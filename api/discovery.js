@@ -1,3 +1,4 @@
+import { rateOk } from "../lib/aiusage.js";
 // /api/discovery.js — the /discovery page's data.
 //   GET  → public progress feed (every candidate company, its status, and any link already tried)
 //   POST → admin only (Beat the Pile owner, signed in with Clerk):
@@ -36,6 +37,10 @@ export default async function handler(req, res) {
       const clip = (v, n) => String(v ?? "").replace(/[\u0000-\u001f]/g, " ").trim().slice(0, n);
       const message = clip(fb.message, 2000);
       if (message.length < 3) return res.status(400).json({ error: "Tell us a bit more" });
+      // Nov 17 audit: public form → per-IP limit so a bot can't flood the table
+      const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "?";
+      try { if (!(await rateOk(`feedback:${ip}`, 600, 10))) return res.status(429).json({ error: "Thanks! That's a lot of reports at once. Try again in a few minutes." }); }
+      catch { return res.status(503).json({ error: "Try again in a minute" }); }
       await db.insert("feedback", [{ page: clip(fb.page, 120), kind: clip(fb.kind, 40), message, contact: clip(fb.contact, 120) || null, listing_id: clip(fb.listingId, 200) || null }]);
       return res.status(200).json({ ok: true });
     }

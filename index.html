@@ -35,8 +35,8 @@
     window.__btpPre = { sum: j("/api/listings?summary=1"), fresh: j("/api/listings?field=all&limit=80") };
     window.__btpPre.sum.catch(function(){}); window.__btpPre.fresh.catch(function(){}); })();
 </script>
-<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
-<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="/vendor/react-18.3.1.min.js"></script>
+<script src="/vendor/react-dom-18.3.1.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
