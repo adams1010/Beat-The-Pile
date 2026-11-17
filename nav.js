@@ -5,6 +5,14 @@
 // If the page has an #acct element (its sign-in / sign-out widget), it is moved into the bar's right side.
 (function () {
   if (window.__btpNav) return; window.__btpNav = true;
+  // Nov 17: AI calls carry the sign-in when there is one, so signed-in students get their own AI pool (api/generate.js)
+  if (!window.__btpGenFetch) { window.__btpGenFetch = true; const F = window.fetch.bind(window);
+    window.fetch = async (u, o = {}) => {
+      if (typeof u === "string" && u.split("?")[0] === "/api/generate" && window.Clerk?.session) {
+        try { const t = await window.Clerk.session.getToken(); if (t) { const h = new Headers(o.headers || {}); if (!h.has("Authorization")) h.set("Authorization", "Bearer " + t); o = { ...o, headers: h }; } } catch {}
+      }
+      return F(u, o);
+    }; }
   // Nov 17: every page gets the app tags (Add to Home Screen / installed app), not just the few that had them
   { const H = document.head, has = (sel) => H.querySelector(sel), add = (tag, attrs) => { const e = document.createElement(tag); Object.assign(e, attrs); H.appendChild(e); };
     if (!has('link[rel="manifest"]')) add("link", { rel: "manifest", href: "/manifest.webmanifest" });

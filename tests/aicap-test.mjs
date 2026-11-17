@@ -38,3 +38,14 @@ assert.equal(await (async () => { f.failNext = () => true; return ai.aiAllowed()
 f.failNext = null;
 const sum = await ai.aiSummary(); assert.equal(sum.cap, 10);
 console.log("✓ failed call = $0; budget store down = no AI (fails closed)");
+
+// Nov 17: anonymous traffic has its own hourly pool; it can't use up the signed-in students' pool
+{ const { makeKeys } = await import("./fakedb.mjs");
+  const { jwk, tok } = makeKeys(); const f2 = installFake({ jwk, anthropic: () => ({ text: "hi", usage: { input_tokens: 10, output_tokens: 10 } }) });
+  f2.T("rate_hits").push(...Array.from({ length: 200 }, () => ({ key: "gen-site", at: Date.now() })));   // anonymous pool full
+  let k = 0; const hit = (headers = {}) => invoke(g, { method: "POST", headers: { host: "a.app", origin: "https://a.app", "x-forwarded-for": "8.8.8." + (++k), ...headers }, body: { feature: "intel", input: { name: "Acme" } } });
+  const anon = await hit(); assert.equal(anon.code, 429, "anonymous pool full"); assert.match(anon.body.error, /sign in/i);
+  const member = await hit({ authorization: "Bearer " + tok("u_student") }); assert.equal(member.code, 200, "a signed-in student still gets AI");
+  const nav = (await import("node:fs")).readFileSync(new URL("../nav.js", import.meta.url), "utf8");
+  assert.ok(/\/api\/generate" && window\.Clerk\?\.session/.test(nav), "nav.js attaches the sign-in to AI calls");
+  console.log("✓ AI pools: anonymous traffic can't lock signed-in students out"); }

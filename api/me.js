@@ -572,6 +572,33 @@ export default async function handler(req, res) {
     }
     // Sign-up step 3 (Nov 9): name, school, major, graduation — and "show me to students at my school" (checked by default,
     // in plain words on the screen). Keeps everything else already on the profile; picks a link name if there isn't one.
+    // ── Owner: Reports & feedback (Nov 17). Report-a-problem notes + Orbit reports, newest unhandled first. Handled = kept, just
+    // marked. Suspend (Orbit reports only): bans the reported sign-in at Clerk (undo: Clerk dashboard → Users → Unban),
+    // hides their profile and removes their connections. The reported id is read from the stored report, never from the browser. ──
+    if (action === "admin_feedback" || action === "admin_feedback_done" || action === "admin_suspend") {
+      if (!(await isAdmin(uid, { clerkUser }))) return res.status(403).json({ error: "Owners only" });
+      const id = Number(body.id);
+      if (action === "admin_feedback") {
+        const rows = await db.selectAsAdmin("feedback?select=id,created_at,page,kind,message,contact,listing_id,handled_at&order=handled_at.desc.nullsfirst,created_at.desc&limit=150");
+        return res.status(200).json({ items: rows.map((r) => ({ ...r, suspendable: r.kind === "orbit_report" && /Reported user: [A-Za-z0-9_]{3,80}\b/.test(r.message || "") })) });
+      }
+      if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Pick an item" });
+      const row = (await db.selectAsAdmin(`feedback?select=id,kind,message&id=eq.${id}&limit=1`))[0];
+      if (!row) return res.status(404).json({ error: "Not found" });
+      if (action === "admin_feedback_done") { await db.update(`feedback?id=eq.${id}`, { handled_at: body.undo === true ? null : new Date().toISOString() }); return res.status(200).json({ ok: true }); }
+      if (body.confirm !== "SUSPEND") return res.status(400).json({ error: "Type SUSPEND to confirm" });
+      const who = row.kind === "orbit_report" ? ((row.message || "").match(/Reported user: ([A-Za-z0-9_]{3,80})\b/) || [])[1] : null;
+      if (!who) return res.status(400).json({ error: "Only Orbit reports can suspend someone" });
+      if (who === uid) return res.status(400).json({ error: "That's you" });
+      const ban = await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(who)}/ban`, { method: "POST", headers: { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` } });
+      if (!ban.ok && ban.status !== 404) return res.status(502).json({ error: "Couldn't suspend the sign-in. Try again." });
+      await db.update(`user_jobs?clerk_user_id=eq.${encodeURIComponent(who)}`, { profile_public: false }).catch(() => null);
+      await db.deleteRows(`orbit_links?or=(user_a.eq.${encodeURIComponent(who)},user_b.eq.${encodeURIComponent(who)})`).catch(() => null);
+      await db.update(`employers?clerk_user_id=eq.${encodeURIComponent(who)}&status=eq.verified`, { status: "rejected", reviewed_by: "suspended after report" }).catch(() => null);
+      await db.update(`feedback?id=eq.${id}`, { handled_at: new Date().toISOString() });
+      console.log("[admin] suspended after report", id);
+      return res.status(200).json({ ok: true, suspended: true });
+    }
     if (action === "admin_orbit_why") {       // owners only (Nov 9): why isn't <name> in my orbit? Facts only — no ids, no emails
       if (!(await isAdmin(uid, { clerkUser }))) return res.status(403).json({ error: "Owners only" });
       const q = String(body.q || "").trim().toLowerCase(); if (q.length < 2) return res.status(400).json({ error: "Type a name" });

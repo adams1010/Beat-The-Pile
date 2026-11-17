@@ -10,9 +10,11 @@
 //   - Per-visitor rate limit (rate_take), plus a site-wide hourly ceiling.
 //   - Every call reserves its worst-case cost against the monthly cap first (lib/aiusage.js callClaude). Fails closed.
 import { callClaude, rateOk, AIError } from "../lib/aiusage.js";
+import { verifyClerkJWT, bearer } from "../lib/auth.js";
 
 const PER_IP_10MIN = 20;
-const SITE_PER_HOUR = 400;
+const SITE_PER_HOUR = 400;      // signed-in students, per hour, all together
+const ANON_PER_HOUR = 200;      // everyone not signed in, per hour, all together
 
 const str = (v, n) => String(v ?? "").replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, " ").trim().slice(0, n);
 const list = (v, n, len) => (Array.isArray(v) ? v : []).map((x) => str(x, len)).filter(Boolean).slice(0, n);
@@ -302,8 +304,16 @@ export default async function handler(req, res) {
   try {
     const job = FEATURES[feature](body.input || {});
     const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim() || "?";
-    if (!(await rateOk(`gen-ip:${ip}`, 600, PER_IP_10MIN))) return res.status(429).json({ error: "Too many requests, try again in a few minutes" });
-    if (!(await rateOk("gen-site", 3600, SITE_PER_HOUR))) return res.status(429).json({ error: "AI is very busy right now, try again later" });
+    // Nov 17: signed-in people get their own hourly pool (nav.js attaches the sign-in to /api/generate calls), so anonymous
+    // traffic, or a bot, can use up only the anonymous pool and never lock students out. The monthly $ cap still covers both.
+    let uid = null; try { uid = bearer(req) ? await verifyClerkJWT(bearer(req)) : null; } catch { uid = null; }
+    if (uid) {
+      if (!(await rateOk(`gen-user:${uid}`, 600, PER_IP_10MIN))) return res.status(429).json({ error: "Too many requests, try again in a few minutes" });
+      if (!(await rateOk("gen-site-member", 3600, SITE_PER_HOUR))) return res.status(429).json({ error: "AI is very busy right now, try again later" });
+    } else {
+      if (!(await rateOk(`gen-ip:${ip}`, 600, PER_IP_10MIN))) return res.status(429).json({ error: "Too many requests, try again in a few minutes" });
+      if (!(await rateOk("gen-site", 3600, ANON_PER_HOUR))) return res.status(429).json({ error: "AI is very busy right now. Signed-in students skip this line: sign in and try again." });
+    }
     const text = await callClaude({ feature: `home_${feature}`, prompt: job.prompt, maxTokens: job.maxTokens, temperature: job.temperature });
     return res.status(200).json({ text });
   } catch (e) {

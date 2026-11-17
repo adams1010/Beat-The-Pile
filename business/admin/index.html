@@ -102,7 +102,29 @@
       b.disabled = true; try { await biz.api({ action: "admin_delete_account", key: b.dataset.del, confirm: "DELETE" }); await loadAccounts(); } catch (e) { b.disabled = false; alert(e.message); }
     });
   }
-  async function loadStaff(){ try { SL = (await biz.api({ action: "staff_admin_list" })).staff || []; } catch (e) { SL = []; } renderStaff(); loadAccounts(); }
+  // Nov 17: Reports & feedback — Report-a-problem notes and Orbit reports. Mark handled (undo-able); Suspend for Orbit reports.
+  async function loadFeedback(){
+    let box = document.getElementById("fbAdmin");
+    if (!box) { document.getElementById("staffAdmin").insertAdjacentHTML("beforebegin", '<div id="fbAdmin" style="max-width:1100px;margin:0 auto 24px;padding:0 16px"></div>'); box = document.getElementById("fbAdmin"); }
+    let F = []; try { F = (await biz.api({ action: "admin_feedback" })).items || []; } catch (e) { box.innerHTML = ""; return; }
+    const open = F.filter((f) => !f.handled_at), reports = open.filter((f) => f.kind === "orbit_report").length;
+    const label = (k) => k === "orbit_report" ? "Orbit report" : k === "pulse" ? "Quick rating" : k === "community_report" ? "Community report" : (k || "Feedback");
+    box.innerHTML = `<section class="card"><h2>Reports &amp; feedback${open.length ? ` <span class="small muted">${open.length} open${reports ? ` · ${reports} Orbit report${reports === 1 ? "" : "s"}` : ""}</span>` : ""}</h2>
+      <p class="sub">What people sent with Report a problem, plus Orbit reports (the reason and the last messages of that chat). Suspend blocks the reported sign-in at Clerk, hides their profile and removes their connections. Undo it in Clerk → Users → Unban.</p>
+      ${F.length ? `<div class="wrapt"><table><tr><th>When</th><th>Type</th><th>Message</th><th></th></tr>
+      ${F.map((f) => `<tr${f.handled_at ? ' style="opacity:.55"' : ""}><td class="small">${esc(new Date(f.created_at).toLocaleString())}<br><span class="muted">${esc(f.page || "")}</span></td>
+        <td class="small"><b>${esc(label(f.kind))}</b>${f.contact ? `<br>${esc(f.contact)}` : ""}</td>
+        <td class="small" style="white-space:pre-wrap;max-width:520px">${esc(f.message || "")}</td>
+        <td style="white-space:nowrap">${f.handled_at ? `<button class="btn" data-fbundo="${f.id}">Reopen</button>` : `<button class="btn" data-fbdone="${f.id}">Mark handled</button>`}
+          ${f.suspendable && !f.handled_at ? `<br><button class="btn" data-fbsus="${f.id}" style="margin-top:6px;color:#B42318">Suspend</button>` : ""}</td></tr>`).join("")}</table></div>`
+      : `<p class="small muted">Nothing yet.</p>`}</section>`;
+    const run = async (b, body) => { b.disabled = true; try { await biz.api(body); await loadFeedback(); } catch (e) { b.disabled = false; alert(e.message); } };
+    box.querySelectorAll("[data-fbdone]").forEach((b) => b.onclick = () => run(b, { action: "admin_feedback_done", id: +b.dataset.fbdone }));
+    box.querySelectorAll("[data-fbundo]").forEach((b) => b.onclick = () => run(b, { action: "admin_feedback_done", id: +b.dataset.fbundo, undo: true }));
+    box.querySelectorAll("[data-fbsus]").forEach((b) => b.onclick = () => { const t = prompt("Suspend the reported person? Their sign-in is blocked, their profile hidden and their connections removed. Type SUSPEND to confirm."); if (t !== "SUSPEND") return;
+      run(b, { action: "admin_suspend", id: +b.dataset.fbsus, confirm: "SUSPEND" }); });
+  }
+  async function loadStaff(){ try { SL = (await biz.api({ action: "staff_admin_list" })).staff || []; } catch (e) { SL = []; } renderStaff(); loadAccounts(); loadFeedback(); }
   async function load(){ L = (await biz.api({ action: "biz_admin_list" })).employers; render(); if (!document.getElementById("staffAdmin")) $("main").insertAdjacentHTML("afterend", '<div id="staffAdmin" style="max-width:1100px;margin:0 auto 40px;padding:0 16px"></div>'); loadStaff(); }
   biz.start(async (u) => {
     if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable.</div>'; return; }

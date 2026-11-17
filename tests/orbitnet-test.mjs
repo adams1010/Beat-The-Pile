@@ -6,7 +6,8 @@ const { jwk, tok } = makeKeys();
 const f = installFake({ jwk, clerkUsers: {
   u_emp: { email: "jane@boeing.com", role: "employer", first_name: "Jane", last_name: "Recruiter" },
   u_ana: { email: "ana@vt.edu", role: "student" }, u_ben: { email: "ben@vt.edu", role: "student" },
-  u_cal: { email: "cal@vt.edu", role: "student" }, u_dee: { email: "dee@vt.edu", role: "student" } } });
+  u_cal: { email: "cal@vt.edu", role: "student" }, u_dee: { email: "dee@vt.edu", role: "student" },
+  u_own: { email: "shiloniadam10@gmail.com", role: "student" } } });
 const me = (await import("../api/me.js")).default;
 const { canMessage, linkState, cleanBody, peerKey } = await import("../lib/orbitnet.js");
 const call = (sub, body) => invoke(me, { method: "POST", body, headers: { authorization: "Bearer " + tok(sub) } });
@@ -106,6 +107,19 @@ assert.deepEqual((await call("u_ben", { action: "orbit_unblock", to: "ana" })).b
 assert.equal((await call("u_ana", { action: "orbit_connect", to: "ben" })).body.link, "requested", "after unblock, normal rules again");
 assert.equal((await call("u_ben", { action: "orbit_accept", to: "ana" })).body.link, "connected");
 console.log("✓ orbit block + report: report reaches the owner, both sides hidden from each other, unblock restores");
+// Owner: Reports & feedback (read, mark handled, suspend the reported person)
+assert.equal((await call("u_ben", { action: "admin_feedback" })).code, 403, "owners only");
+r = await call("u_own", { action: "admin_feedback" }); const it = r.body.items.find((x) => x.kind === "orbit_report");
+assert.ok(it && it.suspendable && !it.handled_at, "the Orbit report is listed, open, suspendable");
+assert.equal((await call("u_own", { action: "admin_suspend", id: it.id })).code, 400, "needs typed SUSPEND");
+r = await call("u_own", { action: "admin_suspend", id: it.id, confirm: "SUSPEND" }); assert.equal(r.code, 200);
+assert.deepEqual(f.calls.clerkBanned, ["u_ana"], "the REPORTED person's sign-in is banned (id read from the stored report)");
+assert.equal(f.T("user_jobs").find((x) => x.clerk_user_id === "u_ana").profile_public, false, "their profile is hidden");
+assert.ok(f.T("feedback").find((x) => x.id === it.id).handled_at, "report marked handled");
+await call("u_own", { action: "admin_feedback_done", id: it.id, undo: true }); assert.equal(f.T("feedback").find((x) => x.id === it.id).handled_at, null, "reopen works");
+f.T("user_jobs").find((x) => x.clerk_user_id === "u_ana").profile_public = true;   // the rest of this file needs ana public again
+await call("u_ana", { action: "orbit_connect", to: "ben" }); await call("u_ben", { action: "orbit_accept", to: "ana" });   // and connected to ben
+console.log("✓ owner reports: list, mark handled/reopen, suspend bans the reported sign-in and hides the profile");
 
 // withdraw / disconnect, then delete-all wipes links + messages
 await call("u_cal", { action: "orbit_connect", to: "ana" });

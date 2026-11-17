@@ -95,6 +95,7 @@ export function installFake({ jwk, anthropic, clerkUsers = {} } = {}) {
       return resp(200, Object.entries(clerkUsers).map(([id, em]) => ({ id, unsafe_metadata: em?.role ? { role: em.role } : {}, public_metadata: em?.public || {} }))); }
     if (/^https:\/\/api\.clerk\.com\/v1\/users\/[^/]+\/metadata$/.test(u) && m === "PATCH") { const id = decodeURIComponent(u.split("/").slice(-2)[0]);
       const em = clerkUsers[id]; if (!em || typeof em !== "object") return resp(404, {}); em.public = { ...(em.public || {}), ...JSON.parse(o.body).public_metadata }; return resp(200, { id }); }
+    if (/^https:\/\/api\.clerk\.com\/v1\/users\/[^/]+\/ban$/.test(u) && m === "POST") { (calls.clerkBanned ||= []).push(decodeURIComponent(u.split("/").slice(-2)[0])); return resp(200, {}); }
     if (u.startsWith("https://api.clerk.com/v1/users/") && m === "DELETE") { const id = decodeURIComponent(u.split("/").pop());
       (calls.clerkDeleted ||= []).push(id); const had = id in clerkUsers; delete clerkUsers[id]; return resp(had ? 200 : 404, {}); }
     if (u.startsWith("https://api.clerk.com/v1/users/")) { const id = decodeURIComponent(u.split("/").pop()); const em = clerkUsers[id];

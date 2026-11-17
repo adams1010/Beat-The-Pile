@@ -1,6 +1,7 @@
 {
  "lang": "de",
  "strings": {
+    "AI is very busy right now. Signed-in students skip this line: sign in and try again.": "Die KI ist gerade sehr ausgelastet. Angemeldete Studierende müssen nicht warten: Melde dich an und versuche es erneut.",
     "We couldn't find that page": "Diese Seite haben wir nicht gefunden",
     "The link may be old, or the page moved.": "Der Link ist vielleicht alt, oder die Seite wurde verschoben.",
     "Find jobs": "Jobs finden",
