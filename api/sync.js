@@ -56,12 +56,20 @@ export async function saveResult(cfg, runStart, got) {
     entry.raw_count = raw;
     entry.kept_count = listings.length;
 
-    // 1) Upsert everything we saw. last_seen=now, and reopen if it was closed.
-    await db.upsert("listings", listings.map((l) => ({ ...l, last_seen: runStart, closed_at: null })));
+    // Nov 16 (database overload: rewriting all ~110k open listings every Turbo run made /api/listings time out on the Nano
+    // database): read what's open first, then write only what's needed —
+    //   • new or reopened jobs → upsert
+    //   • jobs we already have → re-upsert at most once a day (keeps titles/fields/kinds fresh after rule changes)
+    //   • open jobs we didn't see → closed by id (step 3), so closing no longer depends on last_seen for every row
+    const open = await db.selectAllAsAdmin(`listings?select=id,last_seen&company_id=eq.${encodeURIComponent(cfg.id)}&closed_at=is.null&order=id.asc`);
+    const openAt = new Map(open.map((r) => [r.id, Date.parse(r.last_seen) || 0]));
+    const stale = Date.parse(runStart) - 20 * 3600e3;
+    const toWrite = listings.filter((l) => !openAt.has(l.id) || openAt.get(l.id) < stale);
+    // 1) Upsert new/reopened/day-old rows. last_seen=now, and reopen if it was closed.
+    if (toWrite.length) await db.upsert("listings", toWrite.map((l) => ({ ...l, last_seen: runStart, closed_at: null })));
 
     // 2) FEED HEALTH GUARD: board returned literally nothing, but we had open jobs before?
     //    That's almost always a broken scraper, not a hiring freeze. Don't wipe; flag it.
-    const open = await db.selectAsAdmin(`listings?select=id&company_id=eq.${encodeURIComponent(cfg.id)}&closed_at=is.null`);
     if (raw === 0 && open.length > 0) {
       entry.closed_skipped = true;
       entry.error = "Board returned 0 jobs; kept existing listings. Check the fetcher.";
@@ -71,11 +79,14 @@ export async function saveResult(cfg, runStart, got) {
       entry.closed_skipped = true;
       entry.error = "Partial read (some searches failed); closed nothing.";
     } else {
-      // 3) Anything we didn't see this run is gone from the company's board → closed.
-      await db.update(
-        `listings?company_id=eq.${encodeURIComponent(cfg.id)}&closed_at=is.null&last_seen=lt.${encodeURIComponent(runStart)}`,
-        { closed_at: runStart }
-      );
+      // 3) Anything open that we didn't see this run is gone from the company's board → closed (by id, in chunks).
+      const seen = new Set(listings.map((l) => l.id));
+      const gone = open.map((r) => r.id).filter((id) => !seen.has(id));
+
+      for (let i = 0; i < gone.length; i += 100) {
+        const ids = gone.slice(i, i + 100).map((id) => encodeURIComponent(`"${String(id).replace(/"/g, "")}"`)).join(",");
+        await db.update(`listings?company_id=eq.${encodeURIComponent(cfg.id)}&closed_at=is.null&id=in.(${ids})`, { closed_at: runStart });
+      }
     }
     entry.ok = !entry.closed_skipped || !!partial;
   } catch (e) {

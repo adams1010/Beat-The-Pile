@@ -72,10 +72,10 @@ function fakeDb(u, opts) {
     (!p.company_id || r.company_id === p.company_id.slice(3)) &&
     (p.closed_at !== "is.null" || !r.closed_at) &&
     (!p.last_seen || r.last_seen < p.last_seen.slice(3)) &&
-    (!p.id || r.id === p.id.slice(3)));
+    (!p.id || (p.id.startsWith("in.") ? p.id.slice(4, -1).split(",").map((x) => x.replace(/^"|"$/g, "")).includes(r.id) : r.id === p.id.slice(3))));
   if (table === "bot_runs" || table === "bot_settings") return mk(m === "POST" ? 201 : 200, m === "POST" ? undefined : []);
   if (table === "feed_runs") { if (m==="POST") { T.feed_runs.push(...JSON.parse(opts.body)); return mk(201); } return mk(200, T.feed_runs.slice(-1)); }
-  if (m === "POST") { for (const r of JSON.parse(opts.body)) T.listings.set(r.id, {...(T.listings.get(r.id)||{first_seen:new Date().toISOString(), link_ok:null}), ...r}); return mk(201); }
+  if (m === "POST") { T.posted = (T.posted || 0) + JSON.parse(opts.body).length; for (const r of JSON.parse(opts.body)) T.listings.set(r.id, {...(T.listings.get(r.id)||{first_seen:new Date().toISOString(), link_ok:null}), ...r}); return mk(201); }
   if (m === "PATCH") { const patch = JSON.parse(opts.body); rows().forEach(r => Object.assign(r, patch)); return mk(204); }
   return mk(200, rows());
 }
@@ -112,7 +112,8 @@ console.log("link check ✓  dead:", r.body.dead);
 // Day 2: Salem job removed from Volvo's board; BWXT's site redesign breaks the scraper
 await new Promise(s=>setTimeout(s,5));
 volvoRows = VOLVO_ROWS.filter(x => !x.h.includes("1400000001")); bwxtBroken = true;
-r = resObj(); await sync(cronReq, r);
+T.posted = 0; r = resObj(); await sync(cronReq, r);
+assert.equal(T.posted, 0, "Nov 16: jobs we already have are not rewritten again within 20 h (database load)");
 assert.ok(T.listings.get("volvo-group:1400000001").closed_at, "removed job closed");
 assert.ok(!T.listings.get("bwxt:900").closed_at, "broken feed did NOT wipe BWXT");
 const bw = r.body.report.find(x=>x.company_id==="bwxt"); assert.equal(bw.ok, false); assert.equal(bw.closed_skipped, true);

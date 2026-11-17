@@ -434,7 +434,7 @@ export default async function handler(req, res) {
       const all = []; for (let off = 0; off < 10000; off += 500) { const r = await fetch(`https://api.clerk.com/v1/users?limit=500&offset=${off}&order_by=created_at`, { headers: CK });
         if (!r.ok) return res.status(503).json({ error: "Couldn't list accounts" }); const pg = await r.json(); all.push(...pg); if (pg.length < 500) break; }
       const norm = (x) => String(x || "").toLowerCase().replace(/[^a-z]/g, "");
-      const rows = await db.selectAllAsAdmin("user_jobs?select=clerk_user_id,handle,profile").catch(() => []);
+      const rows = await db.selectAllAsAdmin("user_jobs?select=clerk_user_id,handle,profile&order=clerk_user_id.asc").catch(() => []);   // no id column: give selectAll an order
       const byId = new Map(rows.map((r) => [r.clerk_user_id, r]));
       const nameOf = (u) => norm([u.first_name, u.last_name].filter(Boolean).join("")) || norm(byId.get(u.id)?.profile?.name);
       const me = all.find((u) => u.id === uid); const mine = nameOf(me) || "x";
