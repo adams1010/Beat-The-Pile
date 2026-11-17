@@ -5,6 +5,13 @@
 // If the page has an #acct element (its sign-in / sign-out widget), it is moved into the bar's right side.
 (function () {
   if (window.__btpNav) return; window.__btpNav = true;
+  // Nov 17: every page gets the app tags (Add to Home Screen / installed app), not just the few that had them
+  { const H = document.head, has = (sel) => H.querySelector(sel), add = (tag, attrs) => { const e = document.createElement(tag); Object.assign(e, attrs); H.appendChild(e); };
+    if (!has('link[rel="manifest"]')) add("link", { rel: "manifest", href: "/manifest.webmanifest" });
+    if (!has('link[rel="apple-touch-icon"]')) add("link", { rel: "apple-touch-icon", href: "/icons/icon-180.png" });
+    if (!has('meta[name="theme-color"]')) { const m = document.createElement("meta"); m.name = "theme-color"; m.content = "#060A2C"; H.appendChild(m); }
+    if (!has('meta[name="apple-mobile-web-app-capable"]')) { const m = document.createElement("meta"); m.name = "apple-mobile-web-app-capable"; m.content = "yes"; H.appendChild(m); }
+    if (!has('meta[name="apple-mobile-web-app-title"]')) { const m = document.createElement("meta"); m.name = "apple-mobile-web-app-title"; m.content = "Beat the Pile"; H.appendChild(m); } }
   // Line icons (24×24, stroke = currentColor) so they follow the link color and never look like emoji.
   const ICON = {
     home: '<path d="M3.5 10.5 12 4l8.5 6.5"/><path d="M5.5 9v11h13V9"/><path d="M10 20v-5.5h4V20"/>',
