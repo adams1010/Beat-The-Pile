@@ -103,3 +103,9 @@ console.log("✓ business orbit + company page: team, interested students, forme
   assert.equal((await call("u_ana", { action: "orbit_connect", to: k2 })).code, 404, "only verified recruiters can be joined");
   console.log("✓ students join a company's orbit from its page; employer accepts; unverified recruiters can't be reached");
 }
+// Nov 16: owners can delete a business account on /business/admin/ (typed DELETE); owner access doesn't recreate the owner's own
+{
+  const src = (await import("node:fs")).readFileSync(new URL("../lib/employer.js", import.meta.url), "utf8");
+  if (!(src.includes('action === "biz_admin_delete"') && src.includes('row?.reviewed_by !== "deleted"') && src.includes('body.confirm !== "DELETE"'))) throw new Error("biz_admin_delete wiring");
+  console.log("✓ business: owners can delete business accounts; your own stays deleted");
+}

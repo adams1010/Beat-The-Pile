@@ -492,7 +492,7 @@ export default async function handler(req, res) {
     }
 
     // ── Faculty & staff verification (lib/staffcheck.js): school-domain email code + directory link + owner approval ──
-    if (typeof action === "string" && /^staff_(status|email_start|email_confirm|submit|admin_list|admin_review)$/.test(action)) {
+    if (typeof action === "string" && /^staff_(status|email_start|email_confirm|submit|admin_list|admin_review|admin_delete)$/.test(action)) {
       if (!(await rateOk(`staff:${uid}`, 60, 40))) return res.status(429).json({ error: "Slow down a little and try again" });
       if (!process.env.CLERK_SECRET_KEY) return res.status(503).json({ error: "Verification isn't switched on yet" });
       const CK = { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` };
@@ -508,7 +508,7 @@ export default async function handler(req, res) {
     }
 
     // ── Business side (lib/employer.js): company setup, work-email code, owner review, dashboard, business Orbit ──
-    if (typeof action === "string" && /^biz_(get|save|email_start|email_confirm|fairs|fair_counts|home|orbit|admin_list|admin_review)$/.test(action)) {
+    if (typeof action === "string" && /^biz_(get|save|email_start|email_confirm|fairs|fair_counts|home|orbit|admin_list|admin_review|admin_delete)$/.test(action)) {
       if (!(await rateOk(`biz:${uid}`, 60, 60))) return res.status(429).json({ error: "Slow down a little and try again" });
       const out = await bizAction(uid, action, body || {}, { rateOk, sendEmail, clerkUser });
       return res.status(out.status).json(out.body);

@@ -16,6 +16,7 @@
   .filters button{font:inherit;font-size:13px;font-weight:600;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;cursor:pointer}
   .filters button[aria-pressed=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
   .wrapt{overflow-x:auto}
+  .btn.danger{border-color:#9B2C2C;color:#9B2C2C}
 </style>
 </head>
 <body>
@@ -42,9 +43,16 @@
             ${r.schoolDomain ? `<br><span class="no">School domain (students have these)</span>` : ""}${r.sameDomainPage ? `<br><span class="no">Domain already has a page: ${esc(r.sameDomainPage)}</span>` : ""}</td>
           <td>${esc(r.status)}${r.reviewNote ? `<br><span class="small muted">${esc(r.reviewNote)}</span>` : ""}</td>
           <td style="white-space:nowrap">${r.status !== "verified" ? `<button class="btn pri" data-k="${esc(r.key)}" data-s="verified" ${r.emailVerified ? "" : "disabled title='Their work email isn&#39;t confirmed yet'"}>Verify</button>` : ""}
-            ${r.status !== "rejected" ? `<button class="btn" data-k="${esc(r.key)}" data-s="rejected">Reject</button>` : ""}</td></tr>`).join("")}</table></div>`
+            ${r.status !== "rejected" ? `<button class="btn" data-k="${esc(r.key)}" data-s="rejected">Reject</button>` : ""}
+            <button class="btn danger" data-del-emp="${esc(r.key)}" data-name="${esc(r.company || "this account")}">Delete</button></td></tr>`).join("")}</table></div>`
         : `<p class="empty">Nothing here.</p>`}</section>`;
     document.querySelectorAll("[data-show]").forEach((b) => b.onclick = () => { show = b.dataset.show; render(); });
+    // Nov 16: delete a business account (company page or recruiter). Your own stays gone (owner access won't recreate it).
+    document.querySelectorAll("[data-del-emp]").forEach((b) => b.onclick = async () => {
+      const t = prompt(`Delete the business account "${b.dataset.name}"? Its company page, recruiter badge and setup are removed. Students keep their own accounts. Type DELETE to confirm.`);
+      if (t !== "DELETE") return;
+      b.disabled = true; try { await biz.api({ action: "biz_admin_delete", key: b.dataset.delEmp, confirm: "DELETE" }); await load(); } catch (e) { b.disabled = false; alert(e.message); }
+    });
     document.querySelectorAll("[data-k]").forEach((b) => b.onclick = async () => {
       let note = "";
       if (b.dataset.s === "rejected") { note = prompt("Reason (the employer sees this):", "We couldn't confirm you work at this company.") ?? null; if (note === null) return; }
