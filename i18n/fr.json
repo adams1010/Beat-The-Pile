@@ -1,6 +1,9 @@
 {
  "lang": "fr",
  "strings": {
+    "We couldn't find that page": "Page introuvable",
+    "The link may be old, or the page moved.": "Le lien est peut-être ancien, ou la page a été déplacée.",
+    "Find jobs": "Trouver des offres",
     "Delete account": "Supprimer le compte",
     "Deletes your profile, resume, applications, Orbit connections and messages, any company page or badge, and your sign-in. This can't be undone.": "Supprime votre profil, CV, candidatures, connexions et messages Orbit, toute page entreprise ou badge, et votre connexion. C'est irréversible.",
     "Type DELETE to confirm": "Tapez DELETE pour confirmer",

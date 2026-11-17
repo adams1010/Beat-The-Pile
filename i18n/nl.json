@@ -1,6 +1,9 @@
 {
  "lang": "nl",
  "strings": {
+    "We couldn't find that page": "We konden die pagina niet vinden",
+    "The link may be old, or the page moved.": "De link is misschien oud, of de pagina is verplaatst.",
+    "Find jobs": "Vacatures zoeken",
     "Delete account": "Account verwijderen",
     "Deletes your profile, resume, applications, Orbit connections and messages, any company page or badge, and your sign-in. This can't be undone.": "Verwijdert je profiel, cv, sollicitaties, Orbit-connecties en berichten, elke bedrijfspagina of badge, en je login. Dit kan niet ongedaan worden gemaakt.",
     "Type DELETE to confirm": "Typ DELETE om te bevestigen",
