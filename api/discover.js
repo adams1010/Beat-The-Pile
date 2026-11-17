@@ -34,7 +34,16 @@ export default async function handler(req, res) {
   // 0) Once a day (07:00–07:59 UTC, or ?import=1): look for brand-new companies on the SimplifyJobs list.
   //    That run only imports; the new companies are then checked by the normal runs (same proof rules).
   const hour = new Date().getUTCHours();
-  if (req.query?.import === "1" || (hour === 7 && await botOn("import"))) {
+  // Nov 17: GitHub often skips the 07:xx scheduled run (no import Nov 16 or 17), so any run from 07:00 on catches up
+  // when the last import is over 20 h old. One tiny bot_runs read per run.
+  const importDue = async () => {
+    if (hour < 7) return false;
+    try {
+      const last = await db.selectAsAdmin(`bot_runs?select=ran_at&bot=eq.import&ran_at=gt.${new Date(Date.now() - 20 * 36e5).toISOString()}&limit=1`);
+      return Array.isArray(last) && last.length === 0;
+    } catch { return hour === 7; }
+  };
+  if (req.query?.import === "1" || (await importDue() && await botOn("import"))) {
     try {
       const r = await get(SIMPLIFY_URL, { timeoutMs: 20000 });
       if (!r.ok) throw new Error(`list answered ${r.status}`);
