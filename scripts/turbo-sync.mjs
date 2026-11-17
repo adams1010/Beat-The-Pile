@@ -37,6 +37,16 @@ const ONLY = (process.argv.find((x) => x.startsWith("--only=")) || "").slice(7).
 const todo = (ONLY.length ? companies.filter((c) => ONLY.includes(c.id)) : companies).slice(0, LIMIT);
 console.log(`${todo.length} companies to read (of ${companies.length}), ${AT_ONCE} at a time, ${MINUTES} min budget`);
 
+// Nov 17 (Vercel CPU at 90% of the free 4 h): only companies whose jobs CHANGED go to Vercel. GitHub keeps a fingerprint
+// of every company's last sent job list (actions/cache → .turbo-cache/sent.json); an unchanged board is skipped unless it
+// hasn't been saved for RESAVE_H hours (keeps last_seen, feed_runs and the empty-board guard fresh). Errors always go.
+import { createHash } from "node:crypto";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+const CACHE = ".turbo-cache/sent.json", RESAVE_H = 12;
+let sent = {}; try { sent = JSON.parse(readFileSync(CACHE, "utf8")); } catch {}
+const pendingHash = new Map(); let skipped = 0;
+const fp = (listings, raw) => createHash("sha1").update(JSON.stringify([raw, [...listings].sort((a, b) => (a.id < b.id ? -1 : 1))])).digest("hex");
+
 // Results go back in small batches (Vercel takes ≤4.5 MB per request; one big hospital board is ~1 MB).
 let batch = [], batchBytes = 0, stored = 0, kept = 0, failed = 0, read = 0, busy = 0;
 let flushing = Promise.resolve();
@@ -47,7 +57,8 @@ const flush = () => {
     if (DRY) { stored += results.length; return; }
     try {
       const r = await post({ action: "turbo_save", runStart, results });
-      for (const x of r.results || []) { stored++; kept += x.kept || 0; if (!x.ok && !x.busy) failed++; if (x.busy) busy++; }
+      for (const x of r.results || []) { stored++; kept += x.kept || 0; if (!x.ok && !x.busy) failed++; if (x.busy) busy++;
+        if (x.ok && pendingHash.has(x.id)) sent[x.id] = { h: pendingHash.get(x.id), at: Date.now() }; else delete sent[x.id]; }
     } catch (e) { console.warn("save failed:", e.message); failed += results.length; }
   });
   return flushing;
@@ -59,6 +70,9 @@ await mapLimit(todo, AT_ONCE, async (cfg) => {
   try {
     const { raw, listings, partial } = await withTimeout(fetchCompany(cfg), PER_BOARD_S * 1000);
     res = { id: cfg.id, raw, listings, ...(partial ? { partial: true } : {}) };
+    if (!partial) { const h = fp(listings, raw), prev = sent[cfg.id];
+      if (prev && prev.h === h && Date.now() - prev.at < RESAVE_H * 3600e3) { read++; skipped++; return; }   // unchanged: Vercel has it
+      pendingHash.set(cfg.id, h); }
   } catch (e) { res = { id: cfg.id, error: String(e?.message || e).slice(0, 400), busy: !!e?.busy }; }
   read++;
   const size = JSON.stringify(res).length;
@@ -67,8 +81,9 @@ await mapLimit(todo, AT_ONCE, async (cfg) => {
   if (read % 200 === 0) console.log(`… ${read} read, ${Math.round((Date.now() - t0) / 6e4)} min`);
 });
 await flush();
+try { mkdirSync(".turbo-cache", { recursive: true }); writeFileSync(CACHE, JSON.stringify(sent)); } catch (e) { console.warn("couldn't keep fingerprints:", e.message); }
 
 const min = Math.round((Date.now() - t0) / 6e4);
-const summary = `Read ${read} job boards in ${min} min · ${kept.toLocaleString("en-US")} jobs kept${failed ? ` · ${failed} boards didn't answer` : ""}`;
+const summary = `Read ${read} job boards in ${min} min · ${skipped} unchanged (not re-sent) · ${kept.toLocaleString("en-US")} jobs kept in the rest${failed ? ` · ${failed} boards didn't answer` : ""}`;
 console.log(summary);
-if (!ONLY.length) await botlog(read > 0 && failed < read, summary, { read, stored, kept, failed, busy, minutes: min, of: companies.length });
+if (!ONLY.length) await botlog(read > 0 && failed < read, summary, { read, stored, kept, failed, busy, skipped, minutes: min, of: companies.length });

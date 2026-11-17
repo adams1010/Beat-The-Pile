@@ -20,12 +20,19 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
+      # Nov 17: fingerprints of what Vercel already has, so unchanged boards aren't re-sent (scripts/turbo-sync.mjs)
+      - uses: actions/cache/restore@v4
+        with: { path: .turbo-cache, key: "turbo-sent-${{ github.run_id }}", restore-keys: "turbo-sent-" }
       - run: node scripts/turbo-sync.mjs ${{ inputs.args }}
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
           USAJOBS_KEY: ${{ secrets.USAJOBS_KEY }}        # Nov 16: federal jobs (lib/fetchers/usajobs.js)
           USAJOBS_EMAIL: ${{ secrets.USAJOBS_EMAIL }}
           BTP_TURBO: "1"
+      - uses: actions/cache/save@v4
+        if: always()
+        continue-on-error: true
+        with: { path: .turbo-cache, key: "turbo-sent-${{ github.run_id }}" }
       - name: Start the next run (about 3 hours after this one began)
         if: always() && !inputs.args
         env: { GH_TOKEN: "${{ github.token }}" }

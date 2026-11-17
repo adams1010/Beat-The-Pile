@@ -118,6 +118,7 @@ on white, tints `#F2FADF`/`#DDF3A8`.
   list that looks like "no jobs". Pages show "couldn't load" differently from "nothing found".
 
 ## The bots (all visible + switchable on /bots; details in docs/BOTS.md)
+**Vercel CPU (Nov 17): hit 90% of the free 4 h.** Turbo Sync now sends only boards whose jobs changed (fingerprints in actions/cache `.turbo-cache/sent.json`; every board still saved at least every 12 h); Orbit badge 120 s; the 3,522 v1-salvage companies are parked as status `later` (set back to `pending` to resume). Observability per route needs Vercel Pro, so per-route CPU can't be measured on Hobby.
 **Vercel CPU budget (Nov 15):** Hobby = 4 h/month of Fluid Active CPU; on Nov 15 we hit 75% and Vercel pauses the whole site past 100%. So: no Vercel crons for /api/sync or /api/discover (only check-links ×2 + remind ×1 remain in vercel.json); Internship Sync is manual-only (Turbo Sync on GitHub reads every board, now every **3 h**, chained); the Company Finder runs from GitHub `discover.yml` **hourly × 2 passes** (was every 15 min × 3 + 24 Vercel crons). Before adding any schedule that calls a Vercel API, count its runs/day. **Owner wants these speeds back once users grow** (calendar check Dec 1 2026): Vercel Pro → Turbo hourly, CDN cache 5–10 min, badge 15 s. Long-term: run the bots fully in GitHub (needs the Supabase keys as GitHub secrets) or Vercel Pro.
 | Bot | Runs | Where | Code |
 |---|---|---|---|

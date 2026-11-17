@@ -384,7 +384,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   }
   function startBadge(C){
     orbitBadge(C);
-    setInterval(() => { if (document.visibilityState === "visible") orbitBadge(C, true); }, 60000);   // Nov 15: was 15 s; every check is a Vercel call (free tier: 4 h CPU/month)
+    setInterval(() => { if (document.visibilityState === "visible") orbitBadge(C, true); }, 120000);   // Nov 15: was 15 s, Nov 17: 120 s (Vercel CPU at 90% of the free 4 h/month); tab focus still re-checks at once
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") orbitBadge(C); });
     addEventListener("focus", () => orbitBadge(C));
   }
