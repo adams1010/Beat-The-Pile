@@ -14,3 +14,6 @@ grant execute on function public.listing_groups() to anon, authenticated, servic
 
 -- Nov 17: weekly job alerts read every open listing first seen in the last 8 days (≈50k rows); this keeps that fast
 create index if not exists listings_open_first_seen on public.listings (first_seen desc, id) where closed_at is null;
+
+-- Nov 17: public job searches (anon role) timed out at Supabase's default 3 s on the Nano database during heavy sync; 8 s = same as signed-in users
+alter role anon set statement_timeout = '8s'; notify pgrst, 'reload config';
