@@ -11,3 +11,6 @@ returns json language sql stable security invoker set search_path = public as $$
     group by l.company_id, l.field, l.match, l.kind) g
 $$;
 grant execute on function public.listing_groups() to anon, authenticated, service_role;
+
+-- Nov 17: weekly job alerts read every open listing first seen in the last 8 days (≈50k rows); this keeps that fast
+create index if not exists listings_open_first_seen on public.listings (first_seen desc, id) where closed_at is null;
