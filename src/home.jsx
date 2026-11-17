@@ -242,10 +242,10 @@ function LandingD({onQuiz,onPage}){
   const wrap={maxWidth:1240,margin:"0 auto",padding:"0 24px"};
   return(<>
     <section style={{position:"relative",overflow:"hidden",background:"#060A2C",color:"#E8EDF5"}}>
-      <div style={{...wrap,position:"relative",paddingTop:64,paddingBottom:48,display:"flex",gap:48,flexWrap:"wrap",alignItems:"center"}}>
+      <div className="d-hero" style={{...wrap,position:"relative",paddingTop:64,paddingBottom:48,display:"flex",gap:48,flexWrap:"wrap",alignItems:"center"}}>
         <div style={{flex:"1 1 480px",minWidth:0}}>
           <h1 style={{fontSize:"clamp(2.3rem,5vw,3.6rem)",lineHeight:1.03,letterSpacing:"-0.035em",fontWeight:600,margin:"0 0 16px",color:"#fff"}}>Find your job<br/>before the <span style={{color:"#B0F701"}}>pile</span> does.</h1>
-          <p style={{fontSize:18,lineHeight:1.5,color:"#9FAAC0",margin:"0 0 28px",maxWidth:560}}>Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board, no reposts, and jobs drop off when the company takes them down.</p>
+          <p className="d-lead" style={{fontSize:18,lineHeight:1.5,color:"#9FAAC0",margin:"0 0 28px",maxWidth:560}}>Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board, no reposts, and jobs drop off when the company takes them down.</p>
           <form onSubmit={go} role="search" className="d-search" style={{display:"flex",alignItems:"stretch",background:"#fff",borderRadius:10,padding:6,maxWidth:760}}>
             <label style={{flex:"3 1 0",display:"flex",alignItems:"center",gap:10,padding:"0 14px",minWidth:0}}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#55627A" strokeWidth="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
@@ -256,15 +256,15 @@ function LandingD({onQuiz,onPage}){
               <input value={where} onChange={e=>setWhere(e.target.value)} aria-label="City, state or ZIP code" placeholder="City, state or ZIP" inputMode="text" autoComplete="address-level2" style={{flex:1,minWidth:0,border:0,font:"inherit",fontSize:16,color:"#060A2C",height:48,background:"transparent",outline:"none"}}/></label>
             <button type="submit" style={{font:"inherit",fontSize:16,fontWeight:600,background:"#4A7000",color:"#fff",border:0,padding:"0 28px",borderRadius:10,cursor:"pointer",minHeight:48}}>Search</button>
           </form>
-          <div style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:16,alignItems:"center"}}>
-            <span style={{fontSize:13,color:"#8D9AB3",marginRight:4}}>Popular:</span>
+          <div className="d-pop" style={{display:"flex",gap:8,flexWrap:"wrap",marginTop:16,alignItems:"center"}}>
+            <span style={{fontSize:13,color:"#8D9AB3",marginRight:4,flex:"none"}}>Popular:</span>
             {pills.map(k=><a key={k} href={`/jobs/?major=${k}&state=all`} style={{fontSize:13,color:"#CFD7E6",textDecoration:"none",border:"1px solid #22304D",padding:"6px 12px",borderRadius:999}}>{D_FIELD[k].split(" & ")[0]}</a>)}
           </div>
-          <div style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap",marginTop:18}}>
-            <button onClick={onQuiz} style={{font:"inherit",fontSize:15,fontWeight:600,background:"transparent",color:"#B0F701",border:"1.5px solid #B0F701",padding:"10px 18px",borderRadius:999,cursor:"pointer",minHeight:44}}>Not sure where to start? Take the 2-minute match quiz</button>
+          <div className="d-quizrow" style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap",marginTop:18}}>
+            <button className="d-quizbtn" onClick={onQuiz} style={{font:"inherit",fontSize:15,fontWeight:600,background:"transparent",color:"#B0F701",border:"1.5px solid #B0F701",padding:"10px 18px",borderRadius:999,cursor:"pointer",minHeight:44}}>Not sure where to start? Take the 2-minute match quiz</button>
             <span style={{fontSize:13,color:"#8D9AB3"}}>Free · no account needed to browse · <a href="/demo/" style={{color:"#B0F701",fontWeight:600,textDecoration:"none"}}>90-second demo</a></span>
           </div>
-          {found&&found.left>0&&<p style={{fontSize:13.5,color:"#CFD7E6",marginTop:10,display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><span style={{fontWeight:600,color:"#B0F701",...DM}}>{found.left} of {found.total} founding spots left</span><span>The first {found.total} students keep every Pro feature free, for life.</span><a href="/start/" style={{color:"#B0F701",fontWeight:600,textDecoration:"none"}}>Claim yours →</a></p>}
+          {found&&found.left>0&&<p className="d-found" style={{fontSize:13.5,color:"#CFD7E6",marginTop:10,display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><span style={{fontWeight:600,color:"#B0F701",...DM}}>{found.left} of {found.total} founding spots left</span><span className="d-foundx">The first {found.total} students keep every Pro feature free, for life.</span><a href="/start/" style={{color:"#B0F701",fontWeight:600,textDecoration:"none"}}>Claim yours →</a></p>}
         </div>
         <div style={{position:"relative",flex:"1 1 340px",maxWidth:560,minWidth:0,width:"100%"}}>
           <HeroMap near={near} fresh={fresh} sum={sum} sumErr={sumErr}/>
@@ -273,20 +273,20 @@ function LandingD({onQuiz,onPage}){
 
     </section>
 
-    <main style={{...wrap,paddingTop:40,paddingBottom:64,display:"flex",flexDirection:"column",gap:40}}>
+    <main className="d-main" style={{...wrap,paddingTop:40,paddingBottom:64,display:"flex",flexDirection:"column",gap:40}}>
       <section>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#060A2C"}}>Explore by major</h2><a href="/majors/" style={{fontSize:14,color:"#4A7000",textDecoration:"none",fontWeight:500}}>Every major →</a></div>
         <div className="d-grid4">
-          {(fields||Object.keys(D_FIELD).slice(0,8).map(k=>[k,null])).map(([k,n])=>(
-            <a key={k} href={`/jobs/?major=${k}&state=all`} style={{...card,borderRadius:10,textDecoration:"none",color:"#060A2C",padding:18,display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}><span style={{fontWeight:500}}>{D_FIELD[k]}</span><span style={{...DM,fontSize:13,color:"#55627A"}}>{n==null?"":fmt(n)}</span></a>))}
+          {(fields||Object.keys(D_FIELD).slice(0,8).map(k=>[k,null])).map(([k,n],i)=>(
+            <a key={k} className={i>=4?"d-more":undefined} href={`/jobs/?major=${k}&state=all`} style={{...card,borderRadius:10,textDecoration:"none",color:"#060A2C",padding:18,display:"flex",justifyContent:"space-between",alignItems:"center",gap:10}}><span style={{fontWeight:500}}>{D_FIELD[k]}</span><span style={{...DM,fontSize:13,color:"#55627A"}}>{n==null?"":fmt(n)}</span></a>))}
         </div>
       </section>
 
       {sum?.top?.length>0&&<section>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:16,gap:12}}><h2 style={{fontSize:24,fontWeight:600,letterSpacing:"-0.02em",margin:0,color:"#060A2C"}}>Hiring the most interns right now</h2><a href="/radar/" style={{fontSize:14,color:"#4A7000",textDecoration:"none",fontWeight:500}}>When companies open →</a></div>
         <div className="d-grid4">
-          {sum.top.slice(0,4).map(c=>(
-            <article key={c.id} style={{...card,padding:20,display:"flex",flexDirection:"column",gap:12}}>
+          {sum.top.slice(0,4).map((c,i)=>(
+            <article key={c.id} className={i>=2?"d-more":undefined} style={{...card,padding:20,display:"flex",flexDirection:"column",gap:12}}>
               <div style={{display:"flex",gap:12,alignItems:"center"}}><span data-logo-id={c.id} style={{width:44,height:44,borderRadius:10,background:"#F1F4F9",border:"1px solid #DCE2EC",display:"grid",placeItems:"center",fontWeight:600,flexShrink:0,color:"#060A2C"}}>{coInitials(c.company)}</span><p style={{fontWeight:600,margin:0,color:"#060A2C"}}>{c.company}</p></div>
               <div style={{fontSize:13,borderTop:"1px solid #EEF1F6",paddingTop:12,color:"#060A2C"}}><b style={{...DM,fontWeight:500}}>{c.n}</b> open internships</div>
               <a href={`/c/${encodeURIComponent(c.id)}`} style={{fontSize:13,fontWeight:600,color:"#4A7000",textDecoration:"none"}}>See internships →</a>
@@ -299,13 +299,14 @@ function LandingD({onQuiz,onPage}){
         {/* Nov 13 (less AI): a plain two-column list, not a grid of illustrated feature cards */}
         <div style={{...card,padding:"4px 20px"}}>
           <ul className="d-offer" style={{listStyle:"none",margin:0,padding:0,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(300px,100%),1fr))",columnGap:32}}>
-          {FEATURES.map(f=>(
-            <li key={f.k} style={{borderBottom:"1px solid #EEF1F6",padding:"14px 0"}}>
+          {FEATURES.map((f,i)=>(
+            <li key={f.k} className={i>=4?"d-more":undefined} style={{borderBottom:"1px solid #EEF1F6",padding:"14px 0"}}>
               <a href={f.h} onClick={f.pg?(e)=>{e.preventDefault();onPage(f.pg);window.scrollTo(0,0);}:undefined} style={{textDecoration:"none",color:"#060A2C",display:"block"}}>
                 <span style={{fontSize:15,fontWeight:600}}>{f.name}</span><span style={{color:"#4A7000",fontWeight:600}}> · {f.t}</span>
                 <span style={{display:"block",fontSize:14,lineHeight:1.5,color:"#55627A",marginTop:3}}>{f.d}</span>
               </a></li>))}
           </ul>
+          <a className="d-phoneonly" href="/demo/" style={{padding:"12px 0 14px",fontSize:14,fontWeight:600,color:"#4A7000",textDecoration:"none"}}>See everything we offer in the 2-minute tour →</a>
         </div>
       </section>
     </main>

@@ -63,6 +63,13 @@ body{min-height:100vh}
 @media (max-width:900px){.d-grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.d-grid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.d-search{flex-direction:column}.d-search .d-sep{width:auto!important;height:1px;margin:0 10px!important}.d-grid4{grid-template-columns:1fr}.d-grid3{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.d-blink,.d-tick{animation:none}}
+.d-phoneonly{display:none}
+/* Nov 16 (owner): phones get a short homepage: search + the quiz button on the first screen, then the map, then 4 of each list */
+@media (max-width:640px){.d-hero{padding-top:26px!important;padding-bottom:22px!important;gap:22px!important}.d-hero h1{margin-bottom:14px!important}
+.d-lead{display:none}.d-pop{flex-wrap:nowrap!important;overflow-x:auto;scrollbar-width:none;margin-left:-24px!important;margin-right:-24px!important;padding:0 24px}.d-pop::-webkit-scrollbar{display:none}.d-pop a{flex:none}
+.d-quizbtn{width:100%;background:#B0F701!important;color:#060A2C!important;border-color:#B0F701!important}.d-foundx{display:none}
+.d-main{padding-top:24px!important;padding-bottom:32px!important;gap:28px!important}.d-main h2{font-size:20px!important}
+.d-more{display:none!important}.d-phoneonly{display:block}}
 @keyframes spin{to{transform:rotate(360deg)}}
 @keyframes fadeUp{from{opacity:0.4;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pop{0%{transform:scale(0.92)}60%{transform:scale(1.04)}100%{transform:scale(1)}}

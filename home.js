@@ -1,4 +1,4 @@
-/* built from src/home.jsx bb0e0d435f74be11 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 74a3f04f0e8f065a — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -1138,6 +1138,7 @@ function LandingD({
       color: "#E8EDF5"
     }
   }, React.createElement("div", {
+    className: "d-hero",
     style: {
       ...wrap,
       position: "relative",
@@ -1167,6 +1168,7 @@ function LandingD({
       color: "#B0F701"
     }
   }, "pile"), " does."), React.createElement("p", {
+    className: "d-lead",
     style: {
       fontSize: 18,
       lineHeight: 1.5,
@@ -1288,6 +1290,7 @@ function LandingD({
       minHeight: 48
     }
   }, "Search")), React.createElement("div", {
+    className: "d-pop",
     style: {
       display: "flex",
       gap: 8,
@@ -1299,7 +1302,8 @@ function LandingD({
     style: {
       fontSize: 13,
       color: "#8D9AB3",
-      marginRight: 4
+      marginRight: 4,
+      flex: "none"
     }
   }, "Popular:"), pills.map(k => React.createElement("a", {
     key: k,
@@ -1313,6 +1317,7 @@ function LandingD({
       borderRadius: 999
     }
   }, D_FIELD[k].split(" & ")[0]))), React.createElement("div", {
+    className: "d-quizrow",
     style: {
       display: "flex",
       gap: 12,
@@ -1321,6 +1326,7 @@ function LandingD({
       marginTop: 18
     }
   }, React.createElement("button", {
+    className: "d-quizbtn",
     onClick: onQuiz,
     style: {
       font: "inherit",
@@ -1347,6 +1353,7 @@ function LandingD({
       textDecoration: "none"
     }
   }, "90-second demo"))), found && found.left > 0 && React.createElement("p", {
+    className: "d-found",
     style: {
       fontSize: 13.5,
       color: "#CFD7E6",
@@ -1362,7 +1369,9 @@ function LandingD({
       color: "#B0F701",
       ...DM
     }
-  }, found.left, " of ", found.total, " founding spots left"), React.createElement("span", null, "The first ", found.total, " students keep every Pro feature free, for life."), React.createElement("a", {
+  }, found.left, " of ", found.total, " founding spots left"), React.createElement("span", {
+    className: "d-foundx"
+  }, "The first ", found.total, " students keep every Pro feature free, for life."), React.createElement("a", {
     href: "/start/",
     style: {
       color: "#B0F701",
@@ -1383,6 +1392,7 @@ function LandingD({
     sum: sum,
     sumErr: sumErr
   })))), React.createElement("main", {
+    className: "d-main",
     style: {
       ...wrap,
       paddingTop: 40,
@@ -1417,8 +1427,9 @@ function LandingD({
     }
   }, "Every major \u2192")), React.createElement("div", {
     className: "d-grid4"
-  }, (fields || Object.keys(D_FIELD).slice(0, 8).map(k => [k, null])).map(([k, n]) => React.createElement("a", {
+  }, (fields || Object.keys(D_FIELD).slice(0, 8).map(k => [k, null])).map(([k, n], i) => React.createElement("a", {
     key: k,
+    className: i >= 4 ? "d-more" : undefined,
     href: `/jobs/?major=${k}&state=all`,
     style: {
       ...card,
@@ -1467,8 +1478,9 @@ function LandingD({
     }
   }, "When companies open \u2192")), React.createElement("div", {
     className: "d-grid4"
-  }, sum.top.slice(0, 4).map(c => React.createElement("article", {
+  }, sum.top.slice(0, 4).map((c, i) => React.createElement("article", {
     key: c.id,
+    className: i >= 2 ? "d-more" : undefined,
     style: {
       ...card,
       padding: 20,
@@ -1561,8 +1573,9 @@ function LandingD({
       gridTemplateColumns: "repeat(auto-fit,minmax(min(300px,100%),1fr))",
       columnGap: 32
     }
-  }, FEATURES.map(f => React.createElement("li", {
+  }, FEATURES.map((f, i) => React.createElement("li", {
     key: f.k,
+    className: i >= 4 ? "d-more" : undefined,
     style: {
       borderBottom: "1px solid #EEF1F6",
       padding: "14px 0"
@@ -1597,7 +1610,17 @@ function LandingD({
       color: "#55627A",
       marginTop: 3
     }
-  }, f.d)))))))), React.createElement("footer", {
+  }, f.d))))), React.createElement("a", {
+    className: "d-phoneonly",
+    href: "/demo/",
+    style: {
+      padding: "12px 0 14px",
+      fontSize: 14,
+      fontWeight: 600,
+      color: "#4A7000",
+      textDecoration: "none"
+    }
+  }, "See everything we offer in the 2-minute tour \u2192")))), React.createElement("footer", {
     style: {
       textAlign: "center",
       padding: "1.5rem",
