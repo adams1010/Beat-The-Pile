@@ -442,6 +442,18 @@
     $("#rep")?.addEventListener("click", (e) => { e.preventDefault(); window.iqReport ? window.iqReport({ message: "Report profile /u/" + d.handle + "\n" }) : alert("Use the Feedback button to report."); });
   }
 
+  // Nov 17 (app stores require it): delete the whole account, sign-in included
+  document.addEventListener("click", async (e) => {
+    const b = e.target.closest("#delAcct"); if (!b) return;
+    const toast = (m) => { const x = $("#delMsg"); if (x) x.textContent = m; };
+    if (($("#delConf")?.value || "").trim() !== "DELETE") { $("#delConf")?.focus(); return toast("Type DELETE to confirm"); }
+    b.disabled = true; b.textContent = "Deleting…";
+    try { await api("POST", { action: "delete_account", confirm: "DELETE" });
+      try { Object.keys(localStorage).filter((k) => k.startsWith("btp_")).forEach((k) => localStorage.removeItem(k)); } catch {}
+      try { await S.clerk?.signOut(); } catch {}
+      location.href = "/?deleted=1";
+    } catch (err) { b.disabled = false; b.textContent = "Delete my account"; toast(err.message); }
+  });
   // ── Editor (signed in) ──
   async function token(){ try { return await S.clerk?.session?.getToken(); } catch { return null; } }
   async function api(method, body){
@@ -564,6 +576,9 @@
       </section>
       <section class="card" id="language"><h2>Language</h2><p class="small muted">Pick the language for menus, buttons and help text. Job titles and company names stay as the employer wrote them.</p>
         ${window.btpI18n ? window.btpI18n.picker() : ""}</section>
+      <section class="card" id="delete-account"><h2>Delete account</h2><p class="small muted">Deletes your profile, resume, applications, Orbit connections and messages, any company page or badge, and your sign-in. This can't be undone.</p>
+        <label for="delConf">Type DELETE to confirm</label><input id="delConf" autocomplete="off" autocapitalize="characters" spellcheck="false">
+        <button type="button" class="btn" id="delAcct" style="margin-top:10px">Delete my account</button><p class="small" id="delMsg" role="status" style="color:#B42318;margin:8px 0 0"></p></section>
       <section class="card"><h2>Links</h2>
         <div class="row"><div><label for="l_linkedin">LinkedIn</label><input id="l_linkedin" data-link="linkedin" value="${esc(d.p.links.linkedin || "")}" placeholder="https://linkedin.com/in/…"></div>
         <div><label for="l_github">GitHub</label><input id="l_github" data-link="github" value="${esc(d.p.links.github || "")}" placeholder="https://github.com/…"></div></div>

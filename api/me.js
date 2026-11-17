@@ -8,6 +8,7 @@
 //   POST /api/me { action:"rotate" }               → new QR link; the old QR/link stops working
 //   POST /api/me { action:"resume_delete" }        → delete the resume file and the link
 //   POST /api/me { action:"delete_all", confirm:"DELETE" } → delete EVERYTHING we store for you (your sign-in itself lives at Clerk)
+//   POST /api/me { action:"delete_account", confirm:"DELETE" } → the same + business page/badge + the Clerk sign-in (/u/ "Delete account")
 //   POST /api/me { action:"note", note }           → add/update a career-fair conversation note
 //   POST /api/me { action:"note_delete", id }
 //   POST /api/me { action:"star", company, on }     → follow a company (fair game plan + new-job alerts)
@@ -287,6 +288,17 @@ async function unsubscribe(req, res) {
   const t = String(req.query.unsub || "");
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   const alerts = req.query.k === "alerts";
+  const what = alerts ? "weekly job alert emails" : "follow-up reminder emails";
+  // Nov 17 audit: a plain visit only ASKS. Email link scanners (Outlook Safe Links, school mail filters) open every link in an
+  // email, which used to unsubscribe students silently. The button (and Gmail's one-click List-Unsubscribe-Post) is a POST.
+  if (req.method !== "POST") {
+    if (!TOKEN_OK.test(t)) return res.status(404).send(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Link expired</title><body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;padding:40px;text-align:center;color:#060A2C">This unsubscribe link isn't valid.`);
+    const action = `/api/me?unsub=${encodeURIComponent(t)}${alerts ? "&k=alerts" : ""}`;
+    return res.status(200).send(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>Unsubscribe | Beat the Pile</title>
+<body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;display:grid;place-items:center;min-height:90vh;margin:0;background:#FBFBFC;color:#060A2C">
+<form method="post" action="${action}" style="text-align:center;padding:24px"><div style="color:#4A7000;font-weight:700">Beat the Pile</div><h1 style="font-size:22px">Stop ${what}?</h1>
+<button type="submit" style="font:inherit;font-weight:700;background:#4A7000;color:#fff;border:0;border-radius:999px;padding:12px 22px;cursor:pointer">Unsubscribe</button></form>`);
+  }
   if (TOKEN_OK.test(t)) await db.updateReturning(`user_jobs?remind_unsub=eq.${encodeURIComponent(t)}`, alerts ? { alert_on: false } : { remind_email: false });
   return res.status(200).send(`<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>Unsubscribed</title>
 <body style="font-family:-apple-system,Segoe UI,Roboto,sans-serif;display:grid;place-items:center;min-height:90vh;margin:0;background:#FBFBFC;color:#060A2C">
@@ -423,6 +435,22 @@ export default async function handler(req, res) {
       return res.status(200).json({ ok: true, deleted: true });
     }
 
+    // ── Delete the whole ACCOUNT (Nov 17; Apple/Google require it in-app): everything above + any business page/badge +
+    // the sign-in itself at Clerk. Data goes first, so a Clerk hiccup never leaves data behind. ──
+    if (action === "delete_account") {
+      if (body.confirm !== "DELETE") return res.status(400).json({ error: "Type DELETE to confirm" });
+      if (!process.env.CLERK_SECRET_KEY) return res.status(503).json({ error: "Account deletion is temporarily unavailable" });
+      const row = await loadRow(uid);
+      if (row?.resume_path) await deletePdf(row.resume_path);
+      await deleteOrbitData(uid);
+      await dbDelete(`employers?clerk_user_id=eq.${encodeURIComponent(uid)}`).catch(() => {});
+      await dbDelete(`user_jobs?clerk_user_id=eq.${encodeURIComponent(uid)}`);
+      await dbDelete(`user_home?clerk_user_id=eq.${encodeURIComponent(uid)}`);
+      const del = await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(uid)}`, { method: "DELETE", headers: { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` } });
+      if (!del.ok && del.status !== 404) return res.status(502).json({ error: "Your data is deleted, but the sign-in couldn't be removed. Try again in a minute." });
+      return res.status(200).json({ ok: true, deleted: true, account: true });
+    }
+
     // ── Owner: your duplicate sign-ins (Nov 16). Lists every account with YOUR name (from sign-in or profile) so you can tell
     // them apart (founding #, @handle, companies on the profile, masked email), and deletes one you pick: its data here
     // (same as Delete all my data) + the sign-in itself at Clerk. Never the account you're signed in with. ──
@@ -472,7 +500,7 @@ export default async function handler(req, res) {
       return res.status(200).json(await orbitFor(uid, await loadRow(uid), orbitExtras, body?.targets));
     }
     // ── Orbit part 2: connect / accept / remove, messages, same fair (lib/orbitnet.js) ──
-    if (typeof action === "string" && /^orbit_(connect|accept|remove|thread|send|inbox|fair|count|state|search)$/.test(action)) {
+    if (typeof action === "string" && /^orbit_(connect|accept|remove|thread|send|inbox|fair|count|state|search|block|unblock|report)$/.test(action)) {
       if (!(await rateOk(`orbit-act:${uid}`, 60, 60))) return res.status(429).json({ error: "Slow down a little and try again" });
       const out = await orbitAction(uid, action, body || {}, { roleOf, rateOk });
       return res.status(out.status).json(out.body);

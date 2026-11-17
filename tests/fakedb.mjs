@@ -37,7 +37,9 @@ function test(row, col, expr) {
   if (op === "neq") return String(v) !== decodeURIComponent(arg);
   if (op === "is") return arg === "null" ? v == null : v === parseVal(arg);
   if (op === "gt" || op === "gte" || op === "lt" || op === "lte") {
-    const a = decodeURIComponent(arg); const x = isNaN(Number(a)) ? Date.parse(a) : Number(a); const y = isNaN(Number(v)) ? Date.parse(v) : Number(v);
+    let a = decodeURIComponent(arg); if (a.startsWith('"') && a.endsWith('"')) a = a.slice(1, -1);
+    let x = isNaN(Number(a)) ? Date.parse(a) : Number(a), y = isNaN(Number(v)) ? Date.parse(v) : Number(v);
+    if (Number.isNaN(x) || Number.isNaN(y)) { x = String(a); y = String(v ?? ""); }      // plain text compare (ids)
     return op === "gt" ? y > x : op === "gte" ? y >= x : op === "lt" ? y < x : y <= x; }
   if (op === "in") { const list = decodeURIComponent(arg).replace(/^\(|\)$/g, "").split(",").map((x) => x.replace(/^"|"$/g, "")); return list.includes(String(v)); }
   if (op === "imatch" || op === "match") {   // Postgres regex ≈ JS here (\y = word boundary in Postgres)
@@ -93,6 +95,8 @@ export function installFake({ jwk, anthropic, clerkUsers = {} } = {}) {
       return resp(200, Object.entries(clerkUsers).map(([id, em]) => ({ id, unsafe_metadata: em?.role ? { role: em.role } : {}, public_metadata: em?.public || {} }))); }
     if (/^https:\/\/api\.clerk\.com\/v1\/users\/[^/]+\/metadata$/.test(u) && m === "PATCH") { const id = decodeURIComponent(u.split("/").slice(-2)[0]);
       const em = clerkUsers[id]; if (!em || typeof em !== "object") return resp(404, {}); em.public = { ...(em.public || {}), ...JSON.parse(o.body).public_metadata }; return resp(200, { id }); }
+    if (u.startsWith("https://api.clerk.com/v1/users/") && m === "DELETE") { const id = decodeURIComponent(u.split("/").pop());
+      (calls.clerkDeleted ||= []).push(id); const had = id in clerkUsers; delete clerkUsers[id]; return resp(had ? 200 : 404, {}); }
     if (u.startsWith("https://api.clerk.com/v1/users/")) { const id = decodeURIComponent(u.split("/").pop()); const em = clerkUsers[id];
       if (em && typeof em === "object") return resp(200, { id, first_name: em.first_name || null, last_name: em.last_name || null, unsafe_metadata: em.role ? { role: em.role } : {}, public_metadata: em.public || {},
         email_addresses: [{ email_address: em.email, verification: { status: "verified" } }] });
@@ -142,7 +146,8 @@ export function installFake({ jwk, anthropic, clerkUsers = {} } = {}) {
     if (m === "GET") {
       let out = filterRows(rows, sp);
       const order = sp.get("order");
-      if (order) { const [col, dir] = order.split(",")[0].split("."); out = [...out].sort((a, b) => (String(a[col] ?? "") < String(b[col] ?? "") ? -1 : 1) * (dir === "desc" ? -1 : 1)); }
+      if (order) { const keys = order.split(",").map((k) => k.split("."));          // every order key, in turn (ties → next key)
+        out = [...out].sort((a, b) => { for (const [col, dir] of keys) { const x = String(a[col] ?? ""), y = String(b[col] ?? ""); if (x !== y) return (x < y ? -1 : 1) * (dir === "desc" ? -1 : 1); } return 0; }); }
       const total = out.length, off = Number(sp.get("offset") || 0), lim = sp.get("limit") ? Number(sp.get("limit")) : 1e9;
       out = out.slice(off, off + lim).map((r) => ({ ...r }));
       const sel = sp.get("select") || "";

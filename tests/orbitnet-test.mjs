@@ -90,6 +90,23 @@ assert.equal(r.body.fair.on, true);
 assert.deepEqual((await call("u_ben", { action: "orbit" })).body.fair.people, [], "not opted in → sees nobody");
 console.log("✓ orbit same fair: opt-in both ways");
 
+// Nov 17: Block + Report (app-store rule for messaging)
+assert.equal((await call("u_ben", { action: "orbit_report", to: "ana", reason: "" })).code, 400, "a report needs a reason");
+r = await call("u_ben", { action: "orbit_report", to: "ana", reason: "Rude messages" }); assert.deepEqual(r.body, { link: "blocked", reported: true });
+const rep = f.T("feedback").find((x) => x.kind === "orbit_report"); assert.ok(rep && /Rude messages/.test(rep.message) && /Going to the CAMEO fair\?/.test(rep.message), "report keeps the reason + recent messages for the owner");
+assert.equal(f.T("orbit_links").filter((l) => [l.user_a, l.user_b].includes("u_ana") && [l.user_a, l.user_b].includes("u_ben")).length, 0, "blocking ends the connection");
+assert.equal((await call("u_ana", { action: "orbit_send", to: "ben", body: "hello?" })).code, 404, "the blocked person can't reach you");
+assert.equal((await call("u_ana", { action: "orbit_connect", to: "ben" })).code, 404, "or ask to join your orbit again");
+assert.ok(!(await call("u_ana", { action: "orbit_search", q: "ben" })).body.people.length, "or find you in search");
+assert.ok(!(await call("u_ben", { action: "orbit" })).body.classmates.some((c) => c.handle === "ana"), "they're gone from your Orbit lists");
+assert.ok(!(await call("u_ben", { action: "orbit_inbox" })).body.threads.some((t) => t.handle === "ana"), "and from your inbox");
+r = await call("u_ben", { action: "orbit_thread", to: "ana" }); assert.equal(r.body.blocked, true); assert.equal(r.body.canSend, false);
+assert.equal((await call("u_ben", { action: "orbit_send", to: "ana", body: "x" })).code, 403);
+assert.deepEqual((await call("u_ben", { action: "orbit_unblock", to: "ana" })).body, { link: "none" });
+assert.equal((await call("u_ana", { action: "orbit_connect", to: "ben" })).body.link, "requested", "after unblock, normal rules again");
+assert.equal((await call("u_ben", { action: "orbit_accept", to: "ana" })).body.link, "connected");
+console.log("✓ orbit block + report: report reaches the owner, both sides hidden from each other, unblock restores");
+
 // withdraw / disconnect, then delete-all wipes links + messages
 await call("u_cal", { action: "orbit_connect", to: "ana" });
 assert.equal((await call("u_cal", { action: "orbit_remove", to: "ana" })).body.link, "none");
@@ -99,4 +116,16 @@ assert.equal(f.T("orbit_links").length, 0);
 assert.ok(!f.T("orbit_messages").some((m) => m.sender === "u_ana" || m.recipient === "u_ana"));
 assert.equal(f.T("orbit_messages").length, 2, "other people's conversations stay");
 console.log("✓ orbit cleanup: withdraw works, delete-all removes your links and messages");
+
+// Nov 17: delete the whole account (app stores require it): data, business row, blocks, and the Clerk sign-in
+f.T("orbit_blocks").push({ blocker: "u_cal", blocked: "u_dee" });
+assert.equal((await call("u_cal", { action: "delete_account" })).code, 400, "needs the typed confirm");
+r = await call("u_cal", { action: "delete_account", confirm: "DELETE" }); assert.equal(r.code, 200); assert.equal(r.body.account, true);
+assert.ok(!f.T("user_jobs").some((x) => x.clerk_user_id === "u_cal"), "profile gone");
+assert.ok(!f.T("orbit_messages").some((m) => m.sender === "u_cal" || m.recipient === "u_cal"), "messages gone");
+assert.ok(!f.T("orbit_blocks").some((b) => b.blocker === "u_cal"), "blocks gone");
+assert.deepEqual(f.calls.clerkDeleted, ["u_cal"], "the sign-in itself is deleted at Clerk");
+r = await call("u_emp", { action: "delete_account", confirm: "DELETE" }); assert.equal(r.code, 200);
+assert.ok(!f.T("employers").some((x) => x.clerk_user_id === "u_emp"), "business page gone too");
+console.log("✓ delete account: typed confirm, every table, business page, and the Clerk sign-in");
 

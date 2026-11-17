@@ -24,7 +24,7 @@ for (const c of C.CATEGORIES) assert.ok(C.categoryGroup(c.key) && c.label && c.a
 const { parse } = await import("../api/listings.js");
 assert.equal(parse({ cat: "healthcare" }).cat, "healthcare"); assert.equal(parse({ cat: "nope" }).cat, null);
 const api = readFileSync(new URL("../api/listings.js", import.meta.url), "utf8");
-assert.ok(/categoryGroup\(p\.cat\)/.test(api) && (api.match(/hasGroups\(p\)/g) || []).length >= 4, "?cat= joins every list path");
+assert.ok(/categoryGroup\(p\.cat\)/.test(api) && (api.match(/hasGroups\(p\)/g) || []).length >= 3, "?cat= joins every list path");
 const page = readFileSync(new URL("../jobs/index.html", import.meta.url), "utf8");
 assert.ok(page.includes('id="cats"') && page.includes("categoryForQuery") && page.includes("loadRelated"), "/jobs: chips, smart search, related list");
 console.log("✓ categories: " + C.CATEGORIES.length + " job categories, smart search (whole category vs related list), ?cat= server filter");

@@ -33,3 +33,15 @@ create table if not exists orbit_messages (
 create index if not exists orbit_messages_inbox on orbit_messages (recipient, created_at desc);
 create index if not exists orbit_messages_sent on orbit_messages (sender, created_at desc);
 alter table orbit_messages enable row level security;
+
+-- Nov 17 2026: Block (Orbit chats). Either side blocking hides both people from each other: no requests, no messages,
+-- not in search or Orbit lists. Reports go to the feedback table (kind orbit_report) for the owner.
+create table if not exists public.orbit_blocks (
+  blocker text not null,
+  blocked text not null,
+  created_at timestamptz not null default now(),
+  primary key (blocker, blocked)
+);
+create index if not exists orbit_blocks_blocked on public.orbit_blocks (blocked);
+alter table public.orbit_blocks enable row level security;
+revoke all on public.orbit_blocks from anon, authenticated;

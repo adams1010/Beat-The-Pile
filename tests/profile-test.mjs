@@ -49,7 +49,9 @@ process.env.RESEND_API_KEY = "re_test";
 r = await call("POST", "pa", { action: "remind", on: true }); assert.equal(r.body.remindEmail, true); assert.equal(r.body.emailReady, true);
 const unsub = f.T("user_jobs").find((x) => x.clerk_user_id === "pa").remind_unsub; assert.match(unsub, /^[A-Za-z0-9_-]{20,}$/);
 r = await call("GET", null, null, { unsub }); assert.equal(r.code, 200);
-assert.equal(f.T("user_jobs").find((x) => x.clerk_user_id === "pa").remind_email, false, "one-click unsubscribe works without sign-in");
+assert.equal(f.T("user_jobs").find((x) => x.clerk_user_id === "pa").remind_email, true, "a plain visit only asks (email scanners open links)");
+r = await call("POST", null, null, { unsub }); assert.equal(r.code, 200);
+assert.equal(f.T("user_jobs").find((x) => x.clerk_user_id === "pa").remind_email, false, "one-click unsubscribe (POST) works without sign-in");
 console.log("PROFILE TESTS PASSED");
 
 // profile photo: only real, small JPEG/PNG/WebP bytes are kept (never SVG, never a mislabeled file, never huge)

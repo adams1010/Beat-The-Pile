@@ -1012,8 +1012,8 @@
   // Pages of 1,000, newest first. The first page comes back on its own (onFirst → render right away);
   // the rest are fetched 4 at a time in parallel instead of one after another.
   async function getAll(qs, onFirst){
-    const page = async (off) => {
-      const url = `/api/listings?${qs}${qs ? "&" : ""}limit=1000&offset=${off}`;
+    const page = async (off, after) => {
+      const url = `/api/listings?${qs}${qs ? "&" : ""}limit=1000${after ? `&after=${encodeURIComponent(after)}` : `&offset=${off}`}`;
       let r = await fetch(url);
       if (r.status >= 500) { await new Promise((ok) => setTimeout(ok, 1500)); r = await fetch(url); }   // Nov 14: one retry when the database is briefly busy
       if (!r.ok) { const e = new Error(r.status); e.status = r.status; try { e.data = await r.json(); } catch {} throw e; }
@@ -1024,11 +1024,15 @@
     const rows = [...(first.listings || [])];
     if (!first.meta?.more) return rows;
     if (onFirst) onFirst(rows.slice());
-    let done = false;
-    for (let off = 1000; !done && off <= 30000; off += 4000) {
+    // Nov 17: each next page continues after the last row (meta.next). Deep offsets made the database re-read every
+    // earlier row and timed out under load. Pages before a cursor-less (older) server answer fall back to offsets.
+    let done = false, next = first.meta.next, off = 1000;
+    for (; !done && off <= 30000; off += 1000) {
       // a later page that fails keeps what already loaded (never wipe a working list over one bad page)
-      const batch = await Promise.all([0, 1000, 2000, 3000].map((d) => off + d).filter((o) => o <= 30000).map((o) => page(o).catch(() => ({ listings: [], meta: { more: false } }))));
-      for (const d of batch) { rows.push(...(d.listings || [])); if (!d.meta?.more) { done = true; break; } }
+      const d = await page(off, next).catch(() => null);
+      if (!d) { done = true; break; }
+      rows.push(...(d.listings || [])); next = d.meta?.next;
+      if (!d.meta?.more) done = true;
     }
     if (!done) rows.capped = true;      // Nov 14: more exist than a browser should load at once (the count line says so)
     return rows;

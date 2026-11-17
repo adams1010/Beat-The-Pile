@@ -46,6 +46,9 @@ console.log("✓ weekly at most, and only listings since the last email");
 const tokn = f.T("user_jobs").find((x) => x.clerk_user_id === "u1").remind_unsub;
 f.T("user_jobs").find((x) => x.clerk_user_id === "u1").remind_email = true;
 r = await call("GET", null, null, { unsub: tokn, k: "alerts" }); assert.equal(r.code, 200); assert.match(String(r.body), /weekly job alert/);
+assert.equal(f.T("user_jobs").find((x) => x.clerk_user_id === "u1").alert_on, true, "a plain visit (email link scanners) only asks");
+assert.match(String(r.body), /method="post"/);
+r = await call("POST", null, null, { unsub: tokn, k: "alerts" }); assert.equal(r.code, 200);
 const u1 = f.T("user_jobs").find((x) => x.clerk_user_id === "u1"); assert.equal(u1.alert_on, false); assert.equal(u1.remind_email, true, "alert unsub leaves reminders alone");
 console.log("✓ alert unsubscribe turns off alerts only");
 

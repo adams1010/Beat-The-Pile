@@ -57,7 +57,13 @@ export function parse(q) {
   const kind = raw("kind").toLowerCase() || "intern";
   if (!["intern", "fulltime", "hourly", "shadow", "career", "all"].includes(kind)) errs.push("kind must be intern, fulltime, hourly, shadow, career or all");
   const cat = CAT[raw("cat")] ? raw("cat") : null;   // Nov 14: job category (lib/categories.js)
-  return { errs, kind, words, cat, near: near || null, mi, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, summary: raw("summary") === "1", names: raw("names") === "1" };
+  // Nov 17: keyset cursor "<first_seen>~<id>" (meta.next of the previous page). Deep OFFSETs re-read every row before
+  // them (offset 60,000 = 1.6 s on its own) and timed out under load; a cursor page costs the same at any depth.
+  const afterRaw = raw("after"), cut = afterRaw.indexOf("~");
+  const after = afterRaw ? { ts: afterRaw.slice(0, cut), id: afterRaw.slice(cut + 1) } : null;
+  if (after && (cut < 1 || !/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d{1,6})?(Z|[+-]\d\d:\d\d)$/.test(after.ts) || !/^[a-z0-9-]+:[^"\\]{1,300}$/.test(after.id))) errs.push("after must be the meta.next value of the previous page");
+  if (after && offset) errs.push("use after or offset, not both");
+  return { errs, kind, words, cat, near: near || null, mi, states: states.filter((s) => s !== "ALL"), match: match || null, field, companies, ids, limit, offset, after, summary: raw("summary") === "1", names: raw("names") === "1" };
 }
 
 /** Homepage map: every open job (internships + early-career full-time with ?kind=all) with a real city, as dots on the
@@ -105,6 +111,11 @@ const withKind = (rows) => rows.map((l) => ({ ...l, kind: l.kind || kindFor(l.ti
 // Nov 14: ?cat= (lib/categories.js) adds one more group: or(field.in.(…),title.ilike.*word*,…)
 const wordGroups = (p) => [...(p.words || []).map((w) => `or(title.ilike.*${w}*,company.ilike.*${w}*,location.ilike.*${w}*)`), ...(p.cat ? [categoryGroup(p.cat)] : [])];
 const hasGroups = (p) => !!(p.words?.length || p.cat);
+// Nov 17 keyset paging: rows after (first_seen, id) in "first_seen desc, id asc" order
+const cursorOf = (r) => (r ? { ts: r.first_seen, id: r.id } : null);
+const cursorText = (r) => (r?.first_seen && r?.id ? `${r.first_seen}~${r.id}` : null);
+const afterGroup = ({ ts, id }) => { const t = encodeURIComponent(ts), i = encodeURIComponent(`"${String(id).replace(/["\\]/g, "")}"`);
+  return `first_seen.lte.${t},or(first_seen.lt.${t},and(first_seen.eq.${t},id.gt.${i}))`; };   // the plain lte lets Postgres start the index scan right there
 function majorFilter(p) {
   let q = KIND_Q[p.kind || "intern"];
   if (p.match) q += `&match=eq.${p.match}`;
@@ -257,25 +268,30 @@ export default async function handler(req, res) {
 
     res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=86400");
     let q = `listings?select=${COLS}&${LIVE}${KIND_Q[p.kind]}&order=first_seen.desc,id.asc`;
+    // every and=(…) group goes into ONE and=(…) param (states, words/category, cursor)
+    const groups = [];
     // state column holds "VA" or "WA,VA,PA" — match any requested state inside it (re-checked exactly below)
-    if (p.states.length) q += `&and=(or(${[...p.states.map((s) => `state.ilike.*${s}*`), "state.eq.US"].join(",")})${hasGroups(p) ? "," + wordGroups(p).join(",") : ""})`;
+    if (p.states.length) groups.push(`or(${[...p.states.map((s) => `state.ilike.*${s}*`), "state.eq.US"].join(",")})`);
+    if (hasGroups(p)) groups.push(...wordGroups(p));
     if (p.match) q += `&match=eq.${p.match}`;
     else if (!p.field) q += "&match=not.is.null";                       // engineering view (default)
     if (p.field && p.field !== "all") q += `&field=eq.${p.field}`;
     if (p.companies.length) q += `&company_id=in.(${p.companies.join(",")})`;
-    if (hasGroups(p) && !p.states.length) q += `&and=(${wordGroups(p).join(",")})`;   // states: already merged above
+    const pageQ = (after) => { const g = after ? [...groups, afterGroup(after)] : groups; return g.length ? `${q}&and=(${g.join(",")})` : q; };
 
     let listings = [];
-    if (p.limit != null) listings = await db.select(`${q}&limit=${p.limit}&offset=${p.offset}`);
-    else for (let off = 0; off < 20000; off += 1000) {           // Supabase returns ≤1000 rows per request
-      const page = await db.select(`${q}&limit=1000&offset=${off}`);
+    if (p.limit != null) listings = await db.select(`${pageQ(p.after)}&limit=${p.limit}${p.after ? "" : `&offset=${p.offset}`}`);
+    else for (let i = 0, after = null; i < 20; i++) {           // Supabase returns ≤1000 rows per request; keyset, not deep offsets
+      const page = await db.select(`${pageQ(after)}&limit=1000`);
       listings.push(...page);
       if (page.length < 1000) break;
+      after = cursorOf(page[page.length - 1]);
     }
     const lastRun = await db.select("feed_runs?select=ran_at&order=ran_at.desc&limit=1");
     const rows = p.states.length ? listings.filter((l) => String(l.state).split(",").some((s) => p.states.includes(s))) : listings;
+    const more = p.limit != null && listings.length === p.limit;
     return res.status(200).json({ listings: withKind(rows), meta: { count: rows.length, kind: p.kind, lastSync: lastRun?.[0]?.ran_at || null,
-      ...(p.limit != null ? { limit: p.limit, offset: p.offset, more: listings.length === p.limit } : {}) } });
+      ...(p.limit != null ? { limit: p.limit, offset: p.offset, more, next: more ? cursorText(listings[listings.length - 1]) : null } : {}) } });
   } catch (e) {
     console.error("[listings]", e);
     if (kindOk && /imatch|regular expression|PGRST|400/i.test(String(e?.message || e))) { kindOk = false; console.error("[listings] kind filter off"); return handler(req, res); }

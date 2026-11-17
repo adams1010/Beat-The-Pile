@@ -100,6 +100,10 @@
   .chat textarea{flex:1;font:inherit;font-size:14px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;resize:none;height:44px}
   .chat .why{padding:12px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
   .chat .note{font-size:11.5px;color:var(--muted);padding:0 16px 10px}
+  .chat .safety{display:flex;gap:14px;align-items:center;padding:0 16px 12px;font-size:12.5px}
+  .chat .safety button{font:inherit;background:none;border:0;padding:4px 0;color:var(--muted);text-decoration:underline;cursor:pointer}
+  .chat .rep{padding:0 16px 14px}.chat .rep textarea{width:100%;min-height:70px;font:inherit;font-size:14px;border:1px solid var(--line);border-radius:8px;padding:8px;box-sizing:border-box}
+  .chat .rep .row{display:flex;gap:8px;margin-top:8px}
   @media (max-width:1060px){.grid.grid2{grid-template-columns:minmax(0,1fr)}}
   @media (max-width:860px){.sky{grid-template-columns:1fr}}
   @media (max-width:1060px){.grid{grid-template-columns:240px minmax(0,1fr)}.feedcol{grid-column:1/-1}}
@@ -435,6 +439,7 @@
   }
   async function drawChat(first){
     const d = $("#chat"); if (!d || !chatTo) return;
+    if (!first && d.querySelector("#chatRep:not([hidden])")) return;   // don't wipe a report someone is writing
     let c;
     try { c = await api({ action: "orbit_thread", to: chatTo }); }
     catch (e) { d.innerHTML = `<div class="hd"><div class="who"><b>Messages</b></div><button class="x" aria-label="Close">×</button></div><div class="why">${esc(e.message)}</div>`;
@@ -447,10 +452,23 @@
       <div class="msgs">${c.messages.length ? c.messages.map((m) => `<div class="m${m.mine ? " mine" : ""}">${esc(m.body)}<small>${esc(when(m.at))}</small></div>`).join("")
         : `<p class="empty">No messages yet. Say hi.</p>`}</div>
       ${c.canSend ? `<form><textarea maxlength="2000" placeholder="Write a message" aria-label="Message"></textarea><button class="btn pri" style="margin-top:0">Send</button></form>
-        <div class="note">Be kind and professional. Never share passwords or payment details here.</div>` : `<div class="why">${esc(c.why || "You can't message this person.")}</div>`}`;
+        <div class="note">Be kind and professional. Never share passwords or payment details here.</div>` : `<div class="why">${esc(c.why || "You can't message this person.")}</div>`}
+      <div class="safety">${c.blocked ? `<button type="button" id="chatUnblock">Unblock</button>` : `<button type="button" id="chatBlock">Block</button><button type="button" id="chatReport">Report</button>`}</div>
+      <div class="rep" id="chatRep" hidden><textarea maxlength="500" placeholder="What happened? We read every report." aria-label="What happened"></textarea>
+        <div class="row"><button type="button" class="btn pri" id="chatRepSend" style="margin-top:0">Send report and block</button><button type="button" class="btn" id="chatRepNo" style="margin-top:0">Cancel</button></div></div>`;
     d.querySelector(".x").onclick = () => d.close();
     for (const [id, action] of [["#chatJoin", "orbit_connect"], ["#chatAccept", "orbit_accept"]]) { const b = d.querySelector(id);
       if (b) b.onclick = async () => { b.disabled = true; try { await api({ action, to: chatTo }); await drawChat(false); refresh().catch(() => {}); } catch (e) { b.disabled = false; alertBox(e.message); } }; }
+    // Nov 17: Block / Report (app-store rule for messaging). Blocking hides you from each other everywhere in Orbit.
+    const safety = async (action, extra = {}) => { try { await api({ action, to: chatTo, ...extra }); if (action === "orbit_unblock") { await drawChat(false); }
+        else { alertBox(action === "orbit_report" ? "Thanks. We got your report and blocked this person." : "Blocked. You won't see each other in Orbit."); d.close(); }
+        refresh().catch(() => {}); } catch (e) { alertBox(e.message); } };
+    const q = (id) => d.querySelector(id);
+    if (q("#chatUnblock")) q("#chatUnblock").onclick = () => safety("orbit_unblock");
+    if (q("#chatBlock")) q("#chatBlock").onclick = () => { const b = q("#chatBlock"); if (b.dataset.sure) return safety("orbit_block"); b.dataset.sure = "1"; b.textContent = "Tap again to block"; };
+    if (q("#chatReport")) q("#chatReport").onclick = () => { q("#chatRep").hidden = false; q("#chatRep textarea").focus(); };
+    if (q("#chatRepNo")) q("#chatRepNo").onclick = () => { q("#chatRep").hidden = true; };
+    if (q("#chatRepSend")) q("#chatRepSend").onclick = () => { const reason = q("#chatRep textarea").value.trim(); if (reason.length < 3) return alertBox("Say briefly what happened"); q("#chatRepSend").disabled = true; safety("orbit_report", { reason }); };
     const box = d.querySelector(".msgs"); box.scrollTop = box.scrollHeight;
     const f = d.querySelector("form");
     if (f) {
