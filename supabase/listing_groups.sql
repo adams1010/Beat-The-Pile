@@ -17,3 +17,9 @@ create index if not exists listings_open_first_seen on public.listings (first_se
 
 -- Nov 17: public job searches (anon role) timed out at Supabase's default 3 s on the Nano database during heavy sync; 8 s = same as signed-in users
 alter role anon set statement_timeout = '8s'; notify pgrst, 'reload config';
+
+-- Nov 17 2026: listing_groups averaged 3 s (peaks 7.3 s, timeout 8 s) on the Nano instance. This index lets it answer from
+-- the index alone (index-only scan): ~0.1 s. Plus the /jobs index for "this job type + this major, newest first".
+create index if not exists listings_open_groups on public.listings (company_id, field, match, kind) include (company, first_seen, link_ok) where closed_at is null;
+create index if not exists listings_open_field_kind_first_seen on public.listings (field, kind, first_seen desc, id) where closed_at is null;
+alter table public.feedback add column if not exists handled_at timestamptz;
