@@ -194,8 +194,9 @@ export default async function handler(req, res) {
 // ── Backlog refill ──
 const REFILL_BELOW = PER_RUN * 2, REFILL_SIZE = 60;
 const slug = (s) => String(s).toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60);
+// Nov 17: the v1 salvage rows wait at priority 1 and never count as "queue full" — the backlog/wanted list still refills ahead of them.
 export async function refillFromBacklog() {
-  const pending = await db.selectAsAdmin(`company_candidates?select=id&status=eq.pending&limit=${REFILL_BELOW}`);
+  const pending = await db.selectAsAdmin(`company_candidates?select=id&status=eq.pending&priority=gt.1&limit=${REFILL_BELOW}`);
   if (pending.length >= REFILL_BELOW) return [];
   const rows = await db.selectAllAsAdmin("company_candidates?select=id,company,ats,config");
   const ids = new Set(rows.map((r) => r.id));
