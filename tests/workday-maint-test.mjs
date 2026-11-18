@@ -17,7 +17,7 @@ const r = await discoverOne({ id: "b-acme", company: "Acme", hint: "https://acme
 assert.equal(r.status, "board_error", JSON.stringify(r));
 assert.match(r.detail, /answered 503 \(Workday maintenance\)/);
 const api = readFileSync(new URL("../api/discover.js", import.meta.url), "utf8");
-assert.ok(/detail\.ilike\.\*answered%205\*/.test(api) && /BUSY_RETRY_HOURS = 6/.test(api), "5xx board errors come back after 6 hours");
+assert.ok(/detail\.ilike\.\*answered%205\*/.test(api) && /BUSY_RETRY_HOURS = 48/.test(api), "5xx board errors come back after 48 hours (Nov 17: 6 h wasted Vercel CPU)");
 const lib = readFileSync(new URL("../lib/discover.js", import.meta.url), "utf8");
 assert.ok((lib.match(/answered 422/g) || []).length >= 2, "a renamed Workday site (422) starts over from the website");
 console.log("✓ Workday maintenance page = 503 (retry in 6 h), never 'no postings'; 422 starts over from the website");
