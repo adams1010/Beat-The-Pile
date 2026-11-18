@@ -1,0 +1,398 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;overflow:hidden;background:#060A2C;font-family:Inter,sans-serif;font-feature-settings:'tnum'}
+#st{position:absolute;inset:0;overflow:hidden}
+.sc{position:absolute;inset:0;overflow:hidden}
+.navy{background:#060A2C;color:#fff}.light{background:#EEF1F6;color:#060A2C}
+.lime{color:#B0F701}
+.logo{position:absolute;left:90px;top:150px;height:76px}
+.hook{position:absolute;left:90px;right:140px;top:600px;font-size:104px;font-weight:800;line-height:1.08;letter-spacing:-2.5px}
+.w{display:inline-block;white-space:pre}
+.sub{font-size:46px;font-weight:500;line-height:1.3;color:#C9CEE0;margin-top:46px;letter-spacing:0}
+.uline{position:absolute;height:14px;background:#B0F701;border-radius:7px}
+.band{background:#060A2C;color:#fff;padding:170px 70px 50px 70px}
+.band h2{font-size:70px;font-weight:800;line-height:1.1;letter-spacing:-1px}
+.band p{font-size:40px;color:#C9CEE0;margin-top:16px;line-height:1.3}
+.wrap{padding:44px 54px 0 54px;position:relative}
+.box{background:#fff;border-radius:12px;border:1px solid #DCE1EA;padding:30px;margin-bottom:30px}
+.search{display:flex;gap:18px;align-items:center}
+.inp{flex:1;height:110px;border:2px solid #C9D0DD;border-radius:999px;padding:0 40px;display:flex;align-items:center;font-size:42px;color:#060A2C}
+.inp.ph{color:#8A93A8}
+.caret{display:inline-block;width:4px;height:50px;background:#4A7000;margin-left:4px}
+.sbtn{height:110px;padding:0 46px;border-radius:999px;background:#4A7000;color:#fff;font-weight:700;font-size:40px;display:flex;align-items:center}
+.card{color:#060A2C;background:#fff;border-radius:12px;padding:36px 38px;margin-bottom:24px;border:1px solid #DCE1EA;display:flex;gap:28px;align-items:flex-start;position:relative}
+.tile{flex:0 0 104px;height:104px;border-radius:12px;background:#F1F3F8;border:1px solid #DCE1EA;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:34px;color:#334}
+.t{font-size:48px;font-weight:700;line-height:1.16;letter-spacing:-.3px}
+.c{font-size:37px;margin-top:10px;color:#1c2340}.c span{color:#5E6A80}
+.pill{display:inline-block;margin-top:16px;font-size:30px;font-weight:600;padding:6px 18px;border-radius:999px;background:#F2FADF;color:#4A7000;border:1px solid #DDF3A8}
+.pill.b{background:#EEF1F6;color:#334;border-color:#DCE1EA}
+.abtn{display:inline-block;background:#4A7000;color:#fff;font-weight:700;font-size:34px;padding:16px 46px;border-radius:999px;margin-top:20px}
+.chips{display:flex;gap:16px;flex-wrap:nowrap;margin-bottom:30px;position:relative}
+.chip{font-size:36px;font-weight:600;padding:18px 32px;border-radius:999px;background:#fff;border:1px solid #DCE1EA;position:relative;z-index:1}
+.chip.on{color:#fff}
+.chipbg{position:absolute;top:0;height:100%;border-radius:999px;background:#060A2C;z-index:0}
+.seg{display:flex;background:#fff;border:1px solid #DCE1EA;border-radius:999px;padding:8px;position:relative;margin-bottom:30px}
+.seg div{flex:1;text-align:center;font-size:31px;font-weight:600;padding:20px 0;position:relative;z-index:1;color:#334}
+.seg .on{color:#fff}
+.segbg{position:absolute;top:8px;bottom:8px;border-radius:999px;background:#060A2C}
+.finger{position:absolute;width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,.55);border:6px solid #B0F701;transform:translate(-50%,-50%);z-index:50}
+.ripple{position:absolute;border-radius:50%;border:6px solid #B0F701;transform:translate(-50%,-50%);z-index:49}
+.toast{position:absolute;left:54px;right:54px;bottom:470px;background:#060A2C;color:#fff;border-radius:12px;padding:34px 40px;font-size:38px;font-weight:600;line-height:1.3;z-index:40}
+.toast b{color:#B0F701}
+.stat{position:absolute;left:90px;right:140px;top:470px}
+.stat .n{font-size:156px;font-weight:800;letter-spacing:-4px;color:#B0F701;line-height:1}
+.stat .l{font-size:50px;font-weight:600;margin:8px 0 60px 0;color:#fff}
+.end{position:absolute;left:0;right:0;top:620px;text-align:center}
+.end img{height:160px}
+.end .u{font-size:70px;font-weight:800;margin-top:70px;color:#fff;letter-spacing:-1px;height:84px}
+.end .s{font-size:42px;color:#C9CEE0;margin-top:22px}
+.end .cta{display:inline-block;margin-top:64px;background:#B0F701;color:#060A2C;font-weight:800;font-size:46px;padding:28px 64px;border-radius:999px}
+.ex{position:absolute;right:54px;top:60px;font-size:30px;font-weight:700;background:#fff;color:#060A2C;padding:10px 22px;border-radius:999px;border:1px solid #DCE1EA;z-index:30}
+.prog{position:absolute;left:30px;right:30px;top:40px;height:8px;border-radius:4px;background:rgba(255,255,255,.22);z-index:90}
+.prog i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:#B0F701}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:#EEF1F6;border-radius:28px 28px 0 0;padding:30px 54px 0 54px;z-index:20;height:1240px;overflow:hidden}
+.grab{width:120px;height:10px;border-radius:5px;background:#C9D0DD;margin:0 auto 30px}
+.sh h3{font-size:56px;font-weight:800;color:#060A2C;letter-spacing:-.5px}
+.sh p{font-size:36px;color:#5E6A80;margin:8px 0 30px}
+.floor{position:absolute;left:54px;right:54px;top:470px;height:900px;background:#fff;border-radius:12px;border:1px solid #DCE1EA}
+.booth{position:absolute;width:150px;height:96px;border-radius:8px;background:#F1F3F8;border:1px solid #DCE1EA;font-size:28px;font-weight:600;color:#5E6A80;display:flex;align-items:center;justify-content:center}
+.booth.hit{background:#F2FADF;border:3px solid #4A7000;color:#4A7000}
+.bpin{position:absolute;width:76px;height:76px;border-radius:50%;background:#060A2C;color:#B0F701;font-weight:800;font-size:38px;display:flex;align-items:center;justify-content:center;transform:translate(-50%,-50%);z-index:5}
+.feat{display:inline-block;background:#fff;color:#060A2C;border-radius:999px;font-size:48px;font-weight:700;padding:26px 50px;margin:0 0 30px 0}
+.feat b{color:#4A7000;margin-right:18px}
+
+.cap{position:absolute;left:60px;right:60px;top:1180px;text-align:center;z-index:80;font-size:104px;font-weight:900;letter-spacing:-2px;line-height:1.05;color:#fff;text-shadow:0 0 6px #060A2C,0 0 6px #060A2C,0 4px 0 #060A2C,4px 0 0 #060A2C,-4px 0 0 #060A2C,0 -4px 0 #060A2C,4px 4px 0 #060A2C,-4px -4px 0 #060A2C,4px -4px 0 #060A2C,-4px 4px 0 #060A2C}
+.cap.l{color:#B0F701}
+.pilecard{position:absolute;left:190px;width:700px;height:200px;background:#fff;border-radius:14px;border:1px solid #DCE1EA;padding:34px 40px}
+.pilecard .a{width:340px;height:30px;border-radius:15px;background:#DCE1EA}
+.pilecard .b{width:220px;height:24px;border-radius:12px;background:#EEF1F6;margin-top:22px}
+.pilecard .s{position:absolute;right:36px;top:34px;font-size:30px;font-weight:700;color:#4A7000;background:#F2FADF;border-radius:999px;padding:8px 20px}
+.flash{position:absolute;inset:0;background:#fff;z-index:85;pointer-events:none}
+.stamp{position:absolute;font-size:96px;font-weight:900;color:#C62828;border:12px solid #C62828;border-radius:18px;padding:10px 40px;letter-spacing:-1px}
+
+.topbox{position:absolute;left:80px;right:80px;top:150px;background:#fff;color:#060A2C;border-radius:18px;padding:30px 40px;font-size:54px;font-weight:800;line-height:1.15;text-align:center;letter-spacing:-1px;z-index:70}
+.phone{position:absolute;background:#0B0F1F;border-radius:70px;padding:20px;border:3px solid #2A3156}
+.screen{width:100%;height:100%;border-radius:52px;overflow:hidden;position:relative;background:#EEF1F6}
+.stoprow{font-size:300px;font-weight:900;letter-spacing:-10px;line-height:.86;white-space:nowrap}
+.hol{color:transparent;-webkit-text-stroke:5px rgba(176,247,1,.55)}
+.bignum{font-size:230px;font-weight:900;color:#B0F701;letter-spacing:-8px;line-height:1}
+.chipg{display:inline-block;background:#fff;border:1px solid #DCE1EA;border-radius:999px;font-size:36px;font-weight:700;padding:18px 30px;margin:0 14px 18px 0;color:#060A2C}
+.mail{position:absolute;left:54px;right:54px;top:760px;background:#fff;border-radius:12px;border:1px solid #DCE1EA;padding:44px;font-size:38px;line-height:1.45;color:#060A2C}
+.mail .h{color:#5E6A80;border-bottom:1px solid #DCE1EA;padding-bottom:18px;margin-bottom:24px}
+</style></head><body><div id="st"></div>
+<script>
+const LOGO = "file:///home/claude/ads/logo-white.png";
+const cl = (x,a=0,b=1)=>Math.max(a,Math.min(b,x));
+const P = (t,a,b)=>cl((t-a)/(b-a));
+const out = p=>1-Math.pow(1-p,3);
+const back = p=>{const c=1.7; p=p-1; return 1+p*p*((c+1)*p+c);};
+const io = p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
+const esc = s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+const fmt = n=>Math.round(n).toLocaleString("en-US");
+const ini = c=>{const w=c.replace(/&/g," ").split(/\s+/).filter(x=>/^[A-Za-z0-9]/.test(x)); return (w[0][0]+(w[1]?w[1][0]:w[0][1])).toUpperCase();};
+
+// words pop in one by one. *word* = lime
+function words(text, t, t0, gap=0.11){
+  let i=0; return text.split(/(\s+|<br>)/).map(tok=>{
+    if(tok==="<br>") return "<br>"; if(/^\s+$/.test(tok)) return " ";
+    const lime = /^\*.*\*[?.!,]*$/.test(tok); const w = tok.replace(/\*/g,"");
+    const p = out(P(t, t0+i*gap, t0+i*gap+0.35)); i++;
+    return `<span class="w ${lime?'lime':''}" style="opacity:${p};transform:translateY(${(1-p)*60}px) scale(${0.85+0.15*back(P(t,t0+(i-1)*gap,t0+(i-1)*gap+0.4))})">${esc(w)}</span>`;
+  }).join("");
+}
+function hook(t, text, sub, subAt){
+  const s = sub ? `<div class="sub" style="opacity:${out(P(t,subAt,subAt+.4))};transform:translateY(${(1-out(P(t,subAt,subAt+.4)))*30}px)">${esc(sub)}</div>` : "";
+  const lg = out(P(t,0,.4));
+  return `<div class="sc navy"><img class="logo" src="${LOGO}" style="opacity:${lg}"><div class="hook">${words(text,t,.15)}${s}</div></div>`;
+}
+function card(j, t, at, extra=""){
+  const p = out(P(t,at,at+.45));
+  const pill = j.k ? `<div class="pill ${j.kc||''}">${esc(j.k)}</div>` : "";
+  return `<div class="card" style="opacity:${p};transform:translateY(${(1-p)*140}px)"><div class="tile">${esc(j.ini||ini(j.c))}</div><div><div class="t">${esc(j.t)}</div><div class="c">${esc(j.c)} <span>· ${esc(j.l)}</span></div>${pill}${extra}</div></div>`;
+}
+function finger(t, path){ // path: [[time,x,y],...] taps: times
+  if(!path.pts.length || t<path.pts[0][0]-.3 || t>path.end) return "";
+  let x=path.pts[0][1], y=path.pts[0][2];
+  for(let i=1;i<path.pts.length;i++){const [t1,x1,y1]=path.pts[i], [t0,x0,y0]=path.pts[i-1]; if(t>=t0){const p=io(P(t,t0,t1)); x=x0+(x1-x0)*p; y=y0+(y1-y0)*p;}}
+  let h = "", sc = 1;
+  for(const tap of path.taps){ const d=t-tap; if(d>-0.12&&d<0.12) sc=0.82; if(d>=0&&d<.6){const r=60+d*260; h+=`<div class="ripple" style="left:${x}px;top:${y}px;width:${r*2}px;height:${r*2}px;opacity:${1-d/.6}"></div>`;} }
+  const op = Math.min(out(P(t,path.pts[0][0]-.3,path.pts[0][0])), 1-P(t,path.end-.25,path.end));
+  return h+`<div class="finger" style="left:${x}px;top:${y}px;opacity:${op};transform:translate(-50%,-50%) scale(${sc})"></div>`;
+}
+function counter(t, rows, t0){
+  return `<div class="sc navy"><img class="logo" src="${LOGO}"><div class="stat">`+rows.map(([n,l],i)=>{
+    const a=t0+i*0.55, p=out(P(t,a,a+1.1)), q=out(P(t,a,a+.35));
+    return `<div style="opacity:${q};transform:translateX(${(1-q)*-80}px)"><div class="n">${fmt(n*p)}</div><div class="l">${esc(l)}</div></div>`;}).join("")+`</div></div>`;
+}
+function endcard(t, line="Find your job before the pile does."){
+  const a=back(P(t,0,.55)), url="beatthepile.com", n=Math.floor(url.length*P(t,.45,1.25));
+  const pulse = 1+0.045*Math.sin(Math.max(0,t-1.6)*6)*(t>1.6?1:0);
+  return `<div class="sc navy"><div class="end"><img src="${LOGO}" style="transform:scale(${a});opacity:${cl(a)}"><div class="u">${url.slice(0,n)}<span class="caret" style="background:#B0F701;height:60px;opacity:${t<1.4?1:0}"></span></div><div class="s" style="opacity:${out(P(t,1.2,1.6))}">${esc(line)}</div><div class="cta" style="opacity:${out(P(t,1.5,1.9))};transform:scale(${(0.8+0.2*back(P(t,1.5,1.95)))*pulse})">Make your free account</div></div></div>`;
+}
+function swipe(t, sceneStart){ return `transform:translateY(${(1-out(P(t,sceneStart,sceneStart+.32)))*120}px);opacity:${out(P(t,sceneStart,sceneStart+.25))}`; }
+
+// ---------------- real listings (beatthepile.com, Nov 17 2026) ----------------
+const J = {
+  eng:[{t:"Systems Engineering Intern - Power",c:"Texas Instruments",l:"Dallas, TX",k:"Internship"},
+       {t:"Mechanical Engineering Intern",c:"Intuitive Surgical",l:"Blacksburg, VA",k:"Internship"},
+       {t:"Software Engineering Intern - Summer 2027",c:"Lockheed Martin",l:"Highlands Ranch, CO",k:"Internship"},
+       {t:"Intern Engineering, Product Engineering",c:"Moog",l:"Blacksburg, VA",k:"Internship"}],
+  health:[{t:"Student Nurse Emergency Room",c:"Universal Health Services",l:"Bradenton, FL",k:"Internship"},
+          {t:"Registered Nurse (RN) - New Graduate",c:"Universal Health Services",l:"Cape Girardeau, MO",k:"Entry-level",kc:"b"},
+          {t:"Medical Assistant - Certified",c:"Carilion Clinic",l:"Blacksburg, VA",k:"Entry-level",kc:"b"}],
+  mkt:[{t:"Digital Marketing Intern",c:"Oak View Group",l:"Austin, TX",k:"Internship"},
+       {t:"Summer 2027 Marketing Internship",c:"Thorlabs",l:"Newton, NJ",k:"Internship"},
+       {t:"Social Media Intern",c:"Injective",l:"New York, NY",k:"Internship"}],
+  biz:[{t:"Intern, Business",c:"Moog",l:"Blacksburg, VA",k:"Internship"},
+       {t:"Sales Development Representative",c:"Saviynt",l:"Raleigh, NC",k:"Entry-level",kc:"b"},
+       {t:"Entry-Level HR Associate",c:"Maxinsights",l:"Santa Clara, CA",k:"Entry-level",kc:"b"}],
+  hourly:[{t:"Golf Shop Attendant",c:"Troon",l:"Boerne, TX",k:"Part-time & hourly",kc:"b"},
+          {t:"Server - Golf Restaurant",c:"Marriott International",l:"Marana, AZ",k:"Part-time & hourly",kc:"b"},
+          {t:"Event Staff, Virginia Tech",c:"Teall Sports & Entertainment",l:"Blacksburg, VA",k:"Part-time & hourly",kc:"b"}],
+  shadow:[{t:"Volunteer Law Student Summer 2027",c:"U.S. Attorneys' Offices",l:"Lexington, KY",k:"Shadowing"},
+          {t:"Volunteer Program Assistant (Seasonal)",c:"National Park Service",l:"West Glacier, MT",k:"Shadowing"},
+          {t:"Hospice Volunteer",c:"LifeCare Home Health",l:"Fort Worth, TX",k:"Shadowing"}],
+  intern:[{t:"Security and Compliance Analyst Intern",c:"Illumio",l:"Sunnyvale, CA",k:"Internship"},
+          {t:"Summer 2027 Software Engineer Intern",c:"Peraton",l:"Herndon, VA",k:"Internship"},
+          {t:"Aviation Engineering Intern",c:"Ardurra",l:"Blacksburg, VA",k:"Internship"}],
+  near:[{t:"Mechanical Engineering Intern",c:"Intuitive Surgical",l:"2 mi",k:"Internship"},
+        {t:"Event Staff, Virginia Tech",c:"Teall Sports & Entertainment",l:"2 mi",k:"Part-time & hourly",kc:"b"},
+        {t:"Intern, Business",c:"Moog",l:"2 mi",k:"Internship"},
+        {t:"Medical Assistant - Certified",c:"Carilion Clinic",l:"2 mi",k:"Entry-level",kc:"b"},
+        {t:"Aviation Engineering Intern",c:"Ardurra",l:"2 mi",k:"Internship"}],
+  fairs:[{t:"Business Horizons Career Fair",c:"Virginia Tech",l:"Feb 4, 2027",k:"Spring 2027"},
+         {t:"Connection Job Fair (all majors)",c:"Virginia Tech",l:"Feb 10, 2027",k:"Spring 2027"},
+         {t:"Construction Industry Career Fair",c:"Virginia Tech",l:"Feb 18, 2027",k:"Spring 2027"}],
+};
+const N = {intern:19155, entry:52054, hourly:41488, companies:6006, placed:102918, near:35};
+
+// ---------------- videos ----------------
+function appTop(title, sub){ return `<div class="band"><h2>${title}</h2><p>${sub}</p></div>`; }
+
+const V = {};
+V[1] = {len:17.4, scenes:[
+  [0,2.7,t=>hook(t,"Applied to 50 internships and heard *nothing* back?")],
+  [2.7,5.5,t=>hook(t,"Stop applying to *reposts*.","We pull every internship straight from the company's own job board.",1.0)],
+  [5.5,11.0,t=>{
+    const q="engineering intern", typed=q.slice(0,Math.floor(q.length*P(t,.9,2.0)));
+    const show=t>2.45;
+    const cards = show? J.eng.map((j,i)=>card(j,t,2.55+i*.22, i==0?`<div><span class="abtn" style="background:${t>4.3?'#060A2C':'#4A7000'}">${t>4.3?'Opening their site':'Apply'}</span></div>`:"")).join("") : "";
+    const toast = t>4.35? `<div class="toast" style="opacity:${out(P(t,4.35,4.6))};transform:translateY(${(1-out(P(t,4.35,4.65)))*60}px)">Apply goes to <b>Texas Instruments' own careers page</b>. No middleman.</div>`:"";
+    const f = finger(t,{pts:[[.5,620,560],[.7,620,560],[2.15,930,560],[3.9,930,560],[4.25,220,1060]],taps:[.7,2.25,4.3],end:5.2});
+    return `<div class="sc light">${appTop("Internships and jobs,<br>straight from the source","Every board re-read every few hours.")}<div class="wrap"><div class="box search"><div class="inp ${typed?'':'ph'}">${typed?esc(typed)+'<span class="caret" style="opacity:'+(t<2.2?1:0)+'"></span>':'Job title or company'}</div><div class="sbtn">Search</div></div>${cards}</div>${toast}${f}</div>`;}],
+  [11.0,14.2,t=>counter(t,[[N.intern,"internships open right now"],[N.companies,"companies, read from their own boards"]],.1)],
+  [14.2,17.4,t=>endcard(t)],
+]};
+
+function chipsRow(t, names, switches){ // switches: [[time, idx]]
+  let idx=0, from=0, at=-9; for(const [tt,i] of switches){ if(t>=tt){ from=idx; idx=i; at=tt; } }
+  const W=[300,260,240], X=[0,316,592]; const p=io(P(t,at,at+.3));
+  const x=X[from]+(X[idx]-X[from])*p, w=W[from]+(W[idx]-W[from])*p;
+  return {idx, html:`<div class="chips"><div class="chipbg" style="left:${x}px;width:${w}px"></div>`+names.map((n,i)=>`<div class="chip ${i==idx?'on':''}" style="width:${W[i]}px;text-align:center;background:transparent">${n}</div>`).join("")+`</div>`};
+}
+V[2] = {len:16.2, scenes:[
+  [0,2.5,t=>hook(t,"Not an engineer? *Good.*","Beat the Pile is for every major.",1.2)],
+  [2.5,10.9,t=>{
+    const sw=[[0,0],[2.95,1],[5.65,2]]; const r=chipsRow(t,["Healthcare","Marketing","Business"],sw);
+    const lists=[J.health,J.mkt,J.biz], heads=[["Nursing &amp; health","Student nurse roles count as internships here."],["Marketing","Brand, social, digital."],["Business","Sales, HR, finance, ops."]];
+    const at=[.35,3.05,5.75][r.idx];
+    const cards=lists[r.idx].map((j,i)=>card(j,t,at+i*.2)).join("");
+    const f=finger(t,{pts:[[2.4,800,860],[2.85,560,640],[4.9,560,640],[5.55,830,640]],taps:[2.95,5.65],end:6.6});
+    const h=heads[r.idx];
+    return `<div class="sc light">${appTop(h[0],h[1])}<div class="wrap" style="padding-top:52px">${r.html}${cards}</div>${f}</div>`;}],
+  [10.9,13.0,t=>hook(t,"Pick your major. We do the *digging*.")],
+  [13.0,16.2,t=>endcard(t)],
+]};
+
+function segRow(t, names, switches){
+  let idx=0, from=0, at=-9; for(const [tt,i] of switches){ if(t>=tt){ from=idx; idx=i; at=tt; } }
+  const w=(1080-108-16)/names.length, p=io(P(t,at,at+.3)), x=8+(from+(idx-from)*p)*w;
+  return {idx, html:`<div class="seg"><span class="segbg" style="left:${x}px;width:${w}px"></span>`+names.map((n,i)=>`<div class="${i==idx?'on':''}">${n}</div>`).join("")+`</div>`};
+}
+V[3] = {len:16.6, scenes:[
+  [0,2.4,t=>hook(t,"Not ready for a *desk job* yet?")],
+  [2.4,10.6,t=>{
+    const r=segRow(t,["Internships","Entry-level","Hourly","Shadowing"],[[0,0],[1.3,2],[4.6,3]]);
+    const lists=[J.intern,J.intern,J.hourly,J.shadow], at=[.2,.2,1.4,4.7][r.idx];
+    const heads=[["Internships","19,155 open right now."],["",""],["Summer jobs that pay","Golf courses, resorts, parks, game days."],["See the job up close","Shadowing and volunteer spots. Some unpaid, all real."]];
+    const cards=lists[r.idx].map((j,i)=>card(j,t,at+i*.2)).join("");
+    const f=finger(t,{pts:[[.6,500,900],[1.2,720,628],[3.9,720,628],[4.5,930,628]],taps:[1.3,4.6],end:5.4});
+    const h=heads[r.idx];
+    return `<div class="sc light">${appTop(h[0],h[1])}<div class="wrap" style="padding-top:52px">${r.html}${cards}</div>${f}</div>`;}],
+  [10.6,13.4,t=>counter(t,[[N.intern,"internships"],[N.entry,"entry-level jobs"],[N.hourly,"part-time & hourly jobs"]],.1)],
+  [13.4,16.6,t=>endcard(t,"Internships, first jobs, summer jobs.")],
+]};
+
+let DOTS=null, TGT=null;
+function mapScene(t){
+  if(!DOTS) return "";
+  const {w:mw,h:mh,dots}=DOTS;
+  const s0=1000/mw, z=1+3*io(P(t,4.0,6.2));
+  const cx0=mw/2, cy0=mh/2, cx=cx0+(TGT[0]-cx0)*io(P(t,4.0,6.2)), cy=cy0+(TGT[1]-cy0)*io(P(t,4.0,6.2));
+  const s=s0*z, ox=540-cx*s, oy=1100-cy*s;
+  const cv=document.createElement("canvas"); cv.width=1080; cv.height=1920; const g=cv.getContext("2d");
+  const sweep=P(t,.2,3.4);
+  for(let i=0;i<dots.length;i++){ const [x,y,n]=dots[i]; const appear=.2+3.2*(x/mw)*0.95; const p=back(P(t,appear,appear+.35)); if(p<=0) continue;
+    const X=ox+x*s, Y=oy+y*s; if(X<-40||X>1120||Y<380||Y>1960) continue;
+    const r=Math.max(2.5,Math.min(18,1.6*Math.sqrt(n)))*(1+(z-1)*.08)*p; g.beginPath(); g.arc(X,Y,Math.max(0,r),0,7); g.fillStyle="rgba(176,247,1,.72)"; g.fill(); }
+  const placed=fmt(N.placed*out(sweep));
+  let pin="";
+  if(t>6.0){ const X=ox+TGT[0]*s, Y=oy+TGT[1]*s, d=(t-6.0)%1.1;
+    pin=`<div class="ripple" style="left:${X}px;top:${Y}px;width:${60+d*220}px;height:${60+d*220}px;opacity:${1-d/1.1}"></div><div style="position:absolute;left:${X}px;top:${Y}px;width:34px;height:34px;border-radius:50%;background:#fff;transform:translate(-50%,-50%)"></div><div style="position:absolute;left:${X+36}px;top:${Y-30}px;font-size:44px;font-weight:800;color:#fff;opacity:${out(P(t,6.0,6.4))}">Blacksburg, VA</div>`; }
+  const f=finger(t,{pts:[[6.4,800,1500],[6.9,ox+TGT[0]*s,oy+TGT[1]*s]],taps:[7.05],end:7.6});
+  const sp=out(P(t,7.2,7.75));
+  const sheet = t>7.2 ? `<div class="sheet" style="transform:translateY(${(1-sp)*1240}px)"><div class="grab"></div><div class="sh"><h3>${N.near} jobs within 10 mi</h3><p>Blacksburg, VA · internships, first jobs, part-time</p></div>${J.near.map((j,i)=>card(j,t,7.6+i*.18)).join("")}</div>`:"";
+  const head = t<4.2 ? ["Every dot is a real opening",`${placed} jobs on the map`] : ["Zoom in on your school","Tap a dot, see what's close."];
+  return `<div class="sc navy"><img src="${cv.toDataURL()}" style="position:absolute;left:0;top:0"><div class="band" style="background:transparent;position:relative"><h2>${head[0]}</h2><p>${head[1]}</p></div>${pin}${sheet}${f}</div>`;
+}
+V[4] = {len:17.0, scenes:[
+  [0,2.2,t=>hook(t,"What's hiring *near campus?*")],
+  [2.2,13.8,mapScene],
+  [13.8,17.0,t=>endcard(t)],
+]};
+
+function floor(t){
+  const booths=[]; let k=0;
+  for(let r=0;r<6;r++) for(let c=0;c<5;c++){ const num=[301,311,402,505,609,702,801,812][k%8]; k++; booths.push([60+c*180, 70+r*140, `${200+r*100+c*11}`]); }
+  const route=[[1,"311","A M King"],[17,"702","American Contracting"],[28,"801","Allan Myers"]];
+  route.forEach(([i,b])=>booths[i][2]=b);
+  const hit=new Set(route.filter((_,n)=>t>1.0+n*1.0).map(r=>r[0]));
+  const pts=route.map(([i])=>[booths[i][0]+75, booths[i][1]+48]);
+  // route line drawn progressively
+  const total=P(t,1.0,3.2); let d=`M${pts[0][0]} ${pts[0][1]}`;
+  const segs=pts.length-1; for(let n=0;n<segs;n++){ const p=cl(total*segs-n); if(p<=0) break; const [a,b]=[pts[n],pts[n+1]]; d+=` L${a[0]+(b[0]-a[0])*p} ${a[1]+(b[1]-a[1])*p}`; }
+  const pins=route.map(([i,b,nm],n)=>{ const p=back(P(t,1.0+n*1.0,1.4+n*1.0)); return `<div class="bpin" style="left:${pts[n][0]}px;top:${pts[n][1]}px;transform:translate(-50%,-50%) scale(${p})">${n+1}</div>`; }).join("");
+  const svg=`<svg width="972" height="900" style="position:absolute;left:0;top:0"><path d="${d}" stroke="#4A7000" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="2 22"/></svg>`;
+  const list=route.map(([i,b,nm],n)=>{ const p=out(P(t,1.2+n*1.0,1.6+n*1.0)); return `<div style="opacity:${p};transform:translateX(${(1-p)*60}px);font-size:42px;font-weight:700;color:#060A2C;margin-bottom:22px"><span style="color:#4A7000">${n+1}.</span> ${esc(nm)} <span style="color:#5E6A80;font-weight:500">· booth ${b}</span></div>`;}).join("");
+  return `<div class="floor">${booths.map(([x,y,l],i)=>`<div class="booth ${hit.has(i)?'hit':''}" style="left:${x}px;top:${y}px">${l}</div>`).join("")}${svg}${pins}</div><div style="position:absolute;left:70px;right:70px;top:1410px">${list}</div>`;
+}
+V[5] = {len:17.0, scenes:[
+  [0,2.4,t=>hook(t,"Career fair season. Don't walk in *blind.*")],
+  [2.4,5.6,t=>{ const f=finger(t,{pts:[[1.4,800,1500],[2.0,480,700]],taps:[2.3],end:2.9});
+    return `<div class="sc light">${appTop("Your next fairs","52 fairs at 19 schools, from each school's own page.")}<div class="wrap">${J.fairs.map((j,i)=>card(j,t,.2+i*.22)).join("")}</div>${f}</div>`;}],
+  [5.6,10.4,t=>`<div class="sc light">${appTop("Your booth route","Who to visit, in order, with a brief on each.")}<div class="ex">Example</div>${floor(t)}</div>`],
+  [10.4,13.8,t=>{ const fs=[["1","QR code to your resume"],["2","Notes at every booth"],["3","Follow-up emails, drafted"]];
+    return `<div class="sc navy"><img class="logo" src="${LOGO}"><div style="position:absolute;left:90px;right:120px;top:560px"><div style="font-size:84px;font-weight:800;letter-spacing:-2px;margin-bottom:60px">${words("All on your *phone.*",t,.1)}</div>${fs.map(([n,s],i)=>{const p=back(P(t,.7+i*.45,1.15+i*.45));return `<div class="feat" style="transform:scale(${p});transform-origin:left center;opacity:${cl(p)}"><b>${n}</b>${s}</div>`}).join("<br>")}</div></div>`;}],
+  [13.8,17.0,t=>endcard(t)],
+]};
+
+
+// ---------- video 6: fast-cut founder-style (graphics only) ----------
+const CAPS=[[0.2,"Applying"],[0.6,"to internships"],[1.2,"is *broken.*"],[2.3,"You send out"],[2.9,"*fifty*"],[3.3,"applications"],[4.0,"and hear"],[4.4,"*nothing.*"],[5.1,"Some listings"],[5.7,"*closed*"],[6.1,"weeks ago."],[7.6,"So we built"],[8.4,"*Beat the Pile.*"],[9.6,"Every internship"],[10.4,"straight from"],[10.9,"the company's"],[11.4,"*own job board.*"],[12.4,"Checked"],[12.8,"every few hours."],[14.1,"*19,155*"],[14.8,"internships"],[15.3,"right now."],[16.6,"*Every major.*"],[17.4,"Nursing."],[18.1,"Marketing."],[18.8,"Business."],[19.6,"See what's hiring"],[20.5,"*near campus.*"],[21.8,"Tap a dot,"],[22.5,"see the jobs."],[23.6,"Walk into"],[24.1,"career fairs"],[24.7,"*with a plan.*"],[26.5,""]];
+function caption(t){ let cur=null, at=0; for(const [a,txt] of CAPS){ if(t>=a){cur=txt;at=a;} } if(!cur) return "";
+  const lime=/^\*.*\*$/.test(cur), p=back(P(t,at,at+.18));
+  return `<div class="cap ${lime?'l':''}" style="transform:scale(${0.7+0.3*p})">${esc(cur.replace(/\*/g,''))}</div>`; }
+function pile(t){
+  let h=""; for(let i=0;i<10;i++){ const a=.1+i*.2, p=P(t,a,a+.32), y=-300+(1500-i*58+300)*(p*p), rot=((i*37)%11-5)*(1-p*.4);
+    if(p<=0) continue; h+=`<div class="pilecard" style="top:${y-200}px;transform:rotate(${rot}deg)"><div class="a"></div><div class="b"></div><div class="s">Applied</div></div>`; }
+  const shake = t>1.2&&t<1.5 ? Math.sin(t*90)*14 : 0;
+  return `<div class="sc navy" style="transform:translateX(${shake}px)"><img class="logo" src="${LOGO}">${h}</div>`;
+}
+function inbox(t){
+  const sent=Math.round(50*out(P(t,.1,1.4)));
+  return `<div class="sc light"><div class="ex">Example</div><div style="position:absolute;left:70px;right:70px;top:300px">
+   <div class="box" style="padding:50px"><div style="font-size:44px;color:#5E6A80;font-weight:600">Applications sent</div><div style="font-size:200px;font-weight:900;letter-spacing:-6px">${sent}</div></div>
+   <div class="box" style="padding:50px"><div style="font-size:44px;color:#5E6A80;font-weight:600">Replies</div><div style="font-size:200px;font-weight:900;letter-spacing:-6px;color:#C62828">0</div></div></div></div>`;
+}
+function closed(t){
+  const p=back(P(t,.35,.6));
+  return `<div class="sc light"><div class="ex">Example</div><div style="position:absolute;left:70px;right:70px;top:420px">
+   <div class="card" style="padding:50px"><div class="tile">EX</div><div><div class="t">Summer 2027 Intern</div><div class="c">Example Company <span>· posted 6 weeks ago</span></div><div class="pill b">Easy apply</div></div></div></div>
+   <div class="stamp" style="left:420px;top:640px;transform:rotate(-12deg) scale(${2-p});opacity:${cl(p*1.5)}">Closed</div></div>`;
+}
+function built(t){
+  const a=back(P(t,.0,.45));
+  return `<div class="sc navy"><div style="position:absolute;left:0;right:0;top:620px;text-align:center"><img src="${LOGO}" style="height:200px;transform:scale(${a})"></div></div>`;
+}
+function majors(t){
+  const r=chipsRow(t,["Healthcare","Marketing","Business"],[[0,0],[1.5,1],[2.2,2]]);
+  const lists=[J.health,J.mkt,J.biz], at=[.1,1.55,2.25][r.idx];
+  const f=finger(t,{pts:[[1.1,800,860],[1.4,560,640],[1.9,830,640]],taps:[1.5,2.2],end:2.9});
+  return `<div class="sc light">${appTop("Every major","Pick yours.")}<div class="wrap" style="padding-top:52px">${r.html}${lists[r.idx].map((j,i)=>card(j,t,at+i*.12)).join("")}</div>${f}</div>`;
+}
+const CUTS=[[0,2.2,pile],[2.2,5.0,inbox],[5.0,7.4,closed],[7.4,9.5,built],
+ [9.5,14.0,t=>V[1].scenes[2][2](0.45+t)],
+ [14.0,16.5,t=>counter(t,[[N.intern,"internships"],[N.companies,"companies"]],0)],
+ [16.5,19.5,majors],
+ [19.5,23.5,t=>mapScene(t*2.1)],
+ [23.5,26.5,t=>`<div class="sc light">${appTop("Your booth route","Career Fair Mode.")}<div class="ex">Example</div>${floor(t*1.25)}</div>`],
+ [26.5,30.0,endcard]];
+V[6]={len:30.0, custom:(t)=>{
+  let h=""; for(const [a,b,fn] of CUTS){ if(t>=a&&t<b){ const d=t-a, z=1+0.07*(1-out(P(d,0,.28)));
+     h=`<div class="sc" style="transform:scale(${z})">${fn(d)}</div>`; if(d<.07&&a>0) h+=`<div class="flash" style="opacity:${.55*(1-d/.07)}"></div>`; } }
+  return h+caption(t);
+}};
+
+
+// ---------- videos 7-9 (formats from the reference ads) ----------
+function caps(t, list, top=1180, size=104){ let cur=null, at=0; for(const [a,txt] of list){ if(t>=a){cur=txt;at=a;} } if(!cur) return "";
+  const lime=/^\*.*\*$/.test(cur), p=back(P(t,at,at+.18));
+  return `<div class="cap ${lime?'l':''}" style="top:${top}px;font-size:${size}px;transform:scale(${0.7+0.3*p})">${esc(cur.replace(/\*/g,''))}</div>`; }
+function phone(inner, t, x=243, y=370, sc=0.55){
+  const w=1080*sc+40, h=1920*sc+40, inP=back(P(t,0,.6));
+  return `<div class="phone" style="left:${x}px;top:${y+(1-inP)*1400}px;width:${w}px;height:${h}px"><div class="screen"><div style="width:1080px;height:1920px;transform:scale(${sc});transform-origin:0 0;position:absolute;left:0;top:0">${inner}</div></div></div>`;
+}
+function topbox(t, text, at=0){ const p=back(P(t,at,at+.35)); return `<div class="topbox" style="transform:scale(${p});opacity:${cl(p)}">${text}</div>`; }
+function endShare(t, line){ return endcard(t)+`<div class="topbox" style="top:300px;transform:scale(${back(P(t,.1,.45))})">${line}</div>`; }
+function bpm(t){ return 1+0.025*Math.pow(Math.max(0,Math.cos(t*Math.PI*2*100/60)),8); } // subtle pulse on the beat
+
+V[7]={len:23.0, custom:(t)=>{
+  let inner="";
+  if(t<6.0) inner=V[1].scenes[2][2](0.4+t*1.05);
+  else if(t<9.5) inner=V[2].scenes[1][2](0.1+(t-6.0)*1.75);
+  else if(t<14.5) inner=mapScene((t-9.5)*1.7);
+  else inner=V[3].scenes[1][2](0.3+(t-14.5)*1.6);
+  let h="";
+  if(t<19.0){ h=`<div class="sc navy">${phone(inner,t-.2)}${topbox(t,"POV: you found where internships actually get posted",.05)}</div>`; }
+  else h=endShare(t-19.0,"Send this to a friend who still needs an internship");
+  return h+caps(t,[[0.6,"Every internship"],[1.3,"comes from"],[1.7,"*one place:*"],[2.4,"the company's"],[2.9,"own job board."],[3.8,"Beat the Pile"],[4.4,"reads *6,006*"],[5.0,"of them"],[5.4,"every few hours."],[6.1,"Pick your major."],[7.2,"Nursing,"],[7.8,"marketing,"],[8.5,"business."],[9.6,"See what's hiring"],[10.4,"*near campus.*"],[11.8,"Tap a dot,"],[12.5,"see the jobs."],[15.0,"Golf course jobs."],[17.1,"*Shadowing.*"],[18.9,""]],1500,92);
+}};
+
+function stop(t){
+  const rows=[]; for(let i=0;i<8;i++){ const dir=i%2?1:-1, x=-200+dir*(t*120)+(i%2?-300:0), solid=i==3;
+    const p=out(P(t,i*.06,i*.06+.4));
+    rows.push(solid?`<div class="stoprow lime" style="text-align:center;width:1080px;transform:scale(${0.6+0.4*back(P(t,.25,.6))});opacity:${p}">STOP</div>`:`<div class="stoprow hol" style="transform:translateX(${x}px);opacity:${p}">STOP STOP STOP STOP</div>`); }
+  return `<div class="sc navy"><div style="position:absolute;left:0;top:120px;transform:scale(${bpm(t)})">${rows.join("")}</div></div>`;
+}
+V[8]={len:21.0, custom:(t)=>{
+  let h="", cutAt=0;
+  const C=[[0,2.6,stop],[2.6,5.2,d=>hook(d,"applying to internships that *closed* weeks ago.")],[5.2,7.0,closed],[7.0,8.6,d=>hook(d,"Do *this* instead.")],
+           [8.6,14.6,d=>mapScene(d*1.6)],[14.6,17.4,d=>counter(d,[[N.intern,"internships"],[N.entry,"entry-level jobs"],[N.hourly,"part-time & hourly"]],0)],
+           [17.4,21.0,d=>endShare(d,"Send this to a friend who's still applying to dead listings")]];
+  for(const [a,b,fn] of C){ if(t>=a&&t<b){ const d=t-a, z=1+0.07*(1-out(P(d,0,.28))); h=`<div class="sc" style="transform:scale(${z})">${fn(d)}</div>`; if(d<.07&&a>0) h+=`<div class="flash" style="opacity:${.5*(1-d/.07)}"></div>`; } }
+  return h+caps(t,[[8.7,"Every dot"],[9.3,"is a *real* opening."],[11.6,"Near campus?"],[13.2,"*35 jobs*"],[13.8,"within 10 miles."],[14.5,""]],1250,100);
+}};
+
+const FAIRCO=["Lockheed Martin","RTX","Dominion Energy","Caterpillar Inc.","Garmin International","Corning","Booz Allen","Burns & McDonnell","Eastman Chemical","Volvo Group","GE Vernova","DuPont"];
+function item(t, n, head, sub, body){
+  const p=back(P(t,0,.4));
+  return `<div class="sc light"><div class="band" style="padding-top:330px;display:flex;gap:40px;align-items:center"><div class="bignum" style="transform:scale(${p})">${n}</div><div><h2 style="opacity:${out(P(t,.15,.45))}">${head}</h2><p style="opacity:${out(P(t,.3,.6))}">${sub}</p></div></div>${body}</div>`;
+}
+function mailBody(t){
+  const body="Hi Jordan, thanks for talking with me at booth 311 about your summer internships. I'm a mechanical engineering student at Virginia Tech, and I'd love to apply. My resume is attached.";
+  const n=Math.floor(body.length*P(t,.8,4.2));
+  return `<div class="ex" style="top:260px">Example</div><div class="mail"><div class="h">To: recruiter<br>Subject: Great meeting you at the career fair</div>${esc(body.slice(0,n))}<span class="caret"></span></div>`;
+}
+V[9]={len:27.0, custom:(t)=>{
+  let h="";
+  const C=[[0,2.6,d=>hook(d,"Career fair in February?","Do these 3 things first.",1.2)],
+    [2.6,9.0,d=>item(d,"1","Know who's coming","Last fall's Engineering Expo at Virginia Tech had 200 employers.",
+        `<div style="position:absolute;left:54px;right:54px;top:900px">${FAIRCO.map((c,i)=>{const p=back(P(d,.7+i*.16,1.0+i*.16));return `<span class="chipg" style="transform:scale(${p});opacity:${cl(p)}">${esc(c)}</span>`}).join("")}</div>`)],
+    [9.0,15.5,d=>item(d,"2","Plan your booth route","Who to visit, in order, with a brief on each.",`<div class="ex" style="top:260px">Example</div><div style="position:absolute;inset:0;top:430px">${floor(d*.9)}</div>`)],
+    [15.5,22.0,d=>item(d,"3","Follow up in 24 hours","A short thank-you note helps them remember you.",mailBody(d))],
+    [22.0,24.2,d=>hook(d,"Career Fair Mode does *all 3.*")],
+    [24.2,27.0,d=>endShare(d,"Save this for February")]];
+  for(const [a,b,fn] of C){ if(t>=a&&t<b){ const d=t-a, z=1+0.06*(1-out(P(d,0,.28))); h=`<div class="sc" style="transform:scale(${z})">${fn(d)}</div>`; if(d<.07&&a>0) h+=`<div class="flash" style="opacity:${.45*(1-d/.07)}"></div>`; } }
+  if(t>2.6&&t<22) h+=`<div class="topbox" style="top:120px;font-size:44px;padding:22px 34px">3 things before your spring career fair</div>`;
+  return h;
+}};
+
+let CUR=null;
+window.setup = async (v)=>{ CUR=V[v]; if(v==4||v==6||v==7||v==8){ DOTS=await fetch("file:///home/claude/ads/dots-all.json").then(r=>r.json()).catch(()=>null); if(!DOTS){ DOTS=window.__dots; } TGT=DOTS.dots.reduce((b,p)=>((p[3]-37.23)**2+(p[4]+80.41)**2 < (b[3]-37.23)**2+(b[4]+80.41)**2 ? p : b)); } return CUR.len; };
+window.render = (t)=>{
+  let h=""; if(CUR.custom){ h=CUR.custom(t); } else for(const [a,b,fn] of CUR.scenes){ if(t>=a && t<b){ h=`<div class="sc" style="${swipe(t-a,0)}">${fn(t-a)}</div>`; } }
+  h+=`<div class="prog"><i style="width:${100*t/CUR.len}%"></i></div>`;
+  document.getElementById("st").innerHTML=h;
+};
+</script></body></html>
