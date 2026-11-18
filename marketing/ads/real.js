@@ -85,11 +85,11 @@ const A=[
  {img:"jobs_golf", d:3.0, from:full(150), to:full(300), cap:"Internships. First jobs. <span class='l'>Summer jobs</span> too.", sub:"Every major.", hl:[[460,505,280,72,.7]]},
  {kind:"cta", d:3.6, kw:"JOBS", line:"and I'll DM you the link"},
 ];
-R.A={len:lenOf(A), f:t=>run(t,A,{tag:(tt,b)=> b.kind? "" : `<div class="rprog"><i style="width:${100*tt/lenOf(A)}%"></i></div>`}), cuts:[], taps:[]};
+R.A={len:lenOf(A), f:t=>run(t,A), cuts:[], taps:[]};
 
 // ---------- VIDEO B: "Finding jobs near campus, speedrun" (stopwatch POV) ----------
 const B=[
- {kind:"hook", d:2.4, text:"POV: you find <span style='color:#fff'>288 jobs</span> near campus before your coffee's ready ☕", sub:"Timer's running ⏱️"},
+ {kind:"hook", d:2.4, text:"POV: you find <span style='color:#fff'>288 jobs</span> near campus before your coffee's ready ☕", sub:"Watch this 👇"},
  {img:"home_map", d:3.0, from:full(70), to:full(170), cap:"Open Beat the Pile.", sub:"Every dot is a real job.", hl:[[90,985,620,85,1.2]]},
  {img:"map_dc", d:2.6, from:full(220), to:zoom(80,500,640), cap:"Zoom in.", sub:"East coast, packed.", taps:[[279,896,.5]]},
  {img:"map_dc_tap", d:3.0, from:full(240), to:full(300), cap:"Tap a city.", sub:"1,551 jobs within 10 miles.", taps:[[398,662,.4]], hl:[[95,1056,610,370,1.1]]},
@@ -97,11 +97,11 @@ const B=[
  {img:"jobs_marketing", d:3.2, from:full(60), to:full(250), cap:"Filter by <span class='l'>your major</span>.", sub:"Marketing: 734 internships.", hl:[[55,615,640,85,.6]]},
  {img:"jobs_golf", d:3.0, from:full(120), to:full(300), cap:"Need a summer job instead?", sub:"Golf courses, resorts, restaurants.", hl:[[150,765,470,55,.7]]},
  {img:"jobs_near", d:2.6, from:zoom(40,540,600), to:zoom(40,560,600), cap:"Tap Apply.", sub:"It goes to the <span class='l'>company's own site</span>.", taps:[[300,965,.8]], hl:[[57,930,495,70,.5]]},
- {kind:"fn", d:2.4, fn:t=>`<div class="sc navy"><div style="position:absolute;left:0;right:0;top:600px;text-align:center"><div style="font-size:90px;font-weight:900;letter-spacing:-3px;opacity:${out(P(t,0,.25))}">Done in</div><div style="font-size:260px;font-weight:900;color:${LIME};letter-spacing:-8px;opacity:${out(P(t,.15,.4))}">0:22</div><div style="font-size:46px;color:#C9CEE0;font-weight:700;opacity:${out(P(t,.5,.8))}">Coffee's still brewing.</div></div></div>`},
+ {kind:"fn", d:2.4, fn:t=>`<div class="sc navy"><div style="position:absolute;left:0;right:0;top:600px;text-align:center"><div style="font-size:90px;font-weight:900;letter-spacing:-3px;opacity:${out(P(t,0,.25))}">That's it.</div><div style="font-size:200px;font-weight:900;color:${LIME};letter-spacing:-8px;opacity:${out(P(t,.15,.4))}">288 jobs</div><div style="font-size:52px;color:#C9CEE0;font-weight:700;opacity:${out(P(t,.5,.8))}">near campus. Coffee's still brewing.</div></div></div>`},
  {kind:"cta", d:3.6, kw:"MAP", line:"and I'll DM you the map"},
 ];
 const clockB=(t,b)=>{ if(b.kind) return ""; const c=Math.min(t-2.4,22); const s=Math.floor(c), cs=Math.floor((c%1)*100); return `<div class="rtag d">0:${String(s).padStart(2,"0")}.${String(cs).padStart(2,"0")}</div>`; };
-R.B={len:lenOf(B), f:t=>run(t,B,{tag:clockB})};
+R.B={len:lenOf(B), f:t=>run(t,B)};
 
 // ---------- VIDEO C: "Watch an AI grade a Lockheed Martin interview answer" (tutorial with a payoff) ----------
 const C=[
@@ -117,7 +117,7 @@ const C=[
  {kind:"fn", d:2.6, fn:t=>`<div class="sc" style="background:${LIME};color:${NAVY}"><div style="position:absolute;left:80px;right:80px;top:560px"><div style="font-size:104px;font-weight:900;letter-spacing:-4px;line-height:1.03;opacity:${out(P(t,0,.25))}">Do 5 questions tonight.</div><div style="font-size:104px;font-weight:900;letter-spacing:-4px;line-height:1.03;color:#fff;opacity:${out(P(t,.4,.7))}">Walk in warmed up.</div></div></div>`},
  {kind:"cta", d:3.6, kw:"PRACTICE", line:"and I'll DM you interview practice"},
 ];
-R.C={len:lenOf(C), f:t=>run(t,C,{tag:(tt,b)=> b.kind? "" : `<div class="rprog"><i style="width:${100*tt/lenOf(C)}%"></i></div>`})};
+R.C={len:lenOf(C), f:t=>run(t,C)};
 
 // sound effect times: a whoosh on every cut, a click on every tap
 for(const [k,bs] of [["A",A],["B",B],["C",C]]){ let a=0; const cuts=[], taps=[]; for(const b of bs){ if(a>0) cuts.push(+a.toFixed(2)); for(const tp of (b.taps||[])) taps.push(+(a+tp[2]).toFixed(2)); a+=b.d; } R[k].cuts=cuts; R[k].taps=taps; }
