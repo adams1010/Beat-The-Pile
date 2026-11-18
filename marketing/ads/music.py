@@ -188,7 +188,7 @@ def g_disco(bpm=118):
         for k in (.5, 1.5, 2.5, 3.5): add(mu, pad(chord(b, 1), B * .35, 4000) * E(B * .35, .07), t0 + k * B, .45)
     return B
 GEN = dict(house=g_house, trap=g_trap, phonk=g_phonk, jersey=g_jersey, dembow=g_dembow, dnb=g_dnb, lofi=g_lofi, synthwave=g_synthwave, afro=g_afro, drill=g_drill, garage=g_garage, disco=g_disco)
-B = GEN[G]()
+B = GEN[G]() if G != 'none' else 0.5   # 'none' = sound effects only (owner, Nov 18: no music)
 ph = (np.arange(n) / SR) % B; mu *= .45 + .55 * np.minimum(1, ph / (B * .5))           # light sidechain pump
 def whoosh():
     d = .4; x = noise(d); out = np.zeros_like(x)
@@ -200,7 +200,7 @@ def tap(): return np.sin(2 * np.pi * 1900 * T(.05)) * E(.05, .008)
 for c in ts("cuts"): add(fx, whoosh(), max(0, c - .28), .5)
 for c in ts("taps"): add(fx, tap(), c, .8)
 for c in ts("impacts"): add(fx, impact(), c, 1.0)
-mix = dr * .9 + mu + fx; f = int(.6 * SR); mix[-f:] *= np.linspace(1, 0, f)
-mix = hp(mix, 30); mix = np.tanh(mix / (np.abs(mix).max() + 1e-9) * 1.6) * .92
+mix = (dr * .9 + mu + fx) if G != 'none' else fx * .55; f = int(.6 * SR); mix[-f:] *= np.linspace(1, 0, f)
+mix = hp(mix, 30); mix = np.tanh(mix / (np.abs(mix).max() + 1e-9) * 1.6) * .92 if G != 'none' else np.clip(mix / (np.abs(mix).max() + 1e-9) * .35, -1, 1)
 wavfile.write(sys.argv[1], SR, (np.stack([mix, mix], 1) * 32767).astype(np.int16))
 print("music", G, VAR, round(60 / B), "bpm")

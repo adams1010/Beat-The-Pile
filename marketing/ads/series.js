@@ -3,7 +3,7 @@
 (function(){
 const NAVY="#060A2C", LIME="#B0F701", DL="#4A7000", BLUE="#1E3A8A";
 let BEATV=60/128;
-const pumpV=t=>1+0.03*Math.pow(Math.max(0,1-((t%BEATV)/BEATV)*3),2);
+const pumpV=t=>1;
 const EXT=(top=60)=>`<div class="ex" style="top:${top}px">Example</div>`;
 const st=document.createElement("style"); st.textContent=`
 .cta{position:absolute;inset:0;background:${LIME};color:${NAVY};text-align:center}
@@ -43,7 +43,7 @@ const st=document.createElement("style"); st.textContent=`
 
 // ---------- shared pieces ----------
 function cta(t, kw, line="and I'll DM you the link"){
-  const p=back(P(t,0,.3)), q=back(P(t,.25,.6)), a=Math.sin(t*9)*18;
+  const p=back(P(t,0,.3)), q=back(P(t,.25,.6)), a=0;
   return `<div class="cta"><div style="position:absolute;left:0;right:0;top:420px">
     <div class="a" style="transform:scale(${p})">Comment</div>
     <div class="k" style="transform:scale(${q*pumpV(t)})">${esc(kw)}</div>
@@ -54,7 +54,7 @@ function cta(t, kw, line="and I'll DM you the link"){
 }
 function seq(t, C, capList, top=1250, size=100){
   let h="";
-  for(const [a,b,fn] of C){ if(t>=a&&t<b){ const d=t-a, z=(1+0.08*(1-out(P(d,0,.22))))*pumpV(t);
+  for(const [a,b,fn] of C){ if(t>=a&&t<b){ const d=t-a, z=1;
     h=`<div class="sc" style="transform:scale(${z})">${fn(d)}</div>`; if(d<.06&&a>0) h+=`<div class="flash" style="opacity:${.55*(1-d/.06)}"></div>`; } }
   return h+(capList?caps(t,capList,top,size):"");
 }
@@ -81,7 +81,7 @@ function texts(t, msgs, title="Example", hook=""){ // msgs: [side, text, at]
 function guess(t, q, answer, sub){
   const n=t<1.2?3:t<1.9?2:t<2.6?1:0, rev=P(t,2.6,3.6);
   return `<div class="sc navy"><div style="position:absolute;left:80px;right:80px;top:380px;text-align:center"><div style="font-size:76px;font-weight:900;letter-spacing:-2px;line-height:1.1">${q}</div>
-   ${n?`<div style="font-size:420px;font-weight:900;color:${LIME};margin-top:60px;transform:scale(${1.3-0.3*back(P(t%0.7,0,.2))})">${n}</div>`:
+   ${n?`<div style="font-size:420px;font-weight:900;color:${LIME};margin-top:60px;opacity:${out(P(t%0.7,0,.15))}">${n}</div>`:
    `<div style="font-size:300px;font-weight:900;color:${LIME};margin-top:80px;letter-spacing:-10px;transform:scale(${back(P(t,2.6,2.9))})">${Math.round(answer*out(rev))}</div><div style="font-size:54px;font-weight:700;opacity:${out(P(t,3.0,3.4))}">${sub}</div>`}</div></div>`;
 }
 function speedrun(t, steps, stepGap, bgHtml=""){
@@ -126,12 +126,12 @@ const M=[["Nursing",{t:"Student Nurse Emergency Room",c:"Universal Health Servic
  ["Data / AI",{t:"2027 Machine Learning Engineer Intern",c:"Anduril",l:"Santa Ana, CA"}],
  ["Civil",{t:"Transportation Engineering Intern",c:"Ardurra",l:"Miami, FL"}]];
 function rapid(t){ const i=Math.min(M.length-1,Math.floor(t/0.62)), d=t-i*0.62, [maj,j]=M[i], lime=i%2==0;
-  return `<div class="sc" style="background:${lime?LIME:NAVY}"><div style="position:absolute;left:70px;right:70px;top:430px;transform:scale(${1.25-.25*back(P(d,0,.18))})">
+  return `<div class="sc" style="background:${lime?LIME:NAVY}"><div style="position:absolute;left:70px;right:70px;top:430px;opacity:${out(P(d,0,.15))}">
     <div style="font-size:150px;font-weight:900;letter-spacing:-5px;color:${lime?NAVY:LIME}">${maj}?</div>
     <div class="card" style="margin-top:60px"><div class="tile">${ini(j.c)}</div><div><div class="t">${esc(j.t)}</div><div class="c">${esc(j.c)} <span>· ${esc(j.l)}</span></div><div class="pill">Internship</div></div></div></div></div>`; }
 const SURPRISE=[["5","Golf shop attendant","Troon · Boerne, TX"],["4","Event staff at Virginia Tech games","Teall Sports & Entertainment · Blacksburg, VA"],["3","Volunteer law student","U.S. Attorneys' Offices · Lexington, KY"],["2","Park volunteer program assistant","National Park Service · West Glacier, MT"],["1","Student trainee (legal)","Veterans Affairs, Inspector General · Washington, DC"]];
 function countdown(t){ const i=Math.min(4,Math.floor(t/1.5)), d=t-i*1.5, [n,ti,c]=SURPRISE[i];
-  return `<div class="sc navy"><div style="position:absolute;left:80px;right:80px;top:420px"><div class="bignum" style="font-size:330px;transform:scale(${1.3-.3*back(P(d,0,.2))})">#${n}</div>
+  return `<div class="sc navy"><div style="position:absolute;left:80px;right:80px;top:420px"><div class="bignum" style="font-size:330px;opacity:${out(P(d,0,.15))}">#${n}</div>
    <div style="font-size:84px;font-weight:900;letter-spacing:-2px;line-height:1.05;margin-top:30px;opacity:${out(P(d,.15,.4))}">${esc(ti)}</div><div style="font-size:44px;color:#C9CEE0;margin-top:24px;opacity:${out(P(d,.3,.55))}">${esc(c)}</div></div></div>`; }
 const TRK=[["Lockheed Martin","Software Engineering Intern",[1,1,0,0]],["Moog","Intern, Business",[1,1,1,0]],["Texas Instruments","Systems Engineering Intern",[1,0,0,0]],["Thorlabs","Marketing Internship",[1,1,1,1]],["Peraton","Software Engineer Intern",[1,0,0,0]]];
 function tracker(t){

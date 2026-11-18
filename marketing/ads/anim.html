@@ -91,7 +91,7 @@ const LOGO = "file:///home/claude/ads/logo-white.png";
 const cl = (x,a=0,b=1)=>Math.max(a,Math.min(b,x));
 const P = (t,a,b)=>cl((t-a)/(b-a));
 const out = p=>1-Math.pow(1-p,3);
-const back = p=>{const c=1.7; p=p-1; return 1+p*p*((c+1)*p+c);};
+const back = p=>1-Math.pow(1-p,3); // Nov 18 (owner): no bounce, plain ease-out
 const io = p=>p<.5?4*p*p*p:1-Math.pow(-2*p+2,3)/2;
 const esc = s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
 const fmt = n=>Math.round(n).toLocaleString("en-US");
@@ -132,7 +132,7 @@ function counter(t, rows, t0){
 }
 function endcard(t, line="Find your job before the pile does."){
   const a=back(P(t,0,.55)), url="beatthepile.com", n=Math.floor(url.length*P(t,.45,1.25));
-  const pulse = 1+0.045*Math.sin(Math.max(0,t-1.6)*6)*(t>1.6?1:0);
+  const pulse = 1;
   return `<div class="sc navy"><div class="end"><img src="${LOGO}" style="transform:scale(${a});opacity:${cl(a)}"><div class="u">${url.slice(0,n)}<span class="caret" style="background:#B0F701;height:60px;opacity:${t<1.4?1:0}"></span></div><div class="s" style="opacity:${out(P(t,1.2,1.6))}">${esc(line)}</div><div class="cta" style="opacity:${out(P(t,1.5,1.9))};transform:scale(${(0.8+0.2*back(P(t,1.5,1.95)))*pulse})">Make your free account</div></div></div>`;
 }
 function swipe(t, sceneStart){ return `transform:translateY(${(1-out(P(t,sceneStart,sceneStart+.32)))*120}px);opacity:${out(P(t,sceneStart,sceneStart+.25))}`; }
@@ -291,7 +291,7 @@ function caption(t){ let cur=null, at=0; for(const [a,txt] of CAPS){ if(t>=a){cu
 function pile(t){
   let h=""; for(let i=0;i<10;i++){ const a=.1+i*.2, p=P(t,a,a+.32), y=-300+(1500-i*58+300)*(p*p), rot=((i*37)%11-5)*(1-p*.4);
     if(p<=0) continue; h+=`<div class="pilecard" style="top:${y-200}px;transform:rotate(${rot}deg)"><div class="a"></div><div class="b"></div><div class="s">Applied</div></div>`; }
-  const shake = t>1.2&&t<1.5 ? Math.sin(t*90)*14 : 0;
+  const shake = 0;
   return `<div class="sc navy" style="transform:translateX(${shake}px)"><img class="logo" src="${LOGO}">${h}</div>`;
 }
 function inbox(t){
@@ -340,7 +340,7 @@ function phone(inner, t, x=243, y=370, sc=0.55){
 }
 function topbox(t, text, at=0){ const p=back(P(t,at,at+.35)); return `<div class="topbox" style="transform:scale(${p});opacity:${cl(p)}">${text}</div>`; }
 function endShare(t, line){ return endcard(t)+`<div class="topbox" style="top:300px;transform:scale(${back(P(t,.1,.45))})">${line}</div>`; }
-function bpm(t){ return 1+0.025*Math.pow(Math.max(0,Math.cos(t*Math.PI*2*100/60)),8); } // subtle pulse on the beat
+function bpm(t){ return 1; } // subtle pulse on the beat
 
 V[7]={len:23.0, custom:(t)=>{
   let inner="";
@@ -365,7 +365,7 @@ V[8]={len:21.0, custom:(t)=>{
   const C=[[0,2.6,stop],[2.6,5.2,d=>hook(d,"applying to internships that *closed* weeks ago.")],[5.2,7.0,closed],[7.0,8.6,d=>hook(d,"Do *this* instead.")],
            [8.6,14.6,d=>mapScene(d*1.6)],[14.6,17.4,d=>counter(d,[[N.intern,"internships"],[N.entry,"entry-level jobs"],[N.hourly,"part-time & hourly"]],0)],
            [17.4,21.0,d=>endShare(d,"Send this to a friend who's still applying to dead listings")]];
-  for(const [a,b,fn] of C){ if(t>=a&&t<b){ const d=t-a, z=1+0.07*(1-out(P(d,0,.28))); h=`<div class="sc" style="transform:scale(${z})">${fn(d)}</div>`; if(d<.07&&a>0) h+=`<div class="flash" style="opacity:${.5*(1-d/.07)}"></div>`; } }
+  for(const [a,b,fn] of C){ if(t>=a&&t<b){ const d=t-a, z=1; h=`<div class="sc" style="transform:scale(${z})">${fn(d)}</div>`; if(d<.07&&a>0) h+=`<div class="flash" style="opacity:${.5*(1-d/.07)}"></div>`; } }
   return h+caps(t,[[8.7,"Every dot"],[9.3,"is a *real* opening."],[11.6,"Near campus?"],[13.2,"*35 jobs*"],[13.8,"within 10 miles."],[14.5,""]],1250,100);
 }};
 
@@ -388,7 +388,7 @@ V[9]={len:27.0, custom:(t)=>{
     [15.5,22.0,d=>item(d,"3","Follow up in 24 hours","A short thank-you note helps them remember you.",mailBody(d))],
     [22.0,24.2,d=>hook(d,"Career Fair Mode does *all 3.*")],
     [24.2,27.0,d=>endShare(d,"Save this for February")]];
-  for(const [a,b,fn] of C){ if(t>=a&&t<b){ const d=t-a, z=1+0.06*(1-out(P(d,0,.28))); h=`<div class="sc" style="transform:scale(${z})">${fn(d)}</div>`; if(d<.07&&a>0) h+=`<div class="flash" style="opacity:${.45*(1-d/.07)}"></div>`; } }
+  for(const [a,b,fn] of C){ if(t>=a&&t<b){ const d=t-a, z=1; h=`<div class="sc" style="transform:scale(${z})">${fn(d)}</div>`; if(d<.07&&a>0) h+=`<div class="flash" style="opacity:${.45*(1-d/.07)}"></div>`; } }
   if(t>2.6&&t<22) h+=`<div class="topbox" style="top:120px;font-size:44px;padding:22px 34px">3 things before your spring career fair</div>`;
   return h;
 }};
@@ -396,17 +396,17 @@ V[9]={len:27.0, custom:(t)=>{
 
 // ---------- viral cuts (v10-12): 128 BPM, hook on frame 1 ----------
 const BEAT=60/128;
-function pump(t){ return 1+0.03*Math.pow(Math.max(0,1-((t%BEAT)/BEAT)*3),2); }
+function pump(t){ return 1; }
 function emo(s){ return s.replace(/([\u{1F300}-\u{1FAFF}☀-➿])/gu,'<span class="emo">$1</span>'); }
 function slam(t, text, lime=true, small=""){
-  const p=back(P(t,0,.2)), sc=1.12-0.12*p, sh=Math.sin(t*95)*22*Math.max(0,1-t/.35); const L=text.replace(/\*/g,'').length, fs=L>48?104:L>32?122:L>22?140:156;
+  const p=back(P(t,0,.2)), sc=1.12-0.12*p, sh=0; const L=text.replace(/\*/g,'').length, fs=L>48?104:L>32?122:L>22?140:156;
   const txt=emo(esc(text).replace(/\*([^*]+)\*/g,`<span style="color:${lime?'#fff':'#B0F701'}">$1</span>`));
   const sm=small?`<div class="sm">${emo(esc(small))}</div>`:"";
   return `<div class="sc" style="background:${lime?'#B0F701':'#060A2C'};color:${lime?'#060A2C':'#fff'}"><div class="slam" style="transform:translateX(${sh}px) scale(${sc*pump(t)})"><div><div class="tx" style="font-size:${fs}px">${txt}</div>${sm}</div></div></div>`;
 }
 function runCuts(t, C, capList, capTop=1250, capSize=100){
   let h="";
-  for(const [a,b,fn] of C){ if(t>=a&&t<b){ const d=t-a, z=(1+0.08*(1-out(P(d,0,.22))))*pump(t);
+  for(const [a,b,fn] of C){ if(t>=a&&t<b){ const d=t-a, z=1;
     h=`<div class="sc" style="transform:scale(${z})">${fn(d)}</div>`; if(d<.06&&a>0) h+=`<div class="flash" style="opacity:${.6*(1-d/.06)}"></div>`; } }
   return h+(capList?caps(t,capList,capTop,capSize):"");
 }
@@ -421,7 +421,7 @@ V[10]={len:20.0, custom:(t)=>{
     [[1.4,"*Watch this.*"],[2.3,"19,155 internships"],[3.0,"one search."],[3.7,"Straight to the"],[4.2,"*company's site.*"],[5.2,"Any major."],[6.4,"Marketing."],[7.5,"Business."],[8.1,"Near campus?"],[11.3,"*35 jobs*"],[11.8,"10 miles away."],[12.5,"Golf jobs ⛳"],[13.3,"Shadowing."],[14.0,""]],1565,92);
 }};
 function stopFlash(t){ const k=Math.floor(t/BEAT)%2, lime=k==0;
-  return `<div class="sc" style="background:${lime?'#B0F701':'#060A2C'}"><div class="slam" style="transform:scale(${(1.3-0.3*back(P(t%BEAT,0,.18)))})"><div class="tx" style="font-size:330px;letter-spacing:-12px;color:${lime?'#060A2C':'#B0F701'}">STOP</div></div></div>`; }
+  return `<div class="sc" style="background:${lime?'#B0F701':'#060A2C'}"><div class="slam" style="transform:none"><div class="tx" style="font-size:330px;letter-spacing:-12px;color:${lime?'#060A2C':'#B0F701'}">STOP</div></div></div>`; }
 V[11]={len:18.0, custom:(t)=>runCuts(t,[
   [0,0.94,stopFlash],[0.94,1.9,d=>slam(d,"applying to dead listings 💀",false)],[1.9,3.0,d=>closed(d*1.6)],[3.0,3.9,d=>slam(d,"Do this instead 👇")],
   [3.9,9.5,d=>mapScene(d*1.7)],[9.5,12.0,d=>counter(d*1.3,[[N.intern,"internships"],[N.entry,"entry-level jobs"],[N.hourly,"part-time & hourly"]],0)],

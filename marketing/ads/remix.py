@@ -1,7 +1,9 @@
 """Give every video its own track: python3 remix.py  (reads tracks.json + f/<slug>.json, rewrites the finals' audio only)"""
 import json, re, subprocess, os
 from concurrent.futures import ThreadPoolExecutor
-tr = json.load(open("tracks.json")); assert len({tuple(v) for v in tr.values()}) == len(tr), "two videos share a track"
+import sys
+tr = json.load(open(sys.argv[1] if len(sys.argv) > 1 else "tracks.json"))
+if "none" not in {v[0] for v in tr.values()}: assert len({tuple(v) for v in tr.values()}) == len(tr), "two videos share a track"
 OUT = "/mnt/user-data/outputs/Beat the Pile Videos"
 def one(name):
     g, v = tr[name]; slug = re.sub(r"[^A-Za-z0-9]+", "_", name); m = json.load(open(f"f/{slug}.json"))
