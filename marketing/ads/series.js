@@ -262,7 +262,7 @@ S["8-Match-Quiz/03_rate_my_chances"]={kw:"QUIZ",style:"phonk",len:15.4,cuts:[1.4
   [9.0,12.2,d=>slam(d,"Apply where you *actually* have a shot.")],[12.2,15.4,d=>cta(d,"QUIZ","and I'll DM you the match quiz")]],null)};
 
 const STY={house:128,trap:140,phonk:130};
-window.SERIES=S;
+window.SERIES=S; window.btpCTA=cta; window.btpSlam=slam;
 window.setupSeries=(name)=>{ const s=S[name]; BEATV=60/STY[s.style]; return s.len; };
 window.renderSeries=(name,t)=>{ const s=S[name]; document.getElementById("st").innerHTML=s.f(t)+`<div class="prog"><i style="width:${100*t/s.len}%"></i></div>`; };
 })();

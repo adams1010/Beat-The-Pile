@@ -2,7 +2,7 @@
 import { spawn } from "node:child_process";
 import fs from "node:fs";
 let [v, mode, times] = process.argv.slice(2);
-const SERIES = v === "S"; const sname = SERIES ? mode : null; if (SERIES) { mode = times; times = process.argv[5]; }
+const REALV = v === "R"; const SERIES = v === "S" || REALV; const sname = SERIES ? mode : null; if (SERIES) { mode = times; times = process.argv[5]; }
 const slug = SERIES ? sname.replace(/[^A-Za-z0-9]+/g, "_") : v;
 const port = Number(process.env.PORT) || (9300 + (SERIES ? 50 + Math.floor(Math.random()*900) : Number(v)));
 const chrome = spawn("google-chrome", ["--headless=new", "--no-sandbox", "--disable-gpu", "--hide-scrollbars",
@@ -20,8 +20,8 @@ await send("Page.navigate", { url: "file:///home/claude/ads/anim.html" });
 await sleep(1500);
 const ev = async expr => (await send("Runtime.evaluate", { expression: expr, awaitPromise: true, returnByValue: true })).result;
 let len = (await ev(`setup(${SERIES ? 4 : v})`)).result.value;
-if (SERIES) { len = (await ev(`setupSeries(${JSON.stringify(sname)})`)).result.value; const meta=(await ev(`JSON.stringify(Object.assign({},SERIES[${JSON.stringify(sname)}],{f:undefined}))`)).result.value; fs.writeFileSync(`/home/claude/ads/f/${slug}.json`, meta); }
-const shot = async t => { await ev(SERIES ? `renderSeries(${JSON.stringify(sname)},${t})` : `render(${t})`); const r = await send("Page.captureScreenshot", { format: "jpeg", quality: 92 }); return Buffer.from(r.result.data, "base64"); };
+if (REALV) { len = (await ev(`setupReal(${JSON.stringify(sname)})`)).result.value; fs.writeFileSync(`/home/claude/ads/f/${slug}.json`, (await ev(`JSON.stringify({len:REAL[${JSON.stringify(sname)}].len,cuts:REAL[${JSON.stringify(sname)}].cuts,taps:REAL[${JSON.stringify(sname)}].taps})`)).result.value); } else if (SERIES) { len = (await ev(`setupSeries(${JSON.stringify(sname)})`)).result.value; const meta=(await ev(`JSON.stringify(Object.assign({},SERIES[${JSON.stringify(sname)}],{f:undefined}))`)).result.value; fs.writeFileSync(`/home/claude/ads/f/${slug}.json`, meta); }
+const shot = async t => { await ev(REALV ? `renderReal(${JSON.stringify(sname)},${t})` : SERIES ? `renderSeries(${JSON.stringify(sname)},${t})` : `render(${t})`); const r = await send("Page.captureScreenshot", { format: "jpeg", quality: 92 }); return Buffer.from(r.result.data, "base64"); };
 if (mode === "stills") {
   for (const t of times.split(",")) fs.writeFileSync(`/tmp/s${slug}_${t}.jpg`, await shot(Number(t)));
 } else {
