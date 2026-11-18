@@ -1,4 +1,4 @@
-/* built from src/home.jsx 74a3f04f0e8f065a — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 083e226fd3f9d9c6 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -9267,7 +9267,7 @@ function App() {
         fontFamily: "var(--font)",
         fontSize: 16
       }
-    }, "\u2190"), (cur.type === "multi" || cur.type === "zip" || cur.type === "slider" || cur.type === "extracurricular") && React.createElement("button", {
+    }, "\u2190"), !(cur.type === "resume" && !ans.resume) && React.createElement("button", {
       onClick: advanceQuiz,
       disabled: !canNext(),
       style: {
@@ -9284,7 +9284,7 @@ function App() {
         transition: "all 0.2s",
         boxShadow: "none"
       }
-    }, step === STEPS.length - 1 ? "Find My Matches →" : cur.type === "multi" && !ans.skills.length ? "Skip for now →" : "Continue →")))));
+    }, step === STEPS.length - 1 ? "Find My Matches →" : cur.type === "multi" && !ans.skills.length ? "Skip for now →" : cur.type === "multi" || cur.type === "zip" || cur.type === "slider" || cur.type === "extracurricular" ? "Continue →" : "Next →")))));
   }
   if (page === "emailgate") return React.createElement("div", {
     style: {

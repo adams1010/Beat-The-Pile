@@ -3468,10 +3468,11 @@ function App(){
               </>
             ):(<>
               {step>0&&<button onClick={()=>setStep(s=>s-1)} style={{background:"#FBFBFC",border:`1.5px solid #E2E8F0`,color:"#4A5568",padding:"13px 18px",borderRadius:var_rl,cursor:"pointer",fontFamily:"var(--font)",fontSize:16}}>←</button>}
-              {(cur.type==="multi"||cur.type==="zip"||cur.type==="slider"||cur.type==="extracurricular")&&(
+              {/* Nov 17 (owner): a Next button on every question. Single-choice ones still move on by themselves when picked. */}
+              {!(cur.type==="resume"&&!ans.resume)&&(   /* the resume step has its own "Skip, I don't have one" */
                 <button onClick={advanceQuiz} disabled={!canNext()}
                   style={{flex:1,background:canNext()?`${G}`:"#E2E8F0",border:"none",color:canNext()?"#fff":"#6B7280",padding:"14px 24px",borderRadius:var_rl,cursor:canNext()?"pointer":"not-allowed",fontFamily:"var(--font)",fontSize:15,fontWeight:700,transition:"all 0.2s",boxShadow:"none"}}>
-                  {step===STEPS.length-1?"Find My Matches →":cur.type==="multi"&&!ans.skills.length?"Skip for now →":"Continue →"}
+                  {step===STEPS.length-1?"Find My Matches →":cur.type==="multi"&&!ans.skills.length?"Skip for now →":(cur.type==="multi"||cur.type==="zip"||cur.type==="slider"||cur.type==="extracurricular")?"Continue →":"Next →"}
                 </button>
               )}
             </>)}
