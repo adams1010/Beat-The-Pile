@@ -1,6 +1,7 @@
 {
  "lang": "nl",
  "strings": {
+    "Support": "Ondersteuning",
     "AI is very busy right now. Signed-in students skip this line: sign in and try again.": "De AI is nu erg druk. Ingelogde studenten slaan de rij over: log in en probeer het opnieuw.",
     "We couldn't find that page": "We konden die pagina niet vinden",
     "The link may be old, or the page moved.": "De link is misschien oud, of de pagina is verplaatst.",

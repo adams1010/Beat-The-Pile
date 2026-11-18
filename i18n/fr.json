@@ -1,6 +1,7 @@
 {
  "lang": "fr",
  "strings": {
+    "Support": "Assistance",
     "AI is very busy right now. Signed-in students skip this line: sign in and try again.": "L'IA est très occupée en ce moment. Les étudiants connectés passent devant : connectez-vous et réessayez.",
     "We couldn't find that page": "Page introuvable",
     "The link may be old, or the page moved.": "Le lien est peut-être ancien, ou la page a été déplacée.",
