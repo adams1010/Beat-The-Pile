@@ -1,4 +1,4 @@
-/* built from src/home.jsx 083e226fd3f9d9c6 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 3df334a95a805569 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -1126,9 +1126,9 @@ function LandingD({
     borderRadius: 10
   };
   const wrap = {
-    maxWidth: 1240,
+    maxWidth: 1440,
     margin: "0 auto",
-    padding: "0 24px"
+    padding: "0 32px"
   };
   return React.createElement(React.Fragment, null, React.createElement("section", {
     style: {
