@@ -239,7 +239,7 @@ function LandingD({onQuiz,onPage}){
   const fields=sum?.byField?Object.entries(sum.byField).filter(([k])=>D_FIELD[k]).sort((a,b)=>b[1]-a[1]).slice(0,8):null;
   const pills=["finance","software","mechanical","marketing","civil","science_health"];
   const card={background:"#fff",border:"1px solid #DCE2EC",borderRadius:10};
-  const wrap={maxWidth:1240,margin:"0 auto",padding:"0 24px"};
+  const wrap={maxWidth:1440,margin:"0 auto",padding:"0 32px"};
   return(<>
     <section style={{position:"relative",overflow:"hidden",background:"#060A2C",color:"#E8EDF5"}}>
       <div className="d-hero" style={{...wrap,position:"relative",paddingTop:64,paddingBottom:48,display:"flex",gap:48,flexWrap:"wrap",alignItems:"center"}}>

@@ -33,7 +33,7 @@ Top bar + homepage hero: navy `#060A2C` (no grid, no scan line, no ticker, no bl
 logo. Content area `#EEF1F6`, white 12px-radius cards, dark-lime actions `#4A7000`, pill buttons. **No monospace/"terminal" font and
 no ALL-CAPS letter-spaced labels** — sentence case, Geist with `tabular-nums` for numbers. Job cards lead with the **role**, then a
 company line with an initials tile. /jobs = 3 columns on desktop; on phones the filter box is not sticky and Feedback is a small "?".
-Shared static-page theme: `/d.css`. Mockups: Design artifact 6iuFD7mA58DSdeeWUebJCo.
+Shared static-page theme: `/d.css`. **Desktop width (Nov 18, owner "fill the screen"):** app pages + top bar go to 1440px on desktop (homepage `wrap`, nav `.in`, jobs, orbit, tracker, majors, talent); single-column pages turn their lists into grids at ≥1100px (fair `#cos`, season `#list`, radar `#list`, companies `.list`); /jobs shows job cards two across at ≥1500px; /u/ profile view = hero + main column + 380px sidebar (`.pcols/.pmain/.pside`, phone order kept with `display:contents` + `order`), the editor stays 780px. Legal pages and sign-up forms stay narrow on purpose (readability). Mockups: Design artifact 6iuFD7mA58DSdeeWUebJCo.
 Font **Geist**; ink `#060A2C`, one accent (dark lime `#4A7000` on white, lime `#B0F701` on navy), cool neutrals. No gradients, glows, rainbow chips or emoji
 in UI. Homepage tokens: `G/GD/GL/GM` at the top of `src/home.jsx`; static pages: CSS vars at the top of each page.
 Homepage `/#interview` = Interview practice (`/api/generate` feature `interview_turn`). Pro is **free during beta**

@@ -23,7 +23,7 @@
   *{box-sizing:border-box}
   body{font-variant-numeric:tabular-nums;margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
   a{color:inherit}
-  .wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+  .wrap{max-width:1440px;margin:0 auto;padding:0 24px}
   @media (max-width:560px){.wrap{padding:0 16px}}
 
   header{background:#060A2C;color:#fff;padding:26px 0 22px;border-bottom:1px solid #1A2640}
@@ -107,6 +107,8 @@
   @media (max-width:860px){.layout{grid-template-columns:minmax(0,1fr)}.rail{display:none}}
   @media (max-width:640px){.card .co .follow{padding:8px 4px 8px 10px;margin:-8px 0}.report,.rep,a.small{display:inline-block;padding:8px 2px;margin:-8px 0}.co .cn{display:inline-block;padding:6px 0;margin:-6px 0}}
   .list{display:flex;flex-direction:column;gap:10px}
+  /* Nov 18 (owner): big screens show job cards two across */
+  @media (min-width:1500px){.list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}.list>:not(.card){grid-column:1/-1}}
   .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:6px 14px;align-items:start;transition:border-color .15s}
   .card:hover{border-color:#B9C3D3}
   .list>.card{content-visibility:auto;contain-intrinsic-size:auto 150px}

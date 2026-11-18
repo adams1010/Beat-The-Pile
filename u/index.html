@@ -14,6 +14,9 @@
         --bg:#F6F7F9;--card:#fff;--line:#E3E7ED;--red:#B42318;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  /* Nov 18 (owner): wider on desktop. Profile view = hero + main column + sidebar; the editor stays a readable width. */
+  .pcols{display:flex;flex-direction:column}.pcols>.pmain,.pcols>.pside{display:contents}.pcols .og:empty{display:none}
+  @media (min-width:1100px){main:has(.pcols){max-width:1240px}.pcols{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:0 18px;align-items:start}.pcols>.pmain,.pcols>.pside{display:block}}
   main{max-width:780px;margin:0 auto;padding:24px max(16px,env(safe-area-inset-right,0px)) 80px max(16px,env(safe-area-inset-left,0px))}
   .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin-bottom:14px}
   .hero{padding:0;overflow:hidden}
@@ -374,17 +377,8 @@
         ${isPreview && S.me ? `<div class="vis"><span class="dotv${S.me.profilePublic && S.me.handle ? " on" : ""}" aria-hidden="true"></span>${S.me.profilePublic && S.me.handle ? `Public · <a href="/u/${esc(S.me.handle)}" target="_blank" style="color:var(--muted)">beatthepile.com/u/${esc(S.me.handle)}</a>` : "Private · only you can see this"}</div>` : ""}
         ${((p.experience || []).length + (p.projects || []).length + (p.skills || []).length) ? `<div class="hl"><div><b>${(p.experience || []).length}</b><span>Experience</span></div><div><b>${(p.projects || []).length}</b><span>Projects</span></div><div><b>${(p.skills || []).length}</b><span>Skills</span></div></div>` : ""}
       </div></section>
-      ${isPreview ? ownerCards(p) : ""}
-      ${p.about ? `<section class="card"><h2>About</h2><p class="about">${esc(p.about)}</p></section>` : ""}
-      ${knowHtml(p, isPreview)}
-      ${achHtml(ach, isPreview, p)}
-      ${edu ? `<section class="card"><h2>Education</h2>${edu}</section>` : ""}
-      ${exp ? `<section class="card xp"><h2>Experience</h2>${exp}</section>` : ""}
-      ${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}
-      ${(p.courses || []).length ? `<section class="card"><h2>Courses</h2><div class="chips">${p.courses.map((c) => `<span class="chip">${esc(c)}</span>`).join("")}</div></section>` : ""}
-      ${(p.skills || []).length ? `<section class="card"><h2>Skills</h2><div class="chips">${p.skills.map((s, i) => `<span class="chip${i < 3 ? " top" : ""}">${esc(s)}</span>`).join("")}</div>${p.skills.length > 3 ? `<p class="small muted" style="margin:8px 0 0">Top skills first.</p>` : ""}</section>` : ""}
-      ${isPreview ? kitCard(p) : ""}
-      ${isPreview || seenMe() ? "" : `<section class="card cta"><h2>Make your own profile</h2><p class="small" style="margin:0 0 12px">One page for your experience, projects and skills, plus a QR code for career fairs. Free.</p><a class="btn pri" href="/start/" style="background:#B0F701;border-color:#B0F701;color:#060A2C">Get started</a></section>`}
+      <div class="pcols"><div class="pmain"><div class="og" style="order:2">${p.about ? `<section class="card"><h2>About</h2><p class="about">${esc(p.about)}</p></section>` : ""}</div><div class="og" style="order:3">${knowHtml(p, isPreview)}</div><div class="og" style="order:5">${edu ? `<section class="card"><h2>Education</h2>${edu}</section>` : ""}</div><div class="og" style="order:6">${exp ? `<section class="card xp"><h2>Experience</h2>${exp}</section>` : ""}</div><div class="og" style="order:7">${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}</div></div>
+      <aside class="pside"><div class="og" style="order:1">${isPreview ? ownerCards(p) : ""}</div><div class="og" style="order:4">${achHtml(ach, isPreview, p)}</div><div class="og" style="order:8">${(p.courses || []).length ? `<section class="card"><h2>Courses</h2><div class="chips">${p.courses.map((c) => `<span class="chip">${esc(c)}</span>`).join("")}</div></section>` : ""}</div><div class="og" style="order:9">${(p.skills || []).length ? `<section class="card"><h2>Skills</h2><div class="chips">${p.skills.map((s, i) => `<span class="chip${i < 3 ? " top" : ""}">${esc(s)}</span>`).join("")}</div>${p.skills.length > 3 ? `<p class="small muted" style="margin:8px 0 0">Top skills first.</p>` : ""}</section>` : ""}</div><div class="og" style="order:10">${isPreview ? kitCard(p) : ""}</div><div class="og" style="order:11">${isPreview || seenMe() ? "" : `<section class="card cta"><h2>Make your own profile</h2><p class="small" style="margin:0 0 12px">One page for your experience, projects and skills, plus a QR code for career fairs. Free.</p><a class="btn pri" href="/start/" style="background:#B0F701;border-color:#B0F701;color:#060A2C">Get started</a></section>`}</div></aside></div>
       <p class="small muted" style="text-align:center">Profile on <a href="/" style="color:var(--green-dark)">Beat the Pile</a>${isPreview ? "" : ` · <a href="#" id="rep" style="color:var(--muted)">Report this profile</a>`}</p>`;
   }
   // Achievements (Nov 15): stacking badges from the student's own Tracker. Public = tiers reached; owner = progress to the next one.

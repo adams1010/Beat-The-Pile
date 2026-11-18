@@ -67,7 +67,7 @@
   const css = `
 .btpnav{--n-bg:#060A2C;--n-fg:#E8EDF5;--n-dim:#AEB9CC;--n-line:#1A2640;--n-acc:#B0F701;
   background:var(--n-bg);color:var(--n-fg);font:500 14px/1.2 "Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;position:sticky;top:0;z-index:50;border-bottom:1px solid var(--n-line)}
-.btpnav .in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:6px;min-height:60px;
+.btpnav .in{max-width:1440px;margin:0 auto;display:flex;align-items:center;gap:6px;min-height:60px;
   padding:0 max(16px,env(safe-area-inset-right,0px)) 0 max(16px,env(safe-area-inset-left,0px))}
 .btpnav .logo{display:flex;align-items:center;gap:8px;color:#fff;font-weight:650;text-decoration:none;margin-right:14px;white-space:nowrap;letter-spacing:-.01em}
 .btpnav .logo img{display:block;height:38px;width:auto}

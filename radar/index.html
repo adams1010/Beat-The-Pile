@@ -17,6 +17,8 @@
   body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
   a{color:inherit}
   .wrap{max-width:760px;margin:0 auto;padding:0 16px}
+  /* Nov 18 (owner): use the whole desktop width */
+  @media (min-width:1100px){.wrap{max-width:1440px;padding:0 32px}#list{display:grid;grid-template-columns:repeat(auto-fill,minmax(420px,1fr));gap:12px;align-items:start}#list>.card{margin:0}#list>.empty,#list>.more{grid-column:1/-1}}
   header{background:var(--navy);color:#fff;padding:18px 0 22px}
   .top{display:flex;justify-content:space-between;align-items:center}
   .brand{font-weight:800;font-size:15px;color:var(--green);text-decoration:none}
