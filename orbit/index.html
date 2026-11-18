@@ -206,21 +206,39 @@
     return sets;
   }
   const photoOk = (u) => typeof u === "string" && /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(u);   // only real image data, never a link
+  // Nov 17 (owner): everyone available is drawn. As a ring fills, its circles shrink; past what one lane holds, the ring
+  // splits into a few lanes inside its band, so all of them always fit. Initials only while a circle is big enough to read.
+  function skyLayout(n, R, band){
+    if (!n) return [];
+    const MAXR = 19, MINR = 1.6, GAP = 1.15;
+    const fit = (l) => Math.min(MAXR, (2 * Math.PI * (l === 1 ? R : R - band) * l) / n / (2 * GAP), l === 1 ? Infinity : band / l / 1.2);
+    let lanes = 1, r = fit(1);
+    for (let l = 2; l <= 10; l++) if (fit(l) > r + 0.3) { lanes = l; r = fit(l); }
+    r = Math.max(MINR, r);
+    const per = Math.ceil(n / lanes), out = [];
+    for (let i = 0; i < n; i++) {
+      const lane = i % lanes, k = Math.floor(i / lanes), cnt = Math.ceil((n - lane) / lanes);
+      const rr = R + (lanes > 1 ? (lane - (lanes - 1) / 2) * (band * 2 / lanes) : 0);
+      out.push({ rr, a: (k / Math.max(cnt, 1)) * Math.PI * 2 + lane * (Math.PI / Math.max(per, 1)), r });
+    }
+    return out;
+  }
   function sky(o, sets = { inner: o.classmates, campus: o.schoolmates, everyone: o.everyone }, rings3 = RINGS.slice(0, 3), center = { text: initials(o.me.name) || "You", label: "You", photo: o.me.photo }){
-    const RAD = [92, 150, 205], C = 230;
+    const RAD = [92, 150, 205], BAND = [18, 24, 24], C = 230;
     let nodes = "", rings = "";
     rings3.forEach(([k, , , col], ri) => {
       rings += `<circle cx="${C}" cy="${C}" r="${RAD[ri]}" fill="none" stroke="${col}" stroke-opacity=".35" stroke-dasharray="${ri === 2 ? "3 6" : "none"}"/>`;
-      const list = (sets[k] || []).slice(0, ri === 0 ? 8 : 12), n = list.length, R = { [k]: RAD[ri] };
+      const list = sets[k] || [], L = skyLayout(list.length, RAD[ri], BAND[ri]);
       list.forEach((p, i) => {
-        const a = (i / Math.max(n, 1)) * Math.PI * 2 - Math.PI / 2 + ri * 0.45;
-        const x = C + R[k] * Math.cos(a), y = C + R[k] * Math.sin(a);
+        const { rr, a: a0, r } = L[i], a = a0 - Math.PI / 2 + ri * 0.45;
+        const x = +(C + rr * Math.cos(a)).toFixed(1), y = +(C + rr * Math.sin(a)).toFixed(1), sw = r < 8 ? 1 : (p.link === "connected" ? 4 : 2);
+        const fs = Math.round(r * 0.63);
         nodes += `<${p.handle ? `a class="node" href="/u/${encodeURIComponent(p.handle)}" tabindex="0"` : `g class="node"`} aria-label="${esc(p.name)}"><title>${esc(p.name)}${p.at ? " · " + esc(p.at) : ""}</title>
-          ${photoOk(p.photo) ? `<clipPath id="oc${ri}_${i}"><circle cx="${x}" cy="${y}" r="19"/></clipPath><circle cx="${x}" cy="${y}" r="19" fill="#0E1440"/>
-            <image href="${esc(p.photo)}" x="${x - 19}" y="${y - 19}" width="38" height="38" preserveAspectRatio="xMidYMid slice" clip-path="url(#oc${ri}_${i})"/>
-            <circle cx="${x}" cy="${y}" r="19" fill="none" stroke="${col}" stroke-width="${p.link === "connected" ? 4 : 2}"/>`
-          : `<circle cx="${x}" cy="${y}" r="19" fill="${p.link === "connected" ? "#26345F" : "#0E1440"}" stroke="${col}" stroke-width="${p.link === "connected" ? 4 : 2}"/>
-          <text x="${x}" y="${y + 4.5}" text-anchor="middle" font-size="12" font-weight="600" fill="#fff">${esc(initials(p.name))}</text>`}</${p.handle ? "a" : "g"}>`;
+          ${photoOk(p.photo) && r >= 8 ? `<clipPath id="oc${ri}_${i}"><circle cx="${x}" cy="${y}" r="${r}"/></clipPath><circle cx="${x}" cy="${y}" r="${r}" fill="#0E1440"/>
+            <image href="${esc(p.photo)}" x="${x - r}" y="${y - r}" width="${2 * r}" height="${2 * r}" preserveAspectRatio="xMidYMid slice" clip-path="url(#oc${ri}_${i})"/>
+            <circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}"/>`
+          : `<circle cx="${x}" cy="${y}" r="${r}" fill="${p.link === "connected" ? "#26345F" : "#0E1440"}" stroke="${col}" stroke-width="${sw}"/>
+          ${r >= 11 ? `<text x="${x}" y="${y + fs * 0.37}" text-anchor="middle" font-size="${fs}" font-weight="600" fill="#fff">${esc(initials(p.name))}</text>` : ""}`}</${p.handle ? "a" : "g"}>`;
       });
     });
     return `<svg viewBox="0 0 460 460" role="img" aria-label="Your orbit: ${rings3.map(([k, t]) => `${(sets[k] || []).length} ${t}`).join(", ")}">
