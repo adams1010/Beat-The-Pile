@@ -20,7 +20,9 @@
       // Nov 18 pm: remember the business account so the account menu lists it (Instagram-style switch, one email)
       const bn = String(j.profile.company || "").slice(0, 80);
       if (bn && j.profile.kind !== "recruiter") {
-        try { const was = localStorage.getItem("btp_bizname"); localStorage.setItem("btp_bizname", bn); if (was !== bn) window.btpNavMe && window.btpNavMe(); } catch {}
+        try { const was = localStorage.getItem("btp_bizname") + "|" + localStorage.getItem("btp_bizlogo"), lg = /^data:image\/(jpeg|png|webp);base64,/.test(j.profile.logo || "") ? j.profile.logo : "";
+          localStorage.setItem("btp_bizname", bn); if (lg) localStorage.setItem("btp_bizlogo", lg); else localStorage.removeItem("btp_bizlogo");
+          if (was !== bn + "|" + localStorage.getItem("btp_bizlogo")) window.btpNavMe && window.btpNavMe(); } catch {}
         const u = S.clerk && S.clerk.user, md = (u && u.unsafeMetadata) || {};
         if (u && (!md.biz || md.biz.n !== bn)) u.update({ unsafeMetadata: { ...md, biz: { n: bn } } }).catch(() => {});
       }

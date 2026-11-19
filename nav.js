@@ -267,11 +267,20 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     const hasBiz = BIZ || !!bizName || (md.biz && md.biz.on);
     const ini2 = (t) => String(t || "?").replace(/[^A-Za-z0-9 ]/g, " ").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";
     const row = (kind, title, sub, on, av) => `<a role="menuitemradio" aria-checked="${on}" href="#" class="acctrow${on ? " on" : ""}" ${on ? "" : `data-btp-to="${kind}"`}><span class="me sm" aria-hidden="true">${av}</span><span class="t"><b data-noi18n>${esc(title)}</b><small>${sub}</small></span>${on ? '<svg class="ck" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4A7000" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>' : ""}</a>`;
+    // Nov 18 pm (owner): the business row (and your picture while on the business side) = the company's own logo.
+    let bizLogo = ""; try { bizLogo = localStorage.getItem("btp_bizlogo") || ""; } catch {}
+    if (!/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$/.test(bizLogo)) bizLogo = "";
+    const bizAv = bizLogo ? `<img alt="" src="${bizLogo}">` : esc(ini2(bizName || "Business"));
+    if (BIZ && bizLogo) { nav.querySelector("#btpMe").innerHTML = bizAv; nav.querySelector("#btpMe2").innerHTML = bizAv; }
+    if (hasBiz && u && !bizLogo && !ACCT.bizAsked) { ACCT.bizAsked = true;   // another device / never opened a business page here: ask once
+      (async () => { try { const t = await C.session.getToken(); const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + t }, body: JSON.stringify({ action: "biz_get" }) });
+        const j = r.ok ? await r.json() : null, p = (j && j.profile) || {};
+        if (p.company && p.kind !== "recruiter") { localStorage.setItem("btp_bizname", String(p.company).slice(0, 80)); if (/^data:image\/(jpeg|png|webp);base64,/.test(p.logo || "")) localStorage.setItem("btp_bizlogo", p.logo); window.btpNavMe(); } } catch {} })(); }
     const sess = (C && C.client && (C.client.signedInSessions || C.client.activeSessions)) || [];
     const others = sess.filter((x) => x && x.user && x.id !== (C.session && C.session.id));
     nav.querySelector("#btpAccts").innerHTML = `<small class="accthd">Your accounts</small>` +
       row("student", name, "Personal", !BIZ, pic) +
-      (hasBiz ? row("employer", bizName || "Business account", "Business", BIZ, esc(ini2(bizName || "Business"))) : "") +
+      (hasBiz ? row("employer", bizName || "Business account", "Business", BIZ, bizAv) : "") +
       others.map((x) => { const e = x.user.primaryEmailAddress?.emailAddress || "", n = [x.user.firstName, x.user.lastName].filter(Boolean).join(" ") || e.split("@")[0];
         return `<a role="menuitem" href="#" class="acctrow" data-btp-sess="${esc(x.id)}" data-biz="${((x.user.unsafeMetadata || {}).role === "employer") ? 1 : 0}"><span class="me sm" aria-hidden="true">${esc(ini2(n))}</span><span class="t"><b data-noi18n>${esc(n)}</b><small data-noi18n>${esc(e)}</small></span></a>`; }).join("") +
       (hasBiz ? "" : `<a role="menuitem" href="#" class="acctrow add" data-btp-addbiz><span class="me sm plus" aria-hidden="true">+</span><span class="t"><b>Add account</b><small>A business account on this same email</small></span></a>`);
@@ -342,14 +351,14 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
         if (to) return saveRole(to.dataset.btpTo, to.dataset.btpTo === "employer" ? "/business/home/" : "/");
         if (addb) return saveRole("employer", "/business/setup/?kind=company");
         const C = window.Clerk; if (!C) return;
-        try { ["btp_me", "btp_hiring", "btp_role", "btp_bizname"].forEach((k) => localStorage.removeItem(k)); } catch {}
+        try { ["btp_me", "btp_hiring", "btp_role", "btp_bizname", "btp_bizlogo"].forEach((k) => localStorage.removeItem(k)); } catch {}
         try { await C.setActive({ session: sw.dataset.btpSess }); } catch {} location.href = sw.dataset.biz === "1" ? "/business/home/" : "/";
       });
       det.querySelectorAll("[data-btp-signout]").forEach((a) => a.addEventListener("click", async (e) => { e.preventDefault();
         try { localStorage.removeItem("btp_me"); sessionStorage.removeItem("btp_orbit_n"); } catch {}
         const C = window.Clerk, n = ((C && C.client && (C.client.signedInSessions || C.client.activeSessions)) || []).length;
         try { if (C) await (n > 1 ? C.signOut({ sessionId: C.session.id }) : C.signOut()); } catch {}
-        try { ["btp_role", "btp_hiring", "btp_bizname"].forEach((k) => localStorage.removeItem(k)); } catch {} location.href = "/"; }));
+        try { ["btp_role", "btp_hiring", "btp_bizname", "btp_bizlogo"].forEach((k) => localStorage.removeItem(k)); } catch {} location.href = "/"; }));
     }
   };
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);
