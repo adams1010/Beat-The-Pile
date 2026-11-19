@@ -36,3 +36,19 @@ const { fetchCompany } = await import("../lib/fetchers/index.js");
 const out = await fetchCompany({ id: "acme", company: "Acme Robotics", ats: "avature", host: "acme.avature.net", portal: "careers" });
 assert.deepEqual(out.listings.map((l) => l.title).sort(), ["Mechanical Engineering Intern", "Relative Intern", "Software Engineer I & New Grad"], "US internships + new grad kept; London dropped");
 console.log("✓ Avature: search pages parsed, own host only, boards detected, US internships + new-grad kept");
+// Nov 18 live layouts: Maximus "Job-Description" links, Koch "Location:" label, locale portals in links
+{
+  const maxi = `<article class="article article--result"><h3><a class="link" href="https://maximus.avature.net/careers/Job-Description/ITSM-Intern-Remote-US/44094"> ITSM Intern </a></h3><span class="list-item-location">Remote, United States</span></article>`;
+  const j1 = parseAvature(maxi, { host: "maximus.avature.net", portal: "careers" });
+  assert.equal(j1.length, 1); assert.equal(j1[0].sourceId, "44094"); assert.equal(j1[0].title, "ITSM Intern");
+  const koch = `<article class="article article--result"><a class="share__button" aria-label="Share Asst Engineer (Intern) in social media">Share</a>
+    <a href="mailto:?body=https%3A%2F%2Fkoch.avature.net%2Fen_US%2Fcareers%2FJobDetail%2FAsst-Engineer-Intern%2F196402">Email</a>
+    <h3><a class="link" href="https://koch.avature.net/en_US/careers/JobDetail/Asst-Engineer-Intern/196402">Asst Engineer (Intern)</a></h3>
+    <div class="article__content__field"><div class="article__content__field__label"> Location: </div><div class="article__content__field__value"> Atlanta, GA </div></div></article>`;
+  const j2 = parseAvature(koch, { host: "koch.avature.net", portal: "en_US/careers" });
+  assert.equal(j2.length, 1); assert.equal(j2[0].title, "Asst Engineer (Intern)"); assert.equal(j2[0].location, "Atlanta, GA");
+  assert.equal(j2[0].url, "https://koch.avature.net/en_US/careers/JobDetail/Asst-Engineer-Intern/196402");
+  const b3 = scanHtml('<a href="https://koch.avature.net/en_US/careers/SearchJobs">GP jobs</a> <a href="https://ross.avature.net/talentcommunity">join</a> <a href="https://koch.avature.net/portal/4/x.png">', null).boards;
+  assert.deepEqual(b3.filter((x) => x.ats === "avature").map((x) => x.config.host + "/" + x.config.portal), ["koch.avature.net/en_US/careers"], "locale portal kept; talent community + asset paths ignored");
+  console.log("✓ Avature: Maximus + Koch layouts and locale portals");
+}
