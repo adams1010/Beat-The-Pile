@@ -73,7 +73,8 @@
       ${pre === "employer" ? "" : `<p class="lead" id="found" hidden></p>`}
       <div class="panel"><div id="signin"></div></div>
       <p class="lead legal" style="font-size:13.5px;margin-top:12px">By continuing, you agree to our <a href="/terms/">Terms of Use</a> and <a href="/privacy/">Privacy Policy</a>, and confirm you're 16 or older.</p>`;
-    if (pre !== "employer") fetch("/api/me?founding=1").then((r) => r.ok ? r.json() : null).then((d) => { const el = $("#found");   // real count (lib/founding.js)
+    const hadAcct = (() => { try { return !!(localStorage.getItem("btp_me") || localStorage.getItem("btp_role")); } catch { return false; } })();   // Nov 19: no founding pitch for existing accounts
+    if (pre !== "employer" && !hadAcct) fetch("/api/me?founding=1").then((r) => r.ok ? r.json() : null).then((d) => { const el = $("#found");   // real count (lib/founding.js)
       if (el && d && d.left > 0) { el.innerHTML = `<b style="color:#B0F701">${+d.left} of ${+d.total} founding spots left.</b> The first ${+d.total} students keep every Pro feature free, for life.`; el.hidden = false; } }).catch(() => {});
     const preEmail = (new URLSearchParams(location.search).get("email") || "").trim();   // Nov 18: "Switch account" fills in the other account's email
     try { C.mountSignIn($("#signin"), { forceRedirectUrl: location.href, signUpForceRedirectUrl: location.href, withSignUp: true,

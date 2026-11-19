@@ -1009,7 +1009,7 @@
     loadRelated();
     if ((state.kind === "all" || state.kind === "hourly") && !state.near && state.st === "ALL" && !state.company) loadScope(); else render();   // big scopes search on the server
     $("q").blur();
-    const c = $("count"); if (c && c.getBoundingClientRect().top < 60) c.scrollIntoView({ block: "start" });
+    setTimeout(() => { const c = $("count"); if (c && c.getBoundingClientRect().top < 60) c.scrollIntoView({ block: "start" }); }, 350);   // Nov 19: after the iPhone keyboard is gone
   });
   // "Filters ↑" after you've scrolled past the filter box.
   { const b = document.createElement("button"); b.type = "button"; b.className = "totop"; b.textContent = "Filters ↑"; b.setAttribute("aria-label", "Back to filters");

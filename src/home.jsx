@@ -217,7 +217,10 @@ function LandingD({onQuiz,onPage}){
   const [sum,setSum]=React.useState(null),[sumErr,setSumErr]=React.useState(false),[fresh,setFresh]=React.useState(null);
   const [q,setQ]=React.useState(""),[where,setWhere]=React.useState(""),[near,setNear]=React.useState(null);
   const [found,setFound]=React.useState(null);   // founding members: real count from /api/me?founding=1 (lib/founding.js)
-  React.useEffect(()=>{fetch("/api/me?founding=1").then(r=>r.ok?r.json():null).then(d=>{if(d&&typeof d.left==="number")setFound(d);}).catch(()=>{});},[]);
+  // Nov 19 (owner): no "founding spots left" pitch for people who already have an account (signed in on this device now or before)
+  const hasAcct=()=>{try{return !!(localStorage.getItem("btp_me")||localStorage.getItem("btp_role"));}catch{return false;}};
+  const [acct,setAcct]=React.useState(hasAcct);
+  React.useEffect(()=>{if(acct)return;fetch("/api/me?founding=1").then(r=>r.ok?r.json():null).then(d=>{if(d&&typeof d.left==="number")setFound(d);}).catch(()=>{});const t=setInterval(()=>{if(hasAcct()||(window.Clerk&&window.Clerk.user)){setAcct(true);clearInterval(t);}},1500);setTimeout(()=>clearInterval(t),20000);return()=>clearInterval(t);},[]);
   React.useEffect(()=>{   // "City, ST" (or a 5-digit ZIP) in the location box → live "N within 50 mi" on the map
     const z=where.trim(); if(!D_NEAR(z)){setNear(null);return;}
     let live=true; const t=setTimeout(()=>{fetch(`/api/listings?near=${encodeURIComponent(z)}&mi=50&field=all&limit=1&offset=0`).then(r=>r.ok?r.json():Promise.reject(r.status)).then(d=>{if(live)setNear({meta:d.meta});}).catch(()=>{if(live)setNear({bad:true});});},250);
@@ -264,7 +267,7 @@ function LandingD({onQuiz,onPage}){
             <button className="d-quizbtn" onClick={onQuiz} style={{font:"inherit",fontSize:15,fontWeight:600,background:"transparent",color:"#B0F701",border:"1.5px solid #B0F701",padding:"10px 18px",borderRadius:999,cursor:"pointer",minHeight:44}}>Not sure where to start? Take the 2-minute match quiz</button>
             <span style={{fontSize:13,color:"#8D9AB3"}}>Free · no account needed to browse · <a href="/demo/" style={{color:"#B0F701",fontWeight:600,textDecoration:"none"}}>90-second demo</a></span>
           </div>
-          {found&&found.left>0&&<p className="d-found" style={{fontSize:13.5,color:"#CFD7E6",marginTop:10,display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><span style={{fontWeight:600,color:"#B0F701",...DM}}>{found.left} of {found.total} founding spots left</span><span className="d-foundx">The first {found.total} students keep every Pro feature free, for life.</span><a href="/start/" style={{color:"#B0F701",fontWeight:600,textDecoration:"none"}}>Claim yours →</a></p>}
+          {!acct&&found&&found.left>0&&<p className="d-found" style={{fontSize:13.5,color:"#CFD7E6",marginTop:10,display:"flex",gap:8,alignItems:"center",flexWrap:"wrap"}}><span style={{fontWeight:600,color:"#B0F701",...DM}}>{found.left} of {found.total} founding spots left</span><span className="d-foundx">The first {found.total} students keep every Pro feature free, for life.</span><a href="/start/" style={{color:"#B0F701",fontWeight:600,textDecoration:"none"}}>Claim yours →</a></p>}
         </div>
         <div style={{position:"relative",flex:"1 1 340px",maxWidth:560,minWidth:0,width:"100%"}}>
           <HeroMap near={near} fresh={fresh} sum={sum} sumErr={sumErr}/>

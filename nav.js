@@ -289,6 +289,19 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
       (hasBiz ? "" : `<a role="menuitem" href="#" class="acctrow add" data-btp-addbiz><span class="me sm plus" aria-hidden="true">+</span><span class="t"><b>Add account</b><small>A business account on this same email</small></span></a>`);
     if (path.startsWith("/u/") || path.startsWith("/business/company/")) nav.querySelector("#btpMe").classList.add("cur");
   };
+  // Nov 19 (owner screenshot): iPhone Safari. After the keyboard closes (search submitted, box blurred) Safari can leave
+  // the sticky top bar and the fixed bottom tab bar drawn where they were while the keyboard was up, so the bar floats in
+  // the middle of the page with a blank strip above. A 1px scroll nudge once the keyboard is gone makes Safari redraw them.
+  (() => {
+    const nudge = () => requestAnimationFrame(() => { const y = scrollY; scrollTo(scrollX, y + 1); scrollTo(scrollX, y); });
+    const typing = (el) => el && el.matches && el.matches("input,textarea,select,[contenteditable]");
+    document.addEventListener("focusout", (e) => { if (!typing(e.target)) return;
+      setTimeout(() => { if (!typing(document.activeElement)) nudge(); }, 120);
+      setTimeout(() => { if (!typing(document.activeElement)) nudge(); }, 450); });
+    const vv = window.visualViewport; if (!vv) return;
+    let open = false;
+    vv.addEventListener("resize", () => { const now = vv.height < innerHeight * 0.85; if (open && !now) setTimeout(nudge, 60); open = now; });
+  })();
   const seenSignIn = () => { try { return !!(localStorage.getItem("btp_me") || localStorage.getItem("btp_role")); } catch { return false; } };
   window.btpNavMe();
   const later = () => {     // the rest of the page exists now
