@@ -223,6 +223,7 @@
   .whatwhere .sform .search{flex:1;min-width:0;font-size:16px;padding:11px 14px}
   .whatwhere .near{flex:1 1 220px;min-width:0}
   .cats{display:flex;align-items:center;gap:8px;padding:2px 0 10px}.cats label{font-size:13.5px;color:var(--muted);white-space:nowrap}.cats select{flex:0 1 280px;min-width:0}
+  .minput{flex:0 1 340px;min-width:0;cursor:text;padding:8px 14px;font-size:14px}.minput::placeholder{color:#5E6A80}
   .cats button{flex:0 0 auto;border:1px solid #C9D1DE;background:#fff;color:#060A2C;border-radius:999px;padding:7px 13px;font:500 13.5px Geist,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
   .cats button[aria-pressed="true"]{background:#060A2C;border-color:#060A2C;color:#fff}
   .relhead{margin:18px 0 8px;padding-top:14px;border-top:1px solid #C9D1DE}
@@ -238,6 +239,7 @@
 <body>
 <script src="/nav.js"></script>
 <script src="/jobs/search.js"></script>
+<script src="/pick.js"></script>
 <script type="module">import * as C from "/lib/categories.js"; window.btpCats = C; dispatchEvent(new Event("btpcats"));</script>
 <script src="/resume-file.js"></script>
 <header>
@@ -283,12 +285,12 @@
       <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
     </div>
     <div class="fbar"><button type="button" class="fbtn" id="fBtn" aria-expanded="false" aria-controls="cats">Filters</button><span class="fsum" id="fSum" data-noi18n></span></div>
-    <div class="cats" id="cats"><label for="catSel">Category</label><select class="statesel" id="catSel"><option value="">All jobs</option></select></div>
+    <div class="cats" id="cats"><label for="majorIn">Your major</label><input class="statesel minput" id="majorIn" type="search" placeholder="Type your major, like Mechanical or Nursing" aria-label="Your major"><select class="statesel" id="catSel" hidden aria-hidden="true"><option value="">All jobs</option></select></div>
     <div class="kindseg" role="group" aria-label="Job type"><button type="button" data-kind="intern" aria-pressed="true">Internships</button><button type="button" data-kind="fulltime" aria-pressed="false">Entry-level</button><button type="button" data-kind="hourly" aria-pressed="false">Part-time &amp; hourly</button><button type="button" data-kind="shadow" aria-pressed="false">Shadowing &amp; volunteer</button><button type="button" data-kind="all" aria-pressed="false">All</button></div>
     <select class="statesel kindsel" id="kindSel" aria-label="Job type"><option value="intern">Internships</option><option value="fulltime">Entry-level</option><option value="hourly">Part-time &amp; hourly</option><option value="shadow">Shadowing &amp; volunteer</option><option value="all">All</option></select>
     <div class="row">
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">All US states</option></select>
-      <select class="statesel" id="majorSel" aria-label="Major">
+      <select class="statesel" id="majorSel" aria-label="Major" hidden>
         <option value="all">Any major</option>
         <optgroup label="Engineering"><option value="eng">All engineering</option><option value="mechanical">Mechanical &amp; Aerospace</option><option value="electrical">Electrical &amp; Computer Eng.</option><option value="civil">Civil, Construction &amp; Architecture</option><option value="chemical">Chemical &amp; Materials</option><option value="industrial">Industrial &amp; Manufacturing</option></optgroup>
         <optgroup label="Tech"><option value="software">Software &amp; Computer Science</option><option value="data">Data &amp; AI</option><option value="cyber_it">Cybersecurity &amp; IT</option><option value="product_design">Product &amp; Design</option></optgroup>
@@ -346,11 +348,15 @@
   const DAY = 86400000;
   // Majors (keys from lib/fields.js; "eng" = the engineering view, "all" = everything). tests/fields-test.mjs checks this list.
   const MAJOR_KEYS = [...document.querySelectorAll("#majorSel option")].map((o) => o.value);
-  const MAJOR_LABEL = () => state.cat && window.btpCats?.CAT?.[state.cat] ? window.btpCats.CAT[state.cat].label : state.major === "all" ? "every major" : (document.querySelector(`#majorSel option[value="${state.major}"]`)?.textContent || "");
+  // Nov 19 (owner): one "Your major" box that fills in as you type (every major, your school's first) replaces the
+  // Category + Major dropdowns. A major = one or more job areas ("people_hr,education_social,science_health" = Psychology).
+  const AREA_KEYS = new Set(MAJOR_KEYS.filter((k) => k !== "all" && k !== "eng").concat(["engineering", "other"]));
+  const okMajor = (k) => MAJOR_KEYS.includes(k) || (/^[a-z_,]+$/.test(k || "") && k.split(",").length <= 6 && k.split(",").every((x) => AREA_KEYS.has(x)));
+  const MAJOR_LABEL = () => state.cat && window.btpCats?.CAT?.[state.cat] ? window.btpCats.CAT[state.cat].label : state.major === "all" ? "every major" : state.majorName && state.majorKey === state.major ? state.majorName : (document.querySelector(`#majorSel option[value="${state.major}"]`)?.textContent || "");
   const STRICT_OK = () => state.major === "mechanical";   // Nov 10: not under general Engineering — only Mechanical
   const store = { get(k){ try { return localStorage.getItem(k); } catch { return null; } }, set(k, v){ try { localStorage.setItem(k, v); } catch {} } };
   function defaultMajor(){
-    const saved = store.get("btp_major"); if (saved && MAJOR_KEYS.includes(saved)) return saved;
+    const saved = store.get("btp_major"); if (saved && okMajor(saved)) return saved;
     try { const m = JSON.parse(store.get("iq_session") || "{}")?.ans?.major || ""; if (/engineer/i.test(m)) return /mechanical|aerospace/i.test(m) ? "mechanical" : "eng"; } catch {}
     return "all";
   }
@@ -662,6 +668,7 @@
     else if (st !== "all") p.set("state", st);
     if (state.company) p.set("company", state.company);
     if (state.major !== "all") p.set("major", state.major);
+    if (state.major !== "all" && state.majorName && state.majorKey === state.major) p.set("mn", state.majorName);
     if (state.kind !== "intern") p.set("kind", state.kind);
     if (state.work !== "any") p.set("work", state.work);
     if (state.meOnly && STRICT_OK()) p.set("me", "1");
@@ -675,7 +682,7 @@
   // Nov 16: the phone "Filters" button: how many filters are on + a one-line summary of the view
   function phoneSummary(){
     const b = $("fBtn"), sum = $("fSum"); if (!b || !sum) return;
-    const ms = $("majorSel"), majorTxt = state.major !== "all" && ms && ms.selectedOptions[0] ? ms.selectedOptions[0].textContent : "Any major";
+    const ms = $("majorSel"), majorTxt = state.major !== "all" ? (MAJOR_LABEL() || "Your major") : "Any major";
     const where = state.near ? "near " + state.near.q : state.st === "ALL" ? "all of the US" : state.st.join(", ");
     const n = (state.major !== "all") + (state.near || state.st !== "ALL" ? 1 : 0) + (state.work !== "any") + !!state.cat + !!state.meOnly + (state.savedOnly || state.followOnly ? 1 : 0);
     b.innerHTML = "Filters" + (n ? ` <b data-noi18n>${n}</b>` : "");
@@ -692,7 +699,7 @@
     document.querySelectorAll("[data-kind]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.kind === state.kind)));
     const co = (p.get("company") || "").toLowerCase(); state.company = /^[a-z0-9-]{2,80}$/.test(co) ? co : null;   // from the Radar: one company
     const mj = (p.get("major") || "").toLowerCase();
-    state.major = MAJOR_KEYS.includes(mj) ? mj : state.meOnly ? "mechanical" : p.get("q") ? "all" : defaultMajor();   // old ?me=1 links still work; a search link looks at every major
+    state.major = okMajor(mj) ? mj : state.meOnly ? "mechanical" : p.get("q") ? "all" : defaultMajor();   // old ?me=1 links still work; a search link looks at every major
     state.q = (p.get("q") || "").slice(0, 80); $("q").value = state.q; state.qSubmitted = state.q;
     state.cat = /^[a-z_]{2,30}$/.test(p.get("cat") || "") ? p.get("cat") : null;   // Nov 14: job category chips (lib/categories.js)
     if (state.q && !p.get("state")) state.st = "ALL";              // a search link (e.g. from the Radar) looks nationwide
@@ -771,7 +778,7 @@
   // ── Sign-in (Clerk — same account as the main Beat the Pile app) ───────────────
   // ── Weekly job-alert email for the view you're looking at (lib/alerts.js does the sending) ──
   const alertStates = () => state.st === "ALL" ? "" : state.st.join(",");
-  const alertMajor = () => state.major || "all";
+  const alertMajor = () => (state.major || "all").split(",")[0];   // alerts take one area
   function renderMailme(n){
     const el = $("mailme"); if (!el) return;
     let x = false; try { x = localStorage.getItem("btp_mailme_x") === "1"; } catch {}
@@ -1078,6 +1085,7 @@
     track("category_picked", { cat: state.cat || "all" }); renderCats(); syncUrl(); loadScope();
   });
   async function loadScope(){
+    if (typeof majorBoxText === "function") majorBoxText();
     const where = state.near ? `near=${encodeURIComponent(state.near.q)}&mi=${state.near.mi}` : state.st === "ALL" ? "" : `state=${state.st.join(",")}`;
     const kindQ = state.kind === "intern" ? "" : `kind=${state.kind}`;      // internships = the API's default
     // Nov 13: every job type (or every hourly job) across the whole country is too many to send, so the server does the word search
@@ -1139,10 +1147,41 @@
   }));
   $("workSel").addEventListener("change", (e) => { state.work = e.target.value; track("work_picked", { work: state.work }); syncUrl(); render(); });
   $("majorSel").addEventListener("change", (e) => { state.company = null; state.major = e.target.value; store.set("btp_major", state.major); track("major_picked", { major: state.major, from: "picker" }); $("meWrap").hidden = !STRICT_OK(); loadScope(); });
-  if (!MAJOR_KEYS.includes(state.major)) state.major = "all";
+  if (!okMajor(state.major)) state.major = "all";
   $("majorSel").value = state.major; $("meWrap").hidden = !STRICT_OK();
+  // ── "Your major" box (Nov 19): every major we know (jobs/majors.json, built by scripts/build-major-list.mjs) + the
+  // job areas themselves, your school's majors first. Picking one loads that major's job areas; empty = every major.
+  state.majorName = store.get("btp_major_name") || ""; state.majorKey = store.get("btp_major_name_key") || "";
+  { const mn = (new URLSearchParams(location.search).get("mn") || "").slice(0, 70); if (mn) { state.majorName = mn; state.majorKey = state.major; } }
+  function majorBoxText(){ const box = $("majorIn"); if (!box || document.activeElement === box) return;
+    box.value = state.major === "all" ? "" : MAJOR_LABEL(); }
+  (() => { const box = $("majorIn"); if (!box || !window.btpPick) return;
+    const areaOf = (name) => { const A = window.btpJobSearch?.areasOf; if (!A) return "";
+      const n = btpPick.norm(name).split(" "); return [...new Set(n.flatMap((w) => A(w)))].filter((x) => AREA_KEYS.has(x)).slice(0, 4).join(","); };
+    const load = async () => {
+      const list = (await fetch("/jobs/majors.json").then((r) => r.ok ? r.json() : []).catch(() => [])) || [];
+      const byName = new Map(list.map(([n, f]) => [btpPick.norm(n), f]));
+      const out = [], seen = new Set(), push = (it) => { const k = btpPick.norm(it.label); if (seen.has(k)) return; seen.add(k); out.push(it); };
+      const sid = store.get("btp_school_id");
+      if (sid) { const mine = await btpPick.majors(+sid).catch(() => []);   // your school's own majors, biggest-first tier
+        for (const m of mine) { const f = byName.get(btpPick.norm(m.label)) ?? areaOf(m.label); push({ label: m.label, sub: "At your school", f, size: 3 }); } }
+      for (const o of document.querySelectorAll("#majorSel option")) if (o.value !== "all") push({ label: o.textContent, sub: o.parentElement.label ? `Job area · ${o.parentElement.label}` : "Job area", f: o.value, size: 2 });
+      for (const [n, f] of list) push({ label: n, f: f || areaOf(n) });
+      return out;
+    };
+    btpPick.attach(box, { load, max: 30, hint: "Type your major. Every major is here.", onPick(it){
+      const key = !it ? "all" : it.f && okMajor(it.f) ? it.f : "all";
+      state.majorName = it ? it.label : ""; state.majorKey = key;
+      store.set("btp_major_name", state.majorName); store.set("btp_major_name_key", key);
+      if (key === state.major) { syncUrl(); phoneSummary(); render(); return; }
+      state.company = null; state.cat = null; state.major = key; store.set("btp_major", key);
+      track("major_picked", { major: key, from: "typed", name: state.majorName.slice(0, 60) });
+      $("majorSel").value = MAJOR_KEYS.includes(key) ? key : "all"; $("meWrap").hidden = !STRICT_OK(); loadScope();
+    } });
+    majorBoxText();
+  })();
   // Arriving from a major link (homepage tiles) counts as picking one — remembered unless you already chose
-  { const mj = (new URLSearchParams(location.search).get("major") || "").toLowerCase(); if (mj && mj !== "all" && MAJOR_KEYS.includes(mj) && !store.get("btp_major")) store.set("btp_major", mj); }
+  { const mj = (new URLSearchParams(location.search).get("major") || "").toLowerCase(); if (mj && mj !== "all" && okMajor(mj) && !store.get("btp_major")) store.set("btp_major", mj); }
   // First visit: ask for a major once (never blocks the list; dismissing = "every major" and it won't ask again)
   (function welcome(){
     const p = new URLSearchParams(location.search);

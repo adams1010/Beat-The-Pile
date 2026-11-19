@@ -1,6 +1,10 @@
 {
  "_about": "Spanish UI strings (Nov 2026). Key = the English text exactly as shown (whitespace collapsed). Used by /i18n.js when the student picks Español. Job titles, company names and places are data and stay as-is.",
  "strings": {
+    "Type your major, like Mechanical or Nursing": "Escribe tu carrera, como Mecánica o Enfermería",
+    "Type your major. Every major is here.": "Escribe tu carrera. Están todas.",
+    "At your school": "En tu universidad",
+    "Job area": "Área de empleo",
   "Packages": "Paquetes",
   "Your accounts": "Tus cuentas",
   "Business account": "Cuenta de empresa",

@@ -249,5 +249,5 @@
     const similar = exact.length >= minExact ? [] : part.sort((a, b) => b[1] - a[1]).slice(0, maxSimilar).map((x) => x[0]);
     return { exact: exact.map((x) => x[0]), similar, terms, fixed };
   }
-  globalThis.btpJobSearch = { rank, parse, norm };
+  globalThis.btpJobSearch = { rank, parse, norm, areasOf };   // areasOf: scripts/build-major-list.mjs uses it for majors fieldsForMajor can't place
 })();

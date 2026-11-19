@@ -1,6 +1,10 @@
 {
  "lang": "fr",
  "strings": {
+    "Type your major, like Mechanical or Nursing": "Tape ta filière, comme Mécanique ou Soins infirmiers",
+    "Type your major. Every major is here.": "Tape ta filière. Elles y sont toutes.",
+    "At your school": "Dans ton école",
+    "Job area": "Domaine",
   "Packages": "Offres",
   "Your accounts": "Vos comptes",
   "Business account": "Compte entreprise",

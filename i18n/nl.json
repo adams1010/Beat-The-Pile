@@ -1,6 +1,10 @@
 {
  "lang": "nl",
  "strings": {
+    "Type your major, like Mechanical or Nursing": "Typ je studie, zoals Werktuigbouwkunde of Verpleegkunde",
+    "Type your major. Every major is here.": "Typ je studie. Elke studie staat erin.",
+    "At your school": "Op jouw school",
+    "Job area": "Vakgebied",
   "Packages": "Pakketten",
   "Your accounts": "Je accounts",
   "Business account": "Bedrijfsaccount",

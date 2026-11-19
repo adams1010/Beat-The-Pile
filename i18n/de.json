@@ -1,6 +1,10 @@
 {
  "lang": "de",
  "strings": {
+    "Type your major, like Mechanical or Nursing": "Gib dein Fach ein, z. B. Maschinenbau oder Pflege",
+    "Type your major. Every major is here.": "Gib dein Fach ein. Alle Fächer sind dabei.",
+    "At your school": "An deiner Hochschule",
+    "Job area": "Berufsfeld",
   "Packages": "Pakete",
   "Your accounts": "Deine Konten",
   "Business account": "Unternehmenskonto",

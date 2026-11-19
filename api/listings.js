@@ -40,7 +40,8 @@ export function parse(q) {
   const match = raw("match");
   if (match && match !== "me") errs.push("match can only be 'me'");
   const field = raw("field").toLowerCase();
-  if (field && field !== "all" && !FIELD_KEYS.has(field)) errs.push(`unknown field '${field.slice(0, 30)}'`);
+  // Nov 19: several areas at once ("people_hr,education_social,science_health" = Psychology), up to 6
+  if (field && field !== "all" && (field.split(",").length > 6 || !field.split(",").every((f) => FIELD_KEYS.has(f)))) errs.push(`unknown field '${field.slice(0, 30)}'`);
   const companies = raw("companies").split(",").map((x) => x.trim()).filter(Boolean);
   if (companies.some((c) => !/^[a-z0-9-]{2,80}$/.test(c)) || companies.length > 400) errs.push("companies must be up to 400 company ids");
   const ids = raw("ids").split(",").map((x) => x.trim()).filter(Boolean);
@@ -120,7 +121,7 @@ function majorFilter(p) {
   let q = KIND_Q[p.kind || "intern"];
   if (p.match) q += `&match=eq.${p.match}`;
   else if (!p.field) q += "&match=not.is.null";
-  if (p.field && p.field !== "all") q += `&field=eq.${p.field}`;
+  if (p.field && p.field !== "all") q += p.field.includes(",") ? `&field=in.(${p.field})` : `&field=eq.${p.field}`;
   if (p.companies.length) q += `&company_id=in.(${p.companies.join(",")})`;
   if (hasGroups(p) && !p.near && !p.states.length) q += `&and=(${wordGroups(p).join(",")})`;   // near / states: merged into their own and=(…)
   return q;
@@ -275,7 +276,7 @@ export default async function handler(req, res) {
     if (hasGroups(p)) groups.push(...wordGroups(p));
     if (p.match) q += `&match=eq.${p.match}`;
     else if (!p.field) q += "&match=not.is.null";                       // engineering view (default)
-    if (p.field && p.field !== "all") q += `&field=eq.${p.field}`;
+    if (p.field && p.field !== "all") q += p.field.includes(",") ? `&field=in.(${p.field})` : `&field=eq.${p.field}`;
     if (p.companies.length) q += `&company_id=in.(${p.companies.join(",")})`;
     const pageQ = (after) => { const g = after ? [...groups, afterGroup(after)] : groups; return g.length ? `${q}&and=(${g.join(",")})` : q; };
 
