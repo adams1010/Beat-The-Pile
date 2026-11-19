@@ -33,12 +33,12 @@ jobs:
         if: always()
         continue-on-error: true
         with: { path: .turbo-cache, key: "turbo-sent-${{ github.run_id }}" }
-      - name: Start the next run (about 3 hours after this one began)
+      - name: Start the next run (about 1 hour after this one began; Nov 19, Vercel Pro)
         if: always() && !inputs.args
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           on=$(curl -s https://www.beatthepile.com/api/discovery?bots=1 | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const b=JSON.parse(s).bots.find(x=>x.id==="turbo");console.log(b&&b.enabled===false?"off":"on")}catch{console.log("on")}})')
           [ "$on" = "off" ] && { echo "Turbo Sync is off: chain ends"; exit 0; }
           elapsed=$(( $(date +%s) - $(date -d "$(gh run view ${{ github.run_id }} --repo ${{ github.repository }} --json createdAt -q .createdAt)" +%s) ))
-          wait=$(( 10800 - elapsed )); [ $wait -gt 0 ] && { echo "sleeping $wait s"; sleep $wait; }
+          wait=$(( 3600 - elapsed )); [ $wait -gt 0 ] && { echo "sleeping $wait s"; sleep $wait; }
           gh workflow run turbo-sync.yml --repo ${{ github.repository }} --ref main && echo "next run started"
