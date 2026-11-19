@@ -1,6 +1,10 @@
 {
  "lang": "de",
  "strings": {
+  "Add another account": "Weiteres Konto hinzufügen",
+  "Keep a personal and a business account, switch in one tap": "Behalte ein privates und ein Business-Konto, wechsle mit einem Tipp",
+  "Switch account": "Konto wechseln",
+  "Personal": "Privat",
   "Category": "Kategorie",
   "Pick your area": "Wähle deinen Bereich",
   "Settings": "Einstellungen",

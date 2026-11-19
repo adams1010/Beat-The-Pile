@@ -129,6 +129,7 @@
 .btpnav .acctmenu a.pri:hover{background:#F2FADF}
 .btpnav .langs{padding:8px 10px}.btpnav .langs b{font-size:13px}
 .btpnav .langs{display:flex;align-items:center;justify-content:space-between;gap:10px}.btpnav .langsel{font:500 13px "Geist",sans-serif;border:1px solid #DCE2EC;background:#fff;color:#060A2C;border-radius:8px;padding:5px 8px;cursor:pointer}
+.btpnav .accthd{display:block;padding:6px 10px 2px;font-size:12px;color:#5E6A80}
 .btpnav .langrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .btpnav .langrow button{font:500 12.5px "Geist",sans-serif;border:1px solid #DCE2EC;background:#fff;color:#060A2C;border-radius:999px;padding:4px 10px;cursor:pointer}
 .btpnav .langrow button[aria-pressed=true]{background:#060A2C;color:#fff;border-color:#060A2C}
@@ -212,6 +213,9 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
           <div class="sep"></div>
           <a role="menuitem" href="#" data-btp-switch="${BIZ ? "student" : "employer"}"><b>${BIZ ? "Switch to student account" : "Switch to business account"}</b><small>${BIZ ? "Look for internships and jobs" : "Hire interns and new grads"}</small></a>
           <div class="sep"></div>
+          <div id="btpAccts"></div>
+          <a role="menuitem" href="#" data-btp-add><b>Add another account</b><small>Keep a personal and a business account, switch in one tap</small></a>
+          <div class="sep"></div>
           <div class="langs"><label for="btpLangSel"><b>Language</b></label><select id="btpLangSel" class="langsel" data-noi18n>${LANGS.map(([k, n]) => `<option value="${k}"${k === LANG ? " selected" : ""}>${n}</option>`).join("")}</select></div>
           <div class="sep"></div>
           <a role="menuitem" href="#" data-btp-signout>Sign out</a>
@@ -251,6 +255,13 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     let hiring = false; try { hiring = BIZ && localStorage.getItem("btp_hiring") === "1"; } catch {}
     box.classList.toggle("hiring", hiring); nav.querySelector("#btpMe").title = hiring ? "Your account · Hiring" : "Your account";
     nav.querySelector("#btpAName").textContent = name; nav.querySelector("#btpAEmail").textContent = email;
+    // Nov 18 (owner): several accounts in one browser (Clerk multi-session), e.g. a personal one and a business one
+    const C = window.Clerk, sess = (C && C.client && (C.client.signedInSessions || C.client.activeSessions)) || [];
+    const others = sess.filter((x) => x && x.user && x.id !== (C.session && C.session.id));
+    const esc = (t) => String(t || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    nav.querySelector("#btpAccts").innerHTML = others.length ? `<small class="accthd">Switch account</small>${others.map((x) => { const ou = x.user, oe = ou.primaryEmailAddress?.emailAddress || "";
+      const on = [ou.firstName, ou.lastName].filter(Boolean).join(" ") || oe.split("@")[0], biz = (ou.unsafeMetadata || {}).role === "employer";
+      return `<a role="menuitem" href="#" data-btp-sess="${esc(x.id)}" data-biz="${biz ? 1 : 0}"><b data-noi18n>${esc(on)}</b><small><span data-noi18n>${esc(oe)}</span> · ${biz ? "Business" : "Personal"}</small></a>`; }).join("")}<div class="sep"></div>` : "";
     if (path.startsWith("/u/") || path.startsWith("/business/company/")) nav.querySelector("#btpMe").classList.add("cur");
   };
   const seenSignIn = () => { try { return !!(localStorage.getItem("btp_me") || localStorage.getItem("btp_role")); } catch { return false; } };
@@ -311,11 +322,20 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
       det.querySelectorAll(".menu a").forEach((a) => a.addEventListener("click", () => { det.open = false; }));
       det.querySelector("#btpLangSel")?.addEventListener("change", (e) => {   // Nov 18 (owner): a dropdown, not a row of buttons
         const l = e.target.value; if (window.btpI18n) window.btpI18n.set(l); else { try { localStorage.setItem("btp_lang", l); } catch {} location.reload(); } });
+      det.addEventListener("click", async (e) => {
+        const sw = e.target.closest("[data-btp-sess]"), add = e.target.closest("[data-btp-add]"); if (!sw && !add) return;
+        e.preventDefault(); det.open = false; const C = window.Clerk; if (!C) return;
+        const clear = () => { try { ["btp_me", "btp_hiring", "btp_role"].forEach((k) => localStorage.removeItem(k)); sessionStorage.removeItem("btp_orbit_n"); } catch {} };
+        if (sw) { clear(); try { await C.setActive({ session: sw.dataset.btpSess }); } catch {} location.href = sw.dataset.biz === "1" ? "/business/home/" : "/"; return; }
+        try { await C.openSignIn({ forceRedirectUrl: "/", signUpForceRedirectUrl: "/" }); } catch { location.href = "/start/"; }
+      });
       det.querySelectorAll("[data-btp-switch]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); det.open = false;
         saveRole(a.dataset.btpSwitch, a.dataset.btpSwitch === "employer" ? "/business/home/" : "/"); }));
       det.querySelectorAll("[data-btp-signout]").forEach((a) => a.addEventListener("click", async (e) => { e.preventDefault();
         try { localStorage.removeItem("btp_me"); sessionStorage.removeItem("btp_orbit_n"); } catch {}
-        try { if (window.Clerk) await window.Clerk.signOut(); } catch {} location.href = "/"; }));
+        const C = window.Clerk, n = ((C && C.client && (C.client.signedInSessions || C.client.activeSessions)) || []).length;
+        try { if (C) await (n > 1 ? C.signOut({ sessionId: C.session.id }) : C.signOut()); } catch {}
+        try { localStorage.removeItem("btp_role"); localStorage.removeItem("btp_hiring"); } catch {} location.href = "/"; }));
     }
   };
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);
