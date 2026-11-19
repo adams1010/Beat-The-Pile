@@ -128,6 +128,7 @@
 .btpnav .acctmenu a.pri{display:block;text-align:center;border:1px solid #4A7000;color:#4A7000;border-radius:999px;font-weight:600;margin:0 8px 6px;padding:7px 12px}
 .btpnav .acctmenu a.pri:hover{background:#F2FADF}
 .btpnav .langs{padding:8px 10px}.btpnav .langs b{font-size:13px}
+.btpnav .langs{display:flex;align-items:center;justify-content:space-between;gap:10px}.btpnav .langsel{font:500 13px "Geist",sans-serif;border:1px solid #DCE2EC;background:#fff;color:#060A2C;border-radius:8px;padding:5px 8px;cursor:pointer}
 .btpnav .langrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .btpnav .langrow button{font:500 12.5px "Geist",sans-serif;border:1px solid #DCE2EC;background:#fff;color:#060A2C;border-radius:999px;padding:4px 10px;cursor:pointer}
 .btpnav .langrow button[aria-pressed=true]{background:#060A2C;color:#fff;border-color:#060A2C}
@@ -211,7 +212,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
           <div class="sep"></div>
           <a role="menuitem" href="#" data-btp-switch="${BIZ ? "student" : "employer"}"><b>${BIZ ? "Switch to student account" : "Switch to business account"}</b><small>${BIZ ? "Look for internships and jobs" : "Hire interns and new grads"}</small></a>
           <div class="sep"></div>
-          <div class="langs"><b>Language</b><div class="langrow">${LANGS.map(([k, n]) => `<button type="button" data-btp-lang="${k}" aria-pressed="${k === LANG}" data-noi18n>${n}</button>`).join("")}</div></div>
+          <div class="langs"><label for="btpLangSel"><b>Language</b></label><select id="btpLangSel" class="langsel" data-noi18n>${LANGS.map(([k, n]) => `<option value="${k}"${k === LANG ? " selected" : ""}>${n}</option>`).join("")}</select></div>
           <div class="sep"></div>
           <a role="menuitem" href="#" data-btp-signout>Sign out</a>
         </div></details></div></div>`;
@@ -308,8 +309,8 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
       document.addEventListener("keydown", (e) => { if (e.key === "Escape") det.open = false; });
       addEventListener("resize", () => det.open && place());
       det.querySelectorAll(".menu a").forEach((a) => a.addEventListener("click", () => { det.open = false; }));
-      det.querySelectorAll("[data-btp-lang]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault();
-        const l = a.dataset.btpLang; if (window.btpI18n) window.btpI18n.set(l); else { try { localStorage.setItem("btp_lang", l); } catch {} location.reload(); } }));
+      det.querySelector("#btpLangSel")?.addEventListener("change", (e) => {   // Nov 18 (owner): a dropdown, not a row of buttons
+        const l = e.target.value; if (window.btpI18n) window.btpI18n.set(l); else { try { localStorage.setItem("btp_lang", l); } catch {} location.reload(); } });
       det.querySelectorAll("[data-btp-switch]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); det.open = false;
         saveRole(a.dataset.btpSwitch, a.dataset.btpSwitch === "employer" ? "/business/home/" : "/"); }));
       det.querySelectorAll("[data-btp-signout]").forEach((a) => a.addEventListener("click", async (e) => { e.preventDefault();
