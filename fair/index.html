@@ -69,6 +69,17 @@
   .chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 12px}
   .chip{font:inherit;font-size:13px;font-weight:700;padding:6px 12px;border-radius:999px;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer}
   .chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  /* Nov 18: "Featured at this fair" = verified companies with a paid package (/fair/featured.json, labeled Featured) */
+  #featured:empty{display:none}#featured{margin-bottom:12px}
+  #featured .fh{font-size:13px;color:var(--muted);margin:0 0 6px}
+  #featured .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+  #featured .fc{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;text-decoration:none;color:inherit}
+  #featured .fc.big{grid-column:1/-1;border:2px solid #4A7000;align-items:flex-start}
+  #featured .fl{width:44px;height:44px;border-radius:10px;background:#060A2C;color:#B0F701;display:grid;place-items:center;font-weight:700;overflow:hidden;flex-shrink:0}
+  #featured .fl img{width:100%;height:100%;object-fit:contain;background:#fff}
+  #featured .fc b{display:block}#featured .fc small{display:block;color:var(--muted);font-size:12.5px}
+  #featured .ft{font-size:11.5px;font-weight:600;background:#F2FADF;color:#4A7000;border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:middle}
+  #featured .fa{font-size:13.5px;margin:4px 0 0;color:#2B3850}
   .co{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden}
   .co > button{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 14px;cursor:pointer}
   .co > button:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
@@ -168,6 +179,7 @@
         <optgroup label="Science, policy &amp; more"><option value="exercise_sport">Exercise Science, Sports &amp; Rehab</option><option value="science_health">Science, Health &amp; Environment</option><option value="legal_policy">Legal, Policy &amp; Government</option><option value="education_social">Education &amp; Social Impact</option><option value="other">Other / general</option></optgroup>
       </select></label>
     <div class="chips" id="chips"></div>
+    <div id="featured"></div>
     <div id="cos"><div class="empty">Loading companies…</div></div>
   </section>
   <section id="tab-follow" class="hidden"></section>
@@ -369,8 +381,33 @@
 
   // ── Companies at the fair ──
   const talked = () => new Set(S.me.notes.filter((n) => n.fair === S.fair?.name).map((n) => n.companyId || n.company));
+  // Nov 18: paid placements. /fair/featured.json = [{slug, tier: featured|spotlight, fairs:[ids]} | {slug, tier, school (unitid), term}],
+  // added by the owner after a business buys a package. Only verified company pages show (GET /api/me?co= answers verified only).
+  const FEAT = { list: null, co: {} };
+  async function renderFeatured(){
+    const box = $("#featured"); if (!box || !S.fair) return;
+    const fair = S.fair;
+    try { FEAT.list ||= (await fetch("/fair/featured.json").then((r) => r.json())).featured || []; } catch { FEAT.list = []; }
+    const today = new Date().toISOString().slice(0, 10);
+    const hits = FEAT.list.filter((x) => x && x.slug && (!x.until || x.until >= today) && ((x.fairs || []).includes(fair.id) || (x.school && String(x.school) === String(fair.unitid) && x.term === fair.term)));
+    if (!hits.length) { box.innerHTML = ""; return; }
+    const cos = await Promise.all(hits.map(async (x) => { try { FEAT.co[x.slug] ||= await fetch("/api/me?co=" + encodeURIComponent(x.slug)).then((r) => r.ok ? r.json() : null); } catch {} return FEAT.co[x.slug] ? { x, c: FEAT.co[x.slug] } : null; }));
+    if (S.fair !== fair) return;
+    const ok = cos.filter(Boolean).sort((a, b) => (b.x.tier === "spotlight") - (a.x.tier === "spotlight"));
+    if (!ok.length) { box.innerHTML = ""; return; }
+    const ini = (n) => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+    box.innerHTML = `<p class="fh">Featured at this fair</p><div class="fgrid">${ok.map(({ x, c }) => { const co = c.company || {}, big = x.tier === "spotlight";
+      const logo = /^data:image\/(jpeg|png|webp);base64,/.test(co.logo || "") ? `<img alt="" src="${esc(co.logo)}">` : esc(ini(co.company));
+      const hires = [...((co.hiring && co.hiring.types) || []).map((t) => t === "intern" ? "Internships" : "New grads"), ...((co.hiring && co.hiring.majors) || []).slice(0, 4)].join(", ");
+      const jobs = (c.jobs || []).length;
+      return `<a class="fc${big ? " big" : ""}" href="/co/${encodeURIComponent(c.slug)}"><span class="fl">${logo}</span><span style="min-width:0">
+        <b>${esc(co.company || "")}<span class="ft">Featured</span></b>
+        ${big && co.about ? `<span class="fa">${esc(String(co.about).slice(0, 180))}${String(co.about).length > 180 ? "…" : ""}</span>` : ""}
+        <small>${[hires && "Hires: " + esc(hires), jobs ? `${jobs} open role${jobs === 1 ? "" : "s"}` : ""].filter(Boolean).join(" · ") || "See company page"}</small></span></a>`; }).join("")}</div>`;
+  }
   function renderCompanies(){
     if (!S.fair) return;
+    renderFeatured();
     if (!S.fair.companies.length) {     // announced fair, employer list not out yet
       $("#chips").innerHTML = "";
       $("#cos").innerHTML = `<div class="empty"><b>${esc(S.fair.name)}, ${esc(S.fair.term || "")}</b><br>${esc(S.fair.when || "")} · ${esc(S.fair.where || "")}<br><br>

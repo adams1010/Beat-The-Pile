@@ -1,0 +1,50 @@
+{
+  "_about": "Career fair packages (Nov 18 2026). Prices are the owner's call; change them here. Put each Stripe Payment Link in `stripe` (https://buy.stripe.com/...). With no link the button sends an email to support instead. After paying, add the company to fair/featured.json so it shows on the student Career Fair page.",
+  "contact": "support@beatthepile.com",
+  "tiers": [
+    {
+      "id": "featured",
+      "name": "Featured",
+      "price": 149,
+      "per": "per fair",
+      "scope": "fair",
+      "pitch": "Get on students' radar before they walk in.",
+      "features": [
+        "Your logo in \"Featured at this fair\" at the top of that fair in Career Fair Mode",
+        "Live from the day you buy through fair day, even before the school posts its employer list",
+        "One tap to your company page, your open roles and Join orbit"
+      ],
+      "stripe": ""
+    },
+    {
+      "id": "spotlight",
+      "name": "Spotlight",
+      "price": 349,
+      "per": "per fair",
+      "scope": "fair",
+      "pick": true,
+      "pitch": "The first company students see at the fair.",
+      "features": [
+        "Everything in Featured",
+        "Listed first, in a large card with your About line and who you hire",
+        "Your live open roles count with a link straight to them",
+        "Students who tap Follow get your new jobs in their weekly email"
+      ],
+      "stripe": ""
+    },
+    {
+      "id": "season",
+      "name": "Campus season",
+      "price": 899,
+      "per": "per school, per semester",
+      "scope": "school",
+      "pitch": "Own a whole recruiting season at one school.",
+      "features": [
+        "Spotlight at every fair at that school that semester",
+        "Starts the day you buy and covers fairs added later in the term",
+        "One payment, no per-fair setup"
+      ],
+      "stripe": ""
+    }
+  ]
+}

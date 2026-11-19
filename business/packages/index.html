@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Career fair packages | Beat the Pile Business</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icons/icon-192.png?v=4">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/business/biz.css">
+<style>
+  /* /business/packages/ (Nov 18 2026, owner): paid visibility at a career fair. Tiers + prices + Stripe links live in
+     /business/packages.json. Buying = a Stripe Payment Link with client_reference_id "<slug>__<fair or school-term>";
+     the owner then adds the company to /fair/featured.json, which /fair shows to students. Student numbers are live counts. */
+  .hero{background:var(--navy);color:#fff;border-radius:var(--r);padding:28px;margin-bottom:16px}
+  .hero h1{color:#fff;font-size:28px;margin:0 0 6px}.hero p{color:#C9D2E3;margin:0;max-width:62ch}
+  .hero .pick{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
+  .hero select{max-width:440px;background:#fff}
+  .hero .live{font-size:14px;color:#DDF3A8;margin-top:10px;min-height:21px}.hero .live b{color:var(--lime);font-variant-numeric:tabular-nums}
+  .tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:16px}
+  @media (max-width:900px){.tiers{grid-template-columns:1fr}}
+  .tier{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:22px;display:flex;flex-direction:column}
+  .tier.pick{border:2px solid var(--green)}
+  .tier .tag{align-self:flex-start;font-size:12.5px;font-weight:600;background:var(--tint);color:var(--green);border-radius:999px;padding:3px 10px;margin-bottom:10px}
+  .tier h2{font-size:19px}.tier .pitch{color:var(--muted);font-size:14px;margin:2px 0 14px}
+  .price{font-size:34px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}.price small{font-size:14px;font-weight:500;color:var(--muted);letter-spacing:0;margin-left:6px}
+  .tier ul{margin:16px 0 18px;padding-left:18px;font-size:14px;line-height:1.55;flex:1}.tier li{margin:6px 0}
+  .tier .for{font-size:13px;color:var(--muted);margin:0 0 10px;min-height:20px}
+  .tier .btn{width:100%}
+  .faq h3{margin-top:14px}.faq p{margin:4px 0 0;font-size:14px;color:#2B3850}
+  .paid{background:var(--tint);border:1px solid var(--tint2);border-radius:var(--r);padding:14px 16px;margin-bottom:16px;font-size:14.5px}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main"><div class="card center">Loading…</div></main>
+<script src="/business/biz.js"></script>
+<script>
+(() => {
+  const { esc, $ } = biz;
+  const qs = new URLSearchParams(location.search);
+  let P = null, FAIRS = [], COUNTS = { students: {} }, B = null, U = null, sel = qs.get("fair") || "";
+  const today = new Date().toISOString().slice(0, 10);
+  const money = (n) => "$" + Number(n).toLocaleString();
+  const upcoming = () => FAIRS.filter((f) => f.date && f.date >= today).sort((a, b) => a.date.localeCompare(b.date));
+  const fairOf = (id) => FAIRS.find((f) => f.id === id);
+  const schoolFairs = (f) => f ? upcoming().filter((x) => x.school === f.school && x.term === f.term) : [];
+  const ref = (tier, f) => {   // Stripe client_reference_id: letters, digits, - and _ only
+    const what = tier.scope === "school" ? `${f.unitid || f.school}-${f.term}` : f.id;
+    return `${B && B.slug || "company"}__${tier.id}__${what}`.replace(/[^A-Za-z0-9_-]+/g, "-").slice(0, 200);
+  };
+  function buyHref(t, f){
+    const email = U && U.primaryEmailAddress && U.primaryEmailAddress.emailAddress || "";
+    if (/^https:\/\/(buy|checkout)\.stripe\.com\//.test(t.stripe || "")) {
+      const u = new URL(t.stripe); u.searchParams.set("client_reference_id", ref(t, f)); if (email) u.searchParams.set("prefilled_email", email); return u.href;
+    }
+    const what = t.scope === "school" ? `every ${f.school} fair in ${f.term}` : `${f.name} (${f.term || f.when || ""})`;
+    return `mailto:${P.contact}?subject=${encodeURIComponent(`${t.name} package: ${what}`)}&body=${encodeURIComponent(`Company: ${(B && B.profile && B.profile.company) || ""}\nPackage: ${t.name} (${money(t.price)} ${t.per})\nFair: ${what}\nReference: ${ref(t, f)}\n`)}`;
+  }
+  function render(){
+    const up = upcoming(), own = up.find((x) => ((B && B.fairs) || []).includes(x.id)), f = (fairOf(sel) && fairOf(sel).date >= today && fairOf(sel)) || own || up[0]; if (f) sel = f.id;
+    const v = B && B.status === "verified";
+    const going = f ? (COUNTS.students[f.id] || 0) : 0, sf = schoolFairs(f);
+    const goingSchool = sf.reduce((s, x) => s + (COUNTS.students[x.id] || 0), 0);
+    $("main").innerHTML = `${qs.get("paid") ? `<div class="paid"><b>Payment received. Thank you.</b> We'll put your company live at that fair within one business day and email you when it's up. Questions: <a href="mailto:${esc(P.contact)}">${esc(P.contact)}</a></div>` : ""}
+      ${B ? biz.statusBanner(B) : ""}
+      <section class="hero"><h1>Be the company students plan their fair around.</h1>
+        <p>Students open Career Fair Mode before the fair to pick who they'll visit. A package puts your company at the top of that list, with your logo, who you hire and your open roles.</p>
+        <div class="pick"><label for="fairSel" style="color:#fff;margin:0">Fair</label>
+          <select id="fairSel">${up.map((x) => `<option value="${esc(x.id)}"${x.id === sel ? " selected" : ""}>${esc(x.name)} · ${esc(x.school)} · ${esc(x.when || x.date)}</option>`).join("")}</select></div>
+        <div class="live">${f ? (going ? `<b>${going.toLocaleString()}</b> student${going === 1 ? "" : "s"} on Beat the Pile already said they're going. Live count.` : `Students say they're going in their Orbit. Counts update live.`) : ""}</div>
+      </section>
+      ${!v ? `<div class="banner">Packages are for verified company pages, since they link students to yours. <a href="/business/setup/">Finish verification</a> first, then come back.</div>` : ""}
+      ${f ? `<div class="tiers">${P.tiers.map((t) => `<div class="tier${t.pick ? " pick" : ""}"><span class="tag"${t.pick ? "" : ' style="visibility:hidden" aria-hidden="true"'}>Recommended</span>
+        <h2>${esc(t.name)}</h2><p class="pitch">${esc(t.pitch)}</p>
+        <div class="price">${money(t.price)}<small>${esc(t.per)}</small></div>
+        <ul>${t.features.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+        <p class="for">${t.scope === "school" ? `${sf.length} upcoming ${esc(f.school)} fair${sf.length === 1 ? "" : "s"} in ${esc(f.term || "this term")}${goingSchool ? ` · ${goingSchool.toLocaleString()} students going` : ""}` : `For ${esc(f.name)}`}</p>
+        ${v ? `<a class="btn ${t.pick ? "pri" : ""}" href="${esc(buyHref(t, f))}">${/^https:\/\//.test(t.stripe || "") ? `Buy ${esc(t.name)}` : `Request ${esc(t.name)}`}</a>` : `<a class="btn" href="/business/setup/">Verify to buy</a>`}
+      </div>`).join("")}</div>` : `<div class="card"><p class="empty">No upcoming fairs listed right now. Missing yours? Email <a href="mailto:${esc(P.contact)}">${esc(P.contact)}</a>.</p></div>`}
+      <section class="card faq"><h2>Questions</h2>
+        <h3>Where do students see it?</h3><p>In Career Fair Mode on Beat the Pile, the page students use to plan which companies to visit, build their route and take notes at the fair.</p>
+        <h3>When does it start?</h3><p>Within one business day of payment, and it stays up through the fair. Campus season covers every fair at that school in that semester.</p>
+        <h3>Is this the same as registering for the fair?</h3><p>No. Booths and registration are run by each school's career center. A package is your placement on Beat the Pile for that fair, so register with the school too.</p>
+        <h3>Refunds</h3><p>Full refund if you cancel before your placement goes live. See our <a href="/refunds/">refund policy</a>.</p>
+      </section>`;
+    $("#fairSel")?.addEventListener("change", (e) => { sel = e.target.value; history.replaceState(null, "", "?fair=" + encodeURIComponent(sel)); render(); });
+  }
+  biz.start(async (u) => {
+    if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; return; }
+    if (!u) { $("main").innerHTML = biz.signInCard("Career fair packages", "Sign in to your company account to see packages."); return; }
+    U = u;
+    try {
+      const [p, fj, c, b] = await Promise.all([fetch("/business/packages.json").then((r) => r.json()), fetch("/fair/fairs.json").then((r) => r.json()),
+        biz.api({ action: "biz_fair_counts" }).catch(() => ({ students: {} })), biz.api({ action: "biz_get" }).catch(() => null)]);
+      P = p; FAIRS = fj.fairs || []; COUNTS = { students: {}, ...c }; B = b; render();
+    } catch (e) { $("main").innerHTML = `<div class="card center">Couldn't load packages. Refresh to try again.</div>`; }
+  });
+})();
+</script>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

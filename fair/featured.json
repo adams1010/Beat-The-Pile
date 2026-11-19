@@ -1,0 +1,4 @@
+{
+  "_about": "Paid career fair placements (Nov 18 2026). After a company pays for a package (Stripe reference = <slug>__<tier>__<fair or school-term>), add a row: {\"slug\": \"<their /co/ slug>\", \"tier\": \"featured\"|\"spotlight\", \"fairs\": [\"<fair id>\"]} or for Campus season {\"slug\", \"tier\": \"spotlight\", \"school\": <IPEDS unitid>, \"term\": \"Spring 2027\"}. Optional \"until\": \"YYYY-MM-DD\". Only verified company pages show.",
+  "featured": []
+}
