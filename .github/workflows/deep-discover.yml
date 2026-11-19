@@ -3,7 +3,7 @@
 name: deep-discover
 on:
   schedule:
-    - cron: "30 8 * * *"
+    - cron: "30 8,20 * * *"   # Nov 18: twice a day (Vercel Pro)
   workflow_dispatch:
     inputs:
       args: { description: "e.g. --dry --limit=15", required: false, default: "--limit=60" }

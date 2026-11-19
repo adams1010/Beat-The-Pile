@@ -6,7 +6,7 @@
 name: turbo-sync
 on:
   schedule:
-    - cron: "20 */3 * * *"
+    - cron: "20 * * * *"   # Nov 18: hourly again (Vercel Pro)
   workflow_dispatch:
     inputs:
       args: { description: "e.g. --limit=40 --minutes=10", required: false, default: "" }

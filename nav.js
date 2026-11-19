@@ -311,7 +311,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
       det.querySelectorAll("[data-btp-lang]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault();
         const l = a.dataset.btpLang; if (window.btpI18n) window.btpI18n.set(l); else { try { localStorage.setItem("btp_lang", l); } catch {} location.reload(); } }));
       det.querySelectorAll("[data-btp-switch]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); det.open = false;
-        saveRole(a.dataset.btpSwitch, a.dataset.btpSwitch === "employer" ? "/business/home/" : "/jobs/"); }));
+        saveRole(a.dataset.btpSwitch, a.dataset.btpSwitch === "employer" ? "/business/home/" : "/"); }));
       det.querySelectorAll("[data-btp-signout]").forEach((a) => a.addEventListener("click", async (e) => { e.preventDefault();
         try { localStorage.removeItem("btp_me"); sessionStorage.removeItem("btp_orbit_n"); } catch {}
         try { if (window.Clerk) await window.Clerk.signOut(); } catch {} location.href = "/"; }));
@@ -384,7 +384,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   }
   function startBadge(C){
     orbitBadge(C);
-    setInterval(() => { if (document.visibilityState === "visible") orbitBadge(C, true); }, 120000);   // Nov 15: was 15 s, Nov 17: 120 s (Vercel CPU at 90% of the free 4 h/month); tab focus still re-checks at once
+    setInterval(() => { if (document.visibilityState === "visible") orbitBadge(C, true); }, 30000);   // Nov 18: 30 s on Vercel Pro (Nov 15: was 15 s, Nov 17: 120 s (Vercel CPU at 90% of the free 4 h/month); tab focus still re-checks at once
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") orbitBadge(C); });
     addEventListener("focus", () => orbitBadge(C));
   }

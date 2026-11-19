@@ -4,7 +4,7 @@
 name: discover
 on:
   schedule:
-    - cron: "11 * * * *"
+    - cron: "11,41 * * * *"   # Nov 18: every 30 min (Vercel Pro)
   workflow_dispatch:
     inputs:
       import:

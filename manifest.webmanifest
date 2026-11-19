@@ -2,7 +2,7 @@
   "name": "Beat the Pile",
   "short_name": "Beat the Pile",
   "description": "Land an internship or first job in any major: real openings from company job boards, application tracking, follow-up reminders, interview practice and Career Fair Mode.",
-  "start_url": "/jobs/",
+  "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#060A2C",

@@ -102,14 +102,14 @@
   // Step 3 (students, Nov 9): school, major, graduation → classmates at the same school see each other in Orbit right away.
   async function stepSchoolOrRole(C){
     let mine = {}; try { const t = await C.session?.getToken?.(); const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + t } }); if (r.ok) mine = (await r.json()).profile || {}; } catch {}
-    if (mine.school) return wantSchool ? (location.href = next || "/jobs/") : stepRole(C);   // already in their school's orbit
+    if (mine.school) return wantSchool ? (location.href = next || "/") : stepRole(C);   // already in their school's orbit
     return stepSchool(C, roleNow() === "educator");
   }
   async function stepSchool(C, staff){
     const api = async (body) => { const t = await C.session?.getToken?.(); const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + t }, body: JSON.stringify(body) });
       const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Couldn't save. Try again."); return j; };
     let mine = {}, pubNow = null; try { const t = await C.session?.getToken?.(); const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + t } }); if (r.ok) { const j = await r.json(); mine = j.profile || {}; pubNow = j.handle ? j.profilePublic : null; } } catch {}   // Nov 16: a brand-new account has no row yet (profilePublic false) — that is not a choice, so the box starts ticked
-    const go = () => { location.href = next || "/jobs/"; };
+    const go = () => { location.href = next || "/"; };
     // Already set up with a school picked from the list (has its id) → straight in. Nov 14: an older profile with a typed
     // school name and no id now sees step 3 filled in ("Is this still right?"), so the step bar never promises a step
     // that silently disappears, and picking from the list gives the school id Orbit and Career Fair match on.
