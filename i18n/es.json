@@ -1,6 +1,9 @@
 {
  "_about": "Spanish UI strings (Nov 2026). Key = the English text exactly as shown (whitespace collapsed). Used by /i18n.js when the student picks Español. Job titles, company names and places are data and stay as-is.",
  "strings": {
+    "Show every role separately": "Ver cada puesto por separado",
+    "Group roles by company": "Agrupar puestos por empresa",
+    "with save and apply": "con guardar y postular",
     "Clubs & teams": "Clubs y equipos",
     "Which clubs fit your major and lead to internships": "Qué clubs encajan con tu carrera y llevan a prácticas",
     "Clubs & design teams": "Clubs y equipos de diseño",
@@ -1961,6 +1964,11 @@
   "Your Recruiter badge is being verified": "Estamos verificando tu insignia de Reclutador"
  },
  "patterns": [
+    ["^\\+(\\d+) more roles at$", "+$1 puestos más en"],
+    ["^\\+(\\d+) more role at$", "+$1 puesto más en"],
+    ["^See all (\\d+) at$", "Ver los $1 en"],
+    ["^(\\d+) companies with 3\\+ roles here show as one card\\.$", "$1 empresas con 3+ puestos aparecen como una sola tarjeta."],
+    ["^(\\d+) company with 3\\+ roles here show as one card\\.$", "$1 empresa con 3+ puestos aparece como una sola tarjeta."],
   ["^Profile (\\d+)%$", "Perfil $1%"],
   ["^Next: (.+) →$", "Siguiente: $1 →"],
   ["^(\\d) of 4 pinned$", "$1 de 4 fijadas"],

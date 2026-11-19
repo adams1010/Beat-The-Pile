@@ -212,6 +212,8 @@
   .mailme button{font:600 13px inherit;font-family:inherit;padding:7px 14px;border-radius:999px;border:1px solid #C9D1DE;background:#fff;color:var(--ink);cursor:pointer}
   .mailme button.go{background:var(--green);border-color:var(--green);color:#fff}.mailme .mx{position:absolute;top:6px;right:6px;border:0;background:none;color:var(--faint);font-size:17px;padding:2px 8px}
   .alert{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#FFF7E6;border:1px solid #FCD9A5;color:#92400E;border-radius:10px;padding:12px 14px;margin:0 0 12px;font-weight:700;font-size:14px;cursor:pointer;width:100%;font-family:inherit;text-align:left}
+  .roles{margin-top:8px;font-size:13.5px;border-top:1px solid #EEF1F6;padding-top:8px}.roles summary{cursor:pointer;color:var(--green-dark,#3A5A00);font-weight:600}.roles ul{list-style:none;margin:6px 0 0;padding:0}.roles li{padding:6px 0;border-bottom:1px solid #EEF1F6;display:flex;flex-wrap:wrap;gap:4px 8px;align-items:baseline}.roles li a{color:var(--ink,#060A2C);font-weight:600;text-decoration:none}.roles li a:hover{text-decoration:underline}.roles li span{color:var(--muted);font-size:12.5px}.roles .all{display:inline-block;margin-top:8px;font-weight:600;color:var(--green-dark,#3A5A00);text-decoration:none}
+  .grpbar{font-size:13px;color:var(--muted);margin:0 0 10px}
   .sites{margin-top:6px;font-size:13px}.sites summary{cursor:pointer;color:var(--green-dark,#3A5A00);font-weight:600}
   .sites ul{margin:6px 0 0;padding-left:18px;max-height:220px;overflow:auto;columns:2;column-gap:18px}.sites li{break-inside:avoid;margin:2px 0}
   @media(max-width:560px){.sites ul{columns:1}}
@@ -360,6 +362,9 @@
     try { const m = JSON.parse(store.get("iq_session") || "{}")?.ans?.major || ""; if (/engineer/i.test(m)) return /mechanical|aerospace/i.test(m) ? "mechanical" : "eng"; } catch {}
     return "all";
   }
+  const GROUP_MIN = 3;   // Nov 19: roles at one company before they fold into one card
+  document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest("#grpOff,#grpOn"); if (!b) return;
+    store.set("btp_group", b.id === "grpOff" ? "off" : "on"); LIST.sig = ""; render(); });
   const majorParam = () => state.major === "eng" ? "" : `field=${encodeURIComponent(state.major)}`;
 
   function cleanOne(s){
@@ -616,6 +621,7 @@
           <div class="co"><a class="cn" href="${coHref(j)}">${esc(j.company)}</a> <span class="loc">· ${esc(j.sites[0].loc)}${morePlaces(j) ? ` +${morePlaces(j)} more` : ""}</span> <span class="wtag wt-${workOf(j)}">${WORK_NAME[workOf(j)]}</span></div>
           <div class="meta2">${[state.near && j.mi != null ? `<span class="dist">${j.mi < 1 ? "Under 1" : "~" + j.mi} mi away</span>` : "", esc(postedText(j)), j.sites.length > 1 ? `${j.sites.length} locations` : j.count > 1 ? `${j.count} openings` : "", seasonOf(j.title) ? esc(seasonOf(j.title)) : "", (state.major === "all" || !state.major) && FIELD_NAME[j.field] ? esc(FIELD_NAME[j.field]) : "", j.match === "me" && STRICT_OK() ? "Mechanical match" : "", needsClearance(j.title) ? "US citizens / clearance" : ""].filter(Boolean).join(" · ")}</div>
           ${j.sites.length > 1 ? `<details class="sites"><summary>All ${j.sites.length} locations</summary><ul>${j.sites.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.loc)}</a></li>`).join("")}</ul></details>` : ""}
+          ${j._more ? `<details class="roles"><summary>+${j._more.length} more ${j._more.length === 1 ? "role" : "roles"} at <span data-noi18n>${esc(j.company)}</span></summary><ul>${j._more.map((m) => `<li><a href="${esc(m.url)}" target="_blank" rel="noopener" data-co="${esc(m.company)}">${esc(niceTitle(m.title))}</a><span>${esc(m.sites[0].loc)}${m.kind === "fulltime" ? " · Entry-level" : m.kind === "hourly" ? " · Hourly" : m.kind === "shadow" ? " · Shadow / volunteer" : ""}${isNew(m) ? " · New" : ""}</span></li>`).join("")}</ul>${j.company_id ? `<a class="all" href="/jobs/?company=${encodeURIComponent(j.company_id)}${state.kind !== "intern" ? `&kind=${state.kind}` : ""}">See all ${j._more.length + 1} at <span data-noi18n>${esc(j.company)}</span> with save and apply</a>` : ""}</details>` : ""}
         </div>
         <div class="applycol">
           ${j.closed ? "" : `<a class="apply" href="${esc(j.url)}" target="_blank" rel="noopener" data-co="${esc(j.company)}" title="Opens ${esc(domain(j.url))}">Apply →</a>`}
@@ -632,12 +638,25 @@
     // A filter change starts over at the top page; re-renders from Save/Apply clicks keep what you've already scrolled through.
     const sig = [state.cat, state.relCat, state.kind, state.major, state.q, state.st === "ALL" ? "ALL" : state.st.join(","), state.near?.q, state.near?.mi, state.meOnly, state.savedOnly, state.followOnly, state.company].join("|");
     if (sig !== LIST.sig) { LIST.sig = sig; LIST.shown = PAGE; }
-    LIST.rows = rows.concat(simRows, relRows); LIST.tpl = tpl;
+    // Nov 19 (owner): a company with 3+ matching roles shows as ONE card (its best match) with "+N more roles" under it.
+    // Role cards stay the default for everyone else; "Show every role separately" turns it off (remembered on this device).
+    const groupOn = !state.company && !state.savedOnly && !state.followOnly && store.get("btp_group") !== "off";
+    const grouped = (list) => { const key = (j) => j.company_id || j.company, n = new Map();
+      for (const j of list) n.set(key(j), (n.get(key(j)) || 0) + 1);
+      const lead = new Map(), out = [];
+      for (const j of list) { const k = key(j); if ((n.get(k) || 0) < GROUP_MIN) { out.push(j); continue; }
+        if (!lead.has(k)) { const g = { ...j, _more: [] }; lead.set(k, g); out.push(g); } else lead.get(k)._more.push(j); }
+      return out; };
+    const mainRows = groupOn ? grouped(rows) : rows, nGrouped = mainRows.filter((j) => j._more).length;
+    const canGroup = !state.company && !state.savedOnly && !state.followOnly && grouped(rows).some((j) => j._more);
+    const grpBar = !canGroup ? "" : groupOn ? `<div class="grpbar">${nGrouped} ${nGrouped === 1 ? "company" : "companies"} with ${GROUP_MIN}+ roles here show as one card. <button class="linkbtn" id="grpOff" type="button">Show every role separately</button></div>`
+      : `<div class="grpbar"><button class="linkbtn" id="grpOn" type="button">Group roles by company</button></div>`;
+    LIST.rows = mainRows.concat(simRows, relRows); LIST.tpl = tpl;
     const fixedNote = S.fixed ? `<div class="simhead"><b>Showing results for “${esc(S.fixed)}”</b><span>You typed “${esc(state.q)}”.</span></div>` : "";
     const KNAME = { intern: "Internships", fulltime: "Entry-level", hourly: "Part-time & hourly", shadow: "Shadowing & volunteer" };
     const widenNote = (state.widenedFrom && state.major === "all" && state.widenedFor === state.q ? `<div class="simhead"><span>Searched every major, ${esc(state.widenedFrom)} had only a few matches.</span></div>` : "")
       + (state.kindWidenedFrom && state.kind === "all" && state.kindWidenedFor === state.q ? `<div class="simhead"><span>Searched every job type, ${esc(KNAME[state.kindWidenedFrom] || "")} had only a few matches.</span></div>` : "");
-    $("list").innerHTML = fixedNote + widenNote + companyHeader(rows) + LIST.rows.slice(0, LIST.shown).map(tpl).join("") + moreHtml();
+    $("list").innerHTML = fixedNote + widenNote + companyHeader(rows) + grpBar + LIST.rows.slice(0, LIST.shown).map(tpl).join("") + moreHtml();
     watchMore();
   }
   const PAGE = 40, LIST = { sig: null, shown: PAGE, rows: [], tpl: null, io: null };

@@ -1,6 +1,9 @@
 {
  "lang": "de",
  "strings": {
+    "Show every role separately": "Jede Stelle einzeln zeigen",
+    "Group roles by company": "Stellen nach Firma gruppieren",
+    "with save and apply": "mit Speichern und Bewerben",
     "Clubs & teams": "Clubs & Teams",
     "Which clubs fit your major and lead to internships": "Welche Clubs zu deinem Fach passen und zu Praktika führen",
     "Clubs & design teams": "Clubs & Konstruktionsteams",
@@ -1961,6 +1964,11 @@
   "Your Recruiter badge is being verified": "Dein Recruiter-Badge wird geprüft"
  },
  "patterns": [
+    ["^\\+(\\d+) more roles at$", "+$1 weitere Stellen bei"],
+    ["^\\+(\\d+) more role at$", "+$1 weitere Stelle bei"],
+    ["^See all (\\d+) at$", "Alle $1 bei"],
+    ["^(\\d+) companies with 3\\+ roles here show as one card\\.$", "$1 Firmen mit 3+ Stellen erscheinen als eine Karte."],
+    ["^(\\d+) company with 3\\+ roles here show as one card\\.$", "$1 Firma mit 3+ Stellen erscheint als eine Karte."],
   ["^Profile (\\d+)%$", "Profil $1%"],
   ["^Next: (.+) →$", "Als Nächstes: $1 →"],
   ["^(\\d) of 4 pinned$", "$1 von 4 angeheftet"],

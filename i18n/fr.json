@@ -1,6 +1,9 @@
 {
  "lang": "fr",
  "strings": {
+    "Show every role separately": "Voir chaque poste séparément",
+    "Group roles by company": "Regrouper les postes par entreprise",
+    "with save and apply": "avec enregistrer et postuler",
     "Clubs & teams": "Clubs et équipes",
     "Which clubs fit your major and lead to internships": "Quels clubs vont avec ta filière et mènent à des stages",
     "Clubs & design teams": "Clubs et équipes de conception",
@@ -1961,6 +1964,11 @@
   "Your Recruiter badge is being verified": "Ton badge Recruteur est en cours de vérification"
  },
  "patterns": [
+    ["^\\+(\\d+) more roles at$", "+$1 autres postes chez"],
+    ["^\\+(\\d+) more role at$", "+$1 autre poste chez"],
+    ["^See all (\\d+) at$", "Voir les $1 chez"],
+    ["^(\\d+) companies with 3\\+ roles here show as one card\\.$", "$1 entreprises avec 3+ postes apparaissent en une seule carte."],
+    ["^(\\d+) company with 3\\+ roles here show as one card\\.$", "$1 entreprise avec 3+ postes apparaît en une seule carte."],
   ["^Profile (\\d+)%$", "Profil $1%"],
   ["^Next: (.+) →$", "Ensuite : $1 →"],
   ["^(\\d) of 4 pinned$", "$1 sur 4 épinglées"],
