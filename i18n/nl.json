@@ -1964,6 +1964,7 @@
   "Your Recruiter badge is being verified": "Je Recruiter-badge wordt gecontroleerd"
  },
  "patterns": [
+    ["^\\+(\\d+) more$", "+$1 meer"],
     ["^\\+(\\d+) more roles at$", "+$1 andere functies bij"],
     ["^\\+(\\d+) more role at$", "+$1 andere functie bij"],
     ["^See all (\\d+) at$", "Alle $1 bij"],
