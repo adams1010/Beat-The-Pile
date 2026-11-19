@@ -7,6 +7,7 @@ import { discoverOne } from "../lib/discover.js";
 import { db, isAuthorizedCron } from "../lib/db.js";
 import { botOn, logRun } from "../lib/bots.js";
 import { mapLimit, get } from "../lib/http.js";
+import { fetchAggPostings, pickAggCompanies } from "../lib/aggfinder.js";
 import { SIMPLIFY_URL, SIMPLIFY_NEWGRAD_URL, pickCompanies, normName, keyFor } from "../lib/simplify.js";
 import BACKLOG from "../data/backlog.json" with { type: "json" };
 import WANTED from "../data/wanted.json" with { type: "json" };
@@ -61,8 +62,19 @@ export default async function handler(req, res) {
           ng = pickCompanies(await r2.json(), names, boards, { newGrad: true }); }
       } catch (e) { console.error("[import new-grad]", e.message); }
       fresh.push(...ng);
+      // + Adzuna / Jooble (Nov 18): employer NAMES only, never their listings; the finder proves each real board first.
+      let agg = { adzuna: 0, jooble: 0, errors: [] };
+      try {
+        const env = process.env, got = await fetchAggPostings({ adzunaId: env.ADZUNA_APP_ID, adzunaKey: env.ADZUNA_APP_KEY, joobleKey: env.JOOBLE_KEY });
+        for (const f of fresh) names.add(normName(f.company));
+        const a1 = pickAggCompanies(got.adzuna, names, "Adzuna (company name only)", 100);
+        for (const f of a1) names.add(normName(f.company));
+        const a2 = pickAggCompanies(got.jooble, names, "Jooble (company name only)", 100);
+        agg = { adzuna: a1.length, jooble: a2.length, errors: got.errors.slice(0, 3) };
+        fresh.push(...a1, ...a2);
+      } catch (e) { console.error("[import adzuna/jooble]", e.message); agg.errors.push(String(e.message || e).slice(0, 80)); }
       for (let i = 0; i < fresh.length; i += 200) await db.insertIgnore("company_candidates", fresh.slice(i, i + 200));
-      await logRun("import", true, fresh.length ? `Found ${fresh.length} new companies: ${fresh.slice(0, 5).map((f) => f.company).join(", ")}${fresh.length > 5 ? "…" : ""}` : "No new companies today", { imported: fresh.length, newGrad: ng.length });
+      await logRun("import", true, fresh.length ? `Found ${fresh.length} new companies: ${fresh.slice(0, 5).map((f) => f.company).join(", ")}${fresh.length > 5 ? "…" : ""}` : "No new companies today", { imported: fresh.length, newGrad: ng.length, adzuna: agg.adzuna, jooble: agg.jooble, ...(agg.errors.length ? { aggErrors: agg.errors.join(" · ") } : {}) });
       return res.status(200).json({ imported: fresh.length, companies: fresh.slice(0, 50).map((f) => f.company) });
     } catch (e) {
       await logRun("import", false, "Import failed: " + String(e.message || e).slice(0, 150));
