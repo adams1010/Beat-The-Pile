@@ -1,6 +1,8 @@
 {
  "lang": "nl",
  "strings": {
+  "Category": "Categorie",
+  "Pick your area": "Kies je vakgebied",
   "Settings": "Instellingen",
   "Graduates": "Studeert af",
   "Based in": "Woont in",

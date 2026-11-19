@@ -1,6 +1,8 @@
 {
  "lang": "de",
  "strings": {
+  "Category": "Kategorie",
+  "Pick your area": "Wähle deinen Bereich",
   "Settings": "Einstellungen",
   "Graduates": "Abschluss",
   "Based in": "Wohnort",

@@ -60,6 +60,8 @@
   /* Nov 8: job type — internships first, early-career full-time too */
   .kindseg{display:inline-flex;max-width:100%;overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px;margin-bottom:10px}
   .kindseg button{white-space:nowrap}
+  .kindsel,.wsel{display:none}
+  @media (max-width:640px){.kindseg,.wchips#welcomeChips{display:none!important}.kindsel,.wsel{display:block;width:100%;margin-bottom:10px}}
   @media (max-width:520px){.kindseg button{padding:7px 11px;font-size:13px}}
   .kindseg button{border:0;background:none;font:inherit;font-size:14px;font-weight:600;color:var(--muted);padding:7px 16px;border-radius:999px;cursor:pointer}
   .kindseg button[aria-pressed="true"]{background:#060A2C;color:#fff}
@@ -220,7 +222,7 @@
   .whatwhere .sform{flex:2 1 320px;display:flex;gap:6px;min-width:0}
   .whatwhere .sform .search{flex:1;min-width:0;font-size:16px;padding:11px 14px}
   .whatwhere .near{flex:1 1 220px;min-width:0}
-  .cats{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:thin}
+  .cats{display:flex;align-items:center;gap:8px;padding:2px 0 10px}.cats label{font-size:13.5px;color:var(--muted);white-space:nowrap}.cats select{flex:0 1 280px;min-width:0}
   .cats button{flex:0 0 auto;border:1px solid #C9D1DE;background:#fff;color:#060A2C;border-radius:999px;padding:7px 13px;font:500 13.5px Geist,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
   .cats button[aria-pressed="true"]{background:#060A2C;border-color:#060A2C;color:#fff}
   .relhead{margin:18px 0 8px;padding-top:14px;border-top:1px solid #C9D1DE}
@@ -273,7 +275,7 @@
         <button class="wx" id="welcomeX" aria-label="Show every major instead">×</button>
         <h2 id="welcomeH">What are you studying?</h2>
         <p>Pick one and we'll show internships for your major first. You can change it any time.</p>
-        <div class="wchips" id="welcomeChips"></div>
+        <div class="wchips" id="welcomeChips"></div><select class="statesel wsel" id="welcomeSel" aria-label="What are you studying?"></select>
       </section>
 <div class="controls">
     <div class="whatwhere">
@@ -281,8 +283,9 @@
       <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
     </div>
     <div class="fbar"><button type="button" class="fbtn" id="fBtn" aria-expanded="false" aria-controls="cats">Filters</button><span class="fsum" id="fSum" data-noi18n></span></div>
-    <div class="cats" id="cats" role="group" aria-label="Job category"></div>
+    <div class="cats" id="cats"><label for="catSel">Category</label><select class="statesel" id="catSel"><option value="">All jobs</option></select></div>
     <div class="kindseg" role="group" aria-label="Job type"><button type="button" data-kind="intern" aria-pressed="true">Internships</button><button type="button" data-kind="fulltime" aria-pressed="false">Entry-level</button><button type="button" data-kind="hourly" aria-pressed="false">Part-time &amp; hourly</button><button type="button" data-kind="shadow" aria-pressed="false">Shadowing &amp; volunteer</button><button type="button" data-kind="all" aria-pressed="false">All</button></div>
+    <select class="statesel kindsel" id="kindSel" aria-label="Job type"><option value="intern">Internships</option><option value="fulltime">Entry-level</option><option value="hourly">Part-time &amp; hourly</option><option value="shadow">Shadowing &amp; volunteer</option><option value="all">All</option></select>
     <div class="row">
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">All US states</option></select>
       <select class="statesel" id="majorSel" aria-label="Major">
@@ -1054,16 +1057,23 @@
       const d = await r.json(); state.relCat = det.cat; state.relRows = d.listings || []; render();
     } catch { /* the main list still works */ }
   }
+  // Nov 18 (owner): phones get a dropdown for the job type; it presses the same buttons and follows them
+  (() => { const sel = $("kindSel"), seg = document.querySelector(".kindseg"); if (!sel || !seg) return;
+    const follow = () => { const on = seg.querySelector('[aria-pressed="true"]'); if (on) sel.value = on.dataset.kind; };
+    sel.addEventListener("change", () => seg.querySelector(`[data-kind="${sel.value}"]`)?.click());
+    new MutationObserver(follow).observe(seg, { subtree: true, attributes: true, attributeFilter: ["aria-pressed"] }); follow(); })();
   function setKind(k){ state.kind = k; document.querySelectorAll("[data-kind]").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.kind === k))); }
   function renderCats(){
     const C = window.btpCats, box = $("cats"); if (!C || !box) return;
-    box.innerHTML = `<button type="button" data-cat="" aria-pressed="${!state.cat}">All jobs</button>` + C.CATEGORIES.map((c) => `<button type="button" data-cat="${c.key}" aria-pressed="${state.cat === c.key}">${esc(c.label)}</button>`).join("");
+    const sel = $("catSel"); if (!sel) return;   // Nov 18 (owner): a dropdown, not a sideways-scrolling chip row
+    sel.innerHTML = `<option value="">All jobs</option>` + C.CATEGORIES.map((c) => `<option value="${c.key}">${esc(c.label)}</option>`).join("");
+    sel.value = state.cat || "";
   }
   addEventListener("btpcats", () => { renderCats(); if (state.q) loadRelated(); });
   if (window.btpCats) renderCats();
-  document.addEventListener("click", (e) => {
-    const b = e.target.closest("#cats [data-cat]"); if (!b) return;
-    state.cat = b.dataset.cat || null; state.company = null;
+  document.addEventListener("change", (e) => {
+    const b = e.target.closest("#catSel"); if (!b) return;
+    state.cat = b.value || null; state.company = null;
     if (state.cat && state.kind === "intern") setKind("all");    // a category shows every job type; the switch above narrows it
     track("category_picked", { cat: state.cat || "all" }); renderCats(); syncUrl(); loadScope();
   });
@@ -1145,6 +1155,8 @@
       + `<button data-m="all" class="all">Show me everything</button>`;
     $("welcome").hidden = false;
     const pick = (m) => { track("major_picked", { major: m, from: "welcome" }); store.set("btp_major", m); $("welcome").hidden = true; if (m !== state.major) { state.company = null; state.major = m; $("majorSel").value = m; $("meWrap").hidden = !STRICT_OK(); loadScope(); } };
+    $("welcomeSel").innerHTML = `<option value="">Pick your area</option>` + PICKS.filter((k) => MAJOR_KEYS.includes(k)).map((k) => `<option value="${k}">${esc(short(k))}</option>`).join("") + `<option value="all">Show me everything</option>`;
+    $("welcomeSel").addEventListener("change", (e) => { if (e.target.value) pick(e.target.value); });
     $("welcomeChips").addEventListener("click", (e) => { const b = e.target.closest("button[data-m]"); if (b) pick(b.dataset.m); });
     $("welcomeX").onclick = () => pick("all");
     $("majorSel").addEventListener("change", () => { $("welcome").hidden = true; });
