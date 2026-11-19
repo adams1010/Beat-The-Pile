@@ -17,6 +17,13 @@
     if (j && typeof j.status === "string" && j.profile) {   // remember verification so the top bar can show "Hiring" under your picture
       try { const was = localStorage.getItem("btp_hiring") === "1", now = j.status === "verified"; localStorage.setItem("btp_hiring", now ? "1" : "0"); if (was !== now) window.btpNavMe && window.btpNavMe(); } catch {}
       try { localStorage.setItem("btp_bizkind", j.profile.kind === "recruiter" ? "recruiter" : "company"); } catch {}   // menu: "View your profile" vs "View company page"
+      // Nov 18 pm: remember the business account so the account menu lists it (Instagram-style switch, one email)
+      const bn = String(j.profile.company || "").slice(0, 80);
+      if (bn && j.profile.kind !== "recruiter") {
+        try { const was = localStorage.getItem("btp_bizname"); localStorage.setItem("btp_bizname", bn); if (was !== bn) window.btpNavMe && window.btpNavMe(); } catch {}
+        const u = S.clerk && S.clerk.user, md = (u && u.unsafeMetadata) || {};
+        if (u && (!md.biz || md.biz.n !== bn)) u.update({ unsafeMetadata: { ...md, biz: { n: bn } } }).catch(() => {});
+      }
     }
     return j;
   }

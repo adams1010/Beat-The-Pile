@@ -1,6 +1,10 @@
 {
  "lang": "fr",
  "strings": {
+  "Your accounts": "Vos comptes",
+  "Business account": "Compte entreprise",
+  "Add account": "Ajouter un compte",
+  "A business account on this same email": "Un compte entreprise avec cette même adresse e-mail",
   "Add another account": "Ajouter un autre compte",
   "Keep a personal and a business account": "Gardez un compte personnel et un compte entreprise",
   "Switch account": "Changer de compte",

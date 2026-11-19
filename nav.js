@@ -16,7 +16,7 @@
   // Nov 17: every page gets the app tags (Add to Home Screen / installed app), not just the few that had them
   { const H = document.head, has = (sel) => H.querySelector(sel), add = (tag, attrs) => { const e = document.createElement(tag); Object.assign(e, attrs); H.appendChild(e); };
     if (!has('link[rel="manifest"]')) add("link", { rel: "manifest", href: "/manifest.webmanifest" });
-    if (!has('link[rel="apple-touch-icon"]')) add("link", { rel: "apple-touch-icon", href: "/icons/icon-180.png?v=3" });
+    if (!has('link[rel="apple-touch-icon"]')) add("link", { rel: "apple-touch-icon", href: "/icons/icon-180.png?v=4" });
     if (!has('meta[name="theme-color"]')) { const m = document.createElement("meta"); m.name = "theme-color"; m.content = "#060A2C"; H.appendChild(m); }
     if (!has('meta[name="apple-mobile-web-app-capable"]')) { const m = document.createElement("meta"); m.name = "apple-mobile-web-app-capable"; m.content = "yes"; H.appendChild(m); }
     if (!has('meta[name="apple-mobile-web-app-title"]')) { const m = document.createElement("meta"); m.name = "apple-mobile-web-app-title"; m.content = "Beat the Pile"; H.appendChild(m); } }
@@ -129,6 +129,12 @@
 .btpnav .acctmenu a.pri:hover{background:#F2FADF}
 .btpnav .langs{padding:8px 10px}.btpnav .langs b{font-size:13px}
 .btpnav .langs{display:flex;align-items:center;justify-content:space-between;gap:10px}.btpnav .langsel{font:500 13px "Geist",sans-serif;border:1px solid #DCE2EC;background:#fff;color:#060A2C;border-radius:8px;padding:5px 8px;cursor:pointer}
+.btpnav .acctmenu a.acctrow{display:flex;align-items:center;gap:10px;padding:8px 10px}
+.btpnav .acctrow .me.sm{width:34px;height:34px;font-size:12px;border:0}
+.btpnav .acctrow.on .me.sm{outline:2px solid #4A7000;outline-offset:2px}
+.btpnav .acctrow .me.plus{background:#EEF1F6;color:#060A2C;font-size:18px;font-weight:500}
+.btpnav .acctrow .t{flex:1;min-width:0}.btpnav .acctrow .t b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btpnav .acctrow .ck{flex-shrink:0}
 .btpnav .accthd{display:block;padding:6px 10px 2px;font-size:12px;color:#5E6A80}
 .btpnav .langrow{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
 .btpnav .langrow button{font:500 12.5px "Geist",sans-serif;border:1px solid #DCE2EC;background:#fff;color:#060A2C;border-radius:999px;padding:4px 10px;cursor:pointer}
@@ -211,10 +217,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
           <div class="acchead"><span class="me big" id="btpMe2" aria-hidden="true"></span><div style="min-width:0"><b id="btpAName" data-noi18n></b><small id="btpAEmail" data-noi18n></small></div></div>
           <a role="menuitem" class="pri" href="${BIZ ? "/business/company/" : "/u/"}">${BIZ ? (bizKind() === "recruiter" ? "View your profile" : "View company page") : "View profile"}</a>
           <div class="sep"></div>
-          <a role="menuitem" href="#" data-btp-switch="${BIZ ? "student" : "employer"}"><b>${BIZ ? "Switch to student account" : "Switch to business account"}</b><small>${BIZ ? "Look for internships and jobs" : "Hire interns and new grads"}</small></a>
-          <div class="sep"></div>
           <div id="btpAccts"></div>
-          <a role="menuitem" href="#" data-btp-add><b>Add another account</b><small>Keep a personal and a business account</small></a>
           <div class="sep"></div>
           <div class="langs"><label for="btpLangSel"><b>Language</b></label><select id="btpLangSel" class="langsel" data-noi18n>${LANGS.map(([k, n]) => `<option value="${k}"${k === LANG ? " selected" : ""}>${n}</option>`).join("")}</select></div>
           <div class="sep"></div>
@@ -255,18 +258,23 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     let hiring = false; try { hiring = BIZ && localStorage.getItem("btp_hiring") === "1"; } catch {}
     box.classList.toggle("hiring", hiring); nav.querySelector("#btpMe").title = hiring ? "Your account · Hiring" : "Your account";
     nav.querySelector("#btpAName").textContent = name; nav.querySelector("#btpAEmail").textContent = email;
-    // Nov 18 (owner): a personal and a business account in one browser. With Clerk multi-session (a paid Clerk
-    // setting) both stay signed in; without it we remember the accounts used on this device (email, name, kind only)
-    // and switching = sign out + sign in to the other one with its email filled in.
-    const C = window.Clerk, sess = (C && C.client && (C.client.signedInSessions || C.client.activeSessions)) || [];
-    const esc = (t) => String(t || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-    const isBiz = (x) => ((x && x.unsafeMetadata) || {}).role === "employer";
-    let remembered = []; try { remembered = JSON.parse(localStorage.getItem("btp_accts") || "[]").filter((a) => a && a.e); } catch {}
-    if (u && email) { remembered = [{ e: email, n: name, b: isBiz(u) ? 1 : 0 }, ...remembered.filter((a) => a.e !== email)].slice(0, 5); try { localStorage.setItem("btp_accts", JSON.stringify(remembered)); } catch {} }
-    const live = sess.filter((x) => x && x.user && x.id !== (C.session && C.session.id)).map((x) => ({ sess: x.id, e: x.user.primaryEmailAddress?.emailAddress || "", n: [x.user.firstName, x.user.lastName].filter(Boolean).join(" "), b: isBiz(x.user) ? 1 : 0 }));
-    const others = [...live, ...remembered.filter((a) => a.e !== email && !live.some((l) => l.e === a.e))];
-    nav.querySelector("#btpAccts").innerHTML = others.length ? `<small class="accthd">Switch account</small>${others.map((a) =>
-      `<a role="menuitem" href="#" ${a.sess ? `data-btp-sess="${esc(a.sess)}"` : `data-btp-email="${esc(a.e)}"`} data-biz="${a.b ? 1 : 0}"><b data-noi18n>${esc(a.n || a.e.split("@")[0])}</b><small><span data-noi18n>${esc(a.e)}</span> · ${a.b ? "Business" : "Personal"}</small></a>`).join("")}<div class="sep"></div>` : "";
+    // Nov 18 pm (owner): Instagram-style accounts under ONE email. Everyone has a personal account; a business account
+    // is added from here (company setup) and then both show as rows: tap the other one to switch (= unsafeMetadata.role).
+    // Known business: current role is employer, Clerk unsafeMetadata.biz {n}, or this device's btp_bizname.
+    const C = window.Clerk, esc = (t) => String(t || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    const md = (u && u.unsafeMetadata) || {};
+    let bizName = (md.biz && md.biz.n) || ""; try { bizName = bizName || localStorage.getItem("btp_bizname") || ""; } catch {}
+    const hasBiz = BIZ || !!bizName || (md.biz && md.biz.on);
+    const ini2 = (t) => String(t || "?").replace(/[^A-Za-z0-9 ]/g, " ").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "?";
+    const row = (kind, title, sub, on, av) => `<a role="menuitemradio" aria-checked="${on}" href="#" class="acctrow${on ? " on" : ""}" ${on ? "" : `data-btp-to="${kind}"`}><span class="me sm" aria-hidden="true">${av}</span><span class="t"><b data-noi18n>${esc(title)}</b><small>${sub}</small></span>${on ? '<svg class="ck" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4A7000" stroke-width="2.4" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7"/></svg>' : ""}</a>`;
+    const sess = (C && C.client && (C.client.signedInSessions || C.client.activeSessions)) || [];
+    const others = sess.filter((x) => x && x.user && x.id !== (C.session && C.session.id));
+    nav.querySelector("#btpAccts").innerHTML = `<small class="accthd">Your accounts</small>` +
+      row("student", name, "Personal", !BIZ, pic) +
+      (hasBiz ? row("employer", bizName || "Business account", "Business", BIZ, esc(ini2(bizName || "Business"))) : "") +
+      others.map((x) => { const e = x.user.primaryEmailAddress?.emailAddress || "", n = [x.user.firstName, x.user.lastName].filter(Boolean).join(" ") || e.split("@")[0];
+        return `<a role="menuitem" href="#" class="acctrow" data-btp-sess="${esc(x.id)}" data-biz="${((x.user.unsafeMetadata || {}).role === "employer") ? 1 : 0}"><span class="me sm" aria-hidden="true">${esc(ini2(n))}</span><span class="t"><b data-noi18n>${esc(n)}</b><small data-noi18n>${esc(e)}</small></span></a>`; }).join("") +
+      (hasBiz ? "" : `<a role="menuitem" href="#" class="acctrow add" data-btp-addbiz><span class="me sm plus" aria-hidden="true">+</span><span class="t"><b>Add account</b><small>A business account on this same email</small></span></a>`);
     if (path.startsWith("/u/") || path.startsWith("/business/company/")) nav.querySelector("#btpMe").classList.add("cur");
   };
   const seenSignIn = () => { try { return !!(localStorage.getItem("btp_me") || localStorage.getItem("btp_role")); } catch { return false; } };
@@ -328,22 +336,20 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
       det.querySelector("#btpLangSel")?.addEventListener("change", (e) => {   // Nov 18 (owner): a dropdown, not a row of buttons
         const l = e.target.value; if (window.btpI18n) window.btpI18n.set(l); else { try { localStorage.setItem("btp_lang", l); } catch {} location.reload(); } });
       det.addEventListener("click", async (e) => {
-        const sw = e.target.closest("[data-btp-sess]"), rem = e.target.closest("[data-btp-email]"), add = e.target.closest("[data-btp-add]"); if (!sw && !rem && !add) return;
-        e.preventDefault(); det.open = false; const C = window.Clerk; if (!C) return;
-        const clear = () => { try { ["btp_me", "btp_hiring", "btp_role"].forEach((k) => localStorage.removeItem(k)); sessionStorage.removeItem("btp_orbit_n"); } catch {} };
-        const multi = C.__unstable__environment?.authConfig?.singleSessionMode === false;
-        if (sw) { clear(); try { await C.setActive({ session: sw.dataset.btpSess }); } catch {} location.href = sw.dataset.biz === "1" ? "/business/home/" : "/"; return; }
-        if (add && multi) { try { await C.openSignIn({ forceRedirectUrl: "/", signUpForceRedirectUrl: "/" }); return; } catch {} }
-        clear(); try { await C.signOut(); } catch {}
-        location.href = rem ? `/start/?email=${encodeURIComponent(rem.dataset.btpEmail)}&next=${rem.dataset.biz === "1" ? "%2Fbusiness%2Fhome%2F" : "%2F"}` : "/start/";
+        const to = e.target.closest("[data-btp-to]"), addb = e.target.closest("[data-btp-addbiz]"), sw = e.target.closest("[data-btp-sess]"); if (!to && !addb && !sw) return;
+        e.preventDefault(); det.open = false;
+        try { sessionStorage.removeItem("btp_orbit_n"); } catch {}
+        if (to) return saveRole(to.dataset.btpTo, to.dataset.btpTo === "employer" ? "/business/home/" : "/");
+        if (addb) return saveRole("employer", "/business/setup/?kind=company");
+        const C = window.Clerk; if (!C) return;
+        try { ["btp_me", "btp_hiring", "btp_role", "btp_bizname"].forEach((k) => localStorage.removeItem(k)); } catch {}
+        try { await C.setActive({ session: sw.dataset.btpSess }); } catch {} location.href = sw.dataset.biz === "1" ? "/business/home/" : "/";
       });
-      det.querySelectorAll("[data-btp-switch]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); det.open = false;
-        saveRole(a.dataset.btpSwitch, a.dataset.btpSwitch === "employer" ? "/business/home/" : "/"); }));
       det.querySelectorAll("[data-btp-signout]").forEach((a) => a.addEventListener("click", async (e) => { e.preventDefault();
         try { localStorage.removeItem("btp_me"); sessionStorage.removeItem("btp_orbit_n"); } catch {}
         const C = window.Clerk, n = ((C && C.client && (C.client.signedInSessions || C.client.activeSessions)) || []).length;
         try { if (C) await (n > 1 ? C.signOut({ sessionId: C.session.id }) : C.signOut()); } catch {}
-        try { localStorage.removeItem("btp_role"); localStorage.removeItem("btp_hiring"); } catch {} location.href = "/"; }));
+        try { ["btp_role", "btp_hiring", "btp_bizname"].forEach((k) => localStorage.removeItem(k)); } catch {} location.href = "/"; }));
     }
   };
   if (document.body) mount(); else document.addEventListener("DOMContentLoaded", mount);
@@ -352,7 +358,8 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   const DEST = { student: "/start/?school=1", employer: "/business/setup/", educator: "/start/?school=1" };   // students + staff: the quick school step next
   async function saveRole(role, go){
     const u = window.Clerk && window.Clerk.user;
-    try { if (u) await u.update({ unsafeMetadata: { ...(u.unsafeMetadata || {}), role } }); } catch {}
+    const md = (u && u.unsafeMetadata) || {}, leavingBiz = md.role === "employer" && role !== "employer";   // keep the business account listed after switching away
+    try { if (u) await u.update({ unsafeMetadata: { ...md, role, ...(leavingBiz ? { biz: { ...(md.biz || {}), on: 1 } } : {}) } }); } catch {}
     try { localStorage.setItem("btp_role", role); } catch {}
     location.href = go || DEST[role];
   }

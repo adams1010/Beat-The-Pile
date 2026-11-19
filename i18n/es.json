@@ -1,6 +1,10 @@
 {
  "_about": "Spanish UI strings (Nov 2026). Key = the English text exactly as shown (whitespace collapsed). Used by /i18n.js when the student picks Español. Job titles, company names and places are data and stay as-is.",
  "strings": {
+  "Your accounts": "Tus cuentas",
+  "Business account": "Cuenta de empresa",
+  "Add account": "Añadir cuenta",
+  "A business account on this same email": "Una cuenta de empresa con este mismo correo",
   "Add another account": "Agregar otra cuenta",
   "Keep a personal and a business account": "Ten una cuenta personal y una de empresa",
   "Switch account": "Cambiar de cuenta",

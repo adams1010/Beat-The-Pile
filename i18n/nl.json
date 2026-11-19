@@ -1,6 +1,10 @@
 {
  "lang": "nl",
  "strings": {
+  "Your accounts": "Je accounts",
+  "Business account": "Bedrijfsaccount",
+  "Add account": "Account toevoegen",
+  "A business account on this same email": "Een bedrijfsaccount op ditzelfde e-mailadres",
   "Add another account": "Nog een account toevoegen",
   "Keep a personal and a business account": "Houd een persoonlijk en een zakelijk account",
   "Switch account": "Account wisselen",
