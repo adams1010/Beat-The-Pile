@@ -27,6 +27,11 @@
   .nudge a{color:#7A5200;font-weight:600}
   section.card{margin-bottom:16px}
   .people{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+  @media (min-width:1200px){.people{grid-template-columns:repeat(5,minmax(0,1fr))}}
+  @media (min-width:721px) and (max-width:1199px){.people{grid-template-columns:repeat(3,minmax(0,1fr))}}
+  .ppager{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}.ppager .pinfo{font-size:13px;color:var(--muted)}
+  .ppager .pbtns{display:flex;gap:6px;align-items:center}.ppager button{font:inherit;font-size:14px;min-width:36px;height:36px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--ink)}
+  .ppager button[aria-current=page]{background:#060A2C;color:#fff;border-color:#060A2C}.ppager button[disabled]{opacity:.4;cursor:default}
   .p{border:1px solid var(--line);border-radius:10px;padding:16px 12px 12px;text-align:center;display:flex;flex-direction:column;align-items:center;min-width:0}
   .av{width:56px;height:56px;border-radius:50%;background:#4A7000;color:#fff;display:grid;place-items:center;font-weight:600;overflow:hidden;flex-shrink:0}
   .av img{width:100%;height:100%;object-fit:cover}
@@ -174,17 +179,20 @@
     ${p.handle ? `<a class="lnk" href="/u/${encodeURIComponent(p.handle)}">View profile</a>` : ""}</div>`;
   // "Interned at Northrop Grumman" / "Works at Northrop Grumman" (insiders: people at companies you want)
   const atLine = (p) => (p.type === "internship" ? (p.now ? "Interning at " : "Interned at ") : (p.now ? "Works at " : "Worked at ")) + p.at;
-  // Nov 16: show a first batch and a "Show more" button, so thousands of people never become one endless page.
+  // Nov 19 (owner): pages, not "Show more": 15 per page on desktop (3 rows of 5), 8 on phones, with page buttons.
   const MORE = {}; let moreN = 0;
-  const batch = () => (matchMedia("(max-width:720px)").matches ? 8 : 12);
-  const moreBtn = (k) => { const m = MORE[k], left = m.list.length - m.shown; return left > 0 ? `<button type="button" class="pmore" data-more="${k}">Show ${Math.min(left, batch())} more · ${m.list.length} in all</button>` : ""; };
+  const batch = () => (matchMedia("(max-width:720px)").matches ? 8 : 15);
+  const pagesOf = (p, n) => { const s = new Set([1, n, p - 1, p, p + 1].filter((x) => x >= 1 && x <= n)); const a = [...s].sort((x, y) => x - y), o = []; a.forEach((x, i) => { if (i && x - a[i - 1] > 1) o.push("…"); o.push(x); }); return o; };
+  const pager = (k) => { const m = MORE[k], n = batch(), pages = Math.ceil(m.list.length / n); if (pages < 2) return "";
+    const from = (m.page - 1) * n + 1, to = Math.min(m.list.length, m.page * n);
+    return `<nav class="ppager" data-pager="${k}" aria-label="Pages"><span class="pinfo">${from}–${to} of ${m.list.length}</span><span class="pbtns"><button type="button" data-pg="${m.page - 1}" ${m.page <= 1 ? "disabled" : ""} aria-label="Previous page">‹</button>${pagesOf(m.page, pages).map((x) => x === "…" ? "<span>…</span>" : `<button type="button" data-pg="${x}"${x === m.page ? ' aria-current="page"' : ""}>${x}</button>`).join("")}<button type="button" data-pg="${m.page + 1}" ${m.page >= pages ? "disabled" : ""} aria-label="Next page">›</button></span></nav>`; };
   const people = (list, none) => { if (!list.length) return `<p class="empty">${none}</p>`;
-    const k = "m" + (++moreN), n = batch(); MORE[k] = { list, shown: Math.min(n, list.length) };
-    return `<div class="people" data-list="${k}">${list.slice(0, n).map(person).join("")}</div>${moreBtn(k)}`; };
-  document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest("[data-more]"); if (!b) return;
-    const m = MORE[b.dataset.more]; if (!m) return; const grid = document.querySelector(`[data-list="${b.dataset.more}"]`); if (!grid) return;
-    const next = m.list.slice(m.shown, m.shown + batch()); m.shown += next.length; grid.insertAdjacentHTML("beforeend", next.map(person).join(""));
-    b.insertAdjacentHTML("afterend", moreBtn(b.dataset.more)); b.remove(); });
+    const k = "m" + (++moreN), n = batch(); MORE[k] = { list, page: 1 };
+    return `<div class="people" data-list="${k}">${list.slice(0, n).map(person).join("")}</div>${pager(k)}`; };
+  document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest("[data-pg]"); const nav = b && b.closest("[data-pager]"); if (!nav || b.disabled) return;
+    const k = nav.dataset.pager, m = MORE[k]; if (!m) return; const grid = document.querySelector(`[data-list="${k}"]`); if (!grid) return;
+    const n = batch(); m.page = Math.max(1, Math.min(Math.ceil(m.list.length / n), Number(b.dataset.pg))); grid.innerHTML = m.list.slice((m.page - 1) * n, m.page * n).map(person).join("");
+    nav.outerHTML = pager(k); if (grid.getBoundingClientRect().top < 70) grid.scrollIntoView({ block: "start" }); });
 
   // Nov 15 pm (owner): tabs = All · Inner orbit · Campus · Insiders (+ In orbit). Tapping one shows ONLY those people, in the list and the sky.
   const RINGS = [

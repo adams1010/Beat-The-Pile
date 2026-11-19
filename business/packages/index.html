@@ -14,13 +14,19 @@
      the owner then adds the company to /fair/featured.json, which /fair shows to students. Student numbers are live counts. */
   .hero{background:var(--navy);color:#fff;border-radius:var(--r);padding:28px;margin-bottom:16px}
   .hero h1{color:#fff;font-size:28px;margin:0 0 6px}.hero p{color:#C9D2E3;margin:0;max-width:62ch}
-  .hero .pick{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:18px}
-  .hero select{max-width:440px;background:#fff}
+  .step{margin-top:18px}.step .lb{font-size:13px;color:#C9D2E3;margin:0 0 8px;display:block}
+  .chips2{display:flex;gap:8px;flex-wrap:wrap}
+  .chips2 button{font:inherit;font-size:14px;border:1px solid #2A3566;background:#0E1440;color:#fff;border-radius:999px;padding:8px 14px;cursor:pointer;text-align:left}
+  .chips2 button small{display:block;font-size:12px;color:#AEB9CF}
+  .chips2 button[aria-pressed=true]{background:var(--lime);border-color:var(--lime);color:var(--navy)}.chips2 button[aria-pressed=true] small{color:#2B3850}
+  .chips2.fairs button{border-radius:10px;padding:9px 14px}
+  .what{margin-top:16px;border-top:1px solid #2A3566;padding-top:14px;color:#DDE3EE;font-size:14px}.what b{color:#fff}
   .hero .live{font-size:14px;color:#DDF3A8;margin-top:10px;min-height:21px}.hero .live b{color:var(--lime);font-variant-numeric:tabular-nums}
   .tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:16px}
   @media (max-width:900px){.tiers{grid-template-columns:1fr}}
-  .tier{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:22px;display:flex;flex-direction:column}
-  .tier.pick{border:2px solid var(--green)}
+  .tier{background:#fff;border:2px solid #C3CBD9;border-radius:var(--r);padding:24px;display:flex;flex-direction:column}
+  .tier.pick{border:3px solid var(--green);background:#FBFEF4}
+  .tier.pick .tag{background:var(--green);color:#fff}
   .tier .tag{align-self:flex-start;font-size:12.5px;font-weight:600;background:var(--tint);color:var(--green);border-radius:999px;padding:3px 10px;margin-bottom:10px}
   .tier h2{font-size:19px}.tier .pitch{color:var(--muted);font-size:14px;margin:2px 0 14px}
   .price{font-size:34px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}.price small{font-size:14px;font-weight:500;color:var(--muted);letter-spacing:0;margin-left:6px}
@@ -58,6 +64,7 @@
     return `mailto:${P.contact}?subject=${encodeURIComponent(`${t.name} package: ${what}`)}&body=${encodeURIComponent(`Company: ${(B && B.profile && B.profile.company) || ""}\nPackage: ${t.name} (${money(t.price)} ${t.per})\nFair: ${what}\nReference: ${ref(t, f)}\n`)}`;
   }
   function render(){
+    const schools = [...new Set(upcoming().map((x) => x.school))].sort();
     const up = upcoming(), own = up.find((x) => ((B && B.fairs) || []).includes(x.id)), f = (fairOf(sel) && fairOf(sel).date >= today && fairOf(sel)) || own || up[0]; if (f) sel = f.id;
     const v = B && B.status === "verified";
     const going = f ? (COUNTS.students[f.id] || 0) : 0, sf = schoolFairs(f);
@@ -66,9 +73,9 @@
       ${B ? biz.statusBanner(B) : ""}
       <section class="hero"><h1>Be the company students plan their fair around.</h1>
         <p>Students open Career Fair Mode before the fair to pick who they'll visit. A package puts your company at the top of that list, with your logo, who you hire and your open roles.</p>
-        <div class="pick"><label for="fairSel" style="color:#fff;margin:0">Fair</label>
-          <select id="fairSel">${up.map((x) => `<option value="${esc(x.id)}"${x.id === sel ? " selected" : ""}>${esc(x.name)} · ${esc(x.school)} · ${esc(x.when || x.date)}</option>`).join("")}</select></div>
-        <div class="live">${f ? (going ? `<b>${going.toLocaleString()}</b> student${going === 1 ? "" : "s"} on Beat the Pile already said they're going. Live count.` : `Students say they're going in their Orbit. Counts update live.`) : ""}</div>
+        <div class="step"><span class="lb">1. School</span><div class="chips2" id="schChips">${schools.map((n) => `<button type="button" data-sch="${esc(n)}" aria-pressed="${f && f.school === n}">${esc(n)}</button>`).join("")}</div></div>
+        ${f ? `<div class="step"><span class="lb">2. Career fair at ${esc(f.school)}</span><div class="chips2 fairs">${up.filter((x) => x.school === f.school).map((x) => `<button type="button" data-fair="${esc(x.id)}" aria-pressed="${x.id === f.id}">${esc(x.name)}<small>${esc(x.when || x.date)}${x.term ? " · " + esc(x.term) : ""}</small></button>`).join("")}</div></div>
+        <div class="what"><b>${esc(f.name)}</b> · ${esc([f.school, f.where, f.when].filter(Boolean).join(" · "))}<br>${going ? `<b>${going.toLocaleString()}</b> student${going === 1 ? "" : "s"} on Beat the Pile already said they're going (live count). ` : "Students say they're going in their Orbit; counts update live. "}${(f.companies || []).length ? `${f.companies.length} employers are on the school's list. ` : "The school hasn't posted its employer list yet, so featured companies are the first students see. "}${f.source ? `<a href="${esc(f.source)}" target="_blank" rel="noopener" style="color:var(--lime)">School's fair page</a>` : ""}</div>` : ""}
       </section>
       ${!v ? `<div class="banner">Packages are for verified company pages, since they link students to yours. <a href="/business/setup/">Finish verification</a> first, then come back.</div>` : ""}
       ${f ? `<div class="tiers">${P.tiers.map((t) => `<div class="tier${t.pick ? " pick" : ""}"><span class="tag"${t.pick ? "" : ' style="visibility:hidden" aria-hidden="true"'}>Recommended</span>
@@ -84,7 +91,9 @@
         <h3>Is this the same as registering for the fair?</h3><p>No. Booths and registration are run by each school's career center. A package is your placement on Beat the Pile for that fair, so register with the school too.</p>
         <h3>Refunds</h3><p>Full refund if you cancel before your placement goes live. See our <a href="/refunds/">refund policy</a>.</p>
       </section>`;
-    $("#fairSel")?.addEventListener("change", (e) => { sel = e.target.value; history.replaceState(null, "", "?fair=" + encodeURIComponent(sel)); render(); });
+    const go = (id) => { sel = id; history.replaceState(null, "", "?fair=" + encodeURIComponent(sel)); render(); };
+    document.querySelectorAll("[data-sch]").forEach((b) => b.onclick = () => { const first = upcoming().find((x) => x.school === b.dataset.sch); if (first) go(first.id); });
+    document.querySelectorAll("[data-fair]").forEach((b) => b.onclick = () => go(b.dataset.fair));
   }
   biz.start(async (u) => {
     if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; return; }

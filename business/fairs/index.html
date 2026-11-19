@@ -19,6 +19,12 @@
   .go{display:flex;align-items:center;gap:8px;font-weight:600;font-size:14px;border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer;background:#fff;white-space:nowrap}
   .go input{width:auto;margin:0;accent-color:var(--green)}.go.on{background:var(--tint);border-color:var(--tint2);color:var(--green)}
   @media (max-width:600px){.fair{grid-template-columns:56px minmax(0,1fr)}.fair .go{grid-column:2}}
+  /* Nov 19 (owner): school first, then that school's fairs */
+  .schools{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+  .sch{display:flex;flex-direction:column;gap:4px;text-align:left;font:inherit;color:inherit;background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;cursor:pointer}
+  .sch:hover{border-color:var(--green)}.sch b{font-size:15.5px}.sch small{color:var(--muted);font-size:13px}.sch .mine{color:var(--green);font-weight:600;font-size:12.5px}
+  .sfind{max-width:420px;margin:0 0 14px}
+  .crumb{display:flex;gap:10px;align-items:center;margin:0 0 6px}.crumb button{background:none;border:0;font:inherit;color:var(--green);font-weight:600;cursor:pointer;padding:0}
 </style>
 </head>
 <body>
@@ -30,6 +36,7 @@
   const { esc, $ } = biz;
   let FAIRS = [], C = { students: {}, companies: {}, mine: [] }, B = null;
   const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  let SCHOOL = new URLSearchParams(location.search).get("school") || "", SQ = "";
   function render(){
     const today = new Date().toISOString().slice(0, 10);
     const up = FAIRS.filter((f) => !f.date || f.date >= today).sort((a, b) => String(a.date).localeCompare(String(b.date)));
@@ -37,15 +44,32 @@
     const row = (f) => { const d = f.date ? new Date(f.date + "T12:00:00") : null, on = C.mine.includes(f.id), s = C.students[f.id] || 0, co = (C.companies[f.id] || 0) - (on ? 1 : 0);
       return `<div class="fair"><div class="date">${d ? `<span>${MON[d.getMonth()]}</span><b>${d.getDate()}</b>` : "<span>TBA</span>"}</div>
         <div><h3>${esc(f.name)}${f.term ? ` <span class="small muted" style="font-weight:500">· ${esc(f.term)}</span>` : ""}</h3><div class="m">${esc([f.school, f.where, f.when].filter(Boolean).join(" · "))}</div>
-          <div class="nums"><b>${s.toLocaleString()}</b> student${s === 1 ? "" : "s"} on Beat the Pile going · <b>${Math.max(0, co).toLocaleString()}</b> other compan${co === 1 ? "y" : "ies"}</div></div>
+          <div class="nums"><b>${s.toLocaleString()}</b> student${s === 1 ? "" : "s"} on Beat the Pile going · <b>${Math.max(0, co).toLocaleString()}</b> other compan${co === 1 ? "y" : "ies"}${(f.companies || []).length ? ` · <b>${f.companies.length}</b> employers on the school's list` : ""}</div>
+          <div class="small" style="margin-top:6px"><a href="/business/packages/?fair=${encodeURIComponent(f.id)}">Get featured at this fair</a>${f.source ? ` · <a href="${esc(f.source)}" target="_blank" rel="noopener">School's fair page</a>` : ""}</div></div>
         <label class="go ${on ? "on" : ""}"><input type="checkbox" data-fair="${esc(f.id)}" ${on ? "checked" : ""}> We'll be there</label></div>`; };
-    $("main").innerHTML = `${B ? biz.statusBanner(B) : ""}<div class="grid"><div>
-      <section class="card"><h1>Career fairs</h1><p class="sub">Tell students where you'll be. Fairs you pick show on your company page, and students who are going and open to employers appear in your Orbit.</p>
-        ${up.length ? up.map(row).join("") : `<p class="empty">No upcoming fairs listed yet.</p>`}</section>
-      ${past.length ? `<section class="card"><h2>Past fairs you went to</h2>${past.map(row).join("")}</section>` : ""}
+    const bySchool = new Map(); for (const f of up) { const k = f.school || "Other"; if (!bySchool.has(k)) bySchool.set(k, []); bySchool.get(k).push(f); }
+    const mineUp = up.filter((f) => C.mine.includes(f.id));
+    let body;
+    if (SCHOOL && bySchool.has(SCHOOL)) {
+      const list = bySchool.get(SCHOOL);
+      body = `<section class="card"><div class="crumb"><button type="button" id="allSch">‹ All schools</button></div><h1>${esc(SCHOOL)}</h1><p class="sub">${list.length} upcoming fair${list.length === 1 ? "" : "s"}. Tick the ones you'll attend: they show on your company page, and students going who are open to employers appear in your Orbit.</p>${list.map(row).join("")}</section>`;
+    } else {
+      SCHOOL = "";
+      const q = SQ.toLowerCase(), names = [...bySchool.keys()].filter((n) => !q || n.toLowerCase().includes(q)).sort((a, b) => String(bySchool.get(a)[0].date || "9").localeCompare(String(bySchool.get(b)[0].date || "9")));
+      body = `${mineUp.length ? `<section class="card"><h2>Your fairs</h2>${mineUp.map(row).join("")}</section>` : ""}
+        <section class="card"><h1>Career fairs</h1><p class="sub">Start with a school. ${bySchool.size} schools have upcoming fairs on Beat the Pile.</p>
+        <input class="sfind" id="sfind" type="search" placeholder="Find a school" aria-label="Find a school" value="${esc(SQ)}">
+        <div class="schools">${names.map((n) => { const L = bySchool.get(n), going = L.reduce((t, f) => t + (C.students[f.id] || 0), 0), mine = L.filter((f) => C.mine.includes(f.id)).length, dd = L.find((f) => f.date), d = dd ? new Date(dd.date + "T12:00:00") : null;
+          return `<button type="button" class="sch" data-school="${esc(n)}"><b>${esc(n)}</b><small>${L.length} upcoming fair${L.length === 1 ? "" : "s"}${d ? ` · next ${MON[d.getMonth()]} ${d.getDate()}` : ""}</small><small>${going.toLocaleString()} student${going === 1 ? "" : "s"} going</small>${mine ? `<span class="mine">You're going to ${mine}</span>` : ""}</button>`; }).join("") || `<p class="empty">No school matches "${esc(SQ)}".</p>`}</div></section>`;
+    }
+    $("main").innerHTML = `${B ? biz.statusBanner(B) : ""}<div class="grid"><div>${body}
+      ${past.length && !SCHOOL ? `<section class="card"><h2>Past fairs you went to</h2>${past.map(row).join("")}</section>` : ""}
       </div><aside><section class="card"><h2>How it works</h2><ul style="padding-left:18px;margin:0;font-size:14px;line-height:1.6">
         <li>Student counts are students who said they're going in their Orbit.</li><li>You only see names of students who are going <b>and</b> chose to be found by employers.</li>
-        <li>Missing a fair? Use Report a problem and we'll add it.</li></ul></section></aside></div>`;
+        <li>Booth numbers and employer lists show here once the school publishes them.</li><li>Missing a fair? Use Report a problem and we'll add it.</li></ul></section></aside></div>`;
+    document.querySelectorAll("[data-school]").forEach((b) => b.onclick = () => { SCHOOL = b.dataset.school; history.replaceState(null, "", "?school=" + encodeURIComponent(SCHOOL)); render(); scrollTo({ top: 0 }); });
+    $("#allSch") && ($("#allSch").onclick = () => { SCHOOL = ""; history.replaceState(null, "", location.pathname); render(); });
+    const sf = $("#sfind"); if (sf) sf.oninput = (e) => { SQ = e.target.value; const pos = e.target.selectionStart; render(); const n = $("#sfind"); n.focus(); n.setSelectionRange(pos, pos); };
     document.querySelectorAll("[data-fair]").forEach((cb) => cb.onchange = async () => {
       const set = new Set(C.mine); cb.checked ? set.add(cb.dataset.fair) : set.delete(cb.dataset.fair);
       cb.disabled = true;

@@ -80,6 +80,7 @@
   #featured .fc b{display:block}#featured .fc small{display:block;color:var(--muted);font-size:12.5px}
   #featured .ft{font-size:11.5px;font-weight:600;background:#F2FADF;color:#4A7000;border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:middle}
   #featured .fa{font-size:13.5px;margin:4px 0 0;color:#2B3850}
+  #featured .fj{display:block;font-size:12.5px;margin-top:6px;color:#4A7000;font-weight:600}
   .co{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;overflow:hidden}
   .co > button{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:1fr auto;gap:2px 12px;padding:12px 14px;cursor:pointer}
   .co > button:focus-visible{outline:2px solid var(--green);outline-offset:-2px}
@@ -399,11 +400,13 @@
     box.innerHTML = `<p class="fh">Featured at this fair</p><div class="fgrid">${ok.map(({ x, c }) => { const co = c.company || {}, big = x.tier === "spotlight";
       const logo = /^data:image\/(jpeg|png|webp);base64,/.test(co.logo || "") ? `<img alt="" src="${esc(co.logo)}">` : esc(ini(co.company));
       const hires = [...((co.hiring && co.hiring.types) || []).map((t) => t === "intern" ? "Internships" : "New grads"), ...((co.hiring && co.hiring.majors) || []).slice(0, 4)].join(", ");
-      const jobs = (c.jobs || []).length;
+      const posts = (co.posts || []), atFair = posts.filter((j) => (j.fairs || []).includes(fair.id)), show = (atFair.length ? atFair : posts).slice(0, big ? 4 : 2);
+      const jobs = (c.jobs || []).length + posts.length;
       return `<a class="fc${big ? " big" : ""}" href="/co/${encodeURIComponent(c.slug)}"><span class="fl">${logo}</span><span style="min-width:0">
         <b>${esc(co.company || "")}<span class="ft">Featured</span></b>
         ${big && co.about ? `<span class="fa">${esc(String(co.about).slice(0, 180))}${String(co.about).length > 180 ? "…" : ""}</span>` : ""}
-        <small>${[hires && "Hires: " + esc(hires), jobs ? `${jobs} open role${jobs === 1 ? "" : "s"}` : ""].filter(Boolean).join(" · ") || "See company page"}</small></span></a>`; }).join("")}</div>`;
+        <small>${[hires && "Hires: " + esc(hires), jobs ? `${jobs} open role${jobs === 1 ? "" : "s"}` : ""].filter(Boolean).join(" · ") || "See company page"}</small>
+        ${show.length ? `<span class="fj">${atFair.length ? "Hiring at this fair: " : "Open now: "}${show.map((j) => esc(j.title)).join(" · ")}</span>` : ""}</span></a>`; }).join("")}</div>`;
   }
   function renderCompanies(){
     if (!S.fair) return;

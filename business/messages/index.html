@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Messages | Beat the Pile Business</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icons/icon-192.png?v=4">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/business/biz.css">
+<style>
+  /* /business/messages/ (Nov 19 2026, owner): the employer's own Messages tab. Same rules + data as Orbit messages
+     (orbit_inbox / orbit_thread / orbit_send / orbit_search in lib/orbitnet.js): verified employers only, and only to
+     students who turned on "Let employers find me". ?chat=<handle|key> opens a conversation. */
+  main{max-width:1440px}
+  .box{display:grid;grid-template-columns:360px minmax(0,1fr);background:#fff;border:1px solid var(--line);border-radius:var(--r);height:calc(100vh - 150px);min-height:520px;overflow:hidden}
+  .side{border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+  .side .hd{padding:16px;border-bottom:1px solid var(--line)}.side h1{font-size:20px;margin:0 0 10px}
+  .side .hd input{border-radius:999px}
+  .list{overflow:auto;flex:1}.list .sec{font-size:12.5px;color:var(--muted);padding:10px 16px 4px}
+  .row{display:flex;gap:10px;align-items:center;padding:10px 16px;cursor:pointer;border:0;background:none;width:100%;text-align:left;font:inherit;color:inherit}
+  .row:hover{background:#F6F8FB}.row.on{background:var(--tint)}
+  .row .av{width:44px;height:44px;font-size:14px}.row .t{flex:1;min-width:0}
+  .row b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14.5px}
+  .row small{display:block;color:var(--muted);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .n{background:var(--green);color:#fff;border-radius:999px;font-size:12px;font-weight:600;padding:1px 8px}
+  .row.unread b{font-weight:700}.row.unread small{color:var(--ink)}
+  .main{display:flex;flex-direction:column;min-height:0}
+  .main .hd{display:flex;gap:12px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}
+  .main .hd .av{width:44px;height:44px}.main .hd .t{flex:1;min-width:0}.main .hd small{color:var(--muted);display:block;font-size:13px}
+  .back{display:none;background:none;border:0;font:inherit;font-size:22px;cursor:pointer;color:var(--ink);padding:0 6px}
+  .msgs{flex:1;overflow:auto;padding:18px;display:flex;flex-direction:column;gap:8px;background:#FAFBFD}
+  .b{max-width:72%;padding:9px 13px;border-radius:14px;font-size:14.5px;white-space:pre-wrap;word-wrap:break-word;background:#fff;border:1px solid var(--line);align-self:flex-start}
+  .b.me{align-self:flex-end;background:var(--navy);color:#fff;border-color:var(--navy)}
+  .when{font-size:11.5px;color:var(--muted);align-self:center;margin:6px 0 2px}
+  .send{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}.send textarea{min-height:44px;height:44px;resize:none;border-radius:22px;padding:11px 16px}
+  .note{padding:12px 18px;font-size:13.5px;color:var(--muted);border-top:1px solid var(--line)}
+  .empty2{flex:1;display:grid;place-items:center;text-align:center;color:var(--muted);padding:24px}
+  .more{position:relative}.more summary{list-style:none;cursor:pointer;font-size:20px;padding:0 8px;color:var(--muted)}.more summary::-webkit-details-marker{display:none}
+  .more div{position:absolute;right:0;top:28px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px;z-index:5;min-width:160px}
+  .more button{display:block;width:100%;text-align:left;background:none;border:0;font:inherit;font-size:14px;padding:8px 10px;cursor:pointer;border-radius:8px}.more button:hover{background:#F1F4F9}
+  @media (max-width:820px){.box{grid-template-columns:1fr;height:calc(100vh - 170px)}.box.chat .side{display:none}.box:not(.chat) .main{display:none}.back{display:block}}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main"><div class="card center">Loading…</div></main>
+<script src="/business/biz.js"></script>
+<script>
+(() => {
+  const { esc, $ } = biz;
+  const S = { threads: [], found: null, cur: null, q: "" };
+  const av = (p) => `<span class="av">${p.photo ? `<img alt="" src="${esc(p.photo)}">` : esc(biz.initials(p.name))}</span>`;
+  const subOf = (p) => [p.major, p.school].filter(Boolean).join(" · ") || p.headline || "";
+  const keyOf = (p) => p.handle || p.key;
+  const ago = (iso) => { const d = new Date(iso); return isNaN(d) ? "" : d.toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }); };
+
+  function shell(){
+    $("main").innerHTML = `<div id="ban"></div><div class="box" id="box">
+      <aside class="side"><div class="hd"><h1>Messages</h1><input id="q" type="search" placeholder="Find students to message" aria-label="Find students" autocomplete="off"></div><div class="list" id="list"></div></aside>
+      <section class="main" id="pane"><div class="empty2"><div><b style="color:var(--ink)">Pick a conversation</b><br>Or search for a student on the left to start one.</div></div></section></div>`;
+    let tm; $("#q").addEventListener("input", (e) => { clearTimeout(tm); S.q = e.target.value.trim(); tm = setTimeout(find, 250); });
+  }
+  function drawList(){
+    const L = $("#list"); if (!L) return;
+    const cur = S.cur && keyOf(S.cur);
+    const rowHtml = (p, extra) => `<button class="row${keyOf(p) === cur ? " on" : ""}${p.unread ? " unread" : ""}" data-to="${esc(keyOf(p))}">${av(p)}<span class="t"><b>${esc(p.name)}</b><small>${esc(extra)}</small></span>${p.unread ? `<span class="n">${p.unread}</span>` : ""}</button>`;
+    if (S.q.length >= 2) {
+      L.innerHTML = S.found === null ? `<p class="sec">Searching…</p>` : S.found.employerPending ? `<p class="sec">Your company is being verified. You can message students once it's approved.</p>`
+        : S.found.people.length ? `<p class="sec">Students</p>` + S.found.people.map((p) => rowHtml(p, subOf(p))).join("") : `<p class="sec">No students match "${esc(S.q)}". Only students open to employers show here.</p>`;
+    } else {
+      L.innerHTML = S.threads.length ? S.threads.map((t) => rowHtml(t, (t.last?.mine ? "You: " : "") + (t.last?.body || ""))).join("")
+        : `<p class="sec">No conversations yet. Search above, or message students from <a href="/business/talent/">Talent</a>.</p>`;
+    }
+    L.querySelectorAll("[data-to]").forEach((b) => b.onclick = () => open(b.dataset.to));
+  }
+  async function find(){
+    if (S.q.length < 2) { S.found = null; drawList(); return; }
+    S.found = null; drawList(); const q = S.q;
+    try { const r = await biz.api({ action: "orbit_search", q }); if (q === S.q) { S.found = r; drawList(); } } catch { if (q === S.q) { S.found = { people: [] }; drawList(); } }
+  }
+  async function loadInbox(){ try { S.threads = (await biz.api({ action: "orbit_inbox" })).threads || []; } catch { S.threads = []; } drawList(); }
+  async function open(to){
+    $("#box").classList.add("chat"); history.replaceState(null, "", "?chat=" + encodeURIComponent(to));
+    $("#pane").innerHTML = `<div class="empty2">Loading…</div>`;
+    let d; try { d = await biz.api({ action: "orbit_thread", to }); } catch (e) { $("#pane").innerHTML = `<div class="empty2">${esc(e.message)}</div>`; return; }
+    S.cur = d.peer; drawList();
+    const t = S.threads.find((x) => keyOf(x) === keyOf(d.peer)); if (t) { t.unread = 0; drawList(); }
+    const msgs = d.messages || []; let lastDay = "";
+    $("#pane").innerHTML = `<div class="hd"><button class="back" id="back" aria-label="Back to conversations">‹</button>${av(d.peer)}<div class="t"><b>${esc(d.peer.name)}</b><small>${esc(subOf(d.peer))}</small></div>
+        ${d.peer.handle ? `<a class="btn" href="/u/${encodeURIComponent(d.peer.handle)}" target="_blank" rel="noopener">View profile</a>` : ""}
+        <details class="more"><summary aria-label="More">⋯</summary><div>${d.blocked ? `<button data-a="orbit_unblock">Unblock</button>` : `<button data-a="orbit_block">Block</button><button data-a="orbit_report">Report</button>`}</div></details></div>
+      <div class="msgs" id="msgs">${msgs.length ? msgs.map((m) => { const day = new Date(m.at).toDateString(), head = day !== lastDay ? `<div class="when">${esc(ago(m.at))}</div>` : ""; lastDay = day; return head + `<div class="b${m.mine ? " me" : ""}">${esc(m.body)}</div>`; }).join("")
+        : `<div class="empty2">Say hello. Keep it short and specific: the role, why them, and a next step.</div>`}</div>
+      ${d.canSend ? `<form class="send" id="send"><textarea maxlength="2000" placeholder="Write a message" aria-label="Message"></textarea><button class="btn pri">Send</button></form>` : `<div class="note">${esc(d.why || "You can't message this person right now.")}</div>`}`;
+    const M = $("#msgs"); M.scrollTop = M.scrollHeight;
+    $("#back").onclick = () => { $("#box").classList.remove("chat"); history.replaceState(null, "", location.pathname); };
+    $("#pane").querySelectorAll("[data-a]").forEach((b) => b.onclick = async () => {
+      let reason = "";
+      if (b.dataset.a === "orbit_report") { reason = prompt("What happened? This goes to the Beat the Pile team, and blocks them."); if (!reason) return; }
+      else if (b.dataset.a === "orbit_block" && !confirm(`Block ${d.peer.name}? Neither of you can message the other.`)) return;
+      try { await biz.api({ action: b.dataset.a, to, reason }); await loadInbox(); open(to); } catch (e) { alert(e.message); } });
+    const f = $("#send"); if (!f) return; const ta = f.querySelector("textarea");
+    ta.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); f.requestSubmit(); } });
+    f.onsubmit = async (e) => { e.preventDefault(); const body = ta.value.trim(); if (!body) return; const btn = f.querySelector("button"); btn.disabled = true;
+      try { await biz.api({ action: "orbit_send", to, body }); ta.value = ""; M.querySelector(".empty2")?.remove(); M.insertAdjacentHTML("beforeend", `<div class="b me">${esc(body)}</div>`); M.scrollTop = M.scrollHeight; loadInbox(); }
+      catch (ex) { alert(ex.message); } finally { btn.disabled = false; ta.focus(); } };
+    ta.focus();
+  }
+  biz.start(async (u) => {
+    if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; return; }
+    if (!u) { $("main").innerHTML = biz.signInCard("Messages", "Sign in to your company account to message students."); return; }
+    shell();
+    biz.api({ action: "biz_get" }).then((b) => { if (b && b.status !== "verified") $("#ban").innerHTML = biz.statusBanner(b); }).catch(() => {});
+    await loadInbox();
+    const want = new URLSearchParams(location.search).get("chat"); if (want) open(want.slice(0, 120));
+    setInterval(() => { if (document.visibilityState === "visible" && !S.q) loadInbox(); }, 30000);
+  });
+})();
+</script>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

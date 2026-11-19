@@ -33,6 +33,21 @@
   .fair .n{font-size:13.5px;margin:10px 0 0}.fair .n b{font-variant-numeric:tabular-nums}
   .promo{background:var(--navy);color:#fff;border-radius:var(--r);padding:20px;margin-bottom:16px}
   .promo h2{color:#fff}.promo p{color:#C9D2E3;font-size:14px;margin:4px 0 14px}.promo .from{color:var(--lime);font-weight:600}
+  .tiles.five{grid-template-columns:repeat(5,minmax(0,1fr))}@media (max-width:980px){.tiles.five{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .acts2 .a{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:10px 0;border-top:1px solid #EEF1F6}.acts2 .a:first-child{border-top:0}
+  .acts2 b{display:block;font-size:14.5px}.acts2 small{color:var(--muted);font-size:13px}.acts2 .btn{flex-shrink:0;padding:7px 14px}
+  .jh{display:flex;gap:16px;align-items:flex-start;justify-content:space-between;margin-bottom:12px}@media (max-width:640px){.jh{flex-direction:column}}
+  .jtabs{display:flex;gap:6px;margin:0 0 6px;border-bottom:1px solid #EEF1F6}
+  .jtabs button{font:inherit;font-size:14px;font-weight:600;background:none;border:0;border-bottom:2px solid transparent;padding:8px 10px;cursor:pointer;color:var(--muted)}
+  .jtabs button[aria-pressed=true]{color:var(--ink);border-bottom-color:var(--green)}.jtabs span{font-weight:500;color:var(--muted)}
+  .jr{display:flex;gap:14px;align-items:center;justify-content:space-between;padding:14px 0;border-top:1px solid #EEF1F6}.jl .jr:first-child{border-top:0}
+  .jm{min-width:0}.jm b{font-size:15px}.jt{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.jt span{font-size:12px;background:#F1F4F9;border-radius:999px;padding:2px 9px;color:#2B3850}.jt span.warn{background:#FFF4DE;color:#7A4B00}
+  .ja{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}.ja .btn{padding:6px 12px;font-size:13px}
+  @media (max-width:700px){.jr{flex-direction:column;align-items:flex-start}}
+  dialog.pdlg{border:0;border-radius:10px;padding:22px;width:min(640px,96vw);max-height:92vh}dialog.pdlg::backdrop{background:rgba(6,10,44,.5)}
+  dialog.pdlg h2{font-size:19px;margin:0 0 6px}dialog.pdlg label{display:block}dialog.pdlg .hint{font-weight:400;color:var(--muted)}
+  .fchk{max-height:170px;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:6px 10px}.fchk .ck{display:flex;gap:8px;align-items:center;font-weight:500;margin:6px 0}.fchk input{width:auto}
+  .dbtns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}.pdlg .err{color:#A3261A;font-size:13.5px;margin:10px 0 0}
   .mini{display:flex;justify-content:space-between;font-size:14px;padding:8px 0;border-top:1px solid #EEF1F6}.mini:first-of-type{border-top:0}.mini b{font-variant-numeric:tabular-nums}
 </style>
 </head>
@@ -47,13 +62,21 @@
   const MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const hello = () => { const h = new Date().getHours(); return h < 12 ? "Good morning" : h < 18 ? "Good afternoon" : "Good evening"; };
 
+  // Nov 19 (owner): the home is a real dashboard. "Today's actions" (like LinkedIn's admin view, built from real state),
+  // "Your jobs" (like Indeed's Jobs tab: post, edit, pause, close; companies without a job board we read post here),
+  // then Find talent. Job posts live on the employers row (biz_posts) and show on the company page + featured fair cards.
+  const TYPES = { intern: "Internship", coop: "Co-op", fulltime: "Full-time", parttime: "Part-time" }, WORK = { onsite: "In person", hybrid: "Hybrid", remote: "Remote" };
+  const ST = { D: null, F: [], C: { students: {} }, PK: null, tab: "open" };
+  const shortD = (iso) => { const d = new Date(String(iso).length === 10 ? iso + "T12:00:00" : iso); return isNaN(d) ? "" : MON[d.getMonth()] + " " + d.getDate(); };
   function render(d, fairs, counts, pk){
-    const p = d.profile || {}, s = d.stats || {}, v = d.status === "verified";
+    if (d) { ST.D = d; ST.F = fairs; ST.C = counts; ST.PK = pk; } else { d = ST.D; fairs = ST.F; counts = ST.C; pk = ST.PK; }
+    const p = d.profile || {}, s = d.stats || {}, v = d.status === "verified", posts = p.posts || [];
     const today = new Date().toISOString().slice(0, 10);
     const up = (fairs || []).filter((f) => f.date && f.date >= today).sort((a, b) => a.date.localeCompare(b.date));
     const mine = up.filter((f) => (d.fairs || []).includes(f.id));
     const next = mine[0] || up[0] || null, going = next ? (counts.students || {})[next.id] || 0 : 0;
     const from = Math.min(...((pk && pk.tiers) || [{ price: 0 }]).map((t) => t.price));
+    const live = posts.filter((j) => j.status === "open" && (!j.deadline || j.deadline >= today));
     const todo = [
       ["Confirm your work email", !!p.company && d.emailVerified, "/business/setup/"],
       ["Add a logo and an About section", !!p.logo && (p.about || "").length > 80, "/business/company/"],
@@ -61,35 +84,101 @@
       ["Pick the career fairs you'll attend", (d.fairs || []).length > 0, "/business/fairs/"],
     ];
     const done = todo.filter((t) => t[1]).length, nextStep = todo.find((t) => !t[1]);
+    // Today's actions: only real, current things
+    const acts = [];
+    if (s.unread) acts.push([`${fmt(s.unread)} unread message${s.unread === 1 ? "" : "s"}`, "Reply while they're warm", "/business/messages/", "Open"]);
+    if (!live.length) acts.push(["Post your first job", "Students see it on your company page, and before the fair if you're featured", "#post", "Post a job"]);
+    const noPay = live.filter((j) => !j.pay).length; if (noPay) acts.push([`Add pay to ${noPay} job${noPay === 1 ? "" : "s"}`, "Students skip posts with no pay listed", "#jobs", "Edit"]);
+    const noApply = live.filter((j) => !j.apply).length; if (noApply) acts.push([`Add an apply link to ${noApply} job${noApply === 1 ? "" : "s"}`, "Without it students can only message you", "#jobs", "Edit"]);
+    const soon = live.filter((j) => j.deadline && j.deadline <= new Date(Date.now() + 7 * 864e5).toISOString().slice(0, 10));
+    if (soon.length) acts.push([`${soon.length} job${soon.length === 1 ? " closes" : "s close"} within a week`, soon.map((j) => j.title).slice(0, 2).join(", "), "#jobs", "Review"]);
+    if (next && !mine.length) acts.push([`Going to ${next.name}?`, `${next.school} · ${shortD(next.date)}`, `/business/fairs/?school=${encodeURIComponent(next.school)}`, "Say you'll be there"]);
+    if (s.following) acts.push([`${fmt(s.following)} student${s.following === 1 ? " follows" : "s follow"} you`, "Say hi from your Orbit", "/orbit/", "See them"]);
     const max = Math.max(1, ...(s.topMajors || []).map((m) => m.n));
     const dt = next ? new Date(next.date + "T12:00:00") : null;
+    const tabs = [["open", "Open", posts.filter((j) => j.status === "open").length], ["paused", "Paused", posts.filter((j) => j.status === "paused").length], ["closed", "Closed", posts.filter((j) => j.status === "closed").length]];
+    const shown = posts.filter((j) => j.status === ST.tab).sort((a, b) => b.posted.localeCompare(a.posted));
+    const fairName = (id) => (fairs.find((f) => f.id === id) || {}).name || "";
     $("main").innerHTML = `${biz.statusBanner(d)}
       <div class="head">${biz.logo(p, 64)}<div class="t"><div class="hi">${hello()}${p.name ? ", " + esc(p.name.split(" ")[0]) : ""}</div>
         <h1>${esc(p.company || "Your company")} <span class="chip ${v ? "on" : ""}">${v ? "Verified" : d.status === "pending" ? "Verification pending" : d.status === "rejected" ? "Not verified" : "Setup not finished"}</span></h1></div>
-        <div class="bt">${d.slug && v ? `<a class="btn" href="/co/${encodeURIComponent(d.slug)}">View company page</a>` : ""}<a class="btn" href="/business/company/">Edit page</a></div></div>
+        <div class="bt"><button class="btn pri" type="button" data-post>Post a job</button>${d.slug && v ? `<a class="btn" href="/co/${encodeURIComponent(d.slug)}">View company page</a>` : ""}<a class="btn" href="/business/company/">Edit page</a></div></div>
       ${nextStep ? `<div class="setup"><div class="bar"><i style="width:${(done / todo.length) * 100}%"></i></div><div class="tx"><b>${done} of ${todo.length} done</b><span class="muted">Next: ${esc(nextStep[0])}</span></div><a class="btn pri" href="${nextStep[2]}">Continue</a></div>` : ""}
-      <div class="tiles">
+      <div class="tiles five">
+        <a class="tile" href="#jobs"><b>${fmt(live.length)}</b><span>Open job posts</span></a>
         <a class="tile" href="/business/talent/"><b>${fmt(s.openStudents)}</b><span>Students open to employers</span></a>
         <a class="tile" href="/orbit/"><b>${fmt(s.following)}</b><span>Following you</span></a>
-        <a class="tile" href="/orbit/"><b>${fmt(s.alumni)}</b><span>Your former interns</span></a>
-        <a class="tile" href="/orbit/#messages"><b>${fmt(s.unread)}</b><span>Unread messages</span></a>
+        <a class="tile" href="/business/messages/"><b>${fmt(s.unread)}</b><span>Unread messages</span></a>
+        <a class="tile" href="/business/fairs/"><b>${fmt(mine.length)}</b><span>Fairs you're attending</span></a>
       </div>
-      <div class="cols">
+      <div class="cols"><div>
+        ${acts.length ? `<section class="card"><h2>Today's actions</h2><div class="acts2">${acts.slice(0, 5).map(([t, sub, h, b]) => `<div class="a"><div><b>${esc(t)}</b><small>${esc(sub)}</small></div>${h === "#post" ? `<button class="btn" type="button" data-post>${esc(b)}</button>` : `<a class="btn" href="${esc(h)}">${esc(b)}</a>`}</div>`).join("")}</div></section>` : ""}
+        <section class="card" id="jobs"><div class="jh"><div><h2>Your jobs</h2><p class="sub" style="margin:0">Post roles here, even if your company doesn't use a job board we read. Open posts show on your company page${v ? "" : " once you're verified"}, and on Career Fair Mode when you're featured at a fair.</p></div><button class="btn pri" type="button" data-post>Post a job</button></div>
+          <div class="jtabs">${tabs.map(([k, l, n]) => `<button type="button" data-jt="${k}" aria-pressed="${ST.tab === k}">${l} <span>${n}</span></button>`).join("")}</div>
+          ${shown.length ? `<div class="jl">${shown.map((j) => { const past = j.deadline && j.deadline < today;
+            return `<div class="jr"><div class="jm"><b>${esc(j.title)}</b><div class="small muted">${esc([TYPES[j.type], WORK[j.workplace], j.location, j.pay].filter(Boolean).join(" · "))}</div>
+              <div class="jt">${past ? `<span class="warn">Deadline passed</span>` : j.deadline ? `<span>Apply by ${esc(shortD(j.deadline))}</span>` : ""}${(j.fairs || []).map((f) => fairName(f) ? `<span>${esc(fairName(f))}</span>` : "").join("")}${!j.apply ? `<span class="warn">No apply link</span>` : ""}<span>Posted ${esc(shortD(j.posted))}</span></div></div>
+              <div class="ja"><button class="btn" type="button" data-edit="${esc(j.id)}">Edit</button>${j.status === "open" ? `<button class="btn" type="button" data-set="${esc(j.id)}" data-to="paused">Pause</button><button class="btn" type="button" data-set="${esc(j.id)}" data-to="closed">Close</button>` : `<button class="btn" type="button" data-set="${esc(j.id)}" data-to="open">Reopen</button><button class="btn" type="button" data-del="${esc(j.id)}">Delete</button>`}</div></div>`; }).join("")}</div>`
+            : `<p class="empty">${ST.tab === "open" ? "No open jobs yet. Post one and students can see it before they ever reach your booth." : ST.tab === "paused" ? "Nothing paused." : "Nothing closed."}</p>`}
+          ${s.liveJobs ? `<p class="small muted" style="margin:12px 0 0">Plus ${fmt(s.liveJobs)} role${s.liveJobs === 1 ? "" : "s"} we read from your own job board.</p>` : ""}</section>
         <section class="card find"><h2>Find talent</h2><p class="sub">Only students who chose "Let employers find me".</p>
           <form action="/business/talent/"><input name="q" aria-label="Search students" placeholder="Major, skill or school"><button class="btn pri">Search</button></form>
           ${(s.topMajors || []).length ? `<h3>Top majors</h3><div class="bars">${s.topMajors.map((m) => `<a class="b" href="/business/talent/?major=${encodeURIComponent(m.major)}"><div><span class="nm">${esc(m.major)}</span><i style="width:${Math.max(4, (m.n / max) * 100)}%"></i></div><span>${fmt(m.n)}</span></a>`).join("")}</div>`
             : `<p class="empty">No students have opened their profile to employers yet. This fills in as students join.</p>`}</section>
+        </div>
         <div>
-          ${next ? `<section class="promo"><h2>Get featured at ${esc(next.name)}</h2><p>Put your company at the top of Career Fair Mode for this fair, where students plan who they'll visit.${going ? ` ${fmt(going)} student${going === 1 ? " has" : "s have"} said they're going.` : ""}</p>
+          ${next ? `<section class="promo"><h2>Get featured at ${esc(next.name)}</h2><p>Put your company and your open jobs at the top of Career Fair Mode for this fair, where students plan who they'll visit.${going ? ` ${fmt(going)} student${going === 1 ? " has" : "s have"} said they're going.` : ""}</p>
             ${from > 0 ? `<p class="from" style="margin:0 0 14px">From $${fmt(from)} per fair</p>` : ""}<a class="btn lime" href="/business/packages/?fair=${encodeURIComponent(next.id)}">See packages</a></section>` : ""}
           <section class="card fair"><h2>${mine.length ? "Your next fair" : "Next fair"}</h2>${next ? `<div class="d"><div class="cal"><span>${MON[dt.getMonth()]}</span><b>${dt.getDate()}</b></div><div><b>${esc(next.name)}</b><div class="small muted">${esc([next.school, next.term].filter(Boolean).join(" · "))}</div></div></div>
             <p class="n"><b>${fmt(going)}</b> student${going === 1 ? "" : "s"} on Beat the Pile going</p>
             <p style="margin:12px 0 0"><a href="/business/fairs/">${mine.length ? "All your fairs" : "Say you'll be there"}</a></p>` : `<p class="empty">No upcoming fairs listed.</p>`}</section>
           <section class="card"><h2>Your company</h2>
-            <div class="mini"><span>Open roles we track</span><b>${fmt(s.liveJobs)}</b></div>
+            <div class="mini"><span>Jobs you posted (open)</span><b>${fmt(live.length)}</b></div>
+            <div class="mini"><span>Roles from your job board</span><b>${fmt(s.liveJobs)}</b></div>
+            <div class="mini"><span>Former interns on Beat the Pile</span><b>${fmt(s.alumni)}</b></div>
             <div class="mini"><span>Your team on Beat the Pile</span><b>${fmt((s.team || 0) + 1)}</b></div></section>
         </div>
       </div>`;
+    document.querySelectorAll("[data-post]").forEach((b) => b.onclick = () => editPost(null));
+    document.querySelectorAll("[data-edit]").forEach((b) => b.onclick = () => editPost(b.dataset.edit));
+    document.querySelectorAll("[data-jt]").forEach((b) => b.onclick = () => { ST.tab = b.dataset.jt; render(); });
+    document.querySelectorAll("[data-set]").forEach((b) => b.onclick = () => savePosts(posts.map((j) => j.id === b.dataset.set ? { ...j, status: b.dataset.to } : j)));
+    document.querySelectorAll("[data-del]").forEach((b) => b.onclick = () => { if (confirm("Delete this job for good?")) savePosts(posts.filter((j) => j.id !== b.dataset.del)); });
+    if (location.hash === "#post") { history.replaceState(null, "", location.pathname); editPost(null); }
+  }
+  async function savePosts(posts){
+    try { const r = await biz.api({ action: "biz_posts", posts }); ST.D = { ...ST.D, profile: r.profile }; render(); return true; }
+    catch (e) { alert(e.message); return false; }
+  }
+  function editPost(id){
+    const posts = ST.D.profile.posts || [], j = posts.find((x) => x.id === id) || { type: "intern", workplace: "onsite", status: "open", fairs: [], majors: [] };
+    const today = new Date().toISOString().slice(0, 10);
+    const up = (ST.F || []).filter((f) => f.date && f.date >= today).sort((a, b) => (ST.D.fairs || []).includes(b.id) - (ST.D.fairs || []).includes(a.id) || a.date.localeCompare(b.date)).slice(0, 40);
+    let d = document.getElementById("postDlg"); if (!d) { d = document.createElement("dialog"); d.id = "postDlg"; d.className = "pdlg"; document.body.appendChild(d); }
+    const opt = (o, cur) => Object.entries(o).map(([k, l]) => `<option value="${k}"${k === cur ? " selected" : ""}>${l}</option>`).join("");
+    d.innerHTML = `<form method="dialog"><h2>${id ? "Edit job" : "Post a job"}</h2>
+      <label>Job title<input name="title" required maxlength="100" value="${esc(j.title || "")}" placeholder="e.g. Mechanical Engineering Intern, Summer 2027"></label>
+      <div class="row"><label>Type<select name="type">${opt(TYPES, j.type)}</select></label><label>Workplace<select name="workplace">${opt(WORK, j.workplace)}</select></label></div>
+      <div class="row"><label>Location<input name="location" maxlength="80" value="${esc(j.location || "")}" placeholder="City, ST"></label><label>Pay <span class="hint">(shown to students)</span><input name="pay" maxlength="60" value="${esc(j.pay || "")}" placeholder="$22–26/hr"></label></div>
+      <div class="row"><label>Apply by<input name="deadline" type="date" value="${esc(j.deadline || "")}"></label><label>How to apply<input name="apply" maxlength="300" value="${esc(j.apply || "")}" placeholder="https://… or recruiting@company.com"></label></div>
+      <label>Majors you want <span class="hint">(comma separated, up to 8)</span><input name="majors" maxlength="400" value="${esc((j.majors || []).join(", "))}" placeholder="Mechanical Engineering, Industrial Engineering"></label>
+      <label>About the role<textarea name="about" maxlength="2000" placeholder="What they'll do, who you're looking for, and what makes it worth it.">${esc(j.about || "")}</textarea></label>
+      ${up.length ? `<label>Recruiting for this at a fair? <span class="hint">(featured companies show these jobs on the fair's page)</span></label><div class="fchk">${up.map((f) => `<label class="ck"><input type="checkbox" name="fair" value="${esc(f.id)}"${(j.fairs || []).includes(f.id) ? " checked" : ""}> ${esc(f.name)} <span class="hint">· ${esc(f.school)} · ${esc(shortD(f.date))}</span></label>`).join("")}</div>` : ""}
+      <p class="err" hidden></p>
+      <div class="dbtns"><button class="btn" value="cancel" formnovalidate>Cancel</button><button class="btn pri" value="ok">${id ? "Save" : "Post job"}</button></div></form>`;
+    const f = d.querySelector("form");
+    f.onsubmit = async (e) => {
+      if (e.submitter && e.submitter.value === "cancel") return;
+      e.preventDefault(); const fd = new FormData(f);
+      const next = { ...j, title: fd.get("title"), type: fd.get("type"), workplace: fd.get("workplace"), location: fd.get("location"), pay: fd.get("pay"), deadline: fd.get("deadline"),
+        apply: fd.get("apply"), about: fd.get("about"), majors: String(fd.get("majors") || "").split(",").map((x) => x.trim()).filter(Boolean), fairs: fd.getAll("fair") };
+      const ap = String(next.apply || "").trim();
+      if (ap && !/^https:\/\//i.test(ap) && !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(ap)) { const er = f.querySelector(".err"); er.textContent = "Use an https:// link or an email address."; er.hidden = false; return; }
+      const btn = f.querySelector("[value=ok]"); btn.disabled = true;
+      const list = id ? posts.map((x) => x.id === id ? next : x) : [next, ...posts];
+      if (await savePosts(list)) { d.close(); if (!id) ST.tab = "open", render(); } else btn.disabled = false;
+    };
+    d.showModal(); f.querySelector("[name=title]").focus();
   }
 
   biz.start(async (u) => {

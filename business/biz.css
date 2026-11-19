@@ -9,7 +9,7 @@ h1{font-size:24px;letter-spacing:-.015em;margin:0 0 4px}h2{font-size:17px;margin
 .sub{color:var(--muted);font-size:14px;margin:0 0 14px}.muted{color:var(--muted)}.small{font-size:13px}
 .card{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px;margin-bottom:16px}
 .center{text-align:center;padding:44px 24px}.center .sub{max-width:52ch;margin:6px auto 18px}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;font:inherit;font-size:14px;font-weight:600;border-radius:999px;padding:9px 18px;text-decoration:none;cursor:pointer;border:1px solid var(--green);color:var(--green);background:#fff}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;font:inherit;font-size:14px;font-weight:600;border-radius:999px;padding:9px 18px;text-decoration:none;cursor:pointer;border:1px solid var(--green);color:var(--green);background:#fff}
 .btn:hover{background:var(--tint)}.btn.pri{background:var(--green);color:#fff}.btn.pri:hover{background:var(--green-d)}
 .btn[disabled]{opacity:.55;cursor:default}
 .btn.lime{background:var(--lime);border-color:var(--lime);color:var(--navy)}

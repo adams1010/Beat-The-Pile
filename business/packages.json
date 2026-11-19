@@ -12,7 +12,7 @@
       "features": [
         "Your logo in \"Featured at this fair\" at the top of that fair in Career Fair Mode",
         "Live from the day you buy through fair day, even before the school posts its employer list",
-        "One tap to your company page, your open roles and Join orbit"
+        "Your posted jobs on the card, so students see them before the fair"
       ],
       "stripe": ""
     },
@@ -27,8 +27,8 @@
       "features": [
         "Everything in Featured",
         "Listed first, in a large card with your About line and who you hire",
-        "Your live open roles count with a link straight to them",
-        "Students who tap Follow get your new jobs in their weekly email"
+        "Up to 4 of your jobs on the card, the ones you tagged for that fair first",
+        "Links to your company page, where students follow you or join your orbit"
       ],
       "stripe": ""
     },

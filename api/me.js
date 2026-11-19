@@ -536,7 +536,7 @@ export default async function handler(req, res) {
     }
 
     // ── Business side (lib/employer.js): company setup, work-email code, owner review, dashboard, business Orbit ──
-    if (typeof action === "string" && /^biz_(get|save|email_start|email_confirm|fairs|fair_counts|home|orbit|admin_list|admin_review|admin_delete)$/.test(action)) {
+    if (typeof action === "string" && /^biz_(get|save|email_start|email_confirm|fairs|fair_counts|home|posts|orbit|admin_list|admin_review|admin_delete)$/.test(action)) {
       if (!(await rateOk(`biz:${uid}`, 60, 60))) return res.status(429).json({ error: "Slow down a little and try again" });
       const out = await bizAction(uid, action, body || {}, { rateOk, sendEmail, clerkUser });
       return res.status(out.status).json(out.body);
@@ -550,9 +550,9 @@ export default async function handler(req, res) {
         return res.status(403).json(mine ? { error: "Your Recruiter badge is still being verified. You can search students once it's approved.", pending: true }
           : { error: "Find talent is for recruiters. Add a Recruiter badge from your profile, or set up your company page.", badge: true });
       }
-      if (!(await rateOk(`talent:${uid}`, 3600, 120))) return res.status(429).json({ error: "That's a lot of searches, try again in a bit" });
+      if (!(await rateOk(`talent:${uid}`, 3600, 400))) return res.status(429).json({ error: "That's a lot of searches, try again in a bit" });
       const t = (v, n) => String(v ?? "").slice(0, n);
-      return res.status(200).json(await talentFor({ q: t(body.q, 120), major: t(body.major, 80), school: t(body.school, 100), gradYear: Number(body.gradYear) || null }));
+      return res.status(200).json(await talentFor({ q: t(body.q, 120), major: t(body.major, 80), school: t(body.school, 100), gradYear: Number(body.gradYear) || null, skill: t(body.skill, 60), openTo: t(body.openTo, 10), page: Number(body.page) || 1 }));
     }
 
     // ── Profile (LinkedIn-style page at /u/<handle>, private until the student turns it on) ──
