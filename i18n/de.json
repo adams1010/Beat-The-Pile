@@ -1,6 +1,16 @@
 {
  "lang": "de",
  "strings": {
+    "Clubs & teams": "Clubs & Teams",
+    "Which clubs fit your major and lead to internships": "Welche Clubs zu deinem Fach passen und zu Praktika führen",
+    "Clubs & design teams": "Clubs & Konstruktionsteams",
+    "How a team turns into an internship": "Wie ein Team zum Praktikum führt",
+    "How to pick one": "So wählst du eins",
+    "The teams and clubs": "Die Teams und Clubs",
+    "Our advice": "Unser Rat",
+    "Fits your major": "Passt zu deinem Fach",
+    "Skills you build": "Was du lernst",
+    "Jobs it points to": "Jobs, zu denen es führt",
     "Type your major, like Mechanical or Nursing": "Gib dein Fach ein, z. B. Maschinenbau oder Pflege",
     "Type your major. Every major is here.": "Gib dein Fach ein. Alle Fächer sind dabei.",
     "At your school": "An deiner Hochschule",

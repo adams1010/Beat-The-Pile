@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clubs & design teams | Beat the Pile</title>
+<meta name="description" content="Which clubs and design teams fit your major, what they actually do, how to pick one, and how they help you land an internship. Starting with Virginia Tech.">
+<link rel="canonical" href="https://www.beatthepile.com/clubs/">
+<link rel="icon" href="/icons/icon-192.png?v=4">
+<meta name="theme-color" content="#060A2C">
+<style>
+  /* /clubs/ (Nov 19, owner idea): clubs + design teams by school → what they do, who joins, how to pick, and the
+     job areas they lead to (live /jobs links). Data: /clubs/<school>.json, every fact from the school's own pages
+     (sources on each card). Advice sections are labeled as our advice. Starts with Virginia Tech (unitid 233921). */
+  :root{--green:#4A7000;--navy:#060A2C;--ink:#060A2C;--muted:#55627A;--faint:#5E6A80;--line:#DCE2EC;--bg:#EEF1F6;--tint:#F2FADF;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5;overflow-x:clip}
+  main{max-width:1440px;margin:0 auto;padding:28px max(16px,env(safe-area-inset-right,0px)) 72px max(16px,env(safe-area-inset-left,0px))}
+  h1{font-size:30px;letter-spacing:-.02em;margin:2px 0 6px}
+  h2{font-size:20px;margin:34px 0 4px}
+  .sub{color:var(--muted);margin:0 0 14px;max-width:70ch}
+  .school{display:inline-flex;gap:8px;align-items:center;font-size:14px;color:var(--muted);margin:0 0 2px}
+  .school b{color:var(--ink)}
+  .note{background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:12px 0;max-width:820px}
+  .note a,.card a,.ware a,.find a{color:var(--green);font-weight:600;text-decoration:none}
+  .tag{display:inline-block;font-size:12px;font-weight:600;color:var(--muted);background:var(--bg);border-radius:999px;padding:2px 9px}
+  .adv{font-size:12px;font-weight:600;color:var(--green);background:var(--tint);border-radius:999px;padding:2px 9px;margin-left:8px;vertical-align:middle}
+  /* path: how a team turns into an internship */
+  .path{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin:14px 0 0;position:relative}
+  .step{position:relative;padding:0 14px 0 0}
+  .step .dot{width:34px;height:34px;border-radius:50%;background:var(--navy);color:#B0F701;font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums;position:relative;z-index:1}
+  .step:not(:last-child)::before{content:"";position:absolute;left:34px;right:0;top:16px;border-top:2px solid var(--line)}
+  .step .when{font-size:12.5px;color:var(--muted);margin:10px 0 2px;font-weight:600}
+  .step b{display:block;font-size:15px;margin-bottom:3px}
+  .step p{margin:0;font-size:14px;color:var(--muted)}
+  @media (max-width:860px){.path{grid-template-columns:1fr;gap:14px}.step{padding:0 0 0 48px}.step .dot{position:absolute;left:0;top:0}.step:not(:last-child)::before{left:16px;right:auto;top:34px;bottom:-14px;border-top:0;border-left:2px solid var(--line)}.step .when{margin-top:4px}}
+  .honest{margin:16px 0 0;font-size:14.5px;max-width:78ch}
+  /* how to pick */
+  .pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin-top:12px}
+  .q{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .q b{display:block;margin-bottom:4px}
+  .q p{margin:0;font-size:14px;color:var(--muted)}
+  /* filters */
+  .bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:14px 0 12px}
+  .chip{border:1px solid #C9D1DE;background:#fff;color:var(--ink);border-radius:999px;padding:7px 13px;font:500 13.5px var(--font);cursor:pointer}
+  .chip[aria-pressed="true"]{background:var(--navy);border-color:var(--navy);color:#fff}
+  .count{font-size:13.5px;color:var(--muted);margin-left:4px}
+  /* cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px}
+  @media (max-width:400px){.grid{grid-template-columns:1fr}}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px 18px;display:flex;flex-direction:column;gap:8px}
+  .card.fit{border-color:#B9D97A}
+  .card h3{margin:0;font-size:18px;letter-spacing:-.01em}
+  .card .full{font-size:13px;color:var(--muted);margin-top:-6px}
+  .card p{margin:0;font-size:14.5px}
+  .card .who{color:var(--muted);font-size:14px}
+  .lbl{font-size:12.5px;font-weight:600;color:var(--muted);margin-top:4px}
+  .skills{display:flex;flex-wrap:wrap;gap:6px}
+  .skills span{font-size:12.5px;border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+  .jobs{display:flex;flex-direction:column;gap:4px;font-size:14px}
+  .jobs a .n{color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+  .back{font-size:13.5px;color:var(--muted)}
+  .hire{display:inline-block;font-size:12.5px;font-weight:600;color:var(--green);background:var(--tint);border-radius:999px;padding:1px 8px;margin:2px 4px 0 0;text-decoration:none}
+  .src{font-size:12px;color:var(--faint);margin-top:auto;padding-top:6px;border-top:1px solid #EEF1F6}
+  .src a{color:var(--faint);font-weight:500}
+  .fitline{font-size:12.5px;font-weight:600;color:var(--green)}
+  .ware{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:14px 0 0;max-width:900px;font-size:14.5px}
+  .find{margin-top:26px;font-size:15px}
+  .empty{color:var(--muted)}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main">
+  <div class="school">School: <b data-noi18n id="schoolName">Virginia Tech</b></div>
+  <h1>Clubs &amp; design teams</h1>
+  <p class="sub">What each team actually does, who joins, how to pick one, and which jobs it points you toward. Facts come from the school's own pages, linked on every card.</p>
+  <div class="note" id="otherSchool" hidden>We started with Virginia Tech. Your school is next on the list. <a href="#" data-feedback>Tell us which clubs matter at your school</a>.</div>
+
+  <h2>How a team turns into an internship <span class="adv">Our advice</span></h2>
+  <div class="path">
+    <div class="step"><div class="dot">1</div><div class="when">First weeks of fall</div><b>Shop around</b><p>Go to the club fair and two or three info sessions. Most teams recruit right at the start of the year.</p></div>
+    <div class="step"><div class="dot">2</div><div class="when">By October</div><b>Pick one and go deep</b><p>One team where you own real work beats five where you are a name on a list.</p></div>
+    <div class="step"><div class="dot">3</div><div class="when">First semester</div><b>Own one part</b><p>A bracket, a battery mount, a pitch, a script. Something you can point at and say "I built that."</p></div>
+    <div class="step"><div class="dot">4</div><div class="when">Before the career fair</div><b>Write it like a job</b><p>Put the team under Experience: what you built, what tools, what number changed. Bring photos.</p></div>
+    <div class="step"><div class="dot">5</div><div class="when">At the fair and after</div><b>Talk about the part</b><p>Recruiters ask "tell me about a project." Companies that back teams know them. Next year, lead a sub-team.</p></div>
+  </div>
+  <p class="honest"><b>The honest part:</b> a team doesn't hand you an internship. It gives you real work to talk about, people a year or two ahead who already interned, and sometimes companies that sponsor the team and come looking.</p>
+
+  <h2>How to pick one <span class="adv">Our advice</span></h2>
+  <div class="pick">
+    <div class="q"><b>Build, analyze, or sell?</b><p>Design teams build things. Investment funds and consulting clubs analyze. Most big teams also need people for sponsors, marketing and money.</p></div>
+    <div class="q"><b>Does it point at jobs you want?</b><p>Each card below links to live openings in the areas that team trains you for. Look before you join.</p></div>
+    <div class="q"><b>Can a first-year do real work?</b><p>Ask at the info session: "What did your newest members build last year?" Vague answer, keep looking.</p></div>
+    <div class="q"><b>How much time is it really?</b><p>Ask current members, not the flyer. Competition months are heavy. Pick what fits next to your classes.</p></div>
+    <div class="q"><b>Any major welcome?</b><p>Yes, often. BOLT recruits business students, Formula SAE works with finance majors, and about half the Consulting Group came from outside business.</p></div>
+  </div>
+
+  <h2>The teams and clubs</h2>
+  <div class="bar" id="bar" role="group" aria-label="Filter clubs"></div>
+  <div class="grid" id="grid"><p class="empty">Loading…</p></div>
+  <div class="ware" id="ware" hidden></div>
+  <p class="find" id="find"></p>
+</main>
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const get = (k) => { try { return localStorage.getItem(k); } catch { return null; } };
+  const GROUPS = [["all", "All"], ["fit", "Fits your major"], ["vehicles", "Vehicles"], ["aero", "Aerospace & space"], ["energy", "Energy"], ["civil", "Civil & building"], ["business", "Business & finance"], ["tech", "Tech & cyber"]];
+  const VT = 233921;
+  const sid = +get("btp_school_id") || 0;
+  if (sid && sid !== VT) $("otherSchool").hidden = false;
+  const myFields = (get("btp_major") || "").split(",").filter((k) => k && k !== "all");
+  const mine = (c) => myFields.length && c.fields.some((f) => myFields.includes(f) || (f === "engineering" && myFields.includes("eng")));
+  let D = null, counts = {}, hiring = [], group = myFields.length ? "fit" : "all";
+  const norm = (s) => String(s).toLowerCase().replace(/&/g, " and ").replace(/[^a-z0-9]+/g, " ").trim();
+  const hiringFor = (name) => { const n = norm(name); return hiring.find((h) => { const x = norm(h.company); return x === n || x.startsWith(n + " ") || n.startsWith(x + " "); }); };
+  const jobsUrl = (c, q) => `/jobs/?major=${encodeURIComponent(c.fields.join(","))}&state=all${q ? `&q=${encodeURIComponent(q)}` : ""}&kind=all`;
+  const nFor = (c) => c.fields.reduce((s, f) => s + (counts[f] || 0), 0);
+  function bar(){
+    const shown = GROUPS.filter(([k]) => k === "all" || (k === "fit" ? myFields.length : D.clubs.some((c) => c.group === k)));
+    $("bar").innerHTML = shown.map(([k, l]) => `<button type="button" class="chip" data-g="${k}" aria-pressed="${k === group}">${esc(l)}</button>`).join("") + `<span class="count" id="cnt"></span>`;
+  }
+  function render(){
+    const list = D.clubs.filter((c) => group === "all" || (group === "fit" ? mine(c) : c.group === group))
+      .sort((a, b) => (mine(b) ? 1 : 0) - (mine(a) ? 1 : 0));
+    $("cnt").textContent = `${list.length} of ${D.clubs.length}`;
+    $("grid").innerHTML = list.length ? list.map((c) => {
+      const n = nFor(c), backers = c.sponsors ? c.sponsors.names : [];
+      const hires = backers.map((b) => [b, hiringFor(b)]).filter(([, h]) => h);
+      return `<article class="card${mine(c) ? " fit" : ""}">
+        <div><span class="tag">${esc(c.kind)}${c.where ? " · " + esc(c.where) : ""}</span></div>
+        <h3 data-noi18n>${esc(c.name)}</h3>${c.full ? `<div class="full" data-noi18n>${esc(c.full)}</div>` : ""}
+        ${mine(c) ? `<div class="fitline">Fits your major</div>` : ""}
+        <p data-noi18n>${esc(c.does)}</p>
+        <p class="who" data-noi18n><b>Who joins:</b> ${esc(c.who)}</p>
+        <div class="lbl">Skills you build</div><div class="skills" data-noi18n>${c.skills.map((s) => `<span>${esc(s)}</span>`).join("")}</div>
+        <div class="lbl">Jobs it points to</div>
+        <div class="jobs"><a href="${jobsUrl(c)}">Internships and jobs in these areas${n ? ` <span class="n">· ${n.toLocaleString()} open now</span>` : ""}</a>${(c.jobs || []).map(([l, q]) => `<a href="${jobsUrl(c, q)}" data-noi18n>${esc(l)}</a>`).join("")}</div>
+        ${c.sponsors ? `<div class="back" data-noi18n><b>Backers:</b> ${esc(backers.join(", "))} <span>(${esc(c.sponsors.note)}, <a href="${esc(c.sponsors.source)}" rel="noopener" target="_blank">source</a>)</span>${hires.length ? `<div>${hires.map(([b, h]) => `<a class="hire" href="/jobs/?company=${encodeURIComponent(h.id)}&kind=all">${esc(b)} is hiring now</a>`).join("")}</div>` : ""}</div>` : ""}
+        <div class="jobs" data-noi18n>${c.links.map(([l, u]) => `<a href="${esc(u)}" rel="noopener" target="_blank">${esc(l)} ↗</a>`).join("")}</div>
+        <div class="src">Sources: ${c.sources.map((u, i) => `<a href="${esc(u)}" rel="noopener" target="_blank">${i + 1}</a>`).join(" · ")}</div>
+      </article>`; }).join("") : `<p class="empty">No clubs in that group yet.</p>`;
+  }
+  function ware(){
+    const w = D.wareLab; if (!w) return;
+    const hires = w.companies.map((b) => [b, hiringFor(b)]).filter(([, h]) => h);
+    $("ware").hidden = false;
+    $("ware").innerHTML = `<b>Ware Lab teams and the companies behind them.</b> <span data-noi18n>${esc(w.note)}</span> <a href="${esc(w.source)}" rel="noopener" target="_blank">Source</a>`
+      + (hires.length ? `<div style="margin-top:8px">${hires.map(([b, h]) => `<a class="hire" href="/jobs/?company=${encodeURIComponent(h.id)}&kind=all">${esc(b)} is hiring now</a>`).join("")}</div>` : "");
+  }
+  document.addEventListener("click", (e) => { const b = e.target.closest("[data-g]"); if (!b) return; group = b.dataset.g; bar(); render(); });
+  fetch("/clubs/vt.json").then((r) => r.ok ? r.json() : Promise.reject()).then((d) => {
+    D = d; $("schoolName").textContent = d.school;
+    $("find").innerHTML = `Looking for something else? <a href="${esc(d.find.url)}" rel="noopener" target="_blank">${esc(d.find.label)}</a> <span data-noi18n>${esc(d.find.note)}</span>`;
+    bar(); render(); ware();
+    fetch("/api/listings?summary=1&field=all&kind=all").then((r) => r.ok ? r.json() : null).then((s) => { if (s?.byField) { counts = s.byField; render(); } }).catch(() => {});
+    fetch("/api/listings?names=1&field=all&kind=all").then((r) => r.ok ? r.json() : null).then((s) => { if (s?.companies) { hiring = s.companies; render(); ware(); } }).catch(() => {});
+  }).catch(() => { $("grid").innerHTML = `<p class="empty">Couldn't load the club list. Try again in a minute.</p>`; });
+})();
+</script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

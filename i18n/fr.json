@@ -1,6 +1,16 @@
 {
  "lang": "fr",
  "strings": {
+    "Clubs & teams": "Clubs et équipes",
+    "Which clubs fit your major and lead to internships": "Quels clubs vont avec ta filière et mènent à des stages",
+    "Clubs & design teams": "Clubs et équipes de conception",
+    "How a team turns into an internship": "Comment une équipe mène à un stage",
+    "How to pick one": "Comment en choisir un",
+    "The teams and clubs": "Les équipes et clubs",
+    "Our advice": "Notre conseil",
+    "Fits your major": "Va avec ta filière",
+    "Skills you build": "Compétences acquises",
+    "Jobs it points to": "Emplois visés",
     "Type your major, like Mechanical or Nursing": "Tape ta filière, comme Mécanique ou Soins infirmiers",
     "Type your major. Every major is here.": "Tape ta filière. Elles y sont toutes.",
     "At your school": "Dans ton école",

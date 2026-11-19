@@ -1,6 +1,16 @@
 {
  "_about": "Spanish UI strings (Nov 2026). Key = the English text exactly as shown (whitespace collapsed). Used by /i18n.js when the student picks Español. Job titles, company names and places are data and stay as-is.",
  "strings": {
+    "Clubs & teams": "Clubs y equipos",
+    "Which clubs fit your major and lead to internships": "Qué clubs encajan con tu carrera y llevan a prácticas",
+    "Clubs & design teams": "Clubs y equipos de diseño",
+    "How a team turns into an internship": "Cómo un equipo se convierte en prácticas",
+    "How to pick one": "Cómo elegir uno",
+    "The teams and clubs": "Los equipos y clubs",
+    "Our advice": "Nuestro consejo",
+    "Fits your major": "Encaja con tu carrera",
+    "Skills you build": "Habilidades que ganas",
+    "Jobs it points to": "Empleos a los que lleva",
     "Type your major, like Mechanical or Nursing": "Escribe tu carrera, como Mecánica o Enfermería",
     "Type your major. Every major is here.": "Escribe tu carrera. Están todas.",
     "At your school": "En tu universidad",

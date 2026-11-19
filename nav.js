@@ -57,6 +57,7 @@
     ["/internship/", "My Internship", "Got an offer? Prep, first weeks, wrap-up"],
     ["/companies/", "Companies", "Look up any company and follow it"],
     ["/radar/", "Opening Radar", "When each company usually opens internships"],
+    ["/clubs/", "Clubs & teams", "Which clubs fit your major and lead to internships"],
     ["/#quiz", "Match quiz", "Real openings matched to your major"],
     ["/#interview", "Interview practice", "Talk it out against a timer, get graded"],
     ["/#resumebuilder", "Resume builder", "Starter resume from your answers"],
@@ -296,7 +297,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   };
   // Nov 16: phone bottom bar = 4 pinned pages + More (everything else). Students and employers pick their own 4
   // ("Edit bar" in More → tap to pin/unpin); saved on this device in localStorage btp_tabs[_biz]. Desktop is unchanged.
-  const TOOL_ICON = { "/internship/": "jobs", "/companies/": "business", "/radar/": "season", "/#quiz": "tracker", "/#interview": "talent", "/#resumebuilder": "profile", "/#score": "tracker", "/#wall": "orbit", "/demo/": "home" };
+  const TOOL_ICON = { "/internship/": "jobs", "/companies/": "business", "/radar/": "season", "/clubs/": "orbit", "/#quiz": "tracker", "/#interview": "talent", "/#resumebuilder": "profile", "/#score": "tracker", "/#wall": "orbit", "/demo/": "home" };
   const SHORT = { "Career Fairs": "Fairs", "Career Fair": "Fair", "My Season": "Season", "My Internship": "Internship", "Opening Radar": "Radar", "Match quiz": "Quiz", "Interview practice": "Interview", "Resume builder": "Resume", "Resume check": "Resume check", "Community": "Community", "Try it": "Demo", "My profile": "Profile", "Company": "Company" };
   const PICKS = [...MAIN, ...(BIZ ? [["/business/company/", "Company", "business"]] : [["/u/", "My profile", "profile"]]), ...TOOLS.map(([h, t]) => [h, t, TOOL_ICON[h] || "tools"])];
   const TKEY = BIZ ? "btp_tabs_biz" : "btp_tabs";
