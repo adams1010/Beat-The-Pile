@@ -214,7 +214,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
           <a role="menuitem" href="#" data-btp-switch="${BIZ ? "student" : "employer"}"><b>${BIZ ? "Switch to student account" : "Switch to business account"}</b><small>${BIZ ? "Look for internships and jobs" : "Hire interns and new grads"}</small></a>
           <div class="sep"></div>
           <div id="btpAccts"></div>
-          <a role="menuitem" href="#" data-btp-add><b>Add another account</b><small>Keep a personal and a business account, switch in one tap</small></a>
+          <a role="menuitem" href="#" data-btp-add><b>Add another account</b><small>Keep a personal and a business account</small></a>
           <div class="sep"></div>
           <div class="langs"><label for="btpLangSel"><b>Language</b></label><select id="btpLangSel" class="langsel" data-noi18n>${LANGS.map(([k, n]) => `<option value="${k}"${k === LANG ? " selected" : ""}>${n}</option>`).join("")}</select></div>
           <div class="sep"></div>
@@ -255,13 +255,18 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     let hiring = false; try { hiring = BIZ && localStorage.getItem("btp_hiring") === "1"; } catch {}
     box.classList.toggle("hiring", hiring); nav.querySelector("#btpMe").title = hiring ? "Your account · Hiring" : "Your account";
     nav.querySelector("#btpAName").textContent = name; nav.querySelector("#btpAEmail").textContent = email;
-    // Nov 18 (owner): several accounts in one browser (Clerk multi-session), e.g. a personal one and a business one
+    // Nov 18 (owner): a personal and a business account in one browser. With Clerk multi-session (a paid Clerk
+    // setting) both stay signed in; without it we remember the accounts used on this device (email, name, kind only)
+    // and switching = sign out + sign in to the other one with its email filled in.
     const C = window.Clerk, sess = (C && C.client && (C.client.signedInSessions || C.client.activeSessions)) || [];
-    const others = sess.filter((x) => x && x.user && x.id !== (C.session && C.session.id));
     const esc = (t) => String(t || "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-    nav.querySelector("#btpAccts").innerHTML = others.length ? `<small class="accthd">Switch account</small>${others.map((x) => { const ou = x.user, oe = ou.primaryEmailAddress?.emailAddress || "";
-      const on = [ou.firstName, ou.lastName].filter(Boolean).join(" ") || oe.split("@")[0], biz = (ou.unsafeMetadata || {}).role === "employer";
-      return `<a role="menuitem" href="#" data-btp-sess="${esc(x.id)}" data-biz="${biz ? 1 : 0}"><b data-noi18n>${esc(on)}</b><small><span data-noi18n>${esc(oe)}</span> · ${biz ? "Business" : "Personal"}</small></a>`; }).join("")}<div class="sep"></div>` : "";
+    const isBiz = (x) => ((x && x.unsafeMetadata) || {}).role === "employer";
+    let remembered = []; try { remembered = JSON.parse(localStorage.getItem("btp_accts") || "[]").filter((a) => a && a.e); } catch {}
+    if (u && email) { remembered = [{ e: email, n: name, b: isBiz(u) ? 1 : 0 }, ...remembered.filter((a) => a.e !== email)].slice(0, 5); try { localStorage.setItem("btp_accts", JSON.stringify(remembered)); } catch {} }
+    const live = sess.filter((x) => x && x.user && x.id !== (C.session && C.session.id)).map((x) => ({ sess: x.id, e: x.user.primaryEmailAddress?.emailAddress || "", n: [x.user.firstName, x.user.lastName].filter(Boolean).join(" "), b: isBiz(x.user) ? 1 : 0 }));
+    const others = [...live, ...remembered.filter((a) => a.e !== email && !live.some((l) => l.e === a.e))];
+    nav.querySelector("#btpAccts").innerHTML = others.length ? `<small class="accthd">Switch account</small>${others.map((a) =>
+      `<a role="menuitem" href="#" ${a.sess ? `data-btp-sess="${esc(a.sess)}"` : `data-btp-email="${esc(a.e)}"`} data-biz="${a.b ? 1 : 0}"><b data-noi18n>${esc(a.n || a.e.split("@")[0])}</b><small><span data-noi18n>${esc(a.e)}</span> · ${a.b ? "Business" : "Personal"}</small></a>`).join("")}<div class="sep"></div>` : "";
     if (path.startsWith("/u/") || path.startsWith("/business/company/")) nav.querySelector("#btpMe").classList.add("cur");
   };
   const seenSignIn = () => { try { return !!(localStorage.getItem("btp_me") || localStorage.getItem("btp_role")); } catch { return false; } };
@@ -323,11 +328,14 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
       det.querySelector("#btpLangSel")?.addEventListener("change", (e) => {   // Nov 18 (owner): a dropdown, not a row of buttons
         const l = e.target.value; if (window.btpI18n) window.btpI18n.set(l); else { try { localStorage.setItem("btp_lang", l); } catch {} location.reload(); } });
       det.addEventListener("click", async (e) => {
-        const sw = e.target.closest("[data-btp-sess]"), add = e.target.closest("[data-btp-add]"); if (!sw && !add) return;
+        const sw = e.target.closest("[data-btp-sess]"), rem = e.target.closest("[data-btp-email]"), add = e.target.closest("[data-btp-add]"); if (!sw && !rem && !add) return;
         e.preventDefault(); det.open = false; const C = window.Clerk; if (!C) return;
         const clear = () => { try { ["btp_me", "btp_hiring", "btp_role"].forEach((k) => localStorage.removeItem(k)); sessionStorage.removeItem("btp_orbit_n"); } catch {} };
+        const multi = C.__unstable__environment?.authConfig?.singleSessionMode === false;
         if (sw) { clear(); try { await C.setActive({ session: sw.dataset.btpSess }); } catch {} location.href = sw.dataset.biz === "1" ? "/business/home/" : "/"; return; }
-        try { await C.openSignIn({ forceRedirectUrl: "/", signUpForceRedirectUrl: "/" }); } catch { location.href = "/start/"; }
+        if (add && multi) { try { await C.openSignIn({ forceRedirectUrl: "/", signUpForceRedirectUrl: "/" }); return; } catch {} }
+        clear(); try { await C.signOut(); } catch {}
+        location.href = rem ? `/start/?email=${encodeURIComponent(rem.dataset.btpEmail)}&next=${rem.dataset.biz === "1" ? "%2Fbusiness%2Fhome%2F" : "%2F"}` : "/start/";
       });
       det.querySelectorAll("[data-btp-switch]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); det.open = false;
         saveRole(a.dataset.btpSwitch, a.dataset.btpSwitch === "employer" ? "/business/home/" : "/"); }));
