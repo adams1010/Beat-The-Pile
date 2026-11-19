@@ -1,6 +1,11 @@
 {
  "lang": "nl",
  "strings": {
+  "Settings": "Instellingen",
+  "Graduates": "Studeert af",
+  "Based in": "Woont in",
+  "Complete": "Compleet",
+  "Recruiters look here first. Add internships, jobs, research, clubs or leadership.": "Recruiters kijken hier eerst. Voeg stages, banen, onderzoek, clubs of leiderschap toe.",
     "Support": "Ondersteuning",
     "AI is very busy right now. Signed-in students skip this line: sign in and try again.": "De AI is nu erg druk. Ingelogde studenten slaan de rij over: log in en probeer het opnieuw.",
     "We couldn't find that page": "We konden die pagina niet vinden",
@@ -1931,6 +1936,8 @@
   "Your Recruiter badge is being verified": "Je Recruiter-badge wordt gecontroleerd"
  },
  "patterns": [
+  ["^Profile (\\d+)%$", "Profiel $1%"],
+  ["^Next: (.+) →$", "Volgende: $1 →"],
   ["^(\\d) of 4 pinned$", "$1 van 4 vastgezet"],
   ["^(.+) career fair page ↗$", "Banenbeurspagina van $1 ↗"],
   ["^See everything \\((\\d+) chapters\\)$", "Alles bekijken ($1 hoofdstukken)"],

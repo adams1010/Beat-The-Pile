@@ -114,7 +114,16 @@ input,textarea,select{font-size:16px!important} /* prevents iOS zoom-on-focus */
 <body>
 <script src="/nav.js"></script>
 <script src="/resume-file.js"></script>
-<div id="root"></div>
+<div id="root"><!-- Nov 18: real text for search engines and slow phones (React replaces this the moment the app loads). Without it the
+     homepage HTML had zero words, so Google sent "Beat the Pile" searches to /jobs/ instead of here. -->
+<main style="background:#060A2C;color:#fff;min-height:70vh;padding:72px 24px;font-family:Geist,-apple-system,Segoe UI,Roboto,sans-serif">
+  <div style="max-width:880px;margin:0 auto">
+    <p style="color:#B0F701;font-weight:600;margin:0 0 10px">Beat the Pile</p>
+    <h1 style="font-size:clamp(2.3rem,5vw,3.6rem);line-height:1.03;letter-spacing:-.035em;font-weight:600;margin:0 0 16px">Find your job before the <span style="color:#B0F701">pile</span> does.</h1>
+    <p style="font-size:18px;line-height:1.5;color:#C9D1DE;max-width:640px;margin:0 0 24px">Beat the Pile finds internships and entry-level jobs for every major, straight from each company's own job board, so you can apply early. Track your applications, get ready for career fairs, and practice interviews.</p>
+    <p style="margin:0"><a href="/jobs/" style="color:#B0F701;font-weight:600">Find internships</a> &middot; <a href="/fair/" style="color:#fff">Career fairs</a> &middot; <a href="/majors/" style="color:#fff">Every major</a> &middot; <a href="/start/" style="color:#fff">Sign up</a></p>
+  </div>
+</main></div>
 <!-- The app below is built from src/home.jsx by `node scripts/build-home.mjs` (never edit home.js by hand). -->
 <script src="/home.js"></script>
 <script src="/feedback.js" defer></script>

@@ -1,6 +1,11 @@
 {
  "lang": "de",
  "strings": {
+  "Settings": "Einstellungen",
+  "Graduates": "Abschluss",
+  "Based in": "Wohnort",
+  "Complete": "Vollständig",
+  "Recruiters look here first. Add internships, jobs, research, clubs or leadership.": "Recruiter schauen zuerst hierher. Füge Praktika, Jobs, Forschung, Clubs oder Führungsrollen hinzu.",
     "Support": "Support",
     "AI is very busy right now. Signed-in students skip this line: sign in and try again.": "Die KI ist gerade sehr ausgelastet. Angemeldete Studierende müssen nicht warten: Melde dich an und versuche es erneut.",
     "We couldn't find that page": "Diese Seite haben wir nicht gefunden",
@@ -1931,6 +1936,8 @@
   "Your Recruiter badge is being verified": "Dein Recruiter-Badge wird geprüft"
  },
  "patterns": [
+  ["^Profile (\\d+)%$", "Profil $1%"],
+  ["^Next: (.+) →$", "Als Nächstes: $1 →"],
   ["^(\\d) of 4 pinned$", "$1 von 4 angeheftet"],
   ["^(.+) career fair page ↗$", "Karrieremessen-Seite von $1 ↗"],
   ["^See everything \\((\\d+) chapters\\)$", "Alles ansehen ($1 Kapitel)"],

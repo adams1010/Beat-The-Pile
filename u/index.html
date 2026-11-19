@@ -102,12 +102,24 @@
   /* Nov 8 engagement pass: open-to badges, season strip, strength ring, visibility panel, highlights */
   .opento{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
   .founding{display:inline-block;margin:6px 0 0;font-size:12.5px;font-weight:600;color:#4A7000;background:#F2FADF;border:1px solid #DDF3A8;border-radius:999px;padding:3px 10px}
+  .actrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}.actrow>.orbitact,.actrow>.btns{margin-top:0}.btns:empty{display:none}
   .orbitact{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}.orbitact:empty{display:none}
   .orbitact .btn{margin:0}
   .tagio{font-size:13px;font-weight:600;color:#4A7000;background:#F2FADF;border:1px solid #DDF3A8;border-radius:999px;padding:6px 12px}
   .tagio.on::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:#4A7000;margin-right:6px;vertical-align:1px}
   .opento span{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;border-radius:999px;padding:5px 12px;background:#060A2C;color:#B0F701}
   .opento span::before{content:"";width:7px;height:7px;border-radius:50%;background:#B0F701}
+  /* Nov 18: recruiter "at a glance" strip (replaces the Experience/Projects/Skills counters, which showed zeros) */
+  .glance{display:grid;grid-template-columns:repeat(var(--gn,4),minmax(0,1fr));gap:8px;margin-top:16px}
+  .glance div{background:#F5F7FA;border-radius:8px;padding:9px 12px;min-width:0}
+  .glance span{display:block;font-size:12px;color:var(--muted)}.glance b{display:block;font-size:14.5px;color:var(--navy);overflow-wrap:anywhere}
+  @media(max-width:640px){.glance{grid-template-columns:repeat(2,minmax(0,1fr))}}
+  .otabs{display:flex;gap:6px;margin:0 0 14px;flex-wrap:wrap}
+  .otabs button{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:999px;padding:8px 16px;cursor:pointer}
+  .otabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+  .sstrip{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:0 0 14px}
+  .sstrip .bar{flex:1;height:8px;background:#EEF1F6;border-radius:999px;overflow:hidden}.sstrip .bar i{display:block;height:100%;background:#4A7000}
+  .sstrip button{font:inherit;font-size:13px;font-weight:600;color:var(--green-dark);background:none;border:0;cursor:pointer;padding:4px 0;white-space:nowrap}
   .hl{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line);margin:18px -24px -22px;}
   .hl div{padding:12px 8px;text-align:center;border-left:1px solid var(--line)}.hl div:first-child{border-left:0}
   .hl b{display:block;font-size:20px;color:var(--navy);font-variant-numeric:tabular-nums}.hl span{font-size:12.5px;color:var(--muted)}
@@ -279,6 +291,32 @@
     orbit: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75"><circle cx="12" cy="12" r="8.5"/><path d="M3.5 12h17"/><path d="M12 3.5c2.3 2.4 3.5 5.2 3.5 8.5s-1.2 6.1-3.5 8.5c-2.3-2.4-3.5-5.2-3.5-8.5S9.7 5.9 12 3.5z"/></svg>',
     biz: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><path d="M4 20.5V6.5L12 3.5v17"/><path d="M12 9.5h8v11"/><path d="M3 20.5h18"/></svg>',
   };
+  // Nov 18: what a recruiter checks first, in one row. Only filled facts show; private kit answers never do.
+  function glanceHtml(p){
+    const look = p.lookingFor || (p.openTo || []).map((k) => OPEN_TO[k] || k).join(" or ");
+    const items = [["Looking for", look], ["Graduates", gradLabel(p)], ["Major", p.major], ["Based in", p.location]].filter(([, v]) => v && String(v).trim());
+    return items.length >= 2 ? `<div class="glance" style="--gn:${items.length}">${items.map(([k, v]) => `<div><span>${k}</span><b>${esc(v)}</b></div>`).join("")}</div>`
+      : look ? `<div class="looking">Looking for: ${esc(look)}</div>` : "";
+  }
+  // Owner view (Nov 18): one slim strength bar over the profile; everything else lives in the Application kit and Settings tabs
+  function strengthStrip(p){
+    if (!S.me) return "";
+    const st = strength(p), todo = st.items.filter((x) => !x[1]);
+    const t = todo[0] && todo[0][0], jumpTo = t ? (/resume|phone/i.test(t) ? "kit" : /ask me|prompt|hometown/i.test(t) ? "know" : /how you got|experience/i.test(t) ? "experience" : "") : "";
+    return `<div class="sstrip"><b style="font-size:13.5px;white-space:nowrap">Profile ${st.pct}%</b><div class="bar" aria-hidden="true"><i style="width:${st.pct}%"></i></div>
+      ${t ? `<button type="button" data-tab="edit" data-jump="${jumpTo}">Next: ${esc(t)} →</button>` : `<span class="small muted">Complete</span>`}</div>`;
+  }
+  function ownerTabs(){
+    return `<nav class="otabs" aria-label="Your profile">${[["preview","Profile"],["kitv","Application kit"],["settings","Settings"]].map(([k, t]) => `<button type="button" data-tab="${k}" class="${S.tab === k ? "on" : ""}">${t}</button>`).join("")}</nav>`;
+  }
+  function settingsHtml(p){
+    return `${ownerCards(p)}
+      <section class="card" id="language"><h2>Language</h2><p class="small muted">Pick the language for menus, buttons and help text. Job titles and company names stay as the employer wrote them.</p>
+        ${window.btpI18n ? window.btpI18n.picker() : ""}</section>
+      <section class="card" id="delete-account"><h2>Delete account</h2><p class="small muted">Deletes your profile, resume, applications, Orbit connections and messages, any company page or badge, and your sign-in. This can't be undone.</p>
+        <label for="delConf">Type DELETE to confirm</label><input id="delConf" autocomplete="off" autocapitalize="characters" spellcheck="false">
+        <button type="button" class="btn" id="delAcct" style="margin-top:10px">Delete my account</button><p class="small" id="delMsg" role="status" style="color:#B42318;margin:8px 0 0"></p></section>`;
+  }
   function ownerCards(p){
     if (!S.me) return "";
     const st = strength(p), todo = st.items.filter((x) => !x[1]), me = S.me;
@@ -371,14 +409,12 @@
         ${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
         <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}${p.hometown ? `<span>From ${esc(p.hometown)}</span>` : ""}</div>
         ${(p.openTo || []).length || p.coffee ? `<div class="opento">${(p.openTo || []).map((k) => `<span>Open to ${esc(OPEN_TO[k] || k)}</span>`).join("")}${p.coffee ? `<span class="cof">Open to coffee chats</span>` : ""}</div>` : ""}
-        ${p.lookingFor ? `<div class="looking">Looking for: ${esc(p.lookingFor)}</div>` : ""}
-        ${isPreview ? "" : `<div class="orbitact" id="orbitAct"></div><div id="both"></div>`}
-        <div class="btns">${contactBtns}${resume ? `<a class="btn pri" href="${esc(resume)}" target="_blank" rel="noopener">View resume</a>` : isPreview && p.showResume ? `<span class="btn pri" title="Shows when your resume QR link is on">View resume</span>` : ""}${links}</div>${contactNote}
+        ${glanceHtml(p)}
+        <div class="actrow">${isPreview ? "" : `<div class="orbitact" id="orbitAct"></div>`}<div class="btns">${contactBtns}${resume ? `<a class="btn pri" href="${esc(resume)}" target="_blank" rel="noopener">View resume</a>` : isPreview && p.showResume ? `<span class="btn pri" title="Shows when your resume QR link is on">View resume</span>` : ""}${links}</div></div>${contactNote}${isPreview ? "" : `<div id="both"></div>`}
         ${isPreview && S.me ? `<div class="vis"><span class="dotv${S.me.profilePublic && S.me.handle ? " on" : ""}" aria-hidden="true"></span>${S.me.profilePublic && S.me.handle ? `Public · <a href="/u/${esc(S.me.handle)}" target="_blank" style="color:var(--muted)">beatthepile.com/u/${esc(S.me.handle)}</a>` : "Private · only you can see this"}</div>` : ""}
-        ${((p.experience || []).length + (p.projects || []).length + (p.skills || []).length) ? `<div class="hl"><div><b>${(p.experience || []).length}</b><span>Experience</span></div><div><b>${(p.projects || []).length}</b><span>Projects</span></div><div><b>${(p.skills || []).length}</b><span>Skills</span></div></div>` : ""}
       </div></section>
-      <div class="pcols"><div class="pmain"><div class="og" style="order:2">${p.about ? `<section class="card"><h2>About</h2><p class="about">${esc(p.about)}</p></section>` : ""}</div><div class="og" style="order:3">${knowHtml(p, isPreview)}</div><div class="og" style="order:5">${edu ? `<section class="card"><h2>Education</h2>${edu}</section>` : ""}</div><div class="og" style="order:6">${exp ? `<section class="card xp"><h2>Experience</h2>${exp}</section>` : ""}</div><div class="og" style="order:7">${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}</div></div>
-      <aside class="pside"><div class="og" style="order:1">${isPreview ? ownerCards(p) : ""}</div><div class="og" style="order:4">${achHtml(ach, isPreview, p)}</div><div class="og" style="order:8">${(p.courses || []).length ? `<section class="card"><h2>Courses</h2><div class="chips">${p.courses.map((c) => `<span class="chip">${esc(c)}</span>`).join("")}</div></section>` : ""}</div><div class="og" style="order:9">${(p.skills || []).length ? `<section class="card"><h2>Skills</h2><div class="chips">${p.skills.map((s, i) => `<span class="chip${i < 3 ? " top" : ""}">${esc(s)}</span>`).join("")}</div>${p.skills.length > 3 ? `<p class="small muted" style="margin:8px 0 0">Top skills first.</p>` : ""}</section>` : ""}</div><div class="og" style="order:10">${isPreview ? kitCard(p) : ""}</div><div class="og" style="order:11">${isPreview || seenMe() ? "" : `<section class="card cta"><h2>Make your own profile</h2><p class="small" style="margin:0 0 12px">One page for your experience, projects and skills, plus a QR code for career fairs. Free.</p><a class="btn pri" href="/start/" style="background:#B0F701;border-color:#B0F701;color:#060A2C">Get started</a></section>`}</div></aside></div>
+      <div class="pcols"><div class="pmain"><div class="og" style="order:2">${p.about ? `<section class="card"><h2>About</h2><p class="about">${esc(p.about)}</p></section>` : ""}</div><div class="og" style="order:3">${exp ? `<section class="card xp"><h2>Experience</h2>${exp}</section>` : isPreview ? `<section class="card know-empty"><h2>Experience</h2><p class="small muted" style="margin:0 0 10px">Recruiters look here first. Add internships, jobs, research, clubs or leadership.</p><button class="btn pri" type="button" data-tab="edit" data-jump="experience">Add experience</button></section>` : ""}</div><div class="og" style="order:4">${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}</div><div class="og" style="order:5">${edu ? `<section class="card"><h2>Education</h2>${edu}</section>` : ""}</div></div>
+      <aside class="pside"><div class="og" style="order:6">${(p.skills || []).length ? `<section class="card"><h2>Skills</h2><div class="chips">${p.skills.map((s, i) => `<span class="chip${i < 3 ? " top" : ""}">${esc(s)}</span>`).join("")}</div>${p.skills.length > 3 ? `<p class="small muted" style="margin:8px 0 0">Top skills first.</p>` : ""}</section>` : ""}</div><div class="og" style="order:7">${knowHtml(p, isPreview)}</div><div class="og" style="order:8">${(p.courses || []).length ? `<section class="card"><h2>Courses</h2><div class="chips">${p.courses.map((c) => `<span class="chip">${esc(c)}</span>`).join("")}</div></section>` : ""}</div><div class="og" style="order:9">${achHtml(ach, isPreview, p)}</div><div class="og" style="order:11">${isPreview || seenMe() ? "" : `<section class="card cta"><h2>Make your own profile</h2><p class="small" style="margin:0 0 12px">One page for your experience, projects and skills, plus a QR code for career fairs. Free.</p><a class="btn pri" href="/start/" style="background:#B0F701;border-color:#B0F701;color:#060A2C">Get started</a></section>`}</div></aside></div>
       <p class="small muted" style="text-align:center">Profile on <a href="/" style="color:var(--green-dark)">Beat the Pile</a>${isPreview ? "" : ` · <a href="#" id="rep" style="color:var(--muted)">Report this profile</a>`}</p>`;
   }
   // Achievements (Nov 15): stacking badges from the student's own Tracker. Public = tiers reached; owner = progress to the next one.
@@ -485,8 +521,9 @@
     const resumeOn = me.resume && me.resume.share;
     app.className = "";
     document.querySelector("main").innerHTML = `
-      ${S.tab === "preview" ? "" : `<div class="edhead"><button type="button" class="linkbtn" data-tab="preview">← Back to profile</button><b>Edit profile</b><span style="width:110px"></span></div>`}
-      ${S.tab === "preview" ? profileHtml(d.p, resumeOn && d.p.showResume ? "/r/" + me.resume.token : null, true, me.founding, me.achievements) : `
+      ${S.tab === "edit" ? `<div class="edhead"><button type="button" class="linkbtn" data-tab="preview">← Back to profile</button><b>Edit profile</b><span style="width:110px"></span></div>` : ownerTabs()}
+      ${S.tab === "preview" ? strengthStrip(d.p) + profileHtml(d.p, resumeOn && d.p.showResume ? "/r/" + me.resume.token : null, true, me.founding, me.achievements)
+        : S.tab === "kitv" ? kitCard(d.p) : S.tab === "settings" ? settingsHtml(d.p) : `
       <section class="card fill" id="fill"><div class="fi">${FILE_IC}</div><div style="flex:1;min-width:0"><h2 style="margin:0 0 2px">Fill your profile from your resume</h2>
         <p class="small muted" style="margin:0">Upload your resume (PDF or Word) and we'll fill in your school, major, experience, projects, skills and links. Nothing is saved until you check it and tap Save profile.</p></div>
         <label class="btn pri" style="cursor:pointer;margin:0;flex-shrink:0">Upload resume<input type="file" id="fillRes" accept="${btpResumeFile.accept}" style="position:absolute;left:-9999px"></label></section>
@@ -568,11 +605,6 @@
         <label for="f_skill">Add a skill</label><input id="f_skill" list="skilllist" placeholder="Start typing, e.g. SolidWorks, then Enter" ${d.p.skills.length >= 30 ? "disabled" : ""}>
         <datalist id="skilllist">${SKILLS.filter((s) => !d.p.skills.includes(s)).map((s) => `<option value="${esc(s)}">`).join("")}</datalist>
       </section>
-      <section class="card" id="language"><h2>Language</h2><p class="small muted">Pick the language for menus, buttons and help text. Job titles and company names stay as the employer wrote them.</p>
-        ${window.btpI18n ? window.btpI18n.picker() : ""}</section>
-      <section class="card" id="delete-account"><h2>Delete account</h2><p class="small muted">Deletes your profile, resume, applications, Orbit connections and messages, any company page or badge, and your sign-in. This can't be undone.</p>
-        <label for="delConf">Type DELETE to confirm</label><input id="delConf" autocomplete="off" autocapitalize="characters" spellcheck="false">
-        <button type="button" class="btn" id="delAcct" style="margin-top:10px">Delete my account</button><p class="small" id="delMsg" role="status" style="color:#B42318;margin:8px 0 0"></p></section>
       <section class="card"><h2>Links</h2>
         <div class="row"><div><label for="l_linkedin">LinkedIn</label><input id="l_linkedin" data-link="linkedin" value="${esc(d.p.links.linkedin || "")}" placeholder="https://linkedin.com/in/…"></div>
         <div><label for="l_github">GitHub</label><input id="l_github" data-link="github" value="${esc(d.p.links.github || "")}" placeholder="https://github.com/…"></div></div>
@@ -600,7 +632,7 @@
           <button class="btn" type="button" data-rmres="${i}">Remove</button></div>`).join("") || `<p class="small muted" style="margin:10px 0 0">No resumes yet.</p>`}</div>
         ${d.resumes.length < 6 ? `<label class="btn" style="margin-top:12px;cursor:pointer;width:auto">+ Add resume file<input type="file" id="addResF" accept="${btpResumeFile.accept}" style="position:absolute;left:-9999px"></label>` : ""}
       </section>`}`}
-      ${S.tab === "preview" ? `<span class="msg" id="msg" role="status" hidden></span>` : `<div class="bar"><button class="btn pri" id="save">Save profile</button><button class="btn" type="button" data-tab="preview">Cancel</button><span class="msg" id="msg" role="status"></span></div>`}`;
+      ${S.tab !== "edit" ? `<span class="msg" id="msg" role="status" hidden></span>` : `<div class="bar"><button class="btn pri" id="save">Save profile</button><button class="btn" type="button" data-tab="preview">Cancel</button><span class="msg" id="msg" role="status"></span></div>`}`;
     wire();
     if (window.btpInvite && document.getElementById("invSlot")) window.btpInvite.mount(document.getElementById("invSlot"), token);   // Nov 16
   }
@@ -876,7 +908,7 @@
     setTimeout(hiringNow, 0); setTimeout(() => verifyOrgs(xs), 0);
     return `<div class="tl-stats">${stats.map(([n, l]) => `<div><b>${esc(n)}</b><span>${esc(l)}</span></div>`).join("")}</div>
       <div class="tl">
-        ${nextText || gradText ? `<div class="tl-item next"><span class="tl-node" aria-hidden="true"></span><div class="tl-card"><div class="tl-up">Up next</div>
+        ${(nextText || gradText) && !glanceHtml(p) ? `<div class="tl-item next"><span class="tl-node" aria-hidden="true"></span><div class="tl-card"><div class="tl-up">Up next</div>
           <b class="tl-title">${esc(nextText || "What's next")}</b>${gradText ? `<div class="sm">${esc(gradText)}</div>` : ""}
           <a class="tl-find" href="${nextHref}">Find openings</a></div></div>` : ""}
         ${cards}
@@ -1033,6 +1065,7 @@
       // Nov 16: your earned badges (same list visitors see)
       try { if (me.handle && me.profilePublic) { const pr = await fetch(`/api/me?u=${encodeURIComponent(me.handle)}`, { headers: { Authorization: "Bearer " + (await token()) } }); if (pr.ok) window.__BADGES = (await pr.json()).badges || []; } } catch {}
       if (location.hash === "#kit") { S.tab = "edit"; editor(); jump("kit"); }
+      else if (location.hash === "#settings" || location.hash === "#delete-account" || location.hash === "#language") { S.tab = "settings"; editor(); const t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView({ block: "start" }); }
       else if (location.hash === "#experience") { S.tab = "edit"; editor(); jump("experience"); }   // Nov 15: Orbit's "add your internships" nudge
       else if (location.hash === "#photo") { S.tab = "edit"; editor(); const ph = document.getElementById("f_photo"); if (ph) { ph.closest("div")?.scrollIntoView({ block: "center" }); ph.click(); } }   // Nov 14: "Add a profile photo" links
       else editor();
