@@ -52,3 +52,14 @@ console.log("✓ Avature: search pages parsed, own host only, boards detected, U
   assert.deepEqual(b3.filter((x) => x.ats === "avature").map((x) => x.config.host + "/" + x.config.portal), ["koch.avature.net/en_US/careers"], "locale portal kept; talent community + asset paths ignored");
   console.log("✓ Avature: Maximus + Koch layouts and locale portals");
 }
+{
+  const { avatureDetail } = await import("../lib/fetchers/avature.js");
+  const mission = `<article class="article article--result article--collapsible"><h3><a class="link" href="https://m.avature.net/c/JobDetail/BI-Intern/61352">Business Intelligence Intern</a></h3>
+    <span class="paragraph"><strong>Location:</strong> Intermountain Pet Hospitals (Nampa)</span><span><strong>City:</strong> Nampa </span><span><strong>State:</strong> Idaho</span></article>`;
+  assert.equal(parseAvature(mission, { host: "m.avature.net", portal: "c" })[0].location, "Nampa, Idaho", "City/State labels win over a clinic name");
+  const folder = `<article class="article article--result"><h2><a class="link" href="https://smurfitwestrockta.avature.net/en_US/careers/FolderDetail/IT-Intern/32541">IT Solutions Internship, Summer 2027</a></h2></article>`;
+  assert.equal(parseAvature(folder, { host: "smurfitwestrockta.avature.net", portal: "en_US/careers" })[0].sourceId, "32541", "FolderDetail links");
+  const ld = `<script type="application/ld+json">{"@context":"https://schema.org/","@type":"JobPosting","title":"ITSM Intern","datePosted":"2026-10-08","jobLocationType":"TELECOMMUTE","applicantLocationRequirements":{"@type":"Country","name":"US"},"jobLocation":[{"@type":"Place","address":{"addressLocality":"Reston","addressRegion":"VA","addressCountry":"US"}}]}</script>`;
+  assert.deepEqual(avatureDetail(ld), { location: "Remote, United States | Reston, VA, US", postedOn: "2026-10-08" });
+  console.log("✓ Avature: City/State cards, FolderDetail, job-page JSON-LD locations");
+}
