@@ -16,7 +16,7 @@
   // Nov 17: every page gets the app tags (Add to Home Screen / installed app), not just the few that had them
   { const H = document.head, has = (sel) => H.querySelector(sel), add = (tag, attrs) => { const e = document.createElement(tag); Object.assign(e, attrs); H.appendChild(e); };
     if (!has('link[rel="manifest"]')) add("link", { rel: "manifest", href: "/manifest.webmanifest" });
-    if (!has('link[rel="apple-touch-icon"]')) add("link", { rel: "apple-touch-icon", href: "/icons/icon-180.png" });
+    if (!has('link[rel="apple-touch-icon"]')) add("link", { rel: "apple-touch-icon", href: "/icons/icon-180.png?v=3" });
     if (!has('meta[name="theme-color"]')) { const m = document.createElement("meta"); m.name = "theme-color"; m.content = "#060A2C"; H.appendChild(m); }
     if (!has('meta[name="apple-mobile-web-app-capable"]')) { const m = document.createElement("meta"); m.name = "apple-mobile-web-app-capable"; m.content = "yes"; H.appendChild(m); }
     if (!has('meta[name="apple-mobile-web-app-title"]')) { const m = document.createElement("meta"); m.name = "apple-mobile-web-app-title"; m.content = "Beat the Pile"; H.appendChild(m); } }
