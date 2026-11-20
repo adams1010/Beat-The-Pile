@@ -5,6 +5,7 @@ const web = {
   "https://boards-api.greenhouse.io/v1/boards/geckorobotics": J(200, { name: "Gecko Robotics" }),
   "https://boards-api.greenhouse.io/v1/boards/geckorobotics/jobs": J(200, { jobs: [{ title: "Mechanical Engineering Intern" }, { title: "Engineer" }] }),
   "https://boards-api.greenhouse.io/v1/boards/scout": J(200, { name: "Scout RFP" }),                 // someone else's "scout" board
+  "https://boards-api.greenhouse.io/v1/boards/island": J(200, { name: "Island" }),                  // a browser company, not the gate installer
   "https://api.lever.co/v0/postings/xenergy?mode=json&limit=100": J(200, [{ text: "Mechanical Intern", descriptionPlain: "At X-energy we build reactors" }]),
   "https://api.lever.co/v0/postings/trex?mode=json&limit=100": J(200, [{ text: "Intern", descriptionPlain: "Join T-Rex Games!" }]),
 };
@@ -15,6 +16,8 @@ assert.equal(r.status, "live"); assert.equal(r.config.token, "geckorobotics"); a
 console.log("gecko ✓", r.detail);
 assert.equal(await guessJsonBoards({ company: "Scout Motors", key: "scout" }), null);
 console.log("scout ✓ held: 'scout' board belongs to 'Scout RFP'");
+assert.equal(await guessJsonBoards({ company: "Island Automated Gate Systems", key: "island" }), null);
+console.log("island ✓ held: a board named only the first word isn't theirs");
 r = await guessJsonBoards({ company: "X-energy", key: "xenergy" });
 assert.equal(r.status, "live"); assert.equal(r.ats, "lever");
 console.log("x-energy ✓", r.detail);
