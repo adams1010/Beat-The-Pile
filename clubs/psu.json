@@ -1,0 +1,256 @@
+{
+ "school": "Penn State",
+ "unitid": 214777,
+ "updated": "2026-11-20",
+ "clubs": [
+  {
+   "id": "avt",
+   "name": "Advanced Vehicle Team",
+   "kind": "Design team",
+   "group": "vehicles",
+   "does": "Since 1988, competes in the Department of Energy's Advanced Vehicle Technology Competitions. Now in the SAE/GM AutoDrive Challenge II, turning a Chevrolet Bolt EUV into a self-driving electric car.",
+   "who": "About sixty members, mostly undergraduates; run by elected student leaders.",
+   "skills": [
+    "Autonomous driving",
+    "Sensor mounting and CAD",
+    "Electric vehicles",
+    "Systems engineering"
+   ],
+   "fields": [
+    "mechanical",
+    "electrical",
+    "software",
+    "engineering"
+   ],
+   "jobs": [
+    [
+     "Autonomous and EV roles",
+     "autonomous"
+    ],
+    [
+     "Automotive roles",
+     "automotive"
+    ]
+   ],
+   "sponsors": {
+    "names": [
+     "General Motors"
+    ],
+    "note": "co-sponsor of the AutoDrive Challenge II with SAE International",
+    "source": "https://news.engr.psu.edu/2021/avt-autodrive-challenge.aspx"
+   },
+   "links": [
+    [
+     "Team site",
+     "https://avt.psu.edu"
+    ]
+   ],
+   "sources": [
+    "https://avt.psu.edu",
+    "https://www.avt.psu.edu/index.php/current-competition",
+    "https://news.engr.psu.edu/2021/avt-autodrive-challenge.aspx"
+   ]
+  },
+  {
+   "id": "nittanymotorsports",
+   "name": "Nittany Motorsports",
+   "full": "Formula SAE",
+   "kind": "Design team",
+   "group": "vehicles",
+   "does": "Designs, builds and tests an all-electric formula-style race car for the Formula SAE competition.",
+   "who": "Engineering undergraduates; competition rules cap the travel team at 35 students.",
+   "skills": [
+    "Electric powertrains",
+    "Vehicle design",
+    "Project management"
+   ],
+   "fields": [
+    "mechanical",
+    "electrical",
+    "engineering"
+   ],
+   "jobs": [
+    [
+     "Automotive and motorsport roles",
+     "automotive"
+    ],
+    [
+     "EV and battery roles",
+     "battery"
+    ]
+   ],
+   "links": [
+    [
+     "Penn State Engineering story",
+     "https://news.engr.psu.edu/2025/nittany-motorsports-formula-sae-competition-2025.aspx"
+    ]
+   ],
+   "sources": [
+    "https://news.engr.psu.edu/2025/nittany-motorsports-formula-sae-competition-2025.aspx",
+    "https://www.psu.edu/news/engineering/story/nittany-motorsports-gains-momentum-all-electric-formula-1-racecar"
+   ]
+  },
+  {
+   "id": "rocketlabs",
+   "name": "Nittany Rocket Labs",
+   "kind": "Design team",
+   "group": "aero",
+   "does": "The student-run rocketry club at University Park. Designs, builds and tests rockets, with a focus on hands-on engineering and leadership.",
+   "who": "Penn State students who want to build rockets.",
+   "skills": [
+    "Rocket design",
+    "Testing",
+    "Leadership"
+   ],
+   "fields": [
+    "mechanical",
+    "electrical",
+    "engineering"
+   ],
+   "jobs": [
+    [
+     "Aerospace roles",
+     "aerospace"
+    ]
+   ],
+   "links": [
+    [
+     "Club site",
+     "https://rocketlabs.psu.edu"
+    ]
+   ],
+   "sources": [
+    "https://rocketlabs.psu.edu"
+   ]
+  },
+  {
+   "id": "nlf",
+   "name": "Nittany Lion Fund",
+   "kind": "Investment fund",
+   "group": "business",
+   "does": "Each semester about 40 undergraduates manage a stock portfolio of over $10 million for outside accredited investors. More than 350 alumni have gone on to financial firms since 2005.",
+   "who": "Penn State undergraduates in Smeal; selective.",
+   "skills": [
+    "Stock valuation",
+    "Portfolio management",
+    "Stock pitches"
+   ],
+   "fields": [
+    "finance"
+   ],
+   "jobs": [
+    [
+     "Finance and investing roles",
+     "investment"
+    ],
+    [
+     "Analyst roles",
+     "analyst"
+    ]
+   ],
+   "links": [
+    [
+     "Fund site",
+     "https://nittanylionfund.psu.edu"
+    ]
+   ],
+   "sources": [
+    "https://nittanylionfund.psu.edu",
+    "https://www.smeal.psu.edu/nittany-lion-fund"
+   ]
+  },
+  {
+   "id": "psia",
+   "name": "Penn State Investment Association",
+   "kind": "Professional club",
+   "group": "business",
+   "does": "Founded in 1999 to help students pursue Wall Street careers; students research and manage a paper stock portfolio. The Nittany Lion Fund grew out of it.",
+   "who": "Penn State students interested in investing.",
+   "skills": [
+    "Stock research",
+    "Paper portfolio management"
+   ],
+   "fields": [
+    "finance"
+   ],
+   "jobs": [
+    [
+     "Finance roles",
+     "finance"
+    ]
+   ],
+   "links": [
+    [
+     "Smeal story",
+     "https://magazine.smeal.psu.edu/path-to-wall-street/"
+    ]
+   ],
+   "sources": [
+    "https://magazine.smeal.psu.edu/path-to-wall-street/",
+    "https://nittanylionfund.psu.edu/?p=315"
+   ]
+  },
+  {
+   "id": "llc",
+   "name": "Leveraged Lion Capital",
+   "kind": "Investment fund",
+   "group": "business",
+   "does": "Students research and pitch speculative-grade debt for a $125 million paper portfolio of leveraged loans and high-yield bonds.",
+   "who": "Smeal finance students.",
+   "skills": [
+    "Credit analysis",
+    "High-yield bonds",
+    "Leveraged loans"
+   ],
+   "fields": [
+    "finance"
+   ],
+   "jobs": [
+    [
+     "Credit and banking roles",
+     "credit"
+    ]
+   ],
+   "links": [
+    [
+     "Smeal trading room",
+     "https://www.smeal.psu.edu/traderoom"
+    ]
+   ],
+   "sources": [
+    "https://www.smeal.psu.edu/traderoom",
+    "https://magazine.smeal.psu.edu/path-to-wall-street/"
+   ]
+  },
+  {
+   "id": "amg",
+   "name": "Penn State Asset Management Group",
+   "kind": "Investment fund",
+   "group": "business",
+   "does": "Students learn options, futures, credit default swaps and other derivatives by managing a paper portfolio of them.",
+   "who": "Smeal finance students.",
+   "skills": [
+    "Derivatives",
+    "Risk management"
+   ],
+   "fields": [
+    "finance"
+   ],
+   "jobs": [
+    [
+     "Trading and risk roles",
+     "risk"
+    ]
+   ],
+   "links": [
+    [
+     "Smeal trading room",
+     "https://www.smeal.psu.edu/traderoom"
+    ]
+   ],
+   "sources": [
+    "https://www.smeal.psu.edu/traderoom"
+   ]
+  }
+ ]
+}

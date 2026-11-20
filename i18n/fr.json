@@ -1,6 +1,7 @@
 {
  "lang": "fr",
  "strings": {
+    "School:": "École :",
     "Show every role separately": "Voir chaque poste séparément",
     "Group roles by company": "Regrouper les postes par entreprise",
     "with save and apply": "avec enregistrer et postuler",

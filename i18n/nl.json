@@ -1,6 +1,7 @@
 {
  "lang": "nl",
  "strings": {
+    "School:": "School:",
     "Show every role separately": "Elke functie apart tonen",
     "Group roles by company": "Functies per bedrijf groeperen",
     "with save and apply": "met opslaan en solliciteren",

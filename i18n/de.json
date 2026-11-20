@@ -1,6 +1,7 @@
 {
  "lang": "de",
  "strings": {
+    "School:": "Hochschule:",
     "Show every role separately": "Jede Stelle einzeln zeigen",
     "Group roles by company": "Stellen nach Firma gruppieren",
     "with save and apply": "mit Speichern und Bewerben",
