@@ -1,4 +1,4 @@
-/* built from src/home.jsx 0d262dafdd113d00 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx ef533a06c032282a — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -1044,27 +1044,10 @@ function LandingD({
     [where, setWhere] = React.useState(""),
     [near, setNear] = React.useState(null);
   const [found, setFound] = React.useState(null);
-  const hasAcct = () => {
-    try {
-      return !!(localStorage.getItem("btp_me") || localStorage.getItem("btp_role"));
-    } catch {
-      return false;
-    }
-  };
-  const [acct, setAcct] = React.useState(hasAcct);
   React.useEffect(() => {
-    if (acct) return;
     fetch("/api/me?founding=1").then(r => r.ok ? r.json() : null).then(d => {
       if (d && typeof d.left === "number") setFound(d);
     }).catch(() => {});
-    const t = setInterval(() => {
-      if (hasAcct() || window.Clerk && window.Clerk.user) {
-        setAcct(true);
-        clearInterval(t);
-      }
-    }, 1500);
-    setTimeout(() => clearInterval(t), 20000);
-    return () => clearInterval(t);
   }, []);
   React.useEffect(() => {
     const z = where.trim();
@@ -1369,7 +1352,7 @@ function LandingD({
       fontWeight: 600,
       textDecoration: "none"
     }
-  }, "90-second demo"))), !acct && found && found.left > 0 && React.createElement("p", {
+  }, "90-second demo"))), found && found.left > 0 && React.createElement("p", {
     className: "d-found",
     style: {
       fontSize: 13.5,
