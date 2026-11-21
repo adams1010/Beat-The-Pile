@@ -167,6 +167,9 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   .btptab>details{flex:1;display:flex}.btptab>details>summary::-webkit-details-marker{display:none}
   .btptab>a[aria-current="page"],.btptab>details[open]>summary{color:#B0F701}
   .btptab .btpic{width:23px;height:23px}
+  .btptab .meic{display:flex;align-items:center;justify-content:center;width:25px;height:25px;border-radius:50%;overflow:hidden;background:#1A2640;color:#fff;font:600 10.5px "Geist",sans-serif;box-sizing:border-box;border:1.5px solid transparent}
+  .btptab .meic img{width:100%;height:100%;object-fit:cover}
+  .btptab .metab[aria-current="page"] .meic{border-color:#B0F701}
   .btptab .btpbw{position:relative;display:block;height:23px}.btptab .btpbw .btpbadge{position:absolute;top:-5px;left:13px}
   .btptab .btpbadge{font:700 10.5px/16px "Geist",sans-serif;font-style:normal;min-width:16px;height:16px;padding:0 4px;border-radius:999px;background:#B0F701;color:#060A2C;text-align:center}
   .btptab .btpbadge[hidden]{display:none!important}
@@ -253,7 +256,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     let me = null; try { me = JSON.parse(localStorage.getItem("btp_me") || "null"); } catch {}
     const u = ACCT.user, signedIn = u ? true : u === null ? false : !!me;
     box.hidden = !signedIn; si.hidden = signedIn || (u === undefined && seenSignIn()) || path.startsWith("/start");   // already on the sign-in page
-    if (!signedIn) return;
+    if (!signedIn) { window.__btpMeTab = { signedIn: false, pic: "" }; window.btpPaintMeTab && window.btpPaintMeTab(); return; }
     const email = u?.primaryEmailAddress?.emailAddress || "";
     const name = [u?.firstName, u?.lastName].filter(Boolean).join(" ") || (me && me.n) || email.split("@")[0] || "Your account";
     const ini = (me && me.i) || name.split(/[\s._-]+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase() || "Me";
@@ -289,6 +292,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
         return `<a role="menuitem" href="#" class="acctrow" data-btp-sess="${esc(x.id)}" data-biz="${((x.user.unsafeMetadata || {}).role === "employer") ? 1 : 0}"><span class="me sm" aria-hidden="true">${esc(ini2(n))}</span><span class="t"><b data-noi18n>${esc(n)}</b><small data-noi18n>${esc(e)}</small></span></a>`; }).join("") +
       (hasBiz ? "" : `<a role="menuitem" href="#" class="acctrow add" data-btp-addbiz><span class="me sm plus" aria-hidden="true">+</span><span class="t"><b>Add account</b><small>A business account on this same email</small></span></a>`);
     if (path.startsWith("/u/") || path.startsWith("/business/company/")) nav.querySelector("#btpMe").classList.add("cur");
+    window.__btpMeTab = { signedIn: true, pic: nav.querySelector("#btpMe").innerHTML }; window.btpPaintMeTab && window.btpPaintMeTab();
   };
   // Nov 19 (owner screenshot): iPhone Safari. After the keyboard closes (search submitted, box blurred) Safari can leave
   // the sticky top bar and the fixed bottom tab bar drawn where they were while the keyboard was up, so the bar floats in
@@ -313,10 +317,12 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   // ("Edit bar" in More → tap to pin/unpin); saved on this device in localStorage btp_tabs[_biz]. Desktop is unchanged.
   const TOOL_ICON = { "/internship/": "jobs", "/companies/": "business", "/radar/": "season", "/clubs/": "orbit", "/#quiz": "tracker", "/#interview": "talent", "/#resumebuilder": "profile", "/#score": "tracker", "/#wall": "orbit", "/demo/": "home" };
   const SHORT = { "Career Fairs": "Fairs", "Career Fair": "Fair", "My Season": "Season", "My Internship": "Internship", "Opening Radar": "Radar", "Match quiz": "Quiz", "Interview practice": "Interview", "Resume builder": "Resume", "Resume check": "Resume check", "Community": "Community", "Try it": "Demo", "My profile": "Profile", "Company": "Company" };
-  const PICKS = [...MAIN, ...(BIZ ? [["/business/company/", "Company", "business"]] : [["/u/", "My profile", "profile"]]), ...TOOLS.map(([h, t]) => [h, t, TOOL_ICON[h] || "tools"])];
+  // Nov 21 (owner): your profile is the far-right tab (Instagram-style, your photo), so it's no longer a pick; 3 pins + More + you
+  const PICKS = [...MAIN, ...TOOLS.map(([h, t]) => [h, t, TOOL_ICON[h] || "tools"])];
+  const MAXP = 3;
   const TKEY = BIZ ? "btp_tabs_biz" : "btp_tabs";
-  const DEF = BIZ ? ["/business/home/", "/business/talent/", "/orbit/", "/business/fairs/"] : ["/", "/jobs/", "/orbit/", "/tracker/"];
-  const readPins = () => { try { const v = JSON.parse(localStorage.getItem(TKEY) || "null"); const ok = Array.isArray(v) ? v.filter((h) => PICKS.some(([x]) => x === h)).slice(0, 4) : []; return ok.length ? ok : DEF; } catch { return DEF; } };
+  const DEF = BIZ ? ["/business/home/", "/business/talent/", "/orbit/"] : ["/", "/jobs/", "/orbit/"];
+  const readPins = () => { try { const v = JSON.parse(localStorage.getItem(TKEY) || "null"); const ok = Array.isArray(v) ? v.filter((h) => PICKS.some(([x]) => x === h)).slice(0, MAXP) : []; return ok.length ? ok : DEF; } catch { return DEF; } };
   let PINS = readPins(), editing = false;
   const tab = document.createElement("nav"); tab.className = "btptab"; tab.setAttribute("aria-label", "Main (phone)");
   const pinIcon = (on) => `<svg width="18" height="18" viewBox="0 0 24 24" fill="${on ? "#4A7000" : "none"}" stroke="${on ? "#4A7000" : "#8090A8"}" stroke-width="1.8" aria-hidden="true"><path d="M12 17v5"/><path d="M9 3h6l-1 6 3 3v2H7v-2l3-3z"/></svg>`;
@@ -327,15 +333,23 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     tab.innerHTML = pinned.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${k === "orbit" || k === "talent" ? `<span class="btpbw">${svg(k)}<i class="btpbadge" data-noi18n hidden></i></span>` : svg(k)}<span>${SHORT[t] || t}</span></a>`).join("") +
       `<details${wasOpen ? " open" : ""}><summary>${svg("tools")}<span>More</span></summary><div class="more" role="menu">` +
       (editing
-        ? `<div class="edhd"><b>Pick up to 4 for your bar</b><small>${PINS.length} of 4 pinned</small></div>${PICKS.map(([h, t]) => `<button type="button" class="pin" data-pin="${h}" aria-pressed="${PINS.includes(h)}">${pinIcon(PINS.includes(h))}<span>${t}</span></button>`).join("")}<div class="sep"></div><div class="edrow"><button type="button" class="eddone" data-tabedit="done">Done</button><button type="button" class="edreset" data-tabedit="reset">Reset</button></div>`
+        ? `<div class="edhd"><b>Pick up to 3 for your bar</b><small>${PINS.length} of 3 pinned · your profile stays on the right</small></div>${PICKS.map(([h, t]) => `<button type="button" class="pin" data-pin="${h}" aria-pressed="${PINS.includes(h)}">${pinIcon(PINS.includes(h))}<span>${t}</span></button>`).join("")}<div class="sep"></div><div class="edrow"><button type="button" class="eddone" data-tabedit="done">Done</button><button type="button" class="edreset" data-tabedit="reset">Reset</button></div>`
         : `${rest.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div><button type="button" class="edit" data-tabedit="edit">Edit bar</button>`) +
-      `</div></details>`;
+      `</div></details>` + meTab();
     try { window.btpBadgeRepaint && window.btpBadgeRepaint(); } catch {}
   };
+  function meTab(){
+    const m = window.__btpMeTab || { pic: "", signedIn: false };
+    const href = !m.signedIn ? "/start/" : BIZ ? "/business/company/" : "/u/";
+    const label = !m.signedIn ? "Sign in" : BIZ ? "Company" : "Profile";
+    const on = m.signedIn && (path.startsWith("/u") || path.startsWith("/business/company"));
+    return `<a class="metab" href="${href}"${on ? ' aria-current="page"' : ""}>${m.pic ? `<span class="meic">${m.pic}</span>` : svg(BIZ ? "business" : "profile")}<span>${label}</span></a>`;
+  }
+  window.btpPaintMeTab = () => { const a = tab.querySelector(".metab"); if (a) a.outerHTML = meTab(); };
   const savePins = () => { try { localStorage.setItem(TKEY, JSON.stringify(PINS)); } catch {} };
   tab.addEventListener("click", (e) => {
     const p = e.target.closest("[data-pin]"), ed = e.target.closest("[data-tabedit]");
-    if (p) { e.preventDefault(); e.stopPropagation(); const h = p.dataset.pin; PINS = PINS.includes(h) ? PINS.filter((x) => x !== h) : PINS.length < 4 ? [...PINS, h] : [...PINS.slice(1), h]; if (!PINS.length) PINS = [h]; savePins(); drawTab(); return; }
+    if (p) { e.preventDefault(); e.stopPropagation(); const h = p.dataset.pin; PINS = PINS.includes(h) ? PINS.filter((x) => x !== h) : PINS.length < MAXP ? [...PINS, h] : [...PINS.slice(1), h]; if (!PINS.length) PINS = [h]; savePins(); drawTab(); return; }
     if (ed) { e.preventDefault(); e.stopPropagation(); const a = ed.dataset.tabedit; if (a === "edit") editing = true; else if (a === "done") editing = false; else { PINS = DEF.slice(); savePins(); } drawTab(); return; }
     if (e.target.closest(".more a")) tab.querySelector("details").open = false;
   });
