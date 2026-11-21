@@ -49,8 +49,11 @@ export function parse(q) {
   const limit = raw("limit") ? Number(raw("limit")) : null, offset = raw("offset") ? Number(raw("offset")) : 0;
   if (limit != null && !(Number.isInteger(limit) && limit >= 1 && limit <= 1000)) errs.push("limit must be 1–1000");
   if (!(Number.isInteger(offset) && offset >= 0 && offset <= 250000)) errs.push("offset must be 0–250000");   // Nov 14: 60k → 250k (we passed 60k jobs)
-  const near = raw("near").trim().slice(0, 60);
-  if (near && !/^[A-Za-z0-9 .,'-]+$/.test(near)) errs.push("near must be a 5-digit ZIP or 'City, ST'");
+  // Nov 20: several places at once, split by "|" ("Blacksburg, VA|24060|Austin, TX"), up to 5
+  const nearList = raw("near").split("|").map((x) => x.trim().slice(0, 60)).filter(Boolean);
+  const near = [...new Set(nearList)].join("|");
+  if (nearList.length > 5) errs.push("near takes up to 5 places");
+  if (near && !nearList.every((x) => /^[A-Za-z0-9 .,'-]+$/.test(x))) errs.push("near must be a 5-digit ZIP or 'City, ST'");
   const mi = raw("mi") ? Number(raw("mi")) : 50;
   if (!(Number.isInteger(mi) && mi >= 5 && mi <= 300)) errs.push("mi must be 5–300");
   // Nov 13: server-side word search for big scopes (every major + every job type nationwide is too many rows to send)
@@ -131,34 +134,42 @@ function majorFilter(p) {
  *  separately so the page can say so instead of quietly hiding or guessing them. */
 async function nearby(p, res) {
   // Nov 13: forgiving — typos ("washingdon dc"), missing commas, misspelled states, bare big-city names (lib/geocode.js resolvePlace)
-  const typed = p.near, R = resolvePlace(p.near);
-  let center = R?.pt || null, fixedTo = null, others = [];
-  if (R?.choices?.length) { res.setHeader("Cache-Control", "s-maxage=86400");
-    return res.status(400).json({ error: R.fixed ? "Did you mean one of these?" : `There's more than one ${R.choices[0].split(",")[0]}. Which state?`, choices: R.choices.slice(0, 30) }); }
-  if (center) { if (R.fixed) fixedTo = R.q; if (!/^\d{5}$/.test(typed)) p.near = R.q; others = R.others || []; }
-  if (!center) { res.setHeader("Cache-Control", "no-store"); return res.status(400).json({ error: "We couldn't find that place. Try a city and state (Blacksburg, VA) or a 5-digit ZIP code." }); }
-  const st = /^\d{5}$/.test(p.near) ? zipToState(p.near) : geocodeOne(p.near)?.state || null;
-  const dLat = p.mi / 69, dLng = p.mi / (69 * Math.cos((center[0] * Math.PI) / 180));
+  // Nov 20: up to 5 places ("near=A|B"); a job counts when it's within mi of ANY of them, and says which one is closest.
+  const places = [];
+  for (const typed of p.near.split("|")) {
+    const R = resolvePlace(typed);
+    if (R?.choices?.length) { res.setHeader("Cache-Control", "s-maxage=86400");
+      return res.status(400).json({ error: R.fixed ? "Did you mean one of these?" : `There's more than one ${R.choices[0].split(",")[0]}. Which state?`, choices: R.choices.slice(0, 30), place: typed }); }
+    if (!R?.pt) { res.setHeader("Cache-Control", "no-store"); return res.status(400).json({ error: `We couldn't find ${p.near.includes("|") ? `“${typed}”` : "that place"}. Try a city and state (Blacksburg, VA) or a 5-digit ZIP code.`, place: typed }); }
+    const q = /^\d{5}$/.test(typed) ? typed : R.q;
+    const st = /^\d{5}$/.test(q) ? zipToState(q) : geocodeOne(q)?.state || null;
+    places.push({ q, typed, fixedTo: R.fixed ? R.q : null, others: R.others || [], center: R.pt, state: st });
+  }
+  const multi = places.length > 1;
   const r4 = (x) => Math.round(x * 1e4) / 1e4;
-  const box = `and(geo_lat.gte.${r4(center[0] - dLat)},geo_lat.lte.${r4(center[0] + dLat)},geo_lng.gte.${r4(center[1] - dLng)},geo_lng.lte.${r4(center[1] + dLng)})`;
-  const q = `listings?select=${COLS},geo_pts&${LIVE}${majorFilter(p)}&and=(or(${box},geo_n.gt.1)${hasGroups(p) ? "," + wordGroups(p).join(",") : ""})&order=first_seen.desc,id.asc`;
+  const boxes = places.map(({ center }) => { const dLat = p.mi / 69, dLng = p.mi / (69 * Math.cos((center[0] * Math.PI) / 180));
+    return `and(geo_lat.gte.${r4(center[0] - dLat)},geo_lat.lte.${r4(center[0] + dLat)},geo_lng.gte.${r4(center[1] - dLng)},geo_lng.lte.${r4(center[1] + dLng)})`; });
+  const q = `listings?select=${COLS},geo_pts&${LIVE}${majorFilter(p)}&and=(or(${boxes.join(",")},geo_n.gt.1)${hasGroups(p) ? "," + wordGroups(p).join(",") : ""})&order=first_seen.desc,id.asc`;
   const cand = [];
   for (let off = 0; off < 20000; off += 1000) { const page = await db.select(`${q}&limit=1000&offset=${off}`); cand.push(...page); if (page.length < 1000) break; }
   const hits = [];
   for (const l of cand) {
-    const d = Math.min(...(l.geo_pts || []).map((pt) => miles(center, pt)));
-    if (d <= p.mi) { const { geo_pts, ...rest } = l; hits.push({ ...rest, mi: Math.round(d) }); }
+    let d = Infinity, from = null;
+    for (const pl of places) for (const pt of l.geo_pts || []) { const m = miles(pl.center, pt); if (m < d) { d = m; from = pl.q; } }
+    if (d <= p.mi) { const { geo_pts, ...rest } = l; hits.push({ ...rest, mi: Math.round(d), ...(multi ? { from } : {}) }); }
   }
   hits.sort((a, b) => a.mi - b.mi || (a.first_seen < b.first_seen ? 1 : -1));
+  const states = [...new Set(places.map((x) => x.state).filter(Boolean))];
   const [remote, unplaced, lastRun] = await Promise.all([
     db.count(`listings?${LIVE}${majorFilter(p)}&geo_kind=eq.remote`),
-    st ? db.count(`listings?${LIVE}${majorFilter(p)}&geo_kind=in.(multi,state)&state=ilike.*${st}*`) : 0,
+    states.length ? db.count(`listings?${LIVE}${majorFilter(p)}&geo_kind=in.(multi,state)&or=(${states.map((s) => `state.ilike.*${s}*`).join(",")})`) : 0,
     db.select("feed_runs?select=ran_at&order=ran_at.desc&limit=1"),
   ]);
   const page = p.limit != null ? hits.slice(p.offset, p.offset + p.limit) : hits;
+  const one = (x) => ({ q: x.q, typed: x.typed, fixedTo: x.fixedTo, others: x.others.slice(0, 12), mi: p.mi, lat: x.center[0], lng: x.center[1], state: x.state, xy: project(x.center[0], x.center[1]) });
   res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=86400");
   return res.status(200).json({ listings: withKind(page), meta: { count: hits.length, kind: p.kind, lastSync: lastRun?.[0]?.ran_at || null,
-    near: { q: p.near, typed, fixedTo, others: others.slice(0, 12), mi: p.mi, lat: center[0], lng: center[1], state: st, xy: project(center[0], center[1]) }, remote, unplacedInState: unplaced,
+    near: one(places[0]), places: places.map(one), states, remote, unplacedInState: unplaced,
     ...(p.limit != null ? { limit: p.limit, offset: p.offset, more: p.offset + p.limit < hits.length } : {}) } });
 }
 

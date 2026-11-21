@@ -73,6 +73,20 @@ assert.equal(r.body.listings.length, 1); assert.equal(r.body.meta.more, true); a
 assert.equal((await call({ near: "99999", field: "all" })).code, 400, "unknown ZIP → plain 400");
 assert.equal((await call({ near: "24060", mi: "2" })).code, 400);
 assert.equal((await call({ near: "<script>" })).code, 400);
+// Nov 20: several places at once — a job counts when it's near ANY of them, and says which place it's closest to
+r = await call({ near: "24060|Austin, TX", mi: "50", field: "mechanical" });
+assert.equal(r.code, 200);
+assert.deepEqual(r.body.listings.map((l) => l.id).sort(), ["a:1", "d:1", "e:1"], "Blacksburg-area jobs + Austin jobs, one list");
+assert.equal(r.body.listings.find((l) => l.id === "d:1").from, "Austin, TX", "each job says which place it's near");
+assert.equal(r.body.listings.find((l) => l.id === "a:1").from, "24060");
+assert.equal(r.body.listings.find((l) => l.id === "e:1").mi <= 10, true, "a job open in both places keeps its closest distance");
+assert.deepEqual(r.body.meta.places.map((x) => x.q), ["24060", "Austin, TX"]); assert.deepEqual(r.body.meta.states.sort(), ["TX", "VA"]);
+assert.equal(r.body.meta.near.q, "24060", "meta.near stays the first place (older pages keep working)");
+assert.ok(!("from" in (await call({ near: "24060", mi: "50", field: "mechanical" })).body.listings[0]), "one place: no 'from' on cards");
+r = await call({ near: "24060|99999", field: "all" });
+assert.equal(r.code, 400); assert.equal(r.body.place, "99999", "a bad second place is named, so the page can say which one");
+assert.equal((await call({ near: "a, VA|b, VA|c, VA|d, VA|e, VA|f, VA" })).code, 400, "up to 5 places");
+assert.equal((await call({ near: "24060|<b>" })).code, 400);
 r = await call({ dots: "1", field: "all" });
 assert.equal(r.code, 200); assert.equal(r.body.w, 975);
 const nDots = r.body.dots.reduce((n, d) => n + d[2], 0);

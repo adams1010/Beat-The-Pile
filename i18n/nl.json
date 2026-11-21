@@ -1,6 +1,11 @@
 {
  "lang": "nl",
  "strings": {
+    "Add another place": "Nog een plaats toevoegen",
+    "Up to 5 places": "Maximaal 5 plaatsen",
+    "Clear all places": "Alle plaatsen wissen",
+    "Cities and whole states can't be mixed yet. Remove the cities to search a whole state.": "Steden en hele staten kun je nog niet combineren. Haal de steden weg om een hele staat te doorzoeken.",
+    "You can search up to 5 places at once": "Je kunt tot 5 plaatsen tegelijk zoeken",
     "School:": "School:",
     "Show every role separately": "Elke functie apart tonen",
     "Group roles by company": "Functies per bedrijf groeperen",
@@ -1965,6 +1970,8 @@
   "Your Recruiter badge is being verified": "Je Recruiter-badge wordt gecontroleerd"
  },
  "patterns": [
+    ["^~(\\d+) mi from$", "~$1 mi van"],
+    ["^Under 1 mi from$", "Minder dan 1 mi van"],
     ["^\\+(\\d+) more$", "+$1 meer"],
     ["^\\+(\\d+) more roles at$", "+$1 andere functies bij"],
     ["^\\+(\\d+) more role at$", "+$1 andere functie bij"],

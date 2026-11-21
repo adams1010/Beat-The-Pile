@@ -75,6 +75,10 @@
   .near select{font:inherit;font-size:13px;border:0;background:transparent;color:var(--ink);cursor:pointer;padding:2px 0}
   .near input{font:inherit;font-size:13px;width:150px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--ink);background:#F6F8FB}
   .near input:focus{outline:2px solid var(--green);outline-offset:1px;background:#fff}
+  .near{flex-wrap:wrap}
+  .nchip{display:inline-flex;align-items:center;gap:2px;font-size:13px;font-weight:500;background:#F2FADF;border:1px solid #DDF3A8;color:#2F4A00;border-radius:999px;padding:2px 2px 2px 10px;max-width:220px}
+  .nchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .nchip button{border:0;background:none;font:inherit;font-size:15px;line-height:1;color:#2F4A00;cursor:pointer;padding:0 6px}
   .near .nx{border:0;background:none;font:inherit;font-size:15px;color:var(--muted,#55627A);cursor:pointer;padding:0 6px;line-height:1}
   .meta2 .dist{color:var(--green);font-weight:600}
   .tag.multi{background:#EEF2FF;color:#3730A3}
@@ -284,7 +288,7 @@
 <div class="controls">
     <div class="whatwhere">
       <form class="sform" id="qForm" role="search"><input class="search" id="q" type="search" enterkeyhint="search" placeholder="Job title, keyword or company" aria-label="Job title, keyword or company"><button class="sbtn" type="submit">Search</button></form>
-      <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="button" class="nx" id="nearX" aria-label="Clear distance" hidden>×</button></form>
+      <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><span id="nearChips" style="display:contents"></span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="button" class="nx" id="nearX" aria-label="Clear all places" hidden>×</button></form>
     </div>
     <div class="fbar"><button type="button" class="fbtn" id="fBtn" aria-expanded="false" aria-controls="cats">Filters</button><span class="fsum" id="fSum" data-noi18n></span></div>
     <div class="cats" id="cats"><label for="majorIn">Your major</label><input class="statesel minput" id="majorIn" type="search" placeholder="Type your major, like Mechanical or Nursing" aria-label="Your major"><select class="statesel" id="catSel" hidden aria-hidden="true"><option value="">All jobs</option></select></div>
@@ -560,8 +564,9 @@
     $("savedN").textContent = state.mine.saved.size ? `(${state.mine.saved.size})` : "";
     const nm = state.near && !state.savedOnly && !state.followOnly ? state.nearMeta : null;
     const wider = state.near ? { 25: 50, 50: 100, 100: 200 }[state.near.mi] : null;
-    const nearFixedNote = nm?.near?.fixedTo && nm.near.typed ? `Showing results for <b data-noi18n>${esc(nm.near.fixedTo)}</b> (you typed “<span data-noi18n>${esc(nm.near.typed)}</span>”). ` : "";
-    const nearNote = nm ? nearFixedNote + `Within ${state.near.mi} mi, nearest first.${wider ? ` <button class="linkbtn" data-widen="${wider}">Show within ${wider} mi</button>` : ""} Distances are city center to city center. ${nm.unplacedInState ? `${nm.unplacedInState} more in ${esc(NAMES[nm.near.state] || nm.near.state)} ${nm.unplacedInState === 1 ? "doesn't" : "don't"} say which city. <button class="linkbtn" data-near-st="${esc(nm.near.state)}">See all of ${esc(NAMES[nm.near.state] || nm.near.state)}</button> ` : ""}${nm.remote ? `${nm.remote} remote not counted. ` : ""}` : "";
+    const nearFixedNote = (nm ? (nm.places || [nm.near]) : []).filter((x) => x?.fixedTo && x.typed).map((x) => `Showing results for <b data-noi18n>${esc(x.fixedTo)}</b> (you typed “<span data-noi18n>${esc(x.typed)}</span>”). `).join("");
+    const nmSt = nm ? (nm.states || [nm.near.state]).filter(Boolean) : [], nmStName = nmSt.map((x) => NAMES[x] || x).join(" & ");
+    const nearNote = nm ? nearFixedNote + `Within ${state.near.mi} mi, nearest first.${wider ? ` <button class="linkbtn" data-widen="${wider}">Show within ${wider} mi</button>` : ""} Distances are city center to city center. ${nm.unplacedInState && nmSt.length ? `${nm.unplacedInState} more in ${esc(nmStName)} ${nm.unplacedInState === 1 ? "doesn't" : "don't"} say which city. <button class="linkbtn" data-near-st="${esc(nmSt.join(","))}">See all of ${esc(nmStName)}</button> ` : ""}${nm.remote ? `${nm.remote} remote not counted. ` : ""}` : "";
     $("note").innerHTML = nearNote + (state.st !== "ALL" && !state.savedOnly && !state.followOnly
         ? `Showing ${esc(state.st.map((x) => NAMES[x] || x).join(" & "))}. <button class="linkbtn" id="goAll">See all US</button> `
         : "") + (state.company ? `One company, every major. <button class="linkbtn" id="allCos">Show all companies</button> ` : "") + (state.savedOnly || state.followOnly ? "Every major and state." : strict ? "Showing roles that say mechanical (or close, like manufacturing)." : `Major: <b>${esc(MAJOR_LABEL())}</b> (change it above).`)
@@ -574,7 +579,7 @@
     const isNewAll = (j) => { const t = new Date(j.first_seen).getTime(); return t - firstImport > DAY && Date.now() - t < 3 * DAY; };
 
     const companies = new Set(rows.map((j) => j.company)).size;
-    const where = state.savedOnly ? "saved" : state.followOnly ? "you follow" : state.near && !state.company ? `within ${state.near.mi} mi of ${state.near.q}` : state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
+    const where = state.savedOnly ? "saved" : state.followOnly ? "you follow" : state.near && !state.company ? `within ${state.near.mi} mi of ${nearLabel()}` : state.st === "ALL" ? "across the US" : "in " + state.st.join(" & ");
     // Nov 14: count every opening (a card can hold the same job in many places), commas so it reads like a number
     const openings = rows.reduce((t, j) => t + (j.count || 1), 0), nOpen = openings.toLocaleString("en-US");
     // Nov 14: too many to load at once (every job type, whole country): say the real total from the live summary
@@ -619,7 +624,7 @@
         <div style="min-width:0">
           <div class="title">${esc(niceTitle(j.title))}${j.kind === "fulltime" ? '<span class="ftag">Entry-level</span>' : j.kind === "hourly" ? '<span class="ftag">Hourly</span>' : j.kind === "shadow" ? '<span class="ftag">Shadow / volunteer</span>' : ""}${isNew(j) ? '<span class="tag new">New</span>' : ""}${j.closed ? '<span class="tag closed">Closed by the company</span>' : ""}</div>
           <div class="co"><a class="cn" href="${coHref(j)}">${esc(j.company)}</a> <span class="loc">· ${esc(j.sites[0].loc)}${morePlaces(j) ? ` +${morePlaces(j)} more` : ""}</span> <span class="wtag wt-${workOf(j)}">${WORK_NAME[workOf(j)]}</span></div>
-          <div class="meta2">${[state.near && j.mi != null ? `<span class="dist">${j.mi < 1 ? "Under 1" : "~" + j.mi} mi away</span>` : "", esc(postedText(j)), j.sites.length > 1 ? `${j.sites.length} locations` : j.count > 1 ? `${j.count} openings` : "", seasonOf(j.title) ? esc(seasonOf(j.title)) : "", (state.major === "all" || !state.major) && FIELD_NAME[j.field] ? esc(FIELD_NAME[j.field]) : "", j.match === "me" && STRICT_OK() ? "Mechanical match" : "", needsClearance(j.title) ? "US citizens / clearance" : ""].filter(Boolean).join(" · ")}</div>
+          <div class="meta2">${[state.near && j.mi != null ? (j.from ? `<span class="dist">${j.mi < 1 ? "Under 1" : "~" + j.mi} mi from <span data-noi18n>${esc(j.from)}</span></span>` : `<span class="dist">${j.mi < 1 ? "Under 1" : "~" + j.mi} mi away</span>`) : "", esc(postedText(j)), j.sites.length > 1 ? `${j.sites.length} locations` : j.count > 1 ? `${j.count} openings` : "", seasonOf(j.title) ? esc(seasonOf(j.title)) : "", (state.major === "all" || !state.major) && FIELD_NAME[j.field] ? esc(FIELD_NAME[j.field]) : "", j.match === "me" && STRICT_OK() ? "Mechanical match" : "", needsClearance(j.title) ? "US citizens / clearance" : ""].filter(Boolean).join(" · ")}</div>
           ${j.sites.length > 1 ? `<details class="sites"><summary>All ${j.sites.length} locations</summary><ul>${j.sites.map((x) => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.loc)}</a></li>`).join("")}</ul></details>` : ""}
           ${j._more ? `<details class="roles"><summary>+${j._more.length} more ${j._more.length === 1 ? "role" : "roles"} at <span data-noi18n>${esc(j.company)}</span></summary><ul>${j._more.slice(0, 6).map((m) => `<li><a href="${esc(m.url)}" target="_blank" rel="noopener" data-co="${esc(m.company)}">${esc(niceTitle(m.title))}</a><span>${esc(m.sites[0].loc)}${m.kind === "fulltime" ? " · Entry-level" : m.kind === "hourly" ? " · Hourly" : m.kind === "shadow" ? " · Shadow / volunteer" : ""}${isNew(m) ? " · New" : ""}</span></li>`).join("")}</ul>${j._more.length > 6 ? `<div class="grpbar" style="margin:6px 0 0">+${j._more.length - 6} more</div>` : ""}${j.company_id ? `<a class="all" href="/jobs/?company=${encodeURIComponent(j.company_id)}${state.kind !== "intern" ? `&kind=${state.kind}` : ""}">See all ${j._more.length + 1} at <span data-noi18n>${esc(j.company)}</span> with save and apply</a>` : ""}</details>` : ""}
         </div>
@@ -702,7 +707,7 @@
   function phoneSummary(){
     const b = $("fBtn"), sum = $("fSum"); if (!b || !sum) return;
     const ms = $("majorSel"), majorTxt = state.major !== "all" ? (MAJOR_LABEL() || "Your major") : "Any major";
-    const where = state.near ? "near " + state.near.q : state.st === "ALL" ? "all of the US" : state.st.join(", ");
+    const where = state.near ? "near " + nearLabel() : state.st === "ALL" ? "all of the US" : state.st.join(", ");
     const n = (state.major !== "all") + (state.near || state.st !== "ALL" ? 1 : 0) + (state.work !== "any") + !!state.cat + !!state.meOnly + (state.savedOnly || state.followOnly ? 1 : 0);
     b.innerHTML = "Filters" + (n ? ` <b data-noi18n>${n}</b>` : "");
     sum.textContent = [majorTxt, where, state.work !== "any" ? state.work : ""].filter(Boolean).join(" · ");
@@ -723,8 +728,8 @@
     state.cat = /^[a-z_]{2,30}$/.test(p.get("cat") || "") ? p.get("cat") : null;   // Nov 14: job category chips (lib/categories.js)
     if (state.q && !p.get("state")) state.st = "ALL";              // a search link (e.g. from the Radar) looks nationwide
     state.savedOnly = p.get("view") === "saved"; state.followOnly = p.get("view") === "following";
-    const nq = (p.get("near") || "").trim().slice(0, 40), nmi = [25, 50, 100, 200].includes(+p.get("mi")) ? +p.get("mi") : 50;
-    state.near = nearOk(nq) ? { q: nq, mi: nmi } : null;
+    const nq = [...new Set((p.get("near") || "").split("|").map((x) => x.trim().slice(0, 40)).filter(nearOk))].slice(0, 5), nmi = [25, 50, 100, 200].includes(+p.get("mi")) ? +p.get("mi") : 50;
+    state.near = nq.length ? { q: nq.join("|"), mi: nmi } : null;   // Nov 20: several places, "A|B"
     if (state.near) state.st = "ALL";
     paintNear();
     $("savedOnly").setAttribute("aria-pressed", String(state.savedOnly)); $("followOnly").setAttribute("aria-pressed", String(state.followOnly));
@@ -734,10 +739,10 @@
     $("stateSel").classList.toggle("on", !!single); if (single) $("stateSel").value = single;
   }
   function resetFilters(){ history.replaceState(null, "", location.pathname); readUrl(); state.company = null; state.cat = null; renderCats(); state.st = "ALL"; state.major = "all"; $("majorSel").value = "all"; $("meWrap").hidden = true; readUrlButtons(); loadScope(); }
-  function readUrlButtons(){ const one = state.st !== "ALL" && state.st.length === 1 ? state.st[0] : ""; $("stateSel").value = one; $("stateSel").classList.toggle("on", state.st !== "ALL"); }
+  function readUrlButtons(){ paintNear(); const one = state.st !== "ALL" && state.st.length === 1 ? state.st[0] : ""; $("stateSel").value = one; $("stateSel").classList.toggle("on", state.st !== "ALL"); }
   document.addEventListener("click", (e) => {
     if (e.target.closest("#goAll")) { $("stateSel").value = ""; setView("ALL", null); }
-    const ns = e.target.closest("[data-near-st]"); if (ns) { $("stateSel").value = ns.dataset.nearSt; $("stateSel").classList.add("on"); setView([ns.dataset.nearSt], null); }
+    const ns = e.target.closest("[data-near-st]"); if (ns) { $("stateSel").value = ns.dataset.nearSt; $("stateSel").classList.add("on"); const sts = ns.dataset.nearSt.split(","); $("stateSel").value = sts.length === 1 ? sts[0] : ""; setView(sts, null); }
     if (e.target.closest("#resetF")) resetFilters();
     if (e.target.closest("#qAllMaj")) { $("majorSel").value = "all"; $("majorSel").dispatchEvent(new Event("change")); }
     if (e.target.closest("#allCos")) { state.company = null; state.q = ""; $("q").value = ""; loadScope(); }
@@ -750,35 +755,68 @@
   function stateFrom(q){ const t = q.trim().replace(/\.$/, "").toLowerCase(); if (!t) return null;
     for (const [ab, nm] of Object.entries(NAMES)) if (t === ab.toLowerCase() || t === nm.toLowerCase()) return ab;
     return null; }
+  // Nov 20: several places at once. Each city / ZIP you add is a chip (up to 5); jobs near ANY of them show, nearest
+  // first, and each card says which place it's near. Whole states work the same way (Virginia + Maryland), but not
+  // mixed with cities: a state is a different kind of search (every job there, no distances).
+  function NP(){ return state.near ? state.near.q.split("|") : []; }
+  function nearLabel(){ return NP().join(" or "); }
+  var MAXP = 5;
   function paintNear(){
-    const on = !!state.near; $("nearBox").classList.toggle("on", on); $("nearX").hidden = !on;
-    if (on) $("nearIn").value = state.near.q;
+    const places = NP(), sts = !state.near && state.st !== "ALL" ? state.st : [];
+    const chip = (label, attr) => `<span class="nchip"><span data-noi18n>${esc(label)}</span><button type="button" ${attr} aria-label="Remove ${esc(label)}">×</button></span>`;
+    $("nearChips").innerHTML = places.map((x, i) => chip(x, `data-near-rm="${i}"`)).join("") + sts.map((x) => chip(NAMES[x] || x, `data-st-rm="${esc(x)}"`)).join("");
+    const on = places.length > 0 || sts.length > 0;
+    $("nearBox").classList.toggle("on", on); $("nearX").hidden = !on;
+    $("nearIn").placeholder = on ? (places.length >= MAXP ? "Up to 5 places" : "Add another place") : "City, state or ZIP";
   }
-  function setNear(q, mi){
-    q = (q || "").trim();
-    if (!q) return clearNear();
+  function setPlaces(list, mi){
+    list = [...new Set(list)].slice(0, MAXP);
+    if (!list.length) return clearNear();
+    state.near = { q: list.join("|"), mi: +mi || 50 }; state.st = "ALL"; $("stateSel").value = ""; $("stateSel").classList.remove("on");
+    try { localStorage.setItem("btp_near", list[list.length - 1]); } catch {}
+    track("near_search", { mi: state.near.mi, places: list.length }); paintNear(); loadScope();
+  }
+  function setNear(q, mi){   // adds a place (or a state) to the search
+    q = (q || "").trim(); $("nearIn").value = "";
+    if (!q) return;
     const st = stateFrom(q);
-    if (st) { $("nearIn").value = ""; $("stateSel").value = st; return setView([st], null); }   // setView turns distance off
+    if (st) {
+      if (state.near) { toast("Cities and whole states can't be mixed yet. Remove the cities to search a whole state."); return; }
+      const cur = state.st === "ALL" ? [] : state.st;
+      if (cur.includes(st)) return;
+      const next = [...cur, st]; $("stateSel").value = next.length === 1 ? st : ""; return setView(next, null);   // setView turns distance off
+    }
     if (!nearOk(q)) { toast("Type a city, a ZIP code or a state, like Blacksburg, 24060 or Virginia"); return; }
-    state.near = { q, mi: +mi || 50 }; state.st = "ALL"; $("stateSel").value = ""; $("stateSel").classList.remove("on");
-    try { localStorage.setItem("btp_near", q); } catch {}
-    track("near_search", { mi: state.near.mi }); paintNear(); loadScope();
+    const list = NP();
+    if (list.some((x) => x.toLowerCase() === q.toLowerCase())) return;
+    if (list.length >= MAXP) { toast("You can search up to 5 places at once"); return; }
+    setPlaces([...list, q], mi || MI());
   }
   function clearNear(){ if (!state.near) return; state.near = null; state.nearMeta = null; $("nearIn").value = ""; paintNear(); loadScope(); }
+  function clearWhere(){ if (state.near) return clearNear(); if (state.st !== "ALL") { $("stateSel").value = ""; setView("ALL", null); } }
   const MI = () => state.near?.mi || 50;
-  $("nearBox").addEventListener("submit", (e) => { e.preventDefault(); setNear($("nearIn").value, 50); });
-  $("nearIn").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); setNear($("nearIn").value, 50); } });
-  $("nearIn").addEventListener("change", () => { const v = $("nearIn").value.trim(); if ((nearOk(v) || stateFrom(v)) && (!state.near || state.near.q !== v)) setNear(v, 50); });
-  document.addEventListener("click", (e) => {
-    const w = e.target.closest("[data-widen]"); if (w && state.near) { setNear(state.near.q, +w.dataset.widen); return; }
-    const c = e.target.closest("[data-near-pick]"); if (c) setNear(c.dataset.nearPick, MI());
+  $("nearBox").addEventListener("submit", (e) => { e.preventDefault(); setNear($("nearIn").value); });
+  $("nearIn").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); setNear($("nearIn").value); }
+    if (e.key === "Backspace" && !$("nearIn").value) {   // empty box + Backspace = remove the last place
+      const list = NP(); if (list.length) { e.preventDefault(); setPlaces(list.slice(0, -1), MI()); }
+      else if (state.st !== "ALL") { e.preventDefault(); const n = state.st.slice(0, -1); setView(n.length ? n : "ALL", null); }
+    }
   });
-  $("nearX").addEventListener("click", clearNear);
-  try { const last = localStorage.getItem("btp_near"); if (last && !$("nearIn").value) $("nearIn").placeholder = last; } catch {}
+  $("nearIn").addEventListener("change", () => { const v = $("nearIn").value.trim(); if (v && (nearOk(v) || stateFrom(v))) setNear(v); });
+  document.addEventListener("click", (e) => {
+    const w = e.target.closest("[data-widen]"); if (w && state.near) { setPlaces(NP(), +w.dataset.widen); return; }
+    const c = e.target.closest("[data-near-pick]"); if (c) { const list = NP(), i = list.indexOf(c.dataset.nearFor || "");
+      if (i >= 0) list[i] = c.dataset.nearPick; else list.push(c.dataset.nearPick); setPlaces(list, MI()); return; }
+    const rm = e.target.closest("[data-near-rm]"); if (rm) { const list = NP(); list.splice(+rm.dataset.nearRm, 1); setPlaces(list, MI()); return; }
+    const sr = e.target.closest("[data-st-rm]"); if (sr) { const n = (state.st === "ALL" ? [] : state.st).filter((x) => x !== sr.dataset.stRm); $("stateSel").value = n.length === 1 ? n[0] : ""; setView(n.length ? n : "ALL", null); }
+  });
+  $("nearX").addEventListener("click", clearWhere);
+  try { const last = localStorage.getItem("btp_near"); if (last && !state.near) $("nearIn").placeholder = last; } catch {}
 
   function setView(st, btn){
-    if (state.near) { state.near = null; state.nearMeta = null; $("nearIn").value = ""; paintNear(); }
-    state.st = st;
+    if (state.near) { state.near = null; state.nearMeta = null; $("nearIn").value = ""; }
+    state.st = st; paintNear();
     document.querySelectorAll(".seg button").forEach((x) => x.setAttribute("aria-pressed", String(x === btn)));
     $("stateSel").classList.toggle("on", state.st !== "ALL");
     if (btn) $("stateSel").value = "";
@@ -1049,7 +1087,8 @@
       if (r.status >= 500) { await new Promise((ok) => setTimeout(ok, 1500)); r = await fetch(url); }   // Nov 14: one retry when the database is briefly busy
       if (!r.ok) { const e = new Error(r.status); e.status = r.status; try { e.data = await r.json(); } catch {} throw e; }
       const d = await r.json(); if (d.meta?.lastSync) state.lastSync = d.meta.lastSync; if (d.meta?.near && off === 0) { state.nearMeta = d.meta;
-        if (state.near && d.meta.near.q && d.meta.near.q !== state.near.q) { state.near.q = d.meta.near.q; $("nearIn").value = d.meta.near.q; } } return d;
+        const fixed = (d.meta.places || [d.meta.near]).map((x) => x.q).filter(Boolean).join("|");
+        if (state.near && fixed && fixed !== state.near.q) { state.near.q = fixed; paintNear(); } } return d;
     };
     const first = await page(0);
     const rows = [...(first.listings || [])];
@@ -1137,8 +1176,8 @@
       if (seq !== loadSeq) return;
       if (!(e.status === 400 && state.near)) console.error("[jobs] load/render failed", e);
       if (e.status === 400 && state.near && e.data?.choices?.length) { $("count").textContent = "";
-        $("list").innerHTML = `<div class="empty"><b>${esc(e.data.error)}</b><div class="wchips" style="justify-content:center;margin-top:12px">${e.data.choices.map((c) => `<button type="button" data-near-pick="${esc(c)}" data-noi18n>${esc(c)}</button>`).join("")}</div></div>`; return; }
-      if (e.status === 400 && state.near) { $("list").innerHTML = `<div class="empty">We couldn't find “${esc(state.near.q)}”. Try a city and state (Blacksburg, VA) or a 5-digit ZIP code.</div>`; $("count").textContent = ""; return; }
+        $("list").innerHTML = `<div class="empty"><b>${esc(e.data.error)}</b><div class="wchips" style="justify-content:center;margin-top:12px">${e.data.choices.map((c) => `<button type="button" data-near-pick="${esc(c)}" data-near-for="${esc(e.data.place || "")}" data-noi18n>${esc(c)}</button>`).join("")}</div></div>`; return; }
+      if (e.status === 400 && state.near) { $("list").innerHTML = `<div class="empty">We couldn't find “<span data-noi18n>${esc(e.data?.place || nearLabel())}</span>”. Try a city and state (Blacksburg, VA) or a 5-digit ZIP code.</div>`; $("count").textContent = ""; return; }
       $("list").innerHTML = '<div class="err" role="alert">Couldn’t load internships right now, that’s a problem on our side or your connection, not a sign there are no jobs. Refresh in a minute.</div>';
     }
   }

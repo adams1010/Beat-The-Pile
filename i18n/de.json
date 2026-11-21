@@ -1,6 +1,11 @@
 {
  "lang": "de",
  "strings": {
+    "Add another place": "Weiteren Ort hinzufügen",
+    "Up to 5 places": "Bis zu 5 Orte",
+    "Clear all places": "Alle Orte löschen",
+    "Cities and whole states can't be mixed yet. Remove the cities to search a whole state.": "Städte und ganze Bundesstaaten lassen sich noch nicht mischen. Entferne die Städte, um einen ganzen Staat zu durchsuchen.",
+    "You can search up to 5 places at once": "Du kannst bis zu 5 Orte gleichzeitig suchen",
     "School:": "Hochschule:",
     "Show every role separately": "Jede Stelle einzeln zeigen",
     "Group roles by company": "Stellen nach Firma gruppieren",
@@ -1965,6 +1970,8 @@
   "Your Recruiter badge is being verified": "Dein Recruiter-Badge wird geprüft"
  },
  "patterns": [
+    ["^~(\\d+) mi from$", "~$1 mi von"],
+    ["^Under 1 mi from$", "Unter 1 mi von"],
     ["^\\+(\\d+) more$", "+$1 weitere"],
     ["^\\+(\\d+) more roles at$", "+$1 weitere Stellen bei"],
     ["^\\+(\\d+) more role at$", "+$1 weitere Stelle bei"],
