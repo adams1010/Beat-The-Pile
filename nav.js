@@ -126,6 +126,8 @@
 .btpnav .btpsignin{font:600 13px "Geist",sans-serif;background:var(--n-acc);color:#060A2C;border-radius:999px;padding:8px 16px;text-decoration:none;white-space:nowrap}
 .btpnav .btpsignin[hidden],.btpnav details.acct[hidden]{display:none}
 .btpnav .acctmenu{min-width:280px;max-width:calc(100vw - 16px)}
+.btpnav .mobmore{display:none}
+@media (max-width:640px){.btpnav .mobmore{display:block}}
 .btpnav .acchead{display:flex;gap:10px;align-items:center;padding:10px 10px 12px}
 .btpnav .acchead b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.btpnav .acchead small{display:block;color:#5B6675;font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .btpnav .me.big{width:44px;height:44px;font-size:15px;border:0}
@@ -160,6 +162,26 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
 .btptab{display:none}
 @media (max-width:640px){
   .btpnav .mob{display:none}.btpnav .right{margin-left:auto}
+  /* Nov 21 (owner): on phones the top-right corner is "More" (the account menu + every page + Edit bar); your photo is the bottom-right tab */
+  .btpnav #btpMe{width:auto;height:auto;min-width:44px;background:none;border:0;border-radius:8px;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:0;color:#fff;padding:2px 4px}
+  .btpnav #btpMe>*{display:none}
+  .btpnav #btpMe::before{content:"";width:22px;height:22px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8'%3E%3Crect x='4' y='4' width='6.5' height='6.5' rx='1.5'/%3E%3Crect x='13.5' y='4' width='6.5' height='6.5' rx='1.5'/%3E%3Crect x='4' y='13.5' width='6.5' height='6.5' rx='1.5'/%3E%3Crect x='13.5' y='13.5' width='6.5' height='6.5' rx='1.5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8'%3E%3Crect x='4' y='4' width='6.5' height='6.5' rx='1.5'/%3E%3Crect x='13.5' y='4' width='6.5' height='6.5' rx='1.5'/%3E%3Crect x='4' y='13.5' width='6.5' height='6.5' rx='1.5'/%3E%3Crect x='13.5' y='13.5' width='6.5' height='6.5' rx='1.5'/%3E%3C/svg%3E") center/contain no-repeat}
+  .btpnav #btpMe::after{content:"More";font:500 11px/1.1 "Geist",sans-serif;color:#AEB9CC}
+  .btpnav .acct[open] #btpMe::after{color:#B0F701}.btpnav .acct[open] #btpMe{color:#B0F701}
+  .btpnav .acctmenu{position:fixed!important;left:8px!important;right:8px!important;top:58px!important;width:auto!important;max-width:none!important;max-height:calc(100vh - 140px);overflow:auto}
+  .btpnav .mobmore .more{display:block}.btpnav .mobmore .more a{display:block;padding:11px 12px;border-radius:8px;color:#060A2C;text-decoration:none}
+  .btpnav .mobmore .more b{font-weight:600}.btpnav .mobmore .sep{height:1px;background:#E3E7ED;margin:6px 4px}
+  .btpnav .mobmore button{font:inherit;background:none;border:0;color:#060A2C;cursor:pointer;text-align:left}
+  .btpnav .mobmore .edit{display:block;width:100%;padding:11px 12px;font-weight:600;color:#4A7000}
+  .btpnav .mobmore .edhd{padding:10px 12px 6px}.btpnav .mobmore .edhd b{display:block}.btpnav .mobmore .edhd small{color:#55627A;font-size:12px}
+  .btpnav .mobmore .pin{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:8px}
+  .btpnav .mobmore .pin[aria-pressed="true"]{background:#F2FADF;font-weight:600}
+  .btpnav .mobmore .edrow{display:flex;gap:8px;padding:6px 8px}
+  .btpnav .mobmore .eddone{background:#4A7000!important;color:#fff!important;border-radius:999px!important;padding:8px 18px!important;font-weight:600}
+  .btpnav .mobmore .edreset{border:1px solid #C9D2E3!important;border-radius:999px!important;padding:8px 14px!important}
+  .btpnav .mobmore:not(:empty)::after{content:"";display:block;height:1px;background:#E3E7ED;margin:6px 4px}
+  .btpnav:not(.signedin) .mob{display:block!important}
+
   body.btp-has-nav{padding-bottom:calc(66px + max(8px, calc(env(safe-area-inset-bottom,0px) - 12px)))}
   .btptab{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:75;background:#060A2C;border-top:1px solid #1A2640;
     padding:0 env(safe-area-inset-right,0px) max(8px, calc(env(safe-area-inset-bottom,0px) - 12px)) env(safe-area-inset-left,0px);font:500 11px/1.1 "Geist",-apple-system,sans-serif}
@@ -221,6 +243,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
       <a class="btpsignin" id="btpSignIn" href="/start/?next=${encodeURIComponent(location.pathname + location.search)}" hidden>Sign in</a>
       <details class="acct" id="btpAcct" hidden><summary class="me" id="btpMe" aria-label="Your account menu"></summary>
         <div class="menu acctmenu" role="menu">
+          <div class="mobmore" id="btpMoreTop"></div>
           <div class="acchead"><span class="me big" id="btpMe2" aria-hidden="true"></span><div style="min-width:0"><b id="btpAName" data-noi18n></b><small id="btpAEmail" data-noi18n></small></div></div>
           <a role="menuitem" class="pri" href="${BIZ ? "/business/company/" : "/u/"}">${BIZ ? (bizKind() === "recruiter" ? "View your profile" : "View company page") : "View profile"}</a>
           <div class="sep"></div>
@@ -255,7 +278,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     const box = nav.querySelector("#btpAcct"), si = nav.querySelector("#btpSignIn"); if (!box) return;
     let me = null; try { me = JSON.parse(localStorage.getItem("btp_me") || "null"); } catch {}
     const u = ACCT.user, signedIn = u ? true : u === null ? false : !!me;
-    box.hidden = !signedIn; si.hidden = signedIn || (u === undefined && seenSignIn()) || path.startsWith("/start");   // already on the sign-in page
+    nav.classList.toggle("signedin", signedIn); box.hidden = !signedIn; si.hidden = signedIn || (u === undefined && seenSignIn()) || path.startsWith("/start");   // already on the sign-in page
     if (!signedIn) { window.__btpMeTab = { signedIn: false, pic: "" }; window.btpPaintMeTab && window.btpPaintMeTab(); return; }
     const email = u?.primaryEmailAddress?.emailAddress || "";
     const name = [u?.firstName, u?.lastName].filter(Boolean).join(" ") || (me && me.n) || email.split("@")[0] || "Your account";
@@ -319,9 +342,9 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   const SHORT = { "Career Fairs": "Fairs", "Career Fair": "Fair", "My Season": "Season", "My Internship": "Internship", "Opening Radar": "Radar", "Match quiz": "Quiz", "Interview practice": "Interview", "Resume builder": "Resume", "Resume check": "Resume check", "Community": "Community", "Try it": "Demo", "My profile": "Profile", "Company": "Company" };
   // Nov 21 (owner): your profile is the far-right tab (Instagram-style, your photo), so it's no longer a pick; 3 pins + More + you
   const PICKS = [...MAIN, ...TOOLS.map(([h, t]) => [h, t, TOOL_ICON[h] || "tools"])];
-  const MAXP = 3;
+  const MAXP = 4;
   const TKEY = BIZ ? "btp_tabs_biz" : "btp_tabs";
-  const DEF = BIZ ? ["/business/home/", "/business/talent/", "/orbit/"] : ["/", "/jobs/", "/orbit/"];
+  const DEF = BIZ ? ["/business/home/", "/business/talent/", "/orbit/", "/business/fairs/"] : ["/", "/jobs/", "/orbit/", "/tracker/"];
   const readPins = () => { try { const v = JSON.parse(localStorage.getItem(TKEY) || "null"); const ok = Array.isArray(v) ? v.filter((h) => PICKS.some(([x]) => x === h)).slice(0, MAXP) : []; return ok.length ? ok : DEF; } catch { return DEF; } };
   let PINS = readPins(), editing = false;
   const tab = document.createElement("nav"); tab.className = "btptab"; tab.setAttribute("aria-label", "Main (phone)");
@@ -329,13 +352,12 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   const drawTab = () => {
     const pinned = PINS.map((h) => PICKS.find(([x]) => x === h)).filter(Boolean);
     const rest = PICKS.filter(([h]) => !PINS.includes(h));
-    const wasOpen = tab.querySelector("details")?.open;
-    tab.innerHTML = pinned.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${k === "orbit" || k === "talent" ? `<span class="btpbw">${svg(k)}<i class="btpbadge" data-noi18n hidden></i></span>` : svg(k)}<span>${SHORT[t] || t}</span></a>`).join("") +
-      `<details${wasOpen ? " open" : ""}><summary>${svg("tools")}<span>More</span></summary><div class="more" role="menu">` +
-      (editing
-        ? `<div class="edhd"><b>Pick up to 3 for your bar</b><small>${PINS.length} of 3 pinned · your profile stays on the right</small></div>${PICKS.map(([h, t]) => `<button type="button" class="pin" data-pin="${h}" aria-pressed="${PINS.includes(h)}">${pinIcon(PINS.includes(h))}<span>${t}</span></button>`).join("")}<div class="sep"></div><div class="edrow"><button type="button" class="eddone" data-tabedit="done">Done</button><button type="button" class="edreset" data-tabedit="reset">Reset</button></div>`
-        : `${rest.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div><button type="button" class="edit" data-tabedit="edit">Edit bar</button>`) +
-      `</div></details>` + meTab();
+    // Nov 21 (owner): bottom = the 4 pins + your profile; "More" (every other page, Edit bar, your accounts) is the top-right menu
+    tab.innerHTML = pinned.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${k === "orbit" || k === "talent" ? `<span class="btpbw">${svg(k)}<i class="btpbadge" data-noi18n hidden></i></span>` : svg(k)}<span>${SHORT[t] || t}</span></a>`).join("") + meTab();
+    const top = nav.querySelector("#btpMoreTop");
+    if (top) top.innerHTML = `<div class="more">` + (editing
+        ? `<div class="edhd"><b>Pick up to 4 for your bar</b><small>${PINS.length} of 4 pinned · your profile stays on the right</small></div>${PICKS.map(([h, t]) => `<button type="button" class="pin" data-pin="${h}" aria-pressed="${PINS.includes(h)}">${pinIcon(PINS.includes(h))}<span>${t}</span></button>`).join("")}<div class="sep"></div><div class="edrow"><button type="button" class="eddone" data-tabedit="done">Done</button><button type="button" class="edreset" data-tabedit="reset">Reset</button></div>`
+        : `${rest.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div><button type="button" class="edit" data-tabedit="edit">Edit bar</button>`) + `</div>`;
     try { window.btpBadgeRepaint && window.btpBadgeRepaint(); } catch {}
   };
   function meTab(){
@@ -347,14 +369,13 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   }
   window.btpPaintMeTab = () => { const a = tab.querySelector(".metab"); if (a) a.outerHTML = meTab(); };
   const savePins = () => { try { localStorage.setItem(TKEY, JSON.stringify(PINS)); } catch {} };
-  tab.addEventListener("click", (e) => {
+  const onPins = (e) => {
     const p = e.target.closest("[data-pin]"), ed = e.target.closest("[data-tabedit]");
     if (p) { e.preventDefault(); e.stopPropagation(); const h = p.dataset.pin; PINS = PINS.includes(h) ? PINS.filter((x) => x !== h) : PINS.length < MAXP ? [...PINS, h] : [...PINS.slice(1), h]; if (!PINS.length) PINS = [h]; savePins(); drawTab(); return; }
     if (ed) { e.preventDefault(); e.stopPropagation(); const a = ed.dataset.tabedit; if (a === "edit") editing = true; else if (a === "done") editing = false; else { PINS = DEF.slice(); savePins(); } drawTab(); return; }
-    if (e.target.closest(".more a")) tab.querySelector("details").open = false;
-  });
+  };
+  nav.querySelector("#btpMoreTop")?.addEventListener("click", onPins);
   drawTab();
-  document.addEventListener("click", (e) => { const d = tab.querySelector("details"); if (d.open && !tab.contains(e.target)) d.open = false; });
   const mount = () => {
     document.body.insertBefore(nav, document.body.firstChild);
     document.body.appendChild(tab);
