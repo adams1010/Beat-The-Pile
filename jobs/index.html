@@ -802,16 +802,27 @@
   function clearNear(){ if (!state.near) return; state.near = null; state.nearMeta = null; $("nearIn").value = ""; paintNear(); loadScope(); }
   function clearWhere(){ if (state.near) return clearNear(); if (state.st !== "ALL") { $("stateSel").value = ""; setView("ALL", null); } }
   const MI = () => state.near?.mi || 50;
+  // Nov 20 (owner): city names fill in as you type (every US Census place, big cities first, whole states too). Picking one
+  // adds it as a chip; a ZIP or anything not listed still works with Enter / Add ("Use “24060”").
+  if (window.btpPick) {
+    const STATE_ITEMS = () => Object.entries(NAMES).map(([ab, nm]) => ({ label: nm, alias: ab, aliases: [ab], sub: "Whole state", size: 3 }));
+    btpPick.attach($("nearIn"), { max: 8, other: true, otherLabel: "Use", noBlurPick: true, anchor: $("nearBox"),
+      load: async () => {
+        const [pl, big] = await Promise.all([btpPick.places(), fetch("/jobs/bigcities.json").then((r) => r.ok ? r.json() : []).catch(() => [])]);
+        const B = new Set(big);
+        return STATE_ITEMS().concat(pl.filter((x) => x.label !== "Remote").map((x) => ({ label: x.label, size: B.has(x.label.toLowerCase()) ? 2 : 0 })));
+      },
+      onPick(it){ if (it && it.label) setNear(it.label); } });
+  }
   $("nearBox").addEventListener("submit", (e) => { e.preventDefault(); setNear($("nearIn").value); });
   $("nearIn").addEventListener("keydown", (e) => {
-    if (e.key === "Enter") { e.preventDefault(); setNear($("nearIn").value); }
+    if (e.key === "Enter") { if (e.defaultPrevented) return; e.preventDefault(); setNear($("nearIn").value); }   // the suggestion list handles Enter while it's open
     if (e.key === "Backspace" && !$("nearIn").value) {   // empty box + Backspace = remove the last place
       const list = NP(); if (list.length) { e.preventDefault(); setPlaces(list.slice(0, -1), MI()); }
       else if (state.st !== "ALL") { e.preventDefault(); const n = state.st.slice(0, -1); setView(n.length ? n : "ALL", null); }
     }
   });
   $("nearIn").addEventListener("input", () => { const t = !!$("nearIn").value.trim(); $("nearAdd").hidden = !t; if (t) $("nearX").hidden = true; else paintNear(); });
-  $("nearIn").addEventListener("change", () => { const v = $("nearIn").value.trim(); if (v && (nearOk(v) || stateFrom(v))) setNear(v); });
   document.addEventListener("click", (e) => {
     const w = e.target.closest("[data-widen]"); if (w && state.near) { setPlaces(NP(), +w.dataset.widen); return; }
     const c = e.target.closest("[data-near-pick]"); if (c) { const list = NP(), i = list.indexOf(c.dataset.nearFor || "");

@@ -1,6 +1,7 @@
 {
  "lang": "de",
  "strings": {
+    "Whole state": "Ganzer Bundesstaat",
     "Add another place": "Weiteren Ort hinzufügen",
     "Up to 5 places": "Bis zu 5 Orte",
     "Clear all places": "Alle Orte löschen",
@@ -1970,6 +1971,7 @@
   "Your Recruiter badge is being verified": "Dein Recruiter-Badge wird geprüft"
  },
  "patterns": [
+    ["^Use “(.+)”$", "„$1“ verwenden"],
     ["^~(\\d+) mi from$", "~$1 mi von"],
     ["^Under 1 mi from$", "Unter 1 mi von"],
     ["^\\+(\\d+) more$", "+$1 weitere"],

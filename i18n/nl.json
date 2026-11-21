@@ -1,6 +1,7 @@
 {
  "lang": "nl",
  "strings": {
+    "Whole state": "Hele staat",
     "Add another place": "Nog een plaats toevoegen",
     "Up to 5 places": "Maximaal 5 plaatsen",
     "Clear all places": "Alle plaatsen wissen",
@@ -1970,6 +1971,7 @@
   "Your Recruiter badge is being verified": "Je Recruiter-badge wordt gecontroleerd"
  },
  "patterns": [
+    ["^Use “(.+)”$", "“$1” gebruiken"],
     ["^~(\\d+) mi from$", "~$1 mi van"],
     ["^Under 1 mi from$", "Minder dan 1 mi van"],
     ["^\\+(\\d+) more$", "+$1 meer"],

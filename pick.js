@@ -1,7 +1,7 @@
 // /pick.js (Nov 9) — "pick from the list" boxes for school, major and location. Type a few letters, choose from real
 // options (every US college + universities worldwide, the programs a school awards, every US city/town). Picking from the
 // list is what makes "Virginia Tech" and "Virginia Polytechnic Institute…" the same school for Orbit.
-//   btpPick.attach(input, { load: () => Promise<[{label, sub?, alias?, id?}]>, other?: true, onPick(item) })
+//   btpPick.attach(input, { load: () => Promise<[{label, sub?, alias?, id?}]>, other?: true, noBlurPick?: true, anchor?: element, onPick(item) })
 //   btpPick.schools() / .majors(schoolId?) / .places()   ready-made sources
 (() => {
   if (window.btpPick) return;
@@ -36,7 +36,7 @@
     document.body.appendChild(box);
     input.setAttribute("autocomplete", "off"); input.setAttribute("role", "combobox"); input.setAttribute("aria-autocomplete", "list");
     let items = null, shown = [], sel = 0, picked = input.value;
-    const place = () => { const r = input.getBoundingClientRect(); box.style.left = r.left + scrollX + "px"; box.style.top = r.bottom + scrollY + 4 + "px"; box.style.width = Math.max(r.width, 260) + "px"; };
+    const place = () => { const r = (o.anchor || input).getBoundingClientRect(); box.style.left = r.left + scrollX + "px"; box.style.top = r.bottom + scrollY + 4 + "px"; box.style.width = Math.max(r.width, 260) + "px"; };
     const paint = async () => {
       if (!items) { box.innerHTML = "<p>Loading…</p>"; place(); box.hidden = false; items = (await o.load()) || []; }
       if (document.activeElement !== input) return;
@@ -66,6 +66,7 @@
     });
     input.addEventListener("blur", () => setTimeout(() => {
       box.hidden = true;
+      if (o.noBlurPick) return;                                 // Nov 20: the Near box only adds on a real pick / Enter
       const q = input.value.trim(); if (q === picked) return;
       const nq = norm(q), exact = items && items.find((x) => norm(x.label) === nq || (x.aliases || []).some((a) => norm(a) === nq));
       if (exact) return choose(exact);
