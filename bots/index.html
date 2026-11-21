@@ -198,7 +198,10 @@
     const day = Date.now() - 864e5, checkedToday = d.bots[0].runs.filter((r) => Date.parse(r.ran_at) > day).reduce((n, r) => n + (r.stats?.tried || 0), 0);
     const add = (score, impact, title, why, who, link) => items.push({ score, impact, title, why, who, link });
     if ((sys.users || 0) < 25) add(100, "high", `Get students on it: ${sys.users || 0} accounts so far`, "Everything upstream works. The biggest gap is people using it. Demo it before the next fair and ask friends to save one internship.", "You", "/demo/");
-    add(90, "high", "Turn on email alerts", "Banners only work when people open the site. Emails bring them back. Blocked on a free Resend account.", "You (5 min) → Claude", null);
+    // Nov 21: only when the email bot says the Resend key is missing (it has sent since Nov 18)
+    { const r = (d.bots.find((b) => b.id === "remind") || {}).runs?.[0];
+      if (!r || /RESEND_API_KEY/.test(r.summary || "")) add(90, "high", "Turn on email alerts", "Banners only work when people open the site. Emails bring them back. Needs RESEND_API_KEY in Vercel.", "You (5 min) → Claude", null);
+      else if (r.stats?.alerts?.failed > 0 || r.stats?.failed > 0) add(85, "high", "Some emails failed to send", "Check the Resend dashboard (Emails → Logs) for bounces or a domain problem.", "You", null); }
     const parked = (c.no_board || 0) + (c.blocked || 0);
     if (parked) add(parked > 60 ? 80 : 50, parked > 60 ? "high" : "med", `Paste careers links for ${parked} parked companies`, "The robot couldn't find their board on its own. About a minute each: open their careers page, copy the job-search link.", "You + cousin", "/discovery/");
     const ub = Object.entries(sys.unsupportedBy || {}).sort((a, b) => b[1] - a[1]);
