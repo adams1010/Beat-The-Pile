@@ -209,7 +209,7 @@
     const broken = (c.board_error || 0) + (c.identity_failed || 0);
     if (broken) add(35, "med", `Fix ${broken} boards that error or couldn't be proven`, "Found a board but it errored, or couldn't prove it's theirs (Garmin and Corning are in here).", "Claude", null);
     if (checkedToday > 0) { const days = Math.ceil(f.backlogLeft / Math.max(1, checkedToday)); if (days < 7) add(30, days < 3 ? "med" : "low", `Backlog runs out in ~${days} day${days > 1 ? "s" : ""}`, "After that the finder relies on the nightly scout and your links. A new company source would keep it fed.", "Claude", null); }
-    if ((sys.feedbackOpen ?? sys.feedback7d || 0) > 0) { const n = sys.feedbackOpen ?? sys.feedback7d; add(60, "med", `Answer ${n} open feedback note${n > 1 ? "s" : ""}`, "Open them on /business/admin/ → Reports & feedback, reply to the contact if they left one, then press Mark handled. This item clears when none are open.", "You", "/business/admin/"); }
+    { const n = sys.feedbackOpen ?? (sys.feedback7d || 0); if (n > 0) add(60, "med", `Answer ${n} open feedback note${n > 1 ? "s" : ""}`, "Open them on /business/admin/ → Reports & feedback, reply to the contact if they left one, then press Mark handled. This item clears when none are open.", "You", "/business/admin/"); }
     if (d.ai && d.ai.cap > 0 && d.ai.month >= d.ai.cap * 0.8) add(70, "high", "AI budget almost used up", `${fmtUsd(d.ai.month)} of ${fmtUsd(d.ai.cap)} this month. Raise the cap below or AI pauses.`, "You", null);
     items.sort((a, b) => b.score - a.score);
     return `<section class="card" style="margin-top:12px"><div class="row"><div class="name">🎯 Where to spend time</div><span class="how">Ranked by impact, from live numbers</span></div>
