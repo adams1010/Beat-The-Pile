@@ -76,10 +76,17 @@
   .near input{font:inherit;font-size:13px;width:150px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--ink);background:#F6F8FB}
   .near input:focus{outline:2px solid var(--green);outline-offset:1px;background:#fff}
   .near{flex-wrap:wrap}
-  .nchip{display:inline-flex;align-items:center;gap:2px;font-size:13px;font-weight:500;background:#F2FADF;border:1px solid #DDF3A8;color:#2F4A00;border-radius:999px;padding:2px 2px 2px 10px;max-width:220px}
+  .whatwhere .near{display:flex;align-items:center;gap:6px;border-radius:23px;padding:5px 6px 5px 14px;min-height:46px;font-size:14px}
+  .whatwhere .near>span:first-child{color:var(--muted,#55627A);font-weight:500}
+  .whatwhere .near input{flex:1 1 110px;min-width:90px;width:auto;border:0;border-radius:0;background:transparent;padding:6px 2px;font-size:16px}
+  .whatwhere .near input:focus{outline:none;background:transparent}
+  .whatwhere .near:focus-within{border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
+  .near .nadd{flex:none;font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;background:var(--green);color:#fff;padding:7px 14px;cursor:pointer}
+  .near .nadd[hidden]{display:none}
+  .nchip{display:inline-flex;align-items:center;gap:2px;font-size:14px;flex:none;font-weight:500;background:#F2FADF;border:1px solid #DDF3A8;color:#2F4A00;border-radius:999px;padding:2px 2px 2px 10px;max-width:220px}
   .nchip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .nchip button{border:0;background:none;font:inherit;font-size:15px;line-height:1;color:#2F4A00;cursor:pointer;padding:0 6px}
-  .near .nx{border:0;background:none;font:inherit;font-size:15px;color:var(--muted,#55627A);cursor:pointer;padding:0 6px;line-height:1}
+  .nchip button{border:0;background:none;font:inherit;font-size:17px;line-height:1;color:#2F4A00;cursor:pointer;padding:4px 8px;margin:-4px 0}
+  .near .nx{flex:none;margin-left:auto;border:0;background:none;font:inherit;font-size:20px;color:var(--muted,#55627A);cursor:pointer;padding:6px 10px;line-height:1}
   .meta2 .dist{color:var(--green);font-weight:600}
   .tag.multi{background:#EEF2FF;color:#3730A3}
   .toggle{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:500;border-radius:999px!important;color:var(--ink);cursor:pointer;user-select:none;
@@ -162,7 +169,7 @@
     .fbtn[aria-expanded="true"]{border-color:var(--green);color:var(--green)}
     .fbtn b{display:inline-block;min-width:18px;margin-left:4px;padding:0 5px;border-radius:999px;background:var(--green);color:#fff;font-size:11.5px;line-height:18px;text-align:center}
     .fsum{font-size:12.5px;color:var(--muted);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .controls:not(.fopen) .near,.controls:not(.fopen) .cats,.controls:not(.fopen) .row{display:none!important}
+    .controls:not(.fopen) .cats,.controls:not(.fopen) .row{display:none!important}
   }
 
   .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px}
@@ -224,10 +231,10 @@
   [hidden]{display:none!important}
 
   /* Nov 14: What + Where search on top, category chips (lib/categories.js) */
-  .whatwhere{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .whatwhere{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start;margin-bottom:10px}
   .whatwhere .sform{flex:2 1 320px;display:flex;gap:6px;min-width:0}
   .whatwhere .sform .search{flex:1;min-width:0;font-size:16px;padding:11px 14px}
-  .whatwhere .near{flex:1 1 220px;min-width:0}
+  .whatwhere .near{flex:1 1 340px;min-width:0}
   .cats{display:flex;align-items:center;gap:8px;padding:2px 0 10px}.cats label{font-size:13.5px;color:var(--muted);white-space:nowrap}.cats select{flex:0 1 280px;min-width:0}
   .minput{flex:0 1 340px;min-width:0;cursor:text;padding:8px 14px;font-size:14px}.minput::placeholder{color:#5E6A80}
   .cats button{flex:0 0 auto;border:1px solid #C9D1DE;background:#fff;color:#060A2C;border-radius:999px;padding:7px 13px;font:500 13.5px Geist,system-ui,sans-serif;cursor:pointer;white-space:nowrap}
@@ -288,7 +295,7 @@
 <div class="controls">
     <div class="whatwhere">
       <form class="sform" id="qForm" role="search"><input class="search" id="q" type="search" enterkeyhint="search" placeholder="Job title, keyword or company" aria-label="Job title, keyword or company"><button class="sbtn" type="submit">Search</button></form>
-      <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><span id="nearChips" style="display:contents"></span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="button" class="nx" id="nearX" aria-label="Clear all places" hidden>×</button></form>
+      <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><span id="nearChips" style="display:contents"></span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" enterkeyhint="done" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="submit" class="nadd" id="nearAdd" hidden>Add</button><button type="button" class="nx" id="nearX" aria-label="Clear all places" hidden>×</button></form>
     </div>
     <div class="fbar"><button type="button" class="fbtn" id="fBtn" aria-expanded="false" aria-controls="cats">Filters</button><span class="fsum" id="fSum" data-noi18n></span></div>
     <div class="cats" id="cats"><label for="majorIn">Your major</label><input class="statesel minput" id="majorIn" type="search" placeholder="Type your major, like Mechanical or Nursing" aria-label="Your major"><select class="statesel" id="catSel" hidden aria-hidden="true"><option value="">All jobs</option></select></div>
@@ -777,7 +784,7 @@
     track("near_search", { mi: state.near.mi, places: list.length }); paintNear(); loadScope();
   }
   function setNear(q, mi){   // adds a place (or a state) to the search
-    q = (q || "").trim(); $("nearIn").value = "";
+    q = (q || "").trim(); $("nearIn").value = ""; $("nearAdd").hidden = true;
     if (!q) return;
     const st = stateFrom(q);
     if (st) {
@@ -803,6 +810,7 @@
       else if (state.st !== "ALL") { e.preventDefault(); const n = state.st.slice(0, -1); setView(n.length ? n : "ALL", null); }
     }
   });
+  $("nearIn").addEventListener("input", () => { const t = !!$("nearIn").value.trim(); $("nearAdd").hidden = !t; if (t) $("nearX").hidden = true; else paintNear(); });
   $("nearIn").addEventListener("change", () => { const v = $("nearIn").value.trim(); if (v && (nearOk(v) || stateFrom(v))) setNear(v); });
   document.addEventListener("click", (e) => {
     const w = e.target.closest("[data-widen]"); if (w && state.near) { setPlaces(NP(), +w.dataset.widen); return; }
@@ -1086,9 +1094,12 @@
       let r = await fetch(url);
       if (r.status >= 500) { await new Promise((ok) => setTimeout(ok, 1500)); r = await fetch(url); }   // Nov 14: one retry when the database is briefly busy
       if (!r.ok) { const e = new Error(r.status); e.status = r.status; try { e.data = await r.json(); } catch {} throw e; }
-      const d = await r.json(); if (d.meta?.lastSync) state.lastSync = d.meta.lastSync; if (d.meta?.near && off === 0) { state.nearMeta = d.meta;
-        const fixed = (d.meta.places || [d.meta.near]).map((x) => x.q).filter(Boolean).join("|");
-        if (state.near && fixed && fixed !== state.near.q) { state.near.q = fixed; paintNear(); } } return d;
+      const d = await r.json(); if (d.meta?.lastSync) state.lastSync = d.meta.lastSync;
+      // Nov 20: only the answer to the search on screen may touch the places (a late answer to an older search used to wipe a chip)
+      if (d.meta?.near && off === 0 && state.near && qs.includes(`near=${encodeURIComponent(state.near.q)}&`)) { state.nearMeta = d.meta;
+        const list = NP(), got = d.meta.places || [d.meta.near];
+        if (got.length === list.length) { const fixed = got.map((x, i) => x.q || list[i]).join("|");
+          if (fixed !== state.near.q) { state.near.q = fixed; paintNear(); syncUrl(); } } } return d;
     };
     const first = await page(0);
     const rows = [...(first.listings || [])];
