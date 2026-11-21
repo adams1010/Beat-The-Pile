@@ -50,6 +50,7 @@ import { orbitFor, schoolKey, majorKey, sameSchool, sameMajor } from "../lib/orb
 import { orbitExtras, orbitAction, deleteOrbitData } from "../lib/orbitnet.js";
 import { bizAction, publicCompany, isVerifiedEmployer, isAdmin } from "../lib/employer.js";
 import { cleanInternship, internPeers } from "../lib/internship.js";
+import { cleanGrad } from "../lib/gradpaths.js";
 import { foundingCount, foundingFor } from "../lib/founding.js";
 import { schoolIdFor, shortSchool } from "../lib/schools.js";
 import { talentFor, roleOf } from "../lib/talent.js";
@@ -383,6 +384,7 @@ export default async function handler(req, res) {
                             remindEmail: row?.remind_email === true,
                             alerts: row?.alert_on === true ? { major: row.alert_major || "all", states: row.alert_states || "" } : null, emailReady: !!process.env.RESEND_API_KEY,
                             internship: row?.internship || null, internshipReady: row ? "internship" in row : true,
+                            grad: row?.grad || null, gradReady: row ? "grad" in row : true,
                             achievements: achievementsFrom(row?.apps, { owner: true }) });
   const send = (out) => out.error ? res.status(out.status || 400).json({ error: out.error }) : res.status(200).json(view(out.row));
   const stop = (error, status = 400) => ({ error, status });
@@ -506,6 +508,13 @@ export default async function handler(req, res) {
       return res.status(out.status).json(out.body);
     }
 
+    // ── Grad school paths (/grad/, lib/gradpaths.js, Nov 20): path, grad year, LSAT/GPA, hours log. One jsonb column. ──
+    if (action === "grad_save") {
+      const g = cleanGrad(body.grad);
+      if (!g) return res.status(400).json({ error: "Nothing to save" });
+      try { return send(await mutate(uid, () => ({ grad: g }))); }
+      catch (e) { if (/grad/i.test(String(e?.message))) return res.status(503).json({ error: "Grad paths are still being set up. Your changes are kept on this device for now.", setup: true }); throw e; }
+    }
     // ── My Internship (/internship/, lib/internship.js): for students who already have an offer ──
     if (action === "intern_save") {
       const ix = body.internship === null ? null : cleanInternship(body.internship);

@@ -574,7 +574,9 @@
     const nearFixedNote = (nm ? (nm.places || [nm.near]) : []).filter((x) => x?.fixedTo && x.typed).map((x) => `Showing results for <b data-noi18n>${esc(x.fixedTo)}</b> (you typed “<span data-noi18n>${esc(x.typed)}</span>”). `).join("");
     const nmSt = nm ? (nm.states || [nm.near.state]).filter(Boolean) : [], nmStName = nmSt.map((x) => NAMES[x] || x).join(" & ");
     const nearNote = nm ? nearFixedNote + `Within ${state.near.mi} mi, nearest first.${wider ? ` <button class="linkbtn" data-widen="${wider}">Show within ${wider} mi</button>` : ""} Distances are city center to city center. ${nm.unplacedInState && nmSt.length ? `${nm.unplacedInState} more in ${esc(nmStName)} ${nm.unplacedInState === 1 ? "doesn't" : "don't"} say which city. <button class="linkbtn" data-near-st="${esc(nmSt.join(","))}">See all of ${esc(nmStName)}</button> ` : ""}${nm.remote ? `${nm.remote} remote not counted. ` : ""}` : "";
-    $("note").innerHTML = nearNote + (state.st !== "ALL" && !state.savedOnly && !state.followOnly
+    const pathKey = /^path_/.test(state.cat || "") ? state.cat.slice(5) : null;   // Nov 20: from /grad/
+    const pathNote = pathKey ? `<b>${esc(window.btpCats?.CAT?.[state.cat]?.label || "Path jobs")}:</b> jobs that count toward grad school applications. <a href="/grad/?path=${esc(pathKey)}">Your hours and timeline</a>. ` : "";
+    $("note").innerHTML = pathNote + nearNote + (state.st !== "ALL" && !state.savedOnly && !state.followOnly
         ? `Showing ${esc(state.st.map((x) => NAMES[x] || x).join(" & "))}. <button class="linkbtn" id="goAll">See all US</button> `
         : "") + (state.company ? `One company, every major. <button class="linkbtn" id="allCos">Show all companies</button> ` : "") + (state.savedOnly || state.followOnly ? "Every major and state." : strict ? "Showing roles that say mechanical (or close, like manufacturing)." : `Major: <b>${esc(MAJOR_LABEL())}</b> (change it above).`)
       + (state.user ? " · ☆ Follow = flag new jobs from that company · ♡ Save = keep this job · Mark applied = add it to My Season" : "");

@@ -58,6 +58,7 @@
     ["/companies/", "Companies", "Look up any company and follow it"],
     ["/radar/", "Opening Radar", "When each company usually opens internships"],
     ["/clubs/", "Clubs & teams", "Which clubs fit your major and lead to internships"],
+    ["/grad/", "Grad school paths", "Pre-med, PA, law, PhD: jobs, hours and timeline"],
     ["/#quiz", "Match quiz", "Real openings matched to your major"],
     ["/#interview", "Interview practice", "Talk it out against a timer, get graded"],
     ["/#resumebuilder", "Resume builder", "Starter resume from your answers"],

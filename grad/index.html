@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grad school paths | Beat the Pile</title>
+<meta name="description" content="Pre-med, pre-PA, pre-dental, pre-PT, pre-law and PhD: the jobs that count toward your school, an hours log ready for your application, a dated timeline, and law school numbers.">
+<link rel="canonical" href="https://www.beatthepile.com/grad/">
+<link rel="icon" href="/icons/icon-192.png?v=4">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/business/biz.css">
+<style>
+  /* /grad/ (Nov 20 2026, owner): grad school paths. Data + rules: lib/gradpaths.js. Jobs: hidden categories path_* in
+     lib/categories.js (/api/listings?cat=). Saved in user_jobs.grad (supabase/grad.sql) via action grad_save; signed out or
+     before the column exists = this device (localStorage btp_grad). Every number has a source link; advice says "Our advice". */
+  main{max-width:1200px}
+  .hero{background:var(--navy);color:#fff;border-radius:10px;padding:22px;margin-bottom:14px}
+  .hero h1{color:#fff;font-size:26px;margin:0}.hero p{color:#C9D2E3;margin:6px 0 0;max-width:70ch}
+  .paths{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 0}
+  .paths button{font:inherit;font-size:14px;font-weight:600;border:1px solid #2A3157;background:transparent;color:#fff;border-radius:999px;padding:8px 14px;cursor:pointer}
+  .paths button[aria-pressed=true]{background:var(--lime);border-color:var(--lime);color:var(--navy)}
+  .grid{grid-template-columns:minmax(0,1fr) 360px}
+  h2{font-size:18px;margin:0 0 4px}
+  .job{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #EEF1F6}.job:first-of-type{border-top:0}
+  .job b{display:block;font-size:14.5px;font-weight:600}.job span{font-size:13px;color:var(--muted)}
+  .kind{font-size:12px;font-weight:600;border-radius:999px;padding:2px 8px;background:#EEF1F6;color:var(--ink);margin-left:6px;white-space:nowrap}
+  .target{margin:12px 0}.target .t{display:flex;justify-content:space-between;font-size:14px;font-weight:600}
+  .target .t span{font-variant-numeric:tabular-nums;color:var(--muted);font-weight:500}
+  .meter{height:8px;border-radius:999px;background:#EEF1F6;overflow:hidden;margin:6px 0 4px}.meter i{display:block;height:100%;background:var(--green)}
+  .src{font-size:12.5px;color:var(--muted)}.src a{color:var(--muted)}
+  .adv{display:inline-block;font-size:11.5px;font-weight:600;background:#EEF1F6;color:var(--muted);border-radius:999px;padding:1px 8px;margin-left:6px}
+  table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px 6px;border-top:1px solid #EEF1F6;vertical-align:top}
+  th{font-size:12.5px;color:var(--muted);font-weight:600;border-top:0}td.n{font-variant-numeric:tabular-nums;text-align:right}
+  .rowbtn{font:inherit;font-size:13px;background:none;border:0;color:var(--green);cursor:pointer;padding:0 4px}
+  .form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px;padding:14px;border:1px solid var(--line);border-radius:10px;background:#F7F9FC}
+  .form label{font-size:13px;font-weight:600;display:block}.form .full{grid-column:1/-1}
+  .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .tl{list-style:none;margin:10px 0 0;padding:0}.tl li{display:grid;grid-template-columns:86px minmax(0,1fr);gap:10px;padding:10px 0;border-top:1px solid #EEF1F6}.tl li:first-child{border-top:0}
+  .tl .d{font-size:13px;font-weight:600;color:var(--green);font-variant-numeric:tabular-nums}.tl li.past .d,.tl li.past b{color:var(--muted)}
+  .tl b{display:block;font-size:14px}.tl span{font-size:13px;color:var(--muted)}.tl li.goal b{color:var(--ink)}
+  .row2{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px}.row2 select{width:auto}
+  .facts p{font-size:14px;margin:0 0 10px}
+  .law .me{display:flex;gap:10px;flex-wrap:wrap}.law .me label{font-size:13px;font-weight:600}.law .me input{width:110px}
+  .pill{font-size:12px;font-weight:600;border-radius:999px;padding:2px 8px;white-space:nowrap}.pill.up{background:#F2FADF;color:#2F4A00}.pill.mid{background:#EEF1F6;color:var(--ink)}.pill.low{background:#FDECEC;color:#8A1C1C}
+  .empty{color:var(--muted);font-size:14px}
+  @media (max-width:900px){.grid{grid-template-columns:1fr}}
+  @media (max-width:560px){.form{grid-template-columns:1fr}.hero h1{font-size:22px}.tl li{grid-template-columns:72px minmax(0,1fr)}.hide-s{display:none}}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main"><div class="card center">Loading…</div></main>
+<script src="/business/biz.js"></script>
+<script type="module">
+import * as GP from "/lib/gradpaths.js";
+const { esc, $ } = biz;
+const LOCAL_KEY = "btp_grad";
+let G = { path: null, gradYear: null, gap: true, gpa: null, lsat: null, hours: [] };
+let SIGNED = false, LOCAL = true, JOBS = null, LAW = undefined, EDIT = null;
+const NOW = new Date(), thisYear = NOW.getFullYear();
+const srcLink = (k) => k && GP.SRC[k] ? `<a href="${esc(GP.SRC[k].url)}" target="_blank" rel="noopener">${esc(GP.SRC[k].label)}</a>` : "";
+const fmt = (n) => Number(n || 0).toLocaleString("en-US");
+
+// ── storage ──
+const readLocal = () => { try { return JSON.parse(localStorage.getItem(LOCAL_KEY) || "null"); } catch { return null; } };
+let saveT = null;
+function save(){
+  try { localStorage.setItem(LOCAL_KEY, JSON.stringify(G)); } catch {}
+  if (!SIGNED || LOCAL) return;
+  clearTimeout(saveT); saveT = setTimeout(async () => {
+    try { const r = await biz.api({ action: "grad_save", grad: G }); if (r.grad) G = { ...G, ...r.grad }; }
+    catch (e) { if (e.data?.setup) LOCAL = true; else biz.$(".savenote") && (biz.$(".savenote").textContent = e.message); }
+  }, 600);
+}
+
+// ── page ──
+function render(){
+  const P = GP.PATH[G.path];
+  const url = new URL(location.href); if (G.path) url.searchParams.set("path", G.path); else url.searchParams.delete("path"); history.replaceState(null, "", url);
+  $("#main").innerHTML = `
+  <section class="hero"><h1>Grad school paths</h1>
+    <p>The jobs and hours that get you into med, PA, dental, PT, law or a PhD program, pulled from employers' own job boards. Plus a dated plan and an hours log ready for your application.</p>
+    <div class="paths" role="group" aria-label="Your path">${GP.PATHS.map((p) => `<button type="button" data-path="${p.key}" aria-pressed="${G.path === p.key}">${esc(p.label)}</button>`).join("")}</div></section>
+  ${P ? body(P) : `<div class="card center"><h1>Pick your path</h1><p class="sub">Choose the school you're working toward above. You'll see the jobs that count, your hours, and your timeline.</p></div>`}`;
+  document.querySelectorAll("[data-path]").forEach((b) => b.onclick = () => { G.path = b.dataset.path; JOBS = null; EDIT = null; save(); render(); loadJobs(); if (G.path === "prelaw") loadLaw(); });
+  if (P) wire(P);
+}
+
+function body(P){
+  const yrs = Array.from({ length: 8 }, (_, i) => thisYear - 1 + i);
+  const steps = GP.timeline(P.key, G.gradYear || thisYear + 2, G.gap);
+  const nowKey = thisYear * 12 + NOW.getMonth() + 1;
+  return `<div class="grid"><div>
+    <section class="card"><h2>Jobs that count toward ${esc(/^[A-Z][a-z]/.test(P.school) ? P.school[0].toLowerCase() + P.school.slice(1) : P.school)}</h2>
+      <p class="sub">${esc(P.jobsNote)} Every one is from the employer's own job board.</p>
+      <div id="jobs"><div class="skel" style="height:120px;border-radius:10px;background:#EEF1F6"></div></div></section>
+    ${P.key === "prelaw" ? `<section class="card law"><h2>Law schools: your numbers vs. their class</h2>
+      <p class="sub">Each school's LSAT and GPA middle 50% from its ABA Standard 509 report. This shows where you fall, not your odds.</p>
+      <div class="me"><div><label for="lsat">Your LSAT</label><input id="lsat" type="number" inputmode="numeric" min="120" max="180" value="${G.lsat ?? ""}"></div>
+      <div><label for="gpa">Your GPA</label><input id="gpa" type="number" inputmode="decimal" step="0.01" min="0" max="4.33" value="${G.gpa ?? ""}"></div></div>
+      <div id="law" style="margin-top:12px"></div></section>` : ""}
+    <section class="card" id="hours"><h2>Your hours</h2>
+      ${P.targets.length ? `<p class="sub">Goals come from the sources linked under each bar. Each school sets its own rules, so check the ones you apply to.</p>${GP.progress(P.key, G.hours).map((t) => `<div class="target"><div class="t">${esc(t.label)}<span>${fmt(t.have)} / ${fmt(t.goal)} hrs</span></div><div class="meter" role="progressbar" aria-valuenow="${t.pct}" aria-valuemin="0" aria-valuemax="100" aria-label="${esc(t.label)}"><i style="width:${t.pct}%"></i></div><div class="src">${esc(t.note)} ${t.src ? srcLink(t.src) : `<span class="adv">Our advice</span>`}</div></div>`).join("")}`
+        : `<p class="sub">${P.key === "prelaw" ? "Law schools don't count hours, but work experience after college is common. Log jobs and leadership here to keep your resume straight." : "Log research and lab hours here. Your research mentor's letter matters most."}</p>`}
+      ${hoursTable()}
+      <div class="acts"><button class="btn pri" type="button" id="addH">+ Add hours</button>${G.hours.length ? `<button class="btn" type="button" id="csv">Export for ${esc(P.cas || "your application")}</button>` : ""}</div>
+      <div id="hform"></div>
+      <p class="src savenote" style="margin-top:10px">${SIGNED ? (LOCAL ? "Saved on this device for now." : "Saved to your account.") : `Saved on this device. <a href="/start/?next=/grad/">Sign in</a> to keep it on every device.`}</p></section>
+  </div><div>
+    <section class="card"><h2>Your timeline</h2>
+      <div class="row2"><label for="gy">Graduating</label><select id="gy">${yrs.map((y) => `<option value="${y}"${(G.gradYear || thisYear + 2) === y ? " selected" : ""}>Spring ${y}</option>`).join("")}</select>
+      <label><input type="checkbox" id="gap"${G.gap ? " checked" : ""} style="width:auto"> Gap year</label></div>
+      <ol class="tl">${steps.map((s) => `<li class="${s.y * 12 + s.m < nowKey ? "past" : ""} ${s.kind === "goal" ? "goal" : ""}"><div class="d">${esc(s.when)}</div><div><b>${esc(s.title)}</b><span>${esc(s.detail)} ${s.src ? srcLink(s.src) : s.kind === "advice" ? `<span class="adv">Our advice</span>` : ""}</span></div></li>`).join("")}</ol>
+      <p class="src">Dates follow the 2026 cycle's published dates; later years usually land within days of them. Always check the official site.</p></section>
+    <section class="card facts"><h2>Good to know</h2>${P.facts.map((f) => `<p>${esc(f.text)}<br><span class="src">${srcLink(f.src)}</span></p>`).join("")}
+      ${P.key === "premed" ? `<p class="src">Medical school profiles (MCAT and GPA by school) are in the AAMC's official MSAR. ${srcLink("msar")}</p>` : ""}</section>
+    <p class="src">Beat the Pile is not an admissions service. Use this to plan, and confirm every rule with the schools you apply to.</p>
+  </div></div>`;
+}
+
+function hoursTable(){
+  if (!G.hours.length) return `<p class="empty">No hours logged yet.</p>`;
+  const T = Object.fromEntries(GP.HOUR_TYPES.map((h) => [h.key, h.label]));
+  return `<table><thead><tr><th>Where</th><th class="hide-s">Type</th><th class="hide-s">When</th><th style="text-align:right">Hours</th><th></th></tr></thead><tbody>
+    ${G.hours.map((h) => `<tr><td><b style="font-weight:600">${esc(h.org || "")}</b><br><span class="src">${esc(h.role || "")}</span></td><td class="hide-s">${esc(T[h.type] || "")}</td><td class="hide-s src">${esc([h.start, h.end === "present" ? "now" : h.end].filter(Boolean).join(" to "))}</td><td class="n">${fmt(h.hours)}</td>
+      <td style="text-align:right;white-space:nowrap"><button class="rowbtn" data-edit="${esc(h.id)}">Edit</button><button class="rowbtn" data-delh="${esc(h.id)}" aria-label="Delete">×</button></td></tr>`).join("")}
+  </tbody></table>`;
+}
+
+function hoursForm(h){
+  const opts = GP.HOUR_TYPES.map((t) => `<option value="${t.key}"${h.type === t.key ? " selected" : ""}>${esc(t.label)}</option>`).join("");
+  $("#hform").innerHTML = `<form class="form" id="hf">
+    <div><label for="h-org">Organization</label><input id="h-org" required maxlength="120" value="${esc(h.org || "")}" placeholder="Carilion Clinic"></div>
+    <div><label for="h-role">Role</label><input id="h-role" maxlength="120" value="${esc(h.role || "")}" placeholder="ED scribe"></div>
+    <div><label for="h-type">Type</label><select id="h-type">${opts}</select></div>
+    <div><label for="h-hours">Total hours</label><input id="h-hours" type="number" inputmode="decimal" min="0" max="20000" step="0.5" required value="${h.hours ?? ""}"></div>
+    <div><label for="h-start">Start</label><input id="h-start" type="month" value="${esc(h.start || "")}"></div>
+    <div><label for="h-end">End (blank = still going)</label><input id="h-end" type="month" value="${esc(h.end && h.end !== "present" ? h.end : "")}"></div>
+    <div class="full"><label for="h-contact">Contact who can confirm it</label><input id="h-contact" maxlength="160" value="${esc(h.contact || "")}" placeholder="Name, title, email"></div>
+    <div class="full"><label for="h-notes">What you did</label><textarea id="h-notes" rows="3" maxlength="700">${esc(h.notes || "")}</textarea></div>
+    <div class="full acts" style="margin:0"><button class="btn pri" type="submit">Save</button><button class="btn" type="button" id="hcancel">Cancel</button></div></form>`;
+  $("#hf").onsubmit = (e) => { e.preventDefault();
+    const row = { id: h.id || Math.random().toString(36).slice(2, 12), org: $("#h-org").value.trim(), role: $("#h-role").value.trim(), type: $("#h-type").value,
+      hours: Math.max(0, +$("#h-hours").value || 0), start: $("#h-start").value, end: $("#h-end").value || "present", contact: $("#h-contact").value.trim(), notes: $("#h-notes").value.trim() };
+    const i = G.hours.findIndex((x) => x.id === row.id); if (i >= 0) G.hours[i] = row; else G.hours.unshift(row);
+    EDIT = null; save(); render(); loadJobs(true); if (G.path === "prelaw") loadLaw(); };
+  $("#hcancel").onclick = () => { $("#hform").innerHTML = ""; };
+  $("#h-org").focus();
+}
+
+function wire(P){
+  $("#gy").onchange = (e) => { G.gradYear = +e.target.value; save(); render(); loadJobs(true); if (G.path === "prelaw") loadLaw(); };
+  $("#gap").onchange = (e) => { G.gap = e.target.checked; save(); render(); loadJobs(true); if (G.path === "prelaw") loadLaw(); };
+  $("#addH").onclick = () => hoursForm({ type: P.key === "research" ? "research" : P.key === "prelaw" ? "work" : "clinical" });
+  document.querySelectorAll("[data-edit]").forEach((b) => b.onclick = () => hoursForm(G.hours.find((x) => x.id === b.dataset.edit) || {}));
+  document.querySelectorAll("[data-delh]").forEach((b) => b.onclick = () => { const h = G.hours.find((x) => x.id === b.dataset.delh); if (h && !confirm(`Delete ${h.org || "this entry"}?`)) return; G.hours = G.hours.filter((x) => x.id !== b.dataset.delh); save(); render(); loadJobs(true); if (G.path === "prelaw") loadLaw(); });
+  const csv = $("#csv"); if (csv) csv.onclick = () => {
+    const q = (s) => `"${String(s).replace(/"/g, '""')}"`;
+    const text = GP.exportRows(G.hours).map((r) => r.map(q).join(",")).join("\n");
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob(["﻿" + text], { type: "text/csv" })); a.download = `hours-for-${(P.cas || "application").toLowerCase()}.csv`; a.click(); };
+  const l = $("#lsat"), g = $("#gpa");
+  if (l) { const upd = () => { G.lsat = l.value ? +l.value : null; G.gpa = g.value ? +g.value : null; save(); drawLaw(); }; l.oninput = upd; g.oninput = upd; }
+}
+
+// ── jobs (live) ──
+async function loadJobs(cached){
+  const el = $("#jobs"); const P = GP.PATH[G.path]; if (!el || !P) return;
+  if (!cached || !JOBS) {
+    try { const r = await fetch(`/api/listings?cat=${P.jobs}&field=all&kind=all&limit=1000`); if (!r.ok) throw 0; const d = await r.json(); JOBS = { rows: d.listings || [], more: !!d.meta?.more }; }
+    catch { el.innerHTML = `<p class="empty">Couldn't load jobs right now. That's a problem on our side, not a sign there are none. Refresh in a minute.</p>`; return; }
+  }
+  const K = { intern: "Internship", fulltime: "Entry-level", hourly: "Part-time", shadow: "Shadowing" };
+  const n = JOBS.rows.length, all = `/jobs/?cat=${P.jobs}&kind=all&major=all`;
+  el.innerHTML = n ? `<p style="margin:0 0 6px;font-size:14px"><b data-noi18n>${JOBS.more ? "1,000+" : fmt(n)}</b> open now, newest first.</p>
+    ${JOBS.rows.slice(0, 8).map((j) => `<div class="job"><div><b data-noi18n>${esc(j.title)}</b><span data-noi18n>${esc(j.company || "")} · ${esc(j.location || "")}</span><span class="kind">${K[j.kind] || ""}</span></div><a class="btn" href="${esc(j.url)}" target="_blank" rel="noopener">Apply</a></div>`).join("")}
+    <div class="acts"><a class="btn pri" href="${all}">See all${JOBS.more ? "" : " " + fmt(n)} on Jobs</a></div>`
+    : `<p class="empty">Nothing open right now. New jobs come in every hour.</p>`;
+}
+
+// ── law schools (ABA 509 data in /grad/law.json when present) ──
+async function loadLaw(){
+  if (LAW === undefined) { try { const r = await fetch("/grad/law.json"); LAW = r.ok ? await r.json() : null; } catch { LAW = null; } }
+  drawLaw();
+}
+function drawLaw(){
+  const el = $("#law"); if (!el) return;
+  if (!LAW?.schools?.length) { el.innerHTML = `<p class="empty">School-by-school numbers are coming soon. Until then, every school's report is on the ABA's official site. ${srcLink("aba509")}</p>`; return; }
+  const me = { l: G.lsat, g: G.gpa };
+  const where = (v, lo, hi) => v == null || lo == null ? "" : v >= hi ? `<span class="pill up">Above</span>` : v >= lo ? `<span class="pill mid">In range</span>` : `<span class="pill low">Below</span>`;
+  const list = LAW.schools.slice().sort((a, b) => (b.lsat50 || 0) - (a.lsat50 || 0));
+  el.innerHTML = `<div style="overflow-x:auto"><table><thead><tr><th>School</th><th style="text-align:right">LSAT 25-75</th><th></th><th style="text-align:right">GPA 25-75</th><th></th><th class="hide-s" style="text-align:right">Tuition</th></tr></thead><tbody>
+    ${list.map((s) => `<tr><td data-noi18n>${esc(s.name)}<br><span class="src">${esc(s.state || "")}</span></td><td class="n">${s.lsat25 ?? "?"}-${s.lsat75 ?? "?"}</td><td>${where(me.l, s.lsat25, s.lsat75)}</td><td class="n">${s.gpa25 ?? "?"}-${s.gpa75 ?? "?"}</td><td>${where(me.g, s.gpa25, s.gpa75)}</td><td class="n hide-s">${s.tuition ? "$" + fmt(s.tuition) : ""}</td></tr>`).join("")}
+  </tbody></table></div><p class="src">${esc(LAW.year)} ABA Standard 509 compilation. ${srcLink("aba509")}</p>`;
+}
+
+// ── start ──
+const want = new URLSearchParams(location.search).get("path");
+biz.start(async (u) => {
+  if (u === undefined) u = null;      // sign-in down: the page still works, saved on this device
+  const local = readLocal();
+  SIGNED = !!u; LOCAL = true;
+  if (u) {
+    try {
+      const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + (await biz.clerk().session.getToken()) } }); const ME = await r.json();
+      LOCAL = ME.gradReady === false;
+      G = { ...G, ...(ME.grad || local || {}) };
+      if (!G.gradYear && +ME.profile?.gradYear) G.gradYear = +ME.profile.gradYear;
+      if (!LOCAL && !ME.grad && local) save();       // move this device's copy into the account
+    } catch { G = { ...G, ...(local || {}) }; }
+  } else G = { ...G, ...(local || {}) };
+  if (want && GP.PATH[want]) G.path = want;
+  G.hours = Array.isArray(G.hours) ? G.hours : [];
+  render(); loadJobs(); if (G.path === "prelaw") loadLaw();
+});
+</script>
+<script src="/logos.js" defer></script>
+<script src="/ph.js" defer></script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>

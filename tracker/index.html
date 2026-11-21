@@ -155,7 +155,7 @@
         <input type="search" id="q" placeholder="Search company, role, place, notes" value="${esc(S.q)}" aria-label="Search">
         <select id="fs" aria-label="Status"><option value="all">All statuses</option>${STAGES.map(([s, l]) => `<option value="${s}"${S.stage === s ? " selected" : ""}>${l}</option>`).join("")}</select>
         <select id="fk" aria-label="Type"><option value="all">Internships + full-time</option><option value="intern"${S.kind === "intern" ? " selected" : ""}>Internships</option><option value="fulltime"${S.kind === "fulltime" ? " selected" : ""}>Full-time</option></select>
-        <button class="btn" id="csv" type="button">Export CSV</button>
+        <button class="btn" id="csv" type="button">Export CSV</button><a class="btn" href="/grad/#hours" title="Clinical, shadowing, volunteer and research hours for med, PA, dental and PT school">Hours log</a>
       </div>
       <p class="note">Same list as <a href="/season/">My Season</a>. Applying from Jobs adds a row here automatically.</p>
       <div class="sheet"><table>
