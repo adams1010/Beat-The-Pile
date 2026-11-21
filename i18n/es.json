@@ -1,6 +1,16 @@
 {
  "_about": "Spanish UI strings (Nov 2026). Key = the English text exactly as shown (whitespace collapsed). Used by /i18n.js when the student picks Español. Job titles, company names and places are data and stay as-is.",
  "strings": {
+    "Find your next role": "Encuentra tu próximo puesto",
+    "Any workplace": "Cualquier modalidad",
+    "Search every major, like Nursing or Finance": "Busca cualquier carrera, como Enfermería o Finanzas",
+    "All jobs, any major": "Todos los empleos, cualquier carrera",
+    "Job areas": "Áreas de empleo",
+    "Summer, semester and co-op roles": "Puestos de verano, semestre y co-op",
+    "First full-time jobs, no experience needed": "Primeros empleos de tiempo completo, sin experiencia",
+    "Flexible shifts around class": "Turnos flexibles entre clases",
+    "See a job up close first": "Conoce un trabajo de cerca primero",
+    "Every kind of job": "Todo tipo de empleo",
     "Grad school paths": "Caminos al posgrado",
     "Pre-med, PA, law, PhD: jobs, hours and timeline": "Medicina, PA, derecho, doctorado: empleos, horas y calendario",
     "Pick your path": "Elige tu camino",

@@ -247,6 +247,66 @@
   .shpromo{margin:6px 0 10px;padding:10px 14px;border:1px solid #DDF3A8;background:#F2FADF;border-radius:10px;font-size:14px;color:#2B3446}
   .shpromo .linkbtn{font-weight:600;color:#4A7000}
   .cohint{margin:0 0 10px;font-size:14px;color:#55627A}.cohint a{color:#4A7000;font-weight:600}
+
+  /* Nov 21 (owner: "this interface is awful"): the search deck. Navy panel, one white What | Where bar, dropdowns for
+     major (every major we know) and job type, the live count inside the panel. Same ids underneath, so the logic is unchanged. */
+  .controls.deck{background:#060A2C;border:0;border-radius:10px;padding:18px 18px 16px;color:#fff;margin-bottom:10px}
+  .dhead{display:flex;align-items:baseline;justify-content:space-between;gap:6px 14px;flex-wrap:wrap;margin-bottom:12px}
+  .dtitle{margin:0;font-size:21px;font-weight:650;letter-spacing:-.01em;color:#fff}
+  .deck .count{margin:0;font-size:13px;color:#DDF3A8;font-variant-numeric:tabular-nums}
+  .dbar{display:flex;align-items:stretch;background:#fff;border-radius:999px;padding:5px;gap:0;min-height:54px}
+  .dbar:focus-within{outline:2px solid #B0F701;outline-offset:2px}
+  .dbar .sform{display:contents}
+  .dbar #q{order:1;flex:1 1 50%;min-width:0;border:0;border-radius:999px;background:transparent;font-size:16px;padding:10px 16px;outline:none}
+  .dbar .near{order:2;flex:1 1 50%;min-width:0;display:flex;align-items:center;gap:6px;border:0!important;box-shadow:none!important;border-left:1px solid #DCE2EC!important;border-radius:0!important;background:transparent;padding:0 6px 0 14px;font-size:14px;flex-wrap:wrap}
+  .dbar .near>span:first-child{color:#55627A;font-weight:500}
+  .dbar .near input{flex:1 1 110px;min-width:90px;width:auto;border:0;border-radius:0;background:transparent;padding:8px 2px;font-size:16px;outline:none}
+  .dbar .sbtn{order:3;flex:none;background:#B0F701;color:#060A2C;font-size:15px;font-weight:650;padding:0 26px;border-radius:999px}
+  .dbar .sbtn:hover{background:#C6FF3D}
+  .dpills{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  .deck .ddb,.deck .statesel,.deck .chip,.deck .toggle{display:inline-flex;align-items:center;gap:6px;height:38px;padding:0 12px!important;background:transparent;color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px!important;font:500 13.5px Geist,system-ui,sans-serif;padding:0 14px;cursor:pointer;white-space:nowrap;box-shadow:none}
+  .deck .statesel{padding-right:10px}.deck .statesel option{color:#060A2C;background:#fff}
+  .deck .ddb:hover,.deck .statesel:hover,.deck .chip:hover,.deck .toggle:hover{border-color:rgba(255,255,255,.6)}
+  .deck .ddb.on,.deck .statesel.on,.deck .chip[aria-pressed="true"],.dd.open .ddb{border-color:#B0F701;background:rgba(176,247,1,.12);color:#fff}
+  .deck .toggle input{accent-color:#B0F701}
+  .ddk{color:#AEB8CC;font-weight:500}.ddv{font-weight:650;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+  .chev{width:12px;height:12px;opacity:.8}.dd.open .chev{transform:rotate(180deg)}
+  .dd{position:relative}
+  .ddp{position:absolute;top:calc(100% + 8px);left:0;z-index:45;background:#fff;color:#060A2C;border:1px solid #AEB8C8;border-radius:10px;padding:8px;width:380px;max-width:calc(100vw - 32px)}
+  .ddp[hidden]{display:none}
+  .ddsearch{width:100%;box-sizing:border-box;font:inherit;font-size:16px;border:1px solid #C9D1DE;border-radius:8px;padding:10px 12px;margin-bottom:6px;color:#060A2C}
+  .ddsearch:focus{outline:2px solid #4A7000;outline-offset:0;border-color:#4A7000}
+  .ddl{max-height:360px;overflow-y:auto;overscroll-behavior:contain}
+  .mg{font-size:12px;font-weight:600;color:#55627A;padding:10px 10px 4px}
+  .mi{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;text-align:left;font:inherit;font-size:14.5px;color:#060A2C;background:none;border:0;border-radius:8px;padding:9px 10px;cursor:pointer}
+  .mi small{font-size:12px;color:#5E6A80;white-space:nowrap}
+  .mi:hover,.mi:focus-visible{background:#F2F5F9}
+  .mi.on{background:#F2FADF;box-shadow:inset 3px 0 0 #4A7000;font-weight:600}
+  .mnote{font-size:12.5px;color:#5E6A80;padding:10px}
+  .mnote button{font:inherit;color:#4A7000;font-weight:600;background:none;border:0;padding:0;cursor:pointer;text-decoration:underline}
+  .ddkind{width:320px}
+  #kindPop .kindseg{display:flex!important;flex-direction:column;gap:2px;background:none;border:0;padding:0;margin:0;border-radius:0;overflow:visible;max-width:none}
+  #kindPop .kindseg button{display:block;text-align:left;width:100%;padding:10px 12px;border-radius:8px;color:#060A2C;font-weight:500;white-space:normal}
+  #kindPop .kindseg button b{display:block;font-size:14.5px;font-weight:650}
+  #kindPop .kindseg button small{display:block;font-size:12.5px;color:#5E6A80;margin-top:1px}
+  #kindPop .kindseg button:hover{background:#F2F5F9}
+  #kindPop .kindseg button[aria-pressed="true"]{background:#F2FADF;color:#060A2C;box-shadow:inset 3px 0 0 #4A7000}
+  .deck #kindSel,.deck #catSel,.deck #majorSel{display:none!important}
+  .deck .fbar{display:none!important}
+  .belowdeck{margin:0 0 10px}.belowdeck .note:empty{display:none}.belowdeck .note{margin:0 2px}
+  @media (max-width:640px){
+    .controls.deck{padding:14px 14px 12px;border-radius:10px}
+    .dtitle{font-size:18px}
+    .dbar{flex-direction:column;border-radius:10px;padding:4px;min-height:0}
+    .dbar #q{border-radius:8px;padding:11px 12px}
+    .dbar .near{border-left:0!important;border-top:1px solid #DCE2EC!important;padding:4px 4px 4px 12px;min-height:46px}
+    .dbar .sbtn{height:44px;border-radius:8px;margin-top:4px}
+    .dpills{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin:12px -14px 0;padding:0 14px 2px}.dpills::-webkit-scrollbar{display:none}
+    .dpills>*{flex:none}
+    .controls.deck:not(.fopen) .dpills{display:flex!important}
+    .ddp{position:fixed;top:auto;left:10px;right:10px;bottom:calc(72px + env(safe-area-inset-bottom,0px));width:auto;max-width:none;z-index:95}
+    .ddl{max-height:50vh}
+  }
 </style>
 </head>
 <body>
@@ -292,17 +352,24 @@
         <p>Pick one and we'll show internships for your major first. You can change it any time.</p>
         <div class="wchips" id="welcomeChips"></div><select class="statesel wsel" id="welcomeSel" aria-label="What are you studying?"></select>
       </section>
-<div class="controls">
-    <div class="whatwhere">
+<div class="controls deck">
+    <div class="dhead"><h2 class="dtitle">Find your next role</h2><div class="count" id="count" aria-live="polite"></div></div>
+    <div class="dbar">
       <form class="sform" id="qForm" role="search"><input class="search" id="q" type="search" enterkeyhint="search" placeholder="Job title, keyword or company" aria-label="Job title, keyword or company"><button class="sbtn" type="submit">Search</button></form>
       <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><span id="nearChips" style="display:contents"></span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" enterkeyhint="done" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="submit" class="nadd" id="nearAdd" hidden>Add</button><button type="button" class="nx" id="nearX" aria-label="Clear all places" hidden>×</button></form>
     </div>
-    <div class="fbar"><button type="button" class="fbtn" id="fBtn" aria-expanded="false" aria-controls="cats">Filters</button><span class="fsum" id="fSum" data-noi18n></span></div>
-    <div class="cats" id="cats"><label for="majorIn">Your major</label><input class="statesel minput" id="majorIn" type="search" placeholder="Type your major, like Mechanical or Nursing" aria-label="Your major"><select class="statesel" id="catSel" hidden aria-hidden="true"><option value="">All jobs</option></select></div>
-    <div class="kindseg" role="group" aria-label="Job type"><button type="button" data-kind="intern" aria-pressed="true">Internships</button><button type="button" data-kind="fulltime" aria-pressed="false">Entry-level</button><button type="button" data-kind="hourly" aria-pressed="false">Part-time &amp; hourly</button><button type="button" data-kind="shadow" aria-pressed="false">Shadowing &amp; volunteer</button><button type="button" data-kind="all" aria-pressed="false">All</button></div>
-    <select class="statesel kindsel" id="kindSel" aria-label="Job type"><option value="intern">Internships</option><option value="fulltime">Entry-level</option><option value="hourly">Part-time &amp; hourly</option><option value="shadow">Shadowing &amp; volunteer</option><option value="all">All</option></select>
-    <div class="row">
+    <div class="dpills" id="cats">
+      <div class="dd" id="majorDD"><button type="button" class="ddb" aria-haspopup="listbox" aria-expanded="false" aria-controls="majorPop"><span class="ddk">Major</span><span class="ddv" id="majorV" data-noi18n>Every major</span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="ddp ddmajor" id="majorPop" hidden><input class="ddsearch" id="majorIn" type="search" placeholder="Search every major, like Nursing or Finance" autocomplete="off" enterkeyhint="go" aria-label="Your major"><div class="ddl" id="majorList" role="listbox" aria-label="Majors"></div></div></div>
+      <div class="dd" id="kindDD"><button type="button" class="ddb" aria-haspopup="true" aria-expanded="false" aria-controls="kindPop"><span class="ddk">Job type</span><span class="ddv" id="kindV">Internships</span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="ddp ddkind" id="kindPop" hidden><div class="kindseg" role="group" aria-label="Job type"><button type="button" data-kind="intern" aria-pressed="true"><b>Internships</b><small>Summer, semester and co-op roles</small></button><button type="button" data-kind="fulltime" aria-pressed="false"><b>Entry-level</b><small>First full-time jobs, no experience needed</small></button><button type="button" data-kind="hourly" aria-pressed="false"><b>Part-time &amp; hourly</b><small>Flexible shifts around class</small></button><button type="button" data-kind="shadow" aria-pressed="false"><b>Shadowing &amp; volunteer</b><small>See a job up close first</small></button><button type="button" data-kind="all" aria-pressed="false"><b>All</b><small>Every kind of job</small></button></div></div></div>
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">All US states</option></select>
+      <select class="statesel" id="workSel" aria-label="Where you work"><option value="any">Any workplace</option><option value="remote">Remote</option><option value="hybrid">Hybrid</option><option value="onsite">In person</option></select>
+      <label class="toggle" id="meWrap" title="Only roles that say mechanical (or a close match like manufacturing)."><input type="checkbox" id="meOnly"> Strictly mechanical</label>
+      <button class="chip" id="savedOnly" aria-pressed="false" title="Jobs you saved with ♡">♡ Saved <span id="savedN"></span></button>
+      <button class="chip" id="followOnly" aria-pressed="false" title="Companies you follow with ☆, you get flagged when they post">Following <span id="followN"></span></button>
+      <select class="statesel" id="catSel" hidden aria-hidden="true"><option value="">All jobs</option></select>
+      <select hidden class="statesel kindsel" id="kindSel" aria-label="Job type"><option value="intern">Internships</option><option value="fulltime">Entry-level</option><option value="hourly">Part-time &amp; hourly</option><option value="shadow">Shadowing &amp; volunteer</option><option value="all">All</option></select>
       <select class="statesel" id="majorSel" aria-label="Major" hidden>
         <option value="all">Any major</option>
         <optgroup label="Engineering"><option value="eng">All engineering</option><option value="mechanical">Mechanical &amp; Aerospace</option><option value="electrical">Electrical &amp; Computer Eng.</option><option value="civil">Civil, Construction &amp; Architecture</option><option value="chemical">Chemical &amp; Materials</option><option value="industrial">Industrial &amp; Manufacturing</option></optgroup>
@@ -311,12 +378,9 @@
         <optgroup label="Part-time &amp; hourly"><option value="retail">Retail &amp; customer service</option><option value="hospitality">Food, hotels &amp; recreation</option><option value="supply_chain">Warehouse, delivery &amp; supply chain</option></optgroup>
         <optgroup label="Science, policy &amp; more"><option value="exercise_sport">Exercise Science, Sports &amp; Rehab</option><option value="science_health">Science, Health &amp; Environment</option><option value="legal_policy">Legal, Policy &amp; Government</option><option value="education_social">Education &amp; Social Impact</option><option value="other">Other / general</option></optgroup>
       </select>
-      <select class="statesel" id="workSel" aria-label="Where you work"><option value="any">Remote, hybrid or in person</option><option value="remote">Remote</option><option value="hybrid">Hybrid</option><option value="onsite">In person</option></select>
-      <label class="toggle" id="meWrap" title="Only roles that say mechanical (or a close match like manufacturing)."><input type="checkbox" id="meOnly"> Strictly mechanical</label>
-      <button class="chip" id="savedOnly" aria-pressed="false" title="Jobs you saved with ♡">♡ Saved <span id="savedN"></span></button>
-      <button class="chip" id="followOnly" aria-pressed="false" title="Companies you follow with ☆, you get flagged when they post">Following <span id="followN"></span></button>
     </div>
-    <div class="count" id="count" aria-live="polite"></div>
+  </div>
+  <div class="belowdeck">
     <div class="shpromo" id="shPromo" hidden></div>
     <div class="cohint" id="coHint" hidden></div>
     <div class="note" id="note"></div>
@@ -578,8 +642,7 @@
     const pathNote = pathKey ? `<b>${esc(window.btpCats?.CAT?.[state.cat]?.label || "Path jobs")}:</b> jobs that count toward grad school applications. <a href="/grad/?path=${esc(pathKey)}">Your hours and timeline</a>. ` : "";
     $("note").innerHTML = pathNote + nearNote + (state.st !== "ALL" && !state.savedOnly && !state.followOnly
         ? `Showing ${esc(state.st.map((x) => NAMES[x] || x).join(" & "))}. <button class="linkbtn" id="goAll">See all US</button> `
-        : "") + (state.company ? `One company, every major. <button class="linkbtn" id="allCos">Show all companies</button> ` : "") + (state.savedOnly || state.followOnly ? "Every major and state." : strict ? "Showing roles that say mechanical (or close, like manufacturing)." : `Major: <b>${esc(MAJOR_LABEL())}</b> (change it above).`)
-      + (state.user ? " · ☆ Follow = flag new jobs from that company · ♡ Save = keep this job · Mark applied = add it to My Season" : "");
+        : "") + (state.company ? `One company, every major. <button class="linkbtn" id="allCos">Show all companies</button> ` : "") + (state.savedOnly || state.followOnly ? "Every major and state." : strict ? "Showing roles that say mechanical (or close, like manufacturing)." : "");
     syncUrl();
 
     // "New" = appeared after the first import, within the last 3 days (so day-one data isn't all "New")
@@ -1235,31 +1298,83 @@
   // job areas themselves, your school's majors first. Picking one loads that major's job areas; empty = every major.
   state.majorName = store.get("btp_major_name") || ""; state.majorKey = store.get("btp_major_name_key") || "";
   { const mn = (new URLSearchParams(location.search).get("mn") || "").slice(0, 70); if (mn) { state.majorName = mn; state.majorKey = state.major; } }
-  function majorBoxText(){ const box = $("majorIn"); if (!box || document.activeElement === box) return;
-    box.value = state.major === "all" ? "" : MAJOR_LABEL(); }
-  (() => { const box = $("majorIn"); if (!box || !window.btpPick) return;
+  // Nov 21 (owner): the Major dropdown on the search deck = every major we know (jobs/majors.json: quiz + every
+  // school's official names + every federal CIP name), your school's majors first, the job areas, and a search box.
+  const KIND_NAME = { intern: "Internships", fulltime: "Entry-level", hourly: "Part-time & hourly", shadow: "Shadowing & volunteer", all: "All jobs" };
+  function majorBoxText(){
+    const v = $("majorV"); if (v) { const lab = state.cat && window.btpCats?.CAT?.[state.cat] ? window.btpCats.CAT[state.cat].label : state.major === "all" ? "Every major" : MAJOR_LABEL();
+      v.textContent = lab.charAt(0).toUpperCase() + lab.slice(1); v.closest(".ddb")?.classList.toggle("on", state.major !== "all" || !!state.cat); }
+    const k = $("kindV"); if (k) { k.textContent = KIND_NAME[state.kind] || "Internships"; k.closest(".ddb")?.classList.toggle("on", state.kind !== "intern"); }
+  }
+  (() => {
+    const all = () => document.querySelectorAll(".deck .dd");
+    const show = (dd, on) => { const pp = dd.querySelector(".ddp"), bb = dd.querySelector(".ddb"); pp.hidden = !on; bb.setAttribute("aria-expanded", String(on)); dd.classList.toggle("open", on); };
+    const closeAll = () => all().forEach((x) => show(x, false));
+    all().forEach((dd) => dd.querySelector(".ddb").addEventListener("click", (e) => {
+      e.stopPropagation(); const on = dd.querySelector(".ddp").hidden; closeAll(); show(dd, on);
+      if (on && dd.id === "majorDD") { $("majorIn").value = ""; renderMajors(""); setTimeout(() => $("majorIn").focus(), 0); }
+      if (on) track("deck_open", { which: dd.id });
+    }));
+    document.addEventListener("click", (e) => { if (!e.target.closest?.(".deck .dd")) closeAll(); });
+    document.addEventListener("keydown", (e) => { if (e.key !== "Escape") return; for (const x of all()) if (!x.querySelector(".ddp").hidden) { show(x, false); x.querySelector(".ddb").focus(); } });
+    // Job type: the menu holds the same [data-kind] buttons as before; follow them and close
+    const seg = document.querySelector("#kindPop .kindseg");
+    if (seg) new MutationObserver(() => { majorBoxText(); show($("kindDD"), false); }).observe(seg, { subtree: true, attributes: true, attributeFilter: ["aria-pressed"] });
+
+    const norm = window.btpPick?.norm || ((x) => String(x || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/&/g, " and ").replace(/[^a-z0-9]+/g, " ").trim());
     const areaOf = (name) => { const A = window.btpJobSearch?.areasOf; if (!A) return "";
-      const n = btpPick.norm(name).split(" "); return [...new Set(n.flatMap((w) => A(w)))].filter((x) => AREA_KEYS.has(x)).slice(0, 4).join(","); };
-    const load = async () => {
+      const n = norm(name).split(" "); return [...new Set(n.flatMap((w) => A(w)))].filter((x) => AREA_KEYS.has(x)).slice(0, 4).join(","); };
+    let ITEMS = null, LOADING = null;
+    const load = () => LOADING || (LOADING = (async () => {
       const list = (await fetch("/jobs/majors.json").then((r) => r.ok ? r.json() : []).catch(() => [])) || [];
-      const byName = new Map(list.map(([n, f]) => [btpPick.norm(n), f]));
-      const out = [], seen = new Set(), push = (it) => { const k = btpPick.norm(it.label); if (seen.has(k)) return; seen.add(k); out.push(it); };
+      const byName = new Map(list.map(([n, f]) => [norm(n), f]));
+      const out = [], seen = new Set(), push = (it) => { const k = norm(it.label); if (!k || seen.has(k)) return; seen.add(k); it._n = k; out.push(it); };
       const sid = store.get("btp_school_id");
-      if (sid) { const mine = await btpPick.majors(+sid).catch(() => []);   // your school's own majors, biggest-first tier
-        for (const m of mine) { const f = byName.get(btpPick.norm(m.label)) ?? areaOf(m.label); push({ label: m.label, sub: "At your school", f, size: 3 }); } }
-      for (const o of document.querySelectorAll("#majorSel option")) if (o.value !== "all") push({ label: o.textContent, sub: o.parentElement.label ? `Job area · ${o.parentElement.label}` : "Job area", f: o.value, size: 2 });
+      if (sid && window.btpPick?.majors) { const mine = await btpPick.majors(+sid).catch(() => []);
+        for (const m of mine) push({ label: m.label, sub: "At your school", f: byName.get(norm(m.label)) ?? areaOf(m.label), size: 3 }); }
+      for (const o of document.querySelectorAll("#majorSel option")) if (o.value !== "all") push({ label: o.textContent, sub: o.parentElement.label || "Job area", f: o.value, size: 2 });
       for (const [n, f] of list) push({ label: n, f: f || areaOf(n) });
-      return out;
-    };
-    btpPick.attach(box, { load, max: 30, hint: "Type your major. Every major is here.", onPick(it){
+      return (ITEMS = out);
+    })());
+    const row = (it, i) => `<button type="button" class="mi${(i < 0 ? state.major === "all" && !state.cat : state.majorName === it.label && state.majorKey === state.major) ? " on" : ""}" data-i="${i}" role="option"><span${i < 0 ? "" : " data-noi18n"}>${esc(i < 0 ? "Every major" : it.label)}</span>${i < 0 ? "<small>All jobs, any major</small>" : it.sub ? `<small>${esc(it.sub)}</small>` : ""}</button>`;
+    function renderMajors(q){
+      const L = $("majorList"); if (!L) return;
+      if (!ITEMS) { L.innerHTML = `<div class="mnote">Loading majors…</div>`; load().then(() => renderMajors($("majorIn").value)); return; }
+      const n = norm(q), idx = ITEMS.map((it, i) => [it, i]);
+      if (!n) {
+        const school = idx.filter(([it]) => it.size === 3).slice(0, 15), areas = idx.filter(([it]) => it.size === 2);
+        L.innerHTML = row(null, -1) + (school.length ? `<div class="mg">At your school</div>` + school.map(([it, i]) => row({ ...it, sub: "" }, i)).join("") : "")
+          + `<div class="mg">Job areas</div>` + areas.map(([it, i]) => row(it, i)).join("")
+          + `<div class="mnote">Type to search all ${ITEMS.length.toLocaleString("en-US")} majors.</div>`;
+        return;
+      }
+      const words = n.split(" ");
+      const hits = idx.filter(([it]) => words.every((w) => it._n.includes(w)))
+        .sort((x, y) => (y[0]._n.startsWith(n) - x[0]._n.startsWith(n)) || ((y[0].size || 0) - (x[0].size || 0)) || (x[0]._n.length - y[0]._n.length)).slice(0, 60);
+      L.innerHTML = hits.length ? hits.map(([it, i]) => row(it, i)).join("")
+        : `<div class="mnote">No major called “<span data-noi18n>${esc(q)}</span>” yet. <button type="button" data-i="-1">Show every major</button> or <button type="button" data-q="${esc(q)}">search jobs for it</button>.</div>`;
+    }
+    function pickMajor(it){
       const key = !it ? "all" : it.f && okMajor(it.f) ? it.f : "all";
       state.majorName = it ? it.label : ""; state.majorKey = key;
       store.set("btp_major_name", state.majorName); store.set("btp_major_name_key", key);
-      if (key === state.major) { syncUrl(); phoneSummary(); render(); return; }
+      closeAll();
+      if (key === state.major && !state.cat) { syncUrl(); phoneSummary(); majorBoxText(); render(); return; }
       state.company = null; state.cat = null; state.major = key; store.set("btp_major", key);
-      track("major_picked", { major: key, from: "typed", name: state.majorName.slice(0, 60) });
-      $("majorSel").value = MAJOR_KEYS.includes(key) ? key : "all"; $("meWrap").hidden = !STRICT_OK(); loadScope();
-    } });
+      track("major_picked", { major: key, from: "deck", name: state.majorName.slice(0, 60) });
+      $("majorSel").value = MAJOR_KEYS.includes(key) ? key : "all"; $("meWrap").hidden = !STRICT_OK(); majorBoxText(); loadScope();
+    }
+    $("majorIn").addEventListener("input", (e) => renderMajors(e.target.value));
+    $("majorIn").addEventListener("keydown", (e) => {
+      if (e.key === "Enter") { e.preventDefault(); $("majorList").querySelector(".mi")?.click(); }
+      if (e.key === "ArrowDown") { e.preventDefault(); $("majorList").querySelector(".mi")?.focus(); }
+    });
+    $("majorList").addEventListener("keydown", (e) => { const b = e.target.closest(".mi"); if (!b) return; const all2 = [...$("majorList").querySelectorAll(".mi")], i = all2.indexOf(b);
+      if (e.key === "ArrowDown") { e.preventDefault(); all2[i + 1]?.focus(); } if (e.key === "ArrowUp") { e.preventDefault(); (all2[i - 1] || $("majorIn")).focus(); } });
+    $("majorList").addEventListener("click", (e) => {
+      const qb = e.target.closest("[data-q]"); if (qb) { closeAll(); $("q").value = qb.dataset.q; $("qForm").requestSubmit(); return; }
+      const b = e.target.closest("[data-i]"); if (!b) return; const i = +b.dataset.i; pickMajor(i < 0 ? null : ITEMS[i]);
+    });
     majorBoxText();
   })();
   // Arriving from a major link (homepage tiles) counts as picking one — remembered unless you already chose
