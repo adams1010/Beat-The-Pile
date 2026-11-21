@@ -253,7 +253,8 @@
   .controls.deck{background:#060A2C;border:0;border-radius:10px;padding:18px 18px 16px;color:#fff;margin-bottom:10px}
   .dhead{display:flex;align-items:baseline;justify-content:space-between;gap:6px 14px;flex-wrap:wrap;margin-bottom:12px}
   .dtitle{margin:0;font-size:21px;font-weight:650;letter-spacing:-.01em;color:#fff}
-  .deck .count{margin:0;font-size:13px;color:#DDF3A8;font-variant-numeric:tabular-nums}
+  .dtotal{font-size:14px;color:#DDF3A8;font-variant-numeric:tabular-nums}.dtotal b{color:#B0F701;font-weight:650;font-size:16px}
+  .belowdeck .count{margin:2px 2px 8px;font-size:13px;color:#55627A;font-variant-numeric:tabular-nums}
   .dbar{display:flex;align-items:stretch;background:#fff;border-radius:999px;padding:5px;gap:0;min-height:54px}
   .dbar:focus-within{outline:2px solid #B0F701;outline-offset:2px}
   .dbar .sform{display:contents}
@@ -353,7 +354,7 @@
         <div class="wchips" id="welcomeChips"></div><select class="statesel wsel" id="welcomeSel" aria-label="What are you studying?"></select>
       </section>
 <div class="controls deck">
-    <div class="dhead"><h2 class="dtitle">Find your next role</h2><div class="count" id="count" aria-live="polite"></div></div>
+    <div class="dhead"><h2 class="dtitle">Find your next role</h2><div class="dtotal" id="dTotal" aria-live="polite"></div></div>
     <div class="dbar">
       <form class="sform" id="qForm" role="search"><input class="search" id="q" type="search" enterkeyhint="search" placeholder="Job title, keyword or company" aria-label="Job title, keyword or company"><button class="sbtn" type="submit">Search</button></form>
       <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><span id="nearChips" style="display:contents"></span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" enterkeyhint="done" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="submit" class="nadd" id="nearAdd" hidden>Add</button><button type="button" class="nx" id="nearX" aria-label="Clear all places" hidden>×</button></form>
@@ -381,6 +382,7 @@
     </div>
   </div>
   <div class="belowdeck">
+    <div class="count" id="count" aria-live="polite"></div>
     <div class="shpromo" id="shPromo" hidden></div>
     <div class="cohint" id="coHint" hidden></div>
     <div class="note" id="note"></div>
@@ -1298,6 +1300,12 @@
   // job areas themselves, your school's majors first. Picking one loads that major's job areas; empty = every major.
   state.majorName = store.get("btp_major_name") || ""; state.majorKey = store.get("btp_major_name_key") || "";
   { const mn = (new URLSearchParams(location.search).get("mn") || "").slice(0, 70); if (mn) { state.majorName = mn; state.majorKey = state.major; } }
+  // Nov 21 (owner): the deck shows the same total as the homepage (internships + entry-level + hourly + shadowing)
+  (() => { const el = $("dTotal"); if (!el) return;
+    const show = (d) => { if (!d || d.fulltime == null) return; const t = (d.allMajors || 0) + (d.fulltime || 0) + (d.hourly || 0) + (d.shadow || 0);
+      el.innerHTML = `<b>${t.toLocaleString("en-US")}</b> open jobs and internships`; };
+    fetch("/api/listings?summary=1").then((r) => r.ok ? r.json() : null).then((d) => { if (d) { show(d); if (!state.sum) state.sum = d; } }).catch(() => {});
+  })();
   // Nov 21 (owner): the Major dropdown on the search deck = every major we know (jobs/majors.json: quiz + every
   // school's official names + every federal CIP name), your school's majors first, the job areas, and a search box.
   const KIND_NAME = { intern: "Internships", fulltime: "Entry-level", hourly: "Part-time & hourly", shadow: "Shadowing & volunteer", all: "All jobs" };
