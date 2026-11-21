@@ -154,6 +154,7 @@ with the CRON_SECRET. To add a bot: add it to `BOTS` in `lib/bots.js`, check the
    <20), finds each company's board (or uses the hint), and **proves** it's theirs before enabling it.
 
 **Website guessing** (`guessDomain`, for Paylocity/UKG boards that name a company but have no website on file): .com, .org, .net, .us, .ai, .io, .co, with and without www (Nov 9: + .org/.net/.us/bare domain), 20 s cap; the page must carry the full name AND link to that exact board — a guessed site linking to some other board is still held back.
+**Misfiled "needs a new scraper" (Nov 20 night):** staff-login / error-tracker / privacy links (`SYSTEM_NOISE`: internal-/employees-…icims.com, app./vs-errors.eightfold.ai, eightfold.ai/…, …eightfold.ai/careerhub) no longer count as a system; `\u002F`-escaped links are decoded (Celanese's iCIMS boards); Eightfold on the company's own `/careers` page (loads app.eightfold.ai) = board on that host (Infineon 269 jobs, Premier Health). 13 parked rows re-tested via `READERS_UPDATED_AT`. Never use an unanchored `[a-z0-9-]+\.` pattern on page text (huge-image pages freeze). Tests `tests/misfiled-test.mjs`.
 **Proof rules** (`lib/discover.js` verify*): linked from the company's own site; or board name matches the company key
 (≥4 chars, or exact 3-letter key); or most sampled postings name the company as employer (Workday
 `hiringOrganization` 2-of-3, SmartRecruiters company, Jibe `hiring_organization`). iCIMS needs the name in the portal
