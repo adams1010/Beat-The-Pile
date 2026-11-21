@@ -2090,10 +2090,10 @@ function App(){
     if(window.pdfjsLib)return window.pdfjsLib;
     await new Promise((res,rej)=>{
       const s=document.createElement("script");
-      s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+      s.src="/vendor/pdf-3.11.174.min.js";
       s.onload=res;s.onerror=rej;document.head.appendChild(s);
     });
-    if(window.pdfjsLib){window.pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";}
+    if(window.pdfjsLib){window.pdfjsLib.GlobalWorkerOptions.workerSrc="/vendor/pdf.worker-3.11.174.min.js";}
     return window.pdfjsLib;
   }
   // jsPDF loads on first use — used for the Download PDF button on the resume builder.
@@ -2101,7 +2101,7 @@ function App(){
     if(window.jspdf&&window.jspdf.jsPDF)return window.jspdf.jsPDF;
     await new Promise((res,rej)=>{
       const s=document.createElement("script");
-      s.src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+      s.src="/vendor/jspdf-2.5.1.umd.min.js";
       s.onload=res;s.onerror=rej;document.head.appendChild(s);
     });
     return window.jspdf&&window.jspdf.jsPDF;

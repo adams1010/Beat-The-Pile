@@ -1,6 +1,11 @@
 {
  "_about": "Spanish UI strings (Nov 2026). Key = the English text exactly as shown (whitespace collapsed). Used by /i18n.js when the student picks Español. Job titles, company names and places are data and stay as-is.",
  "strings": {
+    "Emails": "Correos",
+    "Weekly job alerts": "Alertas semanales de empleo",
+    "New jobs for your major, at most once a week. Nothing is sent in weeks with nothing new.": "Empleos nuevos para tu carrera, como máximo una vez por semana. No se envía nada las semanas sin novedades.",
+    "Follow-up reminders": "Recordatorios de seguimiento",
+    "A nudge when an application is 5 to 45 days old and you haven't followed up. At most one every 3 days.": "Un aviso cuando una solicitud tiene entre 5 y 45 días y aún no has hecho seguimiento. Como máximo uno cada 3 días.",
     "open jobs and internships": "empleos y prácticas abiertos",
     "Pick up to 3 for your bar": "Elige hasta 3 para tu barra",
     "Find your next role": "Encuentra tu próximo puesto",

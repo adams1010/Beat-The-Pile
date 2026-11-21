@@ -311,11 +311,22 @@
   }
   function settingsHtml(p){
     return `${ownerCards(p)}
+      ${emailCard()}
       <section class="card" id="language"><h2>Language</h2><p class="small muted">Pick the language for menus, buttons and help text. Job titles and company names stay as the employer wrote them.</p>
         ${window.btpI18n ? window.btpI18n.picker() : ""}</section>
       <section class="card" id="delete-account"><h2>Delete account</h2><p class="small muted">Deletes your profile, resume, applications, Orbit connections and messages, any company page or badge, and your sign-in. This can't be undone.</p>
         <label for="delConf">Type DELETE to confirm</label><input id="delConf" autocomplete="off" autocapitalize="characters" spellcheck="false">
         <button type="button" class="btn" id="delAcct" style="margin-top:10px">Delete my account</button><p class="small" id="delMsg" role="status" style="color:#B42318;margin:8px 0 0"></p></section>`;
+  }
+  // Nov 21 (audit): turn emails on/off here too, not only from the unsubscribe link or /jobs
+  function emailCard(){
+    const me = S.me || {};
+    if (me.emailReady === false) return "";
+    const row = (id, on, t, d) => `<label class="chk" style="display:flex;gap:10px;align-items:flex-start;margin:10px 0"><input type="checkbox" data-email="${id}" ${on ? "checked" : ""} style="margin-top:3px"><span><b>${t}</b><br><span class="small muted">${d}</span></span></label>`;
+    return `<section class="card" id="emails"><h2>Emails</h2>
+      ${row("alerts", !!me.alerts, "Weekly job alerts", "New jobs for your major, at most once a week. Nothing is sent in weeks with nothing new.")}
+      ${row("remind", !!me.remindEmail, "Follow-up reminders", "A nudge when an application is 5 to 45 days old and you haven't followed up. At most one every 3 days.")}
+      <p class="small" id="emailMsg" role="status" style="margin:4px 0 0"></p></section>`;
   }
   function ownerCards(p){
     if (!S.me) return "";
@@ -472,6 +483,18 @@
     $("#rep")?.addEventListener("click", (e) => { e.preventDefault(); window.iqReport ? window.iqReport({ message: "Report profile /u/" + d.handle + "\n" }) : alert("Use the Feedback button to report."); });
   }
 
+  // Nov 21 (audit): email switches in Settings
+  document.addEventListener("change", async (e) => {
+    const c = e.target.closest("[data-email]"); if (!c) return;
+    const msg = document.getElementById("emailMsg"), on = c.checked;
+    c.disabled = true;
+    try {
+      const r = await api("POST", { action: c.dataset.email, on });
+      if (S.me) { if (c.dataset.email === "alerts") S.me.alerts = on ? (r.alerts || { major: "" }) : null; else S.me.remindEmail = on; }
+      if (msg) { msg.textContent = "Saved"; msg.style.color = "#4A7000"; }
+    } catch (err) { c.checked = !on; if (msg) { msg.textContent = err.message || "Couldn't save, try again"; msg.style.color = "#B42318"; } }
+    c.disabled = false;
+  });
   // Nov 17 (app stores require it): delete the whole account, sign-in included
   document.addEventListener("click", async (e) => {
     const b = e.target.closest("#delAcct"); if (!b) return;

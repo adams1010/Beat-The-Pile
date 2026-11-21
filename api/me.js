@@ -667,7 +667,9 @@ export default async function handler(req, res) {
     if (action === "alerts") {                  // weekly new-internship email for one major + places
       const on = body.on === true;
       if (on && !process.env.RESEND_API_KEY) return res.status(400).json({ error: "Email alerts aren't switched on yet, check back soon" });
-      return send(await mutate(uid, (row) => ({ alert_on: on, ...(on ? { alert_major: cleanMajor(body.major), alert_states: cleanStates(body.states) || null } : {}),
+      // Nov 21: the profile Settings switch sends no major → keep the one on file, else the student's own major
+      const keepMajor = body.major === undefined;
+      return send(await mutate(uid, (row) => ({ alert_on: on, ...(on ? (keepMajor ? { alert_major: row.alert_major || defaultAlertMajor(row.profile?.major) } : { alert_major: cleanMajor(body.major), alert_states: cleanStates(body.states) || null }) : {}),
         remind_unsub: row.remind_unsub || crypto.randomBytes(18).toString("base64url") })));
     }
     if (action === "alerts_test") {             // this week's alert, now, to yourself (3 a day)

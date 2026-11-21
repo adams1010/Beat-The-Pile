@@ -1,6 +1,11 @@
 {
  "lang": "nl",
  "strings": {
+    "Emails": "E-mails",
+    "Weekly job alerts": "Wekelijkse vacaturemeldingen",
+    "New jobs for your major, at most once a week. Nothing is sent in weeks with nothing new.": "Nieuwe vacatures voor je studie, hooguit één keer per week. In weken zonder nieuws sturen we niets.",
+    "Follow-up reminders": "Herinneringen om op te volgen",
+    "A nudge when an application is 5 to 45 days old and you haven't followed up. At most one every 3 days.": "Een seintje als een sollicitatie 5 tot 45 dagen oud is en je nog niet hebt opgevolgd. Hooguit één per 3 dagen.",
     "open jobs and internships": "openstaande banen en stages",
     "Pick up to 3 for your bar": "Kies er maximaal 3 voor je balk",
     "Find your next role": "Vind je volgende baan",

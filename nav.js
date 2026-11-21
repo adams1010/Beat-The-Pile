@@ -253,9 +253,9 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   if (!document.querySelector('script[src="/i18n.js"]')) { const i = document.createElement("script"); i.src = "/i18n.js"; document.head.appendChild(i); }
   const LANGS = [["en", "English"], ["es", "Español"], ["fr", "Français"], ["de", "Deutsch"], ["nl", "Nederlands"]];
   let LANG = "en"; try { const l = localStorage.getItem("btp_lang"); if (LANGS.some(([k]) => k === l)) LANG = l; } catch {}
-  if (!document.querySelector('link[href*="family=Geist"]')) {
+  if (!document.querySelector('link[href*="geist.css"]')) {
     const f = document.createElement("link"); f.rel = "stylesheet";
-    f.href = "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&display=swap"; document.head.appendChild(f);
+    f.href = "/fonts/geist.css"; document.head.appendChild(f);
   }
   const nav = document.createElement("nav"); nav.className = "btpnav"; nav.setAttribute("aria-label", "Main");
   nav.innerHTML = `<a class="btpskip" href="#main">Skip to content</a><div class="in">
