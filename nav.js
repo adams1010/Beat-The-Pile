@@ -168,7 +168,15 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   .btpnav #btpMe::before{content:"";width:22px;height:22px;background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8'%3E%3Crect x='4' y='4' width='6.5' height='6.5' rx='1.5'/%3E%3Crect x='13.5' y='4' width='6.5' height='6.5' rx='1.5'/%3E%3Crect x='4' y='13.5' width='6.5' height='6.5' rx='1.5'/%3E%3Crect x='13.5' y='13.5' width='6.5' height='6.5' rx='1.5'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8'%3E%3Crect x='4' y='4' width='6.5' height='6.5' rx='1.5'/%3E%3Crect x='13.5' y='4' width='6.5' height='6.5' rx='1.5'/%3E%3Crect x='4' y='13.5' width='6.5' height='6.5' rx='1.5'/%3E%3Crect x='13.5' y='13.5' width='6.5' height='6.5' rx='1.5'/%3E%3C/svg%3E") center/contain no-repeat}
   .btpnav #btpMe::after{content:"More";font:500 11px/1.1 "Geist",sans-serif;color:#AEB9CC}
   .btpnav .acct[open] #btpMe::after{color:#B0F701}.btpnav .acct[open] #btpMe{color:#B0F701}
-  .btpnav .acctmenu{position:fixed!important;left:8px!important;right:8px!important;top:58px!important;width:auto!important;max-width:none!important;max-height:calc(100vh - 140px);overflow:auto}
+  .btpnav .acctmenu{position:fixed!important;left:8px!important;right:8px!important;top:58px!important;width:auto!important;max-width:none!important;max-height:calc(100vh - 150px);max-height:calc(100dvh - 58px - 92px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  /* Nov 21 (owner): the menu scrolls on its own; the page behind it stays put while it's open */
+  html.btp-menu-open,html.btp-menu-open body{overflow:hidden!important;overscroll-behavior:none}
+  html.btp-menu-open .iqfb-btn{display:none!important}
+  /* Nov 21 (owner): condensed pages = a 2-column grid of icon + name */
+  .btpnav .mobmore .more .grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
+  .btpnav .mobmore .more .grid a{display:flex!important;align-items:center;gap:8px;padding:9px 10px;font-size:14px;line-height:1.2}
+  .btpnav .mobmore .more .grid a .btpic{width:19px;height:19px;flex:none;color:#4A7000}
+  .btpnav .mobmore .more .grid b{font-weight:500}
   .btpnav .mobmore .more{display:block}.btpnav .mobmore .more a{display:block;padding:11px 12px;border-radius:8px;color:#060A2C;text-decoration:none}
   .btpnav .mobmore .more b{font-weight:600}.btpnav .mobmore .sep{height:1px;background:#E3E7ED;margin:6px 4px}
   .btpnav .mobmore button{font:inherit;background:none;border:0;color:#060A2C;cursor:pointer;text-align:left}
@@ -338,7 +346,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   };
   // Nov 16: phone bottom bar = 4 pinned pages + More (everything else). Students and employers pick their own 4
   // ("Edit bar" in More → tap to pin/unpin); saved on this device in localStorage btp_tabs[_biz]. Desktop is unchanged.
-  const TOOL_ICON = { "/internship/": "jobs", "/companies/": "business", "/radar/": "season", "/clubs/": "orbit", "/#quiz": "tracker", "/#interview": "talent", "/#resumebuilder": "profile", "/#score": "tracker", "/#wall": "orbit", "/demo/": "home" };
+  const TOOL_ICON = { "/internship/": "jobs", "/grad/": "season", "/companies/": "business", "/radar/": "season", "/clubs/": "orbit", "/#quiz": "tracker", "/#interview": "talent", "/#resumebuilder": "profile", "/#score": "tracker", "/#wall": "orbit", "/demo/": "home" };
   const SHORT = { "Career Fairs": "Fairs", "Career Fair": "Fair", "My Season": "Season", "My Internship": "Internship", "Opening Radar": "Radar", "Match quiz": "Quiz", "Interview practice": "Interview", "Resume builder": "Resume", "Resume check": "Resume check", "Community": "Community", "Try it": "Demo", "My profile": "Profile", "Company": "Company" };
   // Nov 21 (owner): your profile is the far-right tab (Instagram-style, your photo), so it's no longer a pick; 3 pins + More + you
   const PICKS = [...MAIN, ...TOOLS.map(([h, t]) => [h, t, TOOL_ICON[h] || "tools"])];
@@ -357,7 +365,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     const top = nav.querySelector("#btpMoreTop");
     if (top) top.innerHTML = `<div class="more">` + (editing
         ? `<div class="edhd"><b>Pick up to 4 for your bar</b><small>${PINS.length} of 4 pinned · your profile stays on the right</small></div>${PICKS.map(([h, t]) => `<button type="button" class="pin" data-pin="${h}" aria-pressed="${PINS.includes(h)}">${pinIcon(PINS.includes(h))}<span>${t}</span></button>`).join("")}<div class="sep"></div><div class="edrow"><button type="button" class="eddone" data-tabedit="done">Done</button><button type="button" class="edreset" data-tabedit="reset">Reset</button></div>`
-        : `${rest.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}<div class="sep"></div><button type="button" class="edit" data-tabedit="edit">Edit bar</button>`) + `</div>`;
+        : `<div class="grid">${rest.map(([h, t, k]) => `<a role="menuitem" href="${h}">${svg(k || "tools")}<b>${t}</b></a>`).join("")}</div><div class="sep"></div><button type="button" class="edit" data-tabedit="edit">Edit bar</button>`) + `</div>`;
     try { window.btpBadgeRepaint && window.btpBadgeRepaint(); } catch {}
   };
   function meTab(){
@@ -389,7 +397,9 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
         m.style.top = r.bottom + "px";
         if (det.classList.contains("acct")) m.style.left = Math.max(8, Math.min(r.right - m.offsetWidth, innerWidth - m.offsetWidth - 8)) + "px";
         else if (!det.classList.contains("mob")) m.style.left = Math.max(8, Math.min(r.left, innerWidth - m.offsetWidth - 8)) + "px"; };
-      det.addEventListener("toggle", () => det.open && place());
+      det.addEventListener("toggle", () => { if (det.open) place();
+        // Nov 21 (owner): phones: lock the page while the top-right menu is open, so a swipe scrolls the menu, not the page
+        if (det.classList.contains("acct")) document.documentElement.classList.toggle("btp-menu-open", det.open && matchMedia("(max-width:640px)").matches); });
       document.addEventListener("click", (e) => { if (det.open && !det.contains(e.target)) det.open = false; });
       document.addEventListener("keydown", (e) => { if (e.key === "Escape") det.open = false; });
       addEventListener("resize", () => det.open && place());
