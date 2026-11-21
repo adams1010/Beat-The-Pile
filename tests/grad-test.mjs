@@ -40,7 +40,8 @@ assert.ok(!inn("path_premed", "Subscriber Services Representative")); assert.ok(
 assert.ok(inn("path_prepa", "Patient Care Technician")); assert.ok(!inn("path_prepa", "Clinical Research Assistant"));
 assert.ok(inn("path_predental", "Dental Assistant")); assert.ok(inn("path_prept", "Physical Therapy Aide"));
 assert.ok(inn("path_prelaw", "Paralegal")); assert.ok(inn("path_prelaw", "Court Clerk")); assert.ok(!inn("path_prelaw", "Courtyard Host"));
-assert.ok(inn("path_prelaw", "Policy Analyst", "legal_policy"));
+assert.ok(!inn("path_prelaw", "Police Officer", "legal_policy"), "the whole legal/policy field is not pre-law (police, canvassers)");
+assert.ok(!inn("path_predental", "Dental Hygienist")); assert.ok(!inn("path_prept", "Physical Therapy Assistant (PTA)"), "licensed roles stay out");
 assert.ok(inn("path_research", "Research Technician I")); assert.ok(!inn("path_research", "Scientist II"));
 assert.ok(C.categoryGroup("path_prelaw").includes("title.ilike.*court%20*"), "the space after court reaches the server");
 assert.ok(!C.CATEGORIES.some((c) => c.key.startsWith("path_")), "path lists stay out of the category dropdown");
