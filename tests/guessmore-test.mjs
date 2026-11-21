@@ -63,3 +63,10 @@ console.log("common crawl helpers ✓\nALL GUESS-MORE TESTS PASSED");
   assert.equal(off.hint, "https://boards.greenhouse.io/acme"); assert.equal(off.config.ccSeen, undefined, "a board seen off their site is only a hint, needs normal proof");
   console.log("careers finder hint rules ✓");
 }
+{
+  const { INTERNAL_BOARD } = await import("../lib/discover.js");
+  const t = (c) => INTERNAL_BOARD.test(JSON.stringify(c));
+  assert.ok(t({ host: "internaljobs.centurylink.com" }) && t({ tenant: "acme", site: "Internal" }));
+  assert.ok(!t({ host: "jobs.centurylink.com" }) && !t({ token: "internationalpaper" }) && !t({ site: "External" }) && !t({ token: "internalmed" }));
+  console.log("employees-only boards never go live ✓");
+}
