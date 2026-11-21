@@ -7,7 +7,7 @@
 import zlib from "node:zlib";
 import { get, mapLimit } from "../lib/http.js";
 import { latestCrawls } from "../lib/scout.js";
-import { surtOf, lineIsDomain, blocksFor, parseIndexLine, pickCaptures, warcHtml, boardLinks } from "../lib/ccfind.js";
+import { CAREER_PATH, surtOf, lineIsDomain, blocksFor, parseIndexLine, pickCaptures, warcHtml, boardLinks } from "../lib/ccfind.js";
 
 const SITE = process.env.SITE || "https://www.beatthepile.com";
 const arg = (k, d) => { const a = process.argv.find((x) => x.startsWith(`--${k}=`)); return a ? a.split("=")[1] : d; };
@@ -47,7 +47,11 @@ for (const crawl of await latestCrawls(CRAWLS)) {
     const [, file, off, len] = idx[i].split("\t");
     const text = await range(base + file, off, len);
     if (text === null) { failed++; return; }
-    for (const l of text.split("\n")) for (const s of surts) if (lineIsDomain(l, s)) (lines.get(s) || lines.set(s, []).get(s)).push(l);
+    // Nov 21: keep only careers-looking addresses, ≤ 300 per site (a big site has 100k+ archived pages → out of memory)
+    for (const l of text.split("\n")) for (const s of surts) if (lineIsDomain(l, s)) {
+      const sp = l.indexOf(" "); if (!CAREER_PATH.test(l.slice(0, sp))) continue;
+      const arr = lines.get(s) || lines.set(s, []).get(s); if (arr.length < 300) arr.push(l);
+    }
     if (++done % 500 === 0) console.log(`  ${crawl}: ${done}/${want.size} index slices`);
   });
   console.log(`${crawl}: read ${done} of ${want.size} index slices (${failed} failed) · ${lines.size} domains seen so far`);
