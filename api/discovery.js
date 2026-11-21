@@ -106,6 +106,32 @@ export default async function handler(req, res) {
       const list = await syncOrder();
       return res.status(200).json({ runStart: new Date().toISOString(), companies: list.map(({ enabled, discovered, ...c }) => c) });
     }
+    // 🗂 Careers Finder (Nov 21, GitHub cc-careers.yml → scripts/cc-careers.mjs): parked companies' careers pages from
+    // Common Crawl's archive. Robot only. Nothing goes live here: a result only becomes a new HINT, and the finder
+    // re-checks it with the usual proof rules (lib/discover.js). Company websites aren't secret.
+    if (b?.action === "parked_list") {
+      if (who !== "robot") return res.status(403).json({ error: "Robot only" });
+      const rows = await db.selectAllAsAdmin("company_candidates?select=id,company,domain,status&status=in.(no_board,blocked)&domain=not.is.null");
+      return res.status(200).json({ companies: rows });
+    }
+    if (b?.action === "parked_cc") {
+      if (who !== "robot") return res.status(403).json({ error: "Robot only" });
+      const { ccHint } = await import("../lib/ccfind.js");
+      const list = (Array.isArray(b.results) ? b.results : []).slice(0, 200).filter((r) => r && typeof r.id === "string");
+      if (!list.length) return res.status(200).json({ queued: 0 });
+      const rows = await db.selectAllAsAdmin(`company_candidates?select=id,domain,status,hint,config&id=in.(${list.map((r) => encodeURIComponent(r.id)).join(",")})`);
+      const byId = new Map(rows.map((r) => [r.id, r]));
+      let queued = 0;
+      for (const r of list) {
+        const row = byId.get(r.id);
+        if (!row || !["no_board", "blocked"].includes(row.status)) continue;
+        const h = ccHint(row, r);
+        if (!h) continue;
+        await db.update(`company_candidates?id=eq.${encodeURIComponent(row.id)}`, { hint: h.hint, config: h.config, status: "pending", checked_at: null });
+        queued++;
+      }
+      return res.status(200).json({ queued });
+    }
     if (b?.action === "turbo_save") {
       if (who !== "robot") return res.status(403).json({ error: "Robot only" });
       const { saveResult } = await import("./sync.js");

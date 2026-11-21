@@ -1,0 +1,21 @@
+# Weekly: the Careers Finder looks up parked companies' careers pages in Common Crawl's public archive and hands any
+# job-board link (or the real careers page address) to the Company Finder, which still proves every board itself.
+name: cc-careers
+on:
+  schedule:
+    - cron: "0 9 * * 0"     # Sundays ~4 AM ET (a new crawl comes out about monthly)
+  workflow_dispatch:
+    inputs:
+      args: { description: "e.g. --dry --limit=300", required: false, default: "" }
+concurrency: { group: cc-careers, cancel-in-progress: false }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 170
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Careers Finder
+        run: node scripts/cc-careers.mjs ${{ inputs.args }}
+        env: { CRON_SECRET: "${{ secrets.CRON_SECRET }}" }
