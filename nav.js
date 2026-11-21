@@ -34,9 +34,20 @@
     talent: '<circle cx="9" cy="8.5" r="3.25"/><path d="M3 19.5c.6-3.1 3-5 6-5s5.4 1.9 6 5"/><circle cx="17" cy="9.5" r="2.5"/><path d="M16 14.6c2.6-.3 4.6 1.3 5 4.9"/>',
     business: '<path d="M4 20.5V6.5L12 3.5v17"/><path d="M12 9.5h8v11"/><path d="M3 20.5h18"/><path d="M7.5 8.5h1M7.5 12h1M7.5 15.5h1M15.5 13h1M15.5 16.5h1"/>',
     home: '<path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/>',
+    // Nov 21 (owner): every page gets its own icon, no repeats
+    intern: '<rect x="3.5" y="7.5" width="17" height="12" rx="2"/><path d="M9 7.5V5.5a1.5 1.5 0 0 1 1.5-1.5h3A1.5 1.5 0 0 1 15 5.5v2"/><path d="M3.5 12.5h17"/>',
+    radar: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 12 18 6"/><circle cx="12" cy="12" r=".8"/>',
+    grad: '<path d="M2.5 9 12 4.5 21.5 9 12 13.5z"/><path d="M6.5 11v4.5c1.5 1.5 3.4 2.2 5.5 2.2s4-.7 5.5-2.2V11"/><path d="M21.5 9v5"/>',
+    clubs: '<path d="M5 21V3.5"/><path d="M5 4h11l-2 3.5 2 3.5H5"/>',
+    quiz: '<circle cx="12" cy="12" r="8.5"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6"/><path d="M12 17h.01"/>',
+    mic: '<rect x="9" y="3.5" width="6" height="11" rx="3"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0"/><path d="M12 18v3"/>',
+    doc: '<path d="M14 3.5H7A1.5 1.5 0 0 0 5.5 5v14A1.5 1.5 0 0 0 7 20.5h10a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M14 3.5V8h4.5"/><path d="M8.5 12.5h7M8.5 16h5"/>',
+    check: '<path d="M14 3.5H7A1.5 1.5 0 0 0 5.5 5v14A1.5 1.5 0 0 0 7 20.5h10a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M14 3.5V8h4.5"/><path d="m9 14 2 2 4-4"/>',
+    community: '<path d="M14.5 13.5h-6l-4 3v-11A1.5 1.5 0 0 1 6 4h8.5A1.5 1.5 0 0 1 16 5.5v6.5a1.5 1.5 0 0 1-1.5 1.5z"/><path d="M16 8h2A1.5 1.5 0 0 1 19.5 9.5v10l-3-2.5H11a1.5 1.5 0 0 1-1.5-1.5"/>',
+    play: '<circle cx="12" cy="12" r="8.5"/><path d="M10 8.5v7l5.5-3.5z"/>',
     tools: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
   };
-  const TOOL_ICON = { "/internship/": "jobs", "/grad/": "season", "/companies/": "business", "/radar/": "season", "/clubs/": "orbit", "/#quiz": "tracker", "/#interview": "talent", "/#resumebuilder": "profile", "/#score": "tracker", "/#wall": "orbit", "/demo/": "home" };
+  const TOOL_ICON = { "/internship/": "intern", "/grad/": "grad", "/companies/": "business", "/radar/": "radar", "/clubs/": "clubs", "/#quiz": "quiz", "/#interview": "mic", "/#resumebuilder": "doc", "/#score": "check", "/#wall": "community", "/demo/": "play" };
   const svg = (k) => `<svg class="btpic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
   // Account type (chosen once after sign-in on /start/ or in the welcome sheet below): "student" | "employer" | null
   let ROLE = null; try { ROLE = localStorage.getItem("btp_role"); } catch {}
@@ -126,7 +137,7 @@
 .btpnav details.acct.hiring::after{content:"Hiring";position:absolute;left:50%;bottom:-9px;transform:translateX(-50%);font:700 9px/1.3 "Geist",sans-serif;color:#060A2C;background:#B0F701;border:2px solid #060A2C;border-radius:999px;padding:0 5px;pointer-events:none;white-space:nowrap}
 .btpnav .btpsignin{font:600 13px "Geist",sans-serif;background:var(--n-acc);color:#060A2C;border-radius:999px;padding:8px 16px;text-decoration:none;white-space:nowrap}
 .btpnav .btpsignin[hidden],.btpnav details.acct[hidden]{display:none}
-.btpnav .acctmenu{min-width:280px;max-width:calc(100vw - 16px)}
+.btpnav .acctmenu{min-width:280px;max-width:calc(100vw - 16px);max-height:calc(100vh - 80px);overflow-y:auto;overscroll-behavior:contain}
 .btpnav .mobmore{display:none}
 @media (max-width:640px){.btpnav .mobmore{display:block}}
 .btpnav .acchead{display:flex;gap:10px;align-items:center;padding:10px 10px 12px}
@@ -224,7 +235,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
 .btpnav .toolsmenu{display:grid;grid-template-columns:1fr 1fr;gap:2px;width:min(620px,calc(100vw - 16px));max-height:calc(100vh - 90px);overflow-y:auto;overscroll-behavior:contain}
 .btpnav .toolsmenu a{display:flex!important;align-items:flex-start;gap:10px;padding:9px 10px}
 .btpnav .toolsmenu a .btpic{width:19px;height:19px;flex:none;color:#4A7000;margin-top:1px}
-.btpnav .toolsmenu a>span{min-width:0}
+.btpnav .toolsmenu a,.btpnav .toolsmenu a>span{min-width:0}
 .btpnav .toolsmenu small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 @media print{.btpnav{display:none}}
 /* Nov 13 mobile pass: iPhone zooms the page into any field under 16px; Clerk's sign-in boxes were 30px tall and grey */
