@@ -36,6 +36,7 @@
     home: '<path d="M3.5 11 12 4l8.5 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-5.5h4V20"/>',
     tools: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
   };
+  const TOOL_ICON = { "/internship/": "jobs", "/grad/": "season", "/companies/": "business", "/radar/": "season", "/clubs/": "orbit", "/#quiz": "tracker", "/#interview": "talent", "/#resumebuilder": "profile", "/#score": "tracker", "/#wall": "orbit", "/demo/": "home" };
   const svg = (k) => `<svg class="btpic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
   // Account type (chosen once after sign-in on /start/ or in the welcome sheet below): "student" | "employer" | null
   let ROLE = null; try { ROLE = localStorage.getItem("btp_role"); } catch {}
@@ -219,6 +220,12 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   .btpcookie{bottom:calc(72px + max(8px, calc(env(safe-area-inset-bottom,0px) - 12px)))!important}
   .toast,.totop{bottom:calc(74px + max(8px, calc(env(safe-area-inset-bottom,0px) - 12px)))!important}.sheet{z-index:80!important}}
 .btpnav .menu .sep{height:1px;background:#E3E7ED;margin:6px 4px}
+/* Nov 21 (owner): desktop Tools = a 2-column grid that fits the screen and scrolls on its own */
+.btpnav .toolsmenu{display:grid;grid-template-columns:1fr 1fr;gap:2px;width:min(620px,calc(100vw - 16px));max-height:calc(100vh - 90px);overflow-y:auto;overscroll-behavior:contain}
+.btpnav .toolsmenu a{display:flex!important;align-items:flex-start;gap:10px;padding:9px 10px}
+.btpnav .toolsmenu a .btpic{width:19px;height:19px;flex:none;color:#4A7000;margin-top:1px}
+.btpnav .toolsmenu a>span{min-width:0}
+.btpnav .toolsmenu small{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 @media print{.btpnav{display:none}}
 /* Nov 13 mobile pass: iPhone zooms the page into any field under 16px; Clerk's sign-in boxes were 30px tall and grey */
 @media (max-width:768px){input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=file]):not([type=color]),select,textarea{font-size:16px!important}
@@ -245,7 +252,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     ${BIZ ? `<form class="q" role="search" action="/business/talent/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search students" placeholder="Search students by skill, major or school"><kbd>/</kbd></form>`
       : `<form class="q" role="search" action="/jobs/"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8D9AB3" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input name="q" aria-label="Search jobs, companies or people" placeholder="Search jobs, companies or people" autocomplete="off"><input type="hidden" name="state" value="all"><kbd>/</kbd><div class="qs" role="listbox" hidden></div></form>`}
     <div class="links">${MAIN.map(([h, t, k]) => `<a href="${h}"${cur(h) ? ' aria-current="page"' : ""}>${k === "orbit" ? `<span class="btpbw">${svg(k)}<i class="btpbadge" data-noi18n hidden></i></span>` : svg(k)}<span>${t}</span></a>`).join("")}
-      ${TOOLS.length ? `<details><summary>${svg("tools")}<span class="lbl">Tools</span></summary><div class="menu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}"><b>${t}</b><small>${d}</small></a>`).join("")}</div></details>` : ""}</div>
+      ${TOOLS.length ? `<details><summary>${svg("tools")}<span class="lbl">Tools</span></summary><div class="menu toolsmenu" role="menu">${TOOLS.map(([h, t, d]) => `<a role="menuitem" href="${h}">${svg(TOOL_ICON[h] || "tools")}<span><b>${t}</b><small>${d}</small></span></a>`).join("")}</div></details>` : ""}</div>
     <details class="mob"><summary>Menu<i class="btpbadge" data-noi18n hidden></i></summary><div class="menu" role="menu">${MAIN.map(([h, t, k]) => `<a role="menuitem" href="${h}"><b>${t}</b>${k === "orbit" ? '<i class="btpbadge" data-noi18n hidden></i>' : ""}</a>`).join("")}${TOOLS.length ? `<div class="sep"></div>${TOOLS.map(([h, t]) => `<a role="menuitem" href="${h}"><b>${t}</b></a>`).join("")}` : ""}</div></details>
     <div class="right" id="btpRight">
       <a class="btpsignin" id="btpSignIn" href="/start/?next=${encodeURIComponent(location.pathname + location.search)}" hidden>Sign in</a>
@@ -346,7 +353,6 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   };
   // Nov 16: phone bottom bar = 4 pinned pages + More (everything else). Students and employers pick their own 4
   // ("Edit bar" in More → tap to pin/unpin); saved on this device in localStorage btp_tabs[_biz]. Desktop is unchanged.
-  const TOOL_ICON = { "/internship/": "jobs", "/grad/": "season", "/companies/": "business", "/radar/": "season", "/clubs/": "orbit", "/#quiz": "tracker", "/#interview": "talent", "/#resumebuilder": "profile", "/#score": "tracker", "/#wall": "orbit", "/demo/": "home" };
   const SHORT = { "Career Fairs": "Fairs", "Career Fair": "Fair", "My Season": "Season", "My Internship": "Internship", "Opening Radar": "Radar", "Match quiz": "Quiz", "Interview practice": "Interview", "Resume builder": "Resume", "Resume check": "Resume check", "Community": "Community", "Try it": "Demo", "My profile": "Profile", "Company": "Company" };
   // Nov 21 (owner): your profile is the far-right tab (Instagram-style, your photo), so it's no longer a pick; 3 pins + More + you
   const PICKS = [...MAIN, ...TOOLS.map(([h, t]) => [h, t, TOOL_ICON[h] || "tools"])];
