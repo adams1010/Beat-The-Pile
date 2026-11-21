@@ -18,4 +18,4 @@ jobs:
         with: { node-version: 22 }
       - name: Careers Finder
         run: node scripts/cc-careers.mjs ${{ inputs.args }}
-        env: { CRON_SECRET: "${{ secrets.CRON_SECRET }}" }
+        env: { CRON_SECRET: "${{ secrets.CRON_SECRET }}", NODE_OPTIONS: "--max-old-space-size=6144" }

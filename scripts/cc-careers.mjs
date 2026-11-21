@@ -50,7 +50,9 @@ for (const crawl of await latestCrawls(CRAWLS)) {
     // Nov 21: keep only careers-looking addresses, ≤ 300 per site (a big site has 100k+ archived pages → out of memory)
     for (const l of text.split("\n")) for (const s of surts) if (lineIsDomain(l, s)) {
       const sp = l.indexOf(" "); if (!CAREER_PATH.test(l.slice(0, sp))) continue;
-      const arr = lines.get(s) || lines.set(s, []).get(s); if (arr.length < 300) arr.push(l);
+      // JSON.parse makes fresh strings; keeping `l` itself would pin the whole multi-MB slice in memory
+      const arr = lines.get(s) || lines.set(s, []).get(s); if (arr.length >= 300) continue;
+      const o = parseIndexLine(l); if (o) arr.push({ url: o.url, status: o.status, mime: o.mime, filename: o.filename, offset: o.offset, length: o.length, timestamp: Buffer.from(o.timestamp).toString() });
     }
     if (++done % 500 === 0) console.log(`  ${crawl}: ${done}/${want.size} index slices`);
   });
@@ -62,7 +64,7 @@ const results = [];
 let pages = 0, withBoards = 0, withCareers = 0;
 await mapLimit([...bySurt.entries()], 12, async ([s, cos]) => {
   if (late()) return;
-  const rows = (lines.get(s) || []).map(parseIndexLine).filter(Boolean);
+  const rows = lines.get(s) || [];
   const caps = pickCaptures(rows.map((r) => JSON.stringify(r)).join("\n"), cos[0].domain, 5);
   if (!caps.length) return;
   const boards = new Map(); let careers = null, at = null, page = null;
