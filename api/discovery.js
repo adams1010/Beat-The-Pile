@@ -224,7 +224,7 @@ export default async function handler(req, res) {
         // Nov 16: counted in Postgres (rpc listing_groups) instead of pulling every open listing on each /bots refresh (Supabase egress)
         db.rpc("listing_groups").then((g) => (g || []).map(([company_id, , field, match, kind, n, new24]) => ({ company_id, field, match, kind, n, new24 }))).catch(() => []),
         db.selectAllAsAdmin("user_jobs?select=clerk_user_id,updated_at,apps,starred,resume_path&order=clerk_user_id.asc").catch(() => []),
-        db.selectAsAdmin("feedback?select=created_at&limit=10000").catch(() => []),
+        db.selectAsAdmin("feedback?select=created_at,handled_at&limit=10000").catch(() => []),
       ]);
       // Whole-system numbers for the live map + "where to spend time"
       const unsupportedBy = {};
@@ -239,7 +239,7 @@ export default async function handler(req, res) {
         users: users.length, activeUsers7d: users.filter((u) => Date.parse(u.updated_at) > week).length,
         applications: users.reduce((n, u) => n + (Array.isArray(u.apps) ? u.apps.length : 0), 0),
         resumes: users.filter((u) => u.resume_path).length,
-        feedback: feedback.length, feedback7d: feedback.filter((f) => Date.parse(f.created_at) > week).length,
+        feedback: feedback.length, feedback7d: feedback.filter((f) => Date.parse(f.created_at) > week && !f.handled_at).length, feedbackOpen: feedback.filter((f) => !f.handled_at).length,
         unsupportedBy,
       };
       const on = Object.fromEntries(settings.map((x) => [x.bot, x]));
