@@ -10,6 +10,15 @@
 <link rel="icon" href="/icons/icon-192.png?v=4">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Internships &amp; new-grad jobs | Beat the Pile</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Beat the Pile">
+<meta property="og:title" content="Internships &amp; new-grad jobs | Beat the Pile">
+<meta property="og:description" content="Internships and new-grad jobs for every major, pulled straight from each company's own job board. Every board is re-read every few hours, so closed jobs drop off.">
+<meta property="og:url" content="https://www.beatthepile.com/jobs/">
+<meta property="og:image" content="https://www.beatthepile.com/icons/og-1200x630.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="description" content="Internships and new-grad jobs for every major, pulled straight from each company's own job board. Every board is re-read every few hours, so closed jobs drop off.">
 <link rel="canonical" href="https://www.beatthepile.com/jobs/">
 <style>
@@ -208,6 +217,12 @@
   .ic[aria-pressed="true"].done{background:var(--green-light);border-color:#B3F0DA;color:var(--green-dark)}
   .card.applied{opacity:.72}
   .toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:14px;padding:10px 16px;border-radius:10px;z-index:20;max-width:90vw}
+  /* Nov 22: "Did you apply?" when you come back from a company's job page */
+  .askapp{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:14.5px;padding:12px 14px 12px 16px;border-radius:10px;z-index:1000;width:min(520px,calc(100vw - 20px));display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .askapp b{font-weight:600}.askapp .t{flex:1 1 100%;min-width:0;line-height:1.35}
+  .askapp button{font:inherit;font-size:14px;font-weight:600;border:0;border-radius:999px;padding:8px 14px;cursor:pointer}
+  .askapp .y{background:#B0F701;color:#060A2C}.askapp .n{background:transparent;color:#C9D2E3;border:1px solid #3A4A6A}
+  @media (max-width:640px){.askapp{bottom:calc(72px + env(safe-area-inset-bottom,0px))}}
   @media (max-width:560px){ .mine{justify-content:stretch} .mine .ic{flex:1} }
   footer{border-top:1px solid var(--line);background:#fff;padding:20px 0 40px;font-size:13px;color:var(--muted)}
   footer p{margin:6px 0}
@@ -1020,6 +1035,30 @@
   });
   $("tlX").onclick = () => $("tailor").close();
   $("tailor").addEventListener("click", (e) => { if (e.target === e.currentTarget) e.currentTarget.close(); });
+  // Nov 22 (owner: only 4 of 38 students tracked anything): after Apply → opens the company's page; when the student
+  // comes back to this tab (10 s+ later), one tap marks it applied (same as the card's "Mark applied" button).
+  let pendingApply = null;
+  document.addEventListener("click", (e) => {
+    const a = e.target.closest("a.apply"); if (!a) return;
+    const card = a.closest("[data-jid]") || a.closest(".job, .card, article");
+    const btn = card?.querySelector('[data-act="applied"]');
+    if (!btn || btn.getAttribute("aria-pressed") === "true") return;
+    pendingApply = { id: btn.dataset.id, co: a.dataset.co || "", at: Date.now() };
+  }, true);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible" || !pendingApply) return;
+    const p = pendingApply; pendingApply = null;
+    if (Date.now() - p.at < 10000) return;
+    document.querySelectorAll(".askapp").forEach((x) => x.remove());
+    const box = document.createElement("div"); box.className = "askapp"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Did you apply?");
+    box.innerHTML = `<span class="t"><b>Did you apply${p.co ? ` to <span data-noi18n>${esc(p.co)}</span>` : ""}?</b><br>We'll track it and remind you to follow up.</span><button type="button" class="y">Yes, track it</button><button type="button" class="n">Not yet</button>`;
+    document.body.appendChild(box);
+    const close = () => box.remove(); const timer = setTimeout(close, 20000);
+    box.querySelector(".n").onclick = () => { clearTimeout(timer); close(); };
+    box.querySelector(".y").onclick = () => { clearTimeout(timer); close();
+      const b = document.querySelector(`[data-act="applied"][data-id="${CSS.escape(p.id)}"]`);
+      if (b && b.getAttribute("aria-pressed") !== "true") b.click(); };
+  });
   function toast(msg){
     document.querySelectorAll(".toast").forEach((x) => x.remove());   // one at a time, newest wins
     const t = document.createElement("div"); t.className = "toast"; t.setAttribute("role", "status"); t.textContent = msg;

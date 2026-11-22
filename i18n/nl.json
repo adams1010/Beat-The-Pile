@@ -1,6 +1,10 @@
 {
  "lang": "nl",
  "strings": {
+    "Did you apply?": "Heb je gesolliciteerd?",
+    "Did you apply to": "Heb je gesolliciteerd bij",
+    "We'll track it and remind you to follow up.": "We houden het bij en herinneren je eraan om op te volgen.",
+    "Yes, track it": "Ja, bijhouden",
     "Remote jobs aren't included here.": "Remote banen staan hier niet bij.",
     "Within 10 mi": "Binnen 10 mi",
     "Within 25 mi": "Binnen 25 mi",

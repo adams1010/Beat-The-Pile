@@ -1,6 +1,10 @@
 {
  "lang": "fr",
  "strings": {
+    "Did you apply?": "Tu as postulé ?",
+    "Did you apply to": "Tu as postulé chez",
+    "We'll track it and remind you to follow up.": "On le suit et on te rappelle de relancer.",
+    "Yes, track it": "Oui, suivre",
     "Remote jobs aren't included here.": "Les emplois à distance ne sont pas inclus ici.",
     "Within 10 mi": "À 16 km",
     "Within 25 mi": "À 40 km",

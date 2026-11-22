@@ -1,6 +1,10 @@
 {
  "lang": "de",
  "strings": {
+    "Did you apply?": "Hast du dich beworben?",
+    "Did you apply to": "Hast du dich beworben bei",
+    "We'll track it and remind you to follow up.": "Wir tragen es ein und erinnern dich ans Nachfassen.",
+    "Yes, track it": "Ja, eintragen",
     "Remote jobs aren't included here.": "Remote-Jobs sind hier nicht enthalten.",
     "Within 10 mi": "Im Umkreis von 10 mi",
     "Within 25 mi": "Im Umkreis von 25 mi",
