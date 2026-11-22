@@ -36,7 +36,8 @@ console.log("\nSCOUT TESTS PASSED");
   const { cleanName } = await import("../lib/scout.js");
   const want = { "The Nuclear Company": "The Nuclear Company", "The Options Clearing Corporation": "The Options Clearing Corporation", "RS&H Talent Acquisition": "RS&H",
     "LandDesign Internships": "LandDesign", "Pediatrics Plus Website": "Pediatrics Plus", "CrowdStrike UK": "CrowdStrike", "REPUBLIC SERVICES": "Republic Services",
-    "HYDRIL USA DISTRIBUTION": "Hydril USA Distribution", "INFICON": "INFICON", "ABB": "ABB", "Boeing Company": "Boeing", "BAE Systems": "BAE Systems" };
+    "HYDRIL USA DISTRIBUTION": "Hydril USA Distribution", "INFICON": "INFICON", "ABB": "ABB", "Boeing Company": "Boeing", "BAE Systems": "BAE Systems",
+    "Melaleuca Jobs and Careers": "Melaleuca", "R.L.K. And Company": "R.L.K. And Company", "Smith & Company": "Smith & Company" };
   for (const [a, b] of Object.entries(want)) if (cleanName(a) !== b) { console.error("FAIL cleanName", a, "→", cleanName(a)); process.exit(1); }
   console.log("✓ company names: recruiting words, 'The … Company', shouting caps, acronyms");
 }
