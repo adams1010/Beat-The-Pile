@@ -1,6 +1,14 @@
 {
  "_about": "Spanish UI strings (Nov 2026). Key = the English text exactly as shown (whitespace collapsed). Used by /i18n.js when the student picks Español. Job titles, company names and places are data and stay as-is.",
  "strings": {
+    "Within 10 mi": "A 10 mi",
+    "Within 25 mi": "A 25 mi",
+    "Within 50 mi": "A 50 mi",
+    "Within 100 mi": "A 100 mi",
+    "Within 200 mi": "A 200 mi",
+    "Companies with 3+ roles here show as one card.": "Las empresas con 3 o más puestos aparecen en una sola tarjeta.",
+    "More in the same area of work.": "Más en la misma área de trabajo.",
+    "Show more": "Ver más",
     "Community guidelines": "Normas de la comunidad",
     "Safe job search": "Búsqueda de empleo segura",
     "Cookie Policy": "Política de cookies",

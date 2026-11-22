@@ -1,6 +1,14 @@
 {
  "lang": "de",
  "strings": {
+    "Within 10 mi": "Im Umkreis von 10 mi",
+    "Within 25 mi": "Im Umkreis von 25 mi",
+    "Within 50 mi": "Im Umkreis von 50 mi",
+    "Within 100 mi": "Im Umkreis von 100 mi",
+    "Within 200 mi": "Im Umkreis von 200 mi",
+    "Companies with 3+ roles here show as one card.": "Firmen mit 3+ Stellen erscheinen als eine Karte.",
+    "More in the same area of work.": "Mehr im selben Arbeitsbereich.",
+    "Show more": "Mehr anzeigen",
     "Community guidelines": "Community-Richtlinien",
     "Safe job search": "Sichere Jobsuche",
     "Cookie Policy": "Cookie-Richtlinie",

@@ -254,7 +254,7 @@
   .dhead{display:flex;align-items:baseline;justify-content:space-between;gap:6px 14px;flex-wrap:wrap;margin-bottom:12px}
   .dtitle{margin:0;font-size:21px;font-weight:650;letter-spacing:-.01em;color:#fff}
   .dtotal{font-size:14px;color:#DDF3A8;font-variant-numeric:tabular-nums}.dtotal b{color:#B0F701;font-weight:650;font-size:16px}
-  .belowdeck .count{margin:2px 2px 8px;font-size:13px;color:#55627A;font-variant-numeric:tabular-nums}
+  .belowdeck .count{display:none!important}   /* Nov 22 (owner): no job counts on /jobs, just scroll */
   .dbar{display:flex;align-items:stretch;background:#fff;border-radius:999px;padding:5px;gap:0;min-height:54px}
   .dbar:focus-within{outline:2px solid #B0F701;outline-offset:2px}
   .dbar .sform{display:contents}
@@ -354,7 +354,7 @@
         <div class="wchips" id="welcomeChips"></div><select class="statesel wsel" id="welcomeSel" aria-label="What are you studying?"></select>
       </section>
 <div class="controls deck">
-    <div class="dhead"><h2 class="dtitle">Find your next role</h2><div class="dtotal" id="dTotal" aria-live="polite"></div></div>
+    <div class="dhead"><h2 class="dtitle">Find your next role</h2></div>
     <div class="dbar">
       <form class="sform" id="qForm" role="search"><input class="search" id="q" type="search" enterkeyhint="search" placeholder="Job title, keyword or company" aria-label="Job title, keyword or company"><button class="sbtn" type="submit">Search</button></form>
       <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><span id="nearChips" style="display:contents"></span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" enterkeyhint="done" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="submit" class="nadd" id="nearAdd" hidden>Add</button><button type="button" class="nx" id="nearX" aria-label="Clear all places" hidden>×</button></form>
@@ -365,6 +365,7 @@
       <div class="dd" id="kindDD"><button type="button" class="ddb" aria-haspopup="true" aria-expanded="false" aria-controls="kindPop"><span class="ddk">Job type</span><span class="ddv" id="kindV">Internships</span><svg class="chev" viewBox="0 0 12 12" aria-hidden="true"><path d="M3 4.5l3 3 3-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <div class="ddp ddkind" id="kindPop" hidden><div class="kindseg" role="group" aria-label="Job type"><button type="button" data-kind="intern" aria-pressed="true"><b>Internships</b><small>Summer, semester and co-op roles</small></button><button type="button" data-kind="fulltime" aria-pressed="false"><b>Entry-level</b><small>First full-time jobs, no experience needed</small></button><button type="button" data-kind="hourly" aria-pressed="false"><b>Part-time &amp; hourly</b><small>Flexible shifts around class</small></button><button type="button" data-kind="shadow" aria-pressed="false"><b>Shadowing &amp; volunteer</b><small>See a job up close first</small></button><button type="button" data-kind="all" aria-pressed="false"><b>All</b><small>Every kind of job</small></button></div></div></div>
       <select class="statesel" id="stateSel" aria-label="Pick a state"><option value="">All US states</option></select>
+      <select class="statesel" id="miSel" aria-label="How far from your place" title="How far from the places in the Near box"><option value="10">Within 10 mi</option><option value="25">Within 25 mi</option><option value="50" selected>Within 50 mi</option><option value="100">Within 100 mi</option><option value="200">Within 200 mi</option></select>
       <select class="statesel" id="workSel" aria-label="Where you work"><option value="any">Any workplace</option><option value="remote">Remote</option><option value="hybrid">Hybrid</option><option value="onsite">In person</option></select>
       <label class="toggle" id="meWrap" title="Only roles that say mechanical (or a close match like manufacturing)."><input type="checkbox" id="meOnly"> Strictly mechanical</label>
       <button class="chip" id="savedOnly" aria-pressed="false" title="Jobs you saved with ♡">♡ Saved <span id="savedN"></span></button>
@@ -669,7 +670,7 @@
     const nSh = state.sum?.shadow || 0, shp = $("shPromo");
     if (shp) { const show = nSh >= 20 && (state.kind === "intern" || state.kind === "fulltime") && !state.savedOnly && !state.followOnly && !state.company;
       shp.hidden = !show;
-      if (show) { shp.innerHTML = `<b>Not sure yet?</b> See the job up close first: ${nSh.toLocaleString("en-US")} shadowing & volunteer spots, many unpaid. <button type="button" class="linkbtn" id="shGo">See them</button>`;
+      if (show) { shp.innerHTML = `<b>Not sure yet?</b> See the job up close first with shadowing & volunteer spots, many unpaid. <button type="button" class="linkbtn" id="shGo">See them</button>`;
         $("shGo").onclick = () => document.querySelector('[data-kind="shadow"]')?.click(); } }
     // Nov 15: a search can be a company name (one with no open jobs, or a business page): offer the company search to follow it
     const ch = $("coHint");
@@ -691,7 +692,7 @@
     }
     const simHead = () => `<div class="simhead"><b>${rows.length ? "Similar roles" : `No exact matches for “${esc(state.q)}”`}</b><span>${rows.length ? "These fit some of your words." : "Here are the closest roles. They fit some of your words."}${widen}</span></div>`;
     const relLabel = window.btpCats?.CAT?.[state.relCat]?.label || "";
-    const relHead = () => `<div class="relhead"><b>More ${esc(relLabel)} jobs ${esc(where)}</b><span>${relRows.length.toLocaleString("en-US")} more in the same area of work.</span></div>`;
+    const relHead = () => `<div class="relhead"><b>More ${esc(relLabel)} jobs ${esc(where)}</b><span>More in the same area of work.</span></div>`;
     const tpl = (j) => (j._simFirst ? simHead() : "") + (j._relFirst ? relHead() : "") + `
       <article class="card${has("applied", j) ? " applied" : ""}${j.closed ? " closed" : ""}">
         <a class="lg" href="${coHref(j)}" aria-hidden="true" tabindex="-1" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</a>
@@ -728,7 +729,7 @@
       return out; };
     const mainRows = groupOn ? grouped(rows) : rows, nGrouped = mainRows.filter((j) => j._more).length;
     const canGroup = !state.company && !state.savedOnly && !state.followOnly && grouped(rows).some((j) => j._more);
-    const grpBar = !canGroup ? "" : groupOn ? `<div class="grpbar">${nGrouped} ${nGrouped === 1 ? "company" : "companies"} with ${GROUP_MIN}+ roles here show as one card. <button class="linkbtn" id="grpOff" type="button">Show every role separately</button></div>`
+    const grpBar = !canGroup ? "" : groupOn ? `<div class="grpbar">Companies with ${GROUP_MIN}+ roles here show as one card. <button class="linkbtn" id="grpOff" type="button">Show every role separately</button></div>`
       : `<div class="grpbar"><button class="linkbtn" id="grpOn" type="button">Group roles by company</button></div>`;
     LIST.rows = mainRows.concat(simRows, relRows); LIST.tpl = tpl;
     const fixedNote = S.fixed ? `<div class="simhead"><b>Showing results for “${esc(S.fixed)}”</b><span>You typed “${esc(state.q)}”.</span></div>` : "";
@@ -740,12 +741,12 @@
   }
   const PAGE = 40, LIST = { sig: null, shown: PAGE, rows: [], tpl: null, io: null };
   const moreHtml = () => LIST.rows.length > LIST.shown
-    ? `<div class="more" id="moreBox"><button type="button" class="moreb" id="moreBtn">Show more (${(LIST.rows.length - LIST.shown).toLocaleString()} left)</button></div>` : "";
+    ? `<div class="more" id="moreBox"><button type="button" class="moreb" id="moreBtn">Show more</button></div>` : "";
   function showMore(){
     const box = $("moreBox"); if (!box || !LIST.tpl) return;
     const from = LIST.shown; LIST.shown = Math.min(LIST.rows.length, from + PAGE);
     box.insertAdjacentHTML("beforebegin", LIST.rows.slice(from, LIST.shown).map(LIST.tpl).join(""));
-    if (LIST.shown >= LIST.rows.length) box.remove(); else $("moreBtn").textContent = `Show more (${(LIST.rows.length - LIST.shown).toLocaleString()} left)`;
+    if (LIST.shown >= LIST.rows.length) box.remove(); else $("moreBtn").textContent = `Show more`;
     try { window.btpLogos && window.btpLogos(); } catch {}
   }
   function watchMore(){
@@ -802,7 +803,7 @@
     state.cat = /^[a-z_]{2,30}$/.test(p.get("cat") || "") ? p.get("cat") : null;   // Nov 14: job category chips (lib/categories.js)
     if (state.q && !p.get("state")) state.st = "ALL";              // a search link (e.g. from the Radar) looks nationwide
     state.savedOnly = p.get("view") === "saved"; state.followOnly = p.get("view") === "following";
-    const nq = [...new Set((p.get("near") || "").split("|").map((x) => x.trim().slice(0, 40)).filter(nearOk))].slice(0, 5), nmi = [25, 50, 100, 200].includes(+p.get("mi")) ? +p.get("mi") : 50;
+    const nq = [...new Set((p.get("near") || "").split("|").map((x) => x.trim().slice(0, 40)).filter(nearOk))].slice(0, 5), nmi = [10, 25, 50, 100, 200].includes(+p.get("mi")) ? +p.get("mi") : (+store.get("btp_mi") || 50);
     state.near = nq.length ? { q: nq.join("|"), mi: nmi } : null;   // Nov 20: several places, "A|B"
     if (state.near) state.st = "ALL";
     paintNear();
@@ -841,12 +842,13 @@
     $("nearChips").innerHTML = places.map((x, i) => chip(x, `data-near-rm="${i}"`)).join("") + sts.map((x) => chip(NAMES[x] || x, `data-st-rm="${esc(x)}"`)).join("");
     const on = places.length > 0 || sts.length > 0;
     $("nearBox").classList.toggle("on", on); $("nearX").hidden = !on;
+    const ms = $("miSel"); if (ms) { if (state.near) ms.value = String(state.near.mi); ms.classList.toggle("on", !!state.near && state.near.mi !== 50); }
     $("nearIn").placeholder = on ? (places.length >= MAXP ? "Up to 5 places" : "Add another place") : "City, state or ZIP";
   }
   function setPlaces(list, mi){
     list = [...new Set(list)].slice(0, MAXP);
     if (!list.length) return clearNear();
-    state.near = { q: list.join("|"), mi: +mi || 50 }; state.st = "ALL"; $("stateSel").value = ""; $("stateSel").classList.remove("on");
+    state.near = { q: list.join("|"), mi: +mi || +$("miSel").value || 50 }; state.st = "ALL"; $("stateSel").value = ""; $("stateSel").classList.remove("on");
     try { localStorage.setItem("btp_near", list[list.length - 1]); } catch {}
     track("near_search", { mi: state.near.mi, places: list.length }); paintNear(); loadScope();
   }
@@ -1300,12 +1302,10 @@
   // job areas themselves, your school's majors first. Picking one loads that major's job areas; empty = every major.
   state.majorName = store.get("btp_major_name") || ""; state.majorKey = store.get("btp_major_name_key") || "";
   { const mn = (new URLSearchParams(location.search).get("mn") || "").slice(0, 70); if (mn) { state.majorName = mn; state.majorKey = state.major; } }
-  // Nov 21 (owner): the deck shows the same total as the homepage (internships + entry-level + hourly + shadowing)
-  (() => { const el = $("dTotal"); if (!el) return;
-    const show = (d) => { if (!d || d.fulltime == null) return; const t = (d.allMajors || 0) + (d.fulltime || 0) + (d.hourly || 0) + (d.shadow || 0);
-      el.innerHTML = `<b>${t.toLocaleString("en-US")}</b> open jobs and internships`; };
-    fetch("/api/listings?summary=1").then((r) => r.ok ? r.json() : null).then((d) => { if (d) { show(d); if (!state.sum) state.sum = d; } }).catch(() => {});
-  })();
+  // Nov 22 (owner): radius dropdown. Applies right away when the Near box has places; otherwise it's remembered for the next place.
+  $("miSel").addEventListener("change", (e) => { const mi = +e.target.value || 50; store.set("btp_mi", String(mi)); track("radius_picked", { mi });
+    if (state.near) setPlaces(NP(), mi); else toast(`Add a city or ZIP in Near to see jobs within ${mi} mi.`); });
+  { const m0 = +store.get("btp_mi"); if ([10, 25, 50, 100, 200].includes(m0) && $("miSel")) $("miSel").value = String(m0); }
   // Nov 21 (owner): the Major dropdown on the search deck = every major we know (jobs/majors.json: quiz + every
   // school's official names + every federal CIP name), your school's majors first, the job areas, and a search box.
   const KIND_NAME = { intern: "Internships", fulltime: "Entry-level", hourly: "Part-time & hourly", shadow: "Shadowing & volunteer", all: "All jobs" };

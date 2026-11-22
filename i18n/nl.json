@@ -1,6 +1,14 @@
 {
  "lang": "nl",
  "strings": {
+    "Within 10 mi": "Binnen 10 mi",
+    "Within 25 mi": "Binnen 25 mi",
+    "Within 50 mi": "Binnen 50 mi",
+    "Within 100 mi": "Binnen 100 mi",
+    "Within 200 mi": "Binnen 200 mi",
+    "Companies with 3+ roles here show as one card.": "Bedrijven met 3+ functies verschijnen als één kaart.",
+    "More in the same area of work.": "Meer in hetzelfde vakgebied.",
+    "Show more": "Meer tonen",
     "Community guidelines": "Communityrichtlijnen",
     "Safe job search": "Veilig werk zoeken",
     "Cookie Policy": "Cookiebeleid",

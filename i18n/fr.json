@@ -1,6 +1,14 @@
 {
  "lang": "fr",
  "strings": {
+    "Within 10 mi": "À 16 km",
+    "Within 25 mi": "À 40 km",
+    "Within 50 mi": "À 80 km",
+    "Within 100 mi": "À 160 km",
+    "Within 200 mi": "À 320 km",
+    "Companies with 3+ roles here show as one card.": "Les entreprises avec 3 postes ou plus apparaissent sur une seule carte.",
+    "More in the same area of work.": "Plus dans le même domaine.",
+    "Show more": "Voir plus",
     "Community guidelines": "Règles de la communauté",
     "Safe job search": "Recherche d'emploi en sécurité",
     "Cookie Policy": "Politique relative aux cookies",
