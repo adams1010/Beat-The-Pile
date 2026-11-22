@@ -182,7 +182,13 @@ async function scanAll() {
   if (scanMemo && Date.now() - scanMemo.at < 120000) return scanMemo.rows;
   // Nov 16 (Supabase egress over the free 5.5 GB): Postgres counts the groups itself (rpc listing_groups, ~1 MB) instead of
   // sending every open listing (~15 MB) on each cold cache. Each row = one company × field × match × kind, with n listings.
-  const rows = ((await db.rpc("listing_groups")) || []).map(([company_id, company, field, match, kind, n]) => ({ company_id, company, field, match, kind: kind || "intern", n: n || 0 }));
+  // Nov 22: the count once timed out at 2 AM while the bots were writing (live-check #226: summary 503). One retry after a
+  // short pause, then the last good counts (even if older than 2 min) rather than an error.
+  let raw;
+  try { raw = await db.rpc("listing_groups"); }
+  catch (e) { await new Promise((r) => setTimeout(r, 1500));
+    try { raw = await db.rpc("listing_groups"); } catch (e2) { if (scanMemo) return scanMemo.rows; throw e2; } }
+  const rows = (raw || []).map(([company_id, company, field, match, kind, n]) => ({ company_id, company, field, match, kind: kind || "intern", n: n || 0 }));
   scanMemo = { at: Date.now(), rows };
   return rows;
 }
