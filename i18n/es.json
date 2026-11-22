@@ -1,6 +1,7 @@
 {
  "_about": "Spanish UI strings (Nov 2026). Key = the English text exactly as shown (whitespace collapsed). Used by /i18n.js when the student picks Español. Job titles, company names and places are data and stay as-is.",
  "strings": {
+    "Remote jobs aren't included here.": "Aquí no se incluyen empleos remotos.",
     "Within 10 mi": "A 10 mi",
     "Within 25 mi": "A 25 mi",
     "Within 50 mi": "A 50 mi",

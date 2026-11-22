@@ -1,6 +1,7 @@
 {
  "lang": "fr",
  "strings": {
+    "Remote jobs aren't included here.": "Les emplois à distance ne sont pas inclus ici.",
     "Within 10 mi": "À 16 km",
     "Within 25 mi": "À 40 km",
     "Within 50 mi": "À 80 km",

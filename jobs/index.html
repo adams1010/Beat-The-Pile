@@ -543,7 +543,7 @@
     const per = new Map();
     for (const j of state.all) if (inView(j)) { const k = j.company_id || j.company; const e = per.get(k) || { n: 0, j }; e.n++; per.set(k, e); }
     const top = [...per.values()].sort((a, b) => b.n - a.n).slice(0, 6);
-    $("topCos").innerHTML = top.length ? top.map(({ n, j }) => `<a class="rrow" href="${coHref(j)}"><span class="lg" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</span><span class="rn">${esc(j.company)}</span><span class="rv">${n}</span></a>`).join("")
+    $("topCos").innerHTML = top.length ? top.map(({ n, j }) => `<a class="rrow" href="${coHref(j)}"><span class="lg" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</span><span class="rn">${esc(j.company)}</span></a>`).join("")
       : `<p style="font-size:13px;color:var(--muted);margin:0">Nothing in this view yet.</p>`;
     loadSoon();
   }
@@ -640,7 +640,7 @@
     const wider = state.near ? { 25: 50, 50: 100, 100: 200 }[state.near.mi] : null;
     const nearFixedNote = (nm ? (nm.places || [nm.near]) : []).filter((x) => x?.fixedTo && x.typed).map((x) => `Showing results for <b data-noi18n>${esc(x.fixedTo)}</b> (you typed “<span data-noi18n>${esc(x.typed)}</span>”). `).join("");
     const nmSt = nm ? (nm.states || [nm.near.state]).filter(Boolean) : [], nmStName = nmSt.map((x) => NAMES[x] || x).join(" & ");
-    const nearNote = nm ? nearFixedNote + `Within ${state.near.mi} mi, nearest first.${wider ? ` <button class="linkbtn" data-widen="${wider}">Show within ${wider} mi</button>` : ""} Distances are city center to city center. ${nm.unplacedInState && nmSt.length ? `${nm.unplacedInState} more in ${esc(nmStName)} ${nm.unplacedInState === 1 ? "doesn't" : "don't"} say which city. <button class="linkbtn" data-near-st="${esc(nmSt.join(","))}">See all of ${esc(nmStName)}</button> ` : ""}${nm.remote ? `${nm.remote} remote not counted. ` : ""}` : "";
+    const nearNote = nm ? nearFixedNote + `Within ${state.near.mi} mi, nearest first.${wider ? ` <button class="linkbtn" data-widen="${wider}">Show within ${wider} mi</button>` : ""} Distances are city center to city center. ${nm.unplacedInState && nmSt.length ? `Some jobs in ${esc(nmStName)} don't say which city. <button class="linkbtn" data-near-st="${esc(nmSt.join(","))}">See all of ${esc(nmStName)}</button> ` : ""}${nm.remote ? `Remote jobs aren't included here. ` : ""}` : "";
     const pathKey = /^path_/.test(state.cat || "") ? state.cat.slice(5) : null;   // Nov 20: from /grad/
     const pathNote = pathKey ? `<b>${esc(window.btpCats?.CAT?.[state.cat]?.label || "Path jobs")}:</b> jobs that count toward grad school applications. <a href="/grad/?path=${esc(pathKey)}">Your hours and timeline</a>. ` : "";
     $("note").innerHTML = pathNote + nearNote + (state.st !== "ALL" && !state.savedOnly && !state.followOnly

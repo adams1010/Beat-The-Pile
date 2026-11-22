@@ -232,6 +232,27 @@
   .bdg{font-size:13px;font-weight:600;border-radius:999px;padding:3px 11px}.bdg a{color:inherit}
   .bdg.rec{background:#E8EDFB;color:#1E3A8A}.bdg.staff{background:#F2FADF;color:#3A5800}
   @media (max-width:560px){.bdg-row{flex-direction:column;align-items:flex-start}.bdg-st{text-align:left}}
+
+  /* Nov 22 (owner: "clean, sleek"): header = name, one badge row, headline, one fact line, one open-to line, one button row */
+  .hero .band{height:72px}
+  .hero h1{margin:14px 0 4px;font-size:28px}
+  .bdgs{gap:6px;margin:6px 0 10px}
+  .bdg{font-size:12.5px;font-weight:600;border-radius:999px;padding:3px 10px;border:1px solid transparent}
+  .bdg.gold{background:#FBF3D6;color:#6E5200;border-color:#E2C15F}.bdg.gold a,.bdg.fm a,.bdg.rec a{color:inherit;text-decoration:none}.bdg a:hover{text-decoration:underline}
+  .bdg.fm{background:#fff;color:#3A4660;border-color:#D5DCE6}
+  .bdg.rec{background:#EEF2FB;color:#1E3A8A}.bdg.staff{background:#F2F7E6;color:#3A5800}
+  .hero .headline{font-size:16.5px;color:#1C2440;margin:0 0 6px}
+  .hero .meta{font-size:14px;gap:2px 0}.hero .meta span+span::before{content:"·";margin:0 8px;color:#AEB8C8}
+  .openln{display:flex;align-items:center;gap:8px;margin:12px 0 0;font-size:14px;color:#1C2440}
+  .openln .od{width:8px;height:8px;border-radius:50%;background:#4A7000;flex:none}
+  .lookln{margin:6px 0 0;font-size:14px;color:#1C2440}.lookln span{color:var(--muted);margin-right:8px}
+  .hero .actrow{margin-top:18px;padding-top:16px;border-top:1px solid #E6EAF0;gap:8px}
+  .cb{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;border:1px solid #D5DCE6;border-radius:999px;background:#fff;color:#060A2C;font:600 14px Geist,system-ui,sans-serif;text-decoration:none;cursor:pointer}
+  .cb:hover{border-color:#060A2C}.cb .pi{width:16px;height:16px;color:#3A4660}
+  .hero .orbitact .btn{height:38px;padding:0 18px}
+  .hero .orbitact .btn.pri{background:#060A2C;border-color:#060A2C;color:#fff}
+  .hero .btns{gap:8px}
+  @media(max-width:600px){.hero h1{font-size:24px}.cb{height:36px;padding:0 12px;font-size:13.5px}}
 </style>
 <link rel="stylesheet" href="/d.css">
 </head>
@@ -394,17 +415,20 @@
 
   const seenMe = () => { try { return !!localStorage.getItem("btp_me"); } catch { return false; } };
   // ── Public view (anyone, no sign-in) ──
+  // Nov 22 (owner: "clean, sleek, buttons all one look"): one line icon per contact/link button
+  const PICO = {"mail": "<path d=\"M4 6h16v12H4z\"/><path d=\"M4 7l8 6 8-6\"/>", "phone": "<path d=\"M6.5 4h3l1.5 4-2 1.3a11 11 0 0 0 5.7 5.7L16 13l4 1.5v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.5 6.2 2 2 0 0 1 6.5 4z\"/>", "doc": "<path d=\"M7 3h7l4 4v14H7z\"/><path d=\"M14 3v4h4\"/><path d=\"M10 12h5M10 16h5\"/>", "in": "<rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"3\"/><path d=\"M8.5 10.5v5M8.5 8v.01M12 15.5v-5M12 12.5a2 2 0 0 1 4 0v3\"/>", "gh": "<path d=\"M9 19c-4 1.3-4-2-6-2.5M15 21v-3.5a3 3 0 0 0-.8-2.3c2.7-.3 5.6-1.3 5.6-6A4.7 4.7 0 0 0 18.5 6a4.4 4.4 0 0 0-.1-3.2s-1-.3-3.4 1.3a11.7 11.7 0 0 0-6 0C6.6 2.5 5.6 2.8 5.6 2.8A4.4 4.4 0 0 0 5.5 6 4.7 4.7 0 0 0 4.2 9.2c0 4.7 2.9 5.7 5.6 6a3 3 0 0 0-.8 2.3V21\"/>", "web": "<circle cx=\"12\" cy=\"12\" r=\"8\"/><path d=\"M4 12h16M12 4a12 12 0 0 1 0 16M12 4a12 12 0 0 0 0 16\"/>"};
+  const pico = (k) => `<svg class="pi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PICO[k]}</svg>`;
   const STAFF_ROLES = ["Professor", "Lecturer or instructor", "Academic advisor", "Career center", "Department staff", "Other school staff"];
   function profileHtml(p, resume, isPreview, founding, ach){
     const where = [p.schoolShort || p.school, p.major, gradLabel(p)].filter(Boolean).join(" · ");
     const edu = [{ school: p.school, degree: "", major: p.major, when: gradLabel(p) }, ...(p.education || [])].filter((x) => x.school)
       .map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.school))}</div><div><b>${esc(x.school)}</b><div class="sm">${esc([x.degree, x.major, x.when].filter(Boolean).join(" · "))}</div></div></div>`).join("");
     const links = [["linkedin","LinkedIn"],["github","GitHub"],["portfolio","Portfolio"]].filter(([k]) => safeUrl(p.links?.[k]))
-      .map(([k, t]) => `<a class="btn" href="${esc(p.links[k])}" target="_blank" rel="noopener nofollow ugc">${t} ↗</a>`).join("");
+      .map(([k, t]) => `<a class="cb" href="${esc(p.links[k])}" target="_blank" rel="noopener nofollow ugc">${pico(k === "linkedin" ? "in" : k === "github" ? "gh" : "web")}${t}</a>`).join("");
     const tel = (x) => String(x || "").replace(/[^\d+]/g, "");
     // Nov 10: contact sits at the top, in the profile header (email / call buttons)
     const hasC = p.contact && (p.contact.email || p.contact.phone);
-    const contactBtns = hasC ? `${p.contact.email ? `<a class="btn pri" href="mailto:${esc(p.contact.email)}" title="Send an email">Email</a>` : ""}${p.contact.phone ? `<a class="btn" href="tel:${esc(tel(p.contact.phone))}" title="Call">Call</a>` : ""}` : "";
+    const contactBtns = hasC ? `${p.contact.email ? `<a class="cb" href="mailto:${esc(p.contact.email)}" title="Send an email">${pico("mail")}Email</a>` : ""}${p.contact.phone ? `<a class="cb" href="tel:${esc(tel(p.contact.phone))}" title="Call">${pico("phone")}Call</a>` : ""}` : "";
     const contactNote = hasC && isPreview ? `<p class="small muted" style="margin:6px 0 0">${p.contact.show === false ? "Contact info is hidden from your profile." : "Contact info is shown to signed-in Beat the Pile members, not to the public web."}</p>` : "";
     const exp = expTimeline(p);
     const proj = (p.projects || []).map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.name))}</div><div><b>${safeUrl(x.link) ? `<a href="${esc(x.link)}" target="_blank" rel="noopener nofollow ugc">${esc(x.name)} ↗</a>` : esc(x.name)}</b>
@@ -414,14 +438,13 @@
         <div class="toprow">${p.photo && /^data:image\/(jpeg|png|webp);base64,/.test(p.photo) ? `<img class="avatar" src="${esc(p.photo)}" alt="${esc(p.name || "Profile photo")}">` : `<div class="avatar" aria-hidden="true">${esc(initials(p.name))}</div>`}
         ${isPreview ? `<div class="own"><button type="button" data-tab="edit">Edit profile</button>${S.me && S.me.handle && S.me.profilePublic ? `<button type="button" id="shareP">Share</button><button type="button" id="qrP" title="A QR code recruiters can scan at a career fair">QR</button>` : ""}</div>` : ""}</div>
         <h1>${esc(p.name || "Your name")}</h1>
-        ${founding ? `<p class="founding" title="One of the first 150 students on Beat the Pile">Founding member #${+founding}</p>` : ""}
-        ${(window.__BADGES || []).length ? `<div class="bdgs">${window.__BADGES.map((b) => `<span class="bdg ${b.kind === "staff" ? "staff" : "rec"}">${esc(b.label)} · ${b.page ? `<a href="${esc(b.page)}" data-noi18n>${esc(b.org)}</a>` : `<span data-noi18n>${esc(b.org)}</span>`}</span>`).join("")}</div>`
+        ${(window.__BADGES || []).length || founding ? `<div class="bdgs">${(window.__BADGES || []).map((b) => `<span class="bdg ${/beat the pile/i.test(b.org || "") && /founder/i.test(b.label || "") ? "gold" : b.kind === "staff" ? "staff" : "rec"}">${esc(b.label)} · ${b.page ? `<a href="${esc(b.page)}" data-noi18n>${esc(b.org)}</a>` : `<span data-noi18n>${esc(b.org)}</span>`}</span>`).join("")}${founding ? `<span class="bdg fm" title="One of the first 150 students on Beat the Pile">Founding member #${+founding}</span>` : ""}</div>`
           : p.staff && isPreview && !p.staffVerified ? `<p class="small muted">Your ${esc(p.staff)} badge shows here once you're verified (Edit → Badges).</p>` : ""}
         ${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
-        <div class="meta">${where ? `<span>${esc(where)}</span>` : ""}${p.location ? `<span>${esc(p.location)}</span>` : ""}${p.hometown ? `<span>From ${esc(p.hometown)}</span>` : ""}</div>
-        ${(p.openTo || []).length || p.coffee ? `<div class="opento">${(p.openTo || []).map((k) => `<span>Open to ${esc(OPEN_TO[k] || k)}</span>`).join("")}${p.coffee ? `<span class="cof">Open to coffee chats</span>` : ""}</div>` : ""}
-        ${glanceHtml(p)}
-        <div class="actrow">${isPreview ? "" : `<div class="orbitact" id="orbitAct"></div>`}<div class="btns">${contactBtns}${resume ? `<a class="btn pri" href="${esc(resume)}" target="_blank" rel="noopener">View resume</a>` : isPreview && p.showResume ? `<span class="btn pri" title="Shows when your resume QR link is on">View resume</span>` : ""}${links}</div></div>${contactNote}${isPreview ? "" : `<div id="both"></div>`}
+        <div class="meta">${[where, p.location].filter(Boolean).length ? `<span>${esc([where, p.location].filter(Boolean).join(" · "))}</span>` : ""}</div>
+        ${(() => { const o = [...(p.openTo || []).map((k) => String(OPEN_TO[k] || k).replace(/^Full-time/, "full-time").replace(/^Internships/, "internships")), ...(p.coffee ? ["coffee chats"] : [])]; return o.length ? `<p class="openln"><span class="od" aria-hidden="true"></span>Open to ${esc(o.length > 1 ? o.slice(0, -1).join(", ") + " and " + o[o.length - 1] : o[0])}</p>` : ""; })()}
+        ${p.lookingFor ? `<p class="lookln"><span>Looking for</span>${esc(p.lookingFor)}</p>` : ""}
+        <div class="actrow">${isPreview ? "" : `<div class="orbitact" id="orbitAct"></div>`}<div class="btns">${contactBtns}${resume ? `<a class="cb" href="${esc(resume)}" target="_blank" rel="noopener">${pico("doc")}Resume</a>` : isPreview && p.showResume ? `<span class="cb" title="Shows when your resume QR link is on">${pico("doc")}Resume</span>` : ""}${links}</div></div>${contactNote}${isPreview ? "" : `<div id="both"></div>`}
         ${isPreview && S.me ? `<div class="vis"><span class="dotv${S.me.profilePublic && S.me.handle ? " on" : ""}" aria-hidden="true"></span>${S.me.profilePublic && S.me.handle ? `Public · <a href="/u/${esc(S.me.handle)}" target="_blank" style="color:var(--muted)">beatthepile.com/u/${esc(S.me.handle)}</a>` : "Private · only you can see this"}</div>` : ""}
       </div></section>
       <div class="pcols"><div class="pmain"><div class="og" style="order:2">${p.about ? `<section class="card"><h2>About</h2><p class="about">${esc(p.about)}</p></section>` : ""}</div><div class="og" style="order:3">${exp ? `<section class="card xp"><h2>Experience</h2>${exp}</section>` : isPreview ? `<section class="card know-empty"><h2>Experience</h2><p class="small muted" style="margin:0 0 10px">Recruiters look here first. Add internships, jobs, research, clubs or leadership.</p><button class="btn pri" type="button" data-tab="edit" data-jump="experience">Add experience</button></section>` : ""}</div><div class="og" style="order:4">${proj ? `<section class="card"><h2>Projects</h2>${proj}</section>` : ""}</div><div class="og" style="order:5">${edu ? `<section class="card"><h2>Education</h2>${edu}</section>` : ""}</div></div>
