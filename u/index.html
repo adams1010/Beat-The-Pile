@@ -239,7 +239,7 @@
   .bdgs{gap:6px;margin:6px 0 10px}
   .bdg{font-size:12.5px;font-weight:600;border-radius:999px;padding:3px 10px;border:1px solid transparent}
   .bdg.gold{background:#FBF3D6;color:#6E5200;border-color:#E2C15F}.bdg.gold a,.bdg.fm a,.bdg.rec a{color:inherit;text-decoration:none}.bdg a:hover{text-decoration:underline}
-  .bdg.fm{background:#fff;color:#3A4660;border-color:#D5DCE6}
+  .bdg.fm{background:#F2FADF;color:#4A7000;border-color:#DDF3A8}
   .bdg.rec{background:#EEF2FB;color:#1E3A8A}.bdg.staff{background:#F2F7E6;color:#3A5800}
   .hero .headline{font-size:16.5px;color:#1C2440;margin:0 0 6px}
   .hero .meta{font-size:14px;gap:2px 0}.hero .meta span+span::before{content:"·";margin:0 8px;color:#AEB8C8}
@@ -247,10 +247,11 @@
   .openln .od{width:8px;height:8px;border-radius:50%;background:#4A7000;flex:none}
   .lookln{margin:6px 0 0;font-size:14px;color:#1C2440}.lookln span{color:var(--muted);margin-right:8px}
   .hero .actrow{margin-top:18px;padding-top:16px;border-top:1px solid #E6EAF0;gap:8px}
-  .cb{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 14px;border:1px solid #D5DCE6;border-radius:999px;background:#fff;color:#060A2C;font:600 14px Geist,system-ui,sans-serif;text-decoration:none;cursor:pointer}
-  .cb:hover{border-color:#060A2C}.cb .pi{width:16px;height:16px;color:#3A4660}
+  .cb{display:inline-flex;align-items:center;gap:7px;height:38px;padding:0 15px;border:1px solid #DDF3A8;border-radius:999px;background:#F2FADF;color:#3A5800;font:600 14px Geist,system-ui,sans-serif;text-decoration:none;cursor:pointer}
+  .cb:hover{background:#E6F6C4;border-color:#C5E68A}.cb .pi{width:16px;height:16px;color:#4A7000}
+  .hero .opento{margin-top:12px}.hero .opento span.cof{background:#060A2C;color:#B0F701}.hero .opento span.cof::before{background:#B0F701}
   .hero .orbitact .btn{height:38px;padding:0 18px}
-  .hero .orbitact .btn.pri{background:#060A2C;border-color:#060A2C;color:#fff}
+  .hero .orbitact .btn.pri{background:#4A7000;border-color:#4A7000;color:#fff}
   .hero .btns{gap:8px}
   @media(max-width:600px){.hero h1{font-size:24px}.cb{height:36px;padding:0 12px;font-size:13.5px}}
 </style>
@@ -442,7 +443,7 @@
           : p.staff && isPreview && !p.staffVerified ? `<p class="small muted">Your ${esc(p.staff)} badge shows here once you're verified (Edit → Badges).</p>` : ""}
         ${p.headline ? `<p class="headline">${esc(p.headline)}</p>` : ""}
         <div class="meta">${[where, p.location].filter(Boolean).length ? `<span>${esc([where, p.location].filter(Boolean).join(" · "))}</span>` : ""}</div>
-        ${(() => { const o = [...(p.openTo || []).map((k) => String(OPEN_TO[k] || k).replace(/^Full-time/, "full-time").replace(/^Internships/, "internships")), ...(p.coffee ? ["coffee chats"] : [])]; return o.length ? `<p class="openln"><span class="od" aria-hidden="true"></span>Open to ${esc(o.length > 1 ? o.slice(0, -1).join(", ") + " and " + o[o.length - 1] : o[0])}</p>` : ""; })()}
+        ${(p.openTo || []).length || p.coffee ? `<div class="opento">${(p.openTo || []).map((k) => `<span>Open to ${esc(OPEN_TO[k] || k)}</span>`).join("")}${p.coffee ? `<span>Open to coffee chats</span>` : ""}</div>` : ""}
         ${p.lookingFor ? `<p class="lookln"><span>Looking for</span>${esc(p.lookingFor)}</p>` : ""}
         <div class="actrow">${isPreview ? "" : `<div class="orbitact" id="orbitAct"></div>`}<div class="btns">${contactBtns}${resume ? `<a class="cb" href="${esc(resume)}" target="_blank" rel="noopener">${pico("doc")}Resume</a>` : isPreview && p.showResume ? `<span class="cb" title="Shows when your resume QR link is on">${pico("doc")}Resume</span>` : ""}${links}</div></div>${contactNote}${isPreview ? "" : `<div id="both"></div>`}
         ${isPreview && S.me ? `<div class="vis"><span class="dotv${S.me.profilePublic && S.me.handle ? " on" : ""}" aria-hidden="true"></span>${S.me.profilePublic && S.me.handle ? `Public · <a href="/u/${esc(S.me.handle)}" target="_blank" style="color:var(--muted)">beatthepile.com/u/${esc(S.me.handle)}</a>` : "Private · only you can see this"}</div>` : ""}
