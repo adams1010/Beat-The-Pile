@@ -187,6 +187,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
   /* Nov 21 (owner): condensed pages = a 2-column grid of icon + name */
   .btpnav .mobmore .more .grid{display:grid;grid-template-columns:1fr 1fr;gap:2px}
   .btpnav .mobmore .more .grid a{display:flex!important;align-items:center;gap:8px;padding:9px 10px;font-size:14px;line-height:1.2}
+  .btpnav .mobmore .more .grid a:last-child:nth-child(odd){grid-column:1/-1}
   .btpnav .mobmore .more .grid a .btpic{width:19px;height:19px;flex:none;color:#4A7000}
   .btpnav .mobmore .more .grid b{font-weight:500}
   .btpnav .mobmore .more{display:block}.btpnav .mobmore .more a{display:block;padding:11px 12px;border-radius:8px;color:#060A2C;text-decoration:none}
@@ -234,6 +235,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
 /* Nov 21 (owner): desktop Tools = a 2-column grid that fits the screen and scrolls on its own */
 .btpnav .toolsmenu{display:grid;grid-template-columns:1fr 1fr;gap:2px;width:min(620px,calc(100vw - 16px));max-height:calc(100vh - 90px);overflow-y:auto;overscroll-behavior:contain}
 .btpnav .toolsmenu a{display:flex!important;align-items:flex-start;gap:10px;padding:9px 10px}
+.btpnav .toolsmenu a:last-child:nth-child(odd){grid-column:1/-1}
 .btpnav .toolsmenu a .btpic{width:19px;height:19px;flex:none;color:#4A7000;margin-top:1px}
 .btpnav .toolsmenu a,.btpnav .toolsmenu a>span{min-width:0}
 .btpnav .toolsmenu small{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}

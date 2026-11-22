@@ -175,7 +175,7 @@ function HeroMap({near,fresh,sum,sumErr}){
       <svg ref={svgRef} viewBox={vb.join(" ")} role="img" aria-label={pts?`Map of the US with ${fmt(pts.placed)} open jobs, one dot per city. Use the zoom buttons or the city list to look closer.`:"Loading map"}
         onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} onPointerLeave={(e)=>{if(e.pointerType!=="touch")drag.current=null;}}
         onDoubleClick={e=>{const [mx,my]=toMap(e.clientX,e.clientY);zoomAt(2,mx,my);}}
-        style={{width:"100%",height:"auto",display:"block",touchAction:zoom>1.01?"none":"pan-y",cursor:zoom>1.01?"grab":"default",userSelect:"none"}}>
+        style={{width:"100%",height:"auto",maxHeight:"max(240px, calc(100vh - 430px))",display:"block",touchAction:zoom>1.01?"none":"pan-y",cursor:zoom>1.01?"grab":"default",userSelect:"none"}}>
         {geo&&<path d={geo.nation} fill="#11203A" stroke="#2A3B5C" strokeWidth={1/zoom}/>}
         {geo&&<path d={geo.borders} fill="none" stroke="#1C2C48" strokeWidth={.8/zoom}/>}
         {pts&&pts.dots.map((dt,i)=>{const on=sel&&sel[0]===dt[0]&&sel[1]===dt[1];return <circle key={i} cx={dt[0]} cy={dt[1]} r={dr(dt[2])*(on?1.6:1)} fill={on?"#fff":"#B0F701"} fillOpacity={on?1:dt[2]>20?.8:.55} style={{cursor:"pointer"}} data-i={i}><title>{`${dt[2]} ${dt[2]===1?"job":"jobs"} here`}</title></circle>;})}
@@ -244,7 +244,7 @@ function LandingD({onQuiz,onPage}){
   const wrap={maxWidth:1440,margin:"0 auto",padding:"0 32px"};
   return(<>
     <section style={{position:"relative",overflow:"hidden",background:"#060A2C",color:"#E8EDF5"}}>
-      <div className="d-hero" style={{...wrap,position:"relative",paddingTop:64,paddingBottom:48,display:"flex",gap:48,flexWrap:"wrap",alignItems:"center"}}>
+      <div className="d-hero" style={{...wrap,position:"relative",paddingTop:24,paddingBottom:28,display:"flex",gap:48,flexWrap:"wrap",alignItems:"center"}}>
         <div style={{flex:"1 1 480px",minWidth:0}}>
           <h1 style={{fontSize:"clamp(2.3rem,5vw,3.6rem)",lineHeight:1.03,letterSpacing:"-0.035em",fontWeight:600,margin:"0 0 16px",color:"#fff"}}>Find your job<br/>before the <span style={{color:"#B0F701"}}>pile</span> does.</h1>
           <p className="d-lead" style={{fontSize:18,lineHeight:1.5,color:"#9FAAC0",margin:"0 0 28px",maxWidth:560}}>Internships first, new-grad jobs too. Every major, pulled straight from each company's own job board, no reposts, and jobs drop off when the company takes them down.</p>

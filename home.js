@@ -1,4 +1,4 @@
-/* built from src/home.jsx 17213450ea474d3d — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 6f6bb5c89bcbfe3f — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -759,6 +759,7 @@ function HeroMap({
     style: {
       width: "100%",
       height: "auto",
+      maxHeight: "max(240px, calc(100vh - 430px))",
       display: "block",
       touchAction: zoom > 1.01 ? "none" : "pan-y",
       cursor: zoom > 1.01 ? "grab" : "default",
@@ -1142,8 +1143,8 @@ function LandingD({
     style: {
       ...wrap,
       position: "relative",
-      paddingTop: 64,
-      paddingBottom: 48,
+      paddingTop: 24,
+      paddingBottom: 28,
       display: "flex",
       gap: 48,
       flexWrap: "wrap",
