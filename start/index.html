@@ -150,7 +150,7 @@
         <div id="o_mjw"><label for="o_mj">${staff ? "Department (optional)" : "Major"}</label><input id="o_mj" value="${esc(st.major)}" placeholder="Pick your school first"></div>
         <div class="two"${staff ? ' style="display:none"' : ""}><div><label for="o_gt">Graduation</label><select id="o_gt"><option value="">Term</option>${["Spring", "Summer", "Fall", "Winter"].map((t) => `<option${mine.gradTerm === t ? " selected" : ""}>${t}</option>`).join("")}</select></div>
           <div><label for="o_gy">Year</label><select id="o_gy"><option value="">Year</option>${Array.from({ length: 8 }, (_, i) => Y + i - 1).map((y) => `<option${+mine.gradYear === y ? " selected" : ""}>${y}</option>`).join("")}</select></div></div>
-        ${staff ? "" : `<div class="ph"><span class="phav" id="o_phv" aria-hidden="true">${esc((nm || "?").trim().slice(0, 1).toUpperCase())}</span><div><b>Add a profile photo</b> <span class="muted">(optional)</span><br><span class="muted">Classmates and recruiters recognize you faster.</span><br><label class="phbtn" for="o_ph">Choose a photo</label><input type="file" id="o_ph" accept="image/*" hidden></div></div>`}
+        ${staff ? "" : `<div class="ph"><span class="phav" id="o_phv" aria-hidden="true">${esc((nm || "?").trim().slice(0, 1).toUpperCase())}</span><div><b>Add a profile photo</b> <span class="muted">(optional)</span><br><span class="muted">Classmates and recruiters recognize you faster.</span><br><label class="phbtn" for="o_ph">Choose a photo</label><input type="file" id="o_ph" accept="image/*" hidden><br><span class="muted small" id="o_phn" hidden></span></div></div>`}
         <label class="chk"><input type="checkbox" id="o_show"${pubNow === false ? "" : " checked"}> <span>${staff ? "Show me to students at my school in Orbit (your name, school, role and photo). You can turn this off any time on your profile." : "Show me to students at my school in Orbit (your name, school, major and photo). You can turn this off any time on your profile."}</span></label>
         ${staff ? "" : `<label class="chk"><input type="checkbox" id="o_emp" checked> <span>Let verified employers find me. Only companies we've checked can see your public profile and message you about real jobs and internships. You can turn this off any time on your profile.</span></label><label class="chk"><input type="checkbox" id="o_alerts" checked> <span>Email me new jobs for my major once a week. One-click unsubscribe in every email.</span></label>`}
         <div class="go"><button id="o_go">Continue</button><a href="#" id="o_skip">Skip for now</a><span class="msg" id="o_msg" role="status"></span></div>
@@ -172,13 +172,38 @@
     if (nm) $("#o_sc").focus();
     // Nov 14: optional profile photo at sign-up: center square, 256 px JPEG (the same size /u/ stores)
     const phIn = $("#o_ph");
+    // Nov 23 (owner): no photo chosen → use the one on their email account: the Google photo Clerk got at sign-in, else their
+    // Gravatar (only if one exists: d=404). Drawn to the same 256 px square; picking a file replaces it. Never over a saved photo.
+    if (phIn && !mine.photo) (async () => {
+      const square = (src) => new Promise((ok) => { const img = new Image(); let done = false; const fin = (v) => { if (!done) { done = true; ok(v); } };
+        img.crossOrigin = "anonymous"; img.referrerPolicy = "no-referrer";
+        img.onload = () => { try { const S = Math.min(img.naturalWidth, img.naturalHeight); if (S < 48) return fin(null);
+          const c = document.createElement("canvas"); c.width = c.height = 256;
+          c.getContext("2d").drawImage(img, (img.naturalWidth - S) / 2, (img.naturalHeight - S) / 2, S, S, 0, 0, 256, 256);
+          fin(c.toDataURL("image/jpeg", 0.85)); } catch { fin(null); } };
+        img.onerror = () => fin(null); setTimeout(() => fin(null), 7000); img.src = src; });
+      const u = C.user || {}, cands = [];
+      const prov = ((u.externalAccounts || []).find((a) => a.imageUrl) || {}).provider || "";
+      if (u.hasImage && u.imageUrl) cands.push([u.imageUrl, prov.replace(/^oauth_/, "")]);
+      for (const a of u.externalAccounts || []) if (a.imageUrl) cands.push([a.imageUrl, (a.provider || "").replace(/^oauth_/, "")]);
+      const em = String(u.primaryEmailAddress?.emailAddress || "").trim().toLowerCase();
+      if (em && window.crypto?.subtle) { try { const h = [...new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(em)))].map((b) => b.toString(16).padStart(2, "0")).join("");
+        cands.push([`https://gravatar.com/avatar/${h}?s=256&d=404`, "gravatar"]); } catch {} }
+      for (const [src, from] of cands) {
+        if (st.photo) return;
+        const d = await square(src);
+        if (d && !st.photo) { st.photo = d; $("#o_phv").innerHTML = `<img src="${d}" alt="">`;
+          const n = $("#o_phn"); if (n) { n.hidden = false; n.textContent = from === "google" ? "Using your Google photo. Choose a photo to change it." : from === "gravatar" ? "Using your Gravatar photo. Choose a photo to change it." : "Using the photo from your account. Choose a photo to change it."; }
+          return; }
+      }
+    })();
     if (phIn) phIn.onchange = () => {
       const f = phIn.files && phIn.files[0]; if (!f || !/^image\//.test(f.type)) return;
       const img = new Image(), url = URL.createObjectURL(f);
       img.onload = () => { const S = Math.min(img.naturalWidth, img.naturalHeight), c = document.createElement("canvas"); c.width = c.height = 256;
         c.getContext("2d").drawImage(img, (img.naturalWidth - S) / 2, (img.naturalHeight - S) / 2, S, S, 0, 0, 256, 256);
         let q = 0.85, d = c.toDataURL("image/jpeg", q); while (d.length > 60000 && q > 0.4) { q -= 0.1; d = c.toDataURL("image/jpeg", q); }
-        st.photo = d; $("#o_phv").innerHTML = `<img src="${d}" alt="">`; URL.revokeObjectURL(url); };
+        st.photo = d; $("#o_phv").innerHTML = `<img src="${d}" alt="">`; const n = $("#o_phn"); if (n) n.hidden = true; URL.revokeObjectURL(url); };
       img.src = url;
     };
     $("#o_skip").onclick = (e) => { e.preventDefault(); try { sessionStorage.setItem("btp_school_skip", "1"); } catch {} tour(); };
