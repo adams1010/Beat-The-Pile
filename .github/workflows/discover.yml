@@ -23,7 +23,7 @@ jobs:
     timeout-minutes: 50
     steps:
       # Nov 19: GitHub fired the 30-min schedule only ~4x a day, so each run now keeps calling the finder for ~40 min
-      # (one pass ~= 60 companies) and then starts the next run itself. Stops when switched off or the queue is empty.
+      # (one pass ~= 60 companies) and then starts the next run itself. Stops only when switched off (Nov 23: an empty queue waits 10 min and asks again).
       - name: Call /api/discover (passes for ~40 min)
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
@@ -39,7 +39,9 @@ jobs:
             if [ "$code" != 200 ]; then fails=$((fails+1)); [ $fails -ge 3 ] && exit 1; sleep 20; continue; fi
             fails=0
             grep -q '"off":true' out.json && { echo off > stop; break; }
-            grep -q '"tried":0' out.json && { echo empty > stop; break; }
+            # Nov 23: an empty queue no longer ends the chain (it sat idle for hours while rate-limited boards and new
+            # wanted-list companies waited); wait 10 min and ask again (an empty pass is ~2 s on Vercel)
+            if grep -q '"tried":0' out.json; then [ -n "$manual" ] && { echo manual > stop; break; }; sleep 600; continue; fi
             [ -n "$manual" ] && { echo manual > stop; break; }
           done
           exit 0
