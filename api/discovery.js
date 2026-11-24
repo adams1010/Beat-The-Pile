@@ -17,6 +17,7 @@ import { isAdminEmail } from "../lib/admins.js";
 const slug = (s) => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const cleanUrl = (u) => { try { const x = new URL(String(u).trim()); return /^https?:$/.test(x.protocol) ? x.toString() : null; } catch { return null; } };
 const cleanDomain = (d) => String(d || "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/.*$/, "");
+const WEEK = { at: 0, data: null };   // /bots "This week" cache (per server, 10 min)
 
 async function adminEmail(req) {
   const uid = await verifyClerkJWT(bearer(req));
@@ -240,6 +241,17 @@ export default async function handler(req, res) {
         const on = Object.fromEntries(settings.map((x) => [x.bot, x.enabled !== false]));
         return res.status(200).json({ public: true, bots: BOTS.map((x) => ({ id: x.id, name: x.name, enabled: on[x.id] !== false })) });
       } catch { return res.status(503).json({ error: "Couldn't load bot switches" }); }
+    }
+    // Nov 24 (owner): "This week" on /bots. One Postgres function (supabase/week_stats.sql) counts it all; its own request so a
+    // slow count never holds up the switches; kept 10 min per server so refreshing /bots doesn't rescan the listings table.
+    if (req.query.week !== undefined) {
+      if (WEEK.at && Date.now() - WEEK.at < 10 * 6e4) return res.status(200).json(WEEK.data);
+      try { WEEK.data = await db.rpc("bot_week_stats"); WEEK.at = Date.now(); return res.status(200).json(WEEK.data); }
+      catch (e) {
+        const missing = /bot_week_stats|PGRST202|42883|Could not find the function/i.test(String(e?.message));
+        console.error("[discovery week]", e?.message);
+        return res.status(503).json({ error: missing ? "Run supabase/week_stats.sql in Supabase first." : "Couldn't count this week's numbers. Try again in a minute." });
+      }
     }
     try {
       const [settings, runs, cands, ai, listings, users, feedback] = await Promise.all([
