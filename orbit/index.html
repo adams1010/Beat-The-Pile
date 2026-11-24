@@ -247,9 +247,9 @@
   // people behind you pass behind the centre and fade. Rings spin slowly (inner fastest); drag sideways to spin it,
   // let go and it coasts. The angle is fixed (owner Nov 24: students only spin it). Hovering or focusing someone stops the spin and shows their name.
   // Reduced motion = still 3D, no auto-spin, no intro, no coasting. Nodes are drawn at (0,0) and moved with a transform.
-  // tilt = camera height above the orbit plane (0° = edge-on), fixed at 29°; the cropped frame fits up to 35°.
+  // tilt = camera height above the orbit plane (0° = edge-on), fixed at 60° (owner Nov 24: "way steeper"); the frame is sized for 60°.
   const SKY_C = 230, SKY_D = 700, SKY_SPEED = [2 * Math.PI / 70, 2 * Math.PI / 100, 2 * Math.PI / 140];
-  const ORB3 = { theta: 0, tilt: 29 * Math.PI / 180, intro: true };   // kept across re-renders so switching tabs doesn't jump
+  const ORB3 = { theta: 0, tilt: 60 * Math.PI / 180, intro: true };   // kept across re-renders so switching tabs doesn't jump
   function sky(o, sets = { inner: o.classmates, campus: o.schoolmates, everyone: o.everyone }, rings3 = RINGS.slice(0, 3), center = { text: initials(o.me.name) || "You", label: "You", photo: o.me.photo }){
     const RAD = [92, 150, 205], BAND = [18, 24, 24], C = SKY_C;
     let nodes = "", rings = "", defs = "";
@@ -279,8 +279,8 @@
       ? `<clipPath id="ocme"><circle cx="${C}" cy="${C}" r="34"/></clipPath><image href="${esc(center.photo)}" x="${C - 34}" y="${C - 34}" width="68" height="68" preserveAspectRatio="xMidYMid slice" clip-path="url(#ocme)"/><circle cx="${C}" cy="${C}" r="34" fill="url(#orbShade)"/><circle cx="${C}" cy="${C}" r="34" fill="none" stroke="#B0F701" stroke-width="3"/>`
       : `<circle cx="${C}" cy="${C}" r="34" fill="url(#orbSun)"/><text x="${C}" y="${C + 6}" text-anchor="middle" font-size="16" font-weight="700" fill="#060A2C">${esc(center.text)}</text>`;
     setTimeout(initSky3d, 0);
-    return `<svg class="sky3d" viewBox="0 110 460 315" role="img" aria-label="Your orbit: ${rings3.map(([k, t]) => `${(sets[k] || []).length} ${t}`).join(", ")}">
-      <defs>${defs}<clipPath id="orbBox"><rect y="110" width="460" height="315"/></clipPath>
+    return `<svg class="sky3d" viewBox="0 44 460 436" role="img" aria-label="Your orbit: ${rings3.map(([k, t]) => `${(sets[k] || []).length} ${t}`).join(", ")}">
+      <defs>${defs}<clipPath id="orbBox"><rect y="44" width="460" height="436"/></clipPath>
         <radialGradient id="orbSun" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#E6FF9A"/><stop offset=".55" stop-color="#B0F701"/><stop offset="1" stop-color="#5E8A00"/></radialGradient>
         <radialGradient id="orbShade" cx="38%" cy="32%" r="75%"><stop offset=".45" stop-color="#060A2C" stop-opacity="0"/><stop offset="1" stop-color="#060A2C" stop-opacity=".55"/></radialGradient></defs>
       <g clip-path="url(#orbBox)"><g class="stars">${stars}</g></g>
