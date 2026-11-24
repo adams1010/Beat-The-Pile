@@ -297,6 +297,9 @@ default, a "Show within 100 mi" link in the note; `?near=&mi=` still work); a ba
 `cityMatches()` uses it when one state has it, else the API returns `choices` and the page shows state buttons; picking a state turns it off. Tests: `tests/geo-radius-test.mjs` (real formats + audit catches). Changing the geocoder?
 Re-run the measure/audit against a fresh pull of live locations before shipping.
 
+## Central US + whole-board reads (Nov 23 2026, owner: "300,000 jobs, nothing in the central US")
+Measured: per 10k people the East Coast has 39 jobs and the central states 36. The Plains (ND, SD, NE, KS, MN, WI) are above the East already; the real gaps are NM, MS, AR, LA, OK (23–27). The map looks empty there mostly because fewer people live there. (1) **Workday whole-board reads** (`FULL_MAX` 2000 in lib/fetchers/workday.js, Turbo only): boards with ≤ 2,000 jobs are read page by page with no keyword and filtered by our rules (3 pages at a time); bigger boards keep the keyword searches. Why: Intermountain kept 25 of 1,464 jobs while ~1 in 3 fit. (2) **Hospital support roles** = Entry-level (`ENTRY`): patient transporter, environmental services/EVS, floor care, patient sitter/safety attendant, nutrition services, laundry/linen; supervisors/managers/senior stay out. New searches: environmental services, transporter, nutrition services, food service, housekeeping, caregiver. (3) **data/wanted.json** + 143 central employers (`region:"central"`, priority 80: AR/LA/MS/OK/NM/MO/KS/NE/IA/SD/ND/MT/WY/ID/UT/TX health systems, flagship universities, ag/food, utilities, railroads, trucking). Tests `tests/wdfull-test.mjs`.
+
 ## Data model (Supabase)
 `company_candidates` (robot queue + results: status, ats, config, hint, priority, detail) · `listings` (match, field,
 first_seen, closed_at, link_ok, link_fails) · `feed_runs` + view `feed_last` · `user_jobs` (saved, applied, apps,

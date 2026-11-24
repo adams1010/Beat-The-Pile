@@ -1,616 +1,3925 @@
 {
-"built":"2026-11-16",
-"why":"Big employers that hire for entry-level and part-time jobs (hospital systems, banks, insurers, schools, retailers, restaurants, hotels; since Nov 15 also golf courses, resorts, parks, childcare, pet care) — the finder proves each board before anything goes live; Nov 16 also gyms, physical therapy, sports brands, nursing hospitals, psychology/behavioral health",
-"count":612,
-"companies":[{"company":"Athletico Physical Therapy","domain":"athletico.com","priority":70},
-{"company":"PT Solutions","domain":"ptsolutions.com","priority":70},
-{"company":"BenchMark Physical Therapy","domain":"benchmarkpt.com","priority":70},
-{"company":"Professional Physical Therapy","domain":"professionalpt.com","priority":70},
-{"company":"U.S. Physical Therapy","domain":"usph.com","priority":70},
-{"company":"Confluent Health","domain":"confluenthealth.com","priority":70},
-{"company":"Pivot Physical Therapy","domain":"pivotphysicaltherapy.com","priority":70},
-{"company":"FYZICAL Therapy & Balance Centers","domain":"fyzical.com","priority":70},
-{"company":"CORA Physical Therapy","domain":"coraphysicaltherapy.com","priority":70},
-{"company":"Twin Boro Physical Therapy","domain":"twinboro.com","priority":70},
-{"company":"Shirley Ryan AbilityLab","domain":"sralab.org","priority":70},
-{"company":"Aegis Therapies","domain":"aegistherapies.com","priority":70},
-{"company":"Hospital for Special Surgery","domain":"hss.edu","priority":70},
-{"company":"Rothman Orthopaedics","domain":"rothmanortho.com","priority":70},
-{"company":"OrthoCarolina","domain":"orthocarolina.com","priority":70},
-{"company":"OrthoVirginia","domain":"orthovirginia.com","priority":70},
-{"company":"Hinge Health","domain":"hingehealth.com","priority":70},
-{"company":"Sword Health","domain":"swordhealth.com","priority":70},
-{"company":"Omada Health","domain":"omadahealth.com","priority":70},
-{"company":"Noom","domain":"noom.com","priority":70},
-{"company":"Life Time","domain":"lifetime.life","priority":70},
-{"company":"Planet Fitness","domain":"planetfitness.com","priority":70},
-{"company":"Orangetheory Fitness","domain":"orangetheory.com","priority":70},
-{"company":"Crunch Fitness","domain":"crunch.com","priority":70},
-{"company":"24 Hour Fitness","domain":"24hourfitness.com","priority":70},
-{"company":"YMCA of the USA","domain":"ymca.org","priority":70},
-{"company":"Anytime Fitness","domain":"anytimefitness.com","priority":70},
-{"company":"EoS Fitness","domain":"eosfitness.com","priority":70},
-{"company":"Chuze Fitness","domain":"chuzefitness.com","priority":70},
-{"company":"Xponential Fitness","domain":"xponential.com","priority":70},
-{"company":"F45 Training","domain":"f45training.com","priority":70},
-{"company":"Barry's","domain":"barrys.com","priority":70},
-{"company":"SoulCycle","domain":"soul-cycle.com","priority":70},
-{"company":"Peloton","domain":"onepeloton.com","priority":70},
-{"company":"Tonal","domain":"tonal.com","priority":70},
-{"company":"Future","domain":"future.co","priority":70},
-{"company":"EXOS","domain":"teamexos.com","priority":70},
-{"company":"IMG Academy","domain":"imgacademy.com","priority":70},
-{"company":"D1 Training","domain":"d1training.com","priority":70},
-{"company":"Under Armour","domain":"underarmour.com","priority":70},
-{"company":"Lululemon","domain":"lululemon.com","priority":70},
-{"company":"Catapult Sports","domain":"catapult.com","priority":70},
-{"company":"Zwift","domain":"zwift.com","priority":70},
-{"company":"NovaCare Rehabilitation","domain":"novacare.com","priority":70},
-{"company":"Kessler Rehabilitation Center","domain":"kesslerrehab.com","priority":70},
-{"company":"MedStar Health","domain":"medstarhealth.org","priority":60},
-{"company":"Children's National Hospital","domain":"childrensnational.org","priority":60},
-{"company":"George Washington University","domain":"gwu.edu","priority":60},
-{"company":"GW Medical Faculty Associates","domain":"gwdocs.com","priority":60},
-{"company":"Howard University","domain":"howard.edu","priority":60},
-{"company":"Howard University Hospital","domain":"huhealthcare.com","priority":60},
-{"company":"Inova Health System","domain":"inova.org","priority":60},
-{"company":"Adventist HealthCare","domain":"adventisthealthcare.com","priority":60},
-{"company":"Holy Cross Health","domain":"holycrosshealth.org","priority":60},
-{"company":"Luminis Health","domain":"luminishealth.org","priority":60},
-{"company":"University of Maryland Medical System","domain":"umms.org","priority":60},
-{"company":"Johns Hopkins Medicine","domain":"hopkinsmedicine.org","priority":60},
-{"company":"Johns Hopkins University","domain":"jhu.edu","priority":60},
-{"company":"Kaiser Permanente","domain":"kaiserpermanente.org","priority":60},
-{"company":"One Medical","domain":"onemedical.com","priority":60},
-{"company":"Unity Health Care","domain":"unityhealthcare.org","priority":60},
-{"company":"Mary's Center","domain":"maryscenter.org","priority":60},
-{"company":"Whitman-Walker Health","domain":"whitman-walker.org","priority":60},
-{"company":"Virginia Hospital Center","domain":"virginiahospitalcenter.com","priority":60},
-{"company":"Mary Washington Healthcare","domain":"marywashingtonhealthcare.com","priority":60},
-{"company":"Bon Secours Mercy Health","domain":"bsmhealth.org","priority":60},
-{"company":"Christiana Care","domain":"christianacare.org","priority":60},
-{"company":"Novant Health","domain":"novanthealth.org","priority":60},
-{"company":"HCA Healthcare","domain":"hcahealthcare.com","priority":60},
-{"company":"Valley Health System","domain":"valleyhealthlink.com","priority":60},
-{"company":"CareFirst BlueCross BlueShield","domain":"carefirst.com","priority":60},
-{"company":"Quest Diagnostics","domain":"questdiagnostics.com","priority":60},
-{"company":"Capital One","domain":"capitalone.com","priority":60},
-{"company":"PNC","domain":"pnc.com","priority":60},
-{"company":"Bank of America","domain":"bankofamerica.com","priority":60},
-{"company":"Navy Federal Credit Union","domain":"navyfederal.org","priority":60},
-{"company":"PenFed Credit Union","domain":"penfed.org","priority":60},
-{"company":"Fairfax County Government","domain":"fairfaxcounty.gov","priority":60},
-{"company":"Montgomery County Government","domain":"montgomerycountymd.gov","priority":60},
-{"company":"Arlington County Government","domain":"arlingtonva.us","priority":60},
-{"company":"Prince George's County Government","domain":"princegeorgescountymd.gov","priority":60},
-{"company":"DC Health","domain":"dchealth.dc.gov","priority":60},
-{"company":"Children's Hospital of Philadelphia","domain":"chop.edu","priority":60},
-{"company":"Penn Medicine","domain":"pennmedicine.org","priority":60},
-{"company":"Jefferson Health","domain":"jeffersonhealth.org","priority":60},
-{"company":"UPMC","domain":"upmc.com","priority":60},
-{"company":"Allegheny Health Network","domain":"ahn.org","priority":60},
-{"company":"Geisinger","domain":"geisinger.org","priority":60},
-{"company":"Penn State Health","domain":"pennstatehealth.org","priority":60},
-{"company":"Main Line Health","domain":"mainlinehealth.org","priority":60},
-{"company":"Temple Health","domain":"templehealth.org","priority":60},
-{"company":"Northwell Health","domain":"northwell.edu","priority":60},
-{"company":"NYU Langone Health","domain":"nyulangone.org","priority":60},
-{"company":"Mount Sinai Health System","domain":"mountsinai.org","priority":60},
-{"company":"NewYork-Presbyterian","domain":"nyp.org","priority":60},
-{"company":"Montefiore Health System","domain":"montefiore.org","priority":60},
-{"company":"NYC Health + Hospitals","domain":"nychealthandhospitals.org","priority":60},
-{"company":"Hackensack Meridian Health","domain":"hackensackmeridianhealth.org","priority":60},
-{"company":"RWJBarnabas Health","domain":"rwjbh.org","priority":60},
-{"company":"Atlantic Health System","domain":"atlantichealth.org","priority":60},
-{"company":"Virtua Health","domain":"virtua.org","priority":60},
-{"company":"Yale New Haven Health","domain":"ynhhs.org","priority":60},
-{"company":"Hartford HealthCare","domain":"hartfordhealthcare.org","priority":60},
-{"company":"Mass General Brigham","domain":"massgeneralbrigham.org","priority":60},
-{"company":"Beth Israel Lahey Health","domain":"bilh.org","priority":60},
-{"company":"Boston Children's Hospital","domain":"childrenshospital.org","priority":60},
-{"company":"Dana-Farber Cancer Institute","domain":"dana-farber.org","priority":60},
-{"company":"Lifespan","domain":"lifespan.org","priority":60},
-{"company":"Dartmouth Health","domain":"dartmouth-health.org","priority":60},
-{"company":"MaineHealth","domain":"mainehealth.org","priority":60},
-{"company":"Rochester Regional Health","domain":"rochesterregional.org","priority":60},
-{"company":"University of Rochester Medical Center","domain":"urmc.rochester.edu","priority":60},
-{"company":"Kaleida Health","domain":"kaleidahealth.org","priority":60},
-{"company":"Cleveland Clinic","domain":"clevelandclinic.org","priority":60},
-{"company":"University Hospitals","domain":"uhhospitals.org","priority":60},
-{"company":"OhioHealth","domain":"ohiohealth.com","priority":60},
-{"company":"Ohio State Wexner Medical Center","domain":"wexnermedical.osu.edu","priority":60},
-{"company":"Nationwide Children's Hospital","domain":"nationwidechildrens.org","priority":60},
-{"company":"Cincinnati Children's","domain":"cincinnatichildrens.org","priority":60},
-{"company":"TriHealth","domain":"trihealth.com","priority":60},
-{"company":"UC Health","domain":"uchealth.com","priority":60},
-{"company":"Premier Health","domain":"premierhealth.com","priority":60},
-{"company":"ProMedica","domain":"promedica.org","priority":60},
-{"company":"Mercy Health","domain":"mercy.com","priority":60},
-{"company":"Corewell Health","domain":"corewellhealth.org","priority":60},
-{"company":"Henry Ford Health","domain":"henryford.com","priority":60},
-{"company":"Michigan Medicine","domain":"uofmhealth.org","priority":60},
-{"company":"Trinity Health","domain":"trinity-health.org","priority":60},
-{"company":"Sparrow Health","domain":"sparrow.org","priority":60},
-{"company":"Advocate Health","domain":"advocatehealth.org","priority":60},
-{"company":"Atrium Health","domain":"atriumhealth.org","priority":60},
-{"company":"Northwestern Medicine","domain":"nm.org","priority":60},
-{"company":"Rush University Medical Center","domain":"rush.edu","priority":60},
-{"company":"UChicago Medicine","domain":"uchicagomedicine.org","priority":60},
-{"company":"Lurie Children's","domain":"luriechildrens.org","priority":60},
-{"company":"OSF HealthCare","domain":"osfhealthcare.org","priority":60},
-{"company":"Carle Health","domain":"carle.org","priority":60},
-{"company":"Endeavor Health","domain":"endeavorhealth.org","priority":60},
-{"company":"Indiana University Health","domain":"iuhealth.org","priority":60},
-{"company":"Community Health Network","domain":"ecommunity.com","priority":60},
-{"company":"Franciscan Health","domain":"franciscanhealth.org","priority":60},
-{"company":"Froedtert ThedaCare Health","domain":"froedtert.com","priority":60},
-{"company":"Aurora Health Care","domain":"aurorahealthcare.org","priority":60},
-{"company":"UW Health","domain":"uwhealth.org","priority":60},
-{"company":"Marshfield Clinic Health System","domain":"marshfieldclinic.org","priority":60},
-{"company":"Mayo Clinic","domain":"mayoclinic.org","priority":60},
-{"company":"Allina Health","domain":"allinahealth.org","priority":60},
-{"company":"Fairview Health Services","domain":"fairview.org","priority":60},
-{"company":"HealthPartners","domain":"healthpartners.com","priority":60},
-{"company":"Essentia Health","domain":"essentiahealth.org","priority":60},
-{"company":"Sanford Health","domain":"sanfordhealth.org","priority":60},
-{"company":"Avera Health","domain":"avera.org","priority":60},
-{"company":"UnityPoint Health","domain":"unitypoint.org","priority":60},
-{"company":"University of Iowa Health Care","domain":"uihc.org","priority":60},
-{"company":"Nebraska Medicine","domain":"nebraskamed.com","priority":60},
-{"company":"CHI Health","domain":"chihealth.com","priority":60},
-{"company":"BJC HealthCare","domain":"bjc.org","priority":60},
-{"company":"SSM Health","domain":"ssmhealth.com","priority":60},
-{"company":"Mercy","domain":"mercy.net","priority":60},
-{"company":"CoxHealth","domain":"coxhealth.com","priority":60},
-{"company":"University of Kansas Health System","domain":"kansashealthsystem.com","priority":60},
-{"company":"Children's Mercy Kansas City","domain":"childrensmercy.org","priority":60},
-{"company":"Saint Luke's Health System","domain":"saintlukeskc.org","priority":60},
-{"company":"Stormont Vail Health","domain":"stormontvail.org","priority":60},
-{"company":"Integris Health","domain":"integrisok.com","priority":60},
-{"company":"OU Health","domain":"ouhealth.com","priority":60},
-{"company":"Saint Francis Health System","domain":"saintfrancis.com","priority":60},
-{"company":"Baylor Scott & White Health","domain":"bswhealth.com","priority":60},
-{"company":"Texas Health Resources","domain":"texashealth.org","priority":60},
-{"company":"Methodist Health System","domain":"methodisthealthsystem.org","priority":60},
-{"company":"UT Southwestern Medical Center","domain":"utsouthwestern.edu","priority":60},
-{"company":"Parkland Health","domain":"parklandhealth.org","priority":60},
-{"company":"Children's Health","domain":"childrens.com","priority":60},
-{"company":"Cook Children's","domain":"cookchildrens.org","priority":60},
-{"company":"Houston Methodist","domain":"houstonmethodist.org","priority":60},
-{"company":"Memorial Hermann","domain":"memorialhermann.org","priority":60},
-{"company":"Texas Children's Hospital","domain":"texaschildrens.org","priority":60},
-{"company":"MD Anderson Cancer Center","domain":"mdanderson.org","priority":60},
-{"company":"Harris Health System","domain":"harrishealth.org","priority":60},
-{"company":"CHRISTUS Health","domain":"christushealth.org","priority":60},
-{"company":"University Health","domain":"universityhealth.com","priority":60},
-{"company":"Ascension","domain":"ascension.org","priority":60},
-{"company":"UT Health San Antonio","domain":"uthscsa.edu","priority":60},
-{"company":"Banner Health","domain":"bannerhealth.com","priority":60},
-{"company":"HonorHealth","domain":"honorhealth.com","priority":60},
-{"company":"Phoenix Children's","domain":"phoenixchildrens.org","priority":60},
-{"company":"Dignity Health","domain":"dignityhealth.org","priority":60},
-{"company":"CommonSpirit Health","domain":"commonspirit.org","priority":60},
-{"company":"Intermountain Health","domain":"intermountainhealthcare.org","priority":60},
-{"company":"University of Utah Health","domain":"healthcare.utah.edu","priority":60},
-{"company":"UCHealth","domain":"uchealth.org","priority":60},
-{"company":"Children's Hospital Colorado","domain":"childrenscolorado.org","priority":60},
-{"company":"Denver Health","domain":"denverhealth.org","priority":60},
-{"company":"Centura Health","domain":"centura.org","priority":60},
-{"company":"Presbyterian Healthcare Services","domain":"phs.org","priority":60},
-{"company":"Providence","domain":"providence.org","priority":60},
-{"company":"MultiCare Health System","domain":"multicare.org","priority":60},
-{"company":"Virginia Mason Franciscan Health","domain":"vmfh.org","priority":60},
-{"company":"UW Medicine","domain":"uwmedicine.org","priority":60},
-{"company":"Seattle Children's","domain":"seattlechildrens.org","priority":60},
-{"company":"Legacy Health","domain":"legacyhealth.org","priority":60},
-{"company":"OHSU","domain":"ohsu.edu","priority":60},
-{"company":"PeaceHealth","domain":"peacehealth.org","priority":60},
-{"company":"St. Luke's Health System","domain":"stlukesonline.org","priority":60},
-{"company":"Renown Health","domain":"renown.org","priority":60},
-{"company":"Sutter Health","domain":"sutterhealth.org","priority":60},
-{"company":"Stanford Health Care","domain":"stanfordhealthcare.org","priority":60},
-{"company":"UCSF Health","domain":"ucsfhealth.org","priority":60},
-{"company":"UC Davis Health","domain":"health.ucdavis.edu","priority":60},
-{"company":"Cedars-Sinai","domain":"cedars-sinai.org","priority":60},
-{"company":"UCLA Health","domain":"uclahealth.org","priority":60},
-{"company":"Keck Medicine of USC","domain":"keckmedicine.org","priority":60},
-{"company":"Children's Hospital Los Angeles","domain":"chla.org","priority":60},
-{"company":"Scripps Health","domain":"scripps.org","priority":60},
-{"company":"Sharp HealthCare","domain":"sharp.com","priority":60},
-{"company":"Rady Children's Hospital","domain":"rchsd.org","priority":60},
-{"company":"UC San Diego Health","domain":"health.ucsd.edu","priority":60},
-{"company":"Hoag","domain":"hoag.org","priority":60},
-{"company":"MemorialCare","domain":"memorialcare.org","priority":60},
-{"company":"Loma Linda University Health","domain":"lluh.org","priority":60},
-{"company":"John Muir Health","domain":"johnmuirhealth.com","priority":60},
-{"company":"El Camino Health","domain":"elcaminohealth.org","priority":60},
-{"company":"Queen's Health Systems","domain":"queens.org","priority":60},
-{"company":"Hawaii Pacific Health","domain":"hawaiipacifichealth.org","priority":60},
-{"company":"Providence Alaska","domain":"providence.org","priority":60},
-{"company":"Emory Healthcare","domain":"emoryhealthcare.org","priority":60},
-{"company":"Piedmont Healthcare","domain":"piedmont.org","priority":60},
-{"company":"Northside Hospital","domain":"northside.com","priority":60},
-{"company":"Wellstar Health System","domain":"wellstar.org","priority":60},
-{"company":"Children's Healthcare of Atlanta","domain":"choa.org","priority":60},
-{"company":"Grady Health System","domain":"gradyhealth.org","priority":60},
-{"company":"Prisma Health","domain":"prismahealth.org","priority":60},
-{"company":"MUSC Health","domain":"muschealth.org","priority":60},
-{"company":"Roper St. Francis Healthcare","domain":"rsfh.com","priority":60},
-{"company":"Duke Health","domain":"dukehealth.org","priority":60},
-{"company":"UNC Health","domain":"unchealth.org","priority":60},
-{"company":"WakeMed","domain":"wakemed.org","priority":60},
-{"company":"ECU Health","domain":"ecuhealth.org","priority":60},
-{"company":"Cone Health","domain":"conehealth.com","priority":60},
-{"company":"Sentara Health","domain":"sentara.com","priority":60},
-{"company":"Riverside Health System","domain":"riversideonline.com","priority":60},
-{"company":"Carilion Clinic","domain":"carilionclinic.org","priority":60},
-{"company":"VCU Health","domain":"vcuhealth.org","priority":60},
-{"company":"UVA Health","domain":"uvahealth.com","priority":60},
-{"company":"Ballad Health","domain":"balladhealth.org","priority":60},
-{"company":"Vanderbilt University Medical Center","domain":"vumc.org","priority":60},
-{"company":"HCA TriStar","domain":"tristarhealth.com","priority":60},
-{"company":"Methodist Le Bonheur Healthcare","domain":"methodisthealth.org","priority":60},
-{"company":"St. Jude Children's Research Hospital","domain":"stjude.org","priority":60},
-{"company":"Baptist Memorial Health Care","domain":"baptistonline.org","priority":60},
-{"company":"Erlanger Health System","domain":"erlanger.org","priority":60},
-{"company":"UAB Medicine","domain":"uabmedicine.org","priority":60},
-{"company":"Huntsville Hospital","domain":"huntsvillehospital.org","priority":60},
-{"company":"Ochsner Health","domain":"ochsner.org","priority":60},
-{"company":"LCMC Health","domain":"lcmchealth.org","priority":60},
-{"company":"Our Lady of the Lake","domain":"ololrmc.com","priority":60},
-{"company":"University of Mississippi Medical Center","domain":"umc.edu","priority":60},
-{"company":"Baptist Health","domain":"baptisthealth.com","priority":60},
-{"company":"Norton Healthcare","domain":"nortonhealthcare.com","priority":60},
-{"company":"UK HealthCare","domain":"ukhealthcare.uky.edu","priority":60},
-{"company":"UofL Health","domain":"uoflhealth.org","priority":60},
-{"company":"AdventHealth","domain":"adventhealth.com","priority":60},
-{"company":"Orlando Health","domain":"orlandohealth.com","priority":60},
-{"company":"BayCare","domain":"baycare.org","priority":60},
-{"company":"Tampa General Hospital","domain":"tgh.org","priority":60},
-{"company":"Moffitt Cancer Center","domain":"moffitt.org","priority":60},
-{"company":"Jackson Health System","domain":"jacksonhealth.org","priority":60},
-{"company":"Baptist Health South Florida","domain":"baptisthealth.net","priority":60},
-{"company":"Memorial Healthcare System","domain":"mhs.net","priority":60},
-{"company":"Broward Health","domain":"browardhealth.org","priority":60},
-{"company":"UF Health","domain":"ufhealth.org","priority":60},
-{"company":"Lee Health","domain":"leehealth.org","priority":60},
-{"company":"Sarasota Memorial Health Care","domain":"smh.com","priority":60},
-{"company":"Nemours Children's Health","domain":"nemours.org","priority":60},
-{"company":"Wolfson Children's Hospital","domain":"wolfsonchildrens.com","priority":60},
-{"company":"Mayo Clinic Florida","domain":"mayoclinic.org","priority":60},
-{"company":"Encompass Health","domain":"encompasshealth.com","priority":60},
-{"company":"Select Medical","domain":"selectmedical.com","priority":60},
-{"company":"Kindred Healthcare","domain":"kindredhealthcare.com","priority":60},
-{"company":"DaVita","domain":"davita.com","priority":60},
-{"company":"Fresenius Medical Care","domain":"freseniusmedicalcare.us","priority":60},
-{"company":"U.S. Renal Care","domain":"usrenalcare.com","priority":60},
-{"company":"Optum","domain":"optum.com","priority":60},
-{"company":"UnitedHealth Group","domain":"unitedhealthgroup.com","priority":60},
-{"company":"Elevance Health","domain":"elevancehealth.com","priority":60},
-{"company":"Cigna","domain":"cigna.com","priority":60},
-{"company":"Humana","domain":"humana.com","priority":60},
-{"company":"Centene","domain":"centene.com","priority":60},
-{"company":"Molina Healthcare","domain":"molinahealthcare.com","priority":60},
-{"company":"Aetna","domain":"aetna.com","priority":60},
-{"company":"Walgreens","domain":"walgreens.com","priority":60},
-{"company":"Rite Aid","domain":"riteaid.com","priority":60},
-{"company":"Labcorp","domain":"labcorp.com","priority":60},
-{"company":"Sonic Healthcare USA","domain":"sonichealthcareusa.com","priority":60},
-{"company":"ATI Physical Therapy","domain":"atipt.com","priority":60},
-{"company":"Upstream Rehabilitation","domain":"upstreamrehab.com","priority":60},
-{"company":"Ivy Rehab","domain":"ivyrehab.com","priority":60},
-{"company":"Concentra","domain":"concentra.com","priority":60},
-{"company":"CityMD","domain":"citymd.com","priority":60},
-{"company":"MinuteClinic","domain":"cvs.com","priority":60},
-{"company":"Carbon Health","domain":"carbonhealth.com","priority":60},
-{"company":"Oak Street Health","domain":"oakstreethealth.com","priority":60},
-{"company":"ChenMed","domain":"chenmed.com","priority":60},
-{"company":"Village Medical","domain":"villagemedical.com","priority":60},
-{"company":"VillageMD","domain":"villagemd.com","priority":60},
-{"company":"Privia Health","domain":"priviahealth.com","priority":60},
-{"company":"Aspen Dental","domain":"aspendental.com","priority":60},
-{"company":"Heartland Dental","domain":"heartland.com","priority":60},
-{"company":"Pacific Dental Services","domain":"pacificdentalservices.com","priority":60},
-{"company":"Banfield Pet Hospital","domain":"banfield.com","priority":60},
-{"company":"VCA Animal Hospitals","domain":"vcahospitals.com","priority":60},
-{"company":"BluePearl Pet Hospital","domain":"bluepearlvet.com","priority":60},
-{"company":"Thrive Pet Healthcare","domain":"thrivepetcare.com","priority":60},
-{"company":"Mission Veterinary Partners","domain":"missionvetpartners.com","priority":60},
-{"company":"Brightview Senior Living","domain":"brightviewseniorliving.com","priority":60},
-{"company":"Sunrise Senior Living","domain":"sunriseseniorliving.com","priority":60},
-{"company":"Brookdale Senior Living","domain":"brookdale.com","priority":60},
-{"company":"Genesis HealthCare","domain":"genesishcc.com","priority":60},
-{"company":"Amedisys","domain":"amedisys.com","priority":60},
-{"company":"BAYADA Home Health Care","domain":"bayada.com","priority":60},
-{"company":"Aveanna Healthcare","domain":"aveanna.com","priority":60},
-{"company":"Maxim Healthcare Services","domain":"maximhealthcare.com","priority":60},
-{"company":"Interim HealthCare","domain":"interimhealthcare.com","priority":60},
-{"company":"Acadia Healthcare","domain":"acadiahealthcare.com","priority":60},
-{"company":"Universal Health Services","domain":"uhs.com","priority":60},
-{"company":"Hopebridge","domain":"hopebridge.com","priority":60},
-{"company":"Action Behavior Centers","domain":"actionbehavior.com","priority":60},
-{"company":"BlueSprig","domain":"bluesprigautism.com","priority":60},
-{"company":"Kyo","domain":"kyocare.com","priority":60},
-{"company":"Behavioral Innovations","domain":"behavioral-innovations.com","priority":60},
-{"company":"JPMorgan Chase","domain":"jpmorganchase.com","priority":60},
-{"company":"Wells Fargo","domain":"wellsfargo.com","priority":60},
-{"company":"Citi","domain":"citigroup.com","priority":60},
-{"company":"U.S. Bank","domain":"usbank.com","priority":60},
-{"company":"Truist","domain":"truist.com","priority":60},
-{"company":"TD Bank","domain":"td.com","priority":60},
-{"company":"Fifth Third Bank","domain":"53.com","priority":60},
-{"company":"KeyBank","domain":"key.com","priority":60},
-{"company":"Huntington Bank","domain":"huntington.com","priority":60},
-{"company":"Regions Bank","domain":"regions.com","priority":60},
-{"company":"M&T Bank","domain":"mtb.com","priority":60},
-{"company":"Citizens Bank","domain":"citizensbank.com","priority":60},
-{"company":"First Citizens Bank","domain":"firstcitizens.com","priority":60},
-{"company":"BMO","domain":"bmo.com","priority":60},
-{"company":"Santander","domain":"santanderbank.com","priority":60},
-{"company":"Ally","domain":"ally.com","priority":60},
-{"company":"Discover","domain":"discover.com","priority":60},
-{"company":"American Express","domain":"americanexpress.com","priority":60},
-{"company":"Synchrony","domain":"synchrony.com","priority":60},
-{"company":"Charles Schwab","domain":"schwab.com","priority":60},
-{"company":"Fidelity Investments","domain":"fidelity.com","priority":60},
-{"company":"Vanguard","domain":"vanguard.com","priority":60},
-{"company":"Edward Jones","domain":"edwardjones.com","priority":60},
-{"company":"State Farm","domain":"statefarm.com","priority":60},
-{"company":"Allstate","domain":"allstate.com","priority":60},
-{"company":"Progressive","domain":"progressive.com","priority":60},
-{"company":"GEICO","domain":"geico.com","priority":60},
-{"company":"Liberty Mutual","domain":"libertymutual.com","priority":60},
-{"company":"Nationwide","domain":"nationwide.com","priority":60},
-{"company":"Travelers","domain":"travelers.com","priority":60},
-{"company":"USAA","domain":"usaa.com","priority":60},
-{"company":"Farmers Insurance","domain":"farmers.com","priority":60},
-{"company":"The Hartford","domain":"thehartford.com","priority":60},
-{"company":"Prudential","domain":"prudential.com","priority":60},
-{"company":"MetLife","domain":"metlife.com","priority":60},
-{"company":"Northwestern Mutual","domain":"northwesternmutual.com","priority":60},
-{"company":"New York Life","domain":"newyorklife.com","priority":60},
-{"company":"Lincoln Financial","domain":"lincolnfinancial.com","priority":60},
-{"company":"Principal Financial Group","domain":"principal.com","priority":60},
-{"company":"Aflac","domain":"aflac.com","priority":60},
-{"company":"Erie Insurance","domain":"erieinsurance.com","priority":60},
-{"company":"Teachers Federal Credit Union","domain":"teachersfcu.org","priority":60},
-{"company":"State Employees' Credit Union","domain":"ncsecu.org","priority":60},
-{"company":"BECU","domain":"becu.org","priority":60},
-{"company":"SchoolsFirst Federal Credit Union","domain":"schoolsfirstfcu.org","priority":60},
-{"company":"America First Credit Union","domain":"americafirst.com","priority":60},
-{"company":"Alliant Credit Union","domain":"alliantcreditunion.org","priority":60},
-{"company":"Suncoast Credit Union","domain":"suncoastcreditunion.com","priority":60},
-{"company":"Mountain America Credit Union","domain":"macu.com","priority":60},
-{"company":"H&R Block","domain":"hrblock.com","priority":60},
-{"company":"ADP","domain":"adp.com","priority":60},
-{"company":"Paychex","domain":"paychex.com","priority":60},
-{"company":"Teleperformance","domain":"teleperformance.com","priority":60},
-{"company":"Concentrix","domain":"concentrix.com","priority":60},
-{"company":"TTEC","domain":"ttec.com","priority":60},
-{"company":"Conduent","domain":"conduent.com","priority":60},
-{"company":"Maximus","domain":"maximus.com","priority":60},
-{"company":"Enterprise Mobility","domain":"enterprisemobility.com","priority":60},
-{"company":"Hertz","domain":"hertz.com","priority":60},
-{"company":"Sherwin-Williams","domain":"sherwin-williams.com","priority":60},
-{"company":"Teach For America","domain":"teachforamerica.org","priority":60},
-{"company":"City Year","domain":"cityyear.org","priority":60},
-{"company":"AmeriCorps","domain":"americorps.gov","priority":60},
-{"company":"KIPP","domain":"kipp.org","priority":60},
-{"company":"IDEA Public Schools","domain":"ideapublicschools.org","priority":60},
-{"company":"Success Academy","domain":"successacademies.org","priority":60},
-{"company":"Bright Horizons","domain":"brighthorizons.com","priority":60},
-{"company":"KinderCare","domain":"kindercare.com","priority":60},
-{"company":"The Learning Experience","domain":"thelearningexperience.com","priority":60},
-{"company":"Primrose Schools","domain":"primroseschools.com","priority":60},
-{"company":"Huntington Learning Center","domain":"huntingtonhelps.com","priority":60},
-{"company":"Sylvan Learning","domain":"sylvanlearning.com","priority":60},
-{"company":"Varsity Tutors","domain":"varsitytutors.com","priority":60},
-{"company":"Boys & Girls Clubs of America","domain":"bgca.org","priority":60},
-{"company":"YMCA","domain":"ymca.org","priority":60},
-{"company":"American Red Cross","domain":"redcross.org","priority":60},
-{"company":"Goodwill Industries","domain":"goodwill.org","priority":60},
-{"company":"Catholic Charities","domain":"catholiccharitiesusa.org","priority":60},
-{"company":"Salvation Army","domain":"salvationarmyusa.org","priority":60},
-{"company":"Big Brothers Big Sisters","domain":"bbbs.org","priority":60},
-{"company":"Walmart","domain":"walmart.com","priority":45},
-{"company":"Target","domain":"target.com","priority":45},
-{"company":"Kroger","domain":"kroger.com","priority":45},
-{"company":"Publix","domain":"publix.com","priority":45},
-{"company":"Albertsons Companies","domain":"albertsonscompanies.com","priority":45},
-{"company":"H-E-B","domain":"heb.com","priority":45},
-{"company":"Wegmans","domain":"wegmans.com","priority":45},
-{"company":"Meijer","domain":"meijer.com","priority":45},
-{"company":"Giant Food","domain":"giantfood.com","priority":45},
-{"company":"Safeway","domain":"safeway.com","priority":45},
-{"company":"Whole Foods Market","domain":"wholefoodsmarket.com","priority":45},
-{"company":"Trader Joe's","domain":"traderjoes.com","priority":45},
-{"company":"Aldi","domain":"aldi.us","priority":45},
-{"company":"Costco","domain":"costco.com","priority":45},
-{"company":"Sam's Club","domain":"samsclub.com","priority":45},
-{"company":"The Home Depot","domain":"homedepot.com","priority":45},
-{"company":"Lowe's","domain":"lowes.com","priority":45},
-{"company":"Best Buy","domain":"bestbuy.com","priority":45},
-{"company":"Dick's Sporting Goods","domain":"dickssportinggoods.com","priority":45},
-{"company":"Academy Sports + Outdoors","domain":"academy.com","priority":45},
-{"company":"REI","domain":"rei.com","priority":45},
-{"company":"Ulta Beauty","domain":"ulta.com","priority":45},
-{"company":"Sephora","domain":"sephora.com","priority":45},
-{"company":"TJX Companies","domain":"tjx.com","priority":45},
-{"company":"Ross Stores","domain":"rossstores.com","priority":45},
-{"company":"Burlington","domain":"burlington.com","priority":45},
-{"company":"Macy's","domain":"macys.com","priority":45},
-{"company":"Kohl's","domain":"kohls.com","priority":45},
-{"company":"Nordstrom","domain":"nordstrom.com","priority":45},
-{"company":"Gap Inc.","domain":"gapinc.com","priority":45},
-{"company":"Nike","domain":"nike.com","priority":45},
-{"company":"Foot Locker","domain":"footlocker.com","priority":45},
-{"company":"American Eagle Outfitters","domain":"ae.com","priority":45},
-{"company":"Abercrombie & Fitch","domain":"abercrombie.com","priority":45},
-{"company":"Bath & Body Works","domain":"bathandbodyworks.com","priority":45},
-{"company":"Victoria's Secret","domain":"victoriassecret.com","priority":45},
-{"company":"Petco","domain":"petco.com","priority":45},
-{"company":"PetSmart","domain":"petsmart.com","priority":45},
-{"company":"Tractor Supply","domain":"tractorsupply.com","priority":45},
-{"company":"Dollar General","domain":"dollargeneral.com","priority":45},
-{"company":"Dollar Tree","domain":"dollartree.com","priority":45},
-{"company":"Five Below","domain":"fivebelow.com","priority":45},
-{"company":"Michaels","domain":"michaels.com","priority":45},
-{"company":"Hobby Lobby","domain":"hobbylobby.com","priority":45},
-{"company":"Barnes & Noble","domain":"barnesandnoble.com","priority":45},
-{"company":"GameStop","domain":"gamestop.com","priority":45},
-{"company":"Staples","domain":"staples.com","priority":45},
-{"company":"AutoZone","domain":"autozone.com","priority":45},
-{"company":"O'Reilly Auto Parts","domain":"oreillyauto.com","priority":45},
-{"company":"Advance Auto Parts","domain":"advanceautoparts.com","priority":45},
-{"company":"Starbucks","domain":"starbucks.com","priority":45},
-{"company":"Chipotle","domain":"chipotle.com","priority":45},
-{"company":"Panera Bread","domain":"panerabread.com","priority":45},
-{"company":"Inspire Brands","domain":"inspirebrands.com","priority":45},
-{"company":"Darden Restaurants","domain":"darden.com","priority":45},
-{"company":"Texas Roadhouse","domain":"texasroadhouse.com","priority":45},
-{"company":"Cracker Barrel","domain":"crackerbarrel.com","priority":45},
-{"company":"Domino's","domain":"dominos.com","priority":45},
-{"company":"Papa John's","domain":"papajohns.com","priority":45},
-{"company":"Yum! Brands","domain":"yum.com","priority":45},
-{"company":"Shake Shack","domain":"shakeshack.com","priority":45},
-{"company":"Sweetgreen","domain":"sweetgreen.com","priority":45},
-{"company":"CAVA","domain":"cava.com","priority":45},
-{"company":"Raising Cane's","domain":"raisingcanes.com","priority":45},
-{"company":"Wawa","domain":"wawa.com","priority":45},
-{"company":"Sheetz","domain":"sheetz.com","priority":45},
-{"company":"QuikTrip","domain":"quiktrip.com","priority":45},
-{"company":"Buc-ee's","domain":"buc-ees.com","priority":45},
-{"company":"7-Eleven","domain":"7-eleven.com","priority":45},
-{"company":"Marriott International","domain":"marriott.com","priority":45},
-{"company":"Hilton","domain":"hilton.com","priority":45},
-{"company":"Hyatt","domain":"hyatt.com","priority":45},
-{"company":"IHG Hotels & Resorts","domain":"ihg.com","priority":45},
-{"company":"Six Flags","domain":"sixflags.com","priority":45},
-{"company":"SeaWorld","domain":"seaworld.com","priority":45},
-{"company":"Universal Parks & Resorts","domain":"universalparks.com","priority":45},
-{"company":"Disney Parks","domain":"disneycareers.com","priority":45},
-{"company":"AMC Theatres","domain":"amctheatres.com","priority":45},
-{"company":"Regal Cinemas","domain":"regmovies.com","priority":45},
-{"company":"Dave & Buster's","domain":"daveandbusters.com","priority":45},
-{"company":"Topgolf","domain":"topgolf.com","priority":45},
-{"company":"Equinox","domain":"equinox.com","priority":45},
-{"company":"Amazon","domain":"amazon.jobs","priority":45},
-{"company":"FedEx","domain":"fedex.com","priority":45},
-{"company":"UPS","domain":"ups.com","priority":45},
-{"company":"DHL","domain":"dhl.com","priority":45},
-{"company":"Chewy","domain":"chewy.com","priority":45},
-{"company":"Instacart","domain":"instacart.com","priority":45},
-{"company":"DoorDash","domain":"doordash.com","priority":45},
-{"company":"Uber","domain":"uber.com","priority":45},
-{"company":"Enterprise Holdings","domain":"enterprise.com","priority":45},
-{"company":"Avis Budget Group","domain":"avisbudgetgroup.com","priority":45},
-{"company":"U-Haul","domain":"uhaul.com","priority":45},
-{"company":"Aramark","domain":"aramark.com","priority":45},
-{"company":"Sodexo","domain":"sodexo.com","priority":45},
-{"company":"Compass Group USA","domain":"compass-usa.com","priority":45},
-{"company":"Allied Universal","domain":"aus.com","priority":45},
-{"company":"Securitas","domain":"securitasinc.com","priority":45},
-{"company":"Cintas","domain":"cintas.com","priority":45},
-{"company":"ABM Industries","domain":"abm.com","priority":45},
-{"company":"Apple","domain":"apple.com","priority":45},
-{"company":"Verizon","domain":"verizon.com","priority":45},
-{"company":"T-Mobile","domain":"t-mobile.com","priority":45},
-{"company":"AT&T","domain":"att.com","priority":45},
-{"company":"Comcast","domain":"comcast.com","priority":45},
-{"company":"Spectrum","domain":"spectrum.com","priority":45},
-{"company":"Troon","domain":"troon.com","priority":60},
-{"company":"Invited","domain":"invitedclubs.com","priority":60},
-{"company":"Arcis Golf","domain":"arcisgolf.com","priority":60},
-{"company":"KemperSports","domain":"kempersports.com","priority":60},
-{"company":"Drive Shack","domain":"driveshack.com","priority":60},
-{"company":"PGA TOUR Superstore","domain":"pgatoursuperstore.com","priority":60},
-{"company":"Pinehurst Resort","domain":"pinehurst.com","priority":60},
-{"company":"Billy Casper Golf","domain":"billycaspergolf.com","priority":60},
-{"company":"Concert Golf Partners","domain":"concertgolfpartners.com","priority":60},
-{"company":"Sea Pines Resort","domain":"seapines.com","priority":60},
-{"company":"The Broadmoor","domain":"broadmoor.com","priority":60},
-{"company":"Vail Resorts","domain":"vailresorts.com","priority":60},
-{"company":"Alterra Mountain Company","domain":"alterramtn.co","priority":60},
-{"company":"Boyne Resorts","domain":"boyneresorts.com","priority":60},
-{"company":"Aspen Skiing Company","domain":"aspensnowmass.com","priority":60},
-{"company":"Powdr","domain":"powdr.com","priority":60},
-{"company":"Snowbird","domain":"snowbird.com","priority":60},
-{"company":"Cedar Fair","domain":"cedarfair.com","priority":60},
-{"company":"United Parks & Resorts","domain":"unitedparks.com","priority":60},
-{"company":"Great Wolf Lodge","domain":"greatwolf.com","priority":60},
-{"company":"Kalahari Resorts","domain":"kalahariresorts.com","priority":60},
-{"company":"Hersheypark","domain":"hersheyentertainment.com","priority":60},
-{"company":"Dollywood","domain":"dollywood.com","priority":60},
-{"company":"Silver Dollar City","domain":"silverdollarcity.com","priority":60},
-{"company":"Main Event","domain":"mainevent.com","priority":60},
-{"company":"Lucky Strike Entertainment","domain":"luckystrikeent.com","priority":60},
-{"company":"Chuck E. Cheese","domain":"chuckecheese.com","priority":60},
-{"company":"Urban Air Adventure Park","domain":"urbanair.com","priority":60},
-{"company":"Sky Zone","domain":"skyzone.com","priority":60},
-{"company":"Delaware North","domain":"delawarenorth.com","priority":60},
-{"company":"Levy Restaurants","domain":"levyrestaurants.com","priority":60},
-{"company":"Legends","domain":"legends.net","priority":60},
-{"company":"Xanterra Travel Collection","domain":"xanterra.com","priority":60},
-{"company":"Live Nation","domain":"livenation.com","priority":60},
-{"company":"Oak View Group","domain":"oakviewgroup.com","priority":60},
-{"company":"Goldfish Swim School","domain":"goldfishswimschool.com","priority":60},
-{"company":"British Swim School","domain":"britishswimschool.com","priority":60},
-{"company":"i9 Sports","domain":"i9sports.com","priority":60},
-{"company":"Soccer Shots","domain":"soccershots.com","priority":60},
-{"company":"US Sports Camps","domain":"ussportscamps.com","priority":60},
-{"company":"BrightView","domain":"brightview.com","priority":60},
-{"company":"Yellowstone Landscape","domain":"yellowstonelandscape.com","priority":60},
-{"company":"The Davey Tree Expert Company","domain":"davey.com","priority":60},
-{"company":"SavATree","domain":"savatree.com","priority":60},
-{"company":"The Goddard School","domain":"goddardschool.com","priority":60},
-{"company":"Learning Care Group","domain":"learningcaregroup.com","priority":60},
-{"company":"Mathnasium","domain":"mathnasium.com","priority":60},
-{"company":"Kumon","domain":"kumon.com","priority":60},
-{"company":"Camp Bow Wow","domain":"campbowwow.com","priority":60},
-{"company":"Dogtopia","domain":"dogtopia.com","priority":60},
-{"company":"Safe Harbor Marinas","domain":"shmarinas.com","priority":60},
-{"company":"Suntex Marinas","domain":"suntex.com","priority":60},
-{"company":"Two Men and a Truck","domain":"twomenandatruck.com","priority":60},
-{"company":"College Hunks Hauling Junk","domain":"collegehunkshaulingjunk.com","priority":60},
-{"company":"Landscapes Golf Management","domain":"landscapesgolf.com","priority":45},
-{"company":"Escalante Golf","domain":"escalantegolf.com","priority":45},
-{"company":"Heritage Golf Group","domain":"heritagegolfgroup.com","priority":45},
-{"company":"Kiawah Island Golf Resort","domain":"kiawahresort.com","priority":45},
-{"company":"Sea Island","domain":"seaisland.com","priority":45},
-{"company":"Omni Hotels & Resorts","domain":"omnihotels.com","priority":45},
-{"company":"Four Seasons","domain":"fourseasons.com","priority":45},
-{"company":"ASM Global","domain":"asmglobal.com","priority":45},
-{"company":"AEG","domain":"aegworldwide.com","priority":45},
-{"company":"Ticketmaster","domain":"ticketmaster.com","priority":45},
-{"company":"Round1 Bowling & Amusement","domain":"round1usa.com","priority":45},
-{"company":"Cinemark","domain":"cinemark.com","priority":45},
-{"company":"Patagonia","domain":"patagonia.com","priority":45},
-{"company":"iD Tech","domain":"idtech.com","priority":45},
-{"company":"Code Ninjas","domain":"codeninjas.com","priority":45},
-{"company":"Girl Scouts of the USA","domain":"girlscouts.org","priority":45},
-{"company":"Outward Bound","domain":"outwardbound.org","priority":45},
-{"company":"NOLS","domain":"nols.edu","priority":45},
-{"company":"Student Conservation Association","domain":"thesca.org","priority":45},
-{"company":"Habitat for Humanity","domain":"habitat.org","priority":45},
-{"company":"Best Friends Animal Society","domain":"bestfriends.org","priority":45},
-{"company":"The Little Gym","domain":"thelittlegym.com","priority":45},
-{"company":"Bass Pro Shops","domain":"basspro.com","priority":45},
-{"company":"Golf Galaxy","domain":"golfgalaxy.com","priority":45},
-{"company":"Callaway","domain":"callawaygolf.com","priority":45},
-{"company":"Acushnet","domain":"acushnetcompany.com","priority":45},
-{"company":"Smithsonian Institution","domain":"si.edu","priority":45},
-{"company":"The Walt Disney Company","domain":"disney.com","priority":45},
-{"company":"Merlin Entertainments","domain":"merlinentertainments.biz","priority":45},
-{"company":"The Princeton Review","domain":"princetonreview.com","priority":45},
-{"company":"Kaplan","domain":"kaplan.com","priority":45},
-{"company":"Results Physiotherapy","domain":"resultspt.com","priority":50},
-{"company":"Adidas","domain":"adidas.com","priority":50},
-{"company":"Fanatics","domain":"fanatics.com","priority":50},
-{"company":"Learfield","domain":"learfield.com","priority":50},
-{"company":"Centerstone","domain":"centerstone.org","priority":50},
-{"company":"Devereux","domain":"devereux.org","priority":50},
-{"company":"May Institute","domain":"mayinstitute.org","priority":50},
-{"company":"Behavioral Health Works","domain":"bhwcares.com","priority":50},
-{"company":"Centria Autism","domain":"centriaautism.com","priority":50},
-{"company":"LifeStance Health","domain":"lifestance.com","priority":50},
-{"company":"Talkspace","domain":"talkspace.com","priority":50}]}
+ "built": "2026-11-23",
+ "why": "Big employers that hire for entry-level and part-time jobs (hospital systems, banks, insurers, schools, retailers, restaurants, hotels; since Nov 15 also golf courses, resorts, parks, childcare, pet care) \u2014 the finder proves each board before anything goes live; Nov 16 also gyms, physical therapy, sports brands, nursing hospitals, psychology/behavioral health Nov 23: + central US (owner: 'nothing in the central US') \u2014 big employers in AR, LA, MS, OK, NM, MO, KS, NE, IA, SD, ND, MT, WY, ID, UT, TX, plus state flagship universities, priority 80.",
+ "count": 755,
+ "companies": [
+  {
+   "company": "Dillard's",
+   "domain": "dillards.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Murphy USA",
+   "domain": "murphyusa.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Arvest Bank",
+   "domain": "arvest.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University of Arkansas for Medical Sciences",
+   "domain": "uams.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Windstream",
+   "domain": "windstream.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Lamar Advertising",
+   "domain": "lamar.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Lumen Technologies",
+   "domain": "lumen.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Love's Travel Stops",
+   "domain": "loves.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Paycom",
+   "domain": "paycom.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "BOK Financial",
+   "domain": "bokf.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Chickasaw Nation",
+   "domain": "chickasaw.net",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Cherokee Nation Businesses",
+   "domain": "cherokee-nation.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Lovelace Health System",
+   "domain": "lovelace.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University of New Mexico",
+   "domain": "unm.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Evergy",
+   "domain": "evergy.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Commerce Bank",
+   "domain": "commercebank.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "UMB Financial",
+   "domain": "umb.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Brown-Forman",
+   "domain": "brown-forman.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Vulcan Materials",
+   "domain": "vulcanmaterials.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Mercedes-Benz U.S. International",
+   "domain": "mbusi.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Zions Bancorporation",
+   "domain": "zionsbancorporation.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Overstock",
+   "domain": "overstock.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Instructure",
+   "domain": "instructure.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Idaho Power",
+   "domain": "idahopower.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Boise State University",
+   "domain": "boisestate.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Casey's",
+   "domain": "caseys.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "MercyOne",
+   "domain": "mercyone.org",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Wells Enterprises",
+   "domain": "wellsenterprisesinc.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Altru Health System",
+   "domain": "altru.org",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Union Pacific",
+   "domain": "up.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Mutual of Omaha",
+   "domain": "mutualofomaha.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Kiewit",
+   "domain": "kiewit.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Bryan Health",
+   "domain": "bryanhealth.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Billings Clinic",
+   "domain": "billingsclinic.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Logan Health",
+   "domain": "logan.org",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Monument Health",
+   "domain": "monument.health",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "International Paper",
+   "domain": "internationalpaper.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "ADM",
+   "domain": "adm.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Kwik Trip",
+   "domain": "kwiktrip.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Menards",
+   "domain": "menards.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Southern Company",
+   "domain": "southerncompany.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "American Airlines",
+   "domain": "aa.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Methodist Healthcare San Antonio",
+   "domain": "sahealth.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Tarrant County",
+   "domain": "tarrantcounty.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Baptist Health Kentucky",
+   "domain": "baptisthealth.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Baptist Health Arkansas",
+   "domain": "baptist-health.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Saint Alphonsus Health System",
+   "domain": "saintalphonsus.org",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Gundersen Health System",
+   "domain": "gundersenhealth.org",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "CentraCare",
+   "domain": "centracare.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Truman Medical Centers",
+   "domain": "universityhealthkc.org",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Ascension Via Christi",
+   "domain": "ascension.org",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Hutchinson Regional Medical Center",
+   "domain": "hutchregional.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Comanche County Memorial Hospital",
+   "domain": "ccmhhealth.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Mercy Hospital Oklahoma City",
+   "domain": "mercy.net",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "CHRISTUS St. Vincent",
+   "domain": "christushealth.org",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Covenant Health Lubbock",
+   "domain": "covenanthealth.org",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University Medical Center El Paso",
+   "domain": "umcelpaso.org",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "UMC Health System Lubbock",
+   "domain": "umchealthsystem.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Hendrick Health",
+   "domain": "hendrickhealth.org",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Texas Tech University",
+   "domain": "ttu.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Texas A&M University",
+   "domain": "tamu.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University of Oklahoma",
+   "domain": "ou.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Oklahoma State University",
+   "domain": "okstate.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University of Arkansas",
+   "domain": "uark.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Louisiana State University",
+   "domain": "lsu.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University of Kansas",
+   "domain": "ku.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Kansas State University",
+   "domain": "k-state.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University of Missouri",
+   "domain": "missouri.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University of Nebraska",
+   "domain": "nebraska.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Iowa State University",
+   "domain": "iastate.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University of Iowa",
+   "domain": "uiowa.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "South Dakota State University",
+   "domain": "sdstate.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "North Dakota State University",
+   "domain": "ndsu.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University of North Dakota",
+   "domain": "und.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Montana State University",
+   "domain": "montana.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University of Wyoming",
+   "domain": "uwyo.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University of Mississippi",
+   "domain": "olemiss.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Mississippi State University",
+   "domain": "msstate.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "New Mexico State University",
+   "domain": "nmsu.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University of Idaho",
+   "domain": "uidaho.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Utah State University",
+   "domain": "usu.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "University of Utah",
+   "domain": "utah.edu",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Cabela's",
+   "domain": "cabelas.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Conagra Brands",
+   "domain": "conagrabrands.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Hormel Foods",
+   "domain": "hormelfoods.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Smithfield Foods",
+   "domain": "smithfieldfoods.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "JBS USA",
+   "domain": "jbsfoodsgroup.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Cargill",
+   "domain": "cargill.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "CHS Inc.",
+   "domain": "chsinc.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Land O'Lakes",
+   "domain": "landolakesinc.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Pilgrim's",
+   "domain": "pilgrims.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Bunge",
+   "domain": "bunge.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Seaboard Foods",
+   "domain": "seaboardfoods.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "AGCO",
+   "domain": "agcocorp.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Valmont Industries",
+   "domain": "valmont.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Lindsay Corporation",
+   "domain": "lindsay.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Polaris",
+   "domain": "polaris.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "3M",
+   "domain": "3m.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Fastenal",
+   "domain": "fastenal.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Fleet Farm",
+   "domain": "fleetfarm.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Scheels",
+   "domain": "scheels.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Bomgaars",
+   "domain": "bomgaars.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Fareway Stores",
+   "domain": "fareway.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "OnCue",
+   "domain": "oncueexpress.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Braum's",
+   "domain": "braums.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Sonic Drive-In",
+   "domain": "sonicdrivein.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Atmos Energy",
+   "domain": "atmosenergy.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "OGE Energy",
+   "domain": "oge.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Xcel Energy",
+   "domain": "xcelenergy.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "MidAmerican Energy",
+   "domain": "midamericanenergy.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Black Hills Energy",
+   "domain": "blackhillsenergy.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "NorthWestern Energy",
+   "domain": "northwesternenergy.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Basin Electric Power Cooperative",
+   "domain": "basinelectric.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "BNSF Railway",
+   "domain": "bnsf.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Great Plains Manufacturing",
+   "domain": "greatplainsag.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Daktronics",
+   "domain": "daktronics.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Raven Industries",
+   "domain": "ravenind.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Citibank South Dakota",
+   "domain": "citi.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "First Interstate Bank",
+   "domain": "firstinterstatebank.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Bell Bank",
+   "domain": "bell.bank",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Gate City Bank",
+   "domain": "gatecitybank.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Pinnacle Bank",
+   "domain": "pinnbank.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Hy-Vee",
+   "domain": "hy-vee.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Mardel",
+   "domain": "mardel.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "American Fidelity",
+   "domain": "americanfidelity.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Tinker Federal Credit Union",
+   "domain": "tinkerfcu.org",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Cox Communications",
+   "domain": "cox.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Entergy",
+   "domain": "entergy.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "CLECO",
+   "domain": "cleco.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Lafayette General Health",
+   "domain": "lgh.org",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Willis-Knighton Health System",
+   "domain": "wkhs.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "North Mississippi Health Services",
+   "domain": "nmhs.net",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Singing River Health System",
+   "domain": "singingriverhealthsystem.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Forrest General Hospital",
+   "domain": "forrestgeneral.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Nucor",
+   "domain": "nucor.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Steel Dynamics",
+   "domain": "steeldynamics.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Bayer Crop Science",
+   "domain": "bayer.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Ag Processing Inc",
+   "domain": "agp.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Navient",
+   "domain": "navient.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "TransAm Trucking",
+   "domain": "transamtrucking.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Prime Inc.",
+   "domain": "primeinc.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "CRST",
+   "domain": "crst.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Ruan",
+   "domain": "ruan.com",
+   "priority": 80,
+   "region": "central"
+  },
+  {
+   "company": "Athletico Physical Therapy",
+   "domain": "athletico.com",
+   "priority": 70
+  },
+  {
+   "company": "PT Solutions",
+   "domain": "ptsolutions.com",
+   "priority": 70
+  },
+  {
+   "company": "BenchMark Physical Therapy",
+   "domain": "benchmarkpt.com",
+   "priority": 70
+  },
+  {
+   "company": "Professional Physical Therapy",
+   "domain": "professionalpt.com",
+   "priority": 70
+  },
+  {
+   "company": "U.S. Physical Therapy",
+   "domain": "usph.com",
+   "priority": 70
+  },
+  {
+   "company": "Confluent Health",
+   "domain": "confluenthealth.com",
+   "priority": 70
+  },
+  {
+   "company": "Pivot Physical Therapy",
+   "domain": "pivotphysicaltherapy.com",
+   "priority": 70
+  },
+  {
+   "company": "FYZICAL Therapy & Balance Centers",
+   "domain": "fyzical.com",
+   "priority": 70
+  },
+  {
+   "company": "CORA Physical Therapy",
+   "domain": "coraphysicaltherapy.com",
+   "priority": 70
+  },
+  {
+   "company": "Twin Boro Physical Therapy",
+   "domain": "twinboro.com",
+   "priority": 70
+  },
+  {
+   "company": "Shirley Ryan AbilityLab",
+   "domain": "sralab.org",
+   "priority": 70
+  },
+  {
+   "company": "Aegis Therapies",
+   "domain": "aegistherapies.com",
+   "priority": 70
+  },
+  {
+   "company": "Hospital for Special Surgery",
+   "domain": "hss.edu",
+   "priority": 70
+  },
+  {
+   "company": "Rothman Orthopaedics",
+   "domain": "rothmanortho.com",
+   "priority": 70
+  },
+  {
+   "company": "OrthoCarolina",
+   "domain": "orthocarolina.com",
+   "priority": 70
+  },
+  {
+   "company": "OrthoVirginia",
+   "domain": "orthovirginia.com",
+   "priority": 70
+  },
+  {
+   "company": "Hinge Health",
+   "domain": "hingehealth.com",
+   "priority": 70
+  },
+  {
+   "company": "Sword Health",
+   "domain": "swordhealth.com",
+   "priority": 70
+  },
+  {
+   "company": "Omada Health",
+   "domain": "omadahealth.com",
+   "priority": 70
+  },
+  {
+   "company": "Noom",
+   "domain": "noom.com",
+   "priority": 70
+  },
+  {
+   "company": "Life Time",
+   "domain": "lifetime.life",
+   "priority": 70
+  },
+  {
+   "company": "Planet Fitness",
+   "domain": "planetfitness.com",
+   "priority": 70
+  },
+  {
+   "company": "Orangetheory Fitness",
+   "domain": "orangetheory.com",
+   "priority": 70
+  },
+  {
+   "company": "Crunch Fitness",
+   "domain": "crunch.com",
+   "priority": 70
+  },
+  {
+   "company": "24 Hour Fitness",
+   "domain": "24hourfitness.com",
+   "priority": 70
+  },
+  {
+   "company": "YMCA of the USA",
+   "domain": "ymca.org",
+   "priority": 70
+  },
+  {
+   "company": "Anytime Fitness",
+   "domain": "anytimefitness.com",
+   "priority": 70
+  },
+  {
+   "company": "EoS Fitness",
+   "domain": "eosfitness.com",
+   "priority": 70
+  },
+  {
+   "company": "Chuze Fitness",
+   "domain": "chuzefitness.com",
+   "priority": 70
+  },
+  {
+   "company": "Xponential Fitness",
+   "domain": "xponential.com",
+   "priority": 70
+  },
+  {
+   "company": "F45 Training",
+   "domain": "f45training.com",
+   "priority": 70
+  },
+  {
+   "company": "Barry's",
+   "domain": "barrys.com",
+   "priority": 70
+  },
+  {
+   "company": "SoulCycle",
+   "domain": "soul-cycle.com",
+   "priority": 70
+  },
+  {
+   "company": "Peloton",
+   "domain": "onepeloton.com",
+   "priority": 70
+  },
+  {
+   "company": "Tonal",
+   "domain": "tonal.com",
+   "priority": 70
+  },
+  {
+   "company": "Future",
+   "domain": "future.co",
+   "priority": 70
+  },
+  {
+   "company": "EXOS",
+   "domain": "teamexos.com",
+   "priority": 70
+  },
+  {
+   "company": "IMG Academy",
+   "domain": "imgacademy.com",
+   "priority": 70
+  },
+  {
+   "company": "D1 Training",
+   "domain": "d1training.com",
+   "priority": 70
+  },
+  {
+   "company": "Under Armour",
+   "domain": "underarmour.com",
+   "priority": 70
+  },
+  {
+   "company": "Lululemon",
+   "domain": "lululemon.com",
+   "priority": 70
+  },
+  {
+   "company": "Catapult Sports",
+   "domain": "catapult.com",
+   "priority": 70
+  },
+  {
+   "company": "Zwift",
+   "domain": "zwift.com",
+   "priority": 70
+  },
+  {
+   "company": "NovaCare Rehabilitation",
+   "domain": "novacare.com",
+   "priority": 70
+  },
+  {
+   "company": "Kessler Rehabilitation Center",
+   "domain": "kesslerrehab.com",
+   "priority": 70
+  },
+  {
+   "company": "MedStar Health",
+   "domain": "medstarhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Children's National Hospital",
+   "domain": "childrensnational.org",
+   "priority": 60
+  },
+  {
+   "company": "George Washington University",
+   "domain": "gwu.edu",
+   "priority": 60
+  },
+  {
+   "company": "GW Medical Faculty Associates",
+   "domain": "gwdocs.com",
+   "priority": 60
+  },
+  {
+   "company": "Howard University",
+   "domain": "howard.edu",
+   "priority": 60
+  },
+  {
+   "company": "Howard University Hospital",
+   "domain": "huhealthcare.com",
+   "priority": 60
+  },
+  {
+   "company": "Inova Health System",
+   "domain": "inova.org",
+   "priority": 60
+  },
+  {
+   "company": "Adventist HealthCare",
+   "domain": "adventisthealthcare.com",
+   "priority": 60
+  },
+  {
+   "company": "Holy Cross Health",
+   "domain": "holycrosshealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Luminis Health",
+   "domain": "luminishealth.org",
+   "priority": 60
+  },
+  {
+   "company": "University of Maryland Medical System",
+   "domain": "umms.org",
+   "priority": 60
+  },
+  {
+   "company": "Johns Hopkins Medicine",
+   "domain": "hopkinsmedicine.org",
+   "priority": 60
+  },
+  {
+   "company": "Johns Hopkins University",
+   "domain": "jhu.edu",
+   "priority": 60
+  },
+  {
+   "company": "Kaiser Permanente",
+   "domain": "kaiserpermanente.org",
+   "priority": 60
+  },
+  {
+   "company": "One Medical",
+   "domain": "onemedical.com",
+   "priority": 60
+  },
+  {
+   "company": "Unity Health Care",
+   "domain": "unityhealthcare.org",
+   "priority": 60
+  },
+  {
+   "company": "Mary's Center",
+   "domain": "maryscenter.org",
+   "priority": 60
+  },
+  {
+   "company": "Whitman-Walker Health",
+   "domain": "whitman-walker.org",
+   "priority": 60
+  },
+  {
+   "company": "Virginia Hospital Center",
+   "domain": "virginiahospitalcenter.com",
+   "priority": 60
+  },
+  {
+   "company": "Mary Washington Healthcare",
+   "domain": "marywashingtonhealthcare.com",
+   "priority": 60
+  },
+  {
+   "company": "Bon Secours Mercy Health",
+   "domain": "bsmhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Christiana Care",
+   "domain": "christianacare.org",
+   "priority": 60
+  },
+  {
+   "company": "Novant Health",
+   "domain": "novanthealth.org",
+   "priority": 60
+  },
+  {
+   "company": "HCA Healthcare",
+   "domain": "hcahealthcare.com",
+   "priority": 60
+  },
+  {
+   "company": "Valley Health System",
+   "domain": "valleyhealthlink.com",
+   "priority": 60
+  },
+  {
+   "company": "CareFirst BlueCross BlueShield",
+   "domain": "carefirst.com",
+   "priority": 60
+  },
+  {
+   "company": "Quest Diagnostics",
+   "domain": "questdiagnostics.com",
+   "priority": 60
+  },
+  {
+   "company": "Capital One",
+   "domain": "capitalone.com",
+   "priority": 60
+  },
+  {
+   "company": "PNC",
+   "domain": "pnc.com",
+   "priority": 60
+  },
+  {
+   "company": "Bank of America",
+   "domain": "bankofamerica.com",
+   "priority": 60
+  },
+  {
+   "company": "Navy Federal Credit Union",
+   "domain": "navyfederal.org",
+   "priority": 60
+  },
+  {
+   "company": "PenFed Credit Union",
+   "domain": "penfed.org",
+   "priority": 60
+  },
+  {
+   "company": "Fairfax County Government",
+   "domain": "fairfaxcounty.gov",
+   "priority": 60
+  },
+  {
+   "company": "Montgomery County Government",
+   "domain": "montgomerycountymd.gov",
+   "priority": 60
+  },
+  {
+   "company": "Arlington County Government",
+   "domain": "arlingtonva.us",
+   "priority": 60
+  },
+  {
+   "company": "Prince George's County Government",
+   "domain": "princegeorgescountymd.gov",
+   "priority": 60
+  },
+  {
+   "company": "DC Health",
+   "domain": "dchealth.dc.gov",
+   "priority": 60
+  },
+  {
+   "company": "Children's Hospital of Philadelphia",
+   "domain": "chop.edu",
+   "priority": 60
+  },
+  {
+   "company": "Penn Medicine",
+   "domain": "pennmedicine.org",
+   "priority": 60
+  },
+  {
+   "company": "Jefferson Health",
+   "domain": "jeffersonhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "UPMC",
+   "domain": "upmc.com",
+   "priority": 60
+  },
+  {
+   "company": "Allegheny Health Network",
+   "domain": "ahn.org",
+   "priority": 60
+  },
+  {
+   "company": "Geisinger",
+   "domain": "geisinger.org",
+   "priority": 60
+  },
+  {
+   "company": "Penn State Health",
+   "domain": "pennstatehealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Main Line Health",
+   "domain": "mainlinehealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Temple Health",
+   "domain": "templehealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Northwell Health",
+   "domain": "northwell.edu",
+   "priority": 60
+  },
+  {
+   "company": "NYU Langone Health",
+   "domain": "nyulangone.org",
+   "priority": 60
+  },
+  {
+   "company": "Mount Sinai Health System",
+   "domain": "mountsinai.org",
+   "priority": 60
+  },
+  {
+   "company": "NewYork-Presbyterian",
+   "domain": "nyp.org",
+   "priority": 60
+  },
+  {
+   "company": "Montefiore Health System",
+   "domain": "montefiore.org",
+   "priority": 60
+  },
+  {
+   "company": "NYC Health + Hospitals",
+   "domain": "nychealthandhospitals.org",
+   "priority": 60
+  },
+  {
+   "company": "Hackensack Meridian Health",
+   "domain": "hackensackmeridianhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "RWJBarnabas Health",
+   "domain": "rwjbh.org",
+   "priority": 60
+  },
+  {
+   "company": "Atlantic Health System",
+   "domain": "atlantichealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Virtua Health",
+   "domain": "virtua.org",
+   "priority": 60
+  },
+  {
+   "company": "Yale New Haven Health",
+   "domain": "ynhhs.org",
+   "priority": 60
+  },
+  {
+   "company": "Hartford HealthCare",
+   "domain": "hartfordhealthcare.org",
+   "priority": 60
+  },
+  {
+   "company": "Mass General Brigham",
+   "domain": "massgeneralbrigham.org",
+   "priority": 60
+  },
+  {
+   "company": "Beth Israel Lahey Health",
+   "domain": "bilh.org",
+   "priority": 60
+  },
+  {
+   "company": "Boston Children's Hospital",
+   "domain": "childrenshospital.org",
+   "priority": 60
+  },
+  {
+   "company": "Dana-Farber Cancer Institute",
+   "domain": "dana-farber.org",
+   "priority": 60
+  },
+  {
+   "company": "Lifespan",
+   "domain": "lifespan.org",
+   "priority": 60
+  },
+  {
+   "company": "Dartmouth Health",
+   "domain": "dartmouth-health.org",
+   "priority": 60
+  },
+  {
+   "company": "MaineHealth",
+   "domain": "mainehealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Rochester Regional Health",
+   "domain": "rochesterregional.org",
+   "priority": 60
+  },
+  {
+   "company": "University of Rochester Medical Center",
+   "domain": "urmc.rochester.edu",
+   "priority": 60
+  },
+  {
+   "company": "Kaleida Health",
+   "domain": "kaleidahealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Cleveland Clinic",
+   "domain": "clevelandclinic.org",
+   "priority": 60
+  },
+  {
+   "company": "University Hospitals",
+   "domain": "uhhospitals.org",
+   "priority": 60
+  },
+  {
+   "company": "OhioHealth",
+   "domain": "ohiohealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Ohio State Wexner Medical Center",
+   "domain": "wexnermedical.osu.edu",
+   "priority": 60
+  },
+  {
+   "company": "Nationwide Children's Hospital",
+   "domain": "nationwidechildrens.org",
+   "priority": 60
+  },
+  {
+   "company": "Cincinnati Children's",
+   "domain": "cincinnatichildrens.org",
+   "priority": 60
+  },
+  {
+   "company": "TriHealth",
+   "domain": "trihealth.com",
+   "priority": 60
+  },
+  {
+   "company": "UC Health",
+   "domain": "uchealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Premier Health",
+   "domain": "premierhealth.com",
+   "priority": 60
+  },
+  {
+   "company": "ProMedica",
+   "domain": "promedica.org",
+   "priority": 60
+  },
+  {
+   "company": "Mercy Health",
+   "domain": "mercy.com",
+   "priority": 60
+  },
+  {
+   "company": "Corewell Health",
+   "domain": "corewellhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Henry Ford Health",
+   "domain": "henryford.com",
+   "priority": 60
+  },
+  {
+   "company": "Michigan Medicine",
+   "domain": "uofmhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Trinity Health",
+   "domain": "trinity-health.org",
+   "priority": 60
+  },
+  {
+   "company": "Sparrow Health",
+   "domain": "sparrow.org",
+   "priority": 60
+  },
+  {
+   "company": "Advocate Health",
+   "domain": "advocatehealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Atrium Health",
+   "domain": "atriumhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Northwestern Medicine",
+   "domain": "nm.org",
+   "priority": 60
+  },
+  {
+   "company": "Rush University Medical Center",
+   "domain": "rush.edu",
+   "priority": 60
+  },
+  {
+   "company": "UChicago Medicine",
+   "domain": "uchicagomedicine.org",
+   "priority": 60
+  },
+  {
+   "company": "Lurie Children's",
+   "domain": "luriechildrens.org",
+   "priority": 60
+  },
+  {
+   "company": "OSF HealthCare",
+   "domain": "osfhealthcare.org",
+   "priority": 60
+  },
+  {
+   "company": "Carle Health",
+   "domain": "carle.org",
+   "priority": 60
+  },
+  {
+   "company": "Endeavor Health",
+   "domain": "endeavorhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Indiana University Health",
+   "domain": "iuhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Community Health Network",
+   "domain": "ecommunity.com",
+   "priority": 60
+  },
+  {
+   "company": "Franciscan Health",
+   "domain": "franciscanhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Froedtert ThedaCare Health",
+   "domain": "froedtert.com",
+   "priority": 60
+  },
+  {
+   "company": "Aurora Health Care",
+   "domain": "aurorahealthcare.org",
+   "priority": 60
+  },
+  {
+   "company": "UW Health",
+   "domain": "uwhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Marshfield Clinic Health System",
+   "domain": "marshfieldclinic.org",
+   "priority": 60
+  },
+  {
+   "company": "Mayo Clinic",
+   "domain": "mayoclinic.org",
+   "priority": 60
+  },
+  {
+   "company": "Allina Health",
+   "domain": "allinahealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Fairview Health Services",
+   "domain": "fairview.org",
+   "priority": 60
+  },
+  {
+   "company": "HealthPartners",
+   "domain": "healthpartners.com",
+   "priority": 60
+  },
+  {
+   "company": "Essentia Health",
+   "domain": "essentiahealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Sanford Health",
+   "domain": "sanfordhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Avera Health",
+   "domain": "avera.org",
+   "priority": 60
+  },
+  {
+   "company": "UnityPoint Health",
+   "domain": "unitypoint.org",
+   "priority": 60
+  },
+  {
+   "company": "University of Iowa Health Care",
+   "domain": "uihc.org",
+   "priority": 60
+  },
+  {
+   "company": "Nebraska Medicine",
+   "domain": "nebraskamed.com",
+   "priority": 60
+  },
+  {
+   "company": "CHI Health",
+   "domain": "chihealth.com",
+   "priority": 60
+  },
+  {
+   "company": "BJC HealthCare",
+   "domain": "bjc.org",
+   "priority": 60
+  },
+  {
+   "company": "SSM Health",
+   "domain": "ssmhealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Mercy",
+   "domain": "mercy.net",
+   "priority": 60
+  },
+  {
+   "company": "CoxHealth",
+   "domain": "coxhealth.com",
+   "priority": 60
+  },
+  {
+   "company": "University of Kansas Health System",
+   "domain": "kansashealthsystem.com",
+   "priority": 60
+  },
+  {
+   "company": "Children's Mercy Kansas City",
+   "domain": "childrensmercy.org",
+   "priority": 60
+  },
+  {
+   "company": "Saint Luke's Health System",
+   "domain": "saintlukeskc.org",
+   "priority": 60
+  },
+  {
+   "company": "Stormont Vail Health",
+   "domain": "stormontvail.org",
+   "priority": 60
+  },
+  {
+   "company": "Integris Health",
+   "domain": "integrisok.com",
+   "priority": 60
+  },
+  {
+   "company": "OU Health",
+   "domain": "ouhealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Saint Francis Health System",
+   "domain": "saintfrancis.com",
+   "priority": 60
+  },
+  {
+   "company": "Baylor Scott & White Health",
+   "domain": "bswhealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Texas Health Resources",
+   "domain": "texashealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Methodist Health System",
+   "domain": "methodisthealthsystem.org",
+   "priority": 60
+  },
+  {
+   "company": "UT Southwestern Medical Center",
+   "domain": "utsouthwestern.edu",
+   "priority": 60
+  },
+  {
+   "company": "Parkland Health",
+   "domain": "parklandhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Children's Health",
+   "domain": "childrens.com",
+   "priority": 60
+  },
+  {
+   "company": "Cook Children's",
+   "domain": "cookchildrens.org",
+   "priority": 60
+  },
+  {
+   "company": "Houston Methodist",
+   "domain": "houstonmethodist.org",
+   "priority": 60
+  },
+  {
+   "company": "Memorial Hermann",
+   "domain": "memorialhermann.org",
+   "priority": 60
+  },
+  {
+   "company": "Texas Children's Hospital",
+   "domain": "texaschildrens.org",
+   "priority": 60
+  },
+  {
+   "company": "MD Anderson Cancer Center",
+   "domain": "mdanderson.org",
+   "priority": 60
+  },
+  {
+   "company": "Harris Health System",
+   "domain": "harrishealth.org",
+   "priority": 60
+  },
+  {
+   "company": "CHRISTUS Health",
+   "domain": "christushealth.org",
+   "priority": 60
+  },
+  {
+   "company": "University Health",
+   "domain": "universityhealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Ascension",
+   "domain": "ascension.org",
+   "priority": 60
+  },
+  {
+   "company": "UT Health San Antonio",
+   "domain": "uthscsa.edu",
+   "priority": 60
+  },
+  {
+   "company": "Banner Health",
+   "domain": "bannerhealth.com",
+   "priority": 60
+  },
+  {
+   "company": "HonorHealth",
+   "domain": "honorhealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Phoenix Children's",
+   "domain": "phoenixchildrens.org",
+   "priority": 60
+  },
+  {
+   "company": "Dignity Health",
+   "domain": "dignityhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "CommonSpirit Health",
+   "domain": "commonspirit.org",
+   "priority": 60
+  },
+  {
+   "company": "Intermountain Health",
+   "domain": "intermountainhealthcare.org",
+   "priority": 60
+  },
+  {
+   "company": "University of Utah Health",
+   "domain": "healthcare.utah.edu",
+   "priority": 60
+  },
+  {
+   "company": "UCHealth",
+   "domain": "uchealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Children's Hospital Colorado",
+   "domain": "childrenscolorado.org",
+   "priority": 60
+  },
+  {
+   "company": "Denver Health",
+   "domain": "denverhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Centura Health",
+   "domain": "centura.org",
+   "priority": 60
+  },
+  {
+   "company": "Presbyterian Healthcare Services",
+   "domain": "phs.org",
+   "priority": 60
+  },
+  {
+   "company": "Providence",
+   "domain": "providence.org",
+   "priority": 60
+  },
+  {
+   "company": "MultiCare Health System",
+   "domain": "multicare.org",
+   "priority": 60
+  },
+  {
+   "company": "Virginia Mason Franciscan Health",
+   "domain": "vmfh.org",
+   "priority": 60
+  },
+  {
+   "company": "UW Medicine",
+   "domain": "uwmedicine.org",
+   "priority": 60
+  },
+  {
+   "company": "Seattle Children's",
+   "domain": "seattlechildrens.org",
+   "priority": 60
+  },
+  {
+   "company": "Legacy Health",
+   "domain": "legacyhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "OHSU",
+   "domain": "ohsu.edu",
+   "priority": 60
+  },
+  {
+   "company": "PeaceHealth",
+   "domain": "peacehealth.org",
+   "priority": 60
+  },
+  {
+   "company": "St. Luke's Health System",
+   "domain": "stlukesonline.org",
+   "priority": 60
+  },
+  {
+   "company": "Renown Health",
+   "domain": "renown.org",
+   "priority": 60
+  },
+  {
+   "company": "Sutter Health",
+   "domain": "sutterhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Stanford Health Care",
+   "domain": "stanfordhealthcare.org",
+   "priority": 60
+  },
+  {
+   "company": "UCSF Health",
+   "domain": "ucsfhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "UC Davis Health",
+   "domain": "health.ucdavis.edu",
+   "priority": 60
+  },
+  {
+   "company": "Cedars-Sinai",
+   "domain": "cedars-sinai.org",
+   "priority": 60
+  },
+  {
+   "company": "UCLA Health",
+   "domain": "uclahealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Keck Medicine of USC",
+   "domain": "keckmedicine.org",
+   "priority": 60
+  },
+  {
+   "company": "Children's Hospital Los Angeles",
+   "domain": "chla.org",
+   "priority": 60
+  },
+  {
+   "company": "Scripps Health",
+   "domain": "scripps.org",
+   "priority": 60
+  },
+  {
+   "company": "Sharp HealthCare",
+   "domain": "sharp.com",
+   "priority": 60
+  },
+  {
+   "company": "Rady Children's Hospital",
+   "domain": "rchsd.org",
+   "priority": 60
+  },
+  {
+   "company": "UC San Diego Health",
+   "domain": "health.ucsd.edu",
+   "priority": 60
+  },
+  {
+   "company": "Hoag",
+   "domain": "hoag.org",
+   "priority": 60
+  },
+  {
+   "company": "MemorialCare",
+   "domain": "memorialcare.org",
+   "priority": 60
+  },
+  {
+   "company": "Loma Linda University Health",
+   "domain": "lluh.org",
+   "priority": 60
+  },
+  {
+   "company": "John Muir Health",
+   "domain": "johnmuirhealth.com",
+   "priority": 60
+  },
+  {
+   "company": "El Camino Health",
+   "domain": "elcaminohealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Queen's Health Systems",
+   "domain": "queens.org",
+   "priority": 60
+  },
+  {
+   "company": "Hawaii Pacific Health",
+   "domain": "hawaiipacifichealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Providence Alaska",
+   "domain": "providence.org",
+   "priority": 60
+  },
+  {
+   "company": "Emory Healthcare",
+   "domain": "emoryhealthcare.org",
+   "priority": 60
+  },
+  {
+   "company": "Piedmont Healthcare",
+   "domain": "piedmont.org",
+   "priority": 60
+  },
+  {
+   "company": "Northside Hospital",
+   "domain": "northside.com",
+   "priority": 60
+  },
+  {
+   "company": "Wellstar Health System",
+   "domain": "wellstar.org",
+   "priority": 60
+  },
+  {
+   "company": "Children's Healthcare of Atlanta",
+   "domain": "choa.org",
+   "priority": 60
+  },
+  {
+   "company": "Grady Health System",
+   "domain": "gradyhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Prisma Health",
+   "domain": "prismahealth.org",
+   "priority": 60
+  },
+  {
+   "company": "MUSC Health",
+   "domain": "muschealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Roper St. Francis Healthcare",
+   "domain": "rsfh.com",
+   "priority": 60
+  },
+  {
+   "company": "Duke Health",
+   "domain": "dukehealth.org",
+   "priority": 60
+  },
+  {
+   "company": "UNC Health",
+   "domain": "unchealth.org",
+   "priority": 60
+  },
+  {
+   "company": "WakeMed",
+   "domain": "wakemed.org",
+   "priority": 60
+  },
+  {
+   "company": "ECU Health",
+   "domain": "ecuhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Cone Health",
+   "domain": "conehealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Sentara Health",
+   "domain": "sentara.com",
+   "priority": 60
+  },
+  {
+   "company": "Riverside Health System",
+   "domain": "riversideonline.com",
+   "priority": 60
+  },
+  {
+   "company": "Carilion Clinic",
+   "domain": "carilionclinic.org",
+   "priority": 60
+  },
+  {
+   "company": "VCU Health",
+   "domain": "vcuhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "UVA Health",
+   "domain": "uvahealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Ballad Health",
+   "domain": "balladhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Vanderbilt University Medical Center",
+   "domain": "vumc.org",
+   "priority": 60
+  },
+  {
+   "company": "HCA TriStar",
+   "domain": "tristarhealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Methodist Le Bonheur Healthcare",
+   "domain": "methodisthealth.org",
+   "priority": 60
+  },
+  {
+   "company": "St. Jude Children's Research Hospital",
+   "domain": "stjude.org",
+   "priority": 60
+  },
+  {
+   "company": "Baptist Memorial Health Care",
+   "domain": "baptistonline.org",
+   "priority": 60
+  },
+  {
+   "company": "Erlanger Health System",
+   "domain": "erlanger.org",
+   "priority": 60
+  },
+  {
+   "company": "UAB Medicine",
+   "domain": "uabmedicine.org",
+   "priority": 60
+  },
+  {
+   "company": "Huntsville Hospital",
+   "domain": "huntsvillehospital.org",
+   "priority": 60
+  },
+  {
+   "company": "Ochsner Health",
+   "domain": "ochsner.org",
+   "priority": 60
+  },
+  {
+   "company": "LCMC Health",
+   "domain": "lcmchealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Our Lady of the Lake",
+   "domain": "ololrmc.com",
+   "priority": 60
+  },
+  {
+   "company": "University of Mississippi Medical Center",
+   "domain": "umc.edu",
+   "priority": 60
+  },
+  {
+   "company": "Baptist Health",
+   "domain": "baptisthealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Norton Healthcare",
+   "domain": "nortonhealthcare.com",
+   "priority": 60
+  },
+  {
+   "company": "UK HealthCare",
+   "domain": "ukhealthcare.uky.edu",
+   "priority": 60
+  },
+  {
+   "company": "UofL Health",
+   "domain": "uoflhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "AdventHealth",
+   "domain": "adventhealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Orlando Health",
+   "domain": "orlandohealth.com",
+   "priority": 60
+  },
+  {
+   "company": "BayCare",
+   "domain": "baycare.org",
+   "priority": 60
+  },
+  {
+   "company": "Tampa General Hospital",
+   "domain": "tgh.org",
+   "priority": 60
+  },
+  {
+   "company": "Moffitt Cancer Center",
+   "domain": "moffitt.org",
+   "priority": 60
+  },
+  {
+   "company": "Jackson Health System",
+   "domain": "jacksonhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Baptist Health South Florida",
+   "domain": "baptisthealth.net",
+   "priority": 60
+  },
+  {
+   "company": "Memorial Healthcare System",
+   "domain": "mhs.net",
+   "priority": 60
+  },
+  {
+   "company": "Broward Health",
+   "domain": "browardhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "UF Health",
+   "domain": "ufhealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Lee Health",
+   "domain": "leehealth.org",
+   "priority": 60
+  },
+  {
+   "company": "Sarasota Memorial Health Care",
+   "domain": "smh.com",
+   "priority": 60
+  },
+  {
+   "company": "Nemours Children's Health",
+   "domain": "nemours.org",
+   "priority": 60
+  },
+  {
+   "company": "Wolfson Children's Hospital",
+   "domain": "wolfsonchildrens.com",
+   "priority": 60
+  },
+  {
+   "company": "Mayo Clinic Florida",
+   "domain": "mayoclinic.org",
+   "priority": 60
+  },
+  {
+   "company": "Encompass Health",
+   "domain": "encompasshealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Select Medical",
+   "domain": "selectmedical.com",
+   "priority": 60
+  },
+  {
+   "company": "Kindred Healthcare",
+   "domain": "kindredhealthcare.com",
+   "priority": 60
+  },
+  {
+   "company": "DaVita",
+   "domain": "davita.com",
+   "priority": 60
+  },
+  {
+   "company": "Fresenius Medical Care",
+   "domain": "freseniusmedicalcare.us",
+   "priority": 60
+  },
+  {
+   "company": "U.S. Renal Care",
+   "domain": "usrenalcare.com",
+   "priority": 60
+  },
+  {
+   "company": "Optum",
+   "domain": "optum.com",
+   "priority": 60
+  },
+  {
+   "company": "UnitedHealth Group",
+   "domain": "unitedhealthgroup.com",
+   "priority": 60
+  },
+  {
+   "company": "Elevance Health",
+   "domain": "elevancehealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Cigna",
+   "domain": "cigna.com",
+   "priority": 60
+  },
+  {
+   "company": "Humana",
+   "domain": "humana.com",
+   "priority": 60
+  },
+  {
+   "company": "Centene",
+   "domain": "centene.com",
+   "priority": 60
+  },
+  {
+   "company": "Molina Healthcare",
+   "domain": "molinahealthcare.com",
+   "priority": 60
+  },
+  {
+   "company": "Aetna",
+   "domain": "aetna.com",
+   "priority": 60
+  },
+  {
+   "company": "Walgreens",
+   "domain": "walgreens.com",
+   "priority": 60
+  },
+  {
+   "company": "Rite Aid",
+   "domain": "riteaid.com",
+   "priority": 60
+  },
+  {
+   "company": "Labcorp",
+   "domain": "labcorp.com",
+   "priority": 60
+  },
+  {
+   "company": "Sonic Healthcare USA",
+   "domain": "sonichealthcareusa.com",
+   "priority": 60
+  },
+  {
+   "company": "ATI Physical Therapy",
+   "domain": "atipt.com",
+   "priority": 60
+  },
+  {
+   "company": "Upstream Rehabilitation",
+   "domain": "upstreamrehab.com",
+   "priority": 60
+  },
+  {
+   "company": "Ivy Rehab",
+   "domain": "ivyrehab.com",
+   "priority": 60
+  },
+  {
+   "company": "Concentra",
+   "domain": "concentra.com",
+   "priority": 60
+  },
+  {
+   "company": "CityMD",
+   "domain": "citymd.com",
+   "priority": 60
+  },
+  {
+   "company": "MinuteClinic",
+   "domain": "cvs.com",
+   "priority": 60
+  },
+  {
+   "company": "Carbon Health",
+   "domain": "carbonhealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Oak Street Health",
+   "domain": "oakstreethealth.com",
+   "priority": 60
+  },
+  {
+   "company": "ChenMed",
+   "domain": "chenmed.com",
+   "priority": 60
+  },
+  {
+   "company": "Village Medical",
+   "domain": "villagemedical.com",
+   "priority": 60
+  },
+  {
+   "company": "VillageMD",
+   "domain": "villagemd.com",
+   "priority": 60
+  },
+  {
+   "company": "Privia Health",
+   "domain": "priviahealth.com",
+   "priority": 60
+  },
+  {
+   "company": "Aspen Dental",
+   "domain": "aspendental.com",
+   "priority": 60
+  },
+  {
+   "company": "Heartland Dental",
+   "domain": "heartland.com",
+   "priority": 60
+  },
+  {
+   "company": "Pacific Dental Services",
+   "domain": "pacificdentalservices.com",
+   "priority": 60
+  },
+  {
+   "company": "Banfield Pet Hospital",
+   "domain": "banfield.com",
+   "priority": 60
+  },
+  {
+   "company": "VCA Animal Hospitals",
+   "domain": "vcahospitals.com",
+   "priority": 60
+  },
+  {
+   "company": "BluePearl Pet Hospital",
+   "domain": "bluepearlvet.com",
+   "priority": 60
+  },
+  {
+   "company": "Thrive Pet Healthcare",
+   "domain": "thrivepetcare.com",
+   "priority": 60
+  },
+  {
+   "company": "Mission Veterinary Partners",
+   "domain": "missionvetpartners.com",
+   "priority": 60
+  },
+  {
+   "company": "Brightview Senior Living",
+   "domain": "brightviewseniorliving.com",
+   "priority": 60
+  },
+  {
+   "company": "Sunrise Senior Living",
+   "domain": "sunriseseniorliving.com",
+   "priority": 60
+  },
+  {
+   "company": "Brookdale Senior Living",
+   "domain": "brookdale.com",
+   "priority": 60
+  },
+  {
+   "company": "Genesis HealthCare",
+   "domain": "genesishcc.com",
+   "priority": 60
+  },
+  {
+   "company": "Amedisys",
+   "domain": "amedisys.com",
+   "priority": 60
+  },
+  {
+   "company": "BAYADA Home Health Care",
+   "domain": "bayada.com",
+   "priority": 60
+  },
+  {
+   "company": "Aveanna Healthcare",
+   "domain": "aveanna.com",
+   "priority": 60
+  },
+  {
+   "company": "Maxim Healthcare Services",
+   "domain": "maximhealthcare.com",
+   "priority": 60
+  },
+  {
+   "company": "Interim HealthCare",
+   "domain": "interimhealthcare.com",
+   "priority": 60
+  },
+  {
+   "company": "Acadia Healthcare",
+   "domain": "acadiahealthcare.com",
+   "priority": 60
+  },
+  {
+   "company": "Universal Health Services",
+   "domain": "uhs.com",
+   "priority": 60
+  },
+  {
+   "company": "Hopebridge",
+   "domain": "hopebridge.com",
+   "priority": 60
+  },
+  {
+   "company": "Action Behavior Centers",
+   "domain": "actionbehavior.com",
+   "priority": 60
+  },
+  {
+   "company": "BlueSprig",
+   "domain": "bluesprigautism.com",
+   "priority": 60
+  },
+  {
+   "company": "Kyo",
+   "domain": "kyocare.com",
+   "priority": 60
+  },
+  {
+   "company": "Behavioral Innovations",
+   "domain": "behavioral-innovations.com",
+   "priority": 60
+  },
+  {
+   "company": "JPMorgan Chase",
+   "domain": "jpmorganchase.com",
+   "priority": 60
+  },
+  {
+   "company": "Wells Fargo",
+   "domain": "wellsfargo.com",
+   "priority": 60
+  },
+  {
+   "company": "Citi",
+   "domain": "citigroup.com",
+   "priority": 60
+  },
+  {
+   "company": "U.S. Bank",
+   "domain": "usbank.com",
+   "priority": 60
+  },
+  {
+   "company": "Truist",
+   "domain": "truist.com",
+   "priority": 60
+  },
+  {
+   "company": "TD Bank",
+   "domain": "td.com",
+   "priority": 60
+  },
+  {
+   "company": "Fifth Third Bank",
+   "domain": "53.com",
+   "priority": 60
+  },
+  {
+   "company": "KeyBank",
+   "domain": "key.com",
+   "priority": 60
+  },
+  {
+   "company": "Huntington Bank",
+   "domain": "huntington.com",
+   "priority": 60
+  },
+  {
+   "company": "Regions Bank",
+   "domain": "regions.com",
+   "priority": 60
+  },
+  {
+   "company": "M&T Bank",
+   "domain": "mtb.com",
+   "priority": 60
+  },
+  {
+   "company": "Citizens Bank",
+   "domain": "citizensbank.com",
+   "priority": 60
+  },
+  {
+   "company": "First Citizens Bank",
+   "domain": "firstcitizens.com",
+   "priority": 60
+  },
+  {
+   "company": "BMO",
+   "domain": "bmo.com",
+   "priority": 60
+  },
+  {
+   "company": "Santander",
+   "domain": "santanderbank.com",
+   "priority": 60
+  },
+  {
+   "company": "Ally",
+   "domain": "ally.com",
+   "priority": 60
+  },
+  {
+   "company": "Discover",
+   "domain": "discover.com",
+   "priority": 60
+  },
+  {
+   "company": "American Express",
+   "domain": "americanexpress.com",
+   "priority": 60
+  },
+  {
+   "company": "Synchrony",
+   "domain": "synchrony.com",
+   "priority": 60
+  },
+  {
+   "company": "Charles Schwab",
+   "domain": "schwab.com",
+   "priority": 60
+  },
+  {
+   "company": "Fidelity Investments",
+   "domain": "fidelity.com",
+   "priority": 60
+  },
+  {
+   "company": "Vanguard",
+   "domain": "vanguard.com",
+   "priority": 60
+  },
+  {
+   "company": "Edward Jones",
+   "domain": "edwardjones.com",
+   "priority": 60
+  },
+  {
+   "company": "State Farm",
+   "domain": "statefarm.com",
+   "priority": 60
+  },
+  {
+   "company": "Allstate",
+   "domain": "allstate.com",
+   "priority": 60
+  },
+  {
+   "company": "Progressive",
+   "domain": "progressive.com",
+   "priority": 60
+  },
+  {
+   "company": "GEICO",
+   "domain": "geico.com",
+   "priority": 60
+  },
+  {
+   "company": "Liberty Mutual",
+   "domain": "libertymutual.com",
+   "priority": 60
+  },
+  {
+   "company": "Nationwide",
+   "domain": "nationwide.com",
+   "priority": 60
+  },
+  {
+   "company": "Travelers",
+   "domain": "travelers.com",
+   "priority": 60
+  },
+  {
+   "company": "USAA",
+   "domain": "usaa.com",
+   "priority": 60
+  },
+  {
+   "company": "Farmers Insurance",
+   "domain": "farmers.com",
+   "priority": 60
+  },
+  {
+   "company": "The Hartford",
+   "domain": "thehartford.com",
+   "priority": 60
+  },
+  {
+   "company": "Prudential",
+   "domain": "prudential.com",
+   "priority": 60
+  },
+  {
+   "company": "MetLife",
+   "domain": "metlife.com",
+   "priority": 60
+  },
+  {
+   "company": "Northwestern Mutual",
+   "domain": "northwesternmutual.com",
+   "priority": 60
+  },
+  {
+   "company": "New York Life",
+   "domain": "newyorklife.com",
+   "priority": 60
+  },
+  {
+   "company": "Lincoln Financial",
+   "domain": "lincolnfinancial.com",
+   "priority": 60
+  },
+  {
+   "company": "Principal Financial Group",
+   "domain": "principal.com",
+   "priority": 60
+  },
+  {
+   "company": "Aflac",
+   "domain": "aflac.com",
+   "priority": 60
+  },
+  {
+   "company": "Erie Insurance",
+   "domain": "erieinsurance.com",
+   "priority": 60
+  },
+  {
+   "company": "Teachers Federal Credit Union",
+   "domain": "teachersfcu.org",
+   "priority": 60
+  },
+  {
+   "company": "State Employees' Credit Union",
+   "domain": "ncsecu.org",
+   "priority": 60
+  },
+  {
+   "company": "BECU",
+   "domain": "becu.org",
+   "priority": 60
+  },
+  {
+   "company": "SchoolsFirst Federal Credit Union",
+   "domain": "schoolsfirstfcu.org",
+   "priority": 60
+  },
+  {
+   "company": "America First Credit Union",
+   "domain": "americafirst.com",
+   "priority": 60
+  },
+  {
+   "company": "Alliant Credit Union",
+   "domain": "alliantcreditunion.org",
+   "priority": 60
+  },
+  {
+   "company": "Suncoast Credit Union",
+   "domain": "suncoastcreditunion.com",
+   "priority": 60
+  },
+  {
+   "company": "Mountain America Credit Union",
+   "domain": "macu.com",
+   "priority": 60
+  },
+  {
+   "company": "H&R Block",
+   "domain": "hrblock.com",
+   "priority": 60
+  },
+  {
+   "company": "ADP",
+   "domain": "adp.com",
+   "priority": 60
+  },
+  {
+   "company": "Paychex",
+   "domain": "paychex.com",
+   "priority": 60
+  },
+  {
+   "company": "Teleperformance",
+   "domain": "teleperformance.com",
+   "priority": 60
+  },
+  {
+   "company": "Concentrix",
+   "domain": "concentrix.com",
+   "priority": 60
+  },
+  {
+   "company": "TTEC",
+   "domain": "ttec.com",
+   "priority": 60
+  },
+  {
+   "company": "Conduent",
+   "domain": "conduent.com",
+   "priority": 60
+  },
+  {
+   "company": "Maximus",
+   "domain": "maximus.com",
+   "priority": 60
+  },
+  {
+   "company": "Enterprise Mobility",
+   "domain": "enterprisemobility.com",
+   "priority": 60
+  },
+  {
+   "company": "Hertz",
+   "domain": "hertz.com",
+   "priority": 60
+  },
+  {
+   "company": "Sherwin-Williams",
+   "domain": "sherwin-williams.com",
+   "priority": 60
+  },
+  {
+   "company": "Teach For America",
+   "domain": "teachforamerica.org",
+   "priority": 60
+  },
+  {
+   "company": "City Year",
+   "domain": "cityyear.org",
+   "priority": 60
+  },
+  {
+   "company": "AmeriCorps",
+   "domain": "americorps.gov",
+   "priority": 60
+  },
+  {
+   "company": "KIPP",
+   "domain": "kipp.org",
+   "priority": 60
+  },
+  {
+   "company": "IDEA Public Schools",
+   "domain": "ideapublicschools.org",
+   "priority": 60
+  },
+  {
+   "company": "Success Academy",
+   "domain": "successacademies.org",
+   "priority": 60
+  },
+  {
+   "company": "Bright Horizons",
+   "domain": "brighthorizons.com",
+   "priority": 60
+  },
+  {
+   "company": "KinderCare",
+   "domain": "kindercare.com",
+   "priority": 60
+  },
+  {
+   "company": "The Learning Experience",
+   "domain": "thelearningexperience.com",
+   "priority": 60
+  },
+  {
+   "company": "Primrose Schools",
+   "domain": "primroseschools.com",
+   "priority": 60
+  },
+  {
+   "company": "Huntington Learning Center",
+   "domain": "huntingtonhelps.com",
+   "priority": 60
+  },
+  {
+   "company": "Sylvan Learning",
+   "domain": "sylvanlearning.com",
+   "priority": 60
+  },
+  {
+   "company": "Varsity Tutors",
+   "domain": "varsitytutors.com",
+   "priority": 60
+  },
+  {
+   "company": "Boys & Girls Clubs of America",
+   "domain": "bgca.org",
+   "priority": 60
+  },
+  {
+   "company": "YMCA",
+   "domain": "ymca.org",
+   "priority": 60
+  },
+  {
+   "company": "American Red Cross",
+   "domain": "redcross.org",
+   "priority": 60
+  },
+  {
+   "company": "Goodwill Industries",
+   "domain": "goodwill.org",
+   "priority": 60
+  },
+  {
+   "company": "Catholic Charities",
+   "domain": "catholiccharitiesusa.org",
+   "priority": 60
+  },
+  {
+   "company": "Salvation Army",
+   "domain": "salvationarmyusa.org",
+   "priority": 60
+  },
+  {
+   "company": "Big Brothers Big Sisters",
+   "domain": "bbbs.org",
+   "priority": 60
+  },
+  {
+   "company": "Walmart",
+   "domain": "walmart.com",
+   "priority": 45
+  },
+  {
+   "company": "Target",
+   "domain": "target.com",
+   "priority": 45
+  },
+  {
+   "company": "Kroger",
+   "domain": "kroger.com",
+   "priority": 45
+  },
+  {
+   "company": "Publix",
+   "domain": "publix.com",
+   "priority": 45
+  },
+  {
+   "company": "Albertsons Companies",
+   "domain": "albertsonscompanies.com",
+   "priority": 45
+  },
+  {
+   "company": "H-E-B",
+   "domain": "heb.com",
+   "priority": 45
+  },
+  {
+   "company": "Wegmans",
+   "domain": "wegmans.com",
+   "priority": 45
+  },
+  {
+   "company": "Meijer",
+   "domain": "meijer.com",
+   "priority": 45
+  },
+  {
+   "company": "Giant Food",
+   "domain": "giantfood.com",
+   "priority": 45
+  },
+  {
+   "company": "Safeway",
+   "domain": "safeway.com",
+   "priority": 45
+  },
+  {
+   "company": "Whole Foods Market",
+   "domain": "wholefoodsmarket.com",
+   "priority": 45
+  },
+  {
+   "company": "Trader Joe's",
+   "domain": "traderjoes.com",
+   "priority": 45
+  },
+  {
+   "company": "Aldi",
+   "domain": "aldi.us",
+   "priority": 45
+  },
+  {
+   "company": "Costco",
+   "domain": "costco.com",
+   "priority": 45
+  },
+  {
+   "company": "Sam's Club",
+   "domain": "samsclub.com",
+   "priority": 45
+  },
+  {
+   "company": "The Home Depot",
+   "domain": "homedepot.com",
+   "priority": 45
+  },
+  {
+   "company": "Lowe's",
+   "domain": "lowes.com",
+   "priority": 45
+  },
+  {
+   "company": "Best Buy",
+   "domain": "bestbuy.com",
+   "priority": 45
+  },
+  {
+   "company": "Dick's Sporting Goods",
+   "domain": "dickssportinggoods.com",
+   "priority": 45
+  },
+  {
+   "company": "Academy Sports + Outdoors",
+   "domain": "academy.com",
+   "priority": 45
+  },
+  {
+   "company": "REI",
+   "domain": "rei.com",
+   "priority": 45
+  },
+  {
+   "company": "Ulta Beauty",
+   "domain": "ulta.com",
+   "priority": 45
+  },
+  {
+   "company": "Sephora",
+   "domain": "sephora.com",
+   "priority": 45
+  },
+  {
+   "company": "TJX Companies",
+   "domain": "tjx.com",
+   "priority": 45
+  },
+  {
+   "company": "Ross Stores",
+   "domain": "rossstores.com",
+   "priority": 45
+  },
+  {
+   "company": "Burlington",
+   "domain": "burlington.com",
+   "priority": 45
+  },
+  {
+   "company": "Macy's",
+   "domain": "macys.com",
+   "priority": 45
+  },
+  {
+   "company": "Kohl's",
+   "domain": "kohls.com",
+   "priority": 45
+  },
+  {
+   "company": "Nordstrom",
+   "domain": "nordstrom.com",
+   "priority": 45
+  },
+  {
+   "company": "Gap Inc.",
+   "domain": "gapinc.com",
+   "priority": 45
+  },
+  {
+   "company": "Nike",
+   "domain": "nike.com",
+   "priority": 45
+  },
+  {
+   "company": "Foot Locker",
+   "domain": "footlocker.com",
+   "priority": 45
+  },
+  {
+   "company": "American Eagle Outfitters",
+   "domain": "ae.com",
+   "priority": 45
+  },
+  {
+   "company": "Abercrombie & Fitch",
+   "domain": "abercrombie.com",
+   "priority": 45
+  },
+  {
+   "company": "Bath & Body Works",
+   "domain": "bathandbodyworks.com",
+   "priority": 45
+  },
+  {
+   "company": "Victoria's Secret",
+   "domain": "victoriassecret.com",
+   "priority": 45
+  },
+  {
+   "company": "Petco",
+   "domain": "petco.com",
+   "priority": 45
+  },
+  {
+   "company": "PetSmart",
+   "domain": "petsmart.com",
+   "priority": 45
+  },
+  {
+   "company": "Tractor Supply",
+   "domain": "tractorsupply.com",
+   "priority": 45
+  },
+  {
+   "company": "Dollar General",
+   "domain": "dollargeneral.com",
+   "priority": 45
+  },
+  {
+   "company": "Dollar Tree",
+   "domain": "dollartree.com",
+   "priority": 45
+  },
+  {
+   "company": "Five Below",
+   "domain": "fivebelow.com",
+   "priority": 45
+  },
+  {
+   "company": "Michaels",
+   "domain": "michaels.com",
+   "priority": 45
+  },
+  {
+   "company": "Hobby Lobby",
+   "domain": "hobbylobby.com",
+   "priority": 45
+  },
+  {
+   "company": "Barnes & Noble",
+   "domain": "barnesandnoble.com",
+   "priority": 45
+  },
+  {
+   "company": "GameStop",
+   "domain": "gamestop.com",
+   "priority": 45
+  },
+  {
+   "company": "Staples",
+   "domain": "staples.com",
+   "priority": 45
+  },
+  {
+   "company": "AutoZone",
+   "domain": "autozone.com",
+   "priority": 45
+  },
+  {
+   "company": "O'Reilly Auto Parts",
+   "domain": "oreillyauto.com",
+   "priority": 45
+  },
+  {
+   "company": "Advance Auto Parts",
+   "domain": "advanceautoparts.com",
+   "priority": 45
+  },
+  {
+   "company": "Starbucks",
+   "domain": "starbucks.com",
+   "priority": 45
+  },
+  {
+   "company": "Chipotle",
+   "domain": "chipotle.com",
+   "priority": 45
+  },
+  {
+   "company": "Panera Bread",
+   "domain": "panerabread.com",
+   "priority": 45
+  },
+  {
+   "company": "Inspire Brands",
+   "domain": "inspirebrands.com",
+   "priority": 45
+  },
+  {
+   "company": "Darden Restaurants",
+   "domain": "darden.com",
+   "priority": 45
+  },
+  {
+   "company": "Texas Roadhouse",
+   "domain": "texasroadhouse.com",
+   "priority": 45
+  },
+  {
+   "company": "Cracker Barrel",
+   "domain": "crackerbarrel.com",
+   "priority": 45
+  },
+  {
+   "company": "Domino's",
+   "domain": "dominos.com",
+   "priority": 45
+  },
+  {
+   "company": "Papa John's",
+   "domain": "papajohns.com",
+   "priority": 45
+  },
+  {
+   "company": "Yum! Brands",
+   "domain": "yum.com",
+   "priority": 45
+  },
+  {
+   "company": "Shake Shack",
+   "domain": "shakeshack.com",
+   "priority": 45
+  },
+  {
+   "company": "Sweetgreen",
+   "domain": "sweetgreen.com",
+   "priority": 45
+  },
+  {
+   "company": "CAVA",
+   "domain": "cava.com",
+   "priority": 45
+  },
+  {
+   "company": "Raising Cane's",
+   "domain": "raisingcanes.com",
+   "priority": 45
+  },
+  {
+   "company": "Wawa",
+   "domain": "wawa.com",
+   "priority": 45
+  },
+  {
+   "company": "Sheetz",
+   "domain": "sheetz.com",
+   "priority": 45
+  },
+  {
+   "company": "QuikTrip",
+   "domain": "quiktrip.com",
+   "priority": 45
+  },
+  {
+   "company": "Buc-ee's",
+   "domain": "buc-ees.com",
+   "priority": 45
+  },
+  {
+   "company": "7-Eleven",
+   "domain": "7-eleven.com",
+   "priority": 45
+  },
+  {
+   "company": "Marriott International",
+   "domain": "marriott.com",
+   "priority": 45
+  },
+  {
+   "company": "Hilton",
+   "domain": "hilton.com",
+   "priority": 45
+  },
+  {
+   "company": "Hyatt",
+   "domain": "hyatt.com",
+   "priority": 45
+  },
+  {
+   "company": "IHG Hotels & Resorts",
+   "domain": "ihg.com",
+   "priority": 45
+  },
+  {
+   "company": "Six Flags",
+   "domain": "sixflags.com",
+   "priority": 45
+  },
+  {
+   "company": "SeaWorld",
+   "domain": "seaworld.com",
+   "priority": 45
+  },
+  {
+   "company": "Universal Parks & Resorts",
+   "domain": "universalparks.com",
+   "priority": 45
+  },
+  {
+   "company": "Disney Parks",
+   "domain": "disneycareers.com",
+   "priority": 45
+  },
+  {
+   "company": "AMC Theatres",
+   "domain": "amctheatres.com",
+   "priority": 45
+  },
+  {
+   "company": "Regal Cinemas",
+   "domain": "regmovies.com",
+   "priority": 45
+  },
+  {
+   "company": "Dave & Buster's",
+   "domain": "daveandbusters.com",
+   "priority": 45
+  },
+  {
+   "company": "Topgolf",
+   "domain": "topgolf.com",
+   "priority": 45
+  },
+  {
+   "company": "Equinox",
+   "domain": "equinox.com",
+   "priority": 45
+  },
+  {
+   "company": "Amazon",
+   "domain": "amazon.jobs",
+   "priority": 45
+  },
+  {
+   "company": "FedEx",
+   "domain": "fedex.com",
+   "priority": 45
+  },
+  {
+   "company": "UPS",
+   "domain": "ups.com",
+   "priority": 45
+  },
+  {
+   "company": "DHL",
+   "domain": "dhl.com",
+   "priority": 45
+  },
+  {
+   "company": "Chewy",
+   "domain": "chewy.com",
+   "priority": 45
+  },
+  {
+   "company": "Instacart",
+   "domain": "instacart.com",
+   "priority": 45
+  },
+  {
+   "company": "DoorDash",
+   "domain": "doordash.com",
+   "priority": 45
+  },
+  {
+   "company": "Uber",
+   "domain": "uber.com",
+   "priority": 45
+  },
+  {
+   "company": "Enterprise Holdings",
+   "domain": "enterprise.com",
+   "priority": 45
+  },
+  {
+   "company": "Avis Budget Group",
+   "domain": "avisbudgetgroup.com",
+   "priority": 45
+  },
+  {
+   "company": "U-Haul",
+   "domain": "uhaul.com",
+   "priority": 45
+  },
+  {
+   "company": "Aramark",
+   "domain": "aramark.com",
+   "priority": 45
+  },
+  {
+   "company": "Sodexo",
+   "domain": "sodexo.com",
+   "priority": 45
+  },
+  {
+   "company": "Compass Group USA",
+   "domain": "compass-usa.com",
+   "priority": 45
+  },
+  {
+   "company": "Allied Universal",
+   "domain": "aus.com",
+   "priority": 45
+  },
+  {
+   "company": "Securitas",
+   "domain": "securitasinc.com",
+   "priority": 45
+  },
+  {
+   "company": "Cintas",
+   "domain": "cintas.com",
+   "priority": 45
+  },
+  {
+   "company": "ABM Industries",
+   "domain": "abm.com",
+   "priority": 45
+  },
+  {
+   "company": "Apple",
+   "domain": "apple.com",
+   "priority": 45
+  },
+  {
+   "company": "Verizon",
+   "domain": "verizon.com",
+   "priority": 45
+  },
+  {
+   "company": "T-Mobile",
+   "domain": "t-mobile.com",
+   "priority": 45
+  },
+  {
+   "company": "AT&T",
+   "domain": "att.com",
+   "priority": 45
+  },
+  {
+   "company": "Comcast",
+   "domain": "comcast.com",
+   "priority": 45
+  },
+  {
+   "company": "Spectrum",
+   "domain": "spectrum.com",
+   "priority": 45
+  },
+  {
+   "company": "Troon",
+   "domain": "troon.com",
+   "priority": 60
+  },
+  {
+   "company": "Invited",
+   "domain": "invitedclubs.com",
+   "priority": 60
+  },
+  {
+   "company": "Arcis Golf",
+   "domain": "arcisgolf.com",
+   "priority": 60
+  },
+  {
+   "company": "KemperSports",
+   "domain": "kempersports.com",
+   "priority": 60
+  },
+  {
+   "company": "Drive Shack",
+   "domain": "driveshack.com",
+   "priority": 60
+  },
+  {
+   "company": "PGA TOUR Superstore",
+   "domain": "pgatoursuperstore.com",
+   "priority": 60
+  },
+  {
+   "company": "Pinehurst Resort",
+   "domain": "pinehurst.com",
+   "priority": 60
+  },
+  {
+   "company": "Billy Casper Golf",
+   "domain": "billycaspergolf.com",
+   "priority": 60
+  },
+  {
+   "company": "Concert Golf Partners",
+   "domain": "concertgolfpartners.com",
+   "priority": 60
+  },
+  {
+   "company": "Sea Pines Resort",
+   "domain": "seapines.com",
+   "priority": 60
+  },
+  {
+   "company": "The Broadmoor",
+   "domain": "broadmoor.com",
+   "priority": 60
+  },
+  {
+   "company": "Vail Resorts",
+   "domain": "vailresorts.com",
+   "priority": 60
+  },
+  {
+   "company": "Alterra Mountain Company",
+   "domain": "alterramtn.co",
+   "priority": 60
+  },
+  {
+   "company": "Boyne Resorts",
+   "domain": "boyneresorts.com",
+   "priority": 60
+  },
+  {
+   "company": "Aspen Skiing Company",
+   "domain": "aspensnowmass.com",
+   "priority": 60
+  },
+  {
+   "company": "Powdr",
+   "domain": "powdr.com",
+   "priority": 60
+  },
+  {
+   "company": "Snowbird",
+   "domain": "snowbird.com",
+   "priority": 60
+  },
+  {
+   "company": "Cedar Fair",
+   "domain": "cedarfair.com",
+   "priority": 60
+  },
+  {
+   "company": "United Parks & Resorts",
+   "domain": "unitedparks.com",
+   "priority": 60
+  },
+  {
+   "company": "Great Wolf Lodge",
+   "domain": "greatwolf.com",
+   "priority": 60
+  },
+  {
+   "company": "Kalahari Resorts",
+   "domain": "kalahariresorts.com",
+   "priority": 60
+  },
+  {
+   "company": "Hersheypark",
+   "domain": "hersheyentertainment.com",
+   "priority": 60
+  },
+  {
+   "company": "Dollywood",
+   "domain": "dollywood.com",
+   "priority": 60
+  },
+  {
+   "company": "Silver Dollar City",
+   "domain": "silverdollarcity.com",
+   "priority": 60
+  },
+  {
+   "company": "Main Event",
+   "domain": "mainevent.com",
+   "priority": 60
+  },
+  {
+   "company": "Lucky Strike Entertainment",
+   "domain": "luckystrikeent.com",
+   "priority": 60
+  },
+  {
+   "company": "Chuck E. Cheese",
+   "domain": "chuckecheese.com",
+   "priority": 60
+  },
+  {
+   "company": "Urban Air Adventure Park",
+   "domain": "urbanair.com",
+   "priority": 60
+  },
+  {
+   "company": "Sky Zone",
+   "domain": "skyzone.com",
+   "priority": 60
+  },
+  {
+   "company": "Delaware North",
+   "domain": "delawarenorth.com",
+   "priority": 60
+  },
+  {
+   "company": "Levy Restaurants",
+   "domain": "levyrestaurants.com",
+   "priority": 60
+  },
+  {
+   "company": "Legends",
+   "domain": "legends.net",
+   "priority": 60
+  },
+  {
+   "company": "Xanterra Travel Collection",
+   "domain": "xanterra.com",
+   "priority": 60
+  },
+  {
+   "company": "Live Nation",
+   "domain": "livenation.com",
+   "priority": 60
+  },
+  {
+   "company": "Oak View Group",
+   "domain": "oakviewgroup.com",
+   "priority": 60
+  },
+  {
+   "company": "Goldfish Swim School",
+   "domain": "goldfishswimschool.com",
+   "priority": 60
+  },
+  {
+   "company": "British Swim School",
+   "domain": "britishswimschool.com",
+   "priority": 60
+  },
+  {
+   "company": "i9 Sports",
+   "domain": "i9sports.com",
+   "priority": 60
+  },
+  {
+   "company": "Soccer Shots",
+   "domain": "soccershots.com",
+   "priority": 60
+  },
+  {
+   "company": "US Sports Camps",
+   "domain": "ussportscamps.com",
+   "priority": 60
+  },
+  {
+   "company": "BrightView",
+   "domain": "brightview.com",
+   "priority": 60
+  },
+  {
+   "company": "Yellowstone Landscape",
+   "domain": "yellowstonelandscape.com",
+   "priority": 60
+  },
+  {
+   "company": "The Davey Tree Expert Company",
+   "domain": "davey.com",
+   "priority": 60
+  },
+  {
+   "company": "SavATree",
+   "domain": "savatree.com",
+   "priority": 60
+  },
+  {
+   "company": "The Goddard School",
+   "domain": "goddardschool.com",
+   "priority": 60
+  },
+  {
+   "company": "Learning Care Group",
+   "domain": "learningcaregroup.com",
+   "priority": 60
+  },
+  {
+   "company": "Mathnasium",
+   "domain": "mathnasium.com",
+   "priority": 60
+  },
+  {
+   "company": "Kumon",
+   "domain": "kumon.com",
+   "priority": 60
+  },
+  {
+   "company": "Camp Bow Wow",
+   "domain": "campbowwow.com",
+   "priority": 60
+  },
+  {
+   "company": "Dogtopia",
+   "domain": "dogtopia.com",
+   "priority": 60
+  },
+  {
+   "company": "Safe Harbor Marinas",
+   "domain": "shmarinas.com",
+   "priority": 60
+  },
+  {
+   "company": "Suntex Marinas",
+   "domain": "suntex.com",
+   "priority": 60
+  },
+  {
+   "company": "Two Men and a Truck",
+   "domain": "twomenandatruck.com",
+   "priority": 60
+  },
+  {
+   "company": "College Hunks Hauling Junk",
+   "domain": "collegehunkshaulingjunk.com",
+   "priority": 60
+  },
+  {
+   "company": "Landscapes Golf Management",
+   "domain": "landscapesgolf.com",
+   "priority": 45
+  },
+  {
+   "company": "Escalante Golf",
+   "domain": "escalantegolf.com",
+   "priority": 45
+  },
+  {
+   "company": "Heritage Golf Group",
+   "domain": "heritagegolfgroup.com",
+   "priority": 45
+  },
+  {
+   "company": "Kiawah Island Golf Resort",
+   "domain": "kiawahresort.com",
+   "priority": 45
+  },
+  {
+   "company": "Sea Island",
+   "domain": "seaisland.com",
+   "priority": 45
+  },
+  {
+   "company": "Omni Hotels & Resorts",
+   "domain": "omnihotels.com",
+   "priority": 45
+  },
+  {
+   "company": "Four Seasons",
+   "domain": "fourseasons.com",
+   "priority": 45
+  },
+  {
+   "company": "ASM Global",
+   "domain": "asmglobal.com",
+   "priority": 45
+  },
+  {
+   "company": "AEG",
+   "domain": "aegworldwide.com",
+   "priority": 45
+  },
+  {
+   "company": "Ticketmaster",
+   "domain": "ticketmaster.com",
+   "priority": 45
+  },
+  {
+   "company": "Round1 Bowling & Amusement",
+   "domain": "round1usa.com",
+   "priority": 45
+  },
+  {
+   "company": "Cinemark",
+   "domain": "cinemark.com",
+   "priority": 45
+  },
+  {
+   "company": "Patagonia",
+   "domain": "patagonia.com",
+   "priority": 45
+  },
+  {
+   "company": "iD Tech",
+   "domain": "idtech.com",
+   "priority": 45
+  },
+  {
+   "company": "Code Ninjas",
+   "domain": "codeninjas.com",
+   "priority": 45
+  },
+  {
+   "company": "Girl Scouts of the USA",
+   "domain": "girlscouts.org",
+   "priority": 45
+  },
+  {
+   "company": "Outward Bound",
+   "domain": "outwardbound.org",
+   "priority": 45
+  },
+  {
+   "company": "NOLS",
+   "domain": "nols.edu",
+   "priority": 45
+  },
+  {
+   "company": "Student Conservation Association",
+   "domain": "thesca.org",
+   "priority": 45
+  },
+  {
+   "company": "Habitat for Humanity",
+   "domain": "habitat.org",
+   "priority": 45
+  },
+  {
+   "company": "Best Friends Animal Society",
+   "domain": "bestfriends.org",
+   "priority": 45
+  },
+  {
+   "company": "The Little Gym",
+   "domain": "thelittlegym.com",
+   "priority": 45
+  },
+  {
+   "company": "Bass Pro Shops",
+   "domain": "basspro.com",
+   "priority": 45
+  },
+  {
+   "company": "Golf Galaxy",
+   "domain": "golfgalaxy.com",
+   "priority": 45
+  },
+  {
+   "company": "Callaway",
+   "domain": "callawaygolf.com",
+   "priority": 45
+  },
+  {
+   "company": "Acushnet",
+   "domain": "acushnetcompany.com",
+   "priority": 45
+  },
+  {
+   "company": "Smithsonian Institution",
+   "domain": "si.edu",
+   "priority": 45
+  },
+  {
+   "company": "The Walt Disney Company",
+   "domain": "disney.com",
+   "priority": 45
+  },
+  {
+   "company": "Merlin Entertainments",
+   "domain": "merlinentertainments.biz",
+   "priority": 45
+  },
+  {
+   "company": "The Princeton Review",
+   "domain": "princetonreview.com",
+   "priority": 45
+  },
+  {
+   "company": "Kaplan",
+   "domain": "kaplan.com",
+   "priority": 45
+  },
+  {
+   "company": "Results Physiotherapy",
+   "domain": "resultspt.com",
+   "priority": 50
+  },
+  {
+   "company": "Adidas",
+   "domain": "adidas.com",
+   "priority": 50
+  },
+  {
+   "company": "Fanatics",
+   "domain": "fanatics.com",
+   "priority": 50
+  },
+  {
+   "company": "Learfield",
+   "domain": "learfield.com",
+   "priority": 50
+  },
+  {
+   "company": "Centerstone",
+   "domain": "centerstone.org",
+   "priority": 50
+  },
+  {
+   "company": "Devereux",
+   "domain": "devereux.org",
+   "priority": 50
+  },
+  {
+   "company": "May Institute",
+   "domain": "mayinstitute.org",
+   "priority": 50
+  },
+  {
+   "company": "Behavioral Health Works",
+   "domain": "bhwcares.com",
+   "priority": 50
+  },
+  {
+   "company": "Centria Autism",
+   "domain": "centriaautism.com",
+   "priority": 50
+  },
+  {
+   "company": "LifeStance Health",
+   "domain": "lifestance.com",
+   "priority": 50
+  },
+  {
+   "company": "Talkspace",
+   "domain": "talkspace.com",
+   "priority": 50
+  }
+ ]
+}
