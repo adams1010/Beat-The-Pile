@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
-process.env.CLERK_SECRET_KEY = "sk"; process.env.INTERNIQ_DB_URL = "https://f.co"; process.env.INTERNIQ_DB_SERVICE_KEY = "s"; process.env.INTERNIQ_DB_ANON_KEY = "a"; process.env.CRON_SECRET = "cron";
+process.env.CLERK_SECRET_KEY = "sk"; process.env.INTERNIQ_DB_URL = "https://f.co"; process.env.INTERNIQ_DB_SERVICE_KEY = "s"; process.env.INTERNIQ_DB_ANON_KEY = "a"; process.env.CRON_SECRET = "cron"; process.env.ADMIN_EMAILS = "owner@example.com,admin@example.com";
 const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", { modulusLength: 2048 });
 const jwk = { ...publicKey.export({ format: "jwk" }), kid: "k1" };
 const settings = new Map(), runs = [];
@@ -8,7 +8,7 @@ const cands = [{ id: "x-a", company: "A", status: "live", verified_at: new Date(
 const ok = (b, s = 200) => ({ ok: s < 400, status: s, text: async () => (b === undefined ? "" : JSON.stringify(b)), json: async () => b });
 globalThis.fetch = async (u, o = {}) => { u = String(u);
   if (u.includes("api.clerk.com/v1/jwks")) return ok({ keys: [jwk] });
-  if (u.includes("api.clerk.com/v1/users/")) return ok({ email_addresses: [{ email_address: u.includes("owner") ? "shiloniadam10@gmail.com" : "rando@x.com", verification: { status: "verified" } }] });
+  if (u.includes("api.clerk.com/v1/users/")) return ok({ email_addresses: [{ email_address: u.includes("owner") ? "owner@example.com" : "rando@x.com", verification: { status: "verified" } }] });
   const x = new URL(u), t = x.pathname.split("/").pop(), m = o.method || "GET";
   if (t === "bot_settings") { if (m === "POST") { for (const r of JSON.parse(o.body)) settings.set(r.bot, r); return ok(); }
     const b = x.searchParams.get("bot"); return ok(b ? [settings.get(b.slice(3))].filter(Boolean) : [...settings.values()]); }
@@ -40,7 +40,7 @@ assert.equal((await call("discovery", { method: "POST", auth: tok("user_rando"),
 assert.equal((await call("discovery", { method: "POST", auth: "cron", body: { action: "bot", bot: "sync", on: false } })).code, 400, "robot can't flip switches");
 assert.equal((await call("discovery", { method: "POST", auth: tok("user_owner"), body: { action: "bot", bot: "nope", on: false } })).code, 400);
 r = await call("discovery", { method: "POST", auth: tok("user_owner"), body: { action: "bot", bot: "sync", on: false } });
-assert.equal(r.code, 200); assert.equal(settings.get("sync").enabled, false); assert.equal(settings.get("sync").updated_by, "shiloniadam10@gmail.com");
+assert.equal(r.code, 200); assert.equal(settings.get("sync").enabled, false); assert.equal(settings.get("sync").updated_by, "owner@example.com");
 console.log("✓ switches: owner only (anon, other users, robot refused)");
 
 // Switched-off bots really stop

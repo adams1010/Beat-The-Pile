@@ -3,3 +3,6 @@ tests/fixtures/
 .env*
 *.pem
 .turbo-cache/
+
+# local security scan output
+semgrep-report.txt

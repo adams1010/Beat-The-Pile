@@ -4,7 +4,7 @@
 land an internship — and their first full-time job**: real internships **pulled straight from each company's own job board**, plus Career Fair Mode, My Season, and the Opening Radar.
 Owner: Adam Shiloni (VT mechanical engineering). **Positioning (Nov 2026): for every major — never write copy that implies it's only for engineers. Internships first, early-career full-time too (Nov 8) — lead with internships, never drop them.** The Vercel project and database keep the old "InternIQ" names (the GitHub repo is now adams1010/beat-the-pile) — only
 the brand changed. All student-facing copy says "Beat the Pile".
-Admins (can flip bot switches, paste links): `ADMIN_EMAILS` env, default shiloniadam10@gmail.com, mdxp21@gmail.com.
+Admins (can flip bot switches, paste links): `ADMIN_EMAILS` env in Vercel (the two owners). Unset = `lib/admins.js` matches the owners by SHA-256 hash; never write the addresses in the repo.
 
 **Non-negotiables**
 - Never show a listing from a board the robot hasn't *proven* belongs to that company (see Proof rules below).

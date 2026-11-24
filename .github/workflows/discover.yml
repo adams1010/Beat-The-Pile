@@ -27,14 +27,17 @@ jobs:
       - name: Call /api/discover (passes for ~40 min)
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          QUERY: ${{ inputs.query }}
+          IMPORT: ${{ inputs.import }}
         run: |
           if [ -z "$CRON_SECRET" ]; then echo "Add the CRON_SECRET repo secret first"; exit 1; fi
-          manual="${{ inputs.query }}${{ inputs.import && 'x' || '' }}"
+          extra=""; [ "$IMPORT" = true ] && extra="&import=1"; [ -n "$QUERY" ] && extra="$extra&$QUERY"
+          manual="$extra"
           end=$(( $(date +%s) + 2400 )); pass=0; fails=0
           while [ $(date +%s) -lt $end ]; do
             pass=$((pass+1))
             code=$(curl -s -o out.json -w '%{http_code}' --max-time 70 \
-              -H "Authorization: Bearer $CRON_SECRET" "https://www.beatthepile.com/api/discover?x=1${{ inputs.import && '&import=1' || '' }}${{ inputs.query && format('&{0}', inputs.query) || '' }}")
+              -H "Authorization: Bearer $CRON_SECRET" "https://www.beatthepile.com/api/discover?x=1$extra")
             echo "pass $pass: HTTP $code $(head -c 300 out.json)"
             if [ "$code" != 200 ]; then fails=$((fails+1)); [ $fails -ge 3 ] && exit 1; sleep 20; continue; fi
             fails=0
@@ -50,4 +53,4 @@ jobs:
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           [ -f stop ] && { echo "chain ends: $(cat stop)"; exit 0; }
-          gh workflow run discover.yml --repo ${{ github.repository }} --ref main && echo "next run started"
+          gh workflow run discover.yml --repo "$GITHUB_REPOSITORY" --ref main && echo "next run started"

@@ -6,7 +6,7 @@ const { jwk, tok } = makeKeys();
 const f = installFake({ jwk, clerkUsers: {
   u_emp: { email: "jane@boeing.com", role: "employer", first_name: "Jane" },
   u_emp2: { email: "raj@boeing.com", role: "employer" },
-  u_adm: { email: "mdxp21@gmail.com", role: "student" },
+  u_adm: { email: "admin@example.com", role: "student" },
   u_ana: { email: "ana@vt.edu", role: "student" }, u_ben: { email: "ben@vt.edu", role: "student" } } });
 const me = (await import("../api/me.js")).default;
 const { workEmailProblem, baseDomain, cleanBizProfile, slugify } = await import("../lib/employer.js");

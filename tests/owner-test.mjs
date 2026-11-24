@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { installFake, makeKeys, invoke, env } from "./fakedb.mjs";
 env(); process.env.CLERK_SECRET_KEY = "sk_test";
 const { jwk, tok } = makeKeys();
-installFake({ jwk, clerkUsers: { u_own: { email: "mdxp21@gmail.com", role: "employer", first_name: "Maddox", last_name: "Potter" },
+installFake({ jwk, clerkUsers: { u_own: { email: "admin@example.com", role: "employer", first_name: "Maddox", last_name: "Potter" },
   u_x: { email: "jane@acme.com", role: "employer" }, u_stu: { email: "s@vt.edu", role: "student" } } });
 const me = (await import("../api/me.js")).default;
 const call = (sub, body) => invoke(me, { method: "POST", body, headers: { authorization: "Bearer " + tok(sub) } });

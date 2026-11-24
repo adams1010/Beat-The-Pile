@@ -17,19 +17,20 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with: { node-version: 22 }
       # Nov 17: fingerprints of what Vercel already has, so unchanged boards aren't re-sent (scripts/turbo-sync.mjs)
-      - uses: actions/cache/restore@v4
+      - uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with: { path: .turbo-cache, key: "turbo-sent-${{ github.run_id }}", restore-keys: "turbo-sent-" }
-      - run: node scripts/turbo-sync.mjs ${{ inputs.args }}
+      - run: set -f; node scripts/turbo-sync.mjs $ARGS
         env:
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
           USAJOBS_KEY: ${{ secrets.USAJOBS_KEY }}        # Nov 16: federal jobs (lib/fetchers/usajobs.js)
           USAJOBS_EMAIL: ${{ secrets.USAJOBS_EMAIL }}
           BTP_TURBO: "1"
-      - uses: actions/cache/save@v4
+          ARGS: ${{ inputs.args }}
+      - uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         if: always()
         continue-on-error: true
         with: { path: .turbo-cache, key: "turbo-sent-${{ github.run_id }}" }
@@ -39,6 +40,6 @@ jobs:
         run: |
           on=$(curl -s https://www.beatthepile.com/api/discovery?bots=1 | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{try{const b=JSON.parse(s).bots.find(x=>x.id==="turbo");console.log(b&&b.enabled===false?"off":"on")}catch{console.log("on")}})')
           [ "$on" = "off" ] && { echo "Turbo Sync is off: chain ends"; exit 0; }
-          elapsed=$(( $(date +%s) - $(date -d "$(gh run view ${{ github.run_id }} --repo ${{ github.repository }} --json createdAt -q .createdAt)" +%s) ))
+          elapsed=$(( $(date +%s) - $(date -d "$(gh run view "$GITHUB_RUN_ID" --repo "$GITHUB_REPOSITORY" --json createdAt -q .createdAt)" +%s) ))
           wait=$(( 3600 - elapsed )); [ $wait -gt 0 ] && { echo "sleeping $wait s"; sleep $wait; }
-          gh workflow run turbo-sync.yml --repo ${{ github.repository }} --ref main && echo "next run started"
+          gh workflow run turbo-sync.yml --repo "$GITHUB_REPOSITORY" --ref main && echo "next run started"

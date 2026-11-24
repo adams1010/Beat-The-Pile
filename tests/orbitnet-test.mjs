@@ -7,7 +7,7 @@ const f = installFake({ jwk, clerkUsers: {
   u_emp: { email: "jane@boeing.com", role: "employer", first_name: "Jane", last_name: "Recruiter" },
   u_ana: { email: "ana@vt.edu", role: "student" }, u_ben: { email: "ben@vt.edu", role: "student" },
   u_cal: { email: "cal@vt.edu", role: "student" }, u_dee: { email: "dee@vt.edu", role: "student" },
-  u_own: { email: "shiloniadam10@gmail.com", role: "student" } } });
+  u_own: { email: "owner@example.com", role: "student" } } });
 const me = (await import("../api/me.js")).default;
 const { canMessage, linkState, cleanBody, peerKey } = await import("../lib/orbitnet.js");
 const call = (sub, body) => invoke(me, { method: "POST", body, headers: { authorization: "Bearer " + tok(sub) } });

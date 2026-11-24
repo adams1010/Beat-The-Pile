@@ -4,7 +4,7 @@ import { installFake, makeKeys, invoke, env } from "./fakedb.mjs";
 env();
 const { jwk, tok } = makeKeys();
 let mode = "ok";
-const f = installFake({ jwk, clerkUsers: { user_owner: "shiloniadam10@gmail.com", user_x: "x@x.com" },
+const f = installFake({ jwk, clerkUsers: { user_owner: "owner@example.com", user_x: "x@x.com" },
   anthropic: (b) => mode === "down" ? { status: 529 } : mode === "junk" ? { text: "I think it's fine" }
     : { text: b.messages[0].content.includes("buy crypto") ? '{"hide":true,"reason":"spam"}' : '{"hide":false,"reason":""}' } });
 const c = (await import("../api/community.js")).default;

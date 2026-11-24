@@ -11,12 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with: { node-version: 20 }
       - name: Download IPEDS
+        env: { YEAR: "${{ inputs.year || '2024' }}" }
         run: |
-          Y="${{ inputs.year || '2024' }}"; mkdir -p /tmp/ipeds && cd /tmp/ipeds
+          Y="$YEAR"; mkdir -p /tmp/ipeds && cd /tmp/ipeds
           curl -sfL --retry 3 -o hd.zip "https://nces.ed.gov/ipeds/datacenter/data/HD${Y}.zip"
           curl -sfL --retry 3 -o c.zip "https://nces.ed.gov/ipeds/datacenter/data/C${Y}_A.zip"
           curl -sfL --retry 3 -o CIPCode2020.csv "https://nces.ed.gov/ipeds/cipcode/Files/CIPCode2020.csv"

@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { installFake, makeKeys, invoke, env } from "./fakedb.mjs";
 env();
 const { jwk, tok } = makeKeys();
-installFake({ jwk, clerkUsers: { u_own: { email: "mdxp21@gmail.com", role: "student" }, u_h: { email: "h@vt.edu", role: "student" } } });
+installFake({ jwk, clerkUsers: { u_own: { email: "admin@example.com", role: "student" }, u_h: { email: "h@vt.edu", role: "student" } } });
 const me = (await import("../api/me.js")).default;
 const call = (sub, body) => invoke(me, { method: "POST", body, headers: { authorization: "Bearer " + tok(sub) } });
 await call("u_own", { action: "onboard", name: "Maddox", school: "Virginia Tech", major: "Mechanical Engineering", show: true });

@@ -204,6 +204,6 @@ export async function invoke(handler, { method = "GET", query = {}, headers = {}
   return r;
 }
 export function env() {
-  Object.assign(process.env, { CLERK_SECRET_KEY: "sk", INTERNIQ_DB_URL: "https://f.co", INTERNIQ_DB_SERVICE_KEY: "s", INTERNIQ_DB_ANON_KEY: "a", ANTHROPIC_API_KEY: "k", BTP_OFFLINE_TEST: "1" });   // BTP_OFFLINE_TEST: no real DNS (hasMail) in tests
+  Object.assign(process.env, { CLERK_SECRET_KEY: "sk", INTERNIQ_DB_URL: "https://f.co", INTERNIQ_DB_SERVICE_KEY: "s", INTERNIQ_DB_ANON_KEY: "a", ANTHROPIC_API_KEY: "k", BTP_OFFLINE_TEST: "1", ADMIN_EMAILS: "owner@example.com,admin@example.com" });   // BTP_OFFLINE_TEST: no real DNS (hasMail) in tests
   delete process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 }

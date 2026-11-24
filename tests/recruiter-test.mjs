@@ -5,7 +5,7 @@ env(); process.env.RESEND_API_KEY = "re_test";
 const { jwk, tok } = makeKeys();
 const f = installFake({ jwk, clerkUsers: {
   u_co: { email: "hr@acme.com", role: "employer" }, u_rec: { email: "jane@acme.com", role: "employer" },
-  u_adm: { email: "mdxp21@gmail.com", role: "student" }, u_ana: { email: "ana@vt.edu", role: "student" } } });
+  u_adm: { email: "admin@example.com", role: "student" }, u_ana: { email: "ana@vt.edu", role: "student" } } });
 const me = (await import("../api/me.js")).default;
 const call = (sub, body) => invoke(me, { method: "POST", body, headers: { authorization: "Bearer " + tok(sub) } });
 const get = (query) => invoke(me, { method: "GET", query });

@@ -26,7 +26,7 @@ import { verifyClerkJWT, bearer } from "../lib/auth.js";
 const MAX_POST_CHARS = 600, MAX_REPLY_CHARS = 400, MIN_CHARS = 4, MAX_NAME_CHARS = 30;
 const HIDE_AFTER_REPORTS = 3;
 const PUBLIC_POST = "id,content,display_name,category,created_at";
-const ADMINS = (process.env.ADMIN_EMAILS || "shiloniadam10@gmail.com,mdxp21@gmail.com").toLowerCase().split(/[,\s]+/).filter(Boolean);
+import { isAdminEmail } from "../lib/admins.js";
 
 const clip = (v, n) => String(v ?? "").replace(/[\u0000-\u001f\u007f]/g, " ").trim().slice(0, n);
 const cleanName = (raw) => { const c = clip(raw, MAX_NAME_CHARS); return c.length ? c : null; };
@@ -78,7 +78,7 @@ async function isAdmin(req) {
   const r = await fetch(`https://api.clerk.com/v1/users/${encodeURIComponent(uid)}`, { headers: { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` } });
   if (!r.ok) return false;
   const u = await r.json();
-  return (u.email_addresses || []).some((e) => e.verification?.status === "verified" && ADMINS.includes(String(e.email_address).toLowerCase()));
+  return (u.email_addresses || []).some((e) => e.verification?.status === "verified" && isAdminEmail(e.email_address));
 }
 
 const visibleMsg = (status) => status === "approved" ? null

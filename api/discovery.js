@@ -13,7 +13,7 @@ import { BOTS, BOT_IDS, logRun, botHealth, STALE_MIN, RESTART } from "../lib/bot
 import { aiSummary } from "../lib/aiusage.js";
 import BACKLOG from "../data/backlog.json" with { type: "json" };
 
-const ADMINS = (process.env.ADMIN_EMAILS || "shiloniadam10@gmail.com,mdxp21@gmail.com").toLowerCase().split(/[,\s]+/).filter(Boolean);
+import { isAdminEmail } from "../lib/admins.js";
 const slug = (s) => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const cleanUrl = (u) => { try { const x = new URL(String(u).trim()); return /^https?:$/.test(x.protocol) ? x.toString() : null; } catch { return null; } };
 const cleanDomain = (d) => String(d || "").trim().toLowerCase().replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/.*$/, "");
@@ -25,7 +25,7 @@ async function adminEmail(req) {
   if (!r.ok) return null;
   const u = await r.json();
   const emails = (u.email_addresses || []).filter((e) => e.verification?.status === "verified").map((e) => e.email_address.toLowerCase());
-  return emails.find((e) => ADMINS.includes(e)) || null;
+  return emails.find(isAdminEmail) || null;
 }
 
 export default async function handler(req, res) {
