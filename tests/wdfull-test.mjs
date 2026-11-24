@@ -59,3 +59,11 @@ console.log("wdfull-test ok");
   assert.ok(!b.some((x) => x.config.section === "iam"));
 }
 console.log("wdfull-test (taleo/jibe) ok");
+// Workday 429 = "slow down": the proof asks twice more, and the finder re-checks after RATE_RETRY_HOURS (not 2 days)
+{
+  const { readFileSync } = await import("node:fs");
+  const api = readFileSync(new URL("../api/discover.js", import.meta.url), "utf8"), lib = readFileSync(new URL("../lib/discover.js", import.meta.url), "utf8");
+  assert.match(api, /RATE_RETRY_HOURS = 3/); assert.match(api, /answered%20429\*,checked_at\.lt\.\$\{cutoff429\}/);
+  assert.match(lib, /r\.status === 429 && i < 2/);
+  console.log("wdfull-test (429 retries) ok");
+}

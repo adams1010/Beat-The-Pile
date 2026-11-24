@@ -22,6 +22,7 @@ const READERS_UPDATED_AT = "2026-11-24T03:00:00Z";   // Nov 23: Taleo links that
 const inSeason = (d = new Date()) => { const m = d.getUTCMonth(); return m >= 7 || m <= 1; };
 const RETRY_AFTER_DAYS = inSeason() ? 7 : 14;
 const MAX_TRIES = 6;
+const RATE_RETRY_HOURS = 3;          // Nov 23: a 429 is "slow down", not "down"
 const BUSY_RETRY_HOURS = 48;         // Nov 14: 5xx = the board was down (Workday maintenance), not gone. Nov 17: 6 → 48 h; every 6 h ~100 boards/run failed again on Vercel CPU
 const BOARD_ERROR_RETRY_DAYS = 2;    // Nov 10: a board that errored is usually a hiccup — try again in 2 days, not 1–2 weeks
 const RESCUE_AT = "2026-11-10T18:00:00Z";   // Nov 10: held-back boards with no website on file get one re-check with the website rescue
@@ -140,8 +141,10 @@ export default async function handler(req, res) {
   const cutoffErr = new Date(Date.now() - BOARD_ERROR_RETRY_DAYS * 86400000).toISOString();
   // Nov 14: a board that answered 5xx (Workday maintenance, a 521 from its firewall) was just down: try again after 6 hours
   const cutoffBusy = new Date(Date.now() - BUSY_RETRY_HOURS * 3600000).toISOString();
+  // Nov 23: 429 = Workday said "too many requests right now" (25 of the 128 central employers on their first check): try again in 3 h
+  const cutoff429 = new Date(Date.now() - RATE_RETRY_HOURS * 3600000).toISOString();
   const rows = await db.selectAsAdmin(
-    `company_candidates?select=*&or=(status.eq.pending,and(status.in.(error,blocked,no_board,board_error),checked_at.lt.${cutoff},attempts.lt.${MAX_TRIES}),and(status.eq.board_error,checked_at.lt.${cutoffErr},attempts.lt.${MAX_TRIES}),and(status.eq.board_error,detail.ilike.*answered%205*,checked_at.lt.${cutoffBusy},attempts.lt.${MAX_TRIES}))` +
+    `company_candidates?select=*&or=(status.eq.pending,and(status.in.(error,blocked,no_board,board_error),checked_at.lt.${cutoff},attempts.lt.${MAX_TRIES}),and(status.eq.board_error,checked_at.lt.${cutoffErr},attempts.lt.${MAX_TRIES}),and(status.eq.board_error,detail.ilike.*answered%205*,checked_at.lt.${cutoffBusy},attempts.lt.${MAX_TRIES}),and(status.eq.board_error,detail.ilike.*answered%20429*,checked_at.lt.${cutoff429},attempts.lt.${MAX_TRIES}))` +
     `&order=priority.desc,checked_at.asc.nullsfirst&limit=${Math.min(+req.query?.n || PER_RUN, PER_RUN)}`
   );
 
