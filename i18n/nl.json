@@ -1,6 +1,10 @@
 {
  "lang": "nl",
  "strings": {
+    "Career orbit": "Carrièrebaan",
+    "Drag to spin · tap a planet": "Sleep om te draaien · tik op een planeet",
+    "Replay my career": "Mijn carrière afspelen",
+    "Between roles": "Tussen functies",
     "City": "Stad",
     "State": "Staat",
     "Hometown city": "Woonplaats van herkomst",

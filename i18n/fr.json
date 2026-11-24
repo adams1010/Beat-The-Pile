@@ -1,6 +1,10 @@
 {
  "lang": "fr",
  "strings": {
+    "Career orbit": "Orbite de carrière",
+    "Drag to spin · tap a planet": "Faites glisser pour tourner · touchez une planète",
+    "Replay my career": "Rejouer ma carrière",
+    "Between roles": "Entre deux postes",
     "City": "Ville",
     "State": "État",
     "Hometown city": "Ville d’origine",
