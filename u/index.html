@@ -58,6 +58,7 @@
   input:focus,textarea:focus{outline:2px solid var(--green);outline-offset:0;border-color:var(--green)}
   textarea{min-height:90px;resize:vertical}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+  .cs{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:0 12px}
   @media(max-width:600px){.row{grid-template-columns:1fr}.card{padding:18px}.card.hero{padding:0}.hero .body{padding:0 18px 18px}}
   .rep{border:1px solid var(--line);border-radius:10px;padding:4px 12px 12px;margin-top:10px;position:relative}
   .rm{position:absolute;top:8px;right:8px;background:none;border:0;color:var(--muted);cursor:pointer;font:inherit;font-size:13px}
@@ -278,6 +279,13 @@
 (function(){
   const $ = (s) => document.querySelector(s);
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const US_STATES = [["AL","Alabama"],["AK","Alaska"],["AZ","Arizona"],["AR","Arkansas"],["CA","California"],["CO","Colorado"],["CT","Connecticut"],["DE","Delaware"],["DC","District of Columbia"],["FL","Florida"],["GA","Georgia"],["HI","Hawaii"],["ID","Idaho"],["IL","Illinois"],["IN","Indiana"],["IA","Iowa"],["KS","Kansas"],["KY","Kentucky"],["LA","Louisiana"],["ME","Maine"],["MD","Maryland"],["MA","Massachusetts"],["MI","Michigan"],["MN","Minnesota"],["MS","Mississippi"],["MO","Missouri"],["MT","Montana"],["NE","Nebraska"],["NV","Nevada"],["NH","New Hampshire"],["NJ","New Jersey"],["NM","New Mexico"],["NY","New York"],["NC","North Carolina"],["ND","North Dakota"],["OH","Ohio"],["OK","Oklahoma"],["OR","Oregon"],["PA","Pennsylvania"],["PR","Puerto Rico"],["RI","Rhode Island"],["SC","South Carolina"],["SD","South Dakota"],["TN","Tennessee"],["TX","Texas"],["UT","Utah"],["VT","Vermont"],["VA","Virginia"],["WA","Washington"],["WV","West Virginia"],["WI","Wisconsin"],["WY","Wyoming"]];
+  const ST_NAME = Object.fromEntries(US_STATES.map(([a, n]) => [n.toLowerCase(), a]));
+  // "Blacksburg, VA" / "Blacksburg, Virginia" → ["Blacksburg", "VA"]; anything else stays in the city box
+  const splitCS = (v) => { const m = String(v || "").trim().match(/^(.*?),\s*([A-Za-z .]+)$/);
+    if (m) { const t = m[2].trim(), a = t.length === 2 ? t.toUpperCase() : ST_NAME[t.toLowerCase()]; if (a && US_STATES.some((x) => x[0] === a)) return [m[1].trim(), a]; }
+    return [String(v || "").trim(), ""]; };
+  const joinCS = (c, st) => [String(c || "").trim().replace(/,\s*$/, ""), st].filter(Boolean).join(", ");
   const safeUrl = (u) => /^https:\/\//i.test(String(u || "")) ? u : "";
   const initials = (n) => String(n || "?").trim().split(/\s+/).slice(0, 2).map((w) => w[0] || "").join("").toUpperCase() || "?";
   const handleFromPath = () => { const m = location.pathname.match(/^\/u\/([a-z0-9-]{3,30})\/?$/i); return m && m[1].toLowerCase() !== "edit" ? m[1].toLowerCase() : null; };
@@ -293,7 +301,7 @@
       ["Add a photo", !!p.photo], ["Write a headline", !!p.headline], ["Add your school and major", !!(p.school && p.major)],
       ["Write an About", (p.about || "").length >= 40], ["Add an experience", (p.experience || []).length > 0], ["List 5+ skills", (p.skills || []).length >= 5],
       ["Save a resume (for cover letters and auto-fill)", (S.resumes || []).some((r) => (r.text || "").length > 200)],
-      ["Add phone + email for applications", !!(k.phone && k.email)], ["Turn on your public link", !!(me.handle && me.profilePublic)],
+      ["Add phone + email for applications", !!((k.phone || p.contact?.phone) && (k.email || p.contact?.email))], ["Turn on your public link", !!(me.handle && me.profilePublic)],
       ["Add 2+ \"Ask me about\" topics", (p.askMe || []).length >= 2], ["Answer a Get to know me prompt", (p.prompts || []).some((x) => x.q && (x.a || "").trim().length >= 20)],
       ["Add your hometown and 3+ interests", !!p.hometown && (p.interests || []).length >= 3],
       ["Tell how you got one of your roles", (p.experience || []).some((x) => (x.story || "").trim().length >= 30)],
@@ -574,6 +582,10 @@
   function editor(){
     const d = S.draft, me = S.me;
     const field = (k, label, ph, attrs = "") => `<div><label for="f_${k}">${label}</label><input id="f_${k}" data-k="${k}" value="${esc(d.p[k] ?? "")}" placeholder="${esc(ph)}" ${attrs}></div>`;
+    // Nov 23 (owner): city and state in two boxes side by side; saved together as "City, ST" so every other page reads it the same
+    const cityState = (k, label, ph) => { const [c, st] = splitCS(d.p[k]);
+      return `<div class="cs"><div><label for="f_${k}">${label}</label><input id="f_${k}" data-cs="${k}" data-part="c" value="${esc(c)}" placeholder="${esc(ph)}" autocomplete="address-level2"></div>
+        <div><label for="f_${k}_st">State</label><select id="f_${k}_st" data-cs="${k}" data-part="s" autocomplete="address-level1"><option value="">State</option>${US_STATES.map(([a, n]) => `<option value="${a}"${st === a ? " selected" : ""}>${a} · ${n}</option>`).join("")}</select></div></div>`; };
     const resumeOn = me.resume && me.resume.share;
     app.className = "";
     document.querySelector("main").innerHTML = `
@@ -605,7 +617,7 @@
             <input type="file" id="f_photo" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" style="position:absolute;left:-9999px"></div>
         </div>
         <div class="row">${field("name", "Name", "Jordan Lee")}${field("headline", "Headline", "Finance student · investment club treasurer")}</div>
-        ${field("location", "Location", "Start typing a city, e.g. Blacksburg")}
+        ${cityState("location", "City", "Blacksburg")}
         ${field("lookingFor", "Looking for", "Summer 2027 internship")}
         <div><label>Open to</label><div style="display:flex;gap:16px;flex-wrap:wrap">${Object.entries(OPEN_TO).map(([k, t]) => `<label class="switch" style="margin:0;font-weight:500"><input type="checkbox" data-opento="${k}" ${(d.p.openTo || []).includes(k) ? "checked" : ""}><span>${t}</span></label>`).join("")}</div></div>
         <label for="f_about">About</label><textarea id="f_about" data-k="about" maxlength="1200" placeholder="A few sentences about what you build and what you want to learn.">${esc(d.p.about)}</textarea>
@@ -614,7 +626,7 @@
         <p class="small muted" style="margin:-4px 0 8px">The part LinkedIn skips. This is what makes people actually reach out.</p>
         <label class="switch"><input type="checkbox" id="f_coffee" ${d.p.coffee ? "checked" : ""}><span><b>Open to coffee chats</b><br><span class="muted small">A badge on your profile and Orbit card saying students can message you to talk.</span></span></label>
         <label class="switch"><input type="checkbox" id="f_ach" ${d.p.hideAchievements ? "" : "checked"}><span><b>Show my achievements</b><br><span class="muted small">Badges for applications, follow-ups and interviews from your Tracker. Others see the level, never exact counts.</span></span></label>
-        ${field("hometown", "Hometown", "Philadelphia, PA")}
+        ${cityState("hometown", "Hometown city", "Philadelphia")}
         ${Object.keys(TAGS).map((k) => tagBox(d, k)).join("")}
         <h3 class="kh">Prompts <span class="muted small">(pick up to 3)</span></h3>
         ${[0, 1, 2].map((i) => { const x = d.p.prompts[i] || { q: "", a: "" }; const used = d.p.prompts.filter((y, j) => j !== i).map((y) => y.q);
@@ -721,7 +733,13 @@
       if (it && it.custom) note("Not on our list, so we'll match classmates by the name you typed.");
       if (was !== d.p.schoolId || !it) renderMajor(); } });
     si.oninput = null;
-    const loc = $("#f_location"); if (loc) P.attach(loc, { load: P.places, other: true, onPick: (it) => { d.p.location = it ? it.label : ""; } });
+    for (const k of ["location", "hometown"]) {
+      const c = $("#f_" + k), st = $("#f_" + k + "_st"); if (!c || !st) continue;
+      const sync = () => { d.p[k] = joinCS(c.value, st.value); };
+      c.oninput = sync; st.onchange = sync;
+      // picking a suggestion ("Blacksburg, VA") fills both boxes
+      P.attach(c, { load: P.places, other: true, onPick: (it) => { const [cc, ss] = splitCS(it ? it.label : ""); c.value = cc; if (ss) st.value = ss; sync(); } });
+    }
     document.querySelectorAll('[data-list="education"][data-f="school"]').forEach((el) => { el.removeAttribute("list");
       P.attach(el, { load: P.schools, other: true, onPick: (it) => { d.p.education[+el.dataset.i].school = it ? it.label : ""; } }); });
     document.querySelectorAll('[data-list="education"][data-f="major"]').forEach((el) => { el.removeAttribute("list");
@@ -1077,6 +1095,9 @@
       const resumes = S.draft.resumes.filter((r) => (r.text || "").trim()).slice(0, 6).map((r, i) => ({ id: r.id || Date.now() + i, name: (r.name || `Resume ${i + 1}`).slice(0, 60), text: String(r.text || "").slice(0, 30000), ...(r.file ? { file: { name: String(r.file.name || "").slice(0, 120), size: +r.file.size || 0, pages: +r.file.pages || null, kind: String(r.file.kind || "").slice(0, 10) } } : {}) }));
       const kit = { ...S.kit, ...S.draft.kit, fullName: p.name || "", school: p.school || "", major: p.major || "", linkedin: p.links.linkedin || S.kit.linkedin || "",
         portfolio: p.links.portfolio || S.kit.portfolio || "", topSkills: (p.skills || []).join(", "), gradDate: p.gradYear && p.gradTerm ? `${TERM_MONTH[p.gradTerm]} ${p.gradYear}` : S.draft.kit.gradDate || (p.gradYear ? `May ${p.gradYear}` : ""), resumes };
+      // Nov 23: the profile Contact box fills an empty kit email/phone, so auto-fill has them too
+      if (!kit.email && p.contact?.email) kit.email = p.contact.email;
+      if (!kit.phone && p.contact?.phone) kit.phone = p.contact.phone;
       if (S.kitOk) try { await sync({ action: "set", kind: "profile", data: kit }); await sync({ action: "set", kind: "resumes", data: { list: resumes } }); S.kit = kit; S.resumes = resumes; S.kitOk = true; }
       catch (e) { msg.className = "msg err"; msg.textContent = "Profile saved, but the application kit didn't: " + e.message; btn.disabled = false; return; }
       load(); remember(); S.tab = "preview"; editor(); window.scrollTo(0, 0);

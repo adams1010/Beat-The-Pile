@@ -1,6 +1,9 @@
 {
  "lang": "nl",
  "strings": {
+    "City": "Stad",
+    "State": "Staat",
+    "Hometown city": "Woonplaats van herkomst",
     "Did you apply?": "Heb je gesolliciteerd?",
     "Did you apply to": "Heb je gesolliciteerd bij",
     "We'll track it and remind you to follow up.": "We houden het bij en herinneren je eraan om op te volgen.",

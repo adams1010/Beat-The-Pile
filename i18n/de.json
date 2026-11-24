@@ -1,6 +1,9 @@
 {
  "lang": "de",
  "strings": {
+    "City": "Stadt",
+    "State": "Bundesstaat",
+    "Hometown city": "Heimatstadt",
     "Did you apply?": "Hast du dich beworben?",
     "Did you apply to": "Hast du dich beworben bei",
     "We'll track it and remind you to follow up.": "Wir tragen es ein und erinnern dich ans Nachfassen.",
