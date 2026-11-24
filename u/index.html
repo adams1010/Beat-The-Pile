@@ -128,7 +128,7 @@
   .otabs button{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:999px;padding:8px 16px;cursor:pointer}
   .otabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
   .sstrip{display:flex;align-items:center;gap:14px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:0 0 14px}
-  .sstrip .bar{flex:1;height:8px;background:#EEF1F6;border-radius:999px;overflow:hidden}.sstrip .bar i{display:block;height:100%;background:#4A7000}
+  .sstrip .bar{flex:1;height:8px;background:#EEF1F6;border-radius:999px;overflow:hidden;padding:0;border:0;position:static;display:block}.sstrip .bar i{display:block;height:100%;background:#4A7000}
   .sstrip button{font:inherit;font-size:13px;font-weight:600;color:var(--green-dark);background:none;border:0;cursor:pointer;padding:4px 0;white-space:nowrap}
   .hl{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line);margin:18px -24px -22px;}
   .hl div{padding:12px 8px;text-align:center;border-left:1px solid var(--line)}.hl div:first-child{border-left:0}
@@ -286,6 +286,7 @@
     if (m) { const t = m[2].trim(), a = t.length === 2 ? t.toUpperCase() : ST_NAME[t.toLowerCase()]; if (a && US_STATES.some((x) => x[0] === a)) return [m[1].trim(), a]; }
     return [String(v || "").trim(), ""]; };
   const joinCS = (c, st) => [String(c || "").trim().replace(/,\s*$/, ""), st].filter(Boolean).join(", ");
+  const STORY_TYPES = ["internship", "job"];   // Nov 23 (owner): "How you got it" only for internships and jobs
   const safeUrl = (u) => /^https:\/\//i.test(String(u || "")) ? u : "";
   const initials = (n) => String(n || "?").trim().split(/\s+/).slice(0, 2).map((w) => w[0] || "").join("").toUpperCase() || "?";
   const handleFromPath = () => { const m = location.pathname.match(/^\/u\/([a-z0-9-]{3,30})\/?$/i); return m && m[1].toLowerCase() !== "edit" ? m[1].toLowerCase() : null; };
@@ -304,7 +305,7 @@
       ["Add phone + email for applications", !!((k.phone || p.contact?.phone) && (k.email || p.contact?.email))], ["Turn on your public link", !!(me.handle && me.profilePublic)],
       ["Add 2+ \"Ask me about\" topics", (p.askMe || []).length >= 2], ["Answer a Get to know me prompt", (p.prompts || []).some((x) => x.q && (x.a || "").trim().length >= 20)],
       ["Add your hometown and 3+ interests", !!p.hometown && (p.interests || []).length >= 3],
-      ["Tell how you got one of your roles", (p.experience || []).some((x) => (x.story || "").trim().length >= 30)],
+      ...((p.experience || []).some((x) => STORY_TYPES.includes(x.type)) ? [["Tell how you got one of your roles", (p.experience || []).some((x) => STORY_TYPES.includes(x.type) && (x.story || "").trim().length >= 30)]] : []),
     ];
     return { items, pct: Math.round(100 * items.filter((x) => x[1]).length / items.length) };
   }
@@ -660,7 +661,7 @@
           <div><label>End</label><input type="month" data-list="experience" data-i="${i}" data-f="end" value="${esc(en === "present" ? "" : en)}" placeholder="2025-08"${en === "present" ? " disabled" : ""}>
             <label class="chkrow"><input type="checkbox" data-now="${i}"${en === "present" ? " checked" : ""}> I work here now</label></div></div>
           <label>What you did</label><textarea data-list="experience" data-i="${i}" data-f="desc" maxlength="600">${esc(x.desc)}</textarea>
-          <label>How you got it <span class="muted small">(optional, shown to students who want the same role)</span></label><textarea data-list="experience" data-i="${i}" data-f="story" maxlength="600" placeholder="Career fair? Cold email? A professor's intro? What would you tell someone applying next year?">${esc(x.story || "")}</textarea></div>`; }).join("")}</div>
+          <div data-story="${i}"${STORY_TYPES.includes(x.type) ? "" : " hidden"}><label>How you got it <span class="muted small">(optional, shown to students who want the same role)</span></label><textarea data-list="experience" data-i="${i}" data-f="story" maxlength="600" placeholder="Career fair? Cold email? A professor's intro? What would you tell someone applying next year?">${esc(x.story || "")}</textarea></div></div>`; }).join("")}</div>
         ${d.p.experience.length < 12 ? `<button class="btn" data-add="experience" style="margin-top:12px">+ Add experience</button>` : ""}</section>
       <section class="card"><h2>Projects</h2><div>${d.p.projects.map((x, i) => `
         <div class="rep"><button class="rm" data-rm="projects" data-i="${i}">Remove</button>
@@ -754,6 +755,7 @@
       try { if (navigator.share) await navigator.share({ title: (S.me.profile && S.me.profile.name) || "My profile", url }); else { await navigator.clipboard.writeText(url); sh.textContent = "Link copied"; setTimeout(() => sh.textContent = "Share", 1600); } } catch {} };
     main.querySelectorAll("[data-k]").forEach((el) => el.oninput = () => { d.p[el.dataset.k] = el.value; });
     main.querySelectorAll("[data-list]").forEach((el) => el.oninput = el.onchange = () => { const it = d.p[el.dataset.list][+el.dataset.i]; it[el.dataset.f] = el.value;
+      if (el.dataset.list === "experience" && el.dataset.f === "type") { const box = main.querySelector(`[data-story="${el.dataset.i}"]`); if (box) box.hidden = !STORY_TYPES.includes(el.value); }   // Nov 23
       if (el.dataset.list === "experience" && (el.dataset.f === "start" || el.dataset.f === "end") && window.btpTL) it.when = expWhen(it); });   // Nov 14: keep the text date in step
     wireCompanyPick(main, d);
     if ($("#staffVerify")) staffBox();
@@ -963,7 +965,7 @@
     };
     const meta = (r) => [r.sp ? T.rangeText(r.sp).replace(/ · [^·]+$/, "") : r.when || "", r.location].filter(Boolean).map(esc).join(" · ");
     const len = (r) => r.sp ? T.duration(r.sp.a, r.sp.b) : "";
-    const story = (r) => r.story ? `<div class="tl-story"><b>How I got it</b><p>${esc(r.story)}</p></div>` : "";
+    const story = (r) => r.story && (!r.type || STORY_TYPES.includes(r.type)) ? `<div class="tl-story"><b>How I got it</b><p>${esc(r.story)}</p></div>` : "";
     const chip = (t) => t ? `<span class="tl-type t-${esc(t)}">${esc(T.TYPES[t] || t)}</span>` : "";
     const cards = groups.map((g) => {
       const multi = g.roles.length > 1, cur = g.roles.some((r) => r.sp?.current), top = g.roles[0];

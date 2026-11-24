@@ -16,3 +16,6 @@ assert.equal(joinCS("", "TX"), "TX");
 assert.ok(/cityState\("location"/.test(html) && /cityState\("hometown"/.test(html));
 assert.ok(/k\.phone \|\| p\.contact\?\.phone/.test(html), "profile Contact counts toward strength");
 console.log("citystate-test ok");
+assert.ok(/\.sstrip \.bar\{[^}]*padding:0/.test(html), "strength bar fill isn't squashed by the sticky .bar padding");
+assert.ok(/const STORY_TYPES = \["internship", "job"\]/.test(html) && /data-story="\$\{i\}"/.test(html), "How you got it: internships and jobs only");
+console.log("strength bar + story ok");
