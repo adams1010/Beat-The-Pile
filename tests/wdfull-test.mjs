@@ -33,3 +33,29 @@ assert.equal(calls.empty, 1, "big board: only the first count request");
 for (const t of ["Patient Transporter", "Environmental Services Technician", "Patient Sitter PRN", "Laundry Attendant", "Floor Care Specialist"]) assert.equal(kindOf(t), "fulltime", t);
 for (const t of ["EVS Supervisor I", "Senior Environmental Services Technician", "Nutrition Services Manager", "Transportation Manager"]) assert.equal(kindOf(t), null, t);
 console.log("wdfull-test ok");
+
+// Taleo: whole-board read in Turbo (portal id given), filtered by our rules
+{
+  const { fetchTaleo } = await import("../lib/fetchers/taleo-ukg.js");
+  const t2 = ["Pharmacy Tech I", "Registered Nurse", "Patient Transporter", "Physician"];
+  const all = Array.from({ length: 60 }, (_, i) => ({ contestNo: String(1000 + i), linkedColumn: 0, column: [t2[i % 4], '["Texas-Dallas"]', "Nov 20, 2026"] }));
+  const kws = [];
+  globalThis.fetch = async (u, o = {}) => {
+    const b = JSON.parse(o.body || "{}"); kws.push(b.fieldData.fields.KEYWORD);
+    const rows = b.fieldData.fields.KEYWORD ? [] : all.slice((b.pageNo - 1) * 25, b.pageNo * 25);
+    return { ok: true, status: 200, json: async () => ({ requisitionList: rows, pagingData: { totalCount: 60, pageSize: 25 } }) };
+  };
+  const jobs = await fetchTaleo({ id: "bsw", host: "bswhealth.taleo.net", section: "ex", portal: "101430233" });
+  assert.equal(jobs.length, 30, "Pharmacy Tech + Transporter = half of 60");
+  assert.ok(kws.filter((k) => k).length <= 1, "only the 'intern' portal check, no keyword sweep");
+}
+// Finder: Taleo apply links carry the portal; jibeapply.com boards are found from the company's page
+{
+  const { scanHtml } = await import("../lib/discover.js");
+  const b = scanHtml(`"applyUrl":"https://bswhealth.taleo.net/careersection/ex/jobapply.ftl?job=1&lang=en&csNo=2&portal=101430233" <a href="https://mdanderson.taleo.net/careersection/MDA_ex/mysubmissions.ftl">x</a> <a href="https://nortonhealthcare.jibeapply.com/careers-home/">y</a> <a href="https://texashealth.taleo.net/careersection/iam/accessmanagement/login.jsf">z</a>`, "https://jobs.bswhealth.com/us/en").boards;
+  assert.deepEqual(b.find((x) => x.config.host === "bswhealth.taleo.net").config, { host: "bswhealth.taleo.net", section: "ex", portal: "101430233" });
+  assert.ok(b.some((x) => x.config.section === "MDA_ex"));
+  assert.ok(b.some((x) => x.ats === "jibe" && x.config.base === "https://nortonhealthcare.jibeapply.com"));
+  assert.ok(!b.some((x) => x.config.section === "iam"));
+}
+console.log("wdfull-test (taleo/jibe) ok");
