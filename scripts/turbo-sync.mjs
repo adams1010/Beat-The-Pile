@@ -24,7 +24,7 @@ const post = async (body) => {
   throw new Error("couldn't reach /api/discovery");
 };
 const botlog = (ok, summary, stats) => DRY ? null : post({ action: "botlog", bot: "turbo", ok, summary, stats }).catch(() => null);
-const withTimeout = (p, ms) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(`timed out after ${Math.round(ms / 1000)}s`)), ms))]);
+const withTimeout = (p, ms) => { let t; return Promise.race([p, new Promise((_, rej) => { t = setTimeout(() => rej(new Error(`timed out after ${Math.round(ms / 1000)}s`)), ms); })]).finally(() => clearTimeout(t)); };
 
 const t0 = Date.now();
 const sw = await fetch(`${SITE}/api/discovery?bots=1`).then((r) => r.json()).catch(() => null);
@@ -64,7 +64,13 @@ const flush = () => {
   return flushing;
 };
 
-await mapLimit(todo, AT_ONCE, async (cfg) => {
+// Nov 23: ~1,300 boards a run came back "Workday busy" (a cluster answered 429 and cooled off for 90 s) and were simply
+// skipped, every run: Intermountain, Banner, Humana… never got re-read. Busy boards now wait for a second and third
+// pass with fewer at once, after the cool-off, while the time budget lasts. Only what is still busy after that is reported.
+const PAUSE = +process.env.TURBO_PAUSE_MS || 95e3;   // tests shorten it
+const PASSES = [[AT_ONCE, 0], [8, PAUSE], [4, PAUSE]];
+let retry = [];
+const readOne = async (cfg, lastPass) => {
   if ((Date.now() - t0) / 6e4 > MINUTES) return;            // out of time: the rest go first next run (oldest first)
   let res;
   try {
@@ -73,17 +79,33 @@ await mapLimit(todo, AT_ONCE, async (cfg) => {
     if (!partial) { const h = fp(listings, raw), prev = sent[cfg.id];
       if (prev && prev.h === h && Date.now() - prev.at < RESAVE_H * 3600e3) { read++; skipped++; return; }   // unchanged: Vercel has it
       pendingHash.set(cfg.id, h); }
-  } catch (e) { res = { id: cfg.id, error: String(e?.message || e).slice(0, 400), busy: !!e?.busy }; }
+  } catch (e) {
+    const isBusy = e?.busy || /\b429\b|Workday busy|rate.?limit/i.test(String(e?.message || e));
+    if (isBusy && !lastPass) { retry.push(cfg); return; }   // try again in the next pass
+    res = { id: cfg.id, error: String(e?.message || e).slice(0, 400), busy: !!isBusy };
+  }
   read++;
   const size = JSON.stringify(res).length;
   if (batchBytes + size > 2_500_000 || batch.length >= 40) await flush();
   batch.push(res); batchBytes += size;
   if (read % 200 === 0) console.log(`… ${read} read, ${Math.round((Date.now() - t0) / 6e4)} min`);
-});
+};
+let queue = todo, retried = 0;
+for (let i = 0; i < PASSES.length && queue.length; i++) {
+  const [atOnce, pause] = PASSES[i], last = i === PASSES.length - 1;
+  if (i) {
+    if ((Date.now() - t0 + pause) / 6e4 > MINUTES - 5) { for (const cfg of queue) { read++; if (batch.length >= 40) await flush(); batch.push({ id: cfg.id, error: `${cfg.id}: Workday busy, will retry next run`, busy: true }); } break; }
+    console.log(`pass ${i + 1}: ${queue.length} boards were busy, trying again ${atOnce} at a time after ${pause / 1000}s`);
+    retried += queue.length; await new Promise((ok) => setTimeout(ok, pause));
+  }
+  retry = [];
+  await mapLimit(queue, atOnce, (cfg) => readOne(cfg, last));
+  queue = retry;
+}
 await flush();
 try { mkdirSync(".turbo-cache", { recursive: true }); writeFileSync(CACHE, JSON.stringify(sent)); } catch (e) { console.warn("couldn't keep fingerprints:", e.message); }
 
 const min = Math.round((Date.now() - t0) / 6e4);
-const summary = `Read ${read} job boards in ${min} min · ${skipped} unchanged (not re-sent) · ${kept.toLocaleString("en-US")} jobs kept in the rest${failed ? ` · ${failed} boards didn't answer` : ""}`;
+const summary = `Read ${read} job boards in ${min} min · ${skipped} unchanged (not re-sent) · ${kept.toLocaleString("en-US")} jobs kept in the rest${failed ? ` · ${failed} boards didn't answer` : ""}${retried ? ` · ${retried} busy boards retried, ${busy} still busy` : ""}`;
 console.log(summary);
-if (!ONLY.length) await botlog(read > 0 && failed < read, summary, { read, stored, kept, failed, busy, skipped, minutes: min, of: companies.length });
+if (!ONLY.length) await botlog(read > 0 && failed < read, summary, { read, stored, kept, failed, busy, retried, skipped, minutes: min, of: companies.length });
