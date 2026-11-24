@@ -65,7 +65,7 @@
   .sky h1{color:#fff;font-size:24px;margin:0 0 4px}.sky .sub{color:#C9D2E3;margin:0 0 12px}
   .sky svg{width:100%;height:auto;display:block;max-height:420px}
   .sky .node{cursor:pointer}.sky .node:focus{outline:none}.sky .node:focus circle,.sky .node:hover circle{stroke:#B0F701;stroke-width:3}
-  /* Nov 24: the sky is 3D (tilted orbit plane, perspective, drag to spin / tilt) */
+  /* Nov 24: the sky is 3D (tilted orbit plane, perspective, drag to spin) */
   .sky svg.sky3d{overflow:visible;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}.sky svg.sky3d.drag{cursor:grabbing}
   .sky .hint3d{font-size:12px;color:#8D9AB3;margin:6px 0 0;text-align:center}
   .legend{display:grid;gap:10px}
@@ -245,12 +245,11 @@
   }
   // Nov 24: the sky is 3D. People sit on a tilted orbit plane seen in perspective: nearer people are bigger and brighter,
   // people behind you pass behind the centre and fade. Rings spin slowly (inner fastest); drag sideways to spin it,
-  // drag up/down to tilt it (mouse), let go and it coasts. Hovering or focusing someone stops the spin and shows their name.
+  // let go and it coasts. The angle is fixed (owner Nov 24: students only spin it). Hovering or focusing someone stops the spin and shows their name.
   // Reduced motion = still 3D, no auto-spin, no intro, no coasting. Nodes are drawn at (0,0) and moved with a transform.
-  // tilt = camera height above the orbit plane (0° = edge-on). Low = strong 3D; max 35° so it fits the cropped frame.
+  // tilt = camera height above the orbit plane (0° = edge-on), fixed at 29°; the cropped frame fits up to 35°.
   const SKY_C = 230, SKY_D = 700, SKY_SPEED = [2 * Math.PI / 70, 2 * Math.PI / 100, 2 * Math.PI / 140];
-  const TILT_MIN = 14 * Math.PI / 180, TILT_MAX = 35 * Math.PI / 180;
-  const ORB3 = { theta: 0, tilt: 24 * Math.PI / 180, intro: true };   // kept across re-renders so switching tabs doesn't jump
+  const ORB3 = { theta: 0, tilt: 29 * Math.PI / 180, intro: true };   // kept across re-renders so switching tabs doesn't jump
   function sky(o, sets = { inner: o.classmates, campus: o.schoolmates, everyone: o.everyone }, rings3 = RINGS.slice(0, 3), center = { text: initials(o.me.name) || "You", label: "You", photo: o.me.photo }){
     const RAD = [92, 150, 205], BAND = [18, 24, 24], C = SKY_C;
     let nodes = "", rings = "", defs = "";
@@ -308,7 +307,7 @@
       ringF.forEach((r) => r.setAttribute("d", arc(+r.dataset.rr, 0)));
     };
     let hover = null, drag = null, vel = 0, t0 = performance.now(), last = t0, spinT = 0, frame = 0, onScreen = true;
-    let introFrom = ORB3.intro && !still ? { tilt: TILT_MAX, theta: ORB3.theta - 1.4 } : null;
+    let introFrom = ORB3.intro && !still ? { tilt: ORB3.tilt, theta: ORB3.theta - 1.4 } : null;
     const introTo = { tilt: ORB3.tilt, theta: ORB3.theta };
     ORB3.intro = false;
     const heavy = nodes.length > 700;
@@ -337,7 +336,7 @@
       const dt = Math.min(now - last, 64); last = now;
       if (!onScreen || document.hidden) return;
       if (heavy && (frame++ & 1)) return;
-      if (introFrom) {   // fly in from top-down to the tilted view, ending a drag cancels it
+      if (introFrom) {   // spin in on first load (angle stays put); a drag cancels it
         const k = drag ? 1 : Math.min(1, (now - t0) / 1600), e = 1 - Math.pow(1 - k, 3);
         if (!drag) { ORB3.tilt = introFrom.tilt + (introTo.tilt - introFrom.tilt) * e; ORB3.theta = introFrom.theta + (introTo.theta - introFrom.theta) * e; }
         if (k >= 1) introFrom = null;
@@ -346,16 +345,15 @@
       if (!drag && Math.abs(vel) > 1e-5 && !still) { ORB3.theta += vel * dt; vel *= Math.pow(0.94, dt / 16); }
       draw(ORB3.tilt, ORB3.theta);
     }
-    // Drag: sideways = spin, up/down = tilt (20°–80°). Touch keeps vertical page scrolling (touch-action: pan-y).
+    // Drag sideways = spin (the only thing a student can change). Touch keeps vertical page scrolling (touch-action: pan-y).
     const scale = () => 460 / (svg.getBoundingClientRect().width || 460);
     svg.addEventListener("pointerdown", (e) => { if (e.button > 0) return; drag = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, lt: performance.now(), moved: false, id: e.pointerId }; vel = 0; });
     svg.addEventListener("pointermove", (e) => {
       if (!drag || e.pointerId !== drag.id) return;
       if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 6) { drag.moved = true; svg.classList.add("drag"); try { svg.setPointerCapture(e.pointerId); } catch {} }
       if (!drag.moved) return;
-      const k = scale(), dx = (e.clientX - drag.lx) * k, dy = (e.clientY - drag.ly) * k, now = performance.now();
+      const k = scale(), dx = (e.clientX - drag.lx) * k, now = performance.now();
       ORB3.theta += dx / 160;
-      if (e.pointerType !== "touch") ORB3.tilt = Math.max(TILT_MIN, Math.min(TILT_MAX, ORB3.tilt - dy / 300));
       vel = (dx / 160) / Math.max(now - drag.lt, 1);
       drag.lx = e.clientX; drag.ly = e.clientY; drag.lt = now;
       if (still) draw(ORB3.tilt, ORB3.theta);
