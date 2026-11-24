@@ -298,6 +298,14 @@
   .cj-logo.cur{background:#B0F701}
   .cj-main{flex:1;min-width:0}.cj-main b{display:block;font-size:15px;margin-bottom:2px}
   .cj-role{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;font-size:13.5px;color:#DDE3EE}.cj-role small{color:#AEB8CC;font-size:12.5px}
+  /* Nov 24 (owner): the profile header is centered and the photo is a little bigger. Nothing else changes. */
+  .hero .body{text-align:center}
+  .hero .toprow{justify-content:center;position:relative}
+  .hero .own{position:absolute;right:0;bottom:2px}
+  .hero .avatar{width:112px;height:112px;font-size:40px;margin-top:-56px}
+  .hero .bdgs,.hero .meta,.hero .opento,.hero .actrow,.hero .btns,.hero .orbitact,.hero .vis{justify-content:center}
+  .hero .headline{max-width:640px;margin-left:auto;margin-right:auto}
+  @media(max-width:600px){.hero .own{position:static;justify-content:center}.hero .avatar{width:100px;height:100px;font-size:36px;margin-top:-50px}}
   .cj-det{color:#B0F701;font-weight:650;font-size:13.5px;white-space:nowrap}
   @media(max-width:600px){.cj-top{flex-wrap:wrap;padding:12px 12px 4px;gap:8px 10px}.cj-h{flex:1 0 100%}.cj-h span{font-size:12px}.cj-clock{flex:1;text-align:left}.cj-clock span{font-size:15px}.cj-clock small{max-width:none}.cj-card{margin:6px 8px 10px;padding:10px 12px}.cj-main b{font-size:14px}.cj-role{font-size:13px}}
 </style>
