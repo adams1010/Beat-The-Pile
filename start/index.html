@@ -138,6 +138,10 @@
     const nm = mine.name || [C.user.firstName, C.user.lastName].filter(Boolean).join(" ");
     const P = window.btpPick, Y = new Date().getFullYear(), st = { school: mine.school || "", schoolId: mine.schoolId || null, major: mine.major || "" };
     $("#s1").className = ""; $("#s2").className = ""; const s3 = $("#s3"); if (s3) s3.className = "on";
+    // Nov 23 (owner): "How did you hear about Beat the Pile?" one optional dropdown (lib/heard.js), set once on the server
+    let H = null; try { H = await import("/lib/heard.js"); } catch {}
+    const fromRef = (() => { try { return !!localStorage.getItem("btp_ref"); } catch { return false; } })();
+    const heardBox = H ? `<label for="o_hd">How did you hear about Beat the Pile? <span class="muted">(optional)</span></label><select id="o_hd"><option value="">Choose one</option>${H.shuffled("student").map(([k, l]) => `<option value="${k}"${fromRef && k === "friend" ? " selected" : ""}>${esc(l)}</option>`).join("")}</select><input id="o_hdx" hidden maxlength="60" placeholder="Where did you hear about us?" style="margin-top:6px">` : "";
     const ROLES = ["Professor", "Lecturer or instructor", "Academic advisor", "Career center", "Department staff", "Other school staff"];
     $("#view").innerHTML = `${staff ? `<h1>Where do you <em>work</em>?</h1>
       <p class="lead">We use this to put you in your school's orbit, with a Faculty &amp; staff tag on your profile.</p>` : `<h1>Where do you go to <em>school</em>?</h1>
@@ -151,6 +155,7 @@
         <div class="two"${staff ? ' style="display:none"' : ""}><div><label for="o_gt">Graduation</label><select id="o_gt"><option value="">Term</option>${["Spring", "Summer", "Fall", "Winter"].map((t) => `<option${mine.gradTerm === t ? " selected" : ""}>${t}</option>`).join("")}</select></div>
           <div><label for="o_gy">Year</label><select id="o_gy"><option value="">Year</option>${Array.from({ length: 8 }, (_, i) => Y + i - 1).map((y) => `<option${+mine.gradYear === y ? " selected" : ""}>${y}</option>`).join("")}</select></div></div>
         ${staff ? "" : `<div class="ph"><span class="phav" id="o_phv" aria-hidden="true">${esc((nm || "?").trim().slice(0, 1).toUpperCase())}</span><div><b>Add a profile photo</b> <span class="muted">(optional)</span><br><span class="muted">Classmates and recruiters recognize you faster.</span><br><label class="phbtn" for="o_ph">Choose a photo</label><input type="file" id="o_ph" accept="image/*" hidden><br><span class="muted small" id="o_phn" hidden></span></div></div>`}
+        ${heardBox}
         <label class="chk"><input type="checkbox" id="o_show"${pubNow === false ? "" : " checked"}> <span>${staff ? "Show me to students at my school in Orbit (your name, school, role and photo). You can turn this off any time on your profile." : "Show me to students at my school in Orbit (your name, school, major and photo). You can turn this off any time on your profile."}</span></label>
         ${staff ? "" : `<label class="chk"><input type="checkbox" id="o_emp" checked> <span>Let verified employers find me. Only companies we've checked can see your public profile and message you about real jobs and internships. You can turn this off any time on your profile.</span></label><label class="chk"><input type="checkbox" id="o_alerts" checked> <span>Email me new jobs for my major once a week. One-click unsubscribe in every email.</span></label>`}
         <div class="go"><button id="o_go">Continue</button><a href="#" id="o_skip">Skip for now</a><span class="msg" id="o_msg" role="status"></span></div>
@@ -206,13 +211,14 @@
         st.photo = d; $("#o_phv").innerHTML = `<img src="${d}" alt="">`; const n = $("#o_phn"); if (n) n.hidden = true; URL.revokeObjectURL(url); };
       img.src = url;
     };
+    if ($("#o_hd")) $("#o_hd").onchange = (e) => { $("#o_hdx").hidden = e.target.value !== "other"; if (e.target.value === "other") $("#o_hdx").focus(); };
     $("#o_skip").onclick = (e) => { e.preventDefault(); try { sessionStorage.setItem("btp_school_skip", "1"); } catch {} tour(); };
     $("#o_go").onclick = async () => {
       const b = $("#o_go"); $("#o_msg").textContent = "";
       if (staff && !$("#o_rl").value) { $("#o_msg").textContent = "Pick your role."; return; }
       b.disabled = true;
       try { await api({ action: "onboard", name: $("#o_nm").value, school: st.school || $("#o_sc").value, schoolId: st.schoolId, major: st.major || ($("#o_mj") && $("#o_mj").value) || "",
-          gradTerm: $("#o_gt").value, gradYear: $("#o_gy").value ? +$("#o_gy").value : null, show: $("#o_show").checked, ...(staff ? { staff: $("#o_rl").value } : { employers: !!$("#o_emp")?.checked, alerts: !!$("#o_alerts")?.checked, ref: (() => { try { return localStorage.getItem("btp_ref") || ""; } catch { return ""; } })(), ...(st.photo ? { photo: st.photo } : {}) }) });
+          gradTerm: $("#o_gt").value, gradYear: $("#o_gy").value ? +$("#o_gy").value : null, show: $("#o_show").checked, ...($("#o_hd") && $("#o_hd").value ? { heard: { src: $("#o_hd").value, detail: $("#o_hdx").value } } : {}), ...(staff ? { staff: $("#o_rl").value } : { employers: !!$("#o_emp")?.checked, alerts: !!$("#o_alerts")?.checked, ref: (() => { try { return localStorage.getItem("btp_ref") || ""; } catch { return ""; } })(), ...(st.photo ? { photo: st.photo } : {}) }) });
         // Nov 10: right after sign-up, the "build your orbit" checklist (join classmates' orbits) — then on to the site
         if (window.btpOrbitStart) return window.btpOrbitStart.show({ getToken: () => C.session.getToken(), done: tour, force: true });
         tour(); }

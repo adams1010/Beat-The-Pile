@@ -30,6 +30,7 @@
 //   POST /api/me { action:"talent", q, major, school, gradYear } → employers only: opted-in student profiles
 //   GET  /api/me?u=<handle>  (no sign-in)          → a PUBLIC profile (404 unless the student turned it on)
 //   GET  /api/me?unsub=<token> (no sign-in)        → one-click unsubscribe from reminder emails
+//   GET|POST /api/me?heard=<token> (no sign-in)    → the one-time "How did you find us?" email link (/heard/): GET = valid?, POST {src, detail} records it
 //   GET  /api/me?r=<token>   (no sign-in)          → the QR target: redirects to the resume if sharing is on
 //                                                    (vercel.json maps /r/<token> here)
 // Requires a genuine Clerk session token (signature-checked in lib/auth.js) for everything except ?r=.
@@ -56,6 +57,9 @@ import { schoolIdFor, shortSchool } from "../lib/schools.js";
 import { talentFor, roleOf } from "../lib/talent.js";
 import { staffAction, staffAdmin, keepStaffVerified, shownStaff } from "../lib/staffcheck.js";
 import { loadRecruiters, badgesOf } from "../lib/badges.js";
+import { cleanHeard, tally } from "../lib/heard.js";
+import { buildHeardEmail } from "../lib/heardmail.js";
+import { isAdminEmail } from "../lib/admins.js";
 
 const LISTS = ["saved", "applied"];
 const MAX = 500;
@@ -307,6 +311,25 @@ async function unsubscribe(req, res) {
 <p style="color:#5B6675">${alerts ? `No more weekly job alert emails. Turn them back on anytime on <a href="/jobs/" style="color:#3A5A00">Jobs</a>.` : `No more follow-up reminder emails. Turn them back on anytime in <a href="/season/" style="color:#3A5A00">My Season</a>.`}</p></div>`);
 }
 
+// Nov 23: "How did you hear about Beat the Pile?" from the one-time email. The token is random (user_jobs.heard_token, set
+// when the email goes out), never a Clerk id. Opening the page only checks the link; the student's Send (POST) records it,
+// so email link scanners can't answer for them. First answer wins.
+async function heardLink(req, res) {
+  const t = String(req.query.heard || "");
+  if (!TOKEN_OK.test(t)) return res.status(404).json({ error: "This link isn't valid." });
+  const r = (await db.selectAsAdmin(`user_jobs?select=clerk_user_id,heard_from&heard_token=eq.${encodeURIComponent(t)}&limit=1`))[0];
+  if (!r) return res.status(404).json({ error: "This link isn't valid anymore." });
+  if (req.method === "GET") return res.status(200).json({ answered: !!r.heard_from });
+  if (req.method !== "POST") return res.status(405).json({ error: "GET or POST" });
+  if (r.heard_from) return res.status(200).json({ answered: true, already: true });
+  if (!(await rateOk(`heard:${t}`, 3600, 10))) return res.status(429).json({ error: "Try again in a bit." });
+  let body = req.body; if (typeof body === "string") { try { body = JSON.parse(body); } catch { body = {}; } }
+  const h = cleanHeard(body, "student");
+  if (!h) return res.status(400).json({ error: "Pick one." });
+  await db.update(`user_jobs?clerk_user_id=eq.${encodeURIComponent(r.clerk_user_id)}&heard_from=is.null`, { heard_from: { ...h, via: "email" } });
+  return res.status(200).json({ answered: true });
+}
+
 async function resumeRedirect(req, res) {
   const t = String(req.query?.r || "");
   const notShared = () => {
@@ -367,6 +390,9 @@ export default async function handler(req, res) {
       await logRun("remind", ok, st.skipped ? "Waiting for RESEND_API_KEY" : `Sent ${st.sent} reminder email${st.sent === 1 ? "" : "s"} · ${st.optedIn} opted in · ${st.due} with follow-ups due · job alerts: ${al.sent} sent, ${al.optedIn} opted in`, { ...st, alerts: al });
       return res.status(200).json({ ...st, alerts: al });
     } catch (e) { await logRun("remind", false, "Run failed: " + String(e.message).slice(0, 120)); return res.status(500).json({ error: "reminder run failed" }); }
+  }
+  if (req.query?.heard !== undefined) {
+    try { return await heardLink(req, res); } catch { return res.status(503).json({ error: "Try again in a minute." }); }
   }
   if ((req.method === "GET" || req.method === "POST") && req.query?.unsub !== undefined) {
     try { return await unsubscribe(req, res); } catch { return res.status(503).send("Try again in a minute"); }
@@ -584,6 +610,52 @@ export default async function handler(req, res) {
     // ── Owner: Reports & feedback (Nov 17). Report-a-problem notes + Orbit reports, newest unhandled first. Handled = kept, just
     // marked. Suspend (Orbit reports only): bans the reported sign-in at Clerk (undo: Clerk dashboard → Users → Unban),
     // hides their profile and removes their connections. The reported id is read from the stored report, never from the browser. ──
+    // ── Owner: "How people found us" (Nov 23). Counts per answer for students (user_jobs.heard_from) and businesses
+    // (employers.profile.heard), "Other" notes without names, and the one-time email to students who signed up before the
+    // dropdown: test to yourself first ({test:true}), then everyone ({confirm:"SEND"}). Never twice (heard_asked_at). ──
+    if (action === "admin_heard" || action === "admin_heard_email") {
+      if (!(await isAdmin(uid, { clerkUser }))) return res.status(403).json({ error: "Owners only" });
+      let rows;
+      try { rows = await db.selectAllAsAdmin("user_jobs?select=clerk_user_id,profile,heard_from,heard_asked_at,heard_token,alert_on,remind_email,remind_unsub&order=clerk_user_id.asc"); }
+      catch { return res.status(503).json({ error: "Run supabase/heard.sql in Supabase first." }); }
+      // students only (no faculty/staff), not answered, not asked, and only people who still get at least one of our emails
+      const askable = (r) => r.profile && r.profile.name && !r.profile.staff && !r.heard_from && !r.heard_asked_at && (r.alert_on === true || r.remind_email === true) && r.remind_unsub;
+      if (action === "admin_heard") {
+        const emps = await db.selectAllAsAdmin("employers?select=profile,reviewed_by&order=clerk_user_id.asc").catch(() => []);
+        return res.status(200).json({
+          students: tally(rows.map((r) => r.heard_from).filter(Boolean), "student"),
+          businesses: tally(emps.filter((e) => e.reviewed_by !== "deleted").map((e) => e.profile?.heard).filter(Boolean), "business"),
+          email: { asked: rows.filter((r) => r.heard_asked_at).length, answered: rows.filter((r) => r.heard_from?.via === "email").length, waiting: rows.filter(askable).length, ready: !!process.env.RESEND_API_KEY } });
+      }
+      if (!process.env.RESEND_API_KEY) return res.status(503).json({ error: "Email isn't switched on (RESEND_API_KEY)." });
+      const newTok = () => crypto.randomBytes(18).toString("base64url");
+      const first = (p) => String(p?.name || "").trim().split(/\s+/)[0].slice(0, 40);
+      if (body.test === true) {           // a real, working copy to the owner's own inbox (answers count, like anyone's)
+        const to = await emailFor(uid); if (!to) return res.status(400).json({ error: "No confirmed email on your sign-in." });
+        const mine = (await mutate(uid, (r) => ({ heard_token: r.heard_token || newTok() }))).row;
+        await sendEmail(to, buildHeardEmail({ token: mine.heard_token, unsubToken: mine.remind_unsub, firstName: first(mine.profile) }));
+        return res.status(200).json({ test: true, waiting: rows.filter(askable).length });
+      }
+      if (body.confirm !== "SEND") return res.status(400).json({ error: "Type SEND to confirm" });
+      if (!(await rateOk(`heard-send:${uid}`, 600, 5))) return res.status(429).json({ error: "Give it a few minutes." });
+      const list = rows.filter(askable), t0 = Date.now();
+      let sent = 0, skipped = 0, failed = 0;
+      for (const r of list) {
+        if (Date.now() - t0 > 50000) break;      // press again for the rest
+        const at = `user_jobs?clerk_user_id=eq.${encodeURIComponent(r.clerk_user_id)}`;
+        try {
+          const to = await emailFor(r.clerk_user_id);
+          if (!to || isAdminEmail(to)) { skipped++; await db.update(at, { heard_asked_at: new Date().toISOString() }); continue; }   // owners use the test copy
+          const token = r.heard_token || newTok();
+          if (!r.heard_token) await db.update(at, { heard_token: token });
+          await sendEmail(to, buildHeardEmail({ token, unsubToken: r.remind_unsub, firstName: first(r.profile) }));
+          await db.update(at, { heard_asked_at: new Date().toISOString() });
+          sent++;
+          await new Promise((ok) => setTimeout(ok, process.env.BTP_OFFLINE_TEST ? 0 : 600));   // Resend allows ~2 a second
+        } catch (e) { failed++; console.warn("[heard-email]", e?.message); }
+      }
+      return res.status(200).json({ sent, skipped, failed, left: list.length - sent - skipped - failed });
+    }
     if (action === "admin_feedback" || action === "admin_feedback_done" || action === "admin_suspend") {
       if (!(await isAdmin(uid, { clerkUser }))) return res.status(403).json({ error: "Owners only" });
       const id = Number(body.id);
@@ -643,8 +715,14 @@ export default async function handler(req, res) {
         (await db.selectAsAdmin(`user_jobs?select=handle&handle=eq.${encodeURIComponent(ref)}&limit=1`).catch(() => [])).length > 0;
       const alertsOn = (r) => !profile.staff && body.alerts !== false && !r?.alert_major;
       const alertPatch = (r) => (alertsOn(r) ? { alert_on: true, alert_major: defaultAlertMajor(profile.major), remind_unsub: r?.remind_unsub || crypto.randomBytes(18).toString("base64url") } : {});
-      try { return send(await mutate(uid, (r) => ({ profile: { ...profile, ...keepStaffVerified(r.profile, profile) }, handle, profile_public: pub, ...alertPatch(r), ...(refOk ? { referred_by: ref } : {}) }))); }
+      let out;
+      try { out = await mutate(uid, (r) => ({ profile: { ...profile, ...keepStaffVerified(r.profile, profile) }, handle, profile_public: pub, ...alertPatch(r), ...(refOk ? { referred_by: ref } : {}) })); }
       catch (e) { if (/23505|duplicate key/i.test(String(e?.message))) return res.status(409).json({ error: "Try again in a moment" }); throw e; }
+      // Nov 23: "How did you hear about Beat the Pile?" (optional dropdown). Set once: only while heard_from is still empty.
+      // Its own write, best effort, so sign-up never fails over it (e.g. before supabase/heard.sql has run).
+      const heard = !out.error && cleanHeard(body.heard, "student");
+      if (heard) await db.update(`user_jobs?clerk_user_id=eq.${encodeURIComponent(uid)}&heard_from=is.null`, { heard_from: { ...heard, via: "signup" } }).catch((e) => console.warn("[heard]", e?.message));
+      return send(out);
     }
     if (action === "invite_stats") {           // Nov 16: your invite link + how many students joined from it
       const row = await loadRow(uid);

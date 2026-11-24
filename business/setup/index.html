@@ -37,6 +37,23 @@
     "Consumer Goods & Retail", "Education", "Energy & Utilities", "Engineering Services", "Government & Public Sector", "Healthcare", "Insurance",
     "Manufacturing", "Media & Entertainment", "Nonprofit", "Software & Internet", "Telecommunications", "Transportation & Logistics", "Other"];
   let B = null;
+  // Nov 23 (owner): "How did you hear about Beat the Pile?" (lib/heard.js, business list), optional, asked until answered.
+  // Not on the recruiter-badge flow (/business/setup/?kind=recruiter&badge=1): those are students who answered at sign-up.
+  let H = null; const heardP = import("/lib/heard.js").then((m) => { H = m; }).catch(() => {});
+  const heardOrder = [];
+  function heardBox(){
+    if (!H || B?.heardDone || new URLSearchParams(location.search).get("badge")) return "";
+    if (!heardOrder.length) heardOrder.push(...H.shuffled("business"));
+    const v = S.heard || {};
+    return `<label for="hd">How did you hear about Beat the Pile? <span class="small muted">(optional)</span></label><select id="hd"><option value="">Choose one</option>${heardOrder.map(([k, l]) => `<option value="${k}"${v.src === k ? " selected" : ""}>${esc(l)}</option>`).join("")}</select><input id="hdx" ${v.src === "other" ? "" : "hidden"} value="${esc(v.detail || "")}" maxlength="60" placeholder="Where did you hear about us?" style="margin-top:6px">`;
+  }
+  function wireHeard(){
+    const sel = $("#hd"); if (!sel) return;
+    const keep = () => { S.heard = { src: sel.value, detail: $("#hdx").value }; };
+    sel.onchange = () => { $("#hdx").hidden = sel.value !== "other"; keep(); if (sel.value === "other") $("#hdx").focus(); };
+    $("#hdx").oninput = keep;
+  }
+  const heardVal = () => ($("#hd") && $("#hd").value ? { heard: { src: $("#hd").value, detail: $("#hdx").value } } : {});
 
   // Nov 9: recruiter (a person, own profile + orbit) or company page — picked at sign-up (?kind=), saved as profile.kind
   const KIND = () => B?.profile?.kind === "recruiter" || (!B?.profile?.company && new URLSearchParams(location.search).get("kind") === "recruiter") ? "recruiter" : "company";
@@ -60,14 +77,16 @@
         <div><label for="hq">Headquarters</label><input id="hq" value="${esc(p.hq || "")}" placeholder="Arlington, VA" maxlength="80"></div></div>
       <div class="row"><div><label for="nm">Your name</label><input id="nm" value="${esc(p.name || "")}" placeholder="Jane Smith" maxlength="80" autocomplete="name"></div>
         <div><label for="ti">Your title</label><input id="ti" value="${esc(p.title || "")}" placeholder="University Recruiter" maxlength="80" autocomplete="organization-title"></div></div>
+      ${heardBox()}
       <div class="logo-row">${biz.logo(p, 56)}<div><b style="font-size:14px">Company logo</b> <span class="small muted">(optional, square works best)</span><br>
         <label class="btn" style="margin:6px 0 0;display:inline-flex;cursor:pointer;font-size:13px;padding:6px 14px">Upload logo<input type="file" id="lg" accept="image/png,image/jpeg,image/webp" style="position:absolute;left:-9999px"></label></div></div>
       <div style="margin-top:18px"><button class="btn pri" id="go">Continue</button><span class="msg" id="msg" role="status"></span></div></section>`;
+    wireHeard();
     $("#lg").onchange = async (e) => { const f = e.target.files[0]; if (!f) return; try { p.logo = await squash(f); company(p); } catch (er) { $("#msg").className = "msg err"; $("#msg").textContent = er.message; } };
     $("#go").onclick = async () => {
       const b = $("#go"); b.disabled = true; $("#msg").className = "msg"; $("#msg").textContent = "Saving…";
       const prof = { ...p, kind: "company", company: $("#c").value, website: $("#w").value, industry: $("#ind").value, size: ($("#sz").value || "").replace(/ employees$/, ""), hq: $("#hq").value, name: $("#nm").value, title: $("#ti").value };
-      try { B = await biz.api({ action: "biz_save", profile: prof }); S.edit = false; render(); window.scrollTo(0, 0); }
+      try { B = await biz.api({ action: "biz_save", profile: prof, ...heardVal() }); S.edit = false; render(); window.scrollTo(0, 0); }
       catch (e) { b.disabled = false; $("#msg").className = "msg err"; $("#msg").textContent = e.message; }
     };
   }
@@ -83,13 +102,15 @@
       <div class="row"><div><label for="c">Company you recruit for</label><input id="c" value="${esc(p.company || "")}" placeholder="Acme Aerospace" maxlength="100" autocomplete="organization"></div>
         <div><label for="w">Company website</label><input id="w" value="${esc(p.website || "")}" placeholder="acme.com" maxlength="200" inputmode="url"></div></div>
       <label for="bio">About you <span class="small muted">(optional)</span></label><textarea id="bio" rows="3" maxlength="600" placeholder="I hire engineering interns for our Arlington and Huntsville sites.">${esc(p.bio || "")}</textarea>
+      ${heardBox()}
       <div style="margin-top:18px"><button class="btn pri" id="go">Continue</button><span class="msg" id="msg" role="status"></span></div></section>`;
+    wireHeard();
     $("#ph").onchange = async (e) => { const f = e.target.files[0]; if (!f) return; try { p.photo = await squash(f, true); p.name = $("#nm").value; p.title = $("#ti").value; p.company = $("#c").value; p.website = $("#w").value; p.bio = $("#bio").value; recruiter(p); } catch (er) { $("#msg").className = "msg err"; $("#msg").textContent = er.message; } };
     $("#go").onclick = async () => {
       const b = $("#go"); b.disabled = true; $("#msg").className = "msg"; $("#msg").textContent = "Saving…";
       if (!$("#nm").value.trim()) { b.disabled = false; $("#msg").className = "msg err"; $("#msg").textContent = "Add your name."; return; }
       const prof = { ...p, kind: "recruiter", name: $("#nm").value, title: $("#ti").value, company: $("#c").value, website: $("#w").value, bio: $("#bio").value };
-      try { B = await biz.api({ action: "biz_save", profile: prof }); S.edit = false; render(); window.scrollTo(0, 0); }
+      try { B = await biz.api({ action: "biz_save", profile: prof, ...heardVal() }); S.edit = false; render(); window.scrollTo(0, 0); }
       catch (e) { b.disabled = false; $("#msg").className = "msg err"; $("#msg").textContent = e.message; }
     };
   }
@@ -159,7 +180,7 @@
   biz.start(async (u) => {
     if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable. Try again in a minute.</div>'; return; }
     if (!u) { $("main").innerHTML = biz.signInCard("Set up your company", "Sign in or create an account to set up your company on Beat the Pile."); return; }
-    try { B = await biz.api({ action: "biz_get" }); render(); }
+    try { B = await biz.api({ action: "biz_get" }); await heardP; render(); }
     catch (e) { $("main").innerHTML = `<div class="card center">${esc(e.message)}</div>`; }
   });
 })();

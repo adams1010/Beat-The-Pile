@@ -17,6 +17,9 @@
   .filters button[aria-pressed=true]{background:var(--navy);color:#fff;border-color:var(--navy)}
   .wrapt{overflow-x:auto}
   .btn.danger{border-color:#9B2C2C;color:#9B2C2C}
+  .hcols{display:grid;grid-template-columns:1fr;gap:18px}
+  @media (min-width:900px){.hcols{grid-template-columns:1fr 1fr}}
+  .hcols td.n,.hcols th.n{text-align:right;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -124,7 +127,36 @@
     box.querySelectorAll("[data-fbsus]").forEach((b) => b.onclick = () => { const t = prompt("Suspend the reported person? Their sign-in is blocked, their profile hidden and their connections removed. Type SUSPEND to confirm."); if (t !== "SUSPEND") return;
       run(b, { action: "admin_suspend", id: +b.dataset.fbsus, confirm: "SUSPEND" }); });
   }
-  async function loadStaff(){ try { SL = (await biz.api({ action: "staff_admin_list" })).staff || []; } catch (e) { SL = []; } renderStaff(); loadAccounts(); loadFeedback(); }
+  // Nov 23: "How people found us": answers from the sign-up dropdowns (students + businesses), counts only, no names.
+  // Plus the one-time email to students who signed up before the dropdown: test to yourself first, then everyone (type SEND).
+  async function loadHeard(){
+    let box = document.getElementById("heardAdmin");
+    if (!box) { $("main").insertAdjacentHTML("afterend", '<div id="heardAdmin" style="max-width:1100px;margin:0 auto 24px;padding:0 16px"></div>'); box = document.getElementById("heardAdmin"); }
+    let D; try { D = await biz.api({ action: "admin_heard" }); } catch (e) { box.innerHTML = `<section class="card"><h2>How people found us</h2><p class="small muted">${esc(e.message)}</p></section>`; return; }
+    const table = (t, who) => `<div><h3 style="margin:0 0 6px">${who} <span class="small muted">${t.total} answer${t.total === 1 ? "" : "s"}</span></h3>
+      ${t.total ? `<div class="wrapt"><table><tr><th>Answer</th><th class="n">7 days</th><th class="n">30 days</th><th class="n">All</th></tr>
+        ${t.rows.map((r) => `<tr${r.all ? "" : ' style="opacity:.5"'}><td>${esc(r.label)}</td><td class="n">${r.n7}</td><td class="n">${r.n30}</td><td class="n">${r.all}</td></tr>`).join("")}</table></div>
+        ${t.notes.length ? `<p class="small muted" style="margin:8px 0 0"><b>"Other" answers:</b> ${t.notes.map(esc).join(" · ")}</p>` : ""}` : `<p class="small muted">No answers yet.</p>`}</div>`;
+    const E = D.email || {};
+    box.innerHTML = `<section class="card"><h2>How people found us</h2>
+      <p class="sub">From the optional question at sign-up. Private: never shown on profiles or company pages.</p>
+      <div class="hcols">${table(D.students, "Students")}${table(D.businesses, "Businesses")}</div>
+      <h3 style="margin:22px 0 6px">Ask students who signed up before the question</h3>
+      <p class="small muted" style="margin:0 0 8px">One email, sent once. Only students who still get our emails. ${E.waiting} waiting · ${E.asked} emailed · ${E.answered} answered from the email.</p>
+      ${E.ready ? `<button class="btn" id="hdTest">Send me a test</button> <button class="btn pri" id="hdSend" ${E.waiting ? "" : "disabled"}>Send to ${E.waiting} student${E.waiting === 1 ? "" : "s"}</button>` : `<p class="small no">Email is off (RESEND_API_KEY isn't set).</p>`}
+      <span class="small" id="hdMsg" role="status" style="margin-left:8px"></span></section>`;
+    const say = (t) => { const m = document.getElementById("hdMsg"); if (m) m.textContent = t; };
+    const tb = document.getElementById("hdTest"), sb = document.getElementById("hdSend");
+    if (tb) tb.onclick = async () => { tb.disabled = true; say("Sending…"); try { await biz.api({ action: "admin_heard_email", test: true }); say("Test sent to your email. Tap an answer in it to try the page."); } catch (e) { say(e.message); } tb.disabled = false; };
+    if (sb) sb.onclick = async () => {
+      if (prompt(`Email ${E.waiting} student${E.waiting === 1 ? "" : "s"} "Quick question: how did you find Beat the Pile?" Each person gets it once. Type SEND to confirm.`) !== "SEND") return;
+      sb.disabled = true; say("Sending… (about 1 a second)");
+      try { const r = await biz.api({ action: "admin_heard_email", confirm: "SEND" });
+        await loadHeard(); say(`Sent ${r.sent}${r.skipped ? ` · skipped ${r.skipped} (owners or no email)` : ""}${r.failed ? ` · ${r.failed} failed` : ""}${r.left > 0 ? ` · ${r.left} left, press again` : ""}.`); }
+      catch (e) { sb.disabled = false; say(e.message); }
+    };
+  }
+  async function loadStaff(){ try { SL = (await biz.api({ action: "staff_admin_list" })).staff || []; } catch (e) { SL = []; } renderStaff(); loadAccounts(); loadFeedback(); if (!document.getElementById("heardAdmin")) loadHeard(); }
   async function load(){ L = (await biz.api({ action: "biz_admin_list" })).employers; render(); if (!document.getElementById("staffAdmin")) $("main").insertAdjacentHTML("afterend", '<div id="staffAdmin" style="max-width:1100px;margin:0 auto 40px;padding:0 16px"></div>'); loadStaff(); }
   biz.start(async (u) => {
     if (u === undefined) { $("main").innerHTML = '<div class="card center">Sign-in is temporarily unavailable.</div>'; return; }

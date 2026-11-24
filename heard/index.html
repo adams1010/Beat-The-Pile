@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>How you found us | Beat the Pile</title>
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<link rel="icon" href="/icons/icon-192.png?v=4">
+<meta name="theme-color" content="#060A2C">
+<style>
+  /* /heard/ (Nov 23 2026): the link in the one-time "How did you find Beat the Pile?" email. ?t=<token>&s=<answer>
+     The answer from the email is only PRE-SELECTED; Send (POST /api/me?heard=) records it, so link scanners can't. */
+  :root{--green:#4A7000;--green-dark:#3A5A00;--navy:#060A2C;--ink:#1A2230;--muted:#52606D;--line:#DCE2EC;--bg:#EEF1F6;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.5}
+  main{max-width:560px;margin:0 auto;padding:28px 16px 60px}
+  .card{background:#fff;border:1px solid var(--line);border-radius:10px;padding:20px}
+  h1{font-size:24px;line-height:1.2;color:var(--navy);margin:0 0 6px;letter-spacing:-.01em}
+  .lead{color:var(--muted);margin:0 0 14px}
+  .opt{display:flex;gap:10px;align-items:center;border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin:6px 0;cursor:pointer}
+  .opt:has(input:checked){border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
+  .opt input{accent-color:var(--green);width:18px;height:18px;margin:0}
+  #x{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;margin:4px 0 0}
+  button{font:inherit;font-weight:600;background:var(--green);color:#fff;border:0;border-radius:999px;padding:11px 24px;cursor:pointer;margin-top:14px}
+  button:hover{background:var(--green-dark)} button:disabled{opacity:.6;cursor:default}
+  .msg{color:#B42318;font-size:14px;margin-left:10px}
+  a{color:var(--green-dark)}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main"><div class="card">Loading…</div></main>
+<script>
+(async () => {
+  const $ = (s) => document.querySelector(s), main = $("#main");
+  const esc = (t) => String(t ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const q = new URLSearchParams(location.search), t = q.get("t") || "", pre = q.get("s") || "";
+  const thanks = (already) => { main.innerHTML = `<div class="card"><h1>${already ? "You already told us" : "Thanks!"}</h1><p class="lead">${already ? "We have your answer. Thanks for helping us out." : "That helps us find more students like you."}</p><a href="/jobs/">See jobs for your major</a></div>`; };
+  const bad = (m) => { main.innerHTML = `<div class="card"><h1>This link doesn't work</h1><p class="lead">${esc(m)}</p><a href="/">Go to Beat the Pile</a></div>`; };
+  let H; try { H = await import("/lib/heard.js"); } catch { return bad("Try again in a minute."); }
+  let st; try { const r = await fetch("/api/me?heard=" + encodeURIComponent(t)); st = await r.json().catch(() => ({})); if (!r.ok) return bad(st.error || "Try again in a minute."); } catch { return bad("Try again in a minute."); }
+  if (st.answered) return thanks(true);
+  main.innerHTML = `<form class="card" id="f"><h1>How did you hear about Beat the Pile?</h1><p class="lead">Check your answer and tap Send.</p>
+    ${H.STUDENT.map(([k, l]) => `<label class="opt"><input type="radio" name="s" value="${k}"${k === pre ? " checked" : ""}> <span>${esc(l)}</span></label>`).join("")}
+    <input id="x" maxlength="60" placeholder="Where did you hear about us?" ${pre === "other" ? "" : "hidden"}>
+    <div><button type="submit" id="go">Send</button><span class="msg" id="msg" role="status"></span></div></form>`;
+  const f = $("#f");
+  f.onchange = () => { const v = (f.querySelector("input[name=s]:checked") || {}).value; $("#x").hidden = v !== "other"; };
+  f.onsubmit = async (e) => {
+    e.preventDefault(); const src = (f.querySelector("input[name=s]:checked") || {}).value;
+    if (!src) { $("#msg").textContent = "Pick one."; return; }
+    $("#go").disabled = true; $("#msg").textContent = "";
+    try { const r = await fetch("/api/me?heard=" + encodeURIComponent(t), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ src, detail: $("#x").value }) });
+      const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || "Couldn't send. Try again.");
+      thanks(!!j.already); }
+    catch (er) { $("#go").disabled = false; $("#msg").textContent = er.message; }
+  };
+})();
+</script>
+<script src="/feedback.js" defer></script>
+</body>
+</html>
