@@ -65,6 +65,9 @@
   .sky h1{color:#fff;font-size:24px;margin:0 0 4px}.sky .sub{color:#C9D2E3;margin:0 0 12px}
   .sky svg{width:100%;height:auto;display:block;max-height:420px}
   .sky .node{cursor:pointer}.sky .node:focus{outline:none}.sky .node:focus circle,.sky .node:hover circle{stroke:#B0F701;stroke-width:3}
+  /* Nov 24: the sky is 3D (tilted orbit plane, perspective, drag to spin / tilt) */
+  .sky svg.sky3d{overflow:visible;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}.sky svg.sky3d.drag{cursor:grabbing}
+  .sky .hint3d{font-size:12px;color:#8D9AB3;margin:6px 0 0;text-align:center}
   .legend{display:grid;gap:10px}
   .legend button{font:inherit;text-align:left;display:flex;align-items:center;gap:10px;background:#0E1440;border:1px solid #1E2A5C;color:#fff;border-radius:10px;padding:12px;cursor:pointer}
   .legend button[aria-pressed=true]{border-color:#B0F701;background:#141B4D}
@@ -240,28 +243,137 @@
     }
     return out;
   }
+  // Nov 24: the sky is 3D. People sit on a tilted orbit plane seen in perspective: nearer people are bigger and brighter,
+  // people behind you pass behind the centre and fade. Rings spin slowly (inner fastest); drag sideways to spin it,
+  // drag up/down to tilt it (mouse), let go and it coasts. Hovering or focusing someone stops the spin and shows their name.
+  // Reduced motion = still 3D, no auto-spin, no intro, no coasting. Nodes are drawn at (0,0) and moved with a transform.
+  // tilt = camera height above the orbit plane (0° = edge-on). Low = strong 3D; max 35° so it fits the cropped frame.
+  const SKY_C = 230, SKY_D = 700, SKY_SPEED = [2 * Math.PI / 70, 2 * Math.PI / 100, 2 * Math.PI / 140];
+  const TILT_MIN = 14 * Math.PI / 180, TILT_MAX = 35 * Math.PI / 180;
+  const ORB3 = { theta: 0, tilt: 24 * Math.PI / 180, intro: true };   // kept across re-renders so switching tabs doesn't jump
   function sky(o, sets = { inner: o.classmates, campus: o.schoolmates, everyone: o.everyone }, rings3 = RINGS.slice(0, 3), center = { text: initials(o.me.name) || "You", label: "You", photo: o.me.photo }){
-    const RAD = [92, 150, 205], BAND = [18, 24, 24], C = 230;
-    let nodes = "", rings = "";
+    const RAD = [92, 150, 205], BAND = [18, 24, 24], C = SKY_C;
+    let nodes = "", rings = "", defs = "";
     rings3.forEach(([k, , , col], ri) => {
-      rings += `<circle cx="${C}" cy="${C}" r="${RAD[ri]}" fill="none" stroke="${col}" stroke-opacity=".35" stroke-dasharray="${ri === 2 ? "3 6" : "none"}"/>`;
+      const dash = ri === 2 ? "3 6" : "none";
+      rings += `<path class="ring" data-rr="${RAD[ri]}" fill="none" stroke="${col}" stroke-opacity=".4" stroke-dasharray="${dash}"/>`;
       const list = sets[k] || [], L = skyLayout(list.length, RAD[ri], BAND[ri]);
       list.forEach((p, i) => {
         const { rr, a: a0, r } = L[i], a = a0 - Math.PI / 2 + ri * 0.45;
-        const x = +(C + rr * Math.cos(a)).toFixed(1), y = +(C + rr * Math.sin(a)).toFixed(1), sw = r < 8 ? 1 : (p.link === "connected" ? 4 : 2);
-        const fs = Math.round(r * 0.63);
-        nodes += `<${p.handle ? `a class="node" href="/u/${encodeURIComponent(p.handle)}" tabindex="0"` : `g class="node"`} aria-label="${esc(p.name)}"><title>${esc(p.name)}${p.at ? " · " + esc(p.at) : ""}</title>
-          ${photoOk(p.photo) && r >= 8 ? `<clipPath id="oc${ri}_${i}"><circle cx="${x}" cy="${y}" r="${r}"/></clipPath><circle cx="${x}" cy="${y}" r="${r}" fill="#0E1440"/>
-            <image href="${esc(p.photo)}" x="${x - r}" y="${y - r}" width="${2 * r}" height="${2 * r}" preserveAspectRatio="xMidYMid slice" clip-path="url(#oc${ri}_${i})"/>
-            <circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="${col}" stroke-width="${sw}"/>`
-          : `<circle cx="${x}" cy="${y}" r="${r}" fill="${p.link === "connected" ? "#26345F" : "#0E1440"}" stroke="${col}" stroke-width="${sw}"/>
-          ${r >= 11 ? `<text x="${x}" y="${y + fs * 0.37}" text-anchor="middle" font-size="${fs}" font-weight="600" fill="#fff">${esc(initials(p.name))}</text>` : ""}`}</${p.handle ? "a" : "g"}>`;
+        const sw = r < 8 ? 1 : (p.link === "connected" ? 4 : 2), fs = Math.round(r * 0.63);
+        const label = `${p.name || ""}${p.at ? " · " + p.at : ""}`;
+        if (photoOk(p.photo) && r >= 8) defs += `<clipPath id="oc${ri}_${i}"><circle cx="0" cy="0" r="${r}"/></clipPath>`;
+        nodes += `<${p.handle ? `a class="node" href="/u/${encodeURIComponent(p.handle)}" tabindex="0"` : `g class="node"`} aria-label="${esc(p.name)}" data-rr="${rr.toFixed(1)}" data-a="${a.toFixed(4)}" data-ri="${ri}" data-tip="${esc(label)}"><title>${esc(label)}</title>
+          ${photoOk(p.photo) && r >= 8 ? `<circle r="${r}" fill="#0E1440"/>
+            <image href="${esc(p.photo)}" x="${-r}" y="${-r}" width="${2 * r}" height="${2 * r}" preserveAspectRatio="xMidYMid slice" clip-path="url(#oc${ri}_${i})"/>
+            <circle r="${r}" fill="none" stroke="${col}" stroke-width="${sw}"/>`
+          : `<circle r="${r}" fill="${p.link === "connected" ? "#26345F" : "#0E1440"}" stroke="${col}" stroke-width="${sw}"/>
+          ${r >= 11 ? `<text y="${(fs * 0.37).toFixed(1)}" text-anchor="middle" font-size="${fs}" font-weight="600" fill="#fff">${esc(initials(p.name))}</text>` : ""}`}</${p.handle ? "a" : "g"}>`;
       });
     });
-    return `<svg viewBox="0 0 460 460" role="img" aria-label="Your orbit: ${rings3.map(([k, t]) => `${(sets[k] || []).length} ${t}`).join(", ")}">
-      ${rings}${photoOk(center.photo) ? `<clipPath id="ocme"><circle cx="${C}" cy="${C}" r="34"/></clipPath><image href="${esc(center.photo)}" x="${C - 34}" y="${C - 34}" width="68" height="68" preserveAspectRatio="xMidYMid slice" clip-path="url(#ocme)"/><circle cx="${C}" cy="${C}" r="34" fill="none" stroke="#B0F701" stroke-width="3"/>`
-        : `<circle cx="${C}" cy="${C}" r="34" fill="#B0F701"/><text x="${C}" y="${C + 6}" text-anchor="middle" font-size="16" font-weight="700" fill="#060A2C">${esc(center.text)}</text>`}
-      <text x="${C}" y="${C + 52}" text-anchor="middle" font-size="11" fill="#8D9AB3">${esc(center.label)}</text>${nodes}</svg>`;
+    // A fixed starfield (same stars every time), drawn in a circle so it can turn with the orbit without empty corners.
+    let seed = 7, stars = "";
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    for (let i = 0; i < 90; i++) { const d = Math.sqrt(rnd()) * 330, t = rnd() * Math.PI * 2;
+      stars += `<circle cx="${(C + d * Math.cos(t)).toFixed(1)}" cy="${(C + d * Math.sin(t)).toFixed(1)}" r="${(0.4 + rnd() * 0.9).toFixed(2)}" fill="#fff" opacity="${(0.15 + rnd() * 0.45).toFixed(2)}"/>`; }
+    const me = photoOk(center.photo)
+      ? `<clipPath id="ocme"><circle cx="${C}" cy="${C}" r="34"/></clipPath><image href="${esc(center.photo)}" x="${C - 34}" y="${C - 34}" width="68" height="68" preserveAspectRatio="xMidYMid slice" clip-path="url(#ocme)"/><circle cx="${C}" cy="${C}" r="34" fill="url(#orbShade)"/><circle cx="${C}" cy="${C}" r="34" fill="none" stroke="#B0F701" stroke-width="3"/>`
+      : `<circle cx="${C}" cy="${C}" r="34" fill="url(#orbSun)"/><text x="${C}" y="${C + 6}" text-anchor="middle" font-size="16" font-weight="700" fill="#060A2C">${esc(center.text)}</text>`;
+    setTimeout(initSky3d, 0);
+    return `<svg class="sky3d" viewBox="0 110 460 315" role="img" aria-label="Your orbit: ${rings3.map(([k, t]) => `${(sets[k] || []).length} ${t}`).join(", ")}">
+      <defs>${defs}<clipPath id="orbBox"><rect y="110" width="460" height="315"/></clipPath>
+        <radialGradient id="orbSun" cx="38%" cy="32%" r="70%"><stop offset="0" stop-color="#E6FF9A"/><stop offset=".55" stop-color="#B0F701"/><stop offset="1" stop-color="#5E8A00"/></radialGradient>
+        <radialGradient id="orbShade" cx="38%" cy="32%" r="75%"><stop offset=".45" stop-color="#060A2C" stop-opacity="0"/><stop offset="1" stop-color="#060A2C" stop-opacity=".55"/></radialGradient></defs>
+      <g clip-path="url(#orbBox)"><g class="stars">${stars}</g></g>
+      <g class="ringsBack">${rings}</g><g class="back"></g>
+      ${me}<text x="${C}" y="${C + 52}" text-anchor="middle" font-size="11" fill="#8D9AB3">${esc(center.label)}</text>
+      <g class="ringsFront">${rings}</g><g class="front">${nodes}</g>
+      <g class="tip3d" data-noi18n style="display:none" pointer-events="none"><rect rx="6" fill="#060A2C" stroke="#B0F701" stroke-opacity=".6"/><text font-size="12" font-weight="600" fill="#fff" text-anchor="middle"></text></g></svg>
+      <p class="hint3d">Drag to spin your orbit</p>`;
+  }
+  function initSky3d(){
+    const svg = document.querySelector("svg.sky3d:not([data-live])"); if (!svg) return;
+    svg.dataset.live = "1";
+    const C = SKY_C, still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const back = svg.querySelector(".back"), front = svg.querySelector(".front"), stars = svg.querySelector(".stars");
+    const tip = svg.querySelector(".tip3d"), tipT = tip.querySelector("text"), tipR = tip.querySelector("rect");
+    const nodes = [...front.querySelectorAll(".node")].map((el) => ({ el, rr: +el.dataset.rr, a: +el.dataset.a, sp: SKY_SPEED[+el.dataset.ri] || SKY_SPEED[2], side: 1 }));
+    const ringB = [...svg.querySelectorAll(".ringsBack .ring")], ringF = [...svg.querySelectorAll(".ringsFront .ring")];
+    const proj = (rr, a, tilt) => { const z = rr * Math.sin(a), depth = z * Math.cos(tilt), s = SKY_D / (SKY_D - depth);
+      return { x: C + rr * Math.cos(a) * s, y: C + z * Math.sin(tilt) * s, s, depth }; };
+    let lastTilt = -1;
+    const drawRings = (tilt) => {   // back half (upper arc) goes behind you, front half in front
+      const arc = (rr, from) => { let d = ""; for (let i = 0; i <= 48; i++) { const p = proj(rr, from + (i / 48) * Math.PI, tilt); d += (i ? "L" : "M") + p.x.toFixed(1) + " " + p.y.toFixed(1); } return d; };
+      ringB.forEach((r) => r.setAttribute("d", arc(+r.dataset.rr, Math.PI)));
+      ringF.forEach((r) => r.setAttribute("d", arc(+r.dataset.rr, 0)));
+    };
+    let hover = null, drag = null, vel = 0, t0 = performance.now(), last = t0, spinT = 0, frame = 0, onScreen = true;
+    let introFrom = ORB3.intro && !still ? { tilt: TILT_MAX, theta: ORB3.theta - 1.4 } : null;
+    const introTo = { tilt: ORB3.tilt, theta: ORB3.theta };
+    ORB3.intro = false;
+    const heavy = nodes.length > 700;
+    function draw(tilt, theta){
+      if (Math.abs(tilt - lastTilt) > 1e-4) { drawRings(tilt); lastTilt = tilt; }
+      const maxD = 205 * Math.cos(tilt) || 1;
+      for (const n of nodes) {
+        const p = proj(n.rr, n.a + theta + n.sp * spinT, tilt);
+        n.el.setAttribute("transform", `translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) scale(${p.s.toFixed(3)})`);
+        n.el.setAttribute("opacity", (0.42 + 0.58 * (p.depth / maxD + 1) / 2).toFixed(2));
+        const side = p.depth < 0 ? -1 : 1;
+        if (side !== n.side) { (side < 0 ? back : front).appendChild(n.el); n.side = side; }
+        n.p = p;
+      }
+      stars.setAttribute("transform", `rotate(${(theta * 8).toFixed(2)} ${C} ${C})`);
+      if (hover && hover.p) {
+        tip.style.display = ""; if (tipT.textContent !== hover.el.dataset.tip) tipT.textContent = hover.el.dataset.tip;
+        const w = Math.min(tipT.getComputedTextLength() + 16, 440), x = Math.max(w / 2 + 4, Math.min(456 - w / 2, hover.p.x)), y = Math.max(20, hover.p.y - 30 * hover.p.s);
+        tipT.setAttribute("x", x); tipT.setAttribute("y", y + 4);
+        tipR.setAttribute("x", x - w / 2); tipR.setAttribute("y", y - 12); tipR.setAttribute("width", w); tipR.setAttribute("height", 22);
+      } else tip.style.display = "none";
+    }
+    function loop(now){
+      if (!svg.isConnected) return;   // page re-rendered: this sky is gone
+      requestAnimationFrame(loop);
+      const dt = Math.min(now - last, 64); last = now;
+      if (!onScreen || document.hidden) return;
+      if (heavy && (frame++ & 1)) return;
+      if (introFrom) {   // fly in from top-down to the tilted view, ending a drag cancels it
+        const k = drag ? 1 : Math.min(1, (now - t0) / 1600), e = 1 - Math.pow(1 - k, 3);
+        if (!drag) { ORB3.tilt = introFrom.tilt + (introTo.tilt - introFrom.tilt) * e; ORB3.theta = introFrom.theta + (introTo.theta - introFrom.theta) * e; }
+        if (k >= 1) introFrom = null;
+      }
+      if (!still && !hover && !drag) spinT += dt / 1000;
+      if (!drag && Math.abs(vel) > 1e-5 && !still) { ORB3.theta += vel * dt; vel *= Math.pow(0.94, dt / 16); }
+      draw(ORB3.tilt, ORB3.theta);
+    }
+    // Drag: sideways = spin, up/down = tilt (20°–80°). Touch keeps vertical page scrolling (touch-action: pan-y).
+    const scale = () => 460 / (svg.getBoundingClientRect().width || 460);
+    svg.addEventListener("pointerdown", (e) => { if (e.button > 0) return; drag = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, lt: performance.now(), moved: false, id: e.pointerId }; vel = 0; });
+    svg.addEventListener("pointermove", (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 6) { drag.moved = true; svg.classList.add("drag"); try { svg.setPointerCapture(e.pointerId); } catch {} }
+      if (!drag.moved) return;
+      const k = scale(), dx = (e.clientX - drag.lx) * k, dy = (e.clientY - drag.ly) * k, now = performance.now();
+      ORB3.theta += dx / 160;
+      if (e.pointerType !== "touch") ORB3.tilt = Math.max(TILT_MIN, Math.min(TILT_MAX, ORB3.tilt - dy / 300));
+      vel = (dx / 160) / Math.max(now - drag.lt, 1);
+      drag.lx = e.clientX; drag.ly = e.clientY; drag.lt = now;
+      if (still) draw(ORB3.tilt, ORB3.theta);
+    });
+    const end = (e) => { if (!drag || (e && e.pointerId !== drag.id)) return; const moved = drag.moved; svg.classList.remove("drag");
+      if (performance.now() - drag.lt > 80) vel = 0;
+      drag = null; if (moved) { svg.dataset.dragged = "1"; setTimeout(() => delete svg.dataset.dragged, 0); } };
+    svg.addEventListener("pointerup", end); svg.addEventListener("pointercancel", () => { if (drag) { drag = null; svg.classList.remove("drag"); } });
+    svg.addEventListener("click", (e) => { if (svg.dataset.dragged) { delete svg.dataset.dragged; e.preventDefault(); e.stopPropagation(); } }, true);
+    // Hover / keyboard focus = stop the spin and name the person.
+    const nodeOf = (el) => { const a = el && el.closest && el.closest(".node"); return a && nodes.find((n) => n.el === a); };
+    svg.addEventListener("pointerover", (e) => { if (e.pointerType !== "touch") hover = nodeOf(e.target) || null; });
+    svg.addEventListener("pointerleave", () => { hover = null; });
+    svg.addEventListener("focusin", (e) => { hover = nodeOf(e.target) || null; });
+    svg.addEventListener("focusout", () => { hover = null; });
+    if ("IntersectionObserver" in window) new IntersectionObserver((es) => { onScreen = es[0].isIntersecting; }).observe(svg);
+    draw(introFrom ? introFrom.tilt : ORB3.tilt, introFrom ? introFrom.theta : ORB3.theta);
+    requestAnimationFrame(loop);
   }
   // ── Find people (Nov 9): search public profiles by name, @handle, school, major, skills or company (orbit_search) ──
   function findBox(){
