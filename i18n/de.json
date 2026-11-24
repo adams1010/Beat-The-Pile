@@ -1,6 +1,11 @@
 {
  "lang": "de",
  "strings": {
+    "Career trajectory": "Karriereverlauf",
+    "Drag across the sky to fly through time · tap a planet": "Über den Himmel ziehen, um durch die Zeit zu fliegen · Planet antippen",
+    "Launch": "Starten",
+    "In transit": "Unterwegs",
+    "Next": "Als Nächstes",
     "Career orbit": "Karriere-Orbit",
     "Drag to spin · tap a planet": "Ziehen zum Drehen · Planet antippen",
     "Replay my career": "Meine Karriere abspielen",

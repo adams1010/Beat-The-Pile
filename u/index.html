@@ -265,31 +265,41 @@
   .hero .btns{gap:8px}
   @media(max-width:600px){.hero h1{font-size:24px}.cb{height:36px;padding:0 12px;font-size:13.5px}}
 
-  /* Nov 23: career orbit (navy sky like /orbit; brand colors only, no glows or shadows) */
-  .corb{background:#060A2C;border-radius:10px;padding:14px 14px 12px;margin:0 0 16px;color:#fff;user-select:none}
-  .corb-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
-  .corb-top b{display:block;font-size:15px}.corb-top span{font-size:12px;color:#AEB8CC}
-  .corb-play{font:600 13px var(--font);background:#B0F701;color:#060A2C;border:0;border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap}
-  .corb-sky{display:block;width:100%;height:auto;touch-action:pan-y;cursor:grab}.corb-sky.grab{cursor:grabbing}
-  .corb-stars circle{fill:#fff}
-  .corb-ring{fill:none;stroke:rgba(255,255,255,.16);stroke-width:1}.corb-ring.cur{stroke:rgba(176,247,1,.55)}.corb-ring.next{stroke:rgba(176,247,1,.5);stroke-dasharray:4 6}
-  .cme-ring{fill:none;stroke:#B0F701;stroke-width:2}.cme-bg{fill:#1A2640}.cme-t{fill:#fff;font:700 20px var(--font);text-anchor:middle}
-  .cpl{cursor:pointer;outline:none}.cpl-b{fill:#fff;stroke:#060A2C;stroke-width:1.5}
-  .cpl-i{fill:#060A2C;font-weight:700;font-family:var(--font);text-anchor:middle;pointer-events:none}
-  .cpl-l{fill:#DDE3EE;font:500 11.5px var(--font);text-anchor:middle;pointer-events:none}.cpl-l[text-anchor="end"]{text-anchor:end}.cpl-l[text-anchor="start"]{text-anchor:start}
-  .cpl.cur .cpl-b{fill:#B0F701}
-  .cpl-sel{fill:none;stroke:#B0F701;stroke-width:2}
-  .cpl:focus-visible .cpl-b{stroke:#B0F701;stroke-width:3}
-  .cpl.past{opacity:.55}.cpl.future{opacity:.15}
-  .cpl.next circle{fill:none;stroke:#B0F701;stroke-width:1.5;stroke-dasharray:3 4}.cpl.next .cpl-l{fill:#B0F701}
-  .corb-time{display:flex;align-items:center;gap:12px;margin-top:6px}
-  .corb-time input{flex:1;accent-color:#B0F701;width:auto;padding:0;border:0;background:none}
-  .corb-at{font-size:13px;color:#DDF3A8;min-width:180px;text-align:right;font-variant-numeric:tabular-nums}
-  .corb-card{display:flex;align-items:center;gap:12px;margin-top:10px;background:#0E1538;border-radius:10px;padding:10px 12px}
-  .cc-logo{width:40px;height:40px;border-radius:8px;background:#fff;color:#060A2C;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
-  .cc-main{flex:1;min-width:0}.cc-main b{display:block;font-size:14.5px}.cc-main .sm{color:#AEB8CC;font-size:13px}
-  .cc-go{color:#B0F701;font-weight:600;font-size:13.5px;white-space:nowrap}
-  @media(max-width:600px){.corb-at{min-width:0;font-size:12px}.cpl-l{font-size:13px}.corb-top span{display:none}.corb{padding:12px 10px 10px}}
+
+  /* Nov 23 v2: career trajectory (navy sky, lime path, no glows, gradients or shadows) */
+  .corb{background:#060A2C;border-radius:10px;margin:0 0 16px;color:#fff;overflow:hidden}
+  .cj-top{display:flex;align-items:center;gap:14px;padding:14px 16px 6px}
+  .cj-h{flex:1;min-width:0}.cj-h b{display:block;font-size:15.5px}.cj-h span{font-size:12.5px;color:#AEB8CC}
+  .cj-clock{text-align:right;line-height:1.2}.cj-clock span{display:block;font:650 17px var(--font);color:#B0F701;font-variant-numeric:tabular-nums}
+  .cj-clock small{font-size:12px;color:#DDE3EE;display:block;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cj-go{font:650 13.5px var(--font);background:#B0F701;color:#060A2C;border:0;border-radius:999px;padding:9px 18px;cursor:pointer}
+  .cj-scroll{overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;scrollbar-color:#2A3658 transparent}
+  .cj-sky{display:block;touch-action:pan-y;cursor:ew-resize;user-select:none}.cj-sky.drag{cursor:grabbing}
+  .cj-stars circle{fill:#fff}
+  .cj-yr{stroke:rgba(255,255,255,.07)}.cj-yl{fill:#7C88A3;font:500 11.5px var(--font)}
+  .cj-today{stroke:#B0F701;stroke-width:1;stroke-dasharray:3 4;opacity:.7}.cj-tl{fill:#B0F701;font:600 11.5px var(--font)}.cj-tl[text-anchor="end"]{text-anchor:end}
+  .cj-band{fill:rgba(255,255,255,.1)}
+  .cj-path{fill:none;stroke:rgba(255,255,255,.16);stroke-width:1.5}
+  .cj-fut{fill:none;stroke:#B0F701;stroke-width:1.5;opacity:.6}
+  .cj-trail{fill:none;stroke:#B0F701;stroke-width:2.2;stroke-linecap:round}
+  .cj-ship path{fill:#B0F701;stroke:#060A2C;stroke-width:1}
+  .cj-pl{cursor:pointer;outline:none}
+  .cj-b{fill:#fff;stroke:#060A2C;stroke-width:2}
+  .cj-pl.t-leadership .cj-b,.cj-pl.t-volunteer .cj-b{fill:#DDF3A8}.cj-pl.t-parttime .cj-b{fill:#E8ECF4}
+  .cj-pl.cur .cj-b{fill:#B0F701}.cj-ringo{fill:none;stroke:#B0F701;stroke-width:1.6}
+  .cj-pl.on .cj-b,.cj-pl:focus-visible .cj-b{stroke:#B0F701;stroke-width:3}
+  .cj-i{fill:#060A2C;font-weight:750;font-family:var(--font);text-anchor:middle;pointer-events:none}
+  .cj-co{fill:#fff;font:650 12.5px var(--font);text-anchor:middle;pointer-events:none}
+  .cj-ro{fill:#AEB8CC;font:500 11.5px var(--font);text-anchor:middle;pointer-events:none}
+  .cj-co.nx,.cj-ro.nx{text-anchor:end;fill:#B0F701}.cj-ro.nx{fill:#DDF3A8}
+  .cj-next circle{fill:none;stroke:#B0F701;stroke-width:1.6;stroke-dasharray:4 4}
+  .cj-card{display:flex;align-items:center;gap:12px;margin:6px 12px 12px;background:#0E1538;border-radius:10px;padding:12px 14px}
+  .cj-logo{width:44px;height:44px;border-radius:50%;background:#fff;color:#060A2C;display:flex;align-items:center;justify-content:center;font-weight:750;flex:none}
+  .cj-logo.cur{background:#B0F701}
+  .cj-main{flex:1;min-width:0}.cj-main b{display:block;font-size:15px;margin-bottom:2px}
+  .cj-role{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;font-size:13.5px;color:#DDE3EE}.cj-role small{color:#AEB8CC;font-size:12.5px}
+  .cj-det{color:#B0F701;font-weight:650;font-size:13.5px;white-space:nowrap}
+  @media(max-width:600px){.cj-top{flex-wrap:wrap;padding:12px 12px 4px;gap:8px 10px}.cj-h{flex:1 0 100%}.cj-h span{font-size:12px}.cj-clock{flex:1;text-align:left}.cj-clock span{font-size:15px}.cj-clock small{max-width:none}.cj-card{margin:6px 8px 10px;padding:10px 12px}.cj-main b{font-size:14px}.cj-role{font-size:13px}}
 </style>
 <link rel="stylesheet" href="/d.css">
 </head>
@@ -1008,7 +1018,7 @@
       return `${yearTag(g.span ? g.span.b : null)}<div class="tl-item${cur ? " cur" : ""}"><span class="tl-node" aria-hidden="true"></span><div class="tl-card">${body}</div></div>`;
     }).join("");
     setTimeout(hiringNow, 0); setTimeout(() => verifyOrgs(xs), 0);
-    setTimeout(() => careerOrbit(groups, p, nextText, gradText), 0);
+    setTimeout(() => careerOrbit(groups, p, nextText), 0);
     return `<div class="corb" id="corb"></div><div class="tl-stats">${stats.map(([n, l]) => `<div><b>${esc(n)}</b><span>${esc(l)}</span></div>`).join("")}</div>
       <div class="tl">
         ${(nextText || gradText) && !glanceHtml(p) ? `<div class="tl-item next"><span class="tl-node" aria-hidden="true"></span><div class="tl-card"><div class="tl-up">Up next</div>
@@ -1018,90 +1028,130 @@
       </div>`;
   }
 
-  // Nov 23 (owner: "make the timeline ultra unique, space, like Orbit, interactive"): the career orbit.
-  // You in the middle; every company is a planet on its own tilted orbit, oldest closest to you, newest farthest out,
-  // size = how long you were there, the current one lime. Drag to spin, tap a planet for its card, scrub through time,
-  // "Replay my career" plays it from your first role to today. Reduced motion = no drifting. The list below stays as is.
-  function careerOrbit(groups, p, nextText, gradText){
+  // Nov 23 v2 (owner: "make it way better, a lot differently"): the career flight path. Time runs left to right across a
+  // starfield; every company is a planet placed at its dates (size = how long, a faint band = exactly how long), stacked in
+  // lanes when roles overlap; one lime flight path links them in order and loops around each planet; a ship flies it.
+  // Drag across the sky = fly through time, tap a planet = fly there, Launch = replay everything, arrow keys = planet to planet.
+  // The path goes on dashed past Today to the "Next" planet. Phones scroll sideways and follow the ship. Reduced motion = no flying.
+  function careerOrbit(groups, p, nextText){
     const box = document.getElementById("corb"); if (!box) return;
-    const T = window.btpTL, gs = groups.filter((g) => g.span).slice().sort((a, b) => a.span.a - b.span.a);
+    const T = window.btpTL, NS = "http://www.w3.org/2000/svg";
+    const gs = groups.filter((g) => g.span).slice().sort((a, b) => a.span.a - b.span.a || a.span.b - b.span.b);
     if (!gs.length) { box.remove(); return; }
-    const NOW = T.toMonths(T.nowYM()), first = gs[0].span.a;
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"], mlab = (m) => `${MON[m % 12]} ${Math.floor(m / 12)}`;
-    const narrow = (box.clientWidth || 800) < 560, W = narrow ? 400 : 800, H = narrow ? 360 : 380, TILT = narrow ? 0.8 : 0.36;
-    const me = p.photo ? `<image href="${esc(p.photo)}" x="-30" y="-30" width="60" height="60" clip-path="url(#corbMe)" preserveAspectRatio="xMidYMid slice"/>` : `<text class="cme-t" y="7">${esc(initials(p.name || "You"))}</text>`;
-    box.innerHTML = `<div class="corb-top"><div><b>Career orbit</b><span>Drag to spin · tap a planet</span></div><button type="button" class="corb-play" id="corbPlay">Replay my career</button></div>
-      <svg class="corb-sky" id="corbSky" viewBox="0 0 ${W} ${H}" role="img" aria-label="Career orbit: ${esc(gs.map((g) => g.org || g.roles[0].title).join(", "))}">
-        <defs><clipPath id="corbMe"><circle r="30"/></clipPath></defs>
-        <g class="corb-stars">${Array.from({ length: 70 }, (_, i) => { const h = (i * 2654435761 >>> 0) % 100000; return `<circle cx="${(h % W)}" cy="${(h * 7 % H)}" r="${(h % 3) * 0.4 + 0.5}" opacity="${0.15 + (h % 5) * 0.1}"/>`; }).join("")}</g>
-        <g id="corbRings"></g><g id="corbBack"></g>
-        <g class="cme" transform="translate(${W / 2} ${H / 2})"><circle r="34" class="cme-ring"/><circle r="30" class="cme-bg"/>${me}</g>
-        <g id="corbFront"></g>
-      </svg>
-      <div class="corb-time"><input type="range" id="corbT" min="${first}" max="${NOW}" value="${NOW}" step="1" aria-label="Move through time"><div class="corb-at" id="corbAt" aria-live="polite"></div></div>
-      <div class="corb-card" id="corbCard"></div>`;
-    const sky = box.querySelector("#corbSky"), back = sky.querySelector("#corbBack"), front = sky.querySelector("#corbFront"), ringsG = sky.querySelector("#corbRings");
-    const n = gs.length + (nextText ? 1 : 0), CX = W / 2, CY = H / 2, R0 = narrow ? 52 : 70, RMAX = W / 2 - (narrow ? 22 : 25), step = (RMAX - R0) / Math.max(n, 1);
-    const maxLen = Math.max(...gs.map((g) => g.span.b - g.span.a + 1));
-    const P = gs.map((g, i) => { const rx = R0 + step * (i + 1), len = g.span.b - g.span.a + 1;
-      return { g, i, rx, ry: rx * TILT, th: (i * 2.399) % (Math.PI * 2), w: 0.00022 * Math.pow(R0 / rx, 1.2) * 3.2,
-        r: 11 + 13 * Math.sqrt(len / maxLen), cur: !!g.roles.some((r) => r.sp?.current), label: g.org || g.roles[0].title }; });
-    const nx = nextText ? { rx: R0 + step * n, ry: (R0 + step * n) * TILT } : null;
-    ringsG.innerHTML = P.map((q) => `<ellipse cx="${CX}" cy="${CY}" rx="${q.rx}" ry="${q.ry}" class="corb-ring${q.cur ? " cur" : ""}"/>`).join("")
-      + (nx ? `<ellipse cx="${CX}" cy="${CY}" rx="${nx.rx}" ry="${nx.ry}" class="corb-ring next"/>` : "");
-    let spin = 0, vel = 0, t0 = performance.now(), sel = P.findIndex((q) => q.cur), atM = NOW, playing = 0;
-    if (sel < 0) sel = P.length - 1;
-    const state = (q) => atM < q.g.span.a ? "future" : atM > q.g.span.b ? "past" : "on";
-    function draw(now){
-      const t = reduce ? 0 : now - t0; let bk = "", fr = "";
-      const items = P.map((q) => { const a = q.th + t * q.w + spin, x = CX + q.rx * Math.cos(a), y = CY + q.ry * Math.sin(a), z = Math.sin(a); return { q, x, y, z }; });
-      if (nx) { const a = -0.6 + spin * 0.5 + (reduce ? 0 : t * 0.00005); items.push({ next: true, x: CX + nx.rx * Math.cos(a), y: CY + nx.ry * Math.sin(a), z: Math.sin(a) }); }
-      items.sort((a, b) => a.z - b.z);
-      for (const it of items) {
-        const sc = 0.8 + 0.2 * (it.z + 1) / 2, edge = W * 0.24, anc = it.x > W - edge ? ' text-anchor="end"' : it.x < edge ? ' text-anchor="start"' : "", ax = it.x > W - edge ? 14 : it.x < edge ? -14 : 0;
-        let h;
-        if (it.next) h = `<g class="cpl next" transform="translate(${it.x.toFixed(1)} ${it.y.toFixed(1)}) scale(${sc.toFixed(3)})"><circle r="13"/><text class="cpl-l" y="30" x="${ax}"${anc}>Next: ${esc(nextText.length > 30 ? nextText.slice(0, 29) + "…" : nextText)}</text></g>`;
-        else { const q = it.q, st = state(q);
-          h = `<g class="cpl ${st}${q.cur ? " cur" : ""}${q.i === sel ? " sel" : ""}" data-i="${q.i}" tabindex="0" role="button" aria-label="${esc(q.label)}" transform="translate(${it.x.toFixed(1)} ${it.y.toFixed(1)}) scale(${sc.toFixed(3)})">
-            ${q.i === sel ? `<circle r="${q.r + 6}" class="cpl-sel"/>` : ""}<circle r="${q.r}" class="cpl-b"/><text class="cpl-i" y="${(q.r * 0.3).toFixed(1)}" style="font-size:${Math.max(9, q.r * 0.75).toFixed(1)}px">${esc(initials(q.label))}</text>
-            <text class="cpl-l" y="${(q.r + 16).toFixed(1)}" x="${ax}"${anc}>${esc(q.label.length > 26 ? q.label.slice(0, 25) + "…" : q.label)}</text></g>`; }
-        (it.z < 0 ? (bk += h) : (fr += h));
-      }
-      back.innerHTML = bk; front.innerHTML = fr;
-    }
-    function card(){
-      const q = P[sel]; if (!q) return; const g = q.g;
-      box.querySelector("#corbCard").innerHTML = `<div class="cc-logo" aria-hidden="true">${esc(initials(q.label))}</div><div class="cc-main">
-        <b>${esc(g.roles.map((r) => r.title).filter(Boolean).slice(0, 2).join(" · ") || q.label)}</b><div class="sm">${esc(g.org || "")}${g.org ? " · " : ""}${esc(T.rangeText({ ...g.span, start: T.fromMonths(g.span.a), end: T.fromMonths(g.span.b), current: q.cur }))}</div></div>
-        <a class="cc-go" href="#xp${g.roles[0].i}">Details</a>`;
-    }
-    function at(){
-      atM = +box.querySelector("#corbT").value;
-      const on = P.filter((q) => state(q) === "on").map((q) => q.label);
-      box.querySelector("#corbAt").textContent = `${atM >= NOW ? "Today" : mlab(atM)} · ${on.length ? on.slice(0, 2).join(" and ") : "Between roles"}`;
-      if (reduce) draw(performance.now());
-    }
-    // drag to spin (mouse + touch), with a little coast after letting go
-    let drag = null;
-    sky.addEventListener("pointerdown", (e) => { if (e.target.closest(".cpl[data-i]")) return; drag = { x: e.clientX, s: spin, t: performance.now() }; sky.setPointerCapture(e.pointerId); sky.classList.add("grab"); });
-    sky.addEventListener("pointermove", (e) => { if (!drag) return; const ns = drag.s + (e.clientX - drag.x) / 140; vel = (ns - spin) / Math.max(1, performance.now() - drag.t); drag.t = performance.now(); spin = ns; if (reduce) draw(performance.now()); });
-    const up = () => { drag = null; sky.classList.remove("grab"); }; sky.addEventListener("pointerup", up); sky.addEventListener("pointercancel", up);
-    const pick = (el) => { sel = +el.dataset.i; card(); draw(performance.now()); };
-    sky.addEventListener("click", (e) => { const el = e.target.closest(".cpl[data-i]"); if (el) pick(el); });
-    sky.addEventListener("keydown", (e) => { const el = e.target.closest(".cpl[data-i]"); if (el && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); pick(el); } });
-    box.querySelector("#corbT").addEventListener("input", () => { playing = 0; at(); });
-    box.querySelector("#corbPlay").addEventListener("click", () => {
-      const r = box.querySelector("#corbT"), span = NOW - first, dur = Math.min(6000, 1500 + span * 60), st = performance.now(), id = ++playing;
-      const tick = (now) => { if (id !== playing) return; const k = Math.min(1, (now - st) / dur); r.value = String(Math.round(first + span * k)); at();
-        const live = P.filter((q) => state(q) === "on"); if (live.length) { const ns = live[live.length - 1].i; if (ns !== sel) { sel = ns; card(); } }
-        if (reduce) draw(now); if (k < 1) requestAnimationFrame(tick); else playing = 0; };
-      requestAnimationFrame(tick);
+    const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"], mlab = (m) => `${MON[((m % 12) + 12) % 12]} ${Math.floor(m / 12)}`;
+    const NOW = T.toMonths(T.nowYM()), m0 = gs[0].span.a - 3, span = NOW - m0, mEnd = NOW + (nextText ? Math.max(8, Math.round(span * 0.18)) : 3);
+    const phone = (box.clientWidth || 800) < 600, H = phone ? 300 : 330, PADL = 40, PADR = 60;
+    const CW = box.clientWidth || 760, W = phone ? Math.max(CW, Math.round((mEnd - m0) * 19)) : CW;
+    const X = (m) => PADL + (m - m0) / (mEnd - m0) * (W - PADL - PADR), MID = H * 0.5;
+    const LANE = [0, -78, 78, -150, 150];
+    // planets + lanes (overlapping roles, or too close to read, go to another lane)
+    const laneEnd = [], P = gs.map((g, i) => {
+      const len = g.span.b - g.span.a + 1, r = Math.max(16, Math.min(34, 12 + 3.2 * Math.sqrt(len)));
+      let x = Math.min(X(g.span.a) + r, W - PADR - r);   // at its start; the band behind it shows how long
+      let lane = 0; while (lane < LANE.length - 1 && laneEnd[lane] != null && (g.span.a <= laneEnd[lane].m + 1 || x - laneEnd[lane].x < 150)) lane++;
+      laneEnd[lane] = { m: g.span.b, x };
+      const cur = g.roles.some((r2) => r2.sp?.current), label = g.org || g.roles[0].title;
+      return { g, i, x, y: MID + LANE[lane] * (phone ? 0.85 : 1), r, cur, label, len, type: g.roles[0].type || "" };
     });
-    // animate only while on screen and the tab is visible
-    let vis = true; try { new IntersectionObserver((es) => { vis = es[0].isIntersecting; }).observe(sky); } catch {}
-    const loop = (now) => { if (!box.isConnected) return; if (vis && !document.hidden) { if (!drag && Math.abs(vel) > 1e-5) { spin += vel * 16; vel *= 0.94; } draw(now); } requestAnimationFrame(loop); };
-    at(); card(); draw(performance.now()); if (!reduce) requestAnimationFrame(loop);
+    const nextP = nextText ? { x: X(mEnd) - 6, y: MID, r: 16 } : null;
+    // flight path: smooth curves between planets, 1.5 loops around each (orbit insertion), then on past Today
+    const R = (q) => q.r + 13;
+    let d = `M ${PADL - 20} ${MID}`, px = PADL - 20, py = MID; const segs = [], tmp = document.createElementNS(NS, "path");
+    const lenOf = (dd) => { tmp.setAttribute("d", dd); return tmp.getTotalLength(); };
+    for (const q of P) {
+      const ex = q.x - R(q), xx = q.x + R(q), dx = Math.max(30, (ex - px) / 2);
+      d += ` C ${px + dx} ${py} ${ex - dx} ${q.y} ${ex} ${q.y}`; const a0 = lenOf(d);
+      d += ` A ${R(q)} ${R(q)} 0 0 1 ${xx} ${q.y} A ${R(q)} ${R(q)} 0 0 1 ${ex} ${q.y} A ${R(q)} ${R(q)} 0 0 1 ${xx} ${q.y}`; const a1 = lenOf(d);
+      segs.push({ q, a0, a1 }); px = xx; py = q.y;
+    }
+    const xToday = X(NOW), dPast = d + ` C ${px + 40} ${py} ${xToday - 40} ${MID} ${xToday} ${MID}`, lToday = lenOf(dPast);
+    const dAll = nextP ? dPast + ` C ${xToday + 50} ${MID} ${nextP.x - nextP.r - 60} ${MID} ${nextP.x - nextP.r - 8} ${MID}` : dPast;
+    const lAll = lenOf(dAll);
+    // samples for drag: progress along the path for any x (the furthest-right point reached so far)
+    const SAMP = []; tmp.setAttribute("d", dAll); let maxX = -1e9;
+    for (let k = 0; k <= 900; k++) { const L = lAll * k / 900, pt = tmp.getPointAtLength(L); maxX = Math.max(maxX, pt.x); SAMP.push([L, maxX]); }
+    const lenAtX = (x) => { for (const [L, mx] of SAMP) if (mx >= x) return L; return lAll; };
+    // years + stars
+    const years = []; for (let y = Math.ceil((m0 + 1) / 12); y * 12 <= mEnd; y++) years.push(y);
+    const stars = Array.from({ length: Math.round(W / 9) }, (_, i) => { const h = (i * 2654435761 >>> 0); return `<circle cx="${h % W}" cy="${(h >>> 7) % H}" r="${((h >>> 3) % 3) * 0.35 + 0.45}" opacity="${0.12 + ((h >>> 5) % 5) * 0.09}"/>`; }).join("");
+    const clip = (t, n) => t.length > n ? t.slice(0, n - 1) + "…" : t;
+    const role = (q) => clip(q.g.roles.map((r2) => r2.title).filter(Boolean)[0] || "", 26);
+    const lbl = (q) => { const up = q.y < MID - 1, ty = up ? q.y - q.r - 24 : q.y + q.r + 30, lx = Math.max(78, Math.min(W - 78, q.x));
+      return `<text class="cj-co" x="${lx}" y="${ty}">${esc(clip(q.label, 24))}</text><text class="cj-ro" x="${lx}" y="${ty + 15}">${esc(role(q))}</text>`; };
+    box.innerHTML = `<div class="cj-top"><div class="cj-h"><b>Career trajectory</b><span>Drag across the sky to fly through time · tap a planet</span></div>
+        <div class="cj-clock" aria-live="polite"><span id="cjDate"></span><small id="cjWhere"></small></div>
+        <button type="button" class="cj-go" id="cjGo">Launch</button></div>
+      <div class="cj-scroll" id="cjScroll"><svg class="cj-sky" id="cjSky" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Career trajectory: ${esc(P.map((q) => q.label).join(", "))}">
+        <g class="cj-stars">${stars}</g>
+        ${years.map((y) => `<line class="cj-yr" x1="${X(y * 12)}" x2="${X(y * 12)}" y1="18" y2="${H - 26}"/><text class="cj-yl" x="${X(y * 12) + 5}" y="${H - 10}">${y}</text>`).join("")}
+        <line class="cj-today" x1="${xToday}" x2="${xToday}" y1="10" y2="${H - 26}"/><text class="cj-tl" x="${xToday > W - 70 ? xToday - 6 : xToday + 6}" y="22"${xToday > W - 70 ? ' text-anchor="end"' : ""}>Today</text>
+        ${P.map((q) => `<rect class="cj-band" x="${X(q.g.span.a)}" y="${q.y - 3}" width="${Math.max(6, X(q.g.span.b + 1) - X(q.g.span.a))}" height="6" rx="3"/>`).join("")}
+        <path class="cj-path" d="${dAll}"/>${nextP ? `<path class="cj-fut" d="${dAll}" style="stroke-dasharray:0 ${lToday} 5 7"/>` : ""}
+        <path class="cj-trail" id="cjTrail" d="${dAll}" style="stroke-dasharray:0 ${lAll}"/>
+        ${P.map((q) => `<g class="cj-pl${q.cur ? " cur" : ""} t-${esc(q.type)}" data-i="${q.i}" tabindex="0" role="button" aria-label="${esc(q.label + ", " + role(q))}">
+            ${q.cur ? `<ellipse class="cj-ringo" cx="${q.x}" cy="${q.y}" rx="${q.r + 9}" ry="${(q.r + 9) * 0.32}" transform="rotate(-18 ${q.x} ${q.y})"/>` : ""}
+            <circle class="cj-b" cx="${q.x}" cy="${q.y}" r="${q.r}"/><text class="cj-i" x="${q.x}" y="${q.y + q.r * 0.28}" style="font-size:${(q.r * 0.74).toFixed(1)}px">${esc(initials(q.label))}</text>${lbl(q)}</g>`).join("")}
+        ${nextP ? `<g class="cj-next"><circle cx="${nextP.x}" cy="${nextP.y}" r="${nextP.r}"/><text class="cj-co nx" x="${nextP.x + nextP.r}" y="${nextP.y - nextP.r - 26}">Next</text><text class="cj-ro nx" x="${nextP.x + nextP.r}" y="${nextP.y - nextP.r - 11}">${esc(clip(nextText, 30))}</text></g>` : ""}
+        <g id="cjShip" class="cj-ship"><path d="M 9 0 L -6 -6 L -3 0 L -6 6 Z"/></g>
+      </svg></div>
+      <div class="cj-card" id="cjCard"></div>`;
+    const sky = box.querySelector("#cjSky"), trail = box.querySelector("#cjTrail"), ship = box.querySelector("#cjShip"), scroller = box.querySelector("#cjScroll");
+    trail.setAttribute("d", dAll); tmp.setAttribute("d", dAll);
+    const mAtX = (x) => Math.round(m0 + (x - PADL) / (W - PADL - PADR) * (mEnd - m0));
+    let S = 0, shown = -1, follow = false;
+    function seg(){ for (const sg of segs) if (S >= sg.a0 - 1 && S <= sg.a1 + 1) return sg; return null; }
+    function last(){ let r2 = null; for (const sg of segs) if (S >= sg.a0) r2 = sg; return r2; }
+    function card(i){ if (i === shown) return; shown = i; const q = P[i]; if (!q) return;
+      box.querySelectorAll(".cj-pl").forEach((el) => el.classList.toggle("on", +el.dataset.i === i));
+      box.querySelector("#cjCard").innerHTML = `<div class="cj-logo${q.cur ? " cur" : ""}" aria-hidden="true">${esc(initials(q.label))}</div><div class="cj-main">
+        <b data-noi18n>${esc(q.label)}</b>${q.g.roles.map((r2) => `<div class="cj-role"><span data-noi18n>${esc(r2.title || "")}</span>${r2.sp ? `<small>${esc(T.rangeText(r2.sp))}</small>` : ""}</div>`).join("")}</div>
+        <a class="cj-det" href="#xp${q.g.roles[0].i}">Details</a>`; }
+    function place(){
+      S = Math.max(0, Math.min(lAll, S)); trail.style.strokeDasharray = `${S} ${lAll}`;
+      const a = tmp.getPointAtLength(S), b = tmp.getPointAtLength(Math.min(lAll, S + 2)), ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
+      ship.setAttribute("transform", `translate(${a.x.toFixed(1)} ${a.y.toFixed(1)}) rotate(${S >= lAll - 1 ? 0 : ang.toFixed(1)})`);
+      const sg = seg(), lp = last(), m = Math.min(mEnd, mAtX(Math.max(a.x, lp ? X(lp.q.g.span.a) : a.x)));
+      box.querySelector("#cjDate").textContent = S > lToday + 2 ? "Up next" : S >= lToday - 2 ? "Today"
+        : sg ? `${mlab(sg.q.g.span.a)} → ${sg.q.cur ? "now" : mlab(sg.q.g.span.b)}` : mlab(m);
+      box.querySelector("#cjWhere").textContent = sg ? sg.q.label : S > lToday + 2 ? nextText : lp ? "In transit" : "Launch";
+      if (sg) card(sg.q.i); else if (lp) card(lp.q.i);
+      if (follow && scroller.scrollWidth > scroller.clientWidth) { const v = a.x - scroller.scrollLeft; if (v < 60 || v > scroller.clientWidth - 80) scroller.scrollLeft = a.x - scroller.clientWidth / 2; }
+    }
+    // flying: ease to a target length; idling: the ship circles the planet it rests on
+    let anim = 0, rest = null;
+    function fly(to, ms, done){
+      const id = ++anim, from = S; follow = true;
+      if (reduce) { S = to; place(); follow = false; done && done(); return; }
+      const st = performance.now(), dur = ms || Math.min(2400, 500 + Math.abs(to - from) * 0.9);
+      const step = (t) => { if (id !== anim) return; const k = Math.min(1, (t - st) / dur), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+        S = from + (to - from) * e; place(); if (k < 1) requestAnimationFrame(step); else { follow = false; done && done(); } };
+      requestAnimationFrame(step);
+    }
+    function goPlanet(i){ const sg = segs.find((x) => x.q.i === i); if (!sg) return; rest = null; fly((sg.a0 + sg.a1) / 2, null, () => { rest = sg; }); }
+    const idle = (t) => { if (!box.isConnected) return;
+      if (rest && !drag && !document.hidden) { const one = (rest.a1 - rest.a0) / 1.5; S = rest.a0 + one * 0.5 + ((t / 30) % one); place(); }
+      requestAnimationFrame(idle); };
+    // drag across the sky to fly through time
+    let drag = null;
+    sky.addEventListener("pointerdown", (e) => { const pl = e.target.closest(".cj-pl"); if (pl) return;
+      drag = { id: e.pointerId, x0: e.clientX, moved: false }; ++anim; rest = null; sky.classList.add("drag"); });
+    sky.addEventListener("pointermove", (e) => { if (!drag) return; if (!drag.moved && Math.abs(e.clientX - drag.x0) < 4) return;
+      if (!drag.moved) { drag.moved = true; try { sky.setPointerCapture(drag.id); } catch {} }
+      const r = sky.getBoundingClientRect(); S = lenAtX((e.clientX - r.left) * (W / r.width)); place(); });
+    const up = () => { if (drag && drag.moved) { const sg = seg(); if (sg) rest = sg; } drag = null; sky.classList.remove("drag"); };
+    sky.addEventListener("pointerup", up); sky.addEventListener("pointercancel", up);
+    sky.addEventListener("click", (e) => { const pl = e.target.closest(".cj-pl"); if (pl) goPlanet(+pl.dataset.i); });
+    sky.addEventListener("keydown", (e) => { const pl = e.target.closest(".cj-pl"); if (pl && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); goPlanet(+pl.dataset.i); } });
+    box.addEventListener("keydown", (e) => { if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return; e.preventDefault();
+      const i = Math.max(0, Math.min(P.length - 1, (shown < 0 ? 0 : shown) + (e.key === "ArrowRight" ? 1 : -1))); goPlanet(i); sky.querySelector(`.cj-pl[data-i="${i}"]`)?.focus(); });
+    box.querySelector("#cjGo").addEventListener("click", () => { rest = null; S = 0; place();
+      fly(nextP ? lAll : lToday, reduce ? 0 : Math.min(7000, 2500 + P.length * 700), () => { const c = segs.find((x) => x.q.cur) || segs[segs.length - 1]; if (!nextP) rest = c; }); });
+    // start: resting on the current role (or the latest), trail drawn up to it
+    const startSeg = segs.find((x) => x.q.cur) || segs[segs.length - 1];
+    S = (startSeg.a0 + startSeg.a1) / 2; place(); rest = reduce ? null : startSeg;
+    if (scroller.scrollWidth > scroller.clientWidth) scroller.scrollLeft = Math.max(0, startSeg.q.x - scroller.clientWidth * 0.55);
+    if (!reduce) requestAnimationFrame(idle);
   }
   // "Hiring now": the company you worked at has open jobs on Beat the Pile right now (live list, matched by name)
   let HIRING = null;

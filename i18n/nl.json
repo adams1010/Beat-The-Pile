@@ -1,6 +1,11 @@
 {
  "lang": "nl",
  "strings": {
+    "Career trajectory": "Carrièrepad",
+    "Drag across the sky to fly through time · tap a planet": "Sleep over de hemel om door de tijd te vliegen · tik op een planeet",
+    "Launch": "Lanceren",
+    "In transit": "Onderweg",
+    "Next": "Volgende",
     "Career orbit": "Carrièrebaan",
     "Drag to spin · tap a planet": "Sleep om te draaien · tik op een planeet",
     "Replay my career": "Mijn carrière afspelen",

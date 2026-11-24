@@ -1,6 +1,11 @@
 {
  "lang": "fr",
  "strings": {
+    "Career trajectory": "Trajectoire de carrière",
+    "Drag across the sky to fly through time · tap a planet": "Faites glisser dans le ciel pour voyager dans le temps · touchez une planète",
+    "Launch": "Décoller",
+    "In transit": "En transit",
+    "Next": "Suivant",
     "Career orbit": "Orbite de carrière",
     "Drag to spin · tap a planet": "Faites glisser pour tourner · touchez une planète",
     "Replay my career": "Rejouer ma carrière",

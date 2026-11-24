@@ -1,6 +1,11 @@
 {
  "_about": "Spanish UI strings (Nov 2026). Key = the English text exactly as shown (whitespace collapsed). Used by /i18n.js when the student picks Español. Job titles, company names and places are data and stay as-is.",
  "strings": {
+    "Career trajectory": "Trayectoria profesional",
+    "Drag across the sky to fly through time · tap a planet": "Arrastra por el cielo para viajar en el tiempo · toca un planeta",
+    "Launch": "Despegar",
+    "In transit": "En tránsito",
+    "Next": "Siguiente",
     "Career orbit": "Órbita profesional",
     "Drag to spin · tap a planet": "Arrastra para girar · toca un planeta",
     "Replay my career": "Repetir mi carrera",
