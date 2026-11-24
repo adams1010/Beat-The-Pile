@@ -160,9 +160,6 @@
   .res{border:1px solid var(--line);border-radius:10px;padding:8px 12px 12px;margin-top:10px;position:relative;background:#fff}
   #experience,#kit{scroll-margin-top:84px}
   /* Nov 14: experience timeline (vertical rail, roles grouped by company, "Up next" on top) */
-  .tl-stats{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
-  .tl-stats>div{flex:1 1 90px;background:#F5F7FA;border-radius:10px;padding:10px 12px}
-  .tl-stats b{display:block;font-size:20px;font-variant-numeric:tabular-nums;color:#060A2C}.tl-stats span{font-size:12.5px;color:var(--muted)}
   .tl{position:relative;padding-left:26px}
   .tl::before{content:"";position:absolute;left:7px;top:6px;bottom:6px;width:2px;background:#DCE2EC}
   .tl-item{position:relative;margin:0 0 12px}
@@ -299,6 +296,33 @@
   .cj-main{flex:1;min-width:0}.cj-main b{display:block;font-size:15px;margin-bottom:2px}
   .cj-role{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;font-size:13.5px;color:#DDE3EE}.cj-role small{color:#AEB8CC;font-size:12.5px}
   /* Nov 24 (owner): the profile header is centered and the photo is a little bigger. Nothing else changes. */
+  /* Nov 24 (owner: experience "less like LinkedIn"): boarding passes. Stub (Stop N, dates, length) | dashed tear line | details. */
+  .tks{display:flex;flex-direction:column;gap:12px}
+  .tks+.corb{margin:16px 0 0}
+  .tk{display:grid;grid-template-columns:132px minmax(0,1fr);border:1px solid var(--line);border-radius:10px;background:#fff}
+  .tk-stub{background:#F2F5FA;color:#060A2C;border-radius:9px 0 0 9px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px}
+  .tk-stop{font-size:11.5px;font-weight:600;color:#5B6675}
+  .tk-d{font-size:17px;font-weight:750;line-height:1.2;font-variant-numeric:tabular-nums}
+  .tk-to{width:2px;height:12px;background:currentColor;opacity:.3;margin:2px 0}
+  .tk-len{margin-top:6px;font-size:12px;font-weight:600;border-radius:999px;padding:1px 9px;background:#fff;color:#3A5800;font-variant-numeric:tabular-nums}
+  .tk-main{position:relative;min-width:0;padding:14px 16px;border-left:2px dashed #CBD3E0}
+  .tk-main::before,.tk-main::after{content:"";position:absolute;left:-9px;width:16px;height:16px;border-radius:50%;background:#fff;border:1px solid transparent;transform:rotate(-45deg)}
+  .tk-main::before{top:-9px;border-left-color:var(--line);border-bottom-color:var(--line)}
+  .tk-main::after{bottom:-9px;border-right-color:var(--line);border-top-color:var(--line)}
+  .tk.cur{border-color:#C5E68A}.tk.cur .tk-main::before{border-left-color:#C5E68A;border-bottom-color:#C5E68A}.tk.cur .tk-main::after{border-right-color:#C5E68A;border-top-color:#C5E68A}
+  .tk.cur .tk-stub{background:#060A2C;color:#fff}.tk.cur .tk-stop{color:#B0F701}.tk.cur .tk-len{background:#B0F701;color:#060A2C}
+  .tk.next{border:1.5px dashed #4A7000;background:#F7FBEC}.tk.next .tk-stub{background:#F2FADF;color:#3A5800}.tk.next .tk-stop{color:#3A5800}
+  .tk.next .tk-main{border-left-color:#B9D98A}.tk.next .tk-main::before,.tk.next .tk-main::after{display:none}
+  .tk-head{display:grid;grid-template-columns:40px minmax(0,1fr);gap:12px;align-items:start}
+  .tk-head .tl-logo{width:40px;height:40px}
+  .tk-title{font-size:16px;font-weight:700;color:#060A2C;line-height:1.3}
+  .tk-body{margin-left:52px}
+  .tk .tl-roles{margin-left:52px}
+  @media (max-width:560px){.tk{grid-template-columns:minmax(0,1fr)}
+    .tk-stub{flex-direction:row;justify-content:flex-start;flex-wrap:wrap;gap:4px 8px;border-radius:9px 9px 0 0;padding:9px 14px}
+    .tk-d{font-size:15px}.tk-to{width:12px;height:2px;margin:0}.tk-len{margin:0 0 0 auto}
+    .tk-main{border-left:0;border-top:2px dashed #CBD3E0;padding:12px 14px}.tk.next .tk-main{border-top-color:#B9D98A}
+    .tk-main::before,.tk-main::after{display:none}.tk-body,.tk .tl-roles{margin-left:0}}
   .hero .body{text-align:center}
   .hero .toprow{justify-content:center;position:relative}
   .hero .own{position:absolute;right:0;bottom:2px}
@@ -990,10 +1014,6 @@
     if (!xs.length) return "";
     if (!T) return xs.map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.org || x.title))}</div><div><b>${esc(x.title)}</b><div class="sm">${esc([x.org, x.when].filter(Boolean).join(" · "))}</div>${x.desc ? `<p>${esc(x.desc)}</p>` : ""}</div></div>`).join("");
     const groups = T.groupByOrg(xs);
-    const tot = T.totalMonths(xs), yrs = Math.floor(tot / 12), mos = tot % 12;
-    const intern = xs.filter((x) => x.type === "internship" || /\bintern(ship)?\b|co-?op/i.test(x.title || "")).length;
-    const stats = [tot ? [[yrs ? `${yrs} yr${yrs > 1 ? "s" : ""}` : "", mos ? `${mos} mo${mos > 1 ? "s" : ""}` : ""].filter(Boolean).join(" "), "Experience"] : null,
-      [String(groups.length), groups.length === 1 ? "Company" : "Companies"], intern ? [String(intern), intern === 1 ? "Internship" : "Internships"] : null].filter(Boolean);
     // Up next: what they're looking for + graduation (the part LinkedIn doesn't have)
     const ft = (p.openTo || []).includes("fulltime"), it = (p.openTo || []).includes("intern");
     const nextText = p.lookingFor || (it ? "Next internship" : ft ? "First full-time role" : "");
@@ -1011,29 +1031,44 @@
     const len = (r) => r.sp ? T.duration(r.sp.a, r.sp.b) : "";
     const story = (r) => r.story && (!r.type || STORY_TYPES.includes(r.type)) ? `<div class="tl-story"><b>How I got it</b><p>${esc(r.story)}</p></div>` : "";
     const chip = (t) => t ? `<span class="tl-type t-${esc(t)}">${esc(T.TYPES[t] || t)}</span>` : "";
-    const cards = groups.map((g) => {
+    void yearTag;
+    // Nov 24 (owner: "less like LinkedIn, our own twist"): every company is a boarding pass on the career flight. The stub
+    // (left; a strip on top on phones) = "Stop N" in time order + the dates big + how long; a dashed tear line; then the
+    // role, company, chips and details. The current stop's stub is navy/lime, the next one a dashed "Next stop" pass.
+    const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"], ym = (m) => `${MON[((m % 12) + 12) % 12]} ${Math.floor(m / 12)}`;
+    const order = groups.map((g, k) => [k, g.span ? g.span.a : Infinity]).sort((a, b) => a[1] - b[1]), stopOf = {};
+    order.forEach(([k], n) => { stopOf[k] = n + 1; });
+    const stub = (g, cur, k) => {
+      const sp = g.span;
+      return `<div class="tk-stub" aria-hidden="true"><span class="tk-stop">Stop ${stopOf[k]}</span>
+        ${sp ? `<b class="tk-d">${esc(ym(sp.a))}</b><span class="tk-to"></span><b class="tk-d">${cur ? "Now" : esc(ym(sp.b))}</b><span class="tk-len">${esc(T.duration(sp.a, sp.b))}</span>`
+          : `<b class="tk-d">${esc(g.roles[0].when || "")}</b>`}</div>`;
+    };
+    const cards = groups.map((g, k) => {
       const multi = g.roles.length > 1, cur = g.roles.some((r) => r.sp?.current), top = g.roles[0];
       const oid = (g.roles.find((r) => r.orgId) || {}).orgId || "";
       const tile = `<div class="tl-logo" aria-hidden="true" data-org-name="${esc(g.org || "")}" data-org-id="${esc(oid)}">${esc(initials(g.org || top.title))}</div>`;
       const hire = g.org ? `<div class="tl-vrow"><span data-org-v></span><span class="hire" data-hire="${esc(g.org)}"></span></div>` : "";
       const body = multi
-        ? `<div class="tl-head">${tile}<div class="tl-main"><div class="tl-co">${esc(g.org)}</div><div class="sm">${g.roles.length} roles${g.span ? " · " + T.duration(g.span.a, g.span.b) : ""}</div>${hire}</div></div>
+        ? `<div class="tk-head">${tile}<div class="tl-main"><div class="tk-title">${esc(g.org)}</div><div class="sm">${g.roles.length} roles</div>${hire}</div></div>
            <div class="tl-roles">${g.roles.map((r) => `<div class="tl-role" id="xp${r.i}"><div class="tl-row"><b>${esc(r.title)}</b>${len(r) ? `<span class="tl-len">${esc(len(r))}</span>` : ""}</div>
              <div class="sm">${meta(r)}</div><div class="tl-chips">${chip(r.type)}${r.sp?.current ? '<span class="tl-now">Current</span>' : ""}</div>${bullets(r.desc)}${story(r)}</div>`).join("")}</div>`
-        : `<div class="tl-head" id="xp${top.i}">${tile}<div class="tl-main"><div class="tl-row"><b class="tl-title">${esc(top.title)}</b>${len(top) ? `<span class="tl-len">${esc(len(top))}</span>` : ""}</div>
-             <div class="tl-co">${esc(g.org || "")}</div><div class="sm">${meta(top)}</div><div class="tl-chips">${chip(top.type)}${cur ? '<span class="tl-now">Current</span>' : ""}</div>${hire}</div></div>
-           <div class="tl-body">${bullets(top.desc)}${story(top)}</div>`;
-      return `${yearTag(g.span ? g.span.b : null)}<div class="tl-item${cur ? " cur" : ""}"><span class="tl-node" aria-hidden="true"></span><div class="tl-card">${body}</div></div>`;
+        : `<div class="tk-head" id="xp${top.i}">${tile}<div class="tl-main"><div class="tk-title">${esc(top.title)}</div>
+             <div class="tl-co">${esc(g.org || "")}${top.location ? ` <span class="sm">· ${esc(top.location)}</span>` : ""}</div><div class="tl-chips">${chip(top.type)}${cur ? '<span class="tl-now">Current</span>' : ""}</div>${hire}</div></div>
+           <div class="tk-body">${bullets(top.desc)}${story(top)}</div>`;
+      return `<div class="tk${cur ? " cur" : ""}">${stub(g, cur, k)}<div class="tk-main">${body}</div></div>`;
     }).join("");
     setTimeout(hiringNow, 0); setTimeout(() => verifyOrgs(xs), 0);
     setTimeout(() => careerOrbit(groups, p, nextText), 0);
-    return `<div class="corb" id="corb"></div><div class="tl-stats">${stats.map(([n, l]) => `<div><b>${esc(n)}</b><span>${esc(l)}</span></div>`).join("")}</div>
-      <div class="tl">
-        ${(nextText || gradText) && !glanceHtml(p) ? `<div class="tl-item next"><span class="tl-node" aria-hidden="true"></span><div class="tl-card"><div class="tl-up">Up next</div>
-          <b class="tl-title">${esc(nextText || "What's next")}</b>${gradText ? `<div class="sm">${esc(gradText)}</div>` : ""}
+    // Nov 24 (owner): no Experience / Companies / Internships number tiles under the trajectory
+    // Nov 24 (owner): the passes first, the career trajectory (the animated flight) underneath them
+    return `<div class="tks">
+        ${(nextText || gradText) && !glanceHtml(p) ? `<div class="tk next"><div class="tk-stub" aria-hidden="true"><span class="tk-stop">Next stop</span><b class="tk-d">${gradText ? esc(gradText.replace(/^Graduating /, "")) : "Soon"}</b></div>
+          <div class="tk-main"><div class="tl-up">Up next</div><div class="tk-title">${esc(nextText || "What's next")}</div>${gradText ? `<div class="sm">${esc(gradText)}</div>` : ""}
           <a class="tl-find" href="${nextHref}">Find openings</a></div></div>` : ""}
         ${cards}
-      </div>`;
+      </div>
+      <div class="corb" id="corb"></div>`;
   }
 
   // Nov 23 v2 (owner: "make it way better, a lot differently"): the career flight path. Time runs left to right across a
