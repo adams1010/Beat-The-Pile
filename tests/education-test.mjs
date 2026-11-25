@@ -15,7 +15,7 @@ assert.equal(r.code, 200);
 const p = r.body.profile;
 assert.equal(p.gradTerm, "Winter"); assert.equal(p.schoolId, 233921);
 assert.equal(p.education.length, 5, "up to 5 extra schools; empty ones dropped");
-assert.deepEqual(p.education[0], { school: "NOVA", degree: "Associate", major: "Engineering", when: "2022 – 2024" });
+assert.deepEqual(p.education[0], { school: "NOVA", degree: "Associate", major: "Engineering", when: "2022 – 2024", minor: "", gpa: "", honors: "", activities: "" });
 r = await call("u_b", { action: "profile", handle: "ben", public: true, profile: { name: "Ben", school: "Virginia Polytechnic Institute and State University", schoolId: "233921", major: "Mechanical Engineering", gradTerm: "Autumn", schoolIdx: 1 } });
 assert.equal(r.body.profile.gradTerm, null, "only Spring / Summer / Fall / Winter"); assert.equal(r.body.profile.schoolId, 233921);
 assert.equal((await call("u_b", { action: "profile", handle: "ben", public: true, profile: { name: "Ben", schoolId: 12 } })).body.profile.schoolId, null);
@@ -54,4 +54,20 @@ console.log(`✓ education: several schools, grad term, school ids; Orbit matche
   const pick = readFileSync(new URL("../pick.js", import.meta.url), "utf8"), u = readFileSync(new URL("../u/index.html", import.meta.url), "utf8");
   assert.ok(pick.includes("/schools/official.json") && u.includes("/schools/official.json"), "both pickers read the official list");
   console.log("✓ official major lists: Virginia Tech (135) + " + (Object.keys(off).filter((k) => /^\d+$/.test(k)).length - 1) + " more schools, every major mapped to job areas");
+}
+
+// Nov 24: more education detail — degree, minor, GPA (validated), honors, activities on the main school and each extra school
+{
+  const { gpaTxt } = await import("../api/me.js");
+  assert.equal(gpaTxt("3.6"), "3.6"); assert.equal(gpaTxt(" 3.62 "), "3.62"); assert.equal(gpaTxt("3.6/4.0"), "3.6 / 4.0"); assert.equal(gpaTxt("8.7 / 10"), "8.7 / 10");
+  for (const bad of ["", "abc", "6.2", "4.5/4.0", "3.6/2", "<b>3</b>", "0"]) assert.equal(gpaTxt(bad), "", "rejects " + bad);
+  const r2 = await call("u_b", { action: "profile", handle: "bea", public: true, profile: { name: "Bea", school: "Virginia Tech", major: "Finance", degree: "Bachelor's", minor: "Spanish", gpa: "3.7",
+    honors: "Dean's List", activities: "Finance club", education: [{ school: "NOVA", minor: "Math", gpa: "9.9", honors: "Phi Theta Kappa", activities: "Soccer" }] } });
+  assert.equal(r2.code, 200);
+  const q = r2.body.profile;
+  assert.deepEqual([q.degree, q.minor, q.gpa, q.honors, q.activities], ["Bachelor's", "Spanish", "3.7", "Dean's List", "Finance club"]);
+  assert.deepEqual([q.education[0].minor, q.education[0].gpa, q.education[0].honors, q.education[0].activities], ["Math", "", "Phi Theta Kappa", "Soccer"], "bad GPA dropped");
+  const u2 = readFileSync(new URL("../u/index.html", import.meta.url), "utf8");
+  assert.ok(u2.includes('data-k="minor"') && u2.includes('data-k="gpa"') && u2.includes('data-f="activities"') && u2.includes("eduX(\"Honors\""), "/u/ edits + shows the new education fields");
+  console.log("✓ education detail: degree, minor, GPA (validated), honors, activities");
 }

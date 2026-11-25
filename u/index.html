@@ -288,7 +288,8 @@
   .cj-i{fill:#060A2C;font-weight:750;font-family:var(--font);text-anchor:middle;pointer-events:none}
   .cj-co{fill:#fff;font:650 12.5px var(--font);text-anchor:middle;pointer-events:none}
   .cj-ro{fill:#AEB8CC;font:500 11.5px var(--font);text-anchor:middle;pointer-events:none}
-  .cj-co.nx,.cj-ro.nx{text-anchor:end;fill:#B0F701}.cj-ro.nx{fill:#DDF3A8}
+  .cj-co.nx,.cj-ro.nx{fill:#B0F701}.cj-ro.nx{fill:#DDF3A8}
+  .cj-wh{fill:#8D9AB3;font:500 11px var(--font);text-anchor:middle;pointer-events:none;font-variant-numeric:tabular-nums}.cj-wh.cur{fill:#B0F701}
   .cj-next circle{fill:none;stroke:#B0F701;stroke-width:1.6;stroke-dasharray:4 4}
   .cj-card{display:flex;align-items:center;gap:12px;margin:6px 12px 12px;background:#0E1538;border-radius:10px;padding:12px 14px}
   .cj-logo{width:44px;height:44px;border-radius:50%;background:#fff;color:#060A2C;display:flex;align-items:center;justify-content:center;font-weight:750;flex:none}
@@ -297,6 +298,7 @@
   .cj-role{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;font-size:13.5px;color:#DDE3EE}.cj-role small{color:#AEB8CC;font-size:12.5px}
   /* Nov 24 (owner): the profile header is centered and the photo is a little bigger. Nothing else changes. */
   /* Nov 24 (owner: experience "less like LinkedIn"): boarding passes. Stub (Stop N, dates, length) | dashed tear line | details. */
+  .edu-x{font-size:14px;color:#2B3446;margin-top:4px}.edu-x span{display:inline-block;min-width:74px;font-size:12.5px;font-weight:600;color:var(--muted)}
   .tks{display:flex;flex-direction:column;gap:12px}
   .tks+.corb{margin:16px 0 0}
   .tk{display:grid;grid-template-columns:132px minmax(0,1fr);border:1px solid var(--line);border-radius:10px;background:#fff}
@@ -508,8 +510,11 @@
   const STAFF_ROLES = ["Professor", "Lecturer or instructor", "Academic advisor", "Career center", "Department staff", "Other school staff"];
   function profileHtml(p, resume, isPreview, founding, ach){
     const where = [p.schoolShort || p.school, p.major, gradLabel(p)].filter(Boolean).join(" · ");
-    const edu = [{ school: p.school, degree: "", major: p.major, when: gradLabel(p) }, ...(p.education || [])].filter((x) => x.school)
-      .map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.school))}</div><div><b>${esc(x.school)}</b><div class="sm">${esc([x.degree, x.major, x.when].filter(Boolean).join(" · "))}</div></div></div>`).join("");
+    // Nov 24 (owner: "more information we could fill in"): degree, minor, GPA (only if they typed one), honors, clubs & activities
+    const eduX = (k, v) => v ? `<div class="edu-x"><span>${k}</span>${esc(v)}</div>` : "";
+    const edu = [{ school: p.school, degree: p.degree, major: p.major, when: gradLabel(p), minor: p.minor, gpa: p.gpa, honors: p.honors, activities: p.activities }, ...(p.education || [])].filter((x) => x.school)
+      .map((x) => `<div class="item"><div class="dot" aria-hidden="true">${esc(initials(x.school))}</div><div><b>${esc(x.school)}</b><div class="sm">${esc([x.degree, x.major, x.when].filter(Boolean).join(" · "))}</div>
+        ${eduX("Minor", x.minor)}${eduX("GPA", x.gpa)}${eduX("Honors", x.honors)}${eduX("Activities", x.activities)}</div></div>`).join("");
     const links = [["linkedin","LinkedIn"],["github","GitHub"],["portfolio","Portfolio"]].filter(([k]) => safeUrl(p.links?.[k]))
       .map(([k, t]) => `<a class="cb" href="${esc(p.links[k])}" target="_blank" rel="noopener nofollow ugc">${pico(k === "linkedin" ? "in" : k === "github" ? "gh" : "web")}${t}</a>`).join("");
     const tel = (x) => String(x || "").replace(/[^\d+]/g, "");
@@ -638,7 +643,7 @@
     return [...new Set(((m && m[id]) || []).map((c) => names[c]).filter(Boolean))].sort((a, b) => a.localeCompare(b)); }
   async function findSchool(name){ const n = sNorm(name); if (n.length < 2) return null;
     return (await schools()).find((x) => sNorm(x[1]) === n || String(x[2] || "").split("|").some((a) => sNorm(a) === n)) || null; }
-  const blank = () => ({ photo: null, name: "", headline: "", school: "", major: "", gradYear: "", gradTerm: "", schoolId: null, education: [], location: "", lookingFor: "", about: "", skills: [], experience: [], projects: [], links: {}, showResume: false, openToEmployers: false, openTo: [],
+  const blank = () => ({ photo: null, name: "", headline: "", school: "", major: "", gradYear: "", gradTerm: "", schoolId: null, degree: "", minor: "", gpa: "", honors: "", activities: "", education: [], location: "", lookingFor: "", about: "", skills: [], experience: [], projects: [], links: {}, showResume: false, openToEmployers: false, openTo: [],
     hometown: "", coffee: false, askMe: [], canHelp: [], interests: [], courses: [], prompts: [] });
   function tagBox(d, k){
     const t = TAGS[k], list = d.p[k] || [], low = list.map((x) => x.toLowerCase());
@@ -708,13 +713,22 @@
           <div id="majorBox"><label for="f_major">Major</label><input id="f_major" data-k="major" list="majorlist" value="${esc(d.p.major)}" placeholder="Finance"></div></div>
         <p class="small muted" id="schoolNote" style="margin:4px 0 0"></p>
         <div class="row"><div><label for="f_gradTerm">Graduation</label><div style="display:flex;gap:8px"><select id="f_gradTerm" aria-label="Graduation term" style="width:auto"><option value="">Term</option>${TERMS.map((t) => `<option${d.p.gradTerm === t ? " selected" : ""}>${t}</option>`).join("")}</select>
-          <input id="f_gradYear" data-k="gradYear" value="${esc(d.p.gradYear ?? "")}" placeholder="2027" inputmode="numeric" maxlength="4" aria-label="Graduation year"></div></div><div></div></div>
+          <input id="f_gradYear" data-k="gradYear" value="${esc(d.p.gradYear ?? "")}" placeholder="2027" inputmode="numeric" maxlength="4" aria-label="Graduation year"></div></div>
+          <div><label for="f_degree">Degree</label><input id="f_degree" data-k="degree" list="degreelist" value="${esc(d.p.degree || "")}" placeholder="Bachelor's" maxlength="60"></div></div>
+        <div class="row"><div><label for="f_minor">Minor <span class="muted small">(optional)</span></label><input id="f_minor" data-k="minor" value="${esc(d.p.minor || "")}" placeholder="Business" maxlength="80"></div>
+          <div><label for="f_gpa">GPA <span class="muted small">(optional, shows on your profile)</span></label><input id="f_gpa" data-k="gpa" value="${esc(d.p.gpa || "")}" placeholder="3.6" inputmode="decimal" maxlength="9"></div></div>
+        <label for="f_honors">Honors &amp; awards <span class="muted small">(optional)</span></label><input id="f_honors" data-k="honors" value="${esc(d.p.honors || "")}" placeholder="Dean's List, Honors College" maxlength="160">
+        <label for="f_acts">Clubs &amp; activities <span class="muted small">(optional)</span></label><input id="f_acts" data-k="activities" value="${esc(d.p.activities || "")}" placeholder="Baja SAE, Society of Women Engineers, club soccer" maxlength="200">
         <div>${(d.p.education || []).map((x, i) => `
           <div class="rep"><button class="rm" data-rm="education" data-i="${i}">Remove</button>
             <div class="row"><div><label>School</label><input data-list="education" data-i="${i}" data-f="school" list="schoollist" value="${esc(x.school)}" placeholder="Northern Virginia Community College" autocomplete="off"></div>
             <div><label>Degree</label><input data-list="education" data-i="${i}" data-f="degree" list="degreelist" value="${esc(x.degree)}" placeholder="Associate"></div></div>
             <div class="row"><div><label>Major or field</label><input data-list="education" data-i="${i}" data-f="major" list="majorlist" value="${esc(x.major)}" placeholder="Engineering"></div>
-            <div><label>When</label><input data-list="education" data-i="${i}" data-f="when" value="${esc(x.when)}" placeholder="2023 – 2025"></div></div></div>`).join("")}</div>
+            <div><label>When</label><input data-list="education" data-i="${i}" data-f="when" value="${esc(x.when)}" placeholder="2023 – 2025"></div></div>
+            <div class="row"><div><label>Minor <span class="muted small">(optional)</span></label><input data-list="education" data-i="${i}" data-f="minor" value="${esc(x.minor || "")}" maxlength="80"></div>
+            <div><label>GPA <span class="muted small">(optional)</span></label><input data-list="education" data-i="${i}" data-f="gpa" value="${esc(x.gpa || "")}" inputmode="decimal" maxlength="9"></div></div>
+            <label>Honors &amp; awards <span class="muted small">(optional)</span></label><input data-list="education" data-i="${i}" data-f="honors" value="${esc(x.honors || "")}" maxlength="160">
+            <label>Clubs &amp; activities <span class="muted small">(optional)</span></label><input data-list="education" data-i="${i}" data-f="activities" value="${esc(x.activities || "")}" maxlength="200"></div>`).join("")}</div>
         ${(d.p.education || []).length < 5 ? `<button class="btn" data-add="education" style="margin-top:12px">+ Add another school</button>` : ""}
         <datalist id="degreelist">${["Bachelor's", "Associate", "Master's", "PhD", "Minor", "Certificate", "Study abroad", "Transfer", "High school"].map((x) => `<option value="${x}">`).join("")}</datalist>
         <datalist id="majorlist"></datalist>
@@ -832,7 +846,7 @@
     main.querySelectorAll("[data-link]").forEach((el) => el.oninput = () => { d.p.links[el.dataset.link] = el.value.trim(); });
     main.querySelectorAll("[data-contact]").forEach((el) => el.oninput = () => { d.p.contact = { ...(d.p.contact || {}), [el.dataset.contact]: el.value.trim() }; });
     const cs = $("#c_show"); if (cs) cs.onchange = () => { d.p.contact = { ...(d.p.contact || {}), show: cs.checked }; };
-    const NEW = { experience: { title: "", org: "", orgId: "", when: "", desc: "", start: "", end: "", type: "", location: "" }, projects: { name: "", link: "", desc: "" }, education: { school: "", degree: "", major: "", when: "" } };
+    const NEW = { experience: { title: "", org: "", orgId: "", when: "", desc: "", start: "", end: "", type: "", location: "" }, projects: { name: "", link: "", desc: "" }, education: { school: "", degree: "", major: "", when: "", minor: "", gpa: "", honors: "", activities: "" } };
     main.querySelectorAll("[data-add]").forEach((b) => b.onclick = () => { (d.p[b.dataset.add] ||= []).push({ ...NEW[b.dataset.add] }); editor(); });
     wireEducation(d);
     main.querySelectorAll("[data-rm]").forEach((b) => b.onclick = () => { d.p[b.dataset.rm].splice(+b.dataset.i, 1); editor(); });
@@ -1027,8 +1041,7 @@
       const li = (a) => a.map((t) => `<li>${esc(t)}</li>`).join("");
       return `<ul class="tl-desc">${li(parts.slice(0, 2))}</ul>${parts.length > 2 ? `<details class="tl-more"><summary>Show ${parts.length - 2} more</summary><ul class="tl-desc">${li(parts.slice(2))}</ul></details>` : ""}`;
     };
-    const meta = (r) => [r.sp ? T.rangeText(r.sp).replace(/ · [^·]+$/, "") : r.when || "", r.location].filter(Boolean).map(esc).join(" · ");
-    const len = (r) => r.sp ? T.duration(r.sp.a, r.sp.b) : "";
+    const meta = (r) => [r.sp ? T.whenText(r.sp) : r.when || "", r.location].filter(Boolean).map(esc).join(" · ");
     const story = (r) => r.story && (!r.type || STORY_TYPES.includes(r.type)) ? `<div class="tl-story"><b>How I got it</b><p>${esc(r.story)}</p></div>` : "";
     const chip = (t) => t ? `<span class="tl-type t-${esc(t)}">${esc(T.TYPES[t] || t)}</span>` : "";
     void yearTag;
@@ -1041,7 +1054,8 @@
     const stub = (g, cur, k) => {
       const sp = g.span;
       return `<div class="tk-stub" aria-hidden="true"><span class="tk-stop">Stop ${stopOf[k]}</span>
-        ${sp ? `<b class="tk-d">${esc(ym(sp.a))}</b><span class="tk-to"></span><b class="tk-d">${cur ? "Now" : esc(ym(sp.b))}</b><span class="tk-len">${esc(T.duration(sp.a, sp.b))}</span>`
+        ${sp ? (() => { const w = T.whenText({ a: sp.a, b: sp.b, start: T.fromMonths(sp.a), end: T.fromMonths(sp.b), current: cur });   // Nov 24 (owner): when, never how long
+          return /^Summer |^[A-Z][a-z]{2} d{4}$/.test(w) ? `<b class="tk-d">${esc(w)}</b>` : `<b class="tk-d">${esc(ym(sp.a))}</b><span class="tk-to"></span><b class="tk-d">${cur ? "Now" : esc(ym(sp.b))}</b>`; })()
           : `<b class="tk-d">${esc(g.roles[0].when || "")}</b>`}</div>`;
     };
     const cards = groups.map((g, k) => {
@@ -1051,7 +1065,7 @@
       const hire = g.org ? `<div class="tl-vrow"><span data-org-v></span><span class="hire" data-hire="${esc(g.org)}"></span></div>` : "";
       const body = multi
         ? `<div class="tk-head">${tile}<div class="tl-main"><div class="tk-title">${esc(g.org)}</div><div class="sm">${g.roles.length} roles</div>${hire}</div></div>
-           <div class="tl-roles">${g.roles.map((r) => `<div class="tl-role" id="xp${r.i}"><div class="tl-row"><b>${esc(r.title)}</b>${len(r) ? `<span class="tl-len">${esc(len(r))}</span>` : ""}</div>
+           <div class="tl-roles">${g.roles.map((r) => `<div class="tl-role" id="xp${r.i}"><div class="tl-row"><b>${esc(r.title)}</b></div>
              <div class="sm">${meta(r)}</div><div class="tl-chips">${chip(r.type)}${r.sp?.current ? '<span class="tl-now">Current</span>' : ""}</div>${bullets(r.desc)}${story(r)}</div>`).join("")}</div>`
         : `<div class="tk-head" id="xp${top.i}">${tile}<div class="tl-main"><div class="tk-title">${esc(top.title)}</div>
              <div class="tl-co">${esc(g.org || "")}${top.location ? ` <span class="sm">· ${esc(top.location)}</span>` : ""}</div><div class="tl-chips">${chip(top.type)}${cur ? '<span class="tl-now">Current</span>' : ""}</div>${hire}</div></div>
@@ -1071,93 +1085,77 @@
       <div class="corb" id="corb"></div>`;
   }
 
-  // Nov 23 v2 (owner: "make it way better, a lot differently"): the career flight path. Time runs left to right across a
-  // starfield; every company is a planet placed at its dates (size = how long, a faint band = exactly how long), stacked in
-  // lanes when roles overlap; one lime flight path links them in order and loops around each planet; a ship flies it.
-  // Drag across the sky = fly through time, tap a planet = fly there, Launch = replay everything, arrow keys = planet to planet.
-  // The path goes on dashed past Today to the "Next" planet. Phones scroll sideways and follow the ship. Reduced motion = no flying.
+  // Nov 24 v3 (owner: "doesn't make a lot of sense, make it more uniform, a better look, abbreviate"): the career flight,
+  // uniform. Every company is the same-size planet (the current one a touch bigger, lime, with a ring), evenly spaced on one
+  // line in the order they started (order, not to scale). Above each: the company, shortened; below: the role and when it
+  // was (Summer 2025 / May 2024 – Present). The ship flies the line and loops each planet; the line runs on dashed to a
+  // hollow "Next" planet. Drag = fly along, tap a planet = fly there, Launch = replay, arrow keys = planet to planet.
+  // Phones scroll sideways and follow the ship. Reduced motion = no flying.
   function careerOrbit(groups, p, nextText){
     const box = document.getElementById("corb"); if (!box) return;
     const T = window.btpTL, NS = "http://www.w3.org/2000/svg";
     const gs = groups.filter((g) => g.span).slice().sort((a, b) => a.span.a - b.span.a || a.span.b - b.span.b);
     if (!gs.length) { box.remove(); return; }
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"], mlab = (m) => `${MON[((m % 12) + 12) % 12]} ${Math.floor(m / 12)}`;
-    const NOW = T.toMonths(T.nowYM()), m0 = gs[0].span.a - 3, span = NOW - m0, mEnd = NOW + (nextText ? Math.max(8, Math.round(span * 0.18)) : 3);
-    const phone = (box.clientWidth || 800) < 600, H = phone ? 300 : 330, PADL = 40, PADR = 60;
-    const CW = box.clientWidth || 760, W = phone ? Math.max(CW, Math.round((mEnd - m0) * 19)) : CW;
-    const X = (m) => PADL + (m - m0) / (mEnd - m0) * (W - PADL - PADR), MID = H * 0.5;
-    const LANE = [0, -78, 78, -150, 150];
-    // planets + lanes (overlapping roles, or too close to read, go to another lane)
-    const laneEnd = [], P = gs.map((g, i) => {
-      const len = g.span.b - g.span.a + 1, r = Math.max(16, Math.min(34, 12 + 3.2 * Math.sqrt(len)));
-      let x = Math.min(X(g.span.a) + r, W - PADR - r);   // at its start; the band behind it shows how long
-      let lane = 0; while (lane < LANE.length - 1 && laneEnd[lane] != null && (g.span.a <= laneEnd[lane].m + 1 || x - laneEnd[lane].x < 150)) lane++;
-      laneEnd[lane] = { m: g.span.b, x };
-      const cur = g.roles.some((r2) => r2.sp?.current), label = g.org || g.roles[0].title;
-      return { g, i, x, y: MID + LANE[lane] * (phone ? 0.85 : 1), r, cur, label, len, type: g.roles[0].type || "" };
-    });
-    const nextP = nextText ? { x: X(mEnd) - 6, y: MID, r: 16 } : null;
-    // flight path: smooth curves between planets, 1.5 loops around each (orbit insertion), then on past Today
-    const R = (q) => q.r + 13;
-    let d = `M ${PADL - 20} ${MID}`, px = PADL - 20, py = MID; const segs = [], tmp = document.createElementNS(NS, "path");
+    const sn = (s, n) => (T.shortName ? T.shortName(s, n) : String(s || "").slice(0, n));
+    const spOf = (g, cur) => ({ a: g.span.a, b: g.span.b, start: T.fromMonths(g.span.a), end: T.fromMonths(g.span.b), current: cur });
+    const when = (sp) => (sp && T.whenText ? T.whenText(sp) : "");
+    const n = gs.length + (nextText ? 1 : 0), PADX = 80, GAP_MIN = 100, H = 236, MID = 118, R0 = 18, LOOP = 10;   // labels alternate above/below, so each has two gaps of room
+    const CW = box.clientWidth || 760, W = Math.max(CW, Math.round(PADX * 2 + GAP_MIN * Math.max(0, n - 1)));
+    const X = (k) => (n > 1 ? PADX + (W - PADX * 2) / (n - 1) * k : W / 2);
+    const P = gs.map((g, i) => { const cur = g.roles.some((r2) => r2.sp?.current);
+      return { g, i, x: X(i), y: MID, r: cur ? R0 + 3 : R0, cur, sp: spOf(g, cur), label: g.org || g.roles[0].title, type: g.roles[0].type || "" }; });
+    const nextP = nextText ? { x: X(n - 1), y: MID, r: 14 } : null;
+    const R = (q) => q.r + LOOP;
+    // flight path: a straight line, 1.5 loops around each planet (orbit insertion), then dashed on to Next
+    const x0 = Math.max(10, P[0].x - 72); let d = `M ${x0} ${MID}`; const segs = [], tmp = document.createElementNS(NS, "path");
     const lenOf = (dd) => { tmp.setAttribute("d", dd); return tmp.getTotalLength(); };
     for (const q of P) {
-      const ex = q.x - R(q), xx = q.x + R(q), dx = Math.max(30, (ex - px) / 2);
-      d += ` C ${px + dx} ${py} ${ex - dx} ${q.y} ${ex} ${q.y}`; const a0 = lenOf(d);
-      d += ` A ${R(q)} ${R(q)} 0 0 1 ${xx} ${q.y} A ${R(q)} ${R(q)} 0 0 1 ${ex} ${q.y} A ${R(q)} ${R(q)} 0 0 1 ${xx} ${q.y}`; const a1 = lenOf(d);
-      segs.push({ q, a0, a1 }); px = xx; py = q.y;
+      const ex = q.x - R(q), xx = q.x + R(q);
+      d += ` L ${ex} ${MID}`; const a0 = lenOf(d);
+      d += ` A ${R(q)} ${R(q)} 0 0 1 ${xx} ${MID} A ${R(q)} ${R(q)} 0 0 1 ${ex} ${MID} A ${R(q)} ${R(q)} 0 0 1 ${xx} ${MID}`; const a1 = lenOf(d);
+      segs.push({ q, a0, a1 });
     }
-    const xToday = X(NOW), dPast = d + ` C ${px + 40} ${py} ${xToday - 40} ${MID} ${xToday} ${MID}`, lToday = lenOf(dPast);
-    const dAll = nextP ? dPast + ` C ${xToday + 50} ${MID} ${nextP.x - nextP.r - 60} ${MID} ${nextP.x - nextP.r - 8} ${MID}` : dPast;
-    const lAll = lenOf(dAll);
+    const lPast = lenOf(d), dAll = nextP ? d + ` L ${nextP.x - nextP.r - 6} ${MID}` : d, lAll = lenOf(dAll);
     // samples for drag: progress along the path for any x (the furthest-right point reached so far)
     const SAMP = []; tmp.setAttribute("d", dAll); let maxX = -1e9;
     for (let k = 0; k <= 900; k++) { const L = lAll * k / 900, pt = tmp.getPointAtLength(L); maxX = Math.max(maxX, pt.x); SAMP.push([L, maxX]); }
     const lenAtX = (x) => { for (const [L, mx] of SAMP) if (mx >= x) return L; return lAll; };
-    // years + stars
-    const years = []; for (let y = Math.ceil((m0 + 1) / 12); y * 12 <= mEnd; y++) years.push(y);
     const stars = Array.from({ length: Math.round(W / 9) }, (_, i) => { const h = (i * 2654435761 >>> 0); return `<circle cx="${h % W}" cy="${(h >>> 7) % H}" r="${((h >>> 3) % 3) * 0.35 + 0.45}" opacity="${0.12 + ((h >>> 5) % 5) * 0.09}"/>`; }).join("");
-    const clip = (t, n) => t.length > n ? t.slice(0, n - 1) + "…" : t;
-    const role = (q) => clip(q.g.roles.map((r2) => r2.title).filter(Boolean)[0] || "", 26);
-    const lbl = (q) => { const up = q.y < MID - 1, ty = up ? q.y - q.r - 24 : q.y + q.r + 30, lx = Math.max(78, Math.min(W - 78, q.x));
-      return `<text class="cj-co" x="${lx}" y="${ty}">${esc(clip(q.label, 24))}</text><text class="cj-ro" x="${lx}" y="${ty + 15}">${esc(role(q))}</text>`; };
-    box.innerHTML = `<div class="cj-top"><div class="cj-h"><b>Career trajectory</b><span>Drag across the sky to fly through time · tap a planet</span></div>
+    const role = (q) => sn(q.g.roles.map((r2) => r2.title).filter(Boolean)[0] || "", 24);
+    const lbl = (q) => { const y0 = q.i % 2 === 0 ? q.y - R(q) - 40 : q.y + R(q) + 18;   // even = above, odd = below
+      return `<text class="cj-co" x="${q.x}" y="${y0}">${esc(sn(q.label, 22))}</text><text class="cj-ro" x="${q.x}" y="${y0 + 14}">${esc(role(q))}</text><text class="cj-wh${q.cur ? " cur" : ""}" x="${q.x}" y="${y0 + 28}">${esc(when(q.sp))}</text>`; };
+    box.innerHTML = `<div class="cj-top"><div class="cj-h"><b>Career trajectory</b><span>Drag along the path or tap a planet</span></div>
         <div class="cj-clock" aria-live="polite"><span id="cjDate"></span><small id="cjWhere"></small></div>
         <button type="button" class="cj-go" id="cjGo">Launch</button></div>
       <div class="cj-scroll" id="cjScroll"><svg class="cj-sky" id="cjSky" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Career trajectory: ${esc(P.map((q) => q.label).join(", "))}">
         <g class="cj-stars">${stars}</g>
-        ${years.map((y) => `<line class="cj-yr" x1="${X(y * 12)}" x2="${X(y * 12)}" y1="18" y2="${H - 26}"/><text class="cj-yl" x="${X(y * 12) + 5}" y="${H - 10}">${y}</text>`).join("")}
-        <line class="cj-today" x1="${xToday}" x2="${xToday}" y1="10" y2="${H - 26}"/><text class="cj-tl" x="${xToday > W - 70 ? xToday - 6 : xToday + 6}" y="22"${xToday > W - 70 ? ' text-anchor="end"' : ""}>Today</text>
-        ${P.map((q) => `<rect class="cj-band" x="${X(q.g.span.a)}" y="${q.y - 3}" width="${Math.max(6, X(q.g.span.b + 1) - X(q.g.span.a))}" height="6" rx="3"/>`).join("")}
-        <path class="cj-path" d="${dAll}"/>${nextP ? `<path class="cj-fut" d="${dAll}" style="stroke-dasharray:0 ${lToday} 5 7"/>` : ""}
+        <path class="cj-path" d="${dAll}"/>${nextP ? `<path class="cj-fut" d="${dAll}" style="stroke-dasharray:0 ${lPast} 5 7"/>` : ""}
         <path class="cj-trail" id="cjTrail" d="${dAll}" style="stroke-dasharray:0 ${lAll}"/>
-        ${P.map((q) => `<g class="cj-pl${q.cur ? " cur" : ""} t-${esc(q.type)}" data-i="${q.i}" tabindex="0" role="button" aria-label="${esc(q.label + ", " + role(q))}">
-            ${q.cur ? `<ellipse class="cj-ringo" cx="${q.x}" cy="${q.y}" rx="${q.r + 9}" ry="${(q.r + 9) * 0.32}" transform="rotate(-18 ${q.x} ${q.y})"/>` : ""}
+        ${P.map((q) => `<g class="cj-pl${q.cur ? " cur" : ""} t-${esc(q.type)}" data-i="${q.i}" tabindex="0" role="button" aria-label="${esc(q.label + ", " + (q.g.roles[0].title || "") + ", " + when(q.sp))}">
+            ${q.cur ? `<ellipse class="cj-ringo" cx="${q.x}" cy="${q.y}" rx="${q.r + 8}" ry="${(q.r + 8) * 0.32}" transform="rotate(-18 ${q.x} ${q.y})"/>` : ""}
             <circle class="cj-b" cx="${q.x}" cy="${q.y}" r="${q.r}"/><text class="cj-i" x="${q.x}" y="${q.y + q.r * 0.28}" style="font-size:${(q.r * 0.74).toFixed(1)}px">${esc(initials(q.label))}</text>${lbl(q)}</g>`).join("")}
-        ${nextP ? `<g class="cj-next"><circle cx="${nextP.x}" cy="${nextP.y}" r="${nextP.r}"/><text class="cj-co nx" x="${nextP.x + nextP.r}" y="${nextP.y - nextP.r - 26}">Next</text><text class="cj-ro nx" x="${nextP.x + nextP.r}" y="${nextP.y - nextP.r - 11}">${esc(clip(nextText, 30))}</text></g>` : ""}
+        ${nextP ? `<g class="cj-next"><circle cx="${nextP.x}" cy="${nextP.y}" r="${nextP.r}"/>${(() => { const y0 = (n - 1) % 2 === 0 ? nextP.y - nextP.r - 30 : nextP.y + nextP.r + 18; return `<text class="cj-co nx" x="${nextP.x}" y="${y0}">Next</text><text class="cj-ro nx" x="${nextP.x}" y="${y0 + 14}">${esc(sn(nextText, 24))}</text>`; })()}</g>` : ""}
         <g id="cjShip" class="cj-ship"><path d="M 9 0 L -6 -6 L -3 0 L -6 6 Z"/></g>
       </svg></div>
       <div class="cj-card" id="cjCard"></div>`;
     const sky = box.querySelector("#cjSky"), trail = box.querySelector("#cjTrail"), ship = box.querySelector("#cjShip"), scroller = box.querySelector("#cjScroll");
-    trail.setAttribute("d", dAll); tmp.setAttribute("d", dAll);
-    const mAtX = (x) => Math.round(m0 + (x - PADL) / (W - PADL - PADR) * (mEnd - m0));
+    tmp.setAttribute("d", dAll);
     let S = 0, shown = -1, follow = false;
     function seg(){ for (const sg of segs) if (S >= sg.a0 - 1 && S <= sg.a1 + 1) return sg; return null; }
     function last(){ let r2 = null; for (const sg of segs) if (S >= sg.a0) r2 = sg; return r2; }
     function card(i){ if (i === shown) return; shown = i; const q = P[i]; if (!q) return;
       box.querySelectorAll(".cj-pl").forEach((el) => el.classList.toggle("on", +el.dataset.i === i));
       box.querySelector("#cjCard").innerHTML = `<div class="cj-logo${q.cur ? " cur" : ""}" aria-hidden="true">${esc(initials(q.label))}</div><div class="cj-main">
-        <b data-noi18n>${esc(q.label)}</b>${q.g.roles.map((r2) => `<div class="cj-role"><span data-noi18n>${esc(r2.title || "")}</span>${r2.sp ? `<small>${esc(T.rangeText(r2.sp))}</small>` : ""}</div>`).join("")}</div>
+        <b data-noi18n>${esc(q.label)}</b>${q.g.roles.map((r2) => `<div class="cj-role"><span data-noi18n>${esc(r2.title || "")}</span>${r2.sp ? `<small>${esc(when(r2.sp))}</small>` : ""}</div>`).join("")}</div>
         <a class="cj-det" href="#xp${q.g.roles[0].i}">Details</a>`; }
     function place(){
       S = Math.max(0, Math.min(lAll, S)); trail.style.strokeDasharray = `${S} ${lAll}`;
       const a = tmp.getPointAtLength(S), b = tmp.getPointAtLength(Math.min(lAll, S + 2)), ang = Math.atan2(b.y - a.y, b.x - a.x) * 180 / Math.PI;
       ship.setAttribute("transform", `translate(${a.x.toFixed(1)} ${a.y.toFixed(1)}) rotate(${S >= lAll - 1 ? 0 : ang.toFixed(1)})`);
-      const sg = seg(), lp = last(), m = Math.min(mEnd, mAtX(Math.max(a.x, lp ? X(lp.q.g.span.a) : a.x)));
-      box.querySelector("#cjDate").textContent = S > lToday + 2 ? "Up next" : S >= lToday - 2 ? "Today"
-        : sg ? `${mlab(sg.q.g.span.a)} → ${sg.q.cur ? "now" : mlab(sg.q.g.span.b)}` : mlab(m);
-      box.querySelector("#cjWhere").textContent = sg ? sg.q.label : S > lToday + 2 ? nextText : lp ? "In transit" : "Launch";
+      const sg = seg(), lp = last();
+      box.querySelector("#cjDate").textContent = sg ? when(sg.q.sp) : S > lPast + 2 ? "Up next" : lp ? "In transit" : "Launch";
+      box.querySelector("#cjWhere").textContent = sg ? sn(sg.q.label, 28) : S > lPast + 2 ? sn(nextText, 28) : lp ? `${sn(lp.q.label, 14)} → ${P[lp.q.i + 1] ? sn(P[lp.q.i + 1].label, 14) : "Next"}` : sn(P[0].label, 28);
       if (sg) card(sg.q.i); else if (lp) card(lp.q.i);
       if (follow && scroller.scrollWidth > scroller.clientWidth) { const v = a.x - scroller.scrollLeft; if (v < 60 || v > scroller.clientWidth - 80) scroller.scrollLeft = a.x - scroller.clientWidth / 2; }
     }
@@ -1175,7 +1173,7 @@
     const idle = (t) => { if (!box.isConnected) return;
       if (rest && !drag && !document.hidden) { const one = (rest.a1 - rest.a0) / 1.5; S = rest.a0 + one * 0.5 + ((t / 30) % one); place(); }
       requestAnimationFrame(idle); };
-    // drag across the sky to fly through time
+    // drag along the path to fly through the career
     let drag = null;
     sky.addEventListener("pointerdown", (e) => { const pl = e.target.closest(".cj-pl"); if (pl) return;
       drag = { id: e.pointerId, x0: e.clientX, moved: false }; ++anim; rest = null; sky.classList.add("drag"); });
@@ -1189,9 +1187,9 @@
     box.addEventListener("keydown", (e) => { if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return; e.preventDefault();
       const i = Math.max(0, Math.min(P.length - 1, (shown < 0 ? 0 : shown) + (e.key === "ArrowRight" ? 1 : -1))); goPlanet(i); sky.querySelector(`.cj-pl[data-i="${i}"]`)?.focus(); });
     box.querySelector("#cjGo").addEventListener("click", () => { rest = null; S = 0; place();
-      fly(nextP ? lAll : lToday, reduce ? 0 : Math.min(7000, 2500 + P.length * 700), () => { const c = segs.find((x) => x.q.cur) || segs[segs.length - 1]; if (!nextP) rest = c; }); });
+      fly(nextP ? lAll : lPast, reduce ? 0 : Math.min(7000, 2500 + P.length * 700), () => { const c = segs.find((x) => x.q.cur) || segs[segs.length - 1]; if (!nextP) rest = c; }); });
     // start: resting on the current role (or the latest), trail drawn up to it
-    const startSeg = segs.find((x) => x.q.cur) || segs[segs.length - 1];
+    const startSeg = [...segs].reverse().find((x) => x.q.cur) || segs[segs.length - 1];
     S = (startSeg.a0 + startSeg.a1) / 2; place(); rest = reduce ? null : startSeg;
     if (scroller.scrollWidth > scroller.clientWidth) scroller.scrollLeft = Math.max(0, startSeg.q.x - scroller.clientWidth * 0.55);
     if (!reduce) requestAnimationFrame(idle);

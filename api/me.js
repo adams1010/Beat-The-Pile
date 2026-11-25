@@ -228,6 +228,14 @@ async function autoHandle(uid, profile) {
 export const PROMPTS = ["How I got my first internship", "Best recruiting advice I ever got", "What I wish I knew as a freshman", "A project I'm proud of, and why",
   "Something I'm working on right now", "Why I picked my major", "My go-to interview tip", "Outside of class, you'll find me"];
 const STAFF_ROLES = ["Professor", "Lecturer or instructor", "Academic advisor", "Career center", "Department staff", "Other school staff"];
+/** "3.6", "3.62", "3.6/4.0", "3.62 / 4.00" (scales up to 5 or 10); anything else is dropped. */
+export function gpaTxt(v) {
+  const m = /^(\d{1,2}(?:\.\d{1,3})?)(?:\s*\/\s*(\d{1,2}(?:\.\d{1,2})?))?$/.exec(String(v ?? "").trim());
+  if (!m) return "";
+  const g = +m[1], sc = m[2] ? +m[2] : null;
+  if (sc != null ? !(sc >= 4 && sc <= 10 && g <= sc) : !(g > 0 && g <= 5)) return "";
+  return sc != null ? `${m[1]} / ${m[2]}` : m[1];
+}
 function cleanProfile(p) {
   p = p && typeof p === "object" ? p : {};
   const arr = (a, n) => (Array.isArray(a) ? a : []).slice(0, n);
@@ -238,7 +246,10 @@ function cleanProfile(p) {
     gradYear: Number.isInteger(year) && year >= 2020 && year <= 2040 ? year : null,
     gradTerm: ["Spring", "Summer", "Fall", "Winter"].includes(p.gradTerm) ? p.gradTerm : null,    // Nov 9: December grads pick Winter/Fall
     schoolId: Number.isInteger(+p.schoolId) && +p.schoolId >= 100000 && +p.schoolId <= 999999 ? +p.schoolId : schoolIdFor(p.school),   // IPEDS id (schools/index.json); typed names/aliases resolve too
-    education: arr(p.education, 20).map((x) => ({ school: txt(x?.school, 100), degree: txt(x?.degree, 60), major: txt(x?.major, 80), when: txt(x?.when, 40) })).filter((x) => x.school).slice(0, 5),
+    // Nov 24: more education detail (main school + each extra school): degree, minor, GPA (public only if typed), honors, activities
+    degree: txt(p.degree, 60), minor: txt(p.minor, 80), gpa: gpaTxt(p.gpa), honors: txt(p.honors, 160), activities: txt(p.activities, 200),
+    education: arr(p.education, 20).map((x) => ({ school: txt(x?.school, 100), degree: txt(x?.degree, 60), major: txt(x?.major, 80), when: txt(x?.when, 40),
+      minor: txt(x?.minor, 80), gpa: gpaTxt(x?.gpa), honors: txt(x?.honors, 160), activities: txt(x?.activities, 200) })).filter((x) => x.school).slice(0, 5),
     location: txt(p.location, 80), lookingFor: txt(p.lookingFor, 140), about: txt(p.about, 1200),
     skills: [...new Set(arr(p.skills, 30).map((x) => txt(x, 40)).filter(Boolean))],
     // Nov 15: the personal side (Orbit, coffee chats): hometown, "ask me about", "I can help with", interests, courses, prompts
