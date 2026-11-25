@@ -1,4 +1,4 @@
-/* built from src/home.jsx 187cf50069058918 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 7ce478aa030442c9 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
