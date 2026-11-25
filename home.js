@@ -1,4 +1,4 @@
-/* built from src/home.jsx bc83e574d9161181 — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx 187cf50069058918 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -647,6 +647,7 @@ function HeroMap({
     touchAction: "manipulation"
   };
   return React.createElement("aside", {
+    "data-btp-keep": "",
     style: {
       position: "relative",
       boxSizing: "border-box",

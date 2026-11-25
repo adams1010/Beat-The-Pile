@@ -6,19 +6,155 @@
 (function () {
   if (window.__btpNav) return; window.__btpNav = true;
   // Nov 24 (owner): Appearance in the account menu: Light, Dark, Navy, Gray or Match my device (saved on this device as btp_theme).
-  // Only the LIGHT parts change (white cards, light page, light tints, dark text on them); navy bars, lime and green buttons,
-  // photos and the map stay as they are, like other apps. The work is in /theme.js, loaded only when a dark appearance is on.
   // ?btp_theme=dark sets it from a link (for previews).
   const THEMES = [["light", "Light"], ["dark", "Dark"], ["navy", "Navy"], ["gray", "Gray"], ["device", "Match my device"]];
   const themeGet = () => { try { const q = new URLSearchParams(location.search).get("btp_theme"); if (q && THEMES.some(([k]) => k === q)) localStorage.setItem("btp_theme", q); return localStorage.getItem("btp_theme") || "light"; } catch { return "light"; } };
   const darkMQ = window.matchMedia ? matchMedia("(prefers-color-scheme: dark)") : null;
-  let themeJs = null;
+  // Color engine (Nov 24–25 2026, owner), part of nav.js so it runs before the page first paints.
+  //
+  // Two jobs, same machinery (read each element's computed colors, override inline with !important, remember the page's
+  // own values and put them back when the mode changes):
+  //  • "sky" = the default Light look (owner Nov 25: "way lighter blue, easy on the eyes, keep the top bar navy").
+  //    Navy panels (homepage header, Jobs search deck, page headers, banners, CTAs) become a soft light blue and the text on
+  //    them turns dark (lime text → dark green so it stays readable); the grey page background becomes a very light blue.
+  //    White cards stay white. The top bar (.btpnav), the phone tab bar (.btptab) and [data-btp-keep] (the live map,
+  //    Orbit's sky, the career trajectory: lime dots vanish on light blue) keep their navy.
+  //  • "dark" / "navy" / "gray" = Appearance modes (owner Nov 24: "only change the light parts, like every other app").
+  //    Only LIGHT backgrounds turn dark, only dark text/icons on them turn light, light borders turn dark. Navy, lime,
+  //    green buttons, photos and the map stay as they are.
+  (function () {
+    if (window.btpThemeEngine) return;
+    const PAL = {
+      dark: { page: [15, 17, 21], surf: [24, 27, 34], bord: [44, 49, 60], text: [231, 234, 240], mute: [168, 176, 190] },
+      navy: { page: [11, 20, 48], surf: [21, 33, 72], bord: [44, 60, 108], text: [232, 237, 248], mute: [170, 182, 211] },
+      gray: { page: [43, 45, 49], surf: [54, 57, 63], bord: [76, 80, 88], text: [236, 237, 239], mute: [181, 185, 192] },
+    };
+    const SKY = { panel: [220, 231, 248], panel2: [201, 218, 244], page: [233, 241, 252], page2: [243, 247, 253], bord: [182, 200, 232],
+      ink: [20, 34, 74], mute: [69, 84, 122], green: [58, 90, 0], green2: [74, 112, 0] };
+    let MODE = null, P = null;
+    const touched = new Set(), SET = new WeakMap(), STATE = new WeakMap(), sheetBackups = [];
+    const SKIP = new Set(["IMG", "VIDEO", "CANVAS", "IFRAME", "PICTURE", "SCRIPT", "STYLE", "LINK", "META", "NOSCRIPT", "BR", "SOURCE", "TEMPLATE"]);
+    const KEEP = ".btpnav,.btptab,[data-btp-keep]";
+
+    const parse = (s) => { const m = /rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\)/.exec(s || ""); return m ? [+m[1], +m[2], +m[3], m[4] == null ? 1 : +m[4]] : null; };
+    const hsl = ([r, g, b]) => { r /= 255; g /= 255; b /= 255; const mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2; let h = 0, s = 0;
+      if (mx !== mn) { const d = mx - mn; s = l > 0.5 ? d / (2 - mx - mn) : d / (mx + mn); h = mx === r ? (g - b) / d + (g < b ? 6 : 0) : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; h /= 6; } return [h, s, l]; };
+    const fromHsl = (h, s, l) => { const f = (n) => { const k = (n + h * 12) % 12, a = s * Math.min(l, 1 - l); return Math.round(255 * (l - a * Math.max(-1, Math.min(k - 3, 9 - k, 1)))); }; return [f(0), f(8), f(4)]; };
+    const css = (c, a = 1) => a < 1 ? `rgba(${c[0]},${c[1]},${c[2]},${a})` : `rgb(${c[0]},${c[1]},${c[2]})`;
+
+    // ── dark modes: a light background → its dark counterpart; dark text on light → light ──
+    const darkBg = (c) => { if (!c || c[3] < 0.05) return null; const [h, s, l] = hsl(c);
+      if (l >= 0.97) return css(P.surf, c[3]);
+      if (l >= 0.86 && s < 0.4) return css(P.page, c[3]);
+      if (l >= 0.8) return css(fromHsl(h, Math.min(s, 0.55) * 0.7, 0.19), c[3]);   // a light tint keeps its hue, goes dark
+      return null; };
+    const lightFg = (c) => { if (!c || c[3] < 0.05) return null; const [h, s, l] = hsl(c); if (l > 0.5) return null;
+      if (l < 0.2) return css(P.text, c[3]);                                       // ink (our navy #060A2C too) → plain light text
+      if (s < 0.25) return css(l < 0.3 ? P.text : P.mute, c[3]);
+      return css(fromHsl(h, Math.min(s, 0.75), 0.74), c[3]); };
+    const lightBorder = (c) => { if (!c || c[3] < 0.05) return null; return hsl(c)[2] >= 0.78 ? css(P.bord, c[3]) : null; };
+
+    // ── sky: navy → light blue, grey page → very light blue, light text on (former) navy → dark ──
+    const isNavy = ([h, s, l]) => l < 0.34 && h >= 0.55 && h <= 0.75 && s >= 0.2;
+    const skyBg = (c) => { if (!c || c[3] < 0.05) return null; const x = hsl(c);
+      if (c[3] >= 0.85 && isNavy(x)) return { v: css(x[2] < 0.13 ? SKY.panel : SKY.panel2), conv: true };
+      if (x[2] >= 0.9 && x[2] < 0.985 && x[1] < 0.45 && !(x[0] > 0.15 && x[0] < 0.35 && x[1] > 0.3)) return { v: css(x[2] >= 0.955 ? SKY.page2 : SKY.page, c[3]), conv: false };
+      return null; };
+    const skyFg = (c) => { if (!c || c[3] < 0.05) return null; const [h, s, l] = hsl(c);
+      if (h > 0.15 && h < 0.35 && s > 0.45 && l > 0.38) return css(SKY.green, c[3]);   // lime / light green text → dark green
+      if (l <= 0.55) return null;
+      return css(l > 0.82 ? SKY.ink : SKY.mute, c[3] < 0.6 ? 1 : c[3]); };
+    const skyBorder = (c) => { if (!c || c[3] < 0.05) return null; const [h, s, l] = hsl(c);
+      if (h > 0.15 && h < 0.35 && s > 0.45 && l > 0.3) return css(SKY.green2);       // lime outline → dark green outline
+      if (isNavy([h, s, l]) || l > 0.6 || c[3] < 0.5) return css(SKY.bord);
+      return null; };
+
+    // the page's own inline value for each property we override is kept and put back (React writes inline styles too)
+    function clear(el){ const props = SET.get(el); if (!props) return;
+      for (const [p, [v, pri]] of props) { if (el.style.getPropertyValue(p) !== props.mine.get(p)) continue;   // the page changed it since: keep theirs
+        if (v) el.style.setProperty(p, v, pri); else el.style.removeProperty(p); }
+      SET.delete(el); touched.delete(el); }
+    function put(el, prop, val){ let s = SET.get(el); if (!s) { s = new Map(); s.mine = new Map(); SET.set(el, s); touched.add(el); }
+      if (!s.has(prop)) s.set(prop, [el.style.getPropertyValue(prop), el.style.getPropertyPriority(prop)]);
+      el.style.setProperty(prop, val, "important"); s.mine.set(prop, el.style.getPropertyValue(prop)); }
+    const SIDES = ["top", "right", "bottom", "left"];
+    // st = inherited state: dark modes → "the nearest background is light"; sky → "the nearest background was navy (now light blue)"
+    function paint(el, st){
+      if (SKIP.has(el.tagName)) return;
+      clear(el);
+      if (MODE === "sky" && el.matches && el.matches(KEEP)) { STATE.set(el, false); return; }
+      const cs = getComputedStyle(el), bg = parse(cs.backgroundColor), svg = el instanceof SVGElement;
+      if (MODE === "sky") {
+        if (bg && bg[3] >= 0.05) { let r = skyBg(bg);
+          if (!r && (el === document.body || el === document.documentElement) && hsl(bg)[2] >= 0.9) r = { v: css(SKY.page2), conv: false };   // the page itself, even near-white
+          if (r) put(el, "background-color", r.v); st = r ? r.conv : false; }
+        if (st) { const fg = skyFg(parse(cs.color)); if (fg) put(el, "color", fg);
+          if (svg) { if (cs.fill && cs.fill !== "none") { const f = skyFg(parse(cs.fill)); if (f) put(el, "fill", f); }
+            if (cs.stroke && cs.stroke !== "none") { const f = skyFg(parse(cs.stroke)); if (f) put(el, "stroke", f); } }
+          for (const sd of SIDES) if (parseFloat(cs[`border-${sd}-width`]) > 0) { const b = skyBorder(parse(cs[`border-${sd}-color`])); if (b) put(el, `border-${sd}-color`, b); } }
+      } else {
+        if (bg && bg[3] >= 0.05) { const d = darkBg(bg); st = !!d; if (d) put(el, "background-color", d); }
+        if (st) { const fg = lightFg(parse(cs.color)); if (fg) put(el, "color", fg);
+          if (svg) { if (cs.fill && cs.fill !== "none") { const f = lightFg(parse(cs.fill)); if (f) put(el, "fill", f); }
+            if (cs.stroke && cs.stroke !== "none") { const f = lightFg(parse(cs.stroke)); if (f) put(el, "stroke", f); } } }
+        for (const sd of SIDES) if (parseFloat(cs[`border-${sd}-width`]) > 0) { const b = lightBorder(parse(cs[`border-${sd}-color`])); if (b) put(el, `border-${sd}-color`, b); }
+      }
+      STATE.set(el, st);
+      if (el.tagName === "svg" && el.querySelectorAll("*").length > 150) return;   // maps and charts: leave their insides alone
+      for (const k of el.children) paint(k, st);
+    }
+    const stateOf = (el) => { for (let p = el.parentElement; p; p = p.parentElement) { if (MODE === "sky" && p.matches(KEEP)) return null; if (STATE.has(p)) return STATE.get(p); }
+      return MODE !== "sky"; };
+
+    // our own stylesheets: :hover / :focus / :active rules get the same swap (inline paint can't see hover states). Dark modes only.
+    function sheets(){
+      for (const sh of document.styleSheets) { let rules; try { rules = sh.cssRules; } catch { continue; } walk(rules); }
+      function walk(rules){ for (const r of rules) { if (r.cssRules && !r.selectorText) { walk(r.cssRules); continue; }
+        if (!r.selectorText || !/:(hover|focus|active)/.test(r.selectorText) || r.__btpDone) continue; r.__btpDone = true;
+        const st = r.style, bg = parse(st.backgroundColor), d = darkBg(bg);
+        const fg = !bg || d ? lightFg(parse(st.color)) : null;
+        if (d || fg) { sheetBackups.push([st, st.backgroundColor, st.getPropertyPriority("background-color"), st.color, st.getPropertyPriority("color")]);
+          if (d) st.setProperty("background-color", d, "important"); if (fg) st.setProperty("color", fg, "important"); } } }
+    }
+    function unsheets(){ for (const [st, bg, bp, c, cp] of sheetBackups.splice(0)) { st.setProperty("background-color", bg, bp); st.setProperty("color", c, cp); }
+      for (const sh of document.styleSheets) { try { for (const r of sh.cssRules) delete r.__btpDone; } catch {} } }
+
+    let obs = null, queue = new Set(), raf = 0;
+    function flush(){ raf = 0; if (!MODE) { queue.clear(); return; }
+      const roots = [...queue].filter((el) => el.isConnected && ![...queue].some((o) => o !== el && o.contains(el))); queue.clear();
+      for (const el of roots) { const st = stateOf(el); if (st !== null) paint(el, st); }
+      obs && obs.takeRecords();                    // our own inline writes are not changes to react to
+    }
+    function watch(){
+      obs = new MutationObserver((ms) => { if (!MODE) return;
+        for (const m of ms) { if (m.type === "childList") { for (const n of m.addedNodes) if (n.nodeType === 1) queue.add(n); }
+          else if (m.target.nodeType === 1) queue.add(m.target); }
+        if (queue.size && !raf) raf = requestAnimationFrame(flush); });
+      obs.observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ["class", "style", "aria-pressed", "aria-selected", "aria-expanded", "open", "hidden", "disabled"] });
+    }
+    // pseudo-elements can't be read or painted inline: the few we draw get their colors here
+    const pseudo = document.createElement("style"); pseudo.id = "btpThemePseudo";
+    const PSEUDO_SURF = [".tk-main::before", ".tk-main::after"];
+    function apply(name){
+      const next = name === "sky" ? "sky" : PAL[name] ? name : null;
+      if (MODE) { for (const el of [...touched]) clear(el); unsheets(); }
+      MODE = next; P = PAL[next] || null;
+      document.documentElement.style.colorScheme = P ? "dark" : "";
+      pseudo.textContent = P ? `${PSEUDO_SURF.join(",")}{background:${css(P.surf)}!important}input::placeholder,textarea::placeholder{color:${css(P.mute)}!important;opacity:1}` : "";
+      if (!pseudo.isConnected) (document.head || document.documentElement).appendChild(pseudo);
+      if (!MODE) return;
+      paint(document.documentElement, MODE !== "sky"); if (P) sheets(); obs && obs.takeRecords();
+      if (!obs) { watch();   // stylesheets that finish loading later change colors without a DOM change: look again then
+        const again = () => { if (MODE) { paint(document.documentElement, MODE !== "sky"); obs.takeRecords(); } };
+        document.addEventListener("DOMContentLoaded", again); addEventListener("load", again); }
+    }
+    window.btpThemeEngine = { apply, _t: { darkBg, lightFg, skyBg, skyFg, skyBorder, setP: (n) => { MODE = n; P = PAL[n] || null; } } };
+  })();
+
+  // Light = the "sky" look (light blue, navy top bar kept); Dark / Navy / Gray change only the light parts.
   const themeApply = (t) => { const eff = t === "device" ? (darkMQ && darkMQ.matches ? "dark" : "light") : t;
-    if (eff === "light") { delete document.documentElement.dataset.btpTheme; window.btpThemeEngine && window.btpThemeEngine.apply("light"); return; }
-    document.documentElement.dataset.btpTheme = eff;
-    if (window.btpThemeEngine) return window.btpThemeEngine.apply(eff);
-    themeJs ||= new Promise((ok) => { const sc = document.createElement("script"); sc.src = "/theme.js?v=1"; sc.onload = ok; sc.onerror = ok; (document.head || document.documentElement).appendChild(sc); });
-    themeJs.then(() => window.btpThemeEngine && window.btpThemeEngine.apply(document.documentElement.dataset.btpTheme || "light")); };
+    if (eff === "light") delete document.documentElement.dataset.btpTheme; else document.documentElement.dataset.btpTheme = eff;
+    window.btpThemeEngine.apply(eff === "light" ? "sky" : eff); };
   themeApply(themeGet()); darkMQ && darkMQ.addEventListener && darkMQ.addEventListener("change", () => themeApply(themeGet()));
   window.btpTheme = { list: THEMES, get: themeGet, set: (t) => { try { localStorage.setItem("btp_theme", t); } catch {} themeApply(t); } };
   // Nov 17: AI calls carry the sign-in when there is one, so signed-in students get their own AI pool (api/generate.js)

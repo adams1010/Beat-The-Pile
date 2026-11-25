@@ -160,7 +160,7 @@ function HeroMap({near,fresh,sum,sumErr}){
   }
   const dr=(n)=>(1.6+Math.sqrt(n)*1.05)/Math.pow(zoom,0.85);
   const btn={font:"inherit",fontSize:14,fontWeight:600,background:"#0E1440",color:"#fff",border:"1px solid #2A3B5C",borderRadius:8,minWidth:40,height:40,cursor:"pointer",touchAction:"manipulation"};
-  return(<aside style={{position:"relative",boxSizing:"border-box",background:"#0E1440",border:"1px solid #2A3B5C",borderRadius:10,padding:"18px 18px 14px",boxShadow:"none",...DM}}>
+  return(<aside data-btp-keep="" style={{position:"relative",boxSizing:"border-box",background:"#0E1440",border:"1px solid #2A3B5C",borderRadius:10,padding:"18px 18px 14px",boxShadow:"none",...DM}}>
     {/* One live number for the whole hero (Nov 15): the same "open jobs" total as /api/listings?summary=1, no second count above the headline */}
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",flexWrap:"wrap",gap:"4px 12px",fontFamily:"Geist,sans-serif"}}>
       <span style={{fontSize:14,fontWeight:600,color:"#fff"}}><span style={{display:"inline-block",width:7,height:7,borderRadius:"50%",background:"#B0F701",marginRight:8,verticalAlign:1}}/>
