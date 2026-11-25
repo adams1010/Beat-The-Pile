@@ -30,6 +30,7 @@
     try { sessionStorage.setItem(KEY, JSON.stringify({ t: Date.now(), m })); } catch {}
     ready(m);
   }).catch(() => ready({}));
-  new MutationObserver((ms) => { if (!map) return; for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1) { if (n.matches && n.matches("[data-logo-id]")) watch(n); scan(n); } })
-    .observe(document.documentElement, { childList: true, subtree: true });
+  new MutationObserver((ms) => { if (!map) return; for (const m of ms) { if (m.type === "attributes") { watch(m.target); continue; }   // Nov 24: an id set later (profile tiles)
+      for (const n of m.addedNodes) if (n.nodeType === 1) { if (n.matches && n.matches("[data-logo-id]")) watch(n); scan(n); } } })
+    .observe(document.documentElement, { childList: true, subtree: true, attributes: true, attributeFilter: ["data-logo-id"] });
 })();

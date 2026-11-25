@@ -20,6 +20,7 @@ assert.equal((api.match(/field=in\.\(\$\{p\.field\}\)/g) || []).length, 2, "both
 const page = readFileSync(new URL("../jobs/index.html", import.meta.url), "utf8");
 assert.ok(page.includes('id="majorIn"') && page.includes("/pick.js") && page.includes("/jobs/majors.json"));
 console.log(`✓ major box: ${list.length} majors, ${quiz.length} quiz majors present, multi-area filter on`);
-// Nov 19: company grouping on /jobs (3+ roles → one card with "+N more roles", toggle remembered)
-assert.ok(page.includes("GROUP_MIN = 3") && page.includes('id="grpOff"') && page.includes("btp_group") && page.includes('class="roles"'));
-console.log("✓ /jobs groups companies with 3+ roles into one card");
+// Nov 24 (owner): no company grouping on /jobs: every role is its own card, no toggle; no "Hiring most right now"; tools on the right
+assert.ok(!page.includes("GROUP_MIN") && !page.includes('id="grpOff"') && page.includes("const groupOn = false"), "no grouping");
+assert.ok(!page.includes("Hiring most right now") && page.includes("data-btp-tools"), "tools rail, no hiring-most list");
+console.log("✓ /jobs: every role its own card, tools on the right");

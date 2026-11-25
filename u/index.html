@@ -224,7 +224,7 @@
   .cpo b{display:block;font-weight:600;font-size:14.5px}.cpo small{display:block;color:#5E6A80;font-size:12.5px}
   .cpo.plain{border-top:1px solid #EEF1F6;border-radius:0 0 8px 8px}
   .cpt{flex:none;width:32px;height:32px;border-radius:8px;background:#EEF1F6;color:#1E3A8A;display:grid;place-items:center;font-weight:700;font-size:12px;overflow:hidden}
-  .cpt img{width:100%;height:100%;object-fit:contain;background:#fff}
+  .cpt img{width:100%;height:100%;object-fit:contain;background:#fff}.cpt-l{width:100%;height:100%;display:grid;place-items:center}
   .tl-logo.has-img{background:#fff;border:1px solid #DCE2EC;padding:4px;overflow:hidden}.tl-logo img{width:100%;height:100%;object-fit:contain}
   .tl-vrow{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;margin-top:6px;font-size:13px}.tl-vrow .hire a{margin-top:0}
   .tl-vrow a{color:#4A7000;font-weight:600}
@@ -339,6 +339,7 @@
 </head>
 <body>
 <script src="/nav.js"></script>
+<script src="/logos.js" defer></script>
 <script type="module">import * as T from "/lib/timeline.js"; window.btpTL = T; dispatchEvent(new Event("btptl"));</script>
 <script src="/resume-file.js"></script>
 <script src="/pick.js"></script>
@@ -975,7 +976,27 @@
   async function coSearch(q){ q = q.trim(); if (CO_CACHE.has(q)) return CO_CACHE.get(q);
     const p = fetch("/api/me?cosearch=" + encodeURIComponent(q)).then((r) => r.ok ? r.json() : { companies: [] }).then((d) => (d.companies || []).slice(0, 8)).catch(() => []);
     CO_CACHE.set(q, p); return p; }
-  const coTile = (c) => c.logo ? `<img alt="" src="${esc(c.logo)}" referrerpolicy="no-referrer" onerror="this.remove()">` : esc(initials(c.name));
+  // Nov 24 (owner: typing "HITT Contracting" should offer it with its logo): companies we track show in the picker with the
+  // logo the Logo Finder proved (/logos.js swaps the initials), and a profile entry naming a tracked company gets that logo.
+  // Never labeled "Verified company": that still needs a claimed company page (orgId stays empty for these).
+  let TRACKED = null;
+  function trackedCos(){ if (TRACKED) return TRACKED;
+    TRACKED = (async () => { const K = "btp_tracked_v1"; try { const c = JSON.parse(sessionStorage.getItem(K) || "null"); if (c && Date.now() - c.t < 6 * 3600e3) return c.l; } catch {}
+      const l = await fetch("/api/listings?names=1").then((r) => r.ok ? r.json() : { companies: [] }).then((d) => (d.companies || []).map((c) => [c.id, c.company])).catch(() => []);
+      try { sessionStorage.setItem(K, JSON.stringify({ t: Date.now(), l })); } catch {} return l; })();
+    return TRACKED; }
+  const coNorm = (x) => String(x || "").toLowerCase().replace(/(inc|llc|corp(oration)?|co|company|the|ltd|group)/g, "").replace(/[^a-z0-9]/g, "");
+  async function trackedSearch(q){ const n = coNorm(q); if (n.length < 2) return [];
+    const l = await trackedCos(), words = q.toLowerCase().split(/s+/).filter(Boolean);
+    return l.filter(([, name]) => { const parts = name.toLowerCase().split(/[^a-z0-9]+/); return coNorm(name).startsWith(n) || words.every((w) => parts.some((x) => x.startsWith(w))); })
+      .sort((a, b) => a[1].length - b[1].length).slice(0, 6).map(([id, name]) => ({ name, logoId: id })); }
+  async function trackedLogos(){
+    const tiles = [...document.querySelectorAll(".tl-logo[data-org-name]")].filter((el) => el.dataset.orgName && !el.dataset.logoId && !el.classList.contains("has-img")); if (!tiles.length) return;
+    const m = new Map((await trackedCos()).map(([id, name]) => [coNorm(name), id]));
+    tiles.forEach((el) => { const id = m.get(coNorm(el.dataset.orgName)); if (!id || !el.isConnected || el.classList.contains("has-img")) return;
+      el.dataset.logoId = id; });   // /logos.js watches this attribute and swaps in the proven logo
+  }
+  const coTile = (c) => c.logoId ? `<span class="cpt-l" data-logo-id="${esc(c.logoId)}">${esc(initials(c.name))}</span>` : c.logo ? `<img alt="" src="${esc(c.logo)}" referrerpolicy="no-referrer" onerror="this.remove()">` : esc(initials(c.name));
   function wireCompanyPick(main, d){
     main.querySelectorAll("[data-cpick]").forEach((inp) => {
       const i = +inp.dataset.cpick, box = main.querySelector(`[data-cpbox="${i}"]`), chip = main.querySelector(`[data-cpv="${i}"]`);
@@ -984,14 +1005,15 @@
       const pick = (c) => { const it = d.p.experience[i]; it.org = c.name; it.orgId = c.key || ""; inp.value = c.name; chip.hidden = !c.key; close(); };
       const paint = () => {
         const typed = inp.value.trim();
-        box.innerHTML = opts.map((c, k) => `<button type="button" class="cpo${k === sel ? " on" : ""}" role="option" data-k="${k}"><span class="cpt" aria-hidden="true">${coTile(c)}</span><span><b data-noi18n>${esc(c.name)}</b><small>Verified company</small></span></button>`).join("")
+        box.innerHTML = opts.map((c, k) => `<button type="button" class="cpo${k === sel ? " on" : ""}" role="option" data-k="${k}"><span class="cpt" aria-hidden="true">${coTile(c)}</span><span><b data-noi18n>${esc(c.name)}</b><small>${c.key ? "Verified company" : "Company"}</small></span></button>`).join("")
           + (typed ? `<button type="button" class="cpo plain" role="option" data-k="typed"><span><b>Use “<span data-noi18n>${esc(typed)}</span>”</b><small>Not a verified company yet, so it shows as plain text</small></span></button>` : "");
         box.hidden = !box.innerHTML; inp.setAttribute("aria-expanded", String(!box.hidden));
         box.querySelectorAll(".cpo").forEach((b) => b.onmousedown = (e) => { e.preventDefault(); pick(b.dataset.k === "typed" ? { name: inp.value.trim() } : opts[+b.dataset.k]); });
       };
       inp.addEventListener("input", () => { d.p.experience[i].orgId = ""; chip.hidden = true; clearTimeout(t);
         const q = inp.value.trim(); if (q.length < 2) { opts = []; close(); return; }
-        t = setTimeout(async () => { const r = await coSearch(q); if (inp.value.trim() !== q) return; opts = r; sel = r.length ? 0 : -1; paint(); }, 220); });
+        t = setTimeout(async () => { const [r, tr] = await Promise.all([coSearch(q), trackedSearch(q)]); if (inp.value.trim() !== q) return;
+          opts = [...r, ...tr.filter((x) => !r.some((v) => coNorm(v.name) === coNorm(x.name)))].slice(0, 8); sel = opts.length ? 0 : -1; paint(); }, 220); });
       inp.addEventListener("keydown", (e) => { if (box.hidden) return;
         if (e.key === "ArrowDown" || e.key === "ArrowUp") { e.preventDefault(); sel = Math.max(0, Math.min(opts.length - 1, sel + (e.key === "ArrowDown" ? 1 : -1))); paint(); }
         else if (e.key === "Enter" && opts[sel]) { e.preventDefault(); pick(opts[sel]); }
@@ -1014,7 +1036,7 @@
       const c = (el.dataset.orgId && byId.get(el.dataset.orgId)) || byName.get(el.dataset.orgName.toLowerCase()); if (!c) return;
       if (c.logo && !el.querySelector("img")) { const img = new Image(); img.alt = ""; img.referrerPolicy = "no-referrer";
         img.onload = () => { if (img.naturalWidth <= 16 && /favicons/.test(c.logo)) return; el.textContent = ""; el.appendChild(img); el.classList.add("has-img"); }; img.src = c.logo; }
-      const v = el.closest(".tl-card")?.querySelector("[data-org-v]");
+      const v = el.closest(".tl-card, .tk")?.querySelector("[data-org-v]");
       if (v && !v.innerHTML) v.innerHTML = `<span class="tl-ver">Verified company</span>${c.page ? ` <a href="${esc(c.page)}">Company page</a>` : ""}`;
     });
   }
@@ -1072,7 +1094,7 @@
            <div class="tk-body">${bullets(top.desc)}${story(top)}</div>`;
       return `<div class="tk${cur ? " cur" : ""}">${stub(g, cur, k)}<div class="tk-main">${body}</div></div>`;
     }).join("");
-    setTimeout(hiringNow, 0); setTimeout(() => verifyOrgs(xs), 0);
+    setTimeout(hiringNow, 0); setTimeout(() => verifyOrgs(xs), 0); setTimeout(trackedLogos, 0);
     setTimeout(() => careerOrbit(groups, p, nextText), 0);
     // Nov 24 (owner): no Experience / Companies / Internships number tiles under the trajectory
     // Nov 24 (owner): the passes first, the career trajectory (the animated flight) underneath them

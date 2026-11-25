@@ -1,4 +1,4 @@
-/* built from src/home.jsx 6f6bb5c89bcbfe3f — do not edit; run node scripts/build-home.mjs */
+/* built from src/home.jsx c592f564de5dd718 — do not edit; run node scripts/build-home.mjs */
 const {
   useState,
   useEffect,
@@ -1120,7 +1120,6 @@ function LandingD({
   };
   const fmt = n => n == null ? "—" : Number(n).toLocaleString();
   const fields = sum?.byField ? Object.entries(sum.byField).filter(([k]) => D_FIELD[k]).sort((a, b) => b[1] - a[1]).slice(0, 8) : null;
-  const pills = ["finance", "software", "mechanical", "marketing", "civil", "science_health"];
   const card = {
     background: "#fff",
     border: "1px solid #DCE2EC",
@@ -1157,7 +1156,7 @@ function LandingD({
     }
   }, React.createElement("h1", {
     style: {
-      fontSize: "clamp(2.3rem,5vw,3.6rem)",
+      fontSize: "clamp(2.6rem,5.6vw,4.2rem)",
       lineHeight: 1.03,
       letterSpacing: "-0.035em",
       fontWeight: 600,
@@ -1291,33 +1290,6 @@ function LandingD({
       minHeight: 48
     }
   }, "Search")), React.createElement("div", {
-    className: "d-pop",
-    style: {
-      display: "flex",
-      gap: 8,
-      flexWrap: "wrap",
-      marginTop: 16,
-      alignItems: "center"
-    }
-  }, React.createElement("span", {
-    style: {
-      fontSize: 13,
-      color: "#8D9AB3",
-      marginRight: 4,
-      flex: "none"
-    }
-  }, "Popular:"), pills.map(k => React.createElement("a", {
-    key: k,
-    href: `/jobs/?major=${k}&state=all`,
-    style: {
-      fontSize: 13,
-      color: "#CFD7E6",
-      textDecoration: "none",
-      border: "1px solid #22304D",
-      padding: "6px 12px",
-      borderRadius: 999
-    }
-  }, D_FIELD[k].split(" & ")[0]))), React.createElement("div", {
     className: "d-quizrow",
     style: {
       display: "flex",
@@ -1356,7 +1328,7 @@ function LandingD({
   }, "90-second demo"))), found && found.left > 0 && React.createElement("p", {
     className: "d-found",
     style: {
-      fontSize: 13.5,
+      fontSize: 16.5,
       color: "#CFD7E6",
       marginTop: 10,
       display: "flex",
@@ -1393,14 +1365,18 @@ function LandingD({
     sum: sum,
     sumErr: sumErr
   })))), React.createElement("main", {
-    className: "d-main",
+    className: "d-main d-cols",
     style: {
       ...wrap,
       paddingTop: 40,
-      paddingBottom: 64,
+      paddingBottom: 64
+    }
+  }, React.createElement("div", {
+    style: {
       display: "flex",
       flexDirection: "column",
-      gap: 40
+      gap: 40,
+      minWidth: 0
     }
   }, React.createElement("section", null, React.createElement("div", {
     style: {
@@ -1445,183 +1421,19 @@ function LandingD({
     }
   }, React.createElement("span", {
     style: {
-      fontWeight: 500
+      fontWeight: 600,
+      fontSize: 17.5
     }
   }, D_FIELD[k]), React.createElement("span", {
     style: {
       ...DM,
-      fontSize: 13,
+      fontSize: 15,
       color: "#55627A"
     }
-  }, n == null ? "" : fmt(n)))))), sum?.top?.length > 0 && React.createElement("section", null, React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "baseline",
-      marginBottom: 16,
-      gap: 12
-    }
-  }, React.createElement("h2", {
-    style: {
-      fontSize: 24,
-      fontWeight: 600,
-      letterSpacing: "-0.02em",
-      margin: 0,
-      color: "#060A2C"
-    }
-  }, "Hiring the most interns right now"), React.createElement("a", {
-    href: "/radar/",
-    style: {
-      fontSize: 14,
-      color: "#4A7000",
-      textDecoration: "none",
-      fontWeight: 500
-    }
-  }, "When companies open \u2192")), React.createElement("div", {
-    className: "d-grid4"
-  }, sum.top.slice(0, 4).map((c, i) => React.createElement("article", {
-    key: c.id,
-    className: i >= 2 ? "d-more" : undefined,
-    style: {
-      ...card,
-      padding: 20,
-      display: "flex",
-      flexDirection: "column",
-      gap: 12
-    }
-  }, React.createElement("div", {
-    style: {
-      display: "flex",
-      gap: 12,
-      alignItems: "center"
-    }
-  }, React.createElement("span", {
-    "data-logo-id": c.id,
-    style: {
-      width: 44,
-      height: 44,
-      borderRadius: 10,
-      background: "#F1F4F9",
-      border: "1px solid #DCE2EC",
-      display: "grid",
-      placeItems: "center",
-      fontWeight: 600,
-      flexShrink: 0,
-      color: "#060A2C"
-    }
-  }, coInitials(c.company)), React.createElement("p", {
-    style: {
-      fontWeight: 600,
-      margin: 0,
-      color: "#060A2C"
-    }
-  }, c.company)), React.createElement("div", {
-    style: {
-      fontSize: 13,
-      borderTop: "1px solid #EEF1F6",
-      paddingTop: 12,
-      color: "#060A2C"
-    }
-  }, React.createElement("b", {
-    style: {
-      ...DM,
-      fontWeight: 500
-    }
-  }, c.n), " open internships"), React.createElement("a", {
-    href: `/c/${encodeURIComponent(c.id)}`,
-    style: {
-      fontSize: 13,
-      fontWeight: 600,
-      color: "#4A7000",
-      textDecoration: "none"
-    }
-  }, "See internships \u2192"))))), React.createElement("section", null, React.createElement("div", {
-    style: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "baseline",
-      marginBottom: 16,
-      gap: 12
-    }
-  }, React.createElement("h2", {
-    style: {
-      fontSize: 24,
-      fontWeight: 600,
-      letterSpacing: "-0.02em",
-      margin: 0,
-      color: "#060A2C"
-    }
-  }, "What we offer"), React.createElement("a", {
-    href: "/demo/",
-    style: {
-      fontSize: 14,
-      color: "#4A7000",
-      textDecoration: "none",
-      fontWeight: 500
-    }
-  }, "See it in the 2-minute tour \u2192")), React.createElement("div", {
-    style: {
-      ...card,
-      padding: "4px 20px"
-    }
-  }, React.createElement("ul", {
-    className: "d-offer",
-    style: {
-      listStyle: "none",
-      margin: 0,
-      padding: 0,
-      display: "grid",
-      gridTemplateColumns: "repeat(auto-fit,minmax(min(300px,100%),1fr))",
-      columnGap: 32
-    }
-  }, FEATURES.map((f, i) => React.createElement("li", {
-    key: f.k,
-    className: i >= 4 ? "d-more" : undefined,
-    style: {
-      borderBottom: "1px solid #EEF1F6",
-      padding: "14px 0"
-    }
-  }, React.createElement("a", {
-    href: f.h,
-    onClick: f.pg ? e => {
-      e.preventDefault();
-      onPage(f.pg);
-      window.scrollTo(0, 0);
-    } : undefined,
-    style: {
-      textDecoration: "none",
-      color: "#060A2C",
-      display: "block"
-    }
-  }, React.createElement("span", {
-    style: {
-      fontSize: 15,
-      fontWeight: 600
-    }
-  }, f.name), React.createElement("span", {
-    style: {
-      color: "#4A7000",
-      fontWeight: 600
-    }
-  }, " \xB7 ", f.t), React.createElement("span", {
-    style: {
-      display: "block",
-      fontSize: 14,
-      lineHeight: 1.5,
-      color: "#55627A",
-      marginTop: 3
-    }
-  }, f.d))))), React.createElement("a", {
-    className: "d-phoneonly",
-    href: "/demo/",
-    style: {
-      padding: "12px 0 14px",
-      fontSize: 14,
-      fontWeight: 600,
-      color: "#4A7000",
-      textDecoration: "none"
-    }
-  }, "See everything we offer in the 2-minute tour \u2192")))), React.createElement("footer", {
+  }, n == null ? "" : fmt(n))))))), React.createElement("aside", {
+    className: "d-tools",
+    "data-btp-tools": ""
+  })), React.createElement("footer", {
     style: {
       textAlign: "center",
       padding: "1.5rem",

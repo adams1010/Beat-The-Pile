@@ -61,6 +61,7 @@ body{min-height:100vh}
 @keyframes dblink{50%{opacity:.25}}
 @keyframes dtick{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .d-blink{animation:dblink 1.6s infinite}.d-tick{animation:dtick 45s linear infinite}.d-tick:hover{animation-play-state:paused}
+/* Nov 24 (owner): homepage content + a Tools column on the right (filled by nav.js) */ .d-cols{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px;align-items:start}.d-tools{position:sticky;top:84px}@media (max-width:1000px){.d-cols{grid-template-columns:minmax(0,1fr)}.d-tools{position:static}}
 .d-grid4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.d-grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}@media(max-width:600px){.d-mapbadge{position:static!important;display:inline-block;margin-top:8px}}.d-feat:hover{border-color:#B9C3D3}
 @media (max-width:900px){.d-grid4{grid-template-columns:repeat(2,minmax(0,1fr))}.d-grid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:560px){.d-search{flex-direction:column}.d-search .d-sep{width:auto!important;height:1px;margin:0 10px!important}.d-grid4{grid-template-columns:1fr}.d-grid3{grid-template-columns:1fr}}

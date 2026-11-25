@@ -361,6 +361,7 @@
         <div class="stats"><div><b id="stSaved">0</b><span>saved</span></div><div><b id="stApplied">0</b><span>applied</span></div><div><b id="stFollow">0</b><span>following</span></div></div>
         <p style="margin:12px 0 0;font-size:13px"><a href="/season/" style="color:var(--green);text-decoration:none;font-weight:500">Open My Season →</a></p>
       </section>
+      <section class="panel" id="soonBox" hidden><h3>Opening soon</h3><p class="est">Estimates from past seasons</p><div id="soon"></div><p style="margin:10px 0 0;font-size:13px"><a href="/radar/" style="color:var(--green);text-decoration:none;font-weight:500">Opening Radar →</a></p></section>
     </aside>
     <div class="feed">
       <section class="panel welcome" id="welcome" hidden aria-labelledby="welcomeH">
@@ -414,9 +415,8 @@
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
       </div>
     </div>
-    <aside class="rail right" aria-label="Right now">
-      <section class="panel"><h3>Hiring most right now</h3><div id="topCos"></div></section>
-      <section class="panel" id="soonBox" hidden><h3>Opening soon</h3><p class="est">Estimates from past seasons</p><div id="soon"></div><p style="margin:10px 0 0;font-size:13px"><a href="/radar/" style="color:var(--green);text-decoration:none;font-weight:500">Opening Radar →</a></p></section>
+    <aside class="rail right" aria-label="Tools">
+      <section data-btp-tools></section>
     </aside>
   </div>
 </main>
@@ -456,9 +456,6 @@
     try { const m = JSON.parse(store.get("iq_session") || "{}")?.ans?.major || ""; if (/engineer/i.test(m)) return /mechanical|aerospace/i.test(m) ? "mechanical" : "eng"; } catch {}
     return "all";
   }
-  const GROUP_MIN = 3;   // Nov 19: roles at one company before they fold into one card
-  document.addEventListener("click", (e) => { const b = e.target.closest && e.target.closest("#grpOff,#grpOn"); if (!b) return;
-    store.set("btp_group", b.id === "grpOff" ? "off" : "on"); LIST.sig = ""; render(); });
   const majorParam = () => state.major === "eng" ? "" : `field=${encodeURIComponent(state.major)}`;
 
   function cleanOne(s){
@@ -555,12 +552,6 @@
       + (u ? `<p class="nm">${esc(nm)}</p><p class="sb">Looking at ${esc(MAJOR_LABEL())}</p><a href="/u/">${photo ? "View &amp; edit profile" : "Add a photo &amp; build your profile →"}</a>`
            : `<p class="nm">Save, follow &amp; track</p><p class="sb">Save jobs and follow companies right away, no account needed. Sign in to keep them on every device.</p>${state.clerk ? `<button class="lnk" id="profSignIn">Sign in →</button>` : ""}`) + `</div>`;
     const b = $("profSignIn"); if (b) b.onclick = () => state.clerk.openSignIn();
-    // who's hiring the most in what you're looking at
-    const per = new Map();
-    for (const j of state.all) if (inView(j)) { const k = j.company_id || j.company; const e = per.get(k) || { n: 0, j }; e.n++; per.set(k, e); }
-    const top = [...per.values()].sort((a, b) => b.n - a.n).slice(0, 6);
-    $("topCos").innerHTML = top.length ? top.map(({ n, j }) => `<a class="rrow" href="${coHref(j)}"><span class="lg" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</span><span class="rn">${esc(j.company)}</span></a>`).join("")
-      : `<p style="font-size:13px;color:var(--muted);margin:0">Nothing in this view yet.</p>`;
     loadSoon();
   }
   let soonLoaded = false;
@@ -736,17 +727,15 @@
     if (sig !== LIST.sig) { LIST.sig = sig; LIST.shown = PAGE; }
     // Nov 19 (owner): a company with 3+ matching roles shows as ONE card (its best match) with "+N more roles" under it.
     // Role cards stay the default for everyone else; "Show every role separately" turns it off (remembered on this device).
-    const groupOn = !state.company && !state.savedOnly && !state.followOnly && store.get("btp_group") !== "off";
+    const groupOn = false;   // Nov 24 (owner): every role is its own card, always (no "3+ roles as one card", no toggle)
     const grouped = (list) => { const key = (j) => j.company_id || j.company, n = new Map();
       for (const j of list) n.set(key(j), (n.get(key(j)) || 0) + 1);
       const lead = new Map(), out = [];
-      for (const j of list) { const k = key(j); if ((n.get(k) || 0) < GROUP_MIN) { out.push(j); continue; }
+      for (const j of list) { const k = key(j); if ((n.get(k) || 0) < 3) { out.push(j); continue; }
         if (!lead.has(k)) { const g = { ...j, _more: [] }; lead.set(k, g); out.push(g); } else lead.get(k)._more.push(j); }
       return out; };
     const mainRows = groupOn ? grouped(rows) : rows, nGrouped = mainRows.filter((j) => j._more).length;
-    const canGroup = !state.company && !state.savedOnly && !state.followOnly && grouped(rows).some((j) => j._more);
-    const grpBar = !canGroup ? "" : groupOn ? `<div class="grpbar">Companies with ${GROUP_MIN}+ roles here show as one card. <button class="linkbtn" id="grpOff" type="button">Show every role separately</button></div>`
-      : `<div class="grpbar"><button class="linkbtn" id="grpOn" type="button">Group roles by company</button></div>`;
+    const grpBar = "";
     LIST.rows = mainRows.concat(simRows, relRows); LIST.tpl = tpl;
     const fixedNote = S.fixed ? `<div class="simhead"><b>Showing results for “${esc(S.fixed)}”</b><span>You typed “${esc(state.q)}”.</span></div>` : "";
     const KNAME = { intern: "Internships", fulltime: "Entry-level", hourly: "Part-time & hourly", shadow: "Shadowing & volunteer" };

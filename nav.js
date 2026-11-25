@@ -5,6 +5,22 @@
 // If the page has an #acct element (its sign-in / sign-out widget), it is moved into the bar's right side.
 (function () {
   if (window.__btpNav) return; window.__btpNav = true;
+  // Nov 24 (owner): Appearance in the account menu: Light, Dark, Navy, Gray or Match my device (saved on this device as btp_theme).
+  // Only the LIGHT parts change (white cards, light page, light tints, dark text on them); navy bars, lime and green buttons,
+  // photos and the map stay as they are, like other apps. The work is in /theme.js, loaded only when a dark appearance is on.
+  // ?btp_theme=dark sets it from a link (for previews).
+  const THEMES = [["light", "Light"], ["dark", "Dark"], ["navy", "Navy"], ["gray", "Gray"], ["device", "Match my device"]];
+  const themeGet = () => { try { const q = new URLSearchParams(location.search).get("btp_theme"); if (q && THEMES.some(([k]) => k === q)) localStorage.setItem("btp_theme", q); return localStorage.getItem("btp_theme") || "light"; } catch { return "light"; } };
+  const darkMQ = window.matchMedia ? matchMedia("(prefers-color-scheme: dark)") : null;
+  let themeJs = null;
+  const themeApply = (t) => { const eff = t === "device" ? (darkMQ && darkMQ.matches ? "dark" : "light") : t;
+    if (eff === "light") { delete document.documentElement.dataset.btpTheme; window.btpThemeEngine && window.btpThemeEngine.apply("light"); return; }
+    document.documentElement.dataset.btpTheme = eff;
+    if (window.btpThemeEngine) return window.btpThemeEngine.apply(eff);
+    themeJs ||= new Promise((ok) => { const sc = document.createElement("script"); sc.src = "/theme.js?v=1"; sc.onload = ok; sc.onerror = ok; (document.head || document.documentElement).appendChild(sc); });
+    themeJs.then(() => window.btpThemeEngine && window.btpThemeEngine.apply(document.documentElement.dataset.btpTheme || "light")); };
+  themeApply(themeGet()); darkMQ && darkMQ.addEventListener && darkMQ.addEventListener("change", () => themeApply(themeGet()));
+  window.btpTheme = { list: THEMES, get: themeGet, set: (t) => { try { localStorage.setItem("btp_theme", t); } catch {} themeApply(t); } };
   // Nov 17: AI calls carry the sign-in when there is one, so signed-in students get their own AI pool (api/generate.js)
   if (!window.__btpGenFetch) { window.__btpGenFetch = true; const F = window.fetch.bind(window);
     window.fetch = async (u, o = {}) => {
@@ -278,6 +294,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
           <div id="btpAccts"></div>
           <div class="sep"></div>
           <div class="langs"><label for="btpLangSel"><b>Language</b></label><select id="btpLangSel" class="langsel" data-noi18n>${LANGS.map(([k, n]) => `<option value="${k}"${k === LANG ? " selected" : ""}>${n}</option>`).join("")}</select></div>
+          <div class="langs"><label for="btpThemeSel"><b>Appearance</b></label><select id="btpThemeSel" class="langsel">${THEMES.map(([k, n]) => `<option value="${k}"${k === themeGet() ? " selected" : ""}>${n}</option>`).join("")}</select></div>
           <div class="sep"></div>
           <a role="menuitem" href="#" data-btp-signout>Sign out</a>
         </div></details></div></div>`;
@@ -423,6 +440,7 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
       document.addEventListener("keydown", (e) => { if (e.key === "Escape") det.open = false; });
       addEventListener("resize", () => det.open && place());
       det.querySelectorAll(".menu a").forEach((a) => a.addEventListener("click", () => { det.open = false; }));
+      det.querySelector("#btpThemeSel")?.addEventListener("change", (e) => window.btpTheme.set(e.target.value));
       det.querySelector("#btpLangSel")?.addEventListener("change", (e) => {   // Nov 18 (owner): a dropdown, not a row of buttons
         const l = e.target.value; if (window.btpI18n) window.btpI18n.set(l); else { try { localStorage.setItem("btp_lang", l); } catch {} location.reload(); } });
       det.addEventListener("click", async (e) => {
@@ -549,4 +567,20 @@ body.btp-has-nav header .top,body.btp-has-nav header .topbar{display:none}
     C.addListener && C.addListener(({ user }) => { ACCT.user = user || null; window.btpNavMe(); const id = user?.id || null; if (id === lastU) return; lastU = id;
       try { sessionStorage.removeItem("btp_orbit_n"); } catch {} if (!user) paintBadge(0); else setTimeout(() => orbitBadge(C, true), 300); });
   }, 500);
+  // Nov 24 (owner): the tools always sit in a column on the right of Home, Jobs and Career Fair. A page marks the spot with
+  // [data-btp-tools]; this fills it with the same list as the Tools menu (React pages render later, so watch for it).
+  if (TOOLS.length) {
+    const st = document.createElement("style");
+    st.textContent = `.btptools{background:#fff;border:1px solid #DCE2EC;border-radius:10px;padding:14px 14px 8px}
+.btptools h3{margin:0 0 8px;font:600 15px/1.3 Geist,system-ui,sans-serif;color:#060A2C}
+.btptools a{display:flex;gap:10px;align-items:flex-start;padding:9px 6px;border-radius:8px;text-decoration:none;color:#060A2C;border-top:1px solid #EEF1F6}
+.btptools a:first-of-type{border-top:0}.btptools a:hover{background:#F2F5FA}
+.btptools .btpic{width:20px;height:20px;flex:none;color:#4A7000;margin-top:1px}
+.btptools b{display:block;font:600 14.5px/1.3 Geist,system-ui,sans-serif}.btptools small{display:block;font-size:12.5px;line-height:1.35;color:#55627A;margin-top:1px}`;
+    document.head.appendChild(st);
+    const fill = (el) => { el.dataset.done = "1"; el.classList.add("btptools"); el.setAttribute("aria-label", "Tools");
+      el.innerHTML = `<h3>Tools</h3>${TOOLS.map(([h, t, d]) => `<a href="${h}">${svg(TOOL_ICON[h] || "tools")}<span><b>${t}</b><small>${d}</small></span></a>`).join("")}`; };
+    let q = 0; const mount = () => { q = 0; document.querySelectorAll("[data-btp-tools]:not([data-done])").forEach(fill); };
+    mount(); new MutationObserver(() => { if (!q) q = requestAnimationFrame(mount); }).observe(document.documentElement, { childList: true, subtree: true });
+  }
 })();
