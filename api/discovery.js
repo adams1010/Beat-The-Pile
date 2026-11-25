@@ -29,6 +29,7 @@ async function adminEmail(req) {
   return emails.find(isAdminEmail) || null;
 }
 
+const BIG_STATS = new Set(["gaps", "unlock"]);
 export default async function handler(req, res) {
   if (req.method === "POST") {
     res.setHeader("Cache-Control", "no-store");
@@ -292,7 +293,8 @@ export default async function handler(req, res) {
       return res.status(200).json({
         ai, system,
         bots: BOTS.map((x) => ({ ...x, enabled: on[x.id]?.enabled !== false, changedAt: on[x.id]?.updated_at || null, changedBy: on[x.id]?.updated_by || null,
-          runs: runs.filter((r) => r.bot === x.id).slice(0, 30) })),
+          // Nov 25: the analyst bots' reports are big; only the newest keeps its full report (older runs keep their totals for trends)
+          runs: runs.filter((r) => r.bot === x.id).slice(0, 30).map((r, i) => i && BIG_STATS.has(x.id) && r.stats ? { ...r, stats: { at: r.stats.at, totals: r.stats.totals } } : r) })),
         finder: { counts, queue: counts.pending || 0, backlogLeft, backlogTotal: (BACKLOG.companies || []).length,
           checked24h: cands.filter((c) => c.checked_at && Date.parse(c.checked_at) > day).length,
           live24h: cands.filter((c) => c.status === "live" && c.verified_at && Date.parse(c.verified_at) > day).length, recentLive },
