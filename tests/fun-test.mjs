@@ -24,7 +24,7 @@ const play = read("play/index.html"), jobs = read("jobs/index.html");
 assert.ok(play.includes("/pay/game.json") && play.includes("btp_play") && play.includes("dayNo - 20782"), "Pay Guess: daily pool, streak storage, #1 = Nov 26 2026");
 assert.ok(!play.includes("—") && play.includes('<script src="/nav.js"></script>'));
 // Swipe mode lives in the Jobs search (owner, Nov 26): right = Wishlist (the saved list), left = dump, up = apply now
-assert.ok(jobs.includes('id="modeSeg"') && jobs.includes('data-mode="swipe"') && jobs.includes('p.set("mode", "swipe")'), "List | Swipe switch in the URL");
+assert.ok(jobs.includes('id="modeSeg"') && jobs.includes('data-mode="swipe"') && jobs.includes('if (!state.swipe) p.set("mode", "list")') && jobs.includes('state.swipe = p.get("mode") !== "list"') && jobs.includes('data-mode="swipe" aria-pressed="true">Swipe'), "Swipe is the default; List is the switch (?mode=list)");
 assert.ok(/if \(dir === "right" && !state\.mine\.saved\.has\(j\.id\)\) toggle\("saved", j\.id\)/.test(jobs), "right swipe adds to the Wishlist via the same toggle as ♡ Save");
 assert.ok(/if \(dir === "up"\) \{ window\.open\(j\.url[^}]*pendingApply = /.test(jobs), "up opens the application and asks 'Did you apply?' on return");
 assert.ok(jobs.includes('toggle("applied", p.id)'), "the Did-you-apply answer works without a list card");

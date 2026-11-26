@@ -409,7 +409,7 @@
         <div class="wchips" id="welcomeChips"></div><select class="statesel wsel" id="welcomeSel" aria-label="What are you studying?"></select>
       </section>
 <div class="controls deck">
-    <div class="dhead"><h2 class="dtitle">Find your next role</h2><div class="modeseg" role="group" aria-label="How to browse" id="modeSeg"><button type="button" data-mode="list" aria-pressed="true">List</button><button type="button" data-mode="swipe" aria-pressed="false">Swipe</button></div></div>
+    <div class="dhead"><h2 class="dtitle">Find your next role</h2><div class="modeseg" role="group" aria-label="How to browse" id="modeSeg"><button type="button" data-mode="swipe" aria-pressed="true">Swipe</button><button type="button" data-mode="list" aria-pressed="false">List</button></div></div>
     <div class="dbar">
       <form class="sform" id="qForm" role="search"><input class="search" id="q" type="search" enterkeyhint="search" placeholder="Job title, keyword or company" aria-label="Job title, keyword or company"><button class="sbtn" type="submit">Search</button></form>
       <form class="near" id="nearBox" role="search" aria-label="Jobs near a city, state or ZIP code"><span>Near</span><span id="nearChips" style="display:contents"></span><input id="nearIn" placeholder="City, state or ZIP" autocomplete="off" inputmode="text" enterkeyhint="done" maxlength="40" aria-label="City, state or ZIP code, like Blacksburg, VA, Virginia or 24060"><button type="submit" class="nadd" id="nearAdd" hidden>Add</button><button type="button" class="nx" id="nearX" aria-label="Clear all places" hidden>×</button></form>
@@ -476,7 +476,7 @@
   // Nov 13: where the work happens, read from the posting's title + location ("Remote", "Hybrid"); everything else is in person
   const workOf = (j) => { const t = `${j.title} ${j.location || ""}`; return /\bhybrid\b/i.test(t) ? "hybrid" : (/\b(remote|work from home|wfh|telecommute|virtual)\b/i.test(t) || j.geo_kind === "remote") ? "remote" : "onsite"; };
   const WORK_NAME = { remote: "Remote", hybrid: "Hybrid", onsite: "In person" };
-  const state = { cat: null, relCat: null, relRows: [], work: "any", payOnly: false, kind: "intern", near: null, nearMeta: null, all: [], savedRows: [], followRows: [], major: "all", st: "ALL", meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
+  const state = { cat: null, relCat: null, relRows: [], work: "any", payOnly: false, swipe: true, kind: "intern", near: null, nearMeta: null, all: [], savedRows: [], followRows: [], major: "all", st: "ALL", meOnly: false, q: "", savedOnly: false, followOnly: false,   // st: array of states, or "ALL"
                   user: null, clerk: null, mine: { saved: new Set(), applied: new Set(), starred: new Set(), seenAt: null } };
   const NAMES = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"Washington DC",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming"};
   const statesOf = (j) => String(j.state || "").split(",").filter(Boolean);
@@ -651,7 +651,8 @@
     try { renderRails(); } catch (e) { console.error("[jobs] rails", e); }
     if (!state.loaded) { if (state.swipe) { $("list").hidden = true; $("swipeBox").hidden = false; paintSwipe(); } return; }
     $("list").hidden = false; $("swipeBox").hidden = true;   // swipe mode switches these back below, once there are results
-    if (state.swipe && (state.savedOnly || state.followOnly)) { state.swipe = false; document.querySelectorAll("#modeSeg [data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === "list"))); syncUrl(); }   // Wishlist / Following are lists
+    { const eff = state.swipe && !state.savedOnly && !state.followOnly ? "swipe" : "list";   // Wishlist / Following always show as lists; leaving them returns to the deck
+      document.querySelectorAll("#modeSeg [data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === eff))); }
     const strict = state.meOnly && STRICT_OK();
     const matches = (j) => (!strict || j.match === "me") && (state.work === "any" || workOf(j) === state.work) && (!state.payOnly || !!payOf(j.id));   // the search words are applied below (jobs/search.js)
     // "Saved" view shows everything you saved, in any state
@@ -927,7 +928,7 @@
   $("swipeBox").addEventListener("click", (e) => {
     if (e.target.closest("#swKeep")) swDecide("right"); else if (e.target.closest("#swDump")) swDecide("left"); else if (e.target.closest("#swApply")) swDecide("up");
     else if (e.target.closest("#swUndo")) swUndo();
-    else if (e.target.closest("#swWish, #swOpenWish")) { setMode("list"); $("savedOnly").click(); }
+    else if (e.target.closest("#swWish, #swOpenWish")) $("savedOnly").click();   // the Wishlist shows as a list; closing it brings the deck back
   });
   addEventListener("keydown", (e) => {
     if (!state.swipe || $("swipeBox").hidden || e.target.closest?.("input,textarea,select,dialog,[contenteditable]")) return;
@@ -966,7 +967,7 @@
     if (state.kind !== "intern") p.set("kind", state.kind);
     if (state.work !== "any") p.set("work", state.work);
     if (state.payOnly) p.set("pay", "1");
-    if (state.swipe) p.set("mode", "swipe");
+    if (!state.swipe) p.set("mode", "list");   // Nov 26 (owner): Swipe is the default; List is the switch
     if (state.meOnly && STRICT_OK()) p.set("me", "1");
     if (state.q) p.set("q", state.q);
     if (state.cat) p.set("cat", state.cat);
@@ -1000,7 +1001,7 @@
     state.cat = /^[a-z_]{2,30}$/.test(p.get("cat") || "") ? p.get("cat") : null;   // Nov 14: job category chips (lib/categories.js)
     if (state.q && !p.get("state")) state.st = "ALL";              // a search link (e.g. from the Radar) looks nationwide
     state.payOnly = p.get("pay") === "1"; $("payOnly").setAttribute("aria-pressed", String(state.payOnly)); if (state.payOnly) loadPay();
-    state.swipe = p.get("mode") === "swipe"; document.querySelectorAll("#modeSeg [data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === (state.swipe ? "swipe" : "list"))));
+    state.swipe = p.get("mode") !== "list"; document.querySelectorAll("#modeSeg [data-mode]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.mode === (state.swipe ? "swipe" : "list"))));
     state.savedOnly = p.get("view") === "saved"; state.followOnly = p.get("view") === "following";
     const nq = [...new Set((p.get("near") || "").split("|").map((x) => x.trim().slice(0, 40)).filter(nearOk))].slice(0, 5), nmi = [10, 25, 50, 100, 200].includes(+p.get("mi")) ? +p.get("mi") : (+store.get("btp_mi") || 50);
     state.near = nq.length ? { q: nq.join("|"), mi: nmi } : null;   // Nov 20: several places, "A|B"
