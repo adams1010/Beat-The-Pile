@@ -199,9 +199,10 @@
     check: '<path d="M14 3.5H7A1.5 1.5 0 0 0 5.5 5v14A1.5 1.5 0 0 0 7 20.5h10a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M14 3.5V8h4.5"/><path d="m9 14 2 2 4-4"/>',
     community: '<path d="M14.5 13.5h-6l-4 3v-11A1.5 1.5 0 0 1 6 4h8.5A1.5 1.5 0 0 1 16 5.5v6.5a1.5 1.5 0 0 1-1.5 1.5z"/><path d="M16 8h2A1.5 1.5 0 0 1 19.5 9.5v10l-3-2.5H11a1.5 1.5 0 0 1-1.5-1.5"/>',
     play: '<circle cx="12" cy="12" r="8.5"/><path d="M10 8.5v7l5.5-3.5z"/>',
+    about: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5"/><path d="M12 7.6v.1"/>',
     tools: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
   };
-  const TOOL_ICON = { "/internship/": "intern", "/grad/": "grad", "/companies/": "business", "/radar/": "radar", "/clubs/": "clubs", "/#quiz": "quiz", "/#interview": "mic", "/#resumebuilder": "doc", "/#score": "check", "/#wall": "community", "/demo/": "play" };
+  const TOOL_ICON = { "/internship/": "intern", "/grad/": "grad", "/companies/": "business", "/radar/": "radar", "/clubs/": "clubs", "/#quiz": "quiz", "/#interview": "mic", "/#resumebuilder": "doc", "/#score": "check", "/#wall": "community", "/demo/": "play", "/about/": "about" };
   const svg = (k) => `<svg class="btpic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
   // Account type (chosen once after sign-in on /start/ or in the welcome sheet below): "student" | "employer" | null
   let ROLE = null; try { ROLE = localStorage.getItem("btp_role"); } catch {}
@@ -231,6 +232,7 @@
     ["/#score", "Resume check", "How a resume reads against a posting"],
     ["/#wall", "Community", "Tips from other students"],
     ["/demo/", "Try it", "Hands-on demo in 2 minutes"],
+    ["/about/", "About us", "Who we are and why we built this"],
   ];
   const path = location.pathname.replace(/index\.html$/, "");
   const cur = (h) => h === path || h.slice(0, -1) === path;
