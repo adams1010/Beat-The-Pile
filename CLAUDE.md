@@ -325,6 +325,7 @@ Functions: `rate_take`, `ai_reserve` (service role only). Storage bucket `resume
 ## Working on it
 - Clone: `/home/claude/beat-the-pile` (repo adams1010/beat-the-pile; renamed from InternIQ). Push to `main` deploys (check
   `gh api repos/adams1010/beat-the-pile/commits/<sha>/status`).
+- **Commit author (owner, Nov 25):** commit as `adams1010 <286508602+adams1010@users.noreply.github.com>` (`git config user.name/user.email` in a fresh clone) so commits count on his GitHub graph; keep the Claude co-author trailer.
 - Tests: `bash tests/run.sh` (offline, everything faked via `tests/fakedb.mjs`). Add a test for every bot/reader/API change.
 - Risky robot changes: push a branch, run `probe.yml` with `ref=<branch>` against real sites, then merge.
 - Secrets in GitHub: `CRON_SECRET` only. Everything else lives in Vercel env.
