@@ -35,7 +35,7 @@
   function banner(force) {
     if (document.querySelector(".btpcookie")) return;
     var d = document.createElement("div"); d.className = "btpcookie"; d.setAttribute("role", "dialog"); d.setAttribute("aria-label", "Cookie choices");
-    d.innerHTML = "<h2>Cookies</h2><p>We use cookies and similar storage that the site needs to work, like keeping you signed in. With your OK we also count page visits with PostHog analytics, without your name or email. <a href=\"/cookies/\">Cookie policy</a></p>"
+    d.innerHTML = "<h2>Cookies</h2><p>We use cookies and similar storage that the site needs to work, like keeping you signed in. With your OK we also count page visits with PostHog analytics, without your name or email, and show extra job listings from Careerjet on the jobs page. <a href=\"/cookies/\">Cookie policy</a></p>"
       + "<div class=\"row\"><button type=\"button\" class=\"yes\">Accept analytics</button><button type=\"button\" class=\"no\">Necessary only</button></div>";
     d.querySelector(".yes").onclick = function () { set("all"); };
     d.querySelector(".no").onclick = function () { set("necessary"); };

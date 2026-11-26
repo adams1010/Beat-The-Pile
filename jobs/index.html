@@ -51,6 +51,10 @@
   .more{display:flex;justify-content:center;padding:8px 0 4px}
   .simhead{grid-column:1/-1;background:#fff;border:1px solid var(--line,#DCE2EC);border-radius:10px;padding:12px 16px;font-size:14px}
   .simhead b{display:block;font-size:15px}.simhead span{color:var(--muted,#55627A)}
+  .cjbox{margin:16px 0 0;background:#fff;border:1px solid var(--line,#DCE2EC);border-radius:10px;padding:14px 16px}
+  .cjhead b{display:block;font-size:15px}.cjhead span{color:var(--muted,#55627A);font-size:14px}
+  .cjload{margin-top:12px;font:inherit;font-weight:600;border-radius:999px;padding:9px 18px;cursor:pointer;border:1.5px solid #4A7000;background:#fff;color:#3A5A00}
+  .cjnote{margin:8px 0 0;font-size:13px;color:var(--muted,#55627A)}.cjnote a{color:#3A5A00}
   .moreb{font:inherit;font-size:14px;font-weight:600;color:var(--green);background:#fff;border:1px solid var(--green);border-radius:999px;padding:9px 20px;cursor:pointer}
   .moreb:hover{background:var(--green-light)}
   .totop{position:fixed;left:50%;bottom:max(18px,env(safe-area-inset-bottom,0px));z-index:15;font:inherit;font-size:14px;font-weight:600;
@@ -414,6 +418,7 @@
       <div class="list" id="list">
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
       </div>
+      <section class="cjbox" id="cjBox" hidden aria-label="More jobs from Careerjet"></section>
     </div>
     <aside class="rail right" aria-label="Tools">
       <section data-btp-tools></section>
@@ -426,6 +431,7 @@
     <p>Every listing comes from the employer's own careers site. We re-read every company's job board every few hours (about 4 times a day), and we also open job links in rotation to catch dead pages. If a job closes, it disappears here too.</p>
     <p>“Posted” dates come from the employer's board (“~” means worked out from text like “posted 3 days ago”). “Found” is when our robot first saw it.</p>
     <p>Applying takes you to the company's page. Beat the Pile isn't affiliated with these employers. · <a href="/privacy/">Privacy</a></p>
+    <p>The “More jobs from Careerjet” list under the results is different: it comes from Careerjet, opens on Careerjet's site, and Careerjet pays us a small amount when you click one. We don't store or check those jobs.</p>
   </div>
 </footer>
 
@@ -743,7 +749,39 @@
       + (state.kindWidenedFrom && state.kind === "all" && state.kindWidenedFor === state.q ? `<div class="simhead"><span>Searched every job type, ${esc(KNAME[state.kindWidenedFrom] || "")} had only a few matches.</span></div>` : "");
     $("list").innerHTML = fixedNote + widenNote + companyHeader(rows) + grpBar + LIST.rows.slice(0, LIST.shown).map(tpl).join("") + moreHtml();
     watchMore();
+    try { cjSync(); } catch (e) { console.error("[jobs] careerjet", e); }
   }
+  // Nov 26 (owner): Careerjet JobBox under our own results, "More jobs from Careerjet". Their jobs are never mixed into ours,
+  // never stored and never counted (their terms: live display only). It sits after the list, so a short search shows it
+  // at once and a long list reaches it at the end. Careerjet's script sees the visitor's IP, so it only loads by itself when
+  // the cookie choice allows optional services (btpConsent.analytics()); otherwise one tap loads it for this visit.
+  const CJ = { url: "https://widget.careerjet.net/job-box/679d733ccaa09d55b932b54937559a0e", sig: null, ok: false };
+  try { CJ.ok = sessionStorage.getItem("btp_cj_ok") === "1"; } catch {}
+  const CJ_KIND = { intern: "internship", fulltime: "entry level", hourly: "part time", shadow: "volunteer" };
+  function cjAllowed(){ if (CJ.ok) return true; try { return !!window.btpConsent?.analytics(); } catch { return false; } }
+  function cjSync(){
+    const box = $("cjBox"); if (!box) return;
+    if (!state.loaded || state.savedOnly || state.followOnly || state.company) { box.hidden = true; return; }
+    const major = !state.q && !state.cat && state.major !== "all" ? MAJOR_LABEL() : "";
+    const search = [state.q || major, CJ_KIND[state.kind] || ""].filter(Boolean).join(" ").trim();
+    const location = state.near ? (NP()[0] || "") : Array.isArray(state.st) && state.st.length === 1 ? (NAMES[state.st[0]] || "") : "";
+    box.hidden = false;
+    const sig = [search, location, cjAllowed()].join("|");
+    if (sig === CJ.sig) return;
+    CJ.sig = sig;
+    const head = `<div class="cjhead"><b>More jobs from Careerjet</b><span>These open on Careerjet. We don't check them the way we check the jobs above.</span></div>`;
+    if (!cjAllowed()) {
+      box.innerHTML = head + `<button type="button" class="cjload" id="cjLoad">Show jobs from Careerjet</button><p class="cjnote">This loads Careerjet's job list, which sees your IP address. <a href="/cookies/">Cookie policy</a></p>`;
+      $("cjLoad").onclick = () => { CJ.ok = true; try { sessionStorage.setItem("btp_cj_ok", "1"); } catch {} CJ.sig = null; cjSync(); };
+      return;
+    }
+    box.innerHTML = head + `<div class="cj-job-box" data-noi18n data-url="${CJ.url}" data-search="${esc(search)}" data-location="${esc(location)}"></div>`;
+    document.getElementById("cj-job-box")?.remove();   // their loader reads the box when it runs, so a new search loads it again
+    const js = document.createElement("script"); js.id = "cj-job-box"; js.async = true;
+    js.src = "https://static.careerjet.org/js/all_widget_job_box_3rd_party.min.js?t=" + Date.now();
+    document.body.appendChild(js);
+  }
+  addEventListener("btp-consent", () => { CJ.sig = null; try { cjSync(); } catch {} });
   const PAGE = 40, LIST = { sig: null, shown: PAGE, rows: [], tpl: null, io: null };
   const moreHtml = () => LIST.rows.length > LIST.shown
     ? `<div class="more" id="moreBox"><button type="button" class="moreb" id="moreBtn">Show more</button></div>` : "";
