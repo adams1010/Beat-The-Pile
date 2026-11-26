@@ -1,7 +1,7 @@
 {
- "built": "2026-11-23",
- "why": "Big employers that hire for entry-level and part-time jobs (hospital systems, banks, insurers, schools, retailers, restaurants, hotels; since Nov 15 also golf courses, resorts, parks, childcare, pet care) \u2014 the finder proves each board before anything goes live; Nov 16 also gyms, physical therapy, sports brands, nursing hospitals, psychology/behavioral health Nov 23: + central US (owner: 'nothing in the central US') \u2014 big employers in AR, LA, MS, OK, NM, MO, KS, NE, IA, SD, ND, MT, WY, ID, UT, TX, plus state flagship universities, priority 80.",
- "count": 755,
+ "built": "2026-11-26",
+ "why": "Big employers that hire for entry-level and part-time jobs (hospital systems, banks, insurers, schools, retailers, restaurants, hotels; since Nov 15 also golf courses, resorts, parks, childcare, pet care) — the finder proves each board before anything goes live; Nov 16 also gyms, physical therapy, sports brands, nursing hospitals, psychology/behavioral health Nov 23: + central US (owner: 'nothing in the central US') — big employers in AR, LA, MS, OK, NM, MO, KS, NE, IA, SD, ND, MT, WY, ID, UT, TX, plus state flagship universities, priority 80. Nov 26: + 41 of the biggest US hourly employers we had never tried (restaurants, logistics, auto service, salons, pest control, USPS…), priority 70; staffing agencies left out on purpose.",
+ "count": 795,
  "companies": [
   {
    "company": "Dillard's",
@@ -3920,6 +3920,246 @@
    "company": "Talkspace",
    "domain": "talkspace.com",
    "priority": 50
+  },
+  {
+   "company": "Family Dollar",
+   "domain": "familydollar.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Lidl US",
+   "domain": "lidl.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Wendy's",
+   "domain": "wendys.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Burger King",
+   "domain": "bk.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Subway",
+   "domain": "subway.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Olive Garden",
+   "domain": "olivegarden.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Buffalo Wild Wings",
+   "domain": "buffalowildwings.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Applebee's",
+   "domain": "applebees.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Chili's",
+   "domain": "chilis.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Jack in the Box",
+   "domain": "jackinthebox.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Five Guys",
+   "domain": "fiveguys.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "United States Postal Service",
+   "domain": "usps.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Old Dominion Freight Line",
+   "domain": "odfl.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Estes Express Lines",
+   "domain": "estes-express.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Saia",
+   "domain": "saia.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Total Quality Logistics",
+   "domain": "tql.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Wyndham Hotels & Resorts",
+   "domain": "wyndhamhotels.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "MGM Resorts",
+   "domain": "mgmresorts.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Old Navy",
+   "domain": "oldnavy.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Discount Tire",
+   "domain": "discounttire.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Bridgestone Americas (Firestone)",
+   "domain": "bridgestoneamericas.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Jiffy Lube",
+   "domain": "jiffylube.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Valvoline",
+   "domain": "valvoline.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Grainger",
+   "domain": "grainger.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Comfort Keepers",
+   "domain": "comfortkeepers.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "BrightSpring Health Services",
+   "domain": "brightspringhealth.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Ford Motor Company",
+   "domain": "ford.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Stellantis",
+   "domain": "stellantis.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Perdue Farms",
+   "domain": "perduefarms.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Waste Management",
+   "domain": "wm.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Rollins",
+   "domain": "rollins.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Terminix",
+   "domain": "terminix.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Orkin",
+   "domain": "orkin.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "LA Fitness",
+   "domain": "lafitness.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Great Clips",
+   "domain": "greatclips.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Sport Clips",
+   "domain": "sportclips.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Supercuts",
+   "domain": "supercuts.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Massage Envy",
+   "domain": "massageenvy.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "European Wax Center",
+   "domain": "waxcenter.com",
+   "priority": 70,
+   "region": "hourly-big"
+  },
+  {
+   "company": "Hand & Stone Massage and Facial Spa",
+   "domain": "handandstone.com",
+   "priority": 70,
+   "region": "hourly-big"
   }
  ]
 }
