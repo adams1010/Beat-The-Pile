@@ -251,7 +251,7 @@ export default async function handler(req, res) {
       const rows = await db.select(`listings?select=id,company_id,url,title&id=eq.${encodeURIComponent(id)}&limit=1`);
       if (!rows.length) return res.status(404).json({ ok: false, reason: "This job is no longer on Beat the Pile." });
       const { loadCompanies } = await import("../lib/companies.js");
-      const cfg = (await loadCompanies([rows[0].company_id]))[0] || null;
+      const cfg = (await loadCompanies([rows[0].company_id])).find((c) => c.id === rows[0].company_id) || null;   // the list starts with the hand-verified companies
       const { aboutJob } = await import("../lib/jobabout.js");
       const out = await aboutJob({ listing: rows[0], cfg });
       res.setHeader("Cache-Control", out.ok ? "s-maxage=86400, stale-while-revalidate=172800" : "s-maxage=3600");
