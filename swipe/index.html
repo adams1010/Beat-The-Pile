@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Swipe jobs | Beat the Pile</title>
+<meta name="description" content="Swipe through real internships and jobs from employers' own job boards. Right to save, left to skip, up to apply.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Beat the Pile">
+<meta property="og:title" content="Swipe jobs | Beat the Pile">
+<meta property="og:description" content="Right to save, left to skip, up to apply. Real jobs from employers' own job boards.">
+<meta property="og:url" content="https://www.beatthepile.com/swipe/">
+<meta property="og:image" content="https://www.beatthepile.com/icons/og-1200x630.png?v=1">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.beatthepile.com/swipe/">
+<link rel="icon" href="/icons/icon-192.png?v=4">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/fonts/geist.css">
+<link rel="stylesheet" href="/data-pages.css">
+<style>
+  .sw{max-width:560px;margin:0 auto;padding:0 16px}
+  header{padding:16px 0 18px}
+  header h1{font-size:26px;margin:0 0 4px}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .filters select{font:inherit;font-size:15px;background:#0E1440;color:#fff;border:1px solid #2A3757;border-radius:999px;padding:7px 12px;max-width:100%}
+  .filters select:focus{outline:2px solid #B0F701;outline-offset:1px}
+  .bar{display:flex;justify-content:space-between;align-items:center;margin:14px 0 10px;font-size:14px;color:var(--muted)}
+  .bar a{font-weight:600}
+  .stack{position:relative;height:360px;touch-action:pan-y}
+  .card{position:absolute;inset:0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:22px 22px 18px;display:flex;flex-direction:column;user-select:none;-webkit-user-select:none;cursor:grab;will-change:transform}
+  .card.back{transform:scale(.96) translateY(10px);pointer-events:none}
+  .card.back2{transform:scale(.92) translateY(20px);pointer-events:none}
+  .card:active{cursor:grabbing}
+  .card .co{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .card .ini{width:44px;height:44px;border-radius:9px;font-size:15px}
+  .card .co b{display:block;font-size:15.5px}
+  .card .co span{font-size:13.5px;color:var(--muted)}
+  .card h2{font-size:24px;line-height:1.2;margin:0 0 12px;letter-spacing:-.015em}
+  .tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .tag{font-size:13px;border:1px solid var(--line);border-radius:999px;padding:3px 10px;color:var(--ink);background:#fff}
+  .tag.pay{background:var(--tint);border-color:var(--tint2);color:var(--green-dark);font-weight:650}
+  .tag.k{background:var(--navy);border-color:var(--navy);color:#fff}
+  .card .meta{font-size:14px;color:var(--muted);margin-top:auto}
+  .stamp{position:absolute;top:22px;font-weight:700;font-size:20px;border:3px solid;border-radius:8px;padding:2px 10px;opacity:0;background:#fff}
+  .stamp.yes{left:20px;color:var(--green);border-color:var(--green)}
+  .stamp.no{right:20px;color:#B42318;border-color:#B42318}
+  .stamp.go{left:50%;transform:translateX(-50%);color:#1E3A8A;border-color:#1E3A8A}
+  .btns{display:flex;justify-content:center;gap:14px;margin:18px 0 6px}
+  .btns button{font:inherit;font-weight:600;border:1px solid #C9D1DE;background:#fff;color:var(--ink);border-radius:999px;padding:12px 18px;cursor:pointer;display:flex;align-items:center;gap:8px;font-size:15px}
+  .btns button svg{width:20px;height:20px}
+  .btns .save{background:var(--green);border-color:var(--green);color:#fff}
+  .btns .skip{color:#B42318}
+  .btns .apply{color:#1E3A8A}
+  .btns button:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+  .btns .undo{padding:12px}
+  .hint{text-align:center;font-size:13.5px;color:var(--muted)}
+  .empty{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;background:#fff;border:1px dashed var(--line);border-radius:10px;padding:24px}
+  .empty h2{margin:0 0 6px}
+  @media (prefers-reduced-motion:reduce){.card{transition:none!important}}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<header>
+  <div class="sw">
+    <h1>Swipe jobs</h1>
+    <p>Right to save, left to skip, up to apply. Every card is a real job from the employer's own board.</p>
+    <div class="filters">
+      <select id="major" aria-label="Major"><option value="all">Every major</option></select>
+      <select id="kind" aria-label="Job type"><option value="intern">Internships</option><option value="fulltime">Entry-level</option><option value="hourly">Part-time &amp; hourly</option><option value="all">All</option></select>
+      <select id="state" aria-label="State"><option value="">All US states</option></select>
+    </div>
+  </div>
+</header>
+<main id="main" class="sw">
+  <div class="bar"><span id="left" aria-live="polite"></span><a href="/jobs/?view=saved" id="savedLink">Saved <span id="savedN">0</span></a></div>
+  <div class="stack" id="stack"><div class="card"><div class="skel" style="height:100%"></div></div></div>
+  <div class="btns">
+    <button type="button" class="undo" id="bUndo" aria-label="Undo the last swipe" title="Undo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
+    <button type="button" class="skip" id="bSkip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>Skip</button>
+    <button type="button" class="apply" id="bApply"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>Apply</button>
+    <button type="button" class="save" id="bSave"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>Save</button>
+  </div>
+  <p class="hint">Keyboard: ← skip · → save · ↑ apply · Backspace undo</p>
+</main>
+<script src="/logos.js" defer></script>
+<script src="/feedback.js" defer></script>
+<script src="/ph.js" defer></script>
+<script type="module">
+import { FIELD_LIST, FIELD_LABELS } from "/lib/fields.js";
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const ini = (n) => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+const track = (e, p) => { try { window.posthog && posthog.capture(e, p); } catch {} };
+const STATES = "AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
+const KIND = { intern: "Internship", fulltime: "Entry-level", hourly: "Hourly", shadow: "Shadow / volunteer" };
+for (const [k, l] of FIELD_LIST) if (k !== "other") $("major").insertAdjacentHTML("beforeend", `<option value="${k}">${esc(l)}</option>`);
+for (const s of STATES) $("state").insertAdjacentHTML("beforeend", `<option>${s}</option>`);
+// remember choices, and start from the major picked on /jobs
+const pref = store.get("btp_swipe", {}), jobsMajor = (() => { try { return localStorage.getItem("btp_major"); } catch { return null; } })();
+$("major").value = [...$("major").options].some((o) => o.value === (pref.major || jobsMajor)) ? (pref.major || jobsMajor) : "all";
+$("kind").value = pref.kind || "intern"; $("state").value = pref.state || "";
+
+let PAY = null; fetch("/pay/jobs.json").then((r) => r.ok ? r.json() : null).then((d) => { PAY = d && d.j; paint(); }).catch(() => {});
+const payOf = (id) => { if (!PAY) return null; const i = id.indexOf(":"); const c = PAY[id.slice(0, i)]; return c ? c[id.slice(i + 1)] : null; };
+const payText = ([lo, hi, u]) => { const f = (v) => u === "y" || v >= 10000 ? Math.round(v / 1000) + "k" : v >= 1000 ? Math.round(v).toLocaleString("en-US") : (Math.round(v * 100) / 100).toFixed(v % 1 ? 2 : 0); const un = { h: "hr", y: "yr", m: "mo", w: "wk" }[u]; return lo === hi ? `$${f(lo)}/${un}` : `$${f(lo)}–${f(hi)}/${un}`; };
+
+// already-swiped jobs never come back (this device, last 3,000)
+let seen = new Set(store.get("btp_swiped", []));
+const rememberSeen = () => store.set("btp_swiped", [...seen].slice(-3000));
+let deck = [], next = null, loading = false, history = [], saves = 0;
+
+async function token() { try { return await window.Clerk?.session?.getToken(); } catch { return null; } }
+async function save(id) {
+  const t = await token();
+  if (t) {
+    try { const r = await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + t }, body: JSON.stringify({ list: "saved", id, on: true }) }); if (r.ok) return true; } catch {}
+  }
+  // signed out (or the account call failed): keep it on this device; /jobs moves it into the account at sign-in
+  const g = store.get("btp_guest", {}); g.saved = [...new Set([...(g.saved || []), id])].slice(-200); g.applied = g.applied || []; g.starred = g.starred || [];
+  store.set("btp_guest", g); return true;
+}
+async function unsave(id) {
+  const t = await token();
+  if (t) { try { await fetch("/api/me", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + t }, body: JSON.stringify({ list: "saved", id, on: false }) }); } catch {} }
+  const g = store.get("btp_guest", {}); if (g.saved) { g.saved = g.saved.filter((x) => x !== id); store.set("btp_guest", g); }
+}
+
+async function load(reset) {
+  if (loading) return; loading = true;
+  if (reset) { deck = []; next = null; $("stack").innerHTML = '<div class="card"><div class="skel" style="height:100%"></div></div>'; }
+  const q = new URLSearchParams({ field: $("major").value, kind: $("kind").value, limit: "60" });
+  if ($("state").value) q.set("state", $("state").value);
+  if (next) q.set("after", next);
+  try {
+    const r = await fetch("/api/listings?" + q); if (!r.ok) throw 0;
+    const d = await r.json();
+    next = d.meta && d.meta.more ? d.meta.next : null;
+    const fresh = (d.listings || []).filter((l) => !seen.has(l.id) && !deck.some((x) => x.id === l.id));
+    // shuffle a little so the deck isn't one company in a row
+    for (let i = fresh.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [fresh[i], fresh[j]] = [fresh[j], fresh[i]]; }
+    deck.push(...fresh);
+    loading = false;
+    if (!fresh.length && next) return load(false);
+  } catch { loading = false; if (!deck.length) $("stack").innerHTML = '<div class="empty"><h2>Couldn\'t load jobs</h2><p class="note">Check your connection and try again.</p><button class="btn" type="button" id="retry">Try again</button></div>'; return; }
+  paint();
+}
+function when(l) {
+  const d = (Date.now() - Date.parse(l.first_seen)) / 864e5;
+  return d < 2 ? "New" : d < 7 ? "This week" : l.posted_on && /day|today|yesterday/i.test(l.posted_on) ? l.posted_on : "";
+}
+function cardHtml(l, cls) {
+  const p = payOf(l.id), place = String(l.location || "").split(/[|;]/)[0].trim();
+  return `<article class="card ${cls}" data-id="${esc(l.id)}" ${cls ? 'aria-hidden="true"' : 'tabindex="0" aria-label="' + esc(l.title + " at " + l.company) + '"'}>
+    <span class="stamp yes">Save</span><span class="stamp no">Skip</span><span class="stamp go">Apply</span>
+    <div class="co"><span class="ini" data-logo-id="${esc(l.company_id || "")}">${esc(ini(l.company))}</span><div><b>${esc(l.company)}</b><span>${esc(place)}</span></div></div>
+    <h2>${esc(l.title)}</h2>
+    <div class="tags">${p ? `<span class="tag pay">${esc(payText(p))}</span>` : ""}<span class="tag k">${KIND[l.kind] || "Job"}</span>${l.geo_kind === "remote" ? '<span class="tag">Remote</span>' : ""}${FIELD_LABELS[l.field] && l.field !== "other" ? `<span class="tag">${esc(FIELD_LABELS[l.field])}</span>` : ""}${when(l) ? `<span class="tag">${esc(when(l))}</span>` : ""}</div>
+    <div class="meta">${p ? "Pay posted by the employer. " : ""}Apply opens ${esc((l.url.match(/^https?:\/\/([^/]+)/) || [])[1] || "the employer's site")}.</div>
+  </article>`;
+}
+function paint() {
+  const st = $("stack");
+  if (!deck.length) {
+    if (loading) return;
+    st.innerHTML = `<div class="empty"><h2>You've seen them all</h2><p class="note">Nothing new for these filters. Try another major, job type or state, or check back tomorrow.</p><p><a class="btn" href="/jobs/?view=saved">See your ${saves || ""} saved jobs</a></p></div>`;
+    $("left").textContent = ""; return;
+  }
+  st.innerHTML = deck.slice(0, 3).map((l, i) => cardHtml(l, i === 0 ? "" : i === 1 ? "back" : "back2")).reverse().join("");
+  $("left").textContent = deck.length + (next ? "+" : "") + " to go";
+  wire(st.querySelector(".card:not(.back):not(.back2)"));
+  if (deck.length < 8 && next) load(false);
+}
+function decide(dir, card) {
+  const l = deck[0]; if (!l) return;
+  card = card || $("stack").querySelector(".card:not(.back):not(.back2)");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (card && !reduce) { card.style.transition = "transform .25s ease, opacity .25s"; card.style.transform = dir === "up" ? "translateY(-140%)" : `translateX(${dir === "right" ? 140 : -140}%) rotate(${dir === "right" ? 14 : -14}deg)`; card.style.opacity = "0"; }
+  deck.shift(); seen.add(l.id); rememberSeen(); history.push({ l, dir });
+  if (dir === "right") { saves++; $("savedN").textContent = saves; save(l.id); }
+  if (dir === "up") { window.open(l.url, "_blank", "noopener"); save(l.id); }
+  track("swipe", { dir, kind: l.kind, field: l.field });
+  setTimeout(paint, reduce ? 0 : 220);
+}
+function undo() {
+  const h = history.pop(); if (!h) return;
+  seen.delete(h.l.id); rememberSeen(); deck.unshift(h.l);
+  if (h.dir === "right") { saves = Math.max(0, saves - 1); $("savedN").textContent = saves; unsave(h.l.id); }
+  paint();
+}
+function wire(card) {
+  if (!card) return;
+  let x0 = 0, y0 = 0, dx = 0, dy = 0, down = false;
+  const stamps = { yes: card.querySelector(".stamp.yes"), no: card.querySelector(".stamp.no"), go: card.querySelector(".stamp.go") };
+  card.addEventListener("pointerdown", (e) => { down = true; x0 = e.clientX; y0 = e.clientY; card.setPointerCapture(e.pointerId); card.style.transition = "none"; });
+  card.addEventListener("pointermove", (e) => {
+    if (!down) return; dx = e.clientX - x0; dy = e.clientY - y0;
+    card.style.transform = `translate(${dx}px, ${Math.min(dy, 40)}px) rotate(${dx / 18}deg)`;
+    stamps.yes.style.opacity = Math.max(0, Math.min(1, dx / 100)); stamps.no.style.opacity = Math.max(0, Math.min(1, -dx / 100));
+    stamps.go.style.opacity = Math.abs(dx) < 60 ? Math.max(0, Math.min(1, -dy / 120)) : 0;
+  });
+  const end = () => {
+    if (!down) return; down = false;
+    if (dx > 110) decide("right", card); else if (dx < -110) decide("left", card); else if (dy < -130 && Math.abs(dx) < 80) decide("up", card);
+    else { card.style.transition = "transform .2s ease"; card.style.transform = ""; Object.values(stamps).forEach((s) => (s.style.opacity = 0)); }
+    dx = dy = 0;
+  };
+  card.addEventListener("pointerup", end); card.addEventListener("pointercancel", end);
+}
+$("bSave").onclick = () => decide("right"); $("bSkip").onclick = () => decide("left"); $("bApply").onclick = () => decide("up"); $("bUndo").onclick = undo;
+addEventListener("keydown", (e) => {
+  if (e.target.closest && e.target.closest("select,input,textarea")) return;
+  if (e.key === "ArrowRight") decide("right"); else if (e.key === "ArrowLeft") decide("left"); else if (e.key === "ArrowUp") { e.preventDefault(); decide("up"); } else if (e.key === "Backspace") { e.preventDefault(); undo(); }
+});
+document.addEventListener("click", (e) => { if (e.target.closest("#retry")) load(true); });
+for (const id of ["major", "kind", "state"]) $(id).addEventListener("change", () => { store.set("btp_swipe", { major: $("major").value, kind: $("kind").value, state: $("state").value }); history = []; load(true); });
+load(true);
+</script>
+</body>
+</html>

@@ -116,6 +116,21 @@ export function buildStats(rows, at = new Date().toISOString()) {
            companies: new Set(rows.map((r) => r.company_id)).size };
 }
 
+/** Real open jobs for the daily Pay Guess game (/play/): one per company + title, a known hourly-equivalent pay between
+ *  $12 and $100, spread over job types (internships first). Sorted by id so the same day picks the same five for everyone. */
+export function gamePool(rows, cap = { intern: 250, fulltime: 200, hourly: 150 }) {
+  const mid = (p) => toHourly((p.lo + p.hi) / 2, p.u), seen = new Set(), out = [], n = {};
+  const hash = (s) => { let h = 2166136261; for (let i = 0; i < s.length; i++) h = Math.imul(h ^ s.charCodeAt(i), 16777619); return h >>> 0; };   // spread over companies, not A-first
+  for (const r of [...rows].sort((a, b) => hash(a.id) - hash(b.id))) {
+    if (!cap[r.kind] || (n[r.kind] || 0) >= cap[r.kind]) continue;
+    const h = mid(r.pay); if (!(h >= 12 && h <= 100)) continue;
+    const k = r.company_id + "|" + String(r.title).toLowerCase(); if (seen.has(k)) continue; seen.add(k);
+    n[r.kind] = (n[r.kind] || 0) + 1;
+    out.push({ id: r.id, title: r.title, company: r.company, company_id: r.company_id, state: String(r.state || "").split(",")[0], kind: r.kind, field: r.field, url: r.url, pay: [r.pay.lo, r.pay.hi, r.pay.u], hr: r2(h) });
+  }
+  return out.sort((a, b) => a.id.localeCompare(b.id));
+}
+
 async function main() {
   if (!DRY && !(await switchOn())) { console.log("pay: switched off on /bots"); return; }
   const feed = await getJson(`${BASE}/api/discovery`, { timeout: 90000, tries: 3 });
@@ -154,6 +169,7 @@ async function main() {
   fs.mkdirSync("pay", { recursive: true });
   fs.writeFileSync("pay/jobs.json", JSON.stringify({ at, n: open.length, j }));
   fs.writeFileSync("pay/stats.json", JSON.stringify(stats));
+  fs.writeFileSync("pay/game.json", JSON.stringify({ at, pool: gamePool(open) }));   // the daily Pay Guess game (/play/)
   const iMed = stats.byKind.intern?.med;
   await report(true, `${open.length} open jobs with posted pay at ${stats.companies} companies · internship median $${iMed ?? "?"}/hr · ${fails.n} errors · ${Math.round((Date.now() - started) / 60000)} min`,
     { at, total: open.length, companies: stats.companies, byKind: stats.byKind, systems: sys, errors: fails.n });

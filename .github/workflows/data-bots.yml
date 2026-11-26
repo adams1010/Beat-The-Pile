@@ -27,6 +27,6 @@ jobs:
       - name: Commit if changed
         run: |
           git config user.name "btp-data"; git config user.email "btp-data@users.noreply.github.com"
-          git add pay/jobs.json pay/stats.json pulse/data.json pulse/history.json
+          git add pay/jobs.json pay/stats.json pay/game.json pulse/data.json pulse/history.json
           git diff --cached --quiet && { echo "no change"; exit 0; }
           git commit -m "Data bots: pay + pulse refresh" && git pull --rebase && git push

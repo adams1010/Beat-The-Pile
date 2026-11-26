@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pay Guess | Beat the Pile</title>
+<meta name="description" content="A daily game: guess what 5 real jobs pay. Every job and every number is real, posted by the employer. New jobs every day.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Beat the Pile">
+<meta property="og:title" content="Pay Guess | Beat the Pile">
+<meta property="og:description" content="Guess what 5 real jobs pay. New jobs every day.">
+<meta property="og:url" content="https://www.beatthepile.com/play/">
+<meta property="og:image" content="https://www.beatthepile.com/icons/og-1200x630.png?v=1">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.beatthepile.com/play/">
+<link rel="icon" href="/icons/icon-192.png?v=4">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/fonts/geist.css">
+<link rel="stylesheet" href="/data-pages.css">
+<style>
+  .pg{max-width:620px;margin:0 auto;padding:0 16px}
+  header{padding:18px 0 20px}
+  header h1{font-size:28px;margin:0 0 4px}
+  .streak{display:flex;gap:10px;margin-top:14px}
+  .streak div{background:#0E1440;border:1px solid #22304D;border-radius:10px;padding:8px 12px;flex:1}
+  .streak b{display:block;color:#B0F701;font-size:20px}
+  .streak span{font-size:13px;color:#AEB9CC}
+  .dots{display:flex;gap:6px;margin:16px 0 10px}
+  .dots i{flex:1;height:6px;border-radius:999px;background:#DCE2EC}
+  .dots i.done{background:var(--green)}
+  .dots i.now{background:var(--navy)}
+  .q .co{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .q .ini{width:42px;height:42px;font-size:14px}
+  .q h2{font-size:22px;line-height:1.25;margin:0 0 6px}
+  .q .where{color:var(--muted);font-size:14.5px}
+  .guess{margin:20px 0 6px;text-align:center}
+  .guess output{display:block;font-size:40px;font-weight:650;letter-spacing:-.02em}
+  .guess small{color:var(--muted)}
+  input[type=range]{width:100%;accent-color:var(--green);height:28px}
+  .scale{display:flex;justify-content:space-between;font-size:12.5px;color:var(--faint)}
+  .row{display:flex;gap:10px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+  .btn2{font:inherit;font-weight:600;border:1px solid #C9D1DE;background:#fff;color:var(--ink);border-radius:999px;padding:10px 16px;cursor:pointer}
+  .btn{border:0;cursor:pointer;font:inherit;font-weight:600}
+  .reveal{margin-top:16px;border-radius:10px;padding:14px 16px;background:var(--tint)}
+  .reveal b.big{font-size:22px}
+  .reveal .pts{float:right;font-weight:700;font-size:22px;color:var(--green-dark)}
+  .reveal.low{background:#FEF3E2}
+  .reveal.low .pts{color:#8A4B08}
+  .track2{position:relative;height:30px;margin:14px 6px 4px}
+  .track2 .ln{position:absolute;left:0;right:0;top:14px;height:2px;background:#C9D1DE}
+  .track2 .rg{position:absolute;top:9px;height:12px;background:var(--tint2);border-radius:999px}
+  .track2 .mk{position:absolute;top:4px;width:3px;height:22px;margin-left:-1px;border-radius:2px}
+  .track2 .mk.you{background:#1E3A8A}
+  .track2 .mk.real{background:var(--green)}
+  .legend{font-size:13px;color:var(--muted);display:flex;gap:14px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .final{text-align:center}
+  .final .score{font-size:56px;font-weight:700;letter-spacing:-.03em;margin:6px 0}
+  .final ol{text-align:left;padding-left:20px}
+  .final li{margin:8px 0}
+  .final li span{color:var(--muted);font-size:14px}
+  .vh{position:absolute;left:-9999px}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<header>
+  <div class="pg">
+    <h1>Pay Guess</h1>
+    <p>Guess what 5 real jobs pay. Every job is open right now, and every number was posted by the employer. New jobs every day.</p>
+    <div class="streak" aria-live="polite"><div><b id="sStreak">0</b><span>Day streak</span></div><div><b id="sBest">0</b><span>Best score</span></div><div><b id="sAvg">–</b><span>Your average</span></div></div>
+  </div>
+</header>
+<main id="main" class="pg">
+  <div class="dots" id="dots" aria-hidden="true"></div>
+  <section class="card" id="game"><div class="skel"></div></section>
+  <p class="note">Pay is shown per hour so jobs compare. Yearly pay is divided by 2,080 hours; a posted range counts at its middle. <a href="/pay/">See what internships pay</a></p>
+</main>
+<script src="/logos.js" defer></script>
+<script src="/feedback.js" defer></script>
+<script src="/ph.js" defer></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const ini = (n) => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+  const money = (v) => "$" + (Math.round(v * 100) / 100).toFixed(v % 1 ? 2 : 0);
+  const KIND = { intern: "Internship", fulltime: "Entry-level job", hourly: "Hourly job" };
+  const payText = ([lo, hi, u]) => { const f = (v) => u === "y" || v >= 10000 ? Math.round(v / 1000) + "k" : v >= 1000 ? Math.round(v).toLocaleString("en-US") : (Math.round(v * 100) / 100).toFixed(v % 1 ? 2 : 0); const un = { h: "hr", y: "yr", m: "mo", w: "wk" }[u]; return lo === hi ? `$${f(lo)}/${un}` : `$${f(lo)}–${f(hi)}/${un}`; };
+  const hourly = (v, u) => u === "h" ? v : v * ({ y: 1, m: 12, w: 52 }[u] || 1) / 2080;
+  const store = { get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+  const track = (e, p) => { try { window.posthog && posthog.capture(e, p); } catch {} };
+  // the day (local date) picks the jobs, so everyone plays the same five today
+  const now = new Date(), today = now.getFullYear() + "-" + String(now.getMonth() + 1).padStart(2, "0") + "-" + String(now.getDate()).padStart(2, "0");
+  const dayNo = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 864e5);
+  const gameNo = dayNo - 20782;   // Pay Guess #1 = Nov 26, 2026
+  function rng(seed) { return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function pick(pool) {
+    const r = rng(dayNo * 7919), by = (k) => pool.filter((p) => p.kind === k), out = [];
+    const take = (list, n) => { const l = [...list]; for (let i = 0; i < n && l.length; i++) { const j = Math.floor(r() * l.length); const p = l.splice(j, 1)[0]; if (!out.some((o) => o.company_id === p.company_id)) out.push(p); else i--; } };
+    take(by("intern"), 2); take(by("fulltime"), 2); take(by("hourly"), 1);
+    if (out.length < 5) take(pool.filter((p) => !out.includes(p)), 5 - out.length);
+    return out.slice(0, 5);
+  }
+  // score: 100 inside the posted range, then down by how far off you were (half off = 0)
+  function points(g, j) {
+    const lo = hourly(j.pay[0], j.pay[2]), hi = hourly(j.pay[1], j.pay[2]);
+    if (g >= lo - 0.5 && g <= hi + 0.5) return 100;
+    const off = g < lo ? (lo - g) / lo : (g - hi) / hi;
+    return Math.max(0, Math.round(100 * (1 - off * 2)));
+  }
+  const S = store.get("btp_play", { days: {}, streak: 0, last: null, best: 0 });
+  function stats() {
+    const scores = Object.values(S.days).map((d) => d.total).filter((x) => typeof x === "number");
+    $("sStreak").textContent = S.streak || 0; $("sBest").textContent = S.best || 0;
+    $("sAvg").textContent = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : "–";
+  }
+  stats();
+  let JOBS = [], i = 0, guesses = [];
+  const dots = () => { $("dots").innerHTML = JOBS.map((_, k) => `<i class="${k < i ? "done" : k === i ? "now" : ""}"></i>`).join(""); };
+  function ask() {
+    const j = JOBS[i]; dots();
+    const start = j.kind === "intern" ? 25 : 22;
+    $("game").innerHTML = `<div class="q"><div class="co"><span class="ini" data-logo-id="${esc(j.company_id)}">${esc(ini(j.company))}</span><div><b>${esc(j.company)}</b><div class="where">${esc(KIND[j.kind] || "Job")}${j.state && j.state !== "US" ? " · " + esc(j.state) : j.state === "US" ? " · Remote" : ""}</div></div></div>
+      <h2>${esc(j.title)}</h2><p class="where">Job ${i + 1} of ${JOBS.length}. What does it pay per hour?</p></div>
+      <div class="guess"><label for="g" class="vh">Your guess, dollars per hour</label><output id="out">${money(start)}</output><small>per hour</small></div>
+      <input id="g" type="range" min="10" max="100" step="0.5" value="${start}" aria-valuetext="${start} dollars per hour">
+      <div class="scale" aria-hidden="true"><span>$10</span><span>$40</span><span>$70</span><span>$100</span></div>
+      <div class="row"><button class="btn" type="button" id="lock">Lock in guess</button></div>`;
+    const g = $("g"); g.focus();
+    g.addEventListener("input", () => { $("out").textContent = money(+g.value); g.setAttribute("aria-valuetext", g.value + " dollars per hour"); });
+    $("lock").onclick = () => reveal(+g.value);
+  }
+  function reveal(g) {
+    const j = JOBS[i], p = points(g, j); guesses.push({ g, p });
+    const lo = hourly(j.pay[0], j.pay[2]), hi = hourly(j.pay[1], j.pay[2]), max = Math.max(100, g, hi) * 1.02, x = (v) => (Math.min(v, max) / max * 100).toFixed(2) + "%";
+    const msg = p === 100 ? "Spot on." : p >= 75 ? "Close." : p >= 40 ? "Not far." : g < lo ? "It pays more than you'd think." : "It pays less than you guessed.";
+    $("game").insertAdjacentHTML("beforeend", `<div class="reveal${p < 40 ? " low" : ""}" role="status"><span class="pts">+${p}</span><b class="big">${esc(payText(j.pay))}</b>${j.pay[2] !== "h" ? ` <span class="note">(about ${money(Math.round(j.hr))}/hr)</span>` : ""}<div>${msg} You guessed ${money(g)}/hr.</div>
+      <div class="track2" aria-hidden="true"><span class="ln"></span><span class="rg" style="left:${x(lo)};width:calc(${x(hi)} - ${x(lo)} + 4px)"></span><span class="mk real" style="left:${x((lo + hi) / 2)}"></span><span class="mk you" style="left:${x(g)}"></span></div>
+      <div class="legend"><span><i style="background:var(--green)"></i>Posted pay</span><span><i style="background:#1E3A8A"></i>Your guess</span></div></div>
+      <div class="row"><a class="btn2" href="${esc(j.url)}" target="_blank" rel="noopener nofollow">See the job</a><button class="btn" type="button" id="nx">${i + 1 < JOBS.length ? "Next job" : "See my score"}</button></div>`);
+    $("lock").remove(); $("g").disabled = true; $("nx").focus();
+    $("nx").onclick = () => { i++; if (i < JOBS.length) ask(); else finish(); };
+  }
+  function finish(saved) {
+    const total = saved ? saved.total : guesses.reduce((a, b) => a + b.p, 0);
+    const per = saved ? saved.per : guesses.map((x) => x.p);
+    if (!saved) {
+      const y = new Date(now); y.setDate(y.getDate() - 1);
+      const yk = y.getFullYear() + "-" + String(y.getMonth() + 1).padStart(2, "0") + "-" + String(y.getDate()).padStart(2, "0");
+      S.streak = S.last === yk ? (S.streak || 0) + 1 : 1; S.last = today; S.best = Math.max(S.best || 0, total);
+      S.days[today] = { total, per, g: guesses.map((x) => x.g), jobs: JOBS.map((j) => ({ title: j.title, company: j.company, pay: j.pay })) };
+      const keys = Object.keys(S.days).sort(); while (keys.length > 120) delete S.days[keys.shift()];
+      store.set("btp_play", S); stats(); track("pay_guess_done", { total, game: gameNo });
+    }
+    if (saved && saved.jobs && saved.jobs.length) JOBS = saved.jobs;
+    i = JOBS.length; dots();
+    const share = `Beat the Pile Pay Guess #${gameNo}: ${total}/500\n${per.join(" · ")}\nhttps://www.beatthepile.com/play/`;
+    $("game").innerHTML = `<div class="final"><p class="where">Today's score</p><div class="score">${total}<span style="font-size:24px;color:var(--muted)">/500</span></div>
+      <p>${total >= 450 ? "You know your pay. Recruiters, watch out." : total >= 300 ? "Solid. You'd negotiate well." : "Now you know more than most people applying."}</p>
+      <ol>${JOBS.map((j, k) => `<li><b>${esc(j.title)}</b> <span>· ${esc(j.company)} · ${esc(payText(j.pay))} · +${per[k] ?? 0}</span></li>`).join("")}</ol>
+      <div class="row"><button class="btn" type="button" id="share">Share my score</button><a class="btn2" href="/jobs/?pay=1">Jobs that show pay</a></div>
+      <p class="note" id="cd"></p></div>`;
+    $("share").onclick = async () => {
+      try { if (navigator.share) await navigator.share({ text: share }); else { await navigator.clipboard.writeText(share); $("share").textContent = "Copied"; } track("pay_guess_share", { total }); } catch {}
+    };
+    const tick = () => { const t = new Date(); t.setHours(24, 0, 0, 0); const m = Math.round((t - new Date()) / 6e4); $("cd") && ($("cd").textContent = `New jobs in ${Math.floor(m / 60)} h ${m % 60} min. Come back tomorrow to keep your streak.`); };
+    tick(); setInterval(tick, 30000);
+  }
+  fetch("/pay/game.json").then((r) => r.ok ? r.json() : Promise.reject()).then((d) => {
+    const pool = (d.pool || []).filter((p) => p.hr >= 12 && p.hr <= 100);
+    if (pool.length < 5) throw 0;
+    JOBS = pick(pool);
+    if (S.days[today]) { finish(S.days[today]); return; }
+    track("pay_guess_start", { game: gameNo }); ask();
+  }).catch(() => { $("game").innerHTML = '<p>Today\'s game couldn\'t load. Try again in a minute.</p>'; });
+})();
+</script>
+</body>
+</html>

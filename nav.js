@@ -203,9 +203,11 @@
     pay: '<circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.7.8-2.7 2s1 1.7 2.7 2.1c1.8.4 2.9 1 2.9 2.3s-1.2 2.1-2.9 2.1c-1.4 0-2.5-.6-3-1.6"/><path d="M12 6v1.8M12 16.3V18"/>',
     pulse: '<path d="M3.5 12h4l2-5 4 10 2-5h5"/>',
     help: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/><path d="m6 6 3.5 3.5M14.5 14.5 18 18M18 6l-3.5 3.5M9.5 14.5 6 18"/>',
+    swipe: '<rect x="7" y="4" width="10" height="15" rx="2"/><path d="M4 7v11a2 2 0 0 0 2 2h8"/><path d="M10.5 11.5l1.5 1.5 3-3"/>',
+    game: '<rect x="3.5" y="7" width="17" height="10" rx="3"/><path d="M8 10.5v3M6.5 12h3"/><path d="M15.5 11h.01M17.5 13h.01"/>',
     tools: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
   };
-  const TOOL_ICON = { "/internship/": "intern", "/grad/": "grad", "/companies/": "business", "/radar/": "radar", "/clubs/": "clubs", "/#quiz": "quiz", "/#interview": "mic", "/#resumebuilder": "doc", "/#score": "check", "/#wall": "community", "/demo/": "play", "/about/": "about", "/pay/": "pay", "/pulse/": "pulse", "/help/": "help" };
+  const TOOL_ICON = { "/internship/": "intern", "/grad/": "grad", "/companies/": "business", "/radar/": "radar", "/clubs/": "clubs", "/#quiz": "quiz", "/#interview": "mic", "/#resumebuilder": "doc", "/#score": "check", "/#wall": "community", "/demo/": "play", "/about/": "about", "/pay/": "pay", "/pulse/": "pulse", "/help/": "help", "/swipe/": "swipe", "/play/": "game" };
   const svg = (k) => `<svg class="btpic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
   // Account type (chosen once after sign-in on /start/ or in the welcome sheet below): "student" | "employer" | null
   let ROLE = null; try { ROLE = localStorage.getItem("btp_role"); } catch {}
@@ -227,6 +229,8 @@
     ["/internship/", "My Internship", "Got an offer? Prep, first weeks, wrap-up"],
     ["/companies/", "Companies", "Look up any company and follow it"],
     ["/radar/", "Opening Radar", "When each company usually opens internships"],
+    ["/swipe/", "Swipe jobs", "Right to save, left to skip, up to apply"],
+    ["/play/", "Pay Guess", "Daily game: guess what 5 real jobs pay"],
     ["/pay/", "Internship pay", "What internships really pay, from posted pay"],
     ["/pulse/", "Hiring pulse", "What opened this week, by area and company"],
     ["/clubs/", "Clubs & teams", "Which clubs fit your major and lead to internships"],
