@@ -1,12 +1,13 @@
-// Nov 24–25 (owner): Light = the light-blue "sky" look with the navy top bar kept; Appearance (Dark, Navy, Gray, device)
-// changes only the light parts. The color engine lives inside nav.js (runs before first paint).
+// Nov 25 (owner): Appearance = Default (regular navy look, engine off) · Light (light-blue "sky", top bar stays navy) · Dark
+// (only the light parts go dark). The color engine lives inside nav.js (runs before first paint).
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 const nav = readFileSync(new URL("../nav.js", import.meta.url), "utf8");
-for (const k of ["light", "dark", "navy", "gray", "device"]) assert.ok(nav.includes(`["${k}",`), "theme option " + k);
-assert.ok(nav.includes('id="btpThemeSel"') && nav.includes("btp_theme"), "menu dropdown, saved per device");
+assert.ok(nav.includes('const THEMES = [["default", "Default"], ["light", "Light"], ["dark", "Dark"]];'), "three options: Default, Light, Dark");
+assert.ok(nav.includes('return THEMES.some(([k]) => k === v) ? v : "default"'), "Default is the default");
+assert.ok(nav.includes('id="btpThemeSel"') && nav.includes("btp_look"), "menu dropdown, saved per device");
 assert.ok(!/filter:\s*invert/.test(nav) && !nav.includes("mix-blend-mode"), "no whole-page flip or overlay");
-assert.ok(nav.includes('eff === "light" ? "sky" : eff') && nav.includes('KEEP = ".btpnav,.btptab,[data-btp-keep]"'), "Light = sky, top bar + keep areas untouched");
+assert.ok(nav.includes('t === "light" ? "sky" : t === "dark" ? "dark" : null') && nav.includes('KEEP = ".btpnav,.btptab,[data-btp-keep]"'), "Light = sky, top bar + keep areas untouched");
 // pull the engine out of nav.js and test its color rules
 const a = nav.indexOf("  (function () {\n    if (window.btpThemeEngine) return;".replace(/\n/g, nav.includes("\r\n") ? "\r\n" : "\n"));
 const b = nav.indexOf("})();", a) + 5; assert.ok(a > 0 && b > a, "engine found in nav.js");
@@ -25,4 +26,4 @@ T.setP("dark");
 assert.equal(T.darkBg([255, 255, 255, 1]), "rgb(24,27,34)", "dark: white card → surface");
 assert.equal(T.darkBg([6, 10, 44, 1]), null, "dark: navy stays");
 assert.equal(T.lightFg([6, 10, 44, 1]), "rgb(231,234,240)", "dark: navy ink → light text");
-console.log("✓ colors: Light = light blue with navy top bar; Dark/Navy/Gray change only light parts");
+console.log("✓ colors: Default = regular navy; Light = light blue; Dark = only light parts go dark");

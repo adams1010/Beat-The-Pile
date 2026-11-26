@@ -5,11 +5,15 @@
 // If the page has an #acct element (its sign-in / sign-out widget), it is moved into the bar's right side.
 (function () {
   if (window.__btpNav) return; window.__btpNav = true;
-  // Nov 24 (owner): Appearance in the account menu: Light, Dark, Navy, Gray or Match my device (saved on this device as btp_theme).
-  // ?btp_theme=dark sets it from a link (for previews).
-  const THEMES = [["light", "Light"], ["dark", "Dark"], ["navy", "Navy"], ["gray", "Gray"], ["device", "Match my device"]];
-  const themeGet = () => { try { const q = new URLSearchParams(location.search).get("btp_theme"); if (q && THEMES.some(([k]) => k === q)) localStorage.setItem("btp_theme", q); return localStorage.getItem("btp_theme") || "light"; } catch { return "light"; } };
-  const darkMQ = window.matchMedia ? matchMedia("(prefers-color-scheme: dark)") : null;
+  // Nov 25 (owner): Appearance in the account menu = Default (the regular navy look, nothing changed) · Light (the light-blue
+  // "sky" look, top bar stays navy) · Dark (only the light parts go dark). Saved on this device as btp_look; a dark pick
+  // from the Nov 24 version (btp_theme dark/navy/gray) carries over as Dark. ?btp_theme=light sets it from a link (previews).
+  const THEMES = [["default", "Default"], ["light", "Light"], ["dark", "Dark"]];
+  const themeGet = () => { try {
+    const q = new URLSearchParams(location.search).get("btp_theme"); if (q && THEMES.some(([k]) => k === q)) localStorage.setItem("btp_look", q);
+    let v = localStorage.getItem("btp_look");
+    if (!v) { v = ["dark", "navy", "gray"].includes(localStorage.getItem("btp_theme")) ? "dark" : "default"; localStorage.setItem("btp_look", v); localStorage.removeItem("btp_theme"); }
+    return THEMES.some(([k]) => k === v) ? v : "default"; } catch { return "default"; } };
   // Color engine (Nov 24–25 2026, owner), part of nav.js so it runs before the page first paints.
   //
   // Two jobs, same machinery (read each element's computed colors, override inline with !important, remember the page's
@@ -26,8 +30,6 @@
     if (window.btpThemeEngine) return;
     const PAL = {
       dark: { page: [15, 17, 21], surf: [24, 27, 34], bord: [44, 49, 60], text: [231, 234, 240], mute: [168, 176, 190] },
-      navy: { page: [11, 20, 48], surf: [21, 33, 72], bord: [44, 60, 108], text: [232, 237, 248], mute: [170, 182, 211] },
-      gray: { page: [43, 45, 49], surf: [54, 57, 63], bord: [76, 80, 88], text: [236, 237, 239], mute: [181, 185, 192] },
     };
     const SKY = { panel: [220, 231, 248], panel2: [201, 218, 244], page: [233, 241, 252], page2: [243, 247, 253], bord: [182, 200, 232],
       ink: [20, 34, 74], mute: [69, 84, 122], green: [58, 90, 0], green2: [74, 112, 0] };
@@ -151,12 +153,12 @@
     window.btpThemeEngine = { apply, _t: { darkBg, lightFg, skyBg, skyFg, skyBorder, setP: (n) => { MODE = n; P = PAL[n] || null; } } };
   })();
 
-  // Light = the "sky" look (light blue, navy top bar kept); Dark / Navy / Gray change only the light parts.
-  const themeApply = (t) => { const eff = t === "device" ? (darkMQ && darkMQ.matches ? "dark" : "light") : t;
-    if (eff === "light") delete document.documentElement.dataset.btpTheme; else document.documentElement.dataset.btpTheme = eff;
-    window.btpThemeEngine.apply(eff === "light" ? "sky" : eff); };
-  themeApply(themeGet()); darkMQ && darkMQ.addEventListener && darkMQ.addEventListener("change", () => themeApply(themeGet()));
-  window.btpTheme = { list: THEMES, get: themeGet, set: (t) => { try { localStorage.setItem("btp_theme", t); } catch {} themeApply(t); } };
+  // Default = no engine at all (the page's own colors); Light = the "sky" look; Dark = only the light parts go dark.
+  const themeApply = (t) => {
+    if (t === "default") delete document.documentElement.dataset.btpTheme; else document.documentElement.dataset.btpTheme = t;
+    window.btpThemeEngine.apply(t === "light" ? "sky" : t === "dark" ? "dark" : null); };
+  themeApply(themeGet());
+  window.btpTheme = { list: THEMES, get: themeGet, set: (t) => { try { localStorage.setItem("btp_look", t); } catch {} themeApply(t); } };
   // Nov 17: AI calls carry the sign-in when there is one, so signed-in students get their own AI pool (api/generate.js)
   if (!window.__btpGenFetch) { window.__btpGenFetch = true; const F = window.fetch.bind(window);
     window.fetch = async (u, o = {}) => {
