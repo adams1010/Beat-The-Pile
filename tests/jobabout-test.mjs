@@ -26,6 +26,7 @@ assert.match(await descriptionHtml({ ats: "lever", token: "acme", sourceId: "ab-
 assert.match(await descriptionHtml({ ats: "ashby", token: "acme", sourceId: "9" }, fake(() => ({ jobs: [{ id: "8", descriptionHtml: "no" }, { id: "9", descriptionHtml: "<p>Ashby nine</p>" }] }))), /Ashby nine/);
 const page = `<html><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Organization"},{"@type":"JobPosting","description":"&lt;p&gt;From JSON-LD&lt;/p&gt;"}]}</script></html>`;
 assert.match(await descriptionHtml({ ats: "icims", url: "https://careers.example.com/jobs/1" }, fake(() => page)), /From JSON-LD/);
+assert.match(await descriptionHtml({ ats: "amazon", sourceId: "77" }, fake((u) => u.includes("amazon.jobs/en/search.json?base_query=77") ? { jobs: [{ id_icims: "77", description: "Build things.", basic_qualifications: "- Python<br/>- Linux" }] } : null)), /Build things[\s\S]*<li>Python<\/li><li>Linux<\/li>/, "Amazon: full text from its search feed");
 await assert.rejects(descriptionHtml({ ats: "workday", url: "http://insecure.example.com" }, fake(() => page)), /no page/, "https only");
 const ok = await aboutJob({ listing: { id: "b-acme:123", url: "https://x" }, cfg: { ats: "greenhouse", token: "acme" } }, fake(() => ({ content: "&lt;p&gt;" + "A real description of this job. ".repeat(3) + "&lt;/p&gt;" })));
 assert.equal(ok.ok, true); assert.equal(ok.source, "greenhouse");
