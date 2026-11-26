@@ -1439,6 +1439,18 @@
   loadScope();
 })();
 </script>
+<script>
+// Nov 25 (owner): a side rail starts lower than the top bar until the page scrolls, so its fixed max-height ran past the
+// bottom of the window and its last items (Tools) couldn't be reached. Size each rail to the room it really has.
+(function () {
+  let q = 0;
+  const fit = () => { q = 0; for (const r of document.querySelectorAll(".rail")) { if (!r.offsetParent) continue;
+    const top = Math.max(r.getBoundingClientRect().top, 76); r.style.maxHeight = Math.max(220, innerHeight - top - 16) + "px"; } };
+  const ask = () => { if (!q) q = requestAnimationFrame(fit); };
+  addEventListener("scroll", ask, { passive: true }); addEventListener("resize", ask); addEventListener("load", ask);
+  new MutationObserver(ask).observe(document.body, { childList: true, subtree: true }); ask();
+})();
+</script>
 <script src="/ph.js" defer></script>
 <script src="/logos.js" defer></script>
 <script src="/feedback.js" defer></script>

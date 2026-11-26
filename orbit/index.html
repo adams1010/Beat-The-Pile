@@ -348,12 +348,16 @@
     }
     // Drag sideways = spin (the only thing a student can change). Touch keeps vertical page scrolling (touch-action: pan-y).
     const scale = () => 460 / (svg.getBoundingClientRect().width || 460);
-    svg.addEventListener("pointerdown", (e) => { if (e.button > 0) return; drag = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, lt: performance.now(), moved: false, id: e.pointerId }; vel = 0; });
+    // Nov 25 (owner): grab it like a turntable. The near (bottom) half moves the other way to the far half, so a drag
+    // that starts below the centre turns the spin around; whatever is under the pointer follows it.
+    svg.addEventListener("pointerdown", (e) => { if (e.button > 0) return; const r = svg.getBoundingClientRect();
+      const sign = (e.clientY - r.top) * scale() > C ? -1 : 1;
+      drag = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, lt: performance.now(), moved: false, id: e.pointerId, sign }; vel = 0; });
     svg.addEventListener("pointermove", (e) => {
       if (!drag || e.pointerId !== drag.id) return;
       if (!drag.moved && Math.hypot(e.clientX - drag.x, e.clientY - drag.y) > 6) { drag.moved = true; svg.classList.add("drag"); try { svg.setPointerCapture(e.pointerId); } catch {} }
       if (!drag.moved) return;
-      const k = scale(), dx = (e.clientX - drag.lx) * k, now = performance.now();
+      const k = scale(), dx = (e.clientX - drag.lx) * k * drag.sign, now = performance.now();
       ORB3.theta += dx / 160;
       vel = (dx / 160) / Math.max(now - drag.lt, 1);
       drag.lx = e.clientX; drag.ly = e.clientY; drag.lt = now;
@@ -486,15 +490,16 @@
   document.addEventListener("click", (e) => { if (e.target && e.target.id === "expLater") { try { localStorage.setItem(NKEY, String(Date.now())); } catch {} document.getElementById("expNudge")?.remove(); } });
 
   async function refresh(){ if (S.biz) renderBiz(await api({ action: "biz_orbit" })); else render(await api({ action: "orbit", targets: typed() })); }
-  // Nov 13: tapping a ring shows it at once, then reloads fresh people for it (new classmates, new requests) and, on phones,
-  // scrolls down to the list. Coming back to the tab reloads too (at most every 20 s).
+  // Nov 13: tapping a ring shows it at once, then reloads fresh people for it (new classmates, new requests). Coming back to the tab reloads too (at most every 20 s).
   let lastLoad = Date.now(), loading = false;
   async function pickRing(ring, draw){
-    S.ring = ring; draw(S.o);
+    // Nov 25 (owner): phones stay on the sky like desktop (no jump down to the list); the page keeps its place through both redraws
+    const y = scrollY, keep = () => { if (Math.abs(scrollY - y) > 2) scrollTo(0, y); };
+    S.ring = ring; draw(S.o); keep();
     const sec = document.getElementById("ringList");
-    if (sec) { sec.classList.add("updating"); if (innerWidth < 900) sec.scrollIntoView({ behavior: "smooth", block: "start" }); }
+    if (sec) sec.classList.add("updating");
     if (loading) return; loading = true;
-    try { await refresh(); lastLoad = Date.now(); } catch {} finally { loading = false; }
+    try { await refresh(); keep(); lastLoad = Date.now(); } catch {} finally { loading = false; }
     const sec2 = document.getElementById("ringList"); if (sec2) sec2.classList.remove("updating");
   }
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && S.o && !loading && Date.now() - lastLoad > 20000) { lastLoad = Date.now(); refresh().catch(() => {}); } });

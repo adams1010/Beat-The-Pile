@@ -13,6 +13,7 @@ import { BOTS, BOT_IDS, logRun, botHealth, STALE_MIN, RESTART } from "../lib/bot
 import { aiSummary } from "../lib/aiusage.js";
 import BACKLOG from "../data/backlog.json" with { type: "json" };
 
+const STALE_DAYS = 7;   // Nov 25: open jobs not re-checked for this long are hidden until a read sees them again
 import { isAdminEmail } from "../lib/admins.js";
 const slug = (s) => s.toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 const cleanUrl = (u) => { try { const x = new URL(String(u).trim()); return /^https?:$/.test(x.protocol) ? x.toString() : null; } catch { return null; } };
@@ -106,7 +107,13 @@ export default async function handler(req, res) {
       if (who !== "robot") return res.status(403).json({ error: "Robot only" });
       const { syncOrder } = await import("./sync.js");
       const list = await syncOrder();
-      return res.status(200).json({ runStart: new Date().toISOString(), companies: list.map(({ enabled, discovered, ...c }) => c) });
+      // Nov 25 (owner chose "hide after 7 days"): a job we couldn't re-read for STALE_DAYS (its board refused us, e.g. Workday
+      // answering 429 to GitHub) is hidden by closing it. A read that sees it again reopens it (saveResult upserts closed_at null).
+      // Healthy boards refresh last_seen at least every ~32 h (20 h re-upsert + 12 h Turbo re-send), so 7 days is never a false alarm.
+      let staleHidden = null;
+      try { await db.update(`listings?closed_at=is.null&last_seen=lt.${new Date(Date.now() - STALE_DAYS * 864e5).toISOString()}`, { closed_at: new Date().toISOString() }); staleHidden = "ok"; }
+      catch (e) { staleHidden = "failed"; }
+      return res.status(200).json({ runStart: new Date().toISOString(), staleHidden, companies: list.map(({ enabled, discovered, ...c }) => c) });
     }
     // 🗂 Careers Finder (Nov 21, GitHub cc-careers.yml → scripts/cc-careers.mjs): parked companies' careers pages from
     // Common Crawl's archive. Robot only. Nothing goes live here: a result only becomes a new HINT, and the finder

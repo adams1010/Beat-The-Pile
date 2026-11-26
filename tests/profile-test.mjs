@@ -26,7 +26,7 @@ r = await call("GET", null, null, { u: "ADAM-S" }); assert.equal(r.code, 200);
 assert.equal(r.body.profile.links.linkedin, "", "javascript: link dropped"); assert.equal(r.body.profile.links.github, "https://github.com/x");
 assert.equal(r.body.profile.projects[0].link, "", "http (not https) dropped"); assert.equal(r.body.profile.experience[0].desc.length, 600);
 assert.equal(r.body.profile.gradYear, 2029); assert.equal(r.body.resume, null, "no resume button without a shared resume");
-assert.ok(!("showResume" in r.body.profile)); assert.ok(!JSON.stringify(r.body).includes("pa"), "no user id leaked");
+assert.ok(!("showResume" in r.body.profile)); assert.ok(!JSON.stringify(r.body).includes(`"pa"`), "no user id leaked");   // Nov 25: quoted, the new "gpa" field contains pa
 // resume shows only when the QR link is on
 await call("POST", "pa", { action: "resume", name: "r.pdf", data: Buffer.from("%PDF-1.4 x").toString("base64") });
 assert.equal((await call("GET", null, null, { u: "adam-s" })).body.resume, null, "resume link still private");
