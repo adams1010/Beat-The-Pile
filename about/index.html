@@ -40,6 +40,8 @@
   .person{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px}
   .av{width:56px;height:56px;border-radius:50%;background:var(--navy);color:#B0F701;display:grid;place-items:center;font-weight:650;font-size:19px;margin-bottom:10px}
   .person h3{margin:0;font-size:17px;color:var(--navy)}
+  .person h3 a{color:inherit;text-decoration:none}.person h3 a:hover{text-decoration:underline}
+  .av{overflow:hidden}.av img{width:100%;height:100%;object-fit:cover;display:block}
   .person .role{color:var(--muted);font-size:14px;margin:2px 0 8px}
   .person p{margin:0;font-size:15px}
   .nums{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:12px 0}
@@ -60,14 +62,14 @@
   <h2>Who we are</h2>
   <div class="team">
     <div class="person">
-      <div class="av" aria-hidden="true">AS</div>
-      <h3>Adam Shiloni</h3>
+      <div class="av" data-handle="adamshiloni" aria-hidden="true">AS</div>
+      <h3><a href="/u/adamshiloni">Adam Shiloni</a></h3>
       <div class="role">Co-founder · Mechanical engineering, Virginia Tech, class of 2029</div>
       <p>Adam spent last summer as an engineering intern at Scheerer Bearing Corporation, helping run their repair site day to day. This fall he went to career fairs and info sessions and applied for summer internships, and kept finding the same reposted listings everywhere. He builds the site and the robots that read employers' job boards.</p>
     </div>
     <div class="person">
-      <div class="av" aria-hidden="true">MP</div>
-      <h3>Maddox Potter</h3>
+      <div class="av" data-handle="maddoxpotter" aria-hidden="true">MP</div>
+      <h3><a href="/u/maddoxpotter">Maddox Potter</a></h3>
       <div class="role">Co-founder · Construction engineering and management, Virginia Tech, graduating spring 2027</div>
       <p>Maddox is a Division I cheerleader at Virginia Tech and Adam's cousin. He works on getting Beat the Pile in front of students and helps decide what we build next.</p>
     </div>
@@ -110,6 +112,13 @@
     document.getElementById("nJobs").textContent=f((d.allMajors||0)+(d.fulltime||0)+(d.hourly||0)+(d.shadow||0));
     document.getElementById("nCos").textContent=d.companies!=null?f(d.companies):"-";
   }).catch(function(){document.getElementById("nJobs").textContent="-";document.getElementById("nCos").textContent="-";});
+  // Profile photos come live from our own public profiles, so they stay in step when we change them
+  document.querySelectorAll(".av[data-handle]").forEach(function(el){
+    fetch("/api/me?u="+el.getAttribute("data-handle")).then(function(r){return r.ok?r.json():null}).then(function(d){
+      var ph=d&&d.profile&&d.profile.photo; if(!ph||!/^(data:image\/|https:\/\/)/.test(ph))return;
+      var im=new Image(); im.alt=""; im.src=ph; im.onload=function(){el.textContent="";el.appendChild(im)};
+    }).catch(function(){});
+  });
   fetch("/api/me?founding=1").then(function(r){if(!r.ok)throw 0;return r.json()}).then(function(d){
     document.getElementById("nStu").textContent=typeof d.taken==="number"?f(d.taken):"-";
   }).catch(function(){document.getElementById("nStu").textContent="-";});
