@@ -18,6 +18,13 @@ assert.ok(!/\d+ (jobs|matching)/i.test(fn), "no job counts on /jobs");
 assert.ok(!/—/.test(fn), "no em dashes");
 assert.ok(/render\(\)[\s\S]*cjSync\(\)/.test(page), "render keeps it in step with the search");
 
+// a 2+ word search is sent as one quoted phrase; full-time adds no extra word (checked live Nov 26)
+const ph = eval(page.match(/const cjPhrase = ([^\n]+);/)[1]);
+assert.equal(ph("medical assistant"), '"medical assistant"');
+assert.equal(ph("nursing"), "nursing");
+assert.equal(ph('"data analyst"'), '"data analyst"');
+assert.ok(!/fulltime:/.test(page.match(/const CJ_KIND = [^\n]+/)[0]), "no 'entry level' word");
+
 // disclosed where people read about outside services, and in the cookie banner
 assert.ok(/Careerjet/.test(read("cookies/index.html")) && /Careerjet/.test(read("privacy/index.html")), "cookie + privacy pages");
 assert.ok(/job listings from Careerjet/.test(read("consent.js")), "cookie banner says so");

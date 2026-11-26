@@ -757,13 +757,17 @@
   // the cookie choice allows optional services (btpConsent.analytics()); otherwise one tap loads it for this visit.
   const CJ = { url: "https://widget.careerjet.net/job-box/679d733ccaa09d55b932b54937559a0e", sig: null, ok: false };
   try { CJ.ok = sessionStorage.getItem("btp_cj_ok") === "1"; } catch {}
-  const CJ_KIND = { intern: "internship", fulltime: "entry level", hourly: "part time", shadow: "volunteer" };
+  // Nov 26: checked against the live widget. Careerjet matches each word on its own ("medical assistant" also brought
+  // "Medical Laboratory Technologist", "Physician Assistant"), so a 2+ word search goes in quotes as one phrase (10 of 10
+  // real medical assistant jobs). "entry level" made it worse (X-ray techs, admin), so full-time adds no word.
+  const CJ_KIND = { intern: "internship", hourly: "part time", shadow: "volunteer" };
+  const cjPhrase = (s) => { s = String(s || "").replace(/["“”]/g, "").trim(); return /\s/.test(s) ? `"${s}"` : s; };
   function cjAllowed(){ if (CJ.ok) return true; try { return !!window.btpConsent?.analytics(); } catch { return false; } }
   function cjSync(){
     const box = $("cjBox"); if (!box) return;
     if (!state.loaded || state.savedOnly || state.followOnly || state.company) { box.hidden = true; return; }
     const major = !state.q && !state.cat && state.major !== "all" ? MAJOR_LABEL() : "";
-    const search = [state.q || major, CJ_KIND[state.kind] || ""].filter(Boolean).join(" ").trim();
+    const search = [cjPhrase(state.q || major), CJ_KIND[state.kind] || ""].filter(Boolean).join(" ").trim();
     const location = state.near ? (NP()[0] || "") : Array.isArray(state.st) && state.st.length === 1 ? (NAMES[state.st[0]] || "") : "";
     box.hidden = false;
     const sig = [search, location, cjAllowed()].join("|");
