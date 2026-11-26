@@ -159,7 +159,6 @@
   const PAGE = 25;
   // Workday blocking us (429 / cool-off) isn't a missing link: a pasted link wouldn't help, so those stay out of the queue
   const needsYou = (r) => NEEDS.includes(r.status) && !/\b429\b|cool-off|Workday busy/i.test(r.detail || "");
-  const lucky = (r) => "https://duckduckgo.com/?q=" + encodeURIComponent("\\ " + (r.domain ? `site:${r.domain} careers jobs` : `${r.company} careers jobs`));
   const google = (r) => "https://www.google.com/search?q=" + encodeURIComponent(r.company + " careers jobs");
   function needList(rows){
     const q = S.q.toLowerCase();
@@ -180,7 +179,7 @@
     const inTier = all.filter((r) => S.tier === "all" || (S.tier === "local" ? (r.priority || 0) <= 1 : (r.priority || 0) > 1));
     const whyBtn = (k, l) => { const n = k === "any" ? inTier.length : inTier.filter((r) => r.status === k).length; return n || k === "any" ? `<button class="chip${S.why === k ? " on" : ""}" data-why="${k}">${l} <span>${n}</span></button>` : ""; };
     return `<div class="sheet" id="sheet"><h2>Needs a link</h2>
-      <div class="why">How it works: <b>Open careers page</b> opens their careers page in a new tab. Copy the address of the page that lists their jobs, come back, and <b>paste it in the box</b>. It saves by itself and moves to the next company. A wrong link can't go live: the robot still has to prove the board is theirs.${S.savedN ? ` <b class="okc">${S.savedN} saved this session.</b>` : ""}</div>
+      <div class="why">How it works: <b>Search their careers page</b> opens a Google search in a new tab (their careers page is usually the first result). Copy the address of the page that lists their jobs, come back, and <b>paste it in the box</b>. It saves by itself and moves to the next company. A wrong link can't go live: the robot still has to prove the board is theirs.${S.savedN ? ` <b class="okc">${S.savedN} saved this session.</b>` : ""}</div>
       <div class="chips">${tierBtn("worth", "Worth your time", worth)}${tierBtn("local", "Local businesses (low odds)", all.length - worth)}${tierBtn("all", "All", all.length)}</div>
       <div class="chips">${whyBtn("any", "Any reason")}${whyBtn("no_board", "No job board found")}${whyBtn("identity_failed", "Can't prove it's theirs")}${whyBtn("board_error", "Old link broke")}${whyBtn("blocked", "Site blocks robots")}${whyBtn("no_domain", "No website")}${whyBtn("error", "Error")}</div>
       <div class="tools"><input id="q" placeholder="Search a company, website or source…" value="${esc(S.q)}"><label class="hs"><input type="checkbox" id="hs"${S.hideSaved ? " checked" : ""}> Hide saved</label><button id="csv">Download CSV</button></div>
@@ -189,7 +188,7 @@
       shown.map((r) => { const done = S.saved.has(r.id); return `<li class="qi${done ? " done" : ""}" data-id="${esc(r.id)}">
         <div class="qh"><b>${esc(r.company)}</b>${r.domain ? `<a class="dom" href="https://${esc(r.domain)}" target="_blank" rel="noopener">${esc(r.domain)}</a>` : ""}${r.intern_count ? `<span class="pill">${r.intern_count} internships seen</span>` : ""}</div>
         <div class="qw">${esc(WHAT[r.status] || "Paste their job list page")}</div>
-        <div class="qa"><a class="open" href="${lucky(r)}" target="_blank" rel="noopener">Open careers page ↗</a><a class="alt" href="${google(r)}" target="_blank" rel="noopener">Google</a>
+        <div class="qa"><a class="open" href="${google(r)}" target="_blank" rel="noopener">Search their careers page ↗</a>${r.domain ? `<a class="alt" href="https://${esc(r.domain)}/careers" target="_blank" rel="noopener">${esc(r.domain)}/careers</a>` : ""}
           ${S.admin ? `<input type="url" class="paste" placeholder="${done ? "Saved. Paste again to replace" : "Paste the job list link here"}" aria-label="Job list link for ${esc(r.company)}">` : ""}
           ${done ? `<span class="okc">Saved</span>` : ""}</div>
         ${r.hint && !done ? `<details class="tried"><summary>What the robot tried</summary>${esc(r.hint)}${r.detail ? "<br>" + esc(r.detail) : ""}</details>` : ""}
@@ -259,7 +258,7 @@
     app.querySelector("#prev")?.addEventListener("click", () => { S.page--; toTop(); });
     app.querySelector("#next")?.addEventListener("click", () => { S.page++; toTop(); });
     // Open careers page → that row's paste box is ready when you come back to this tab
-    app.querySelectorAll("a.open").forEach((a) => a.addEventListener("click", () => { S.focus = a.closest("li").dataset.id; }));
+    app.querySelectorAll("a.open, a.alt").forEach((a) => a.addEventListener("click", () => { S.focus = a.closest("li").dataset.id; }));
     async function save(input){
       const li = input.closest("li"), id = li.dataset.id, hint = input.value.trim();
       if (!/^https?:\/\/[^\s]+\.[^\s]+/i.test(hint)) { input.value = ""; input.placeholder = "That isn't a full link (https://…). Paste again"; return; }
