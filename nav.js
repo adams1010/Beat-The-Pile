@@ -205,9 +205,11 @@
     help: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/><path d="m6 6 3.5 3.5M14.5 14.5 18 18M18 6l-3.5 3.5M9.5 14.5 6 18"/>',
     swipe: '<rect x="7" y="4" width="10" height="15" rx="2"/><path d="M4 7v11a2 2 0 0 0 2 2h8"/><path d="M10.5 11.5l1.5 1.5 3-3"/>',
     game: '<rect x="3.5" y="7" width="17" height="10" rx="3"/><path d="M8 10.5v3M6.5 12h3"/><path d="M15.5 11h.01M17.5 13h.01"/>',
+    vibe: '<path d="M12 3.5l2.2 4.6 5 .7-3.6 3.5.9 5-4.5-2.4-4.5 2.4.9-5L4.8 8.8l5-.7z"/>',
+    wrapped: '<rect x="6.5" y="3.5" width="11" height="17" rx="2"/><path d="M9.5 6.5h5"/><path d="M9 15l2-3 2 2 2-4"/>',
     tools: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
   };
-  const TOOL_ICON = { "/internship/": "intern", "/grad/": "grad", "/companies/": "business", "/radar/": "radar", "/clubs/": "clubs", "/#quiz": "quiz", "/#interview": "mic", "/#resumebuilder": "doc", "/#score": "check", "/#wall": "community", "/demo/": "play", "/about/": "about", "/pay/": "pay", "/pulse/": "pulse", "/help/": "help", "/jobs/?mode=swipe": "swipe", "/play/": "game" };
+  const TOOL_ICON = { "/internship/": "intern", "/grad/": "grad", "/companies/": "business", "/radar/": "radar", "/clubs/": "clubs", "/#quiz": "quiz", "/#interview": "mic", "/#resumebuilder": "doc", "/#score": "check", "/#wall": "community", "/demo/": "play", "/about/": "about", "/pay/": "pay", "/pulse/": "pulse", "/help/": "help", "/jobs/?mode=swipe": "swipe", "/play/": "game", "/vibe/": "vibe", "/wrapped/": "wrapped" };
   const svg = (k) => `<svg class="btpic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
   // Account type (chosen once after sign-in on /start/ or in the welcome sheet below): "student" | "employer" | null
   let ROLE = null; try { ROLE = localStorage.getItem("btp_role"); } catch {}
@@ -231,6 +233,8 @@
     ["/radar/", "Opening Radar", "When each company usually opens internships"],
     ["/jobs/?mode=swipe", "Swipe jobs", "Right = Wishlist, left = dump, up = apply now"],
     ["/play/", "Pay Guess", "Daily game: guess what 5 real jobs pay"],
+    ["/vibe/", "Work Vibe quiz", "Seven taps, then swipe jobs that fit you"],
+    ["/wrapped/", "Season Wrapped", "Your job hunt as story slides"],
     ["/pay/", "Internship pay", "What internships really pay, from posted pay"],
     ["/pulse/", "Hiring pulse", "What opened this week, by area and company"],
     ["/clubs/", "Clubs & teams", "Which clubs fit your major and lead to internships"],

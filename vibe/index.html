@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Work Vibe quiz | Beat the Pile</title>
+<meta name="description" content="Seven quick this-or-that taps. Find your work vibe and swipe through real jobs that fit it.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Beat the Pile">
+<meta property="og:title" content="What's your work vibe? | Beat the Pile">
+<meta property="og:description" content="Seven quick taps, then swipe real jobs that fit you.">
+<meta property="og:url" content="https://www.beatthepile.com/vibe/">
+<meta property="og:image" content="https://www.beatthepile.com/icons/og-1200x630.png?v=1">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.beatthepile.com/vibe/">
+<link rel="icon" href="/icons/icon-192.png?v=4">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/fonts/geist.css">
+<link rel="stylesheet" href="/data-pages.css">
+<style>
+  .vb{max-width:640px;margin:0 auto;padding:0 16px}
+  header{padding:20px 0 22px}
+  header h1{font-size:30px;margin:0 0 4px}
+  .prog{display:flex;gap:6px;margin:18px 0 14px}.prog i{flex:1;height:6px;border-radius:999px;background:#DCE2EC}.prog i.on{background:#4A7000}
+  .q{font-size:22px;font-weight:650;letter-spacing:-.01em;margin:0 0 14px;text-align:center}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:520px){.opts{grid-template-columns:1fr}}
+  .opt{font:inherit;text-align:left;background:#fff;border:2px solid var(--line);border-radius:10px;padding:22px 18px;cursor:pointer;min-height:130px;display:flex;flex-direction:column;justify-content:space-between;color:var(--ink)}
+  .opt b{font-size:19px;line-height:1.25;letter-spacing:-.01em}
+  .opt span{font-size:13.5px;color:var(--muted);margin-top:10px}
+  .opt:hover,.opt:focus-visible{border-color:#4A7000;outline:none}
+  .opt.pick{border-color:#4A7000;background:#F2FADF}
+  .or{text-align:center;color:var(--muted);font-size:13px;margin:10px 0}
+  .res{background:#060A2C;color:#fff;border-radius:10px;padding:26px 22px;text-align:center}
+  .res .k{font-size:14px;color:#AEB9CC}
+  .res h2{font-size:38px;margin:6px 0 8px;letter-spacing:-.03em;color:#B0F701}
+  .res p{color:#DCE2EC;max-width:46ch;margin:0 auto 14px}
+  .res .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:6px}
+  .res .chips span{border:1px solid #2A3757;border-radius:999px;padding:4px 12px;font-size:13.5px}
+  .res .also{font-size:13.5px;color:#AEB9CC;margin-top:14px}
+  .acts{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:16px 0 6px}
+  .acts a,.acts button{font:inherit;font-weight:600;font-size:15px;border-radius:999px;padding:11px 18px;cursor:pointer;text-decoration:none;border:1px solid #C9D1DE;background:#fff;color:#060A2C}
+  .acts .go{background:#4A7000;border-color:#4A7000;color:#fff}
+  .live{text-align:center;font-size:14px;color:var(--muted)}
+  .bars{margin-top:14px}
+  .bars div{display:grid;grid-template-columns:120px 1fr 36px;gap:8px;align-items:center;font-size:13.5px;margin:4px 0}
+  .bars i{display:block;height:8px;border-radius:0 4px 4px 0;background:#4A7000}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<header><div class="vb"><h1>What's your work vibe?</h1><p>Seven quick taps. No wrong answers. Then swipe through real jobs that fit you.</p></div></header>
+<main id="main" class="vb">
+  <div class="prog" id="prog" aria-hidden="true"></div>
+  <section id="stage" aria-live="polite"></section>
+  <p class="note" style="text-align:center;margin-top:16px">Just for fun, and to point you at jobs worth a look. It doesn't decide anything for you.</p>
+</main>
+<script src="/feedback.js" defer></script>
+<script src="/ph.js" defer></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const track = (e, p) => { try { window.posthog && posthog.capture(e, p); } catch {} };
+  // each vibe → the /jobs areas (lib/fields.js keys) that fit it
+  const VIBES = {
+    builder:   { name: "The Builder",   line: "You'd rather make it than talk about it. Hands on, problem in front of you, something real at the end of the day.", areas: [["mechanical", "Mechanical & Aerospace"], ["industrial", "Manufacturing"], ["civil", "Construction"], ["electrical", "Electrical"]] },
+    coder:     { name: "The Code Wizard", line: "Give you a laptop and a hard problem and you'll disappear for hours, then come back with something that works.", areas: [["software", "Software"], ["data", "Data & AI"], ["cyber_it", "Cyber & IT"]] },
+    healer:    { name: "The Healer",    line: "People feel better after they talk to you. You want work where you can see the difference you make.", areas: [["science_health", "Health & science"], ["exercise_sport", "Sports & rehab"]] },
+    persuader: { name: "The Persuader", line: "You can sell an idea, a product or a plan. You get energy from people, pitches and a little pressure.", areas: [["sales", "Sales"], ["marketing", "Marketing"]] },
+    strategist:{ name: "The Strategist", line: "You see the numbers behind everything and you like being the one with the plan.", areas: [["finance", "Finance"], ["consulting", "Consulting"]] },
+    creator:   { name: "The Creator",   line: "You notice how things look, feel and sound, and you want to make things people actually like using.", areas: [["product_design", "Product & design"], ["marketing", "Media"]] },
+    helper:    { name: "The Helper",    line: "You're the one people come to. Teaching, mentoring and looking out for others comes naturally.", areas: [["education_social", "Education & social impact"], ["people_hr", "People & HR"]] },
+    organizer: { name: "The Organizer", line: "Chaos is a puzzle to you. You like lists, systems and making sure everything actually gets done.", areas: [["supply_chain", "Operations & supply chain"], ["legal_policy", "Policy & government"], ["people_hr", "HR"]] },
+  };
+  const Q = [
+    ["A free Saturday. You're…", ["Building or fixing something with my hands", "Garage, kitchen, workshop", { builder: 2, creator: 1 }], ["Solving a puzzle on my laptop", "Code, games, rabbit holes", { coder: 2, strategist: 1 }]],
+    ["In a group project you're…", ["The one who pitches it to the class", "Slides, story, confidence", { persuader: 2, helper: 1 }], ["The one who makes the plan", "Who does what, by when", { organizer: 2, strategist: 1 }]],
+    ["Pick a place to work", ["Hospital, clinic or gym floor", "Busy, people, real stakes", { healer: 2, helper: 1 }], ["Studio, startup or open office", "Ideas on every wall", { creator: 2, coder: 1 }]],
+    ["Which feels better?", ["A crowd saying wow", "You made something people love", { creator: 2, persuader: 1 }], ["A spreadsheet that finally balances", "Every number in its place", { strategist: 2, organizer: 1 }]],
+    ["Best compliment you could get", ["You really helped me", "And they meant it", { helper: 2, healer: 1 }], ["You really built that?", "From nothing", { builder: 2, coder: 1 }]],
+    ["Your ideal pace", ["On my feet, moving all day", "Never the same two hours", { builder: 1, healer: 1, organizer: 1 }], ["Deep focus at a desk", "Headphones on, door closed", { coder: 1, strategist: 1, creator: 1 }]],
+    ["Big win at the end of the week", ["I closed the deal", "They said yes", { persuader: 2, strategist: 1 }], ["We shipped it on time", "Nothing fell through", { organizer: 2, builder: 1 }]],
+  ];
+  let i = 0, score = {};
+  const prog = () => { $("prog").innerHTML = Q.map((_, k) => `<i class="${k < i ? "on" : ""}"></i>`).join(""); };
+  function ask() {
+    prog();
+    const [q, a, b] = Q[i];
+    $("stage").innerHTML = `<p class="q">${esc(q)}</p><div class="opts">${[a, b].map((o, k) => `<button type="button" class="opt" data-k="${k}"><b>${esc(o[0])}</b><span>${esc(o[1])}</span></button>`).join("")}</div><p class="or">${i + 1} of ${Q.length}</p>`;
+    $("stage").querySelectorAll(".opt").forEach((btn) => btn.onclick = () => {
+      btn.classList.add("pick");
+      const pts = Q[i][1 + +btn.dataset.k][2]; for (const [k, v] of Object.entries(pts)) score[k] = (score[k] || 0) + v;
+      setTimeout(() => { i++; if (i < Q.length) ask(); else done(); }, 180);
+    });
+    $("stage").querySelector(".opt").focus({ preventScroll: true });
+  }
+  function done() {
+    const ranked = Object.entries(score).sort((a, b) => b[1] - a[1]);
+    const res = { top: ranked[0][0], next: ranked[1] ? ranked[1][0] : null, at: new Date().toISOString() };
+    try { localStorage.setItem("btp_vibe", JSON.stringify(res)); } catch {}
+    track("vibe_done", { vibe: res.top });
+    show(res);
+  }
+  function show(res) {
+    i = Q.length; prog();
+    const v = VIBES[res.top], n2 = res.next && VIBES[res.next];
+    const keys = v.areas.map((a) => a[0]), mn = encodeURIComponent(v.name);
+    const link = (kind) => `/jobs/?major=${keys.join(",")}&mn=${mn}${kind ? "&kind=" + kind : ""}&mode=swipe`;
+    $("stage").innerHTML = `<div class="res"><div class="k">Your work vibe</div><h2>${esc(v.name)}</h2><p>${esc(v.line)}</p>
+        <div class="chips">${v.areas.map((a) => `<span>${esc(a[1])}</span>`).join("")}</div>
+        ${n2 ? `<div class="also">With a side of ${esc(n2.name.replace(/^The /, ""))}</div>` : ""}</div>
+      <p class="live" id="live"></p>
+      <div class="acts"><a class="go" href="${link("")}">Swipe ${esc(v.name.replace(/^The /, ""))} internships</a><a href="${link("hourly")}">Part-time jobs</a><a href="${link("fulltime")}">Entry-level jobs</a></div>
+      <div class="acts"><button type="button" id="share">Share my vibe</button><button type="button" id="again">Take it again</button></div>
+      <div class="bars" id="bars"></div>`;
+    $("again").onclick = () => { i = 0; score = {}; try { localStorage.removeItem("btp_vibe"); } catch {} ask(); };
+    $("share").onclick = async () => {
+      const text = `My work vibe is ${v.name}. What's yours? https://www.beatthepile.com/vibe/`;
+      try { if (navigator.share) await navigator.share({ text }); else { await navigator.clipboard.writeText(text); $("share").textContent = "Copied"; } track("vibe_share", { vibe: res.top }); } catch {}
+    };
+    // live: open internships in these areas right now (real counts)
+    fetch("/api/listings?summary=1").then((r) => r.ok ? r.json() : null).then((d) => {
+      if (!d || !d.byField) return;
+      const rows = v.areas.map((a) => [a[1], d.byField[a[0]] || 0]), tot = rows.reduce((s, r) => s + r[1], 0), max = Math.max(1, ...rows.map((r) => r[1]));
+      $("live").textContent = `${tot.toLocaleString("en-US")} internships open right now that fit ${v.name}.`;
+      $("bars").innerHTML = rows.map(([l, n]) => `<div><span>${esc(l)}</span><span><i style="width:${(n / max * 100).toFixed(0)}%"></i></span><b>${n.toLocaleString("en-US")}</b></div>`).join("");
+    }).catch(() => {});
+  }
+  let saved = null; try { saved = JSON.parse(localStorage.getItem("btp_vibe") || "null"); } catch {}
+  if (saved && VIBES[saved.top] && !/[?&]again/.test(location.search)) show(saved); else ask();
+})();
+</script>
+</body>
+</html>

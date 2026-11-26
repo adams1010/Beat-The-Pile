@@ -192,6 +192,7 @@
         <optgroup label="Science, policy &amp; more"><option value="exercise_sport">Exercise Science, Sports &amp; Rehab</option><option value="science_health">Science, Health &amp; Environment</option><option value="legal_policy">Legal, Policy &amp; Government</option><option value="education_social">Education &amp; Social Impact</option><option value="other">Other / general</option></optgroup>
       </select></label>
     <div class="chips" id="chips"></div>
+    <section class="bingo" id="bingo" hidden aria-label="Fair Bingo"></section>
     <div id="featured"></div>
     <div id="cos"><div class="empty">Loading companies…</div></div>
   </section>
@@ -325,6 +326,7 @@
   }
   async function pickFair(id){
     S.fair = S.fairs.find((f) => f.id === id);
+    try { if (S.fair) dispatchEvent(new CustomEvent("btp-fair", { detail: { id: S.fair.id, name: S.fair.name } })); } catch {}   // Fair Bingo (preview) listens
     $("#fairsel").value = id; S.open.clear();
     const booths = S.fair.companies.filter((c) => c.booth).length;
     $("#fairmeta").textContent = (S.fair.companies.length
@@ -713,6 +715,56 @@ ${me}${email ? "\n" + email : ""}`;
 })();
 </script>
 <script src="/ph.js" defer></script>
+<style>
+  /* Fair Bingo (preview): a 4x4 card of real-fair moves; a line = bingo. Kept per fair on this device. */
+  .bingo{background:#fff;border:1px solid var(--line,#DCE2EC);border-radius:10px;padding:14px 14px 12px;margin:12px 0}
+  .bgh{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}
+  .bgh b{font-size:17px}.bgh span{font-size:13.5px;color:#55627A}
+  .bgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .bsq{font:inherit;font-size:12.5px;line-height:1.25;min-height:78px;padding:8px 6px;border:1.5px solid #DCE2EC;background:#fff;border-radius:8px;cursor:pointer;color:#060A2C;text-align:center;display:flex;align-items:center;justify-content:center}
+  .bsq[aria-pressed="true"]{background:#060A2C;border-color:#060A2C;color:#fff}
+  .bsq.free,.bsq.free[aria-pressed="true"]{background:#F2FADF;border-color:#DDF3A8;color:#3A5A00;font-weight:600;cursor:default}
+  .bsq.line{outline:3px solid #B0F701;outline-offset:-3px}
+  .bsq:focus-visible{outline:2px solid #4A7000;outline-offset:2px}
+  .bgfoot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:10px;font-size:14px;flex-wrap:wrap}
+  .bgwin{background:#060A2C;color:#fff;border-radius:8px;padding:10px 12px;margin-top:10px;font-size:14.5px}.bgwin b{color:#B0F701}
+  .bgfoot button{font:inherit;font-weight:600;border:1px solid #C9D1DE;background:#fff;border-radius:999px;padding:6px 14px;cursor:pointer;color:#060A2C}
+  @media(max-width:520px){.bsq{font-size:11.5px;min-height:70px;padding:6px 4px}.bgh{flex-direction:column;gap:2px}}
+</style>
+<script>
+(function () {
+  const box = document.getElementById("bingo"); if (!box) return;
+  const SQ = ["Talk to a company you'd never heard of", "Ask what last year's interns worked on", "Get a recruiter's name", "Visit a company hiring your major",
+    "Ask if interns get return offers", "Give your 30-second pitch", "FREE: You showed up", "Ask what a normal day looks like",
+    "Find a company hiring in your home state", "Ask how they pick who interviews", "Talk to a company outside your major", "Write a note right after a booth",
+    "Ask about pay or housing", "Go to the booth with the shortest line", "Share your QR resume", "Connect with someone you met"];
+  const LINES = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15],[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15],[0,5,10,15],[3,6,9,12]];
+  let fair = null, on = new Set([6]);
+  const key = () => "btp_bingo_" + (fair && fair.id || "any");
+  const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  function load() { try { on = new Set(JSON.parse(localStorage.getItem(key()) || "[6]")); } catch { on = new Set([6]); } on.add(6); }
+  function save() { try { localStorage.setItem(key(), JSON.stringify([...on])); } catch {} }
+  function paint() {
+    const won = LINES.filter((l) => l.every((k) => on.has(k))), inLine = new Set(won.flat()), all = on.size === 16;
+    box.hidden = false;
+    box.innerHTML = `<div class="bgh"><b>Fair Bingo</b><span>${fair ? esc(fair.name) : "Your next fair"} · tap a square when you do it</span></div>
+      <div class="bgrid">${SQ.map((s, k) => `<button type="button" class="bsq${k === 6 ? " free" : ""}${inLine.has(k) ? " line" : ""}" data-k="${k}" aria-pressed="${on.has(k)}"${k === 6 ? " disabled" : ""}>${esc(s.replace(/^FREE: /, ""))}</button>`).join("")}</div>
+      ${won.length ? `<div class="bgwin" role="status">${all ? "<b>Blackout.</b> You did every square. That's how offers start." : `<b>Bingo${won.length > 1 ? " x" + won.length : ""}!</b> ${won.length === 1 ? "One line down." : won.length + " lines down."} Keep going for a blackout.`}</div>` : ""}
+      <div class="bgfoot"><span>${on.size - 1} of 15 done</span><span><button type="button" id="bgShare">Share</button> <button type="button" id="bgReset">Reset</button></span></div>`;
+  }
+  box.addEventListener("click", async (e) => {
+    const b = e.target.closest(".bsq"); if (b && !b.disabled) { const k = +b.dataset.k; on.has(k) ? on.delete(k) : on.add(k); save(); paint(); try { window.posthog && posthog.capture("fair_bingo", { done: on.size - 1 }); } catch {} return; }
+    if (e.target.closest("#bgReset")) { on = new Set([6]); save(); paint(); return; }
+    if (e.target.closest("#bgShare")) {
+      const lines = LINES.filter((l) => l.every((k) => on.has(k))).length;
+      const text = `Fair Bingo${fair ? " at " + fair.name : ""}: ${on.size - 1}/15 squares${lines ? ", " + lines + (lines === 1 ? " line" : " lines") : ""}. https://www.beatthepile.com/fair/`;
+      try { if (navigator.share) await navigator.share({ text }); else { await navigator.clipboard.writeText(text); e.target.textContent = "Copied"; } } catch {}
+    }
+  });
+  addEventListener("btp-fair", (e) => { fair = e.detail; load(); paint(); });
+  load(); paint();
+})();
+</script>
 <script src="/feedback.js" defer></script>
 </body>
 </html>

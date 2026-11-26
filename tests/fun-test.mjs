@@ -33,4 +33,15 @@ assert.ok(!/>(WISHLIST|DUMP|APPLY NOW)</.test(jobs), "no ALL-CAPS labels");
 assert.ok(read("swipe/index.html").includes('location.replace("/jobs/?mode=swipe"'), "old /swipe/ links forward to Swipe mode");
 const nav = read("nav.js"); assert.ok(nav.includes('["/jobs/?mode=swipe"') && nav.includes('["/play/"') && nav.includes('"/jobs/?mode=swipe": "swipe"') && nav.includes('"/play/": "game"'), "Tools menu + own icons");
 assert.ok(read(".github/workflows/data-bots.yml").includes("pay/game.json"));
+// Nov 26: flip card, Fresh drops, Work Vibe quiz, Fair Bingo, Season Wrapped
+assert.ok(jobs.includes('fetch("/api/listings?about=" + encodeURIComponent(j.id))') && jobs.includes("swFlip(card, j)") && jobs.includes('class="face back"'), "tap flips the card; the back loads ?about=");
+assert.ok(jobs.includes("if (key === SW.painted && st.querySelector(\".swcard\")) return;"), "more result pages arriving don't flip the card back");
+assert.ok(jobs.includes('id="drops"') && jobs.includes("48 * 36e5") && jobs.includes("j.company_id === SW.only"), "Fresh drops: last 48 h of this search; tap = swipe only that company");
+const vibe = read("vibe/index.html"), fair = read("fair/index.html"), wrapped = read("wrapped/index.html");
+for (const [k] of [["mechanical"], ["software"], ["science_health"], ["sales"], ["finance"], ["product_design"], ["education_social"], ["supply_chain"]]) assert.ok(vibe.includes(`["${k}"`), "vibe maps to real /jobs areas: " + k);
+assert.ok(vibe.includes("&mode=swipe") && vibe.includes("/api/listings?summary=1"), "vibe → swipe deck + live counts (no made-up numbers)");
+assert.ok(fair.includes('dispatchEvent(new CustomEvent("btp-fair"') && fair.includes('id="bingo"') && fair.includes("btp_bingo_"), "Bingo per fair, kept on the device");
+assert.ok(wrapped.includes('<span class="ex">Example</span>') && wrapped.includes("const example = !apps || apps.length < 3"), "Wrapped: your real tracker, else a labeled Example");
+for (const h of [vibe, wrapped]) { assert.ok(!h.includes("—"), "no em dashes"); assert.ok(h.includes('<script src="/nav.js"></script>')); }
+assert.ok(nav.includes('["/vibe/"') && nav.includes('["/wrapped/"') && nav.includes('"/vibe/": "vibe"') && nav.includes('"/wrapped/": "wrapped"'), "Tools menu + own icons");
 console.log("✓ fun: Pay Guess pool (balanced, sane, stable); Swipe mode in Jobs (Wishlist / dump / apply now); both in Tools + footer");

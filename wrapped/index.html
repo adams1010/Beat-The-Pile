@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Season Wrapped | Beat the Pile</title>
+<meta name="description" content="Your job-hunting season in a few slides: applications, companies, your busiest week, interviews and your fastest apply.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="/icons/icon-192.png?v=4">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/fonts/geist.css">
+<link rel="stylesheet" href="/data-pages.css">
+<style>
+  .wr{max-width:460px;margin:0 auto;padding:18px 16px 30px}
+  .story{position:relative;aspect-ratio:9/16;max-height:80vh;margin:0 auto;background:#060A2C;color:#fff;border-radius:14px;overflow:hidden;user-select:none;-webkit-user-select:none}
+  .bars{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:4px;z-index:3}
+  .bars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden}
+  .bars i b{display:block;height:100%;width:0;background:#fff}
+  .bars i.done b{width:100%}
+  .story.onlime .bars i{background:rgba(6,10,44,.18)}.story.onlime .bars i b{background:#060A2C}
+  .slide{position:absolute;inset:0;padding:54px 26px 30px;display:flex;flex-direction:column;justify-content:center}
+  .slide .k{font-size:15px;color:#AEB9CC;margin-bottom:10px}
+  .slide .big{font-size:76px;line-height:1;font-weight:700;letter-spacing:-.04em;color:#B0F701}
+  .slide h2{font-size:30px;line-height:1.15;letter-spacing:-.02em;margin:10px 0}
+  .slide p{font-size:17px;color:#DCE2EC;line-height:1.45;margin:6px 0}
+  .slide .list{margin-top:16px}
+  .slide .list div{display:flex;justify-content:space-between;border-top:1px solid #1E2A4A;padding:9px 0;font-size:16px}
+  .slide .list div b{color:#B0F701}
+  .slide.lime{background:#B0F701;color:#060A2C}.slide.lime .k{color:#3A5A00}.slide.lime .big{color:#060A2C}.slide.lime p{color:#1A2A00}
+  .slide .shape{position:absolute;right:-60px;bottom:-60px;width:220px;height:220px;border-radius:50%;border:28px solid rgba(176,247,1,.14)}
+  .slide.lime .shape{border-color:rgba(6,10,44,.1)}
+  .tapL,.tapR{position:absolute;top:0;bottom:0;z-index:2;background:none;border:0;cursor:pointer}
+  .tapL{left:0;width:35%}.tapR{right:0;width:65%}
+  .tapL:focus-visible,.tapR:focus-visible{outline:2px solid #B0F701;outline-offset:-4px}
+  .ex{position:absolute;top:22px;right:14px;z-index:3;background:#B0F701;color:#060A2C;font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px}
+  .under{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .under a,.under button{font:inherit;font-weight:600;font-size:15px;border:1px solid #C9D1DE;background:#fff;color:#060A2C;border-radius:999px;padding:10px 16px;cursor:pointer;text-decoration:none}
+  .under .go{background:#4A7000;border-color:#4A7000;color:#fff}
+  .hint{text-align:center;font-size:13px;color:var(--muted);margin-top:8px}
+  @media (prefers-reduced-motion:reduce){.bars i b{transition:none!important}}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<main id="main" class="wr">
+  <div class="story" id="story" aria-live="polite"><div class="slide"><div class="skel" style="height:60%"></div></div></div>
+  <div class="under" id="under"></div>
+  <p class="hint">Tap the right side for next, left to go back. Hold to pause.</p>
+</main>
+<script src="/feedback.js" defer></script>
+<script src="/ph.js" defer></script>
+<script type="module">
+import { fieldOf, FIELD_LABELS } from "/lib/fields.js";
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const track = (e, p) => { try { window.posthog && posthog.capture(e, p); } catch {} };
+const DAY = 864e5;
+// Example season for visitors who aren't signed in (always labeled "Example")
+const ago = (d) => new Date(Date.now() - d * DAY).toISOString();
+const EXAMPLE = [
+  ["Northrop Grumman", "Mechanical Engineering Intern", 52, "interview", 50.1], ["Lockheed Martin", "Systems Engineering Intern", 49, "applied", 47.8], ["Boeing", "Manufacturing Engineering Intern", 47, "applied", 44],
+  ["Siemens", "Mechanical Design Intern", 40, "rejected", 39.9], ["Tesla", "Production Engineering Intern", 33, "applied", 31], ["GE Aerospace", "Engineering Intern", 32, "interview", 31.5],
+  ["Collins Aerospace", "Mechanical Engineering Co-op", 31, "applied", 30], ["Rolls-Royce", "Engineering Intern", 30, "applied", 29], ["John Deere", "Product Engineering Intern", 24, "offer", 23.95],
+  ["Caterpillar", "Engineering Intern", 18, "applied", 16], ["Honeywell", "Mechanical Engineering Intern", 12, "interview", 11.6], ["Dominion Energy", "Engineering Intern", 6, "applied", 5.2],
+].map(([company, title, d, stage, posted]) => ({ company, title, appliedAt: ago(d), stage, firstSeenAt: ago(posted) }));
+
+async function myApps() {
+  for (let i = 0; i < 30 && !window.Clerk?.loaded; i++) await new Promise((z) => setTimeout(z, 100));
+  const t = await window.Clerk?.session?.getToken?.().catch(() => null);
+  if (!t) return null;
+  const r = await fetch("/api/me", { headers: { Authorization: "Bearer " + t } });
+  if (!r.ok) return null;
+  const d = await r.json();
+  return Array.isArray(d.apps) ? d.apps : [];
+}
+function stats(apps) {
+  const cos = new Set(apps.map((a) => a.company).filter(Boolean));
+  const weeks = new Map();
+  for (const a of apps) { const d = new Date(a.appliedAt); const m = new Date(d); m.setDate(d.getDate() - ((d.getDay() + 6) % 7)); m.setHours(0, 0, 0, 0); const k = m.toISOString().slice(0, 10); weeks.set(k, (weeks.get(k) || 0) + 1); }
+  const busy = [...weeks].sort((a, b) => b[1] - a[1])[0];
+  const areas = new Map(); for (const a of apps) { const f = fieldOf(a.title || ""); if (f && f !== "other") areas.set(f, (areas.get(f) || 0) + 1); }
+  const topArea = [...areas].sort((a, b) => b[1] - a[1])[0];
+  const fast = apps.map((a) => ({ a, h: (Date.parse(a.appliedAt) - Date.parse(a.firstSeenAt || a.postedAt || "")) / 36e5 })).filter((x) => x.h >= 0 && x.h < 24 * 60).sort((x, y) => x.h - y.h)[0];
+  const n = (s) => apps.filter((a) => a.stage === s).length;
+  const interviews = apps.filter((a) => a.stage === "interview" || a.stage === "offer" || a.checks?.interviewed).length;
+  const offers = apps.filter((a) => a.stage === "offer" || a.checks?.offered).length;
+  return { total: apps.length, cos: cos.size, busy, topArea, fast, interviews, offers, rejected: n("rejected"), topCos: [...cos].slice(0, 5) };
+}
+function slides(s, example, vibe) {
+  const out = [];
+  const wk = s.busy ? new Date(s.busy[0] + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric" }) : "";
+  const hrs = s.fast ? (s.fast.h < 1 ? "under an hour" : s.fast.h < 48 ? Math.round(s.fast.h) + " hours" : Math.round(s.fast.h / 24) + " days") : "";
+  out.push(`<div class="slide"><div class="k">${example ? "An example season" : "Your season so far"}</div><h2>Your job hunt,<br>wrapped.</h2><p>Every application you tracked on Beat the Pile, in a few slides.</p><span class="shape"></span></div>`);
+  out.push(`<div class="slide lime"><div class="k">You applied to</div><div class="big">${s.total}</div><h2>${s.total === 1 ? "job" : "jobs"}</h2><p>at ${s.cos} ${s.cos === 1 ? "company" : "different companies"}. That's ${s.total} more shots than staying in.</p><span class="shape"></span></div>`);
+  if (s.busy && s.busy[1] > 1) out.push(`<div class="slide"><div class="k">Your busiest week</div><div class="big">${s.busy[1]}</div><h2>applications the week of ${esc(wk)}</h2><p>That's the week you locked in.</p><span class="shape"></span></div>`);
+  if (s.topArea) out.push(`<div class="slide"><div class="k">Your top area</div><h2>${esc(FIELD_LABELS[s.topArea[0]] || s.topArea[0])}</h2><p>${s.topArea[1]} of your applications were here.</p><div class="list">${s.topCos.map((c) => `<div><span>${esc(c)}</span></div>`).join("")}</div><span class="shape"></span></div>`);
+  if (s.fast) out.push(`<div class="slide lime"><div class="k">Fastest apply</div><h2>${esc(s.fast.a.company)}</h2><p>You applied ${esc(hrs)} after it went up. Early applications get read first.</p><span class="shape"></span></div>`);
+  out.push(`<div class="slide"><div class="k">What came back</div><div class="list"><div><span>Interviews</span><b>${s.interviews}</b></div><div><span>Offers</span><b>${s.offers}</b></div><div><span>Still waiting</span><b>${Math.max(0, s.total - s.interviews - s.rejected)}</b></div></div><p style="margin-top:18px">${s.offers ? "An offer. That's the whole point. Go celebrate." : s.interviews ? "Interviews mean your resume works. Keep the volume up." : "No interviews yet is normal this early. Most people need a lot of applications per interview."}</p><span class="shape"></span></div>`);
+  out.push(`<div class="slide lime"><div class="k">Your work vibe</div><h2>${vibe ? esc(vibe) : "Not found yet"}</h2><p>${vibe ? "Swipe more jobs that fit it." : "Seven taps to find out."}</p><span class="shape"></span></div>`);
+  out.push(`<div class="slide"><div class="k">Up next</div><h2>Keep the streak going.</h2><p>New jobs land every few hours. The early ones get read first.</p><span class="shape"></span></div>`);
+  return out;
+}
+const VIBE_NAMES = { builder: "The Builder", coder: "The Code Wizard", healer: "The Healer", persuader: "The Persuader", strategist: "The Strategist", creator: "The Creator", helper: "The Helper", organizer: "The Organizer" };
+let vibe = null; try { const v = JSON.parse(localStorage.getItem("btp_vibe") || "null"); vibe = v && VIBE_NAMES[v.top]; } catch {}
+let apps = null; try { apps = await myApps(); } catch {}
+const example = !apps || apps.length < 3;
+const S = stats(example ? EXAMPLE : apps), SL = slides(S, example, vibe);
+track("wrapped_open", { example, n: S.total });
+let i = 0, t0 = 0, raf = 0, paused = false, elapsed = 0;
+const DUR = 5000, story = $("story");
+function show(k) {
+  i = Math.max(0, Math.min(SL.length - 1, k)); elapsed = 0; t0 = performance.now();
+  story.innerHTML = `<div class="bars">${SL.map((_, j) => `<i class="${j < i ? "done" : ""}"><b></b></i>`).join("")}</div>${example ? '<span class="ex">Example</span>' : ""}${SL[i]}<button class="tapL" aria-label="Previous"></button><button class="tapR" aria-label="Next"></button>`;
+  story.classList.toggle("onlime", SL[i].includes("slide lime"));
+  story.querySelector(".tapL").onclick = () => show(i - 1);
+  story.querySelector(".tapR").onclick = () => (i < SL.length - 1 ? show(i + 1) : null);
+}
+function tick(now) {
+  if (!paused) { elapsed = now - t0; const b = story.querySelectorAll(".bars i b")[i]; if (b) b.style.width = Math.min(100, elapsed / DUR * 100) + "%"; if (elapsed >= DUR && i < SL.length - 1) show(i + 1); }
+  else t0 = now - elapsed;
+  raf = requestAnimationFrame(tick);
+}
+story.addEventListener("pointerdown", () => { paused = true; }); addEventListener("pointerup", () => { paused = false; });
+addEventListener("keydown", (e) => { if (e.key === "ArrowRight") show(i + 1); if (e.key === "ArrowLeft") show(i - 1); });
+show(0);
+if (!matchMedia("(prefers-reduced-motion: reduce)").matches) raf = requestAnimationFrame(tick);
+const share = `My job hunt, wrapped: ${S.total} applications to ${S.cos} companies, ${S.interviews} interviews${S.offers ? ", " + S.offers + " offer" + (S.offers > 1 ? "s" : "") : ""}. https://www.beatthepile.com/`;
+$("under").innerHTML = example
+  ? `<a class="go" href="/start/?next=/wrapped/">Sign in to see yours</a><a href="/jobs/">Start applying</a>`
+  : `<button type="button" id="share">Share my Wrapped</button><a class="go" href="/jobs/">Keep swiping</a>`;
+$("share")?.addEventListener("click", async (e) => { try { if (navigator.share) await navigator.share({ text: share }); else { await navigator.clipboard.writeText(share); e.target.textContent = "Copied"; } track("wrapped_share", {}); } catch {} });
+</script>
+</body>
+</html>

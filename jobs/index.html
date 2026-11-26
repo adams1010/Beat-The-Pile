@@ -279,10 +279,50 @@
   .modeseg button[aria-pressed="true"]{background:#B0F701;color:#060A2C}
   .modeseg button:focus-visible{outline:2px solid #B0F701;outline-offset:2px}
   .swipebox{max-width:560px;margin:4px auto 0}
+  /* Fresh drops (preview): Instagram-style story circles for companies that posted in the last 48 h of this search */
+  .drops{margin:2px 0 12px}
+  .drops .dh{display:flex;justify-content:space-between;align-items:baseline;margin:0 2px 8px;font-size:14px}.drops .dh b{font-size:15px}.drops .dh span{color:var(--muted)}
+  .drow{display:flex;gap:14px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}.drow::-webkit-scrollbar{display:none}
+  .drop{flex:none;width:72px;border:0;background:none;padding:0;font:inherit;cursor:pointer;text-align:center;color:var(--ink)}
+  .drop .ring{width:66px;height:66px;margin:0 auto 5px;border-radius:50%;padding:3px;background:#B0F701;display:grid;place-items:center}
+  .drop.seen .ring{background:#DCE2EC}
+  .drop .ring .lg{width:58px;height:58px;border-radius:50%;border:3px solid #fff;font-size:15px;background:#F1F4F9;overflow:hidden}
+  .drop .ring .lg img{border-radius:50%}
+  .drop .nm{display:block;font-size:12.5px;font-weight:600;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .drop .n{display:block;font-size:11.5px;color:var(--muted)}
+  .drop[aria-pressed="true"] .ring{background:#060A2C}
+  .drop:focus-visible{outline:2px solid #4A7000;outline-offset:3px;border-radius:10px}
+  .onlyco{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#F2FADF;border-radius:10px;padding:8px 12px;margin:0 0 10px;font-size:14px}
+  .onlyco button{font:inherit;font-weight:600;border:0;background:none;color:#3A5A00;cursor:pointer;text-decoration:underline}
   .swbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:2px 0 10px;font-size:14px;color:var(--muted)}
   .swbar .wl{font:inherit;font-weight:600;border:1px solid #C9D1DE;background:#fff;color:#3A5A00;border-radius:999px;padding:6px 14px;cursor:pointer}
   .swstack{position:relative;height:330px}
-  .swcard{position:absolute;inset:0;background:#fff;border:1px solid var(--line);border-radius:10px;padding:22px 22px 18px;display:flex;flex-direction:column;user-select:none;-webkit-user-select:none;cursor:grab;touch-action:none;will-change:transform}
+  .swcard{position:absolute;inset:0;perspective:1400px;user-select:none;-webkit-user-select:none;cursor:grab;touch-action:none;will-change:transform}
+  .swin{position:relative;width:100%;height:100%;transition:transform .45s ease;transform-style:preserve-3d}
+  .swcard.flipped .swin{transform:rotateY(180deg)}
+  .swcard.flipped{cursor:default}
+  .face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;background:#fff;border:1px solid var(--line);border-radius:10px;padding:22px 22px 18px;display:flex;flex-direction:column;overflow:hidden}
+  .face.back{transform:rotateY(180deg);padding:0;user-select:text;-webkit-user-select:text}
+  .fliphint{display:inline-flex;align-items:center;gap:5px;color:#3A5A00;font-weight:600;margin-right:10px}.fliphint svg{width:15px;height:15px}
+  .bkhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:14px 16px 10px;border-bottom:1px solid var(--line)}
+  .bkhead b{display:block;font-size:16px;line-height:1.25}.bkhead span{font-size:13.5px;color:var(--muted)}
+  .bkx{font:inherit;font-size:13.5px;font-weight:600;border:1px solid #C9D1DE;background:#fff;color:#060A2C;border-radius:999px;padding:5px 11px;cursor:pointer;display:inline-flex;gap:5px;align-items:center;flex:none}.bkx svg{width:14px;height:14px}
+  .bkbody{flex:1;overflow:auto;padding:12px 16px 14px;touch-action:pan-y;overscroll-behavior:contain;font-size:14.5px}
+  .bkfacts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+  .bkf{background:#F5F7FA;border-radius:8px;padding:8px 10px;min-width:0}.bkf span{display:block;font-size:12px;color:var(--muted)}.bkf b{font-size:14px;font-weight:600;overflow-wrap:anywhere}.bkf small{font-weight:400;color:var(--muted);font-size:12px}
+  .bkf i{display:inline-block;font-style:normal;font-weight:500;font-size:12.5px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin:2px 4px 0 0}
+  .bkf:has(i){grid-column:1/-1}
+  .bkbody h4{font-size:14.5px;margin:12px 0 6px}.bkbody ul{margin:0;padding-left:18px}.bkbody li{margin:3px 0}
+  .bktext{white-space:pre-line;margin:0;color:#2A3446;line-height:1.55}
+  .bknote{font-size:13.5px;color:var(--muted)}
+  .bkco{font-size:14px;background:#F2FADF;border-radius:8px;padding:8px 10px;margin:12px 0 0}
+  .bkact{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .bkact a,.bkact button{font:inherit;font-size:14px;font-weight:600;border:1px solid #C9D1DE;background:#fff;color:#060A2C;border-radius:999px;padding:8px 14px;cursor:pointer;text-decoration:none}
+  .bkact .bkgo{background:#4A7000;border-color:#4A7000;color:#fff}
+  .bkload .skel{height:16px;margin:8px 0;border-radius:6px}
+  .swstack.tall{height:560px}
+  @media (max-width:640px){.swstack.tall{height:540px}.bkf{padding:7px 9px}}
+  @media (prefers-reduced-motion:reduce){.swin{transition:none}}
   .swcard.back{transform:scale(.96) translateY(10px);pointer-events:none}
   .swcard.back2{transform:scale(.92) translateY(20px);pointer-events:none}
   .swcard .swco{display:flex;align-items:center;gap:10px;margin-bottom:14px}
@@ -450,6 +490,7 @@
   <div class="hd"><div><b id="tlTitle">Tailor your resume</b><span id="tlJob"></span></div><button class="x" type="button" id="tlX" aria-label="Close">×</button></div>
   <div class="bd" id="tlBody"></div>
 </dialog>
+      <section class="drops" id="drops" hidden aria-label="Fresh drops: companies that just posted"></section>
       <section class="swipebox" id="swipeBox" hidden aria-label="Swipe through jobs"></section>
       <div class="list" id="list">
         <div class="skel"></div><div class="skel"></div><div class="skel"></div>
@@ -799,6 +840,7 @@
     const KNAME = { intern: "Internships", fulltime: "Entry-level", hourly: "Part-time & hourly", shadow: "Shadowing & volunteer" };
     const widenNote = (state.widenedFrom && state.major === "all" && state.widenedFor === state.q ? `<div class="simhead"><span>Searched every major, ${esc(state.widenedFrom)} had only a few matches.</span></div>` : "")
       + (state.kindWidenedFrom && state.kind === "all" && state.kindWidenedFor === state.q ? `<div class="simhead"><span>Searched every job type, ${esc(KNAME[state.kindWidenedFrom] || "")} had only a few matches.</span></div>` : "");
+    try { paintDrops(); } catch (e) { console.error("[jobs] drops", e); }
     if (state.swipe && !state.savedOnly && !state.followOnly) {   // Swipe mode: the same results, one card at a time
       $("list").hidden = true; $("swipeBox").hidden = false; $("cjBox").hidden = true; LIST.io?.disconnect();
       paintSwipe(); return;
@@ -847,19 +889,84 @@
   // Deals the exact results of the current search + filters (LIST.rows). Right adds to the Wishlist (the saved list,
   // same storage as ♡ Save), left dumps it, up opens the application and asks "Did you apply?" when you come back.
   // Swiped ids never come back on this device (btp_swiped, shared with the old /swipe/ page).
-  const SW = { seen: new Set(), hist: [], wish: 0 };
+  const SW = { seen: new Set(), hist: [], wish: 0, painted: "" };
   try { SW.seen = new Set(JSON.parse(localStorage.getItem("btp_swiped") || "[]")); } catch {}
   const swSave = () => { try { localStorage.setItem("btp_swiped", JSON.stringify([...SW.seen].slice(-3000))); } catch {} };
-  const swDeck = () => LIST.rows.filter((j) => !SW.seen.has(j.id) && !j.ids.some((id) => state.mine.saved.has(id) || state.mine.applied.has(id)));
+  const swDeck = () => LIST.rows.filter((j) => !SW.seen.has(j.id) && !j.ids.some((id) => state.mine.saved.has(id) || state.mine.applied.has(id)) && (!SW.only || j.company_id === SW.only));
+  // ── Fresh drops (preview): companies in this search that posted in the last 48 h, as story circles. Tap = swipe only theirs. ──
+  let dropsSeen = new Set(); try { dropsSeen = new Set(JSON.parse(localStorage.getItem("btp_drops_seen") || "[]")); } catch {}
+  function paintDrops(){
+    const box = $("drops"); if (!box) return;
+    if (!state.loaded || state.savedOnly || state.followOnly || state.company) { box.hidden = true; return; }
+    const since = Date.now() - 48 * 36e5, by = new Map();
+    for (const j of LIST.rows) { if (!j.company_id || Date.parse(j.first_seen) < since) continue; const g = by.get(j.company_id) || { id: j.company_id, name: j.company, n: 0 }; g.n++; by.set(j.company_id, g); }
+    const list = [...by.values()].sort((a, b) => b.n - a.n).slice(0, 16);   // steady order; ones you opened turn grey
+    if (list.length < 3) { box.hidden = true; return; }
+    box.hidden = false;
+    const short = (s) => String(s).replace(/,? (inc|llc|corp(oration)?|co|company|group|holdings|health system|healthcare)\.?$/i, "");
+    box.innerHTML = `<div class="dh"><b>Fresh drops</b><span>Posted in the last 2 days</span></div><div class="drow" role="list">${list.map((g) =>
+      `<button type="button" class="drop${dropsSeen.has(g.id) ? " seen" : ""}" role="listitem" data-drop="${esc(g.id)}" aria-pressed="${SW.only === g.id}" aria-label="${esc(g.name)}: ${g.n} new"><span class="ring"><span class="lg" data-logo-id="${esc(g.id)}">${esc(initials(g.name))}</span></span><span class="nm" data-noi18n>${esc(short(g.name))}</span><span class="n">${g.n} new</span></button>`).join("")}</div>`
+      + (SW.only ? `<div class="onlyco"><span>Swiping only <b data-noi18n>${esc((by.get(SW.only) || { name: "" }).name)}</b></span><button type="button" data-drop-all>Show everyone</button></div>` : "");
+    try { window.btpLogos && window.btpLogos(); } catch {}
+  }
+  $("drops").addEventListener("click", (e) => {
+    const all = e.target.closest("[data-drop-all]"); if (all) { SW.only = null; SW.painted = ""; paintDrops(); paintSwipe(); return; }
+    const b = e.target.closest("[data-drop]"); if (!b) return;
+    const id = b.dataset.drop; SW.only = SW.only === id ? null : id; dropsSeen.add(id);
+    try { localStorage.setItem("btp_drops_seen", JSON.stringify([...dropsSeen].slice(-300))); } catch {}
+    track("drops_open", { on: !!SW.only });
+    SW.painted = "";
+    if (!state.swipe) setMode("swipe"); else { paintDrops(); paintSwipe(); }
+  });
   const SVG = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
   function swCard(j, cls){
     const p = payOf(j.id);
-    return `<article class="swcard ${cls}" data-id="${esc(j.id)}" ${cls ? 'aria-hidden="true"' : `tabindex="0" aria-label="${esc(niceTitle(j.title) + " at " + j.company)}"`}>
+    return `<article class="swcard ${cls}" data-id="${esc(j.id)}" ${cls ? 'aria-hidden="true"' : `tabindex="0" aria-label="${esc(niceTitle(j.title) + " at " + j.company)}. Tap to see the job details."`}><div class="swin">
+      <div class="face front">
       <span class="stamp yes">Wishlist</span><span class="stamp no">Dump</span><span class="stamp go">Apply now</span>
       <div class="swco"><span class="lg" data-logo-id="${esc(j.company_id || "")}">${esc(initials(j.company))}</span><div><b>${esc(j.company)}</b><span>${esc(j.sites[0].loc)}${morePlaces(j) ? ` +${morePlaces(j)} more` : ""}</span></div></div>
       <h3>${esc(niceTitle(j.title))}</h3>
       <div class="swtags">${p ? `<span class="p">${esc(payText(p))}</span>` : ""}<span class="k">${{ intern: "Internship", fulltime: "Entry-level", hourly: "Hourly", shadow: "Shadow / volunteer" }[j.kind] || "Job"}</span><span>${WORK_NAME[workOf(j)]}</span>${Date.now() - Date.parse(j.first_seen) < 2 * 864e5 ? "<span>New</span>" : ""}${FIELD_NAME[j.field] && j.field !== "other" ? `<span>${esc(FIELD_NAME[j.field])}</span>` : ""}</div>
-      <div class="swmeta">${esc(postedText(j))}${postedText(j) ? " · " : ""}Apply opens ${esc(domain(j.url))}</div></article>`;
+      <div class="swmeta"><span class="fliphint">${SVG('<path d="M4 12a8 8 0 0 1 14-5.3L20 9"/><path d="M20 4v5h-5"/><path d="M20 12a8 8 0 0 1-14 5.3L4 15"/><path d="M4 20v-5h5"/>')}Tap for details</span>${esc(postedText(j))}${postedText(j) ? " · " : ""}Apply opens ${esc(domain(j.url))}</div>
+      </div>
+      ${cls ? "" : `<div class="face back" aria-live="polite"><div class="bkhead"><div><b>${esc(niceTitle(j.title))}</b><span>${esc(j.company)}</span></div><button type="button" class="bkx" data-unflip>${SVG('<path d="M4 12a8 8 0 0 1 14-5.3L20 9"/><path d="M20 4v5h-5"/>')}Front</button></div><div class="bkbody" id="bkBody"></div></div>`}
+    </div></article>`;
+  }
+  // ── back of the card: the job's own description + facts (GET /api/listings?about=, cached a day) ──
+  const ABOUT = new Map();
+  function backHtml(j, a){
+    const p = payOf(j.id), places = j.sites.map((s) => s.loc).filter(Boolean);
+    const sameCo = LIST.rows.filter((x) => x.company_id && x.company_id === j.company_id).length;
+    const fact = (label, val) => val ? `<div class="bkf"><span>${label}</span><b>${val}</b></div>` : "";
+    const chips = (arr) => arr && arr.length ? arr.map((x) => `<i>${esc(x)}</i>`).join("") : "";
+    const payVal = p ? esc(payText(p)) + " <small>posted by the employer</small>" : a?.facts?.pay ? esc(payText([a.facts.pay.lo, a.facts.pay.hi, a.facts.pay.u])) + " <small>from the job ad</small>" : "";
+    return `<div class="bkfacts">
+        ${fact("Pay", payVal)}
+        ${fact("Type", ({ intern: "Internship", fulltime: "Entry-level, full-time", hourly: "Hourly", shadow: "Shadowing / volunteer" }[j.kind] || "Job") + " · " + WORK_NAME[workOf(j)])}
+        ${fact("Where", esc(places.slice(0, 3).join(" · ")) + (places.length > 3 ? ` <small>+${places.length - 3} more</small>` : ""))}
+        ${fact("Posted", esc((postedText(j) || "Recently").replace(/^Posted\s+/i, "")))}
+        ${a?.facts?.schedule?.length ? fact("Schedule", chips(a.facts.schedule)) : ""}
+        ${a?.facts?.asks?.length ? fact("They ask for", chips(a.facts.asks)) : ""}
+        ${a?.facts?.perks?.length ? fact("Perks", chips(a.facts.perks)) : ""}
+      </div>
+      ${!a ? `<div class="bkload"><div class="skel"></div><div class="skel"></div></div>`
+        : a.ok ? `${a.bullets?.length ? `<h4>What you'd need</h4><ul>${a.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}<h4>About the job</h4><p class="bktext">${esc(a.text)}</p>${a.full > a.text.length ? `<p class="bknote">This is the start of the posting. The full one is on ${esc(domain(j.url))}.</p>` : ""}`
+        : `<p class="bknote">${esc(a.reason || "No description to show.")} The full posting is one tap away.</p>`}
+      ${sameCo > 1 && j.company_id ? `<p class="bkco"><b>${sameCo - 1} more</b> ${sameCo - 1 === 1 ? "job" : "jobs"} at <span data-noi18n>${esc(j.company)}</span> in this search. <a href="/jobs/?company=${encodeURIComponent(j.company_id)}&mode=list">See them all</a></p>` : ""}
+      <div class="bkact"><a class="bkgo" href="${esc(j.url)}" target="_blank" rel="noopener" data-swapply>Open the full posting</a><a href="/?company=${encodeURIComponent(j.company)}&role=${encodeURIComponent(niceTitle(j.title))}#interview">Practice the interview</a><button type="button" data-tailor="${esc(j.id)}" data-t="${esc(niceTitle(j.title))}" data-c="${esc(j.company)}" data-l="${esc(j.sites[0].loc)}" data-f="${esc(FIELD_NAME[j.field] || "")}" data-u="${esc(j.url)}">Tailor my resume</button></div>`;
+  }
+  async function swFlip(card, j){
+    const on = !card.classList.contains("flipped");
+    card.classList.toggle("flipped", on); $("swStack").classList.toggle("tall", on);
+    track("swipe_flip", { on, kind: j.kind });
+    if (!on) return;
+    const body = card.querySelector("#bkBody"); body.innerHTML = backHtml(j, ABOUT.get(j.id));
+    if (ABOUT.has(j.id)) return;
+    let a;
+    try { const r = await fetch("/api/listings?about=" + encodeURIComponent(j.id)); a = await r.json(); if (!r.ok && !a.reason) throw 0; }
+    catch { a = { ok: false, reason: "Couldn't load the details right now." }; }
+    ABOUT.set(j.id, a);
+    if (card.isConnected) body.innerHTML = backHtml(j, a);
   }
   function paintSwipe(){
     const box = $("swipeBox"), deck = swDeck(), n = state.mine.saved.size;
@@ -877,8 +984,13 @@
       st.innerHTML = state.loaded && !state.partial
         ? `<div class="swempty"><b>You've been through every match</b><p>Change the search or filters above for a fresh deck, or open your Wishlist to apply.</p><button type="button" class="wl" id="swOpenWish" style="font:inherit;font-weight:600;border:0;background:#4A7000;color:#fff;border-radius:999px;padding:10px 18px;cursor:pointer">Open my Wishlist</button></div>`
         : `<div class="swempty"><div class="skel" style="width:100%;height:100%"></div></div>`;
-      return;
+      SW.painted = ""; return;
     }
+    // the same three cards on top → leave them alone (more pages of results arriving must not flip a card back)
+    const key = deck.slice(0, 3).map((j) => j.id).join("|");
+    if (key === SW.painted && st.querySelector(".swcard")) return;
+    SW.painted = key;
+    st.classList.remove("tall");
     st.innerHTML = deck.slice(0, 3).map((j, i) => swCard(j, i === 0 ? "" : i === 1 ? "back" : "back2")).reverse().join("");
     swWire(st.querySelector(".swcard:not(.back):not(.back2)"), deck[0]);
     try { window.btpLogos && window.btpLogos(); } catch {}
@@ -904,7 +1016,11 @@
     if (!card) return;
     let x0 = 0, y0 = 0, dx = 0, dy = 0, down = false;
     const s = { yes: card.querySelector(".stamp.yes"), no: card.querySelector(".stamp.no"), go: card.querySelector(".stamp.go") };
-    card.addEventListener("pointerdown", (e) => { down = true; x0 = e.clientX; y0 = e.clientY; dx = dy = 0; card.setPointerCapture(e.pointerId); card.style.transition = "none"; });
+    card.addEventListener("pointerdown", (e) => {
+      if (e.target.closest(".bkbody, button, a")) return;   // the back scrolls and has its own buttons
+      down = true; x0 = e.clientX; y0 = e.clientY; dx = dy = 0; card.setPointerCapture(e.pointerId); card.style.transition = "none"; });
+    card.addEventListener("click", (e) => { if (e.target.closest("[data-unflip]")) swFlip(card, j); });
+    card.addEventListener("keydown", (e) => { if ((e.key === "Enter" || e.key === " ") && e.target === card) { e.preventDefault(); swFlip(card, j); } });
     card.addEventListener("pointermove", (e) => {
       if (!down) return; dx = e.clientX - x0; dy = e.clientY - y0;
       card.style.transform = `translate(${dx}px, ${Math.min(dy, 40)}px) rotate(${dx / 18}deg)`;
@@ -913,6 +1029,7 @@
     });
     const end = () => {
       if (!down) return; down = false;
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) { card.style.transform = ""; swFlip(card, j); return; }   // a tap flips the card
       if (dx > 110) swDecide("right", card); else if (dx < -110) swDecide("left", card); else if (dy < -120 && Math.abs(dx) < 80) swDecide("up", card);
       else { card.style.transition = "transform .2s ease"; card.style.transform = ""; Object.values(s).forEach((x) => (x.style.opacity = 0)); }
     };
@@ -928,6 +1045,7 @@
   $("swipeBox").addEventListener("click", (e) => {
     if (e.target.closest("#swKeep")) swDecide("right"); else if (e.target.closest("#swDump")) swDecide("left"); else if (e.target.closest("#swApply")) swDecide("up");
     else if (e.target.closest("#swUndo")) swUndo();
+    else if (e.target.closest("[data-swapply]")) { const j = swDeck()[0]; if (j) pendingApply = { id: j.id, co: j.company, at: Date.now() }; }
     else if (e.target.closest("#swWish, #swOpenWish")) $("savedOnly").click();   // the Wishlist shows as a list; closing it brings the deck back
   });
   addEventListener("keydown", (e) => {
@@ -1211,8 +1329,8 @@
     $("tlAgain").onclick = tailorForm;
     $("tlBody").scrollTop = 0;
   }
-  $("list").addEventListener("click", (e) => {
-    const b = e.target.closest("[data-tailor]"); if (!b) return;
+  document.addEventListener("click", (e) => {   // list cards + the back of swipe cards
+    const b = e.target.closest("[data-tailor]"); if (!b || !b.closest("#list, #swipeBox")) return;
     TL.job = { id: b.dataset.tailor, t: b.dataset.t, c: b.dataset.c, l: b.dataset.l, f: b.dataset.f, u: b.dataset.u };
     track("tailor_open", { field: TL.job.f || null });
     tailorForm(); const d = $("tailor"); if (d.showModal) d.showModal(); else d.setAttribute("open", "");

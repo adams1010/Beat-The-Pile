@@ -239,6 +239,25 @@ export default async function handler(req, res) {
       return res.status(200).json(out);
     } catch (e) { console.error("[logos]", e); return res.status(503).json({ error: "Logos unavailable" }); }
   }
+  // Nov 26: the back of a swipe card — the job's own description from the employer's board + quick facts (lib/jobabout.js).
+  // Cached a day per job at the CDN; a per-IP limit keeps anyone from using us to crawl employers' sites.
+  if (q0.about != null) {
+    const id = String(q0.about);
+    if (!/^[a-z0-9-]{2,80}:[^,()\s]{1,200}$/.test(id)) return res.status(400).json({ error: "Bad job id" });
+    try {
+      const ip = String(req.headers?.["x-forwarded-for"] || "").split(",")[0].trim() || "?";
+      const { rateOk } = await import("../lib/aiusage.js");
+      if (!(await rateOk(`about:${ip}`, 600, 120))) return res.status(429).json({ error: "Slow down a little, then try again" });
+      const rows = await db.select(`listings?select=id,company_id,url,title&id=eq.${encodeURIComponent(id)}&limit=1`);
+      if (!rows.length) return res.status(404).json({ ok: false, reason: "This job is no longer on Beat the Pile." });
+      const { loadCompanies } = await import("../lib/companies.js");
+      const cfg = (await loadCompanies([rows[0].company_id]))[0] || null;
+      const { aboutJob } = await import("../lib/jobabout.js");
+      const out = await aboutJob({ listing: rows[0], cfg });
+      res.setHeader("Cache-Control", out.ok ? "s-maxage=86400, stale-while-revalidate=172800" : "s-maxage=3600");
+      return res.status(200).json(out);
+    } catch (e) { console.error("[about]", e); return res.status(503).json({ ok: false, reason: "Couldn't load the details right now." }); }
+  }
   if (q0.sitemap === "1") {
     try {
       const ids = [...(await hiringCompanies()).keys()].filter((id) => /^[a-z0-9-]{2,80}$/.test(id)).sort();
