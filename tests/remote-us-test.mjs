@@ -52,3 +52,9 @@ console.log("✓ remote/US: Greenhouse offices fill 'Hybrid'/'In-Office', big ci
   assert.deepEqual(listings.map((l) => l.id), ["x-ae:3"]);
   console.log("✓ 'Unsubscribed -' / 'Offline -' titles dropped");
 }
+{ // Nov 26: German "City, DE, 69190" is Germany, not Delaware; real Delaware ZIPs (197xx-199xx) still count
+  const { statesInOne } = await import("../lib/filter.js");
+  for (const t of ["Walldorf, DE, 69190", "Walldorf, Baden-Württemberg, DE, 69190", "Magdeburg, DE, 39126", "Kissing, DE, 86438"]) assert.deepEqual(statesInOne(t), [], t);
+  for (const t of ["Wilmington, DE 19801", "Newark, DE, 19711", "Wilmington, DE", "Lewes, DE, US, 19958"]) assert.deepEqual(statesInOne(t), ["DE"], t);
+  console.log("✓ German postal addresses are not Delaware");
+}
