@@ -351,7 +351,9 @@
     // Nov 25 (owner): grab it like a turntable. The near (bottom) half moves the other way to the far half, so a drag
     // that starts below the centre turns the spin around; whatever is under the pointer follows it.
     svg.addEventListener("pointerdown", (e) => { if (e.button > 0) return; const r = svg.getBoundingClientRect();
-      const sign = (e.clientY - r.top) * scale() > C ? -1 : 1;
+      // Nov 25 fix: the viewBox starts at y 44 and the sky can be letterboxed, so map the pointer with the SVG's own matrix
+      let py; try { py = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse()).y; } catch { py = 44 + (e.clientY - r.top) * scale(); }
+      const sign = py > C ? -1 : 1;
       drag = { x: e.clientX, y: e.clientY, lx: e.clientX, ly: e.clientY, lt: performance.now(), moved: false, id: e.pointerId, sign }; vel = 0; });
     svg.addEventListener("pointermove", (e) => {
       if (!drag || e.pointerId !== drag.id) return;

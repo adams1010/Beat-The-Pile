@@ -9,6 +9,7 @@ assert.match(sync, /!openAt\.has\(l\.id\)/, "jobs not open (hidden ones too) are
 const orbit = readFileSync(new URL("../orbit/index.html", import.meta.url), "utf8");
 assert.ok(!/innerWidth < 900\) sec\.scrollIntoView/.test(orbit), "phones stay on the sky when a ring is picked");
 assert.match(orbit, /\* drag\.sign/, "the near half of the orbit follows the pointer");
+assert.match(orbit, /getScreenCTM\(\)\.inverse\(\)/, "pointer mapped with the SVG matrix (letterboxed sky)");
 const jobs = readFileSync(new URL("../jobs/index.html", import.meta.url), "utf8");
 assert.match(jobs, /innerHeight - top - 16/, "side rails fit the window");
 console.log("stale + orbit + rails ok");
