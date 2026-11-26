@@ -496,7 +496,9 @@
   let lastLoad = Date.now(), loading = false;
   async function pickRing(ring, draw){
     // Nov 25 (owner): phones stay on the sky like desktop (no jump down to the list); the page keeps its place through both redraws
-    const y = scrollY, keep = () => { if (Math.abs(scrollY - y) > 2) scrollTo(0, y); };
+    // and the phone's sideways tab row keeps its scroll too (a redraw used to snap it back to the first tab)
+    const lx = document.querySelector(".legend")?.scrollLeft || 0;
+    const y = scrollY, keep = () => { if (Math.abs(scrollY - y) > 2) scrollTo(0, y); const l = document.querySelector(".legend"); if (l) l.scrollLeft = lx; };
     S.ring = ring; draw(S.o); keep();
     const sec = document.getElementById("ringList");
     if (sec) sec.classList.add("updating");
