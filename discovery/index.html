@@ -141,7 +141,7 @@
     el.innerHTML = u ? `Signed in as ${esc(email)} <button id="so">Sign out</button>` : `Owner? <button id="si">Sign in to paste links</button>`;
     el.querySelector("#so")?.addEventListener("click", () => S.clerk.signOut());
     el.querySelector("#si")?.addEventListener("click", () => S.clerk.openSignIn());
-    if (was !== S.admin && S.data) render(S.data);
+    if (was !== S.admin && S.data) { render(S.data); if (S.admin) load().catch(() => {}); }
   }
   async function post(body){
     const r = await fetch("/api/discovery", { method: "POST", headers: { "Content-Type": "application/json", Authorization: "Bearer " + (await token()) }, body: JSON.stringify(body) });
@@ -158,7 +158,7 @@
     error: "Paste their careers or job list page", no_domain: "Paste their careers page or website" };
   const PAGE = 25;
   // Workday blocking us (429 / cool-off) isn't a missing link: a pasted link wouldn't help, so those stay out of the queue
-  const needsYou = (r) => NEEDS.includes(r.status) && !/\b429\b|cool-off|Workday busy/i.test(r.detail || "");
+  const needsYou = (r) => NEEDS.includes(r.status) && !r.pasted_at && !/\b429\b|cool-off|Workday busy/i.test(r.detail || "");
   const google = (r) => "https://www.google.com/search?q=" + encodeURIComponent(r.company + " careers jobs");
   function needList(rows){
     const q = S.q.toLowerCase();
@@ -168,6 +168,10 @@
       .filter((r) => !S.hideSaved || !S.saved.has(r.id))
       .filter((r) => !q || r.company.toLowerCase().includes(q) || (r.source || "").toLowerCase().includes(q) || (r.domain || "").includes(q))
       .sort((a, b) => (b.priority || 0) - (a.priority || 0) || (b.intern_count || 0) - (a.intern_count || 0) || a.company.localeCompare(b.company));
+  }
+  function pastedLine(rows){
+    const p = rows.filter((r) => r.pasted_at), l = p.filter((r) => r.status === "live").length;
+    return p.length ? ` You've pasted ${p.length} so far${l ? `, ${l} already live` : ""}.` : "";
   }
   function sheet(rows){
     const all = rows.filter(needsYou);
@@ -179,7 +183,7 @@
     const inTier = all.filter((r) => S.tier === "all" || (S.tier === "local" ? (r.priority || 0) <= 1 : (r.priority || 0) > 1));
     const whyBtn = (k, l) => { const n = k === "any" ? inTier.length : inTier.filter((r) => r.status === k).length; return n || k === "any" ? `<button class="chip${S.why === k ? " on" : ""}" data-why="${k}">${l} <span>${n}</span></button>` : ""; };
     return `<div class="sheet" id="sheet"><h2>Needs a link</h2>
-      <div class="why">How it works: <b>Search their careers page</b> opens a Google search in a new tab (their careers page is usually the first result). Copy the address of the page that lists their jobs, come back, and <b>paste it in the box</b>. It saves by itself and moves to the next company. A wrong link can't go live: the robot still has to prove the board is theirs.${S.savedN ? ` <b class="okc">${S.savedN} saved this session.</b>` : ""}</div>
+      <div class="why">How it works: <b>Search their careers page</b> opens a Google search in a new tab (their careers page is usually the first result). Copy the address of the page that lists their jobs, come back, and <b>paste it in the box</b>. It saves by itself and moves to the next company. A wrong link can't go live: the robot still has to prove the board is theirs.${S.savedN ? ` <b class="okc">${S.savedN} saved this session.</b>` : ""}${pastedLine(rows)}</div>
       <div class="chips">${tierBtn("worth", "Worth your time", worth)}${tierBtn("local", "Local businesses (low odds)", all.length - worth)}${tierBtn("all", "All", all.length)}</div>
       <div class="chips">${whyBtn("any", "Any reason")}${whyBtn("no_board", "No job board found")}${whyBtn("identity_failed", "Can't prove it's theirs")}${whyBtn("board_error", "Old link broke")}${whyBtn("blocked", "Site blocks robots")}${whyBtn("no_domain", "No website")}${whyBtn("error", "Error")}</div>
       <div class="tools"><input id="q" placeholder="Search a company, website or source…" value="${esc(S.q)}"><label class="hs"><input type="checkbox" id="hs"${S.hideSaved ? " checked" : ""}> Hide saved</label><button id="csv">Download CSV</button></div>
@@ -208,7 +212,7 @@
     a.download = "beatthepile-needs-a-link.csv"; a.click();
   }
 
-  function load(){ return fetch("/api/discovery", { cache: "no-store" }).then((r) => r.json()).then((d) => { if (d.error) throw new Error(d.error); S.data = d; render(d); }); }
+  function load(){ return fetch("/api/discovery" + (S.admin ? "?fresh=1" : ""), { cache: "no-store" }).then((r) => r.json()).then((d) => { if (d.error) throw new Error(d.error); S.data = d; render(d); }); }
 
   function render(d) {
     const rows = d.rows || [], counts = d.counts || {};

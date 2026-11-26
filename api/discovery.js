@@ -175,6 +175,7 @@ export default async function handler(req, res) {
         const hint = cleanUrl(b.hint);
         if (!hint) return res.status(400).json({ error: "That doesn't look like a link (needs https://…)" });
         await db.update(`company_candidates?id=eq.${encodeURIComponent(b.id)}`, { hint, status: "pending", checked_at: null,
+          ...(who === "robot" ? {} : { pasted_at: new Date().toISOString() }),   // Nov 25: an owner pasted this one, off their queue for good
           detail: who === "robot" ? "Browser pass found a job board, robot will verify it" : "Link added, robot will check it within the hour" });
         return res.status(200).json({ ok: true });
       }
@@ -309,7 +310,8 @@ export default async function handler(req, res) {
     } catch (e) { console.error("[discovery bots]", e); return res.status(500).json({ error: "Couldn't load the control room" }); }
   }
   try {
-    const rows = await db.selectAll("company_candidates?select=id,company,domain,hint,status,ats,detail,intern_count,attempts,checked_at,verified_at,source,priority&order=company.asc,id.asc");
+    const rows = await db.selectAll("company_candidates?select=id,company,domain,hint,status,ats,detail,intern_count,attempts,checked_at,verified_at,source,priority,pasted_at&order=company.asc,id.asc");
+    if (req.query.fresh) res.setHeader("Cache-Control", "no-store");   // the owner queue right after pasting must not come from the CDN
     const counts = {};
     for (const r of rows) counts[r.status] = (counts[r.status] || 0) + 1;
     return res.status(200).json({
