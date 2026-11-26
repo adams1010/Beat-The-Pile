@@ -1,0 +1,76 @@
+/* /data-pages.css (Nov 26 2026) — shared look of the data pages (/pay/, /pulse/): navy header with tiles, white cards, thin single-hue charts. */
+:root{--green:#4A7000;--green-dark:#3A5A00;--tint:#F2FADF;--tint2:#DDF3A8;--navy:#060A2C;--ink:#060A2C;--muted:#55627A;--faint:#5E6A80;--line:#DCE2EC;--bg:#EEF1F6;--card:#fff;--font:"Geist",-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif}
+*{box-sizing:border-box}
+html,body{overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 var(--font);font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+header{background:var(--navy);color:#fff;padding:22px 0 26px}
+header h1{margin:0 0 6px;font-size:30px;font-weight:600;letter-spacing:-.025em}
+header p{margin:0;color:#AEB9CC;max-width:68ch}
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}
+@media(max-width:800px){.tiles{grid-template-columns:1fr 1fr}}
+.tile{background:#0E1440;border:1px solid #22304D;border-radius:10px;padding:12px 14px}
+.tile b{display:block;font-size:26px;color:#B0F701;font-weight:600;letter-spacing:-.02em}
+.tile span{font-size:13.5px;color:#AEB9CC}
+main{padding:20px 0 50px}
+.grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.grid>*{min-width:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:14px}
+.card h2{margin:0 0 4px;font-size:18px;letter-spacing:-.01em}
+.card .sub{margin:0 0 12px;color:var(--muted);font-size:14px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:2px;margin:0 0 12px;flex-wrap:wrap}
+.seg button{border:0;background:none;font:inherit;font-size:14px;padding:5px 12px;border-radius:999px;cursor:pointer;color:var(--ink)}
+.seg button[aria-pressed=true]{background:var(--navy);color:#fff}
+/* histogram */
+.hist{display:flex;align-items:flex-end;gap:2px;height:170px;padding-top:18px;border-bottom:1px solid var(--line);position:relative}
+.hist .b{flex:1;background:var(--green);border-radius:4px 4px 0 0;min-height:2px;position:relative;cursor:default}
+.hist .b:hover,.hist .b:focus{background:var(--green-dark);outline:none}
+.hist .b i{position:absolute;top:-18px;left:0;right:0;text-align:center;font-style:normal;font-size:12px;color:var(--muted)}
+.hlab{display:flex;gap:2px;font-size:12px;color:var(--muted);margin-top:4px}
+.hlab span{flex:1;text-align:center}
+/* range rows */
+.rows{display:grid;gap:2px}
+.row{display:grid;grid-template-columns:minmax(120px,210px) 1fr 74px;gap:10px;align-items:center;padding:6px 4px;border-radius:8px;color:inherit;text-decoration:none}
+a.row:hover{background:#F5F7FA}
+.row .nm{font-size:14.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .nm small{color:var(--faint);font-size:12.5px;margin-left:4px}
+.row .md{text-align:right;font-weight:600;font-size:14.5px}
+.track{position:relative;height:14px;background:#F1F4F8;border-radius:999px}
+.track .iqr{position:absolute;top:3px;height:8px;background:var(--tint2);border-radius:999px}
+.track .med{position:absolute;top:0;width:3px;height:14px;background:var(--green);border-radius:2px;margin-left:-1px}
+.axis{display:grid;grid-template-columns:minmax(120px,210px) 1fr 74px;gap:10px;font-size:12px;color:var(--faint);padding:0 4px}
+.axis div{position:relative;height:16px}.axis div span{position:absolute;transform:translateX(-50%)}
+.key{font-size:13px;color:var(--muted);margin-top:8px;display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.key i{display:inline-block;vertical-align:middle;margin-right:5px}
+/* job list */
+.jobs{list-style:none;margin:0;padding:0}
+.jobs li{display:flex;gap:10px;align-items:center;padding:10px 0;border-top:1px solid #EEF1F5}
+.jobs li:first-child{border-top:0}
+.ini{width:34px;height:34px;flex:none;border-radius:8px;background:var(--navy);color:#B0F701;display:grid;place-items:center;font-size:13px;font-weight:650;overflow:hidden}
+.ini img{width:100%;height:100%;object-fit:contain;background:#fff}
+.jobs .t{flex:1;min-width:0}
+.jobs .t a{color:var(--ink);font-weight:600;text-decoration:none;display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.jobs .t a:hover{text-decoration:underline}
+.jobs .t span{font-size:13.5px;color:var(--muted)}
+.pay{flex:none;font-weight:600;color:var(--green-dark);background:var(--tint);border-radius:999px;padding:3px 10px;font-size:13.5px;white-space:nowrap}
+/* calculator */
+.calc{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:520px){.calc{grid-template-columns:1fr}}
+.calc label{font-size:13.5px;color:var(--muted);display:block}
+.calc input{width:100%;font:inherit;font-size:16px;padding:8px 10px;border:1px solid #C9D1DE;border-radius:8px;margin-top:3px}
+.calc input:focus{outline:2px solid var(--green);outline-offset:1px}
+.out{margin-top:12px;background:var(--tint);border-radius:10px;padding:12px 14px}
+.out b{font-size:24px;letter-spacing:-.02em}
+.note{font-size:13.5px;color:var(--muted)}
+table.tv{width:100%;border-collapse:collapse;font-size:14px;margin-top:8px}
+table.tv th,table.tv td{text-align:left;padding:6px 8px;border-bottom:1px solid #EEF1F5}
+table.tv td:not(:first-child),table.tv th:not(:first-child){text-align:right}
+details summary{cursor:pointer;color:var(--green-dark);font-size:14px;margin-top:8px}
+.skel{height:120px;border-radius:10px;background:linear-gradient(90deg,#EEF1F6,#F7F9FB,#EEF1F6);background-size:200% 100%;animation:sh 1.4s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.skel{animation:none}}
+.err{background:#FEF3E2;color:#8A4B08;border-radius:10px;padding:12px 14px}
+a{color:var(--green-dark)}
+.btn{display:inline-block;background:var(--green);color:#fff;text-decoration:none;font-weight:600;border-radius:999px;padding:9px 16px;font-size:14.5px}
+.tip{position:fixed;pointer-events:none;background:var(--navy);color:#fff;font-size:13px;padding:6px 9px;border-radius:8px;z-index:90;max-width:240px}

@@ -1,0 +1,32 @@
+# Nov 26 2026: the data bots that build public pages from public data, once a day.
+#   Pay Finder   (scripts/pay-finder.mjs) → pay/jobs.json + pay/stats.json  (posted pay on /jobs cards and /pay/)
+#   Hiring Pulse (scripts/pulse.mjs)      → pulse/data.json + pulse/history.json (/pulse/)
+# Each checks its own switch on /bots and reports its run there (CRON_SECRET). Files are committed only when they changed.
+# Reads only public feeds (Greenhouse / Lever / Ashby job APIs and our own public /api/listings); never the database.
+name: data-bots
+on:
+  schedule:
+    - cron: "45 6 * * *"
+  workflow_dispatch: {}
+permissions: { contents: write }
+concurrency: { group: data-bots, cancel-in-progress: false }
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: { node-version: 22 }
+      - name: Pay Finder
+        run: node scripts/pay-finder.mjs || echo "pay finder failed (reported to /bots)"
+        env: { CRON_SECRET: "${{ secrets.CRON_SECRET }}" }
+      - name: Hiring Pulse
+        run: node scripts/pulse.mjs || echo "pulse failed (reported to /bots)"
+        env: { CRON_SECRET: "${{ secrets.CRON_SECRET }}" }
+      - name: Commit if changed
+        run: |
+          git config user.name "btp-data"; git config user.email "btp-data@users.noreply.github.com"
+          git add pay/jobs.json pay/stats.json pulse/data.json pulse/history.json
+          git diff --cached --quiet && { echo "no change"; exit 0; }
+          git commit -m "Data bots: pay + pulse refresh" && git pull --rebase && git push

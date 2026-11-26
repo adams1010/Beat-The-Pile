@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Internship pay | Beat the Pile</title>
+<meta name="description" content="What internships and first jobs really pay, from open job ads where the employer posted the pay. Medians by major area and state, the top-paying internships, and a summer pay calculator.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Beat the Pile">
+<meta property="og:title" content="Internship pay | Beat the Pile">
+<meta property="og:description" content="What internships really pay, from open job ads where the employer posted the pay.">
+<meta property="og:url" content="https://www.beatthepile.com/pay/">
+<meta property="og:image" content="https://www.beatthepile.com/icons/og-1200x630.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.beatthepile.com/pay/">
+<link rel="icon" href="/icons/icon-192.png?v=4">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/fonts/geist.css">
+<link rel="stylesheet" href="/data-pages.css">
+</head>
+<body>
+<script src="/nav.js"></script>
+<header>
+  <div class="wrap">
+    <h1>What internships really pay</h1>
+    <p id="lead">Real pay from open job ads where the employer posted it. No estimates, no self-reported surveys.</p>
+    <div class="tiles" id="tiles" aria-live="polite"></div>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <div id="err" class="err" hidden>We couldn't load the pay numbers right now. Try again in a minute.</div>
+  <div class="grid">
+    <div>
+      <section class="card">
+        <h2>Internship pay, per hour</h2>
+        <p class="sub" id="histSub">How many open internships pay in each range.</p>
+        <div id="hist"><div class="skel"></div></div>
+      </section>
+      <section class="card">
+        <h2>By area</h2>
+        <p class="sub">Median hourly pay for internships in each area, with the middle half of postings. Areas with fewer than 5 postings that show pay are left out.</p>
+        <div id="fields"><div class="skel"></div></div>
+      </section>
+      <section class="card">
+        <h2>By state</h2>
+        <p class="sub">Median hourly internship pay where the job is. Big-city states pay more, and so does the rent.</p>
+        <div id="states"><div class="skel"></div></div>
+      </section>
+    </div>
+    <div>
+      <section class="card">
+        <h2>What a summer pays</h2>
+        <p class="sub">Before taxes. Change the numbers to match an offer.</p>
+        <div class="calc">
+          <label>Per hour ($)<input id="cH" type="number" inputmode="decimal" min="0" step="0.5"></label>
+          <label>Hours a week<input id="cW" type="number" inputmode="numeric" min="1" max="80" value="40"></label>
+          <label>Weeks<input id="cN" type="number" inputmode="numeric" min="1" max="52" value="12"></label>
+        </div>
+        <div class="out" aria-live="polite"><b id="cOut">$0</b><div class="note" id="cNote"></div></div>
+      </section>
+      <section class="card">
+        <h2>Top-paying internships open now</h2>
+        <p class="sub">One per company and title, highest posted pay first.</p>
+        <ul class="jobs" id="top"><li><div class="skel" style="height:60px;width:100%"></div></li></ul>
+      </section>
+      <section class="card">
+        <h2>Companies that pay interns the most</h2>
+        <p class="sub">Median of their open internships that show pay (2 or more).</p>
+        <ul class="jobs" id="cos"></ul>
+      </section>
+      <section class="card">
+        <h2>Where these numbers come from</h2>
+        <p class="note">Our Pay Finder bot reads the pay employers put in their own job ads (Greenhouse, Lever and Ashby boards, about 2,300 companies) once a day, and keeps it only for jobs that are open on Beat the Pile. States like California, Colorado, New York and Washington require pay in job ads, so those show up more. A range counts at its midpoint; yearly pay is turned into hourly at 2,080 hours a year. US dollars only. Bonuses, housing and relocation money are not counted. A job with no posted pay is simply left out, so this is a sample, not every job. Those three systems are popular with tech and finance companies, so the sample leans toward higher-paying fields; hospitals, retailers and government jobs mostly use other systems and aren't counted here yet.</p>
+        <p class="note" id="asof"></p>
+        <a class="btn" href="/jobs/?pay=1">Browse jobs that show pay</a>
+      </section>
+    </div>
+  </div>
+</main>
+<div class="tip" id="tip" hidden></div>
+<script src="/logos.js" defer></script>
+<script src="/feedback.js" defer></script>
+<script src="/ph.js" defer></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const money = (v) => "$" + (v >= 100 ? Math.round(v).toLocaleString("en-US") : (Math.round(v * 100) / 100).toFixed(v % 1 ? 2 : 0));
+  const k = (v) => "$" + Math.round(v / 1000) + "k";
+  function payText(p) {
+    const [lo, hi, u] = p; const f = (v) => u === "y" || v >= 10000 ? Math.round(v / 1000) + "k" : v >= 1000 ? Math.round(v).toLocaleString("en-US") : (Math.round(v * 100) / 100).toFixed(v % 1 ? 2 : 0);
+    const unit = { h: "hr", y: "yr", m: "mo", w: "wk" }[u] || "";
+    return lo === hi ? "$" + f(lo) + "/" + unit : "$" + f(lo) + "–" + f(hi) + "/" + unit;
+  }
+  const ini = (n) => String(n || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+  const tip = $("tip");
+  function hover(el, text) {
+    el.addEventListener("mousemove", (e) => { tip.textContent = text; tip.hidden = false; tip.style.left = Math.min(e.clientX + 12, innerWidth - 250) + "px"; tip.style.top = (e.clientY + 14) + "px"; });
+    el.addEventListener("mouseleave", () => { tip.hidden = true; });
+  }
+  let S = null;
+  function ranges(el, rows, label, link) {
+    if (!rows.length) { el.innerHTML = '<p class="note">Not enough postings with pay yet.</p>'; return; }
+    const max = Math.max(...rows.map((r) => r.p75)) * 1.05, x = (v) => (v / max * 100).toFixed(2) + "%";
+    const step = max > 60 ? 20 : 10, ticks = []; for (let t = 0; t <= max; t += step) ticks.push(t);
+    el.innerHTML = '<div class="rows">' + rows.map((r) => {
+      const tag = link ? "a" : "div", href = link ? ' href="' + esc(link(r)) + '"' : "";
+      return '<' + tag + ' class="row"' + href + ' data-t="' + esc(label(r) + ": median " + money(r.med) + "/hr, middle half " + money(r.p25) + "–" + money(r.p75) + " (" + r.n + " postings)") + '">'
+        + '<span class="nm">' + esc(label(r)) + '<small>' + r.n + '</small></span>'
+        + '<span class="track"><span class="iqr" style="left:' + x(r.p25) + ';width:calc(' + x(r.p75) + ' - ' + x(r.p25) + ')"></span><span class="med" style="left:' + x(r.med) + '"></span></span>'
+        + '<span class="md">' + money(r.med) + '/hr</span></' + tag + '>';
+    }).join("") + '</div>'
+      + '<div class="axis" aria-hidden="true"><span></span><div>' + ticks.map((t) => '<span style="left:' + x(t) + '">$' + t + "</span>").join("") + '</div><span></span></div>'
+      + '<div class="key"><span><i style="width:16px;height:8px;background:var(--tint2);border-radius:999px"></i>Middle half of postings</span><span><i style="width:3px;height:12px;background:var(--green)"></i>Median</span><span>Small number = postings with pay</span></div>'
+      + '<details><summary>Show as a table</summary><table class="tv"><thead><tr><th>' + (rows[0].state ? "State" : "Area") + '</th><th>Postings</th><th>25th</th><th>Median</th><th>75th</th></tr></thead><tbody>'
+      + rows.map((r) => '<tr><td>' + esc(label(r)) + '</td><td>' + r.n + '</td><td>' + money(r.p25) + '</td><td>' + money(r.med) + '</td><td>' + money(r.p75) + '</td></tr>').join("") + '</tbody></table></details>';
+    el.querySelectorAll("[data-t]").forEach((r) => hover(r, r.getAttribute("data-t")));
+  }
+  const ST = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"Washington, DC",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",US:"Remote, anywhere in the US"};
+  function render() {
+    const s = S, i = s.byKind.intern || {}, f = s.byKind.fulltime, h = s.byKind.hourly;
+    $("tiles").innerHTML =
+      '<div class="tile"><b>' + (i.med ? money(i.med) + "/hr" : "–") + '</b><span>Median internship pay</span></div>'
+      + '<div class="tile"><b>' + (i.p25 ? money(i.p25) + "–" + money(i.p75).slice(1) : "–") + '</b><span>Middle half of internships, per hour</span></div>'
+      + '<div class="tile"><b>' + (f ? k(f.med * 2080) + "/yr" : "–") + '</b><span>Median entry-level job</span></div>'
+      + '<div class="tile"><b>' + (h ? money(h.med) + "/hr" : "–") + '</b><span>Median part-time &amp; hourly</span></div>';
+    $("lead").textContent = "Real pay from " + s.total.toLocaleString("en-US") + " open job ads at " + s.companies.toLocaleString("en-US") + " companies where the employer posted it. No estimates, no self-reported surveys.";
+    const d = new Date(s.at); $("asof").textContent = "Updated " + d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) + ".";
+    // histogram
+    const bands = s.bands || [], top = Math.max(1, ...bands.map((b) => b.n)), all = bands.reduce((a, b) => a + b.n, 0);
+    const lab = (b) => b.from === 0 ? "<$" + b.to : b.to >= 999 ? "$" + b.from + "+" : "$" + b.from + "–" + b.to;
+    $("hist").innerHTML = '<div class="hist" role="img" aria-label="Internship pay ranges">' + bands.map((b) =>
+      '<div class="b" tabindex="0" style="height:' + (b.n / top * 100).toFixed(1) + '%" data-t="' + esc(lab(b) + " an hour: " + b.n + " internships (" + Math.round(b.n / Math.max(1, all) * 100) + "%)") + '" aria-label="' + esc(lab(b) + ": " + b.n) + '"><i>' + b.n + '</i></div>').join("")
+      + '</div><div class="hlab" aria-hidden="true">' + bands.map((b) => "<span>" + lab(b) + "</span>").join("") + '</div>';
+    $("hist").querySelectorAll("[data-t]").forEach((r) => hover(r, r.getAttribute("data-t")));
+    $("histSub").textContent = "How many of the " + all.toLocaleString("en-US") + " open internships that show pay fall in each range.";
+    ranges($("fields"), s.byField, (r) => r.label, (r) => "/jobs/?major=" + encodeURIComponent(r.key) + "&kind=intern&pay=1");
+    ranges($("states"), s.byState.slice(0, 25), (r) => ST[r.state] || r.state, (r) => "/jobs/?state=" + r.state + "&major=all&kind=intern&pay=1");
+    const job = (j) => '<li><span class="ini" data-logo-id="' + esc(j.company_id) + '">' + esc(ini(j.company)) + '</span><span class="t"><a href="' + esc(j.url) + '" target="_blank" rel="noopener nofollow">' + esc(j.title) + '</a><span>' + esc(j.company) + (j.state ? " · " + esc(String(j.state).split(",")[0]) : "") + '</span></span><span class="pay">' + esc(payText(j.pay)) + '</span></li>';
+    $("top").innerHTML = (s.topInterns || []).slice(0, 12).map(job).join("") || '<li class="note">None yet.</li>';
+    $("cos").innerHTML = (s.topCompanies || []).slice(0, 10).map((c) => '<li><span class="ini" data-logo-id="' + esc(c.id) + '">' + esc(ini(c.company)) + '</span><span class="t"><a href="/jobs/?company=' + encodeURIComponent(c.id) + '&major=all&kind=intern">' + esc(c.company) + '</a><span>' + c.n + ' internships with pay</span></span><span class="pay">' + money(c.med) + '/hr</span></li>').join("") || '<li class="note">None yet.</li>';
+    if (!$("cH").value && i.med) $("cH").value = i.med;
+    calc();
+  }
+  function calc() {
+    const h = +$("cH").value || 0, w = +$("cW").value || 0, n = +$("cN").value || 0, total = h * w * n;
+    $("cOut").textContent = money(total);
+    const m = S && S.byKind.intern && S.byKind.intern.med;
+    $("cNote").textContent = h ? (money(h) + " × " + w + " hours × " + n + " weeks" + (m ? " · the median internship pays " + money(m) + "/hr" + (h > m ? ", so this is above the middle" : h < m ? ", so this is below the middle" : "") : "")) : "Type an hourly rate.";
+  }
+  ["cH", "cW", "cN"].forEach((id) => $(id).addEventListener("input", calc));
+  fetch("/pay/stats.json", { cache: "no-cache" }).then((r) => { if (!r.ok) throw 0; return r.json(); })
+    .then((d) => { S = d; render(); })
+    .catch(() => { $("err").hidden = false; document.querySelectorAll(".skel").forEach((x) => x.remove()); });
+})();
+</script>
+</body>
+</html>

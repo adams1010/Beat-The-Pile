@@ -30,7 +30,7 @@
     + ".btpcookie .yes{background:#4A7000;color:#fff}.btpcookie .no{background:#fff;color:#3A5A00}"
     + ".btpcookie button:focus-visible,.btpfoot a:focus-visible,.btpfoot button:focus-visible{outline:2px solid #4A7000;outline-offset:2px}"
     + ".btpfoot{border-top:1px solid #E3E7ED;margin-top:40px;padding:18px 16px 26px;font:13.5px/1.6 Geist,-apple-system,Segoe UI,Roboto,sans-serif;color:#4A5568;text-align:center}"
-    + ".btpfoot nav{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 16px;margin-bottom:6px}.btpfoot a,.btpfoot button{color:#3A5A00;text-decoration:none;background:none;border:0;font:inherit;padding:0;cursor:pointer}"
+    + ".btpfoot .cols{display:grid;grid-template-columns:repeat(4,minmax(0,170px));justify-content:center;gap:16px 28px;text-align:left;margin:0 auto 18px;max-width:900px}.btpfoot .cols h2{font-size:13.5px;margin:0 0 6px;color:#060A2C;font-weight:600}.btpfoot .cols a,.btpfoot .cols button{display:block;margin:3px 0;text-align:left}@media(max-width:640px){.btpfoot .cols{grid-template-columns:1fr 1fr}}.btpfoot a,.btpfoot button{color:#3A5A00;text-decoration:none;background:none;border:0;font:inherit;padding:0;cursor:pointer}"
     + ".btpfoot a:hover,.btpfoot button:hover{text-decoration:underline}@media print{.btpcookie,.btpfoot{display:none}}";
   function banner(force) {
     if (document.querySelector(".btpcookie")) return;
@@ -45,7 +45,7 @@
   function footer() {
     if (document.querySelector(".btpfoot") || document.body.hasAttribute("data-nofoot")) return;
     var f = document.createElement("footer"); f.className = "btpfoot";
-    f.innerHTML = "<nav aria-label=\"Legal\"><a href=\"/about/\">About us</a><a href=\"/privacy/\">Privacy</a><a href=\"/terms/\">Terms</a><a href=\"/cookies/\">Cookies</a><a href=\"/refunds/\">Refunds</a><a href=\"/accessibility/\">Accessibility</a><a href=\"/community-guidelines/\">Community guidelines</a><a href=\"/safety/\">Safe job search</a><a href=\"mailto:support@beatthepile.com\">Support</a><button type=\"button\" class=\"btpcset\">Cookie settings</button></nav>"
+    f.innerHTML = "<nav class=\"cols\" aria-label=\"Site\"><div><h2>Find work</h2><a href=\"/jobs/\">Jobs</a><a href=\"/fair/\">Career Fair</a><a href=\"/pay/\">Internship pay</a><a href=\"/pulse/\">Hiring pulse</a><a href=\"/radar/\">Opening Radar</a><a href=\"/majors/\">Every major</a></div><div><h2>Company</h2><a href=\"/about/\">About us</a><a href=\"/press/\">Press</a><a href=\"/changelog/\">What's new</a><a href=\"/status/\">Status</a><a href=\"/business/\">For employers</a></div><div><h2>Help</h2><a href=\"/help/\">Help center</a><a href=\"/contact/\">Contact us</a><a href=\"/safety/\">Safe job search</a><a href=\"/community-guidelines/\">Community guidelines</a><a href=\"mailto:support@beatthepile.com\">Support</a></div><div><h2>Legal</h2><a href=\"/privacy/\">Privacy</a><a href=\"/terms/\">Terms</a><a href=\"/cookies/\">Cookies</a><a href=\"/refunds/\">Refunds</a><a href=\"/accessibility/\">Accessibility</a><button type=\"button\" class=\"btpcset\">Cookie settings</button></div></nav>"
       + "<div>© " + new Date().getFullYear() + " CuzzoCore LLC. Beat the Pile is a service of CuzzoCore LLC. Job listings come from each employer's own job board. Company names and logos belong to their owners.</div>";
     f.querySelector(".btpcset").onclick = function () { banner(true); };
     document.body.appendChild(f);

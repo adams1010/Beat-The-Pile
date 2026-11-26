@@ -200,9 +200,12 @@
     community: '<path d="M14.5 13.5h-6l-4 3v-11A1.5 1.5 0 0 1 6 4h8.5A1.5 1.5 0 0 1 16 5.5v6.5a1.5 1.5 0 0 1-1.5 1.5z"/><path d="M16 8h2A1.5 1.5 0 0 1 19.5 9.5v10l-3-2.5H11a1.5 1.5 0 0 1-1.5-1.5"/>',
     play: '<circle cx="12" cy="12" r="8.5"/><path d="M10 8.5v7l5.5-3.5z"/>',
     about: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5.5"/><path d="M12 7.6v.1"/>',
+    pay: '<circle cx="12" cy="12" r="8.5"/><path d="M14.8 9.2c-.5-.9-1.5-1.4-2.8-1.4-1.6 0-2.7.8-2.7 2s1 1.7 2.7 2.1c1.8.4 2.9 1 2.9 2.3s-1.2 2.1-2.9 2.1c-1.4 0-2.5-.6-3-1.6"/><path d="M12 6v1.8M12 16.3V18"/>',
+    pulse: '<path d="M3.5 12h4l2-5 4 10 2-5h5"/>',
+    help: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="3.5"/><path d="m6 6 3.5 3.5M14.5 14.5 18 18M18 6l-3.5 3.5M9.5 14.5 6 18"/>',
     tools: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
   };
-  const TOOL_ICON = { "/internship/": "intern", "/grad/": "grad", "/companies/": "business", "/radar/": "radar", "/clubs/": "clubs", "/#quiz": "quiz", "/#interview": "mic", "/#resumebuilder": "doc", "/#score": "check", "/#wall": "community", "/demo/": "play", "/about/": "about" };
+  const TOOL_ICON = { "/internship/": "intern", "/grad/": "grad", "/companies/": "business", "/radar/": "radar", "/clubs/": "clubs", "/#quiz": "quiz", "/#interview": "mic", "/#resumebuilder": "doc", "/#score": "check", "/#wall": "community", "/demo/": "play", "/about/": "about", "/pay/": "pay", "/pulse/": "pulse", "/help/": "help" };
   const svg = (k) => `<svg class="btpic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
   // Account type (chosen once after sign-in on /start/ or in the welcome sheet below): "student" | "employer" | null
   let ROLE = null; try { ROLE = localStorage.getItem("btp_role"); } catch {}
@@ -224,6 +227,8 @@
     ["/internship/", "My Internship", "Got an offer? Prep, first weeks, wrap-up"],
     ["/companies/", "Companies", "Look up any company and follow it"],
     ["/radar/", "Opening Radar", "When each company usually opens internships"],
+    ["/pay/", "Internship pay", "What internships really pay, from posted pay"],
+    ["/pulse/", "Hiring pulse", "What opened this week, by area and company"],
     ["/clubs/", "Clubs & teams", "Which clubs fit your major and lead to internships"],
     ["/grad/", "Grad school paths", "Pre-med, PA, law, PhD: jobs, hours and timeline"],
     ["/#quiz", "Match quiz", "Real openings matched to your major"],
@@ -232,6 +237,7 @@
     ["/#score", "Resume check", "How a resume reads against a posting"],
     ["/#wall", "Community", "Tips from other students"],
     ["/demo/", "Try it", "Hands-on demo in 2 minutes"],
+    ["/help/", "Help center", "Answers, contact and service status"],
     ["/about/", "About us", "Who we are and why we built this"],
   ];
   const path = location.pathname.replace(/index\.html$/, "");

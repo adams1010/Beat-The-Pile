@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Contact us | Beat the Pile</title>
+<meta name="description" content="Get in touch with the Beat the Pile team: student help, employers and company pages, schools and career centers, press, and privacy requests.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Beat the Pile">
+<meta property="og:title" content="Contact us | Beat the Pile">
+<meta property="og:description" content="Student help, employers, schools, press and privacy requests.">
+<meta property="og:url" content="https://www.beatthepile.com/contact/">
+<meta property="og:image" content="https://www.beatthepile.com/icons/og-1200x630.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.beatthepile.com/contact/">
+<link rel="icon" href="/icons/icon-192.png?v=4">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/fonts/geist.css">
+<link rel="stylesheet" href="/data-pages.css">
+<style>
+  .cg{display:grid;grid-template-columns:1fr 340px;gap:16px;align-items:start}
+  @media(max-width:860px){.cg{grid-template-columns:1fr}}
+  form .f{margin-bottom:12px}
+  form label{display:block;font-size:14px;font-weight:600;margin-bottom:4px}
+  form label small{font-weight:400;color:var(--muted)}
+  form input,form select,form textarea{width:100%;font:inherit;font-size:16px;padding:10px 12px;border:1px solid #C9D1DE;border-radius:8px;background:#fff;color:var(--ink)}
+  form textarea{min-height:150px;resize:vertical}
+  form input:focus,form select:focus,form textarea:focus{outline:2px solid var(--green);outline-offset:1px;border-color:var(--green)}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:520px){.two{grid-template-columns:1fr}}
+  .topics{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:14px}
+  .topics button{text-align:left;font:inherit;font-size:14px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;color:var(--ink)}
+  .topics button b{display:block;font-size:14.5px}
+  .topics button small{color:var(--muted)}
+  .topics button[aria-pressed=true]{border-color:var(--green);outline:2px solid var(--green);outline-offset:-1px;background:var(--tint)}
+  .hint{background:var(--tint);border-radius:10px;padding:10px 12px;font-size:14px;margin-bottom:12px}
+  .ok{background:var(--tint);border-radius:10px;padding:16px}
+  .ok h2{margin:0 0 4px}
+  .send{border:0;cursor:pointer;font:inherit;font-weight:600}
+  .send[disabled]{opacity:.6;cursor:default}
+  .msgerr{color:#8A4B08;font-size:14px;margin-top:8px}
+  .side dl{margin:0}
+  .side dt{font-weight:600;margin-top:10px}
+  .side dd{margin:2px 0 0;color:var(--muted);font-size:14.5px}
+  .hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<header>
+  <div class="wrap">
+    <h1>Contact us</h1>
+    <p>We're a small team and we read every message. Pick what it's about so it gets to the right place.</p>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <div class="cg">
+    <section class="card">
+      <div id="formWrap">
+        <div class="topics" role="group" aria-label="What is it about?" id="topics">
+          <button type="button" data-k="student" aria-pressed="true"><b>Student help</b><small>Account, jobs, profile</small></button>
+          <button type="button" data-k="employer" aria-pressed="false"><b>Employers</b><small>Company page, packages</small></button>
+          <button type="button" data-k="school" aria-pressed="false"><b>Schools</b><small>Career centers, fairs</small></button>
+          <button type="button" data-k="press" aria-pressed="false"><b>Press</b><small>Stories, data, interviews</small></button>
+          <button type="button" data-k="privacy" aria-pressed="false"><b>Privacy</b><small>Your data, removal</small></button>
+          <button type="button" data-k="other" aria-pressed="false"><b>Something else</b><small>Ideas, partnerships</small></button>
+        </div>
+        <div class="hint" id="hint"></div>
+        <form id="cf" novalidate>
+          <div class="two">
+            <div class="f"><label for="cName">Your name</label><input id="cName" autocomplete="name" maxlength="80"></div>
+            <div class="f"><label for="cEmail">Email <small>so we can write back</small></label><input id="cEmail" type="email" autocomplete="email" maxlength="120" required></div>
+          </div>
+          <div class="f" id="orgRow" hidden><label for="cOrg" id="orgLab">Company</label><input id="cOrg" maxlength="100" autocomplete="organization"></div>
+          <div class="f"><label for="cMsg">Message</label><textarea id="cMsg" maxlength="1800" required placeholder="Tell us what's going on. Links help."></textarea></div>
+          <div class="hp" aria-hidden="true"><label for="cWeb">Website</label><input id="cWeb" tabindex="-1" autocomplete="off"></div>
+          <button class="btn send" type="submit" id="send">Send message</button>
+          <div class="msgerr" id="err" role="alert"></div>
+          <p class="note" style="margin-top:12px">By sending, you agree we can use your email to reply. See our <a href="/privacy/">privacy policy</a>.</p>
+        </form>
+      </div>
+      <div class="ok" id="ok" hidden role="status"><h2>Thanks, it's on its way.</h2><p class="note" id="okNote">We usually reply within 2 business days.</p><a href="/help/">Browse the help center</a></div>
+    </section>
+    <aside class="side">
+      <section class="card"><h2>Quick answers</h2><p class="note">Most questions are already answered in the <a href="/help/">help center</a>.</p>
+        <dl>
+          <dt>Email</dt><dd><a href="mailto:support@beatthepile.com">support@beatthepile.com</a></dd>
+          <dt>Report a listing</dt><dd>Tap "Report" on the job card, or the "?" at the bottom of any page.</dd>
+          <dt>Delete your data</dt><dd>You can do it yourself any time in <a href="/u/#delete-account">Profile, Settings</a>.</dd>
+          <dt>Unsafe message or scam</dt><dd>Block and report from the chat, and read <a href="/safety/">Safe job search</a>.</dd>
+          <dt>Who we are</dt><dd>Beat the Pile is a service of CuzzoCore LLC, Virginia. <a href="/about/">About us</a></dd>
+        </dl>
+      </section>
+    </aside>
+  </div>
+</main>
+<script src="/feedback.js" defer></script>
+<script src="/ph.js" defer></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const HINT = {
+    student: 'Locked out or something not working? Include the page and what you tapped. Many answers are in the <a href="/help/#account">help center</a>.',
+    employer: 'Setting up a company page or asking about <a href="/business/packages/">career fair packages</a>? Use your work email so we can match it to your company.',
+    school: 'Career centers and faculty: we can add your fairs from your school\'s own page and set up staff badges. Include your school and role.',
+    press: 'Writing about internships or early careers? We can share live numbers from <a href="/pulse/">Hiring pulse</a> and <a href="/pay/">Internship pay</a>. The <a href="/press/">press page</a> has logos and facts.',
+    privacy: 'You can see, download or delete your data yourself in <a href="/u/#settings">Settings</a>. For anything else (a request under US state, EU or UK law), tell us here from the email on your account.',
+    other: 'Ideas, partnerships, a company we should add. All welcome.',
+  };
+  let topic = "student";
+  const params = new URLSearchParams(location.search), t0 = params.get("topic");
+  function pick(k) {
+    topic = HINT[k] ? k : "student";
+    document.querySelectorAll("#topics button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.k === topic)));
+    $("hint").innerHTML = HINT[topic];
+    $("orgRow").hidden = !["employer", "school", "press"].includes(topic);
+    $("orgLab").textContent = topic === "school" ? "School" : topic === "press" ? "Publication" : "Company";
+  }
+  $("topics").addEventListener("click", (e) => { const b = e.target.closest("[data-k]"); if (b) pick(b.dataset.k); });
+  pick(t0 || "student");
+  // signed-in students: prefill name/email from the kit cached by the profile page, if any
+  try { const me = JSON.parse(localStorage.getItem("btp_me") || "null"); if (me && me.name) $("cName").value = me.name; } catch {}
+  $("cf").addEventListener("submit", async (e) => {
+    e.preventDefault(); $("err").textContent = "";
+    if ($("cWeb").value) { $("formWrap").hidden = true; $("ok").hidden = false; return; }   // bots fill the hidden field
+    const email = $("cEmail").value.trim(), msg = $("cMsg").value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) { $("err").textContent = "Add an email so we can write back."; $("cEmail").focus(); return; }
+    if (msg.length < 10) { $("err").textContent = "Tell us a little more (a sentence or two)."; $("cMsg").focus(); return; }
+    $("send").disabled = true; $("send").textContent = "Sending…";
+    const org = $("orgRow").hidden ? "" : $("cOrg").value.trim();
+    const message = [$("cName").value.trim() && "From: " + $("cName").value.trim(), org && ($("orgLab").textContent + ": " + org), msg].filter(Boolean).join("\n");
+    try {
+      const r = await fetch("/api/discovery", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "feedback", page: "/contact/", kind: "contact:" + topic, message, contact: email }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || "Couldn't send");
+      $("formWrap").hidden = true; $("ok").hidden = false;
+      $("okNote").textContent = "We'll reply to " + email + ", usually within 2 business days.";
+      try { window.posthog && posthog.capture("contact_sent", { topic }); } catch {}
+    } catch (err) {
+      $("err").innerHTML = (err.message || "Couldn't send") + '. You can also email <a href="mailto:support@beatthepile.com">support@beatthepile.com</a>.';
+      $("send").disabled = false; $("send").textContent = "Send message";
+    }
+  });
+})();
+</script>
+</body>
+</html>

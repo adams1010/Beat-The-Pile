@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hiring pulse | Beat the Pile</title>
+<meta name="description" content="What opened this week: new internships and first jobs by area, state, season and company, counted every day from employers' own job boards.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Beat the Pile">
+<meta property="og:title" content="Hiring pulse | Beat the Pile">
+<meta property="og:description" content="New internships and first jobs this week, by area, state and company. Counted daily from employers' own job boards.">
+<meta property="og:url" content="https://www.beatthepile.com/pulse/">
+<meta property="og:image" content="https://www.beatthepile.com/icons/og-1200x630.png?v=1">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://www.beatthepile.com/pulse/">
+<link rel="icon" href="/icons/icon-192.png?v=4">
+<meta name="theme-color" content="#060A2C">
+<link rel="stylesheet" href="/fonts/geist.css">
+<link rel="stylesheet" href="/data-pages.css">
+<style>
+  .hist.days{height:150px}
+  .hist.days .b i{display:none}
+  .hist.days .b:hover i,.hist.days .b:focus i{display:block}
+  .dlab{display:flex;justify-content:space-between;font-size:12px;color:var(--muted);margin-top:4px}
+  .bars{display:grid;gap:4px}
+  .bar{display:grid;grid-template-columns:minmax(110px,220px) 1fr 64px;gap:10px;align-items:center;padding:5px 4px;border-radius:8px;color:inherit;text-decoration:none;font-size:14.5px}
+  a.bar:hover{background:#F5F7FA}
+  .bar .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bar .fill{display:block;height:10px;background:var(--green);border-radius:0 4px 4px 0;min-width:2px}
+  .bar .v{text-align:right;font-weight:600}
+  .delta{font-size:13px;color:#B7C2D6}
+  svg.trend{width:100%;height:170px;display:block}
+</style>
+</head>
+<body>
+<script src="/nav.js"></script>
+<header>
+  <div class="wrap">
+    <h1>Hiring pulse</h1>
+    <p id="lead">What opened this week, counted every day from employers' own job boards.</p>
+    <div class="tiles" id="tiles" aria-live="polite"></div>
+  </div>
+</header>
+<main id="main" class="wrap">
+  <div id="err" class="err" hidden>We couldn't load this week's numbers right now. Try again in a minute.</div>
+  <div class="grid">
+    <div>
+      <section class="card">
+        <h2>New internships per day</h2>
+        <p class="sub">Internships our robot first saw on each of the last 30 days that are still open today.</p>
+        <div id="days"><div class="skel"></div></div>
+      </section>
+      <section class="card">
+        <h2>New this week, by area</h2>
+        <p class="sub">New internships in the last 7 days. Tap one to see them.</p>
+        <div id="fields"><div class="skel"></div></div>
+      </section>
+      <section class="card">
+        <h2>Open jobs over time</h2>
+        <p class="sub">Open jobs on Beat the Pile at the end of each day.</p>
+        <div class="seg" role="group" aria-label="Job type" id="trendSeg">
+          <button type="button" data-k="intern" aria-pressed="true">Internships</button><button type="button" data-k="fulltime" aria-pressed="false">Entry-level</button><button type="button" data-k="hourly" aria-pressed="false">Part-time &amp; hourly</button>
+        </div>
+        <div id="trend"></div>
+      </section>
+    </div>
+    <div>
+      <section class="card">
+        <h2>Companies opening the most internships</h2>
+        <p class="sub">New internships in the last 7 days.</p>
+        <ul class="jobs" id="cos"><li><div class="skel" style="height:60px;width:100%"></div></li></ul>
+      </section>
+      <section class="card">
+        <h2>States with the most new internships</h2>
+        <p class="sub">Last 7 days, by the job's state.</p>
+        <div id="states"></div>
+      </section>
+      <section class="card">
+        <h2>What term they're for</h2>
+        <p class="sub">Open internships by the term in the job title.</p>
+        <div id="seasons"></div>
+      </section>
+      <section class="card">
+        <h2>How we count</h2>
+        <p class="note">"New" means our robot first saw the job in the last 7 days. When a company joins Beat the Pile its open jobs all count as new that week, even ones it posted earlier, so a big week can mean a new company as much as new hiring. Counts are jobs open right now on Beat the Pile. Updated once a day by our Hiring Pulse bot.</p>
+        <p class="note" id="asof"></p>
+        <a class="btn" href="/jobs/?major=all&amp;state=all">Browse every internship</a>
+      </section>
+    </div>
+  </div>
+</main>
+<div class="tip" id="tip" hidden></div>
+<script src="/logos.js" defer></script>
+<script src="/feedback.js" defer></script>
+<script src="/ph.js" defer></script>
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const n = (v) => Number(v || 0).toLocaleString("en-US");
+  const ini = (x) => String(x || "?").split(/\s+/).filter(Boolean).slice(0, 2).map((w) => w[0]).join("").toUpperCase();
+  const tip = $("tip");
+  const hover = (el, text) => { el.addEventListener("mousemove", (e) => { tip.textContent = text; tip.hidden = false; tip.style.left = Math.min(e.clientX + 12, innerWidth - 250) + "px"; tip.style.top = (e.clientY + 14) + "px"; }); el.addEventListener("mouseleave", () => { tip.hidden = true; }); };
+  const ST = {AL:"Alabama",AK:"Alaska",AZ:"Arizona",AR:"Arkansas",CA:"California",CO:"Colorado",CT:"Connecticut",DE:"Delaware",DC:"Washington, DC",FL:"Florida",GA:"Georgia",HI:"Hawaii",ID:"Idaho",IL:"Illinois",IN:"Indiana",IA:"Iowa",KS:"Kansas",KY:"Kentucky",LA:"Louisiana",ME:"Maine",MD:"Maryland",MA:"Massachusetts",MI:"Michigan",MN:"Minnesota",MS:"Mississippi",MO:"Missouri",MT:"Montana",NE:"Nebraska",NV:"Nevada",NH:"New Hampshire",NJ:"New Jersey",NM:"New Mexico",NY:"New York",NC:"North Carolina",ND:"North Dakota",OH:"Ohio",OK:"Oklahoma",OR:"Oregon",PA:"Pennsylvania",RI:"Rhode Island",SC:"South Carolina",SD:"South Dakota",TN:"Tennessee",TX:"Texas",UT:"Utah",VT:"Vermont",VA:"Virginia",WA:"Washington",WV:"West Virginia",WI:"Wisconsin",WY:"Wyoming",US:"Remote, anywhere in the US"};
+  function bars(el, rows, label, val, link) {
+    if (!rows.length) { el.innerHTML = '<p class="note">Nothing yet.</p>'; return; }
+    const max = Math.max(...rows.map(val));
+    el.innerHTML = '<div class="bars">' + rows.map((r) => { const tag = link ? "a" : "div", href = link ? ' href="' + esc(link(r)) + '"' : "";
+      return '<' + tag + ' class="bar"' + href + '><span class="nm">' + esc(label(r)) + '</span><span><span class="fill" style="width:' + (val(r) / max * 100).toFixed(1) + '%"></span></span><span class="v">' + n(val(r)) + '</span></' + tag + '>'; }).join("") + '</div>';
+  }
+  let D = null, K = "intern";
+  const longDate = (d) => new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  function trend() {
+    const h = (D.history || []).filter((r) => r[K] != null);
+    if (h.length < 2) { $("trend").innerHTML = '<p class="note">The history started on ' + (h[0] ? longDate(h[0].d) : "today") + ' and adds one point a day. Today: ' + n(h[0] ? h[0][K] : 0) + ' open.</p>'; return; }
+    const W = 600, H = 170, P = { l: 52, r: 10, t: 10, b: 22 };
+    const vals = h.map((r) => r[K]), lo = Math.min(...vals) * 0.95, hi = Math.max(...vals) * 1.03 || 1;
+    const x = (i) => P.l + i / (h.length - 1) * (W - P.l - P.r), y = (v) => P.t + (1 - (v - lo) / (hi - lo || 1)) * (H - P.t - P.b);
+    const pts = h.map((r, i) => x(i).toFixed(1) + "," + y(r[K]).toFixed(1)).join(" ");
+    $("trend").innerHTML = '<svg class="trend" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Open jobs per day">'
+      + [lo, (lo + hi) / 2, hi].map((t) => '<line x1="' + P.l + '" x2="' + (W - P.r) + '" y1="' + y(t) + '" y2="' + y(t) + '" stroke="#E6EAF0"/><text x="' + (P.l - 6) + '" y="' + (y(t) + 4) + '" text-anchor="end" font-size="11" fill="#5E6A80">' + n(Math.round(t)) + '</text>').join("")
+      + '<polyline fill="none" stroke="#4A7000" stroke-width="2" stroke-linejoin="round" points="' + pts + '"/>'
+      + h.map((r, i) => '<circle cx="' + x(i) + '" cy="' + y(r[K]) + '" r="9" fill="transparent" data-t="' + esc(longDate(r.d) + ": " + n(r[K]) + " open") + '"/>').join("")
+      + '<text x="' + P.l + '" y="' + (H - 4) + '" font-size="11" fill="#5E6A80">' + longDate(h[0].d) + '</text><text x="' + (W - P.r) + '" y="' + (H - 4) + '" font-size="11" fill="#5E6A80" text-anchor="end">' + longDate(h[h.length - 1].d) + '</text></svg>';
+    $("trend").querySelectorAll("[data-t]").forEach((c) => hover(c, c.getAttribute("data-t")));
+  }
+  function render() {
+    const t = D.totals || {}, nw = D.newThisWeek || {}, lw = D.newLastWeek || {};
+    const d = lw.intern ? Math.round(((nw.intern || 0) - lw.intern) / lw.intern * 100) : null;
+    $("tiles").innerHTML =
+      '<div class="tile"><b>' + n(nw.intern) + '</b><span>New internships this week' + (d != null ? ' <span class="delta">(' + (d >= 0 ? "+" : "") + d + '% vs last week)</span>' : "") + '</span></div>'
+      + '<div class="tile"><b>' + n(t.intern) + '</b><span>Internships open now</span></div>'
+      + '<div class="tile"><b>' + n(nw.fulltime) + '</b><span>New entry-level jobs this week</span></div>'
+      + '<div class="tile"><b>' + n(D.companies) + '</b><span>Companies hiring</span></div>';
+    $("asof").textContent = "Updated " + new Date(D.at).toLocaleString("en-US", { month: "long", day: "numeric", hour: "numeric", minute: "2-digit" }) + ".";
+    const days = D.perDay || [], max = Math.max(1, ...days.map((x) => x.n));
+    const lab = (s) => new Date(s + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric" });
+    $("days").innerHTML = '<div class="hist days" role="img" aria-label="New internships per day, last 30 days">' + days.map((x) => '<div class="b" tabindex="0" style="height:' + (x.n / max * 100).toFixed(1) + '%" data-t="' + esc(lab(x.d) + ": " + n(x.n) + " new internships") + '" aria-label="' + esc(lab(x.d) + ": " + x.n) + '"><i>' + x.n + '</i></div>').join("") + '</div>'
+      + (days.length ? '<div class="dlab" aria-hidden="true"><span>' + lab(days[0].d) + '</span><span>' + lab(days[Math.floor(days.length / 2)].d) + '</span><span>Today</span></div>' : "")
+      + '<details><summary>Show as a table</summary><table class="tv"><thead><tr><th>Day</th><th>New internships</th></tr></thead><tbody>' + days.slice().reverse().map((x) => '<tr><td>' + lab(x.d) + '</td><td>' + n(x.n) + '</td></tr>').join("") + '</tbody></table></details>';
+    $("days").querySelectorAll("[data-t]").forEach((c) => hover(c, c.getAttribute("data-t")));
+    bars($("fields"), (D.fieldsNew || []).filter((f) => f.key !== "other").slice(0, 14), (r) => r.label, (r) => r.n, (r) => "/jobs/?major=" + encodeURIComponent(r.key) + "&state=all");
+    bars($("states"), D.statesNew || [], (r) => ST[r.state] || r.state, (r) => r.n, (r) => "/jobs/?state=" + r.state + "&major=all");
+    const seas = (D.seasons || []).map((s) => ({ ...s, label: s.season === "Not stated" ? "Term not in the title" : s.season.replace(" (no year)", ", year not stated") }));
+    bars($("seasons"), seas, (r) => r.label, (r) => r.n, null);
+    $("cos").innerHTML = (D.companiesNew || []).slice(0, 12).map((c) => '<li><span class="ini" data-logo-id="' + esc(c.id) + '">' + esc(ini(c.company)) + '</span><span class="t"><a href="/jobs/?company=' + encodeURIComponent(c.id) + '&major=all">' + esc(c.company) + '</a><span>' + n(c.open) + ' open internships</span></span><span class="pay">+' + n(c.n) + '</span></li>').join("") || '<li class="note">Nothing new this week yet.</li>';
+    trend();
+  }
+  $("trendSeg").addEventListener("click", (e) => { const b = e.target.closest("[data-k]"); if (!b || !D) return; K = b.dataset.k; $("trendSeg").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b))); trend(); });
+  fetch("/pulse/data.json", { cache: "no-cache" }).then((r) => { if (!r.ok) throw 0; return r.json(); }).then((d) => { D = d; render(); })
+    .catch(() => { $("err").hidden = false; document.querySelectorAll(".skel").forEach((x) => x.remove()); });
+})();
+</script>
+</body>
+</html>
