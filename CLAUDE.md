@@ -37,7 +37,7 @@ Shared static-page theme: `/d.css`. **Desktop width (Nov 18, owner "fill the scr
 Font **Geist**; ink `#060A2C`, one accent (dark lime `#4A7000` on white, lime `#B0F701` on navy), cool neutrals. No gradients, glows, rainbow chips or emoji
 in UI. Homepage tokens: `G/GD/GL/GM` at the top of `src/home.jsx`; static pages: CSS vars at the top of each page.
 Homepage `/#interview` = Interview practice (`/api/generate` feature `interview_turn`). Pro is **free during beta**
-(students are never charged; the only paid thing is employer career fair packages, see below).
+(students are not charged today; the only paid thing now is employer career fair packages, see below). **Nov 26 (owner): a paid student premium package is coming, so never write "students never pay" / "never charged" in copy; say searching and applying are free.** Terms §8 + /refunds/ still say "never charged" (owner to decide the legal wording).
 
 ## Less-AI rules (Nov 13 2026, owner's list)
 No em dashes anywhere a person reads (UI copy, page titles use " | ", separators " · ", AI output: `callClaude` adds a plain-writing system prompt and turns any "—" into ", "). No drop shadows (focus rings and inset rules only), no gradients except the skeleton shimmer and chart rings, no backdrop blur, no purple (interview/saved = dark blue #1E3A8A), corner radius 8–10px (pills stay), no hover lifts or animated arrows, no checkmark bullets in marketing lists, no icon-in-a-square feature cards, no "not X, it's Y" copy, no "free"/"no fee" on the business side. Homepage "What we offer" is a plain two-column list. Keep: real terms/privacy/cookies pages, skeleton loaders, the line icons in the top bar.
