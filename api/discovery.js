@@ -47,30 +47,6 @@ export default async function handler(req, res) {
       await db.insert("feedback", [{ page: clip(fb.page, 120), kind: clip(fb.kind, 40), message, contact: clip(fb.contact, 120) || null, listing_id: clip(fb.listingId, 200) || null }]);
       return res.status(200).json({ ok: true });
     }
-    // Nov 25 probe: does Workday answer from Vercel? (It answers 429 to GitHub runners on wd1/wd3/wd5/wd12/wd108.)
-    // Read-only: one 1-job search per board, only boards we already track, ≤2 per cluster + a wd503 control.
-    // Returns status codes only. Public, but 4 calls per hour site-wide. Remove once the question is answered.
-    if (fb?.action === "wd_probe") {
-      if (!(await rateOk("wd_probe", 3600, 4))) return res.status(429).json({ error: "Probe limit reached, try in an hour" });
-      const { syncOrder } = await import("./sync.js");
-      const { postJson } = await import("../lib/http.js");
-      const clu = (c) => (String(c.apiBase || c.host || "").match(/\b(wd\d+)\b/i) || [, "?"])[1].toLowerCase();
-      const want = { wd1: 2, wd3: 2, wd5: 2, wd12: 2, wd108: 2, wd503: 1 }, picked = [];
-      for (const c of await syncOrder()) {
-        if (c.ats !== "workday" || !c.host || !c.tenant || !c.site) continue;
-        const k = clu(c); if (!want[k]) continue;
-        want[k]--; picked.push(c);
-      }
-      const out = await Promise.all(picked.map(async (c) => {
-        const t = Date.now();
-        try {
-          const r = await postJson(`${c.apiBase || `https://${c.host}/wday/cxs/${c.tenant}/${c.site}`}/jobs`, { appliedFacets: {}, limit: 1, offset: 0, searchText: "" });
-          let total = null; if (r.ok) { try { total = (await r.json()).total ?? null; } catch {} }
-          return { id: c.id, cluster: clu(c), status: r.status, total, ms: Date.now() - t };
-        } catch (e) { return { id: c.id, cluster: clu(c), error: String(e.message || e).slice(0, 80), ms: Date.now() - t }; }
-      }));
-      return res.status(200).json({ from: "vercel", region: process.env.VERCEL_REGION || null, results: out });
-    }
     let who;
     // The nightly browser pass (GitHub Actions, holds CRON_SECRET) may also suggest links — they get the same proof checks
     if (isAuthorizedCron(req)) who = "robot";
