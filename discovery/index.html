@@ -61,6 +61,23 @@
   .account{font-size:13px;color:#CBD5E1;margin-top:10px}.account button{margin-left:6px;padding:4px 10px}
   .addco{display:grid;grid-template-columns:1fr 1fr 1.4fr auto;gap:8px;padding:12px 16px;border-top:1px solid var(--line);background:#FAFCFC}
   @media (max-width:640px){.addco{grid-template-columns:1fr}}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px 10px}
+  .chip{font-weight:600;border-radius:999px;padding:6px 12px}.chip span{color:var(--muted);font-weight:600;margin-left:2px}
+  .chip.on{background:var(--navy);border-color:var(--navy);color:#fff}.chip.on span{color:#B0F701}
+  .hs{font-size:13px;color:var(--muted);display:flex;gap:6px;align-items:center}.hs input{min-width:0}
+  ol.q{list-style:none;margin:0;padding:0;counter-reset:none}
+  .qi{padding:12px 16px;border-top:1px solid var(--line)}
+  .qi.done{background:#F2FADF}
+  .qh{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}.qh b{font-size:15.5px;color:var(--navy)}
+  .qh .dom{font-size:13px;color:var(--muted);text-decoration:none}.qh .dom:hover{text-decoration:underline}
+  .qw{font-size:13px;color:var(--muted);margin:2px 0 8px}
+  .qa{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .qa a.open{background:var(--green);color:#fff;font-weight:700;font-size:13.5px;text-decoration:none;border-radius:8px;padding:8px 12px;white-space:nowrap}
+  .qa a.alt{font-size:13px;color:var(--green-dark);font-weight:600;text-decoration:none}
+  .qa .paste{flex:1;min-width:220px}
+  .okc{color:var(--green-dark);font-weight:700;font-size:13px}
+  details.tried{font-size:12px;color:#8A5A12;margin-top:6px;word-break:break-all}details.tried summary{cursor:pointer;color:var(--muted);font-weight:600;padding:0;display:block}
+  .pager{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -93,7 +110,7 @@
   const NEEDS = ["no_board", "blocked", "board_error", "identity_failed", "error", "no_domain"];
   const SHORT = { no_board: "No job board found", blocked: "Site blocks robots", board_error: "Board didn't work",
                   identity_failed: "Couldn't prove it's theirs", error: "Error", no_domain: "No website" };
-  const S = { admin: false, clerk: null, q: "", data: null, saved: new Set() };
+  const S = { admin: false, clerk: null, q: "", data: null, saved: new Set(), savedN: 0, tier: "worth", why: "any", page: 0, hideSaved: false };
 
   // ── Sign-in (same Clerk account as the app). Only the owner can paste links. ──
   async function token(){ try { return await S.clerk?.session?.getToken(); } catch { return null; } }
@@ -133,24 +150,52 @@
     return j;
   }
 
-  function sheet(rows){
-    const need = rows.filter((r) => NEEDS.includes(r.status))
-      .sort((a, b) => (b.source || "").localeCompare(a.source || "") || a.company.localeCompare(b.company));
+  // Nov 25 (owner: "I just want to click the link, find the careers page, and paste it"): a work queue.
+  // Best companies first, 25 at a time, one click opens their careers page (DuckDuckGo's first result),
+  // pasting a link saves it and jumps to the next company.
+  const WHAT = { no_board: "Paste their careers or job list page", blocked: "Paste their job list page (their site blocks robots)",
+    board_error: "Old link broke. Paste the current job list page", identity_failed: "We found a job board but can't prove it's theirs. Paste their own careers page (the one that links to it)",
+    error: "Paste their careers or job list page", no_domain: "Paste their careers page or website" };
+  const PAGE = 25;
+  // Workday blocking us (429 / cool-off) isn't a missing link: a pasted link wouldn't help, so those stay out of the queue
+  const needsYou = (r) => NEEDS.includes(r.status) && !/\b429\b|cool-off|Workday busy/i.test(r.detail || "");
+  const lucky = (r) => "https://duckduckgo.com/?q=" + encodeURIComponent("\\ " + (r.domain ? `site:${r.domain} careers jobs` : `${r.company} careers jobs`));
+  const google = (r) => "https://www.google.com/search?q=" + encodeURIComponent(r.company + " careers jobs");
+  function needList(rows){
     const q = S.q.toLowerCase();
-    const shown = need.filter((r) => !q || r.company.toLowerCase().includes(q) || (r.source || "").toLowerCase().includes(q));
-    const g = (r) => "https://www.google.com/search?q=" + encodeURIComponent(r.company + " internships careers");
-    return `<div class="sheet"><h2>Needs a link · ${need.length}</h2>
-      <div class="why">The robot couldn't find these job boards on its own. Paste the company's <b>job search page</b> (the page that lists the jobs) and it re-checks within ~15 minutes. A wrong link can't go live: it still has to prove the board is theirs.</div>
-      <div class="tools"><input id="q" placeholder="Search companies or source…" value="${esc(S.q)}"><button id="csv">Download CSV</button></div>
-      <table class="tbl"><thead><tr><th>Company</th><th>Why</th><th>Find it</th><th>${S.admin ? "Paste job-board link" : "Link tried"}</th></tr></thead><tbody>` +
-      shown.map((r) => `<tr data-id="${esc(r.id)}">
-        <td class="co">${esc(r.company)}<span class="src">${esc(r.source || "")}</span></td>
-        <td class="d">${esc(SHORT[r.status] || r.status)}${r.attempts ? ` · tried ${r.attempts}×` : ""}</td>
-        <td><a href="${g(r)}" target="_blank" rel="noopener">Google ↗</a>${r.domain ? `<br><a href="https://${esc(r.domain)}" target="_blank" rel="noopener">${esc(r.domain)} ↗</a>` : ""}</td>
-        <td>${S.admin ? `<div class="linkcell"><input type="url" placeholder="https://…" aria-label="Job board link for ${esc(r.company)}"><button class="go save">Save</button></div>` : ""}
-          ${r.hint ? `<div class="tried">Tried: ${esc(r.hint)}${r.detail ? " · " + esc(r.detail) : ""}</div>` : ""}
-          ${S.saved.has(r.id) ? `<div class="ok">Saved ✓, robot checks it soon</div>` : ""}</td></tr>`).join("") +
-      `</tbody></table>` +
+    return rows.filter(needsYou)
+      .filter((r) => S.tier === "all" || (S.tier === "local" ? (r.priority || 0) <= 1 : (r.priority || 0) > 1))
+      .filter((r) => S.why === "any" || r.status === S.why)
+      .filter((r) => !S.hideSaved || !S.saved.has(r.id))
+      .filter((r) => !q || r.company.toLowerCase().includes(q) || (r.source || "").toLowerCase().includes(q) || (r.domain || "").includes(q))
+      .sort((a, b) => (b.priority || 0) - (a.priority || 0) || (b.intern_count || 0) - (a.intern_count || 0) || a.company.localeCompare(b.company));
+  }
+  function sheet(rows){
+    const all = rows.filter(needsYou);
+    const worth = all.filter((r) => (r.priority || 0) > 1).length;
+    const list = needList(rows), pages = Math.max(1, Math.ceil(list.length / PAGE));
+    S.page = Math.min(S.page, pages - 1);
+    const shown = list.slice(S.page * PAGE, S.page * PAGE + PAGE);
+    const tierBtn = (k, l, n) => `<button class="chip${S.tier === k ? " on" : ""}" data-tier="${k}">${l} <span>${n}</span></button>`;
+    const inTier = all.filter((r) => S.tier === "all" || (S.tier === "local" ? (r.priority || 0) <= 1 : (r.priority || 0) > 1));
+    const whyBtn = (k, l) => { const n = k === "any" ? inTier.length : inTier.filter((r) => r.status === k).length; return n || k === "any" ? `<button class="chip${S.why === k ? " on" : ""}" data-why="${k}">${l} <span>${n}</span></button>` : ""; };
+    return `<div class="sheet" id="sheet"><h2>Needs a link</h2>
+      <div class="why">How it works: <b>Open careers page</b> opens their careers page in a new tab. Copy the address of the page that lists their jobs, come back, and <b>paste it in the box</b>. It saves by itself and moves to the next company. A wrong link can't go live: the robot still has to prove the board is theirs.${S.savedN ? ` <b class="okc">${S.savedN} saved this session.</b>` : ""}</div>
+      <div class="chips">${tierBtn("worth", "Worth your time", worth)}${tierBtn("local", "Local businesses (low odds)", all.length - worth)}${tierBtn("all", "All", all.length)}</div>
+      <div class="chips">${whyBtn("any", "Any reason")}${whyBtn("no_board", "No job board found")}${whyBtn("identity_failed", "Can't prove it's theirs")}${whyBtn("board_error", "Old link broke")}${whyBtn("blocked", "Site blocks robots")}${whyBtn("no_domain", "No website")}${whyBtn("error", "Error")}</div>
+      <div class="tools"><input id="q" placeholder="Search a company, website or source…" value="${esc(S.q)}"><label class="hs"><input type="checkbox" id="hs"${S.hideSaved ? " checked" : ""}> Hide saved</label><button id="csv">Download CSV</button></div>
+      ${!S.admin ? `<div class="why"><b>Sign in at the top to paste links.</b></div>` : ""}
+      <ol class="q" start="${S.page * PAGE + 1}">` +
+      shown.map((r) => { const done = S.saved.has(r.id); return `<li class="qi${done ? " done" : ""}" data-id="${esc(r.id)}">
+        <div class="qh"><b>${esc(r.company)}</b>${r.domain ? `<a class="dom" href="https://${esc(r.domain)}" target="_blank" rel="noopener">${esc(r.domain)}</a>` : ""}${r.intern_count ? `<span class="pill">${r.intern_count} internships seen</span>` : ""}</div>
+        <div class="qw">${esc(WHAT[r.status] || "Paste their job list page")}</div>
+        <div class="qa"><a class="open" href="${lucky(r)}" target="_blank" rel="noopener">Open careers page ↗</a><a class="alt" href="${google(r)}" target="_blank" rel="noopener">Google</a>
+          ${S.admin ? `<input type="url" class="paste" placeholder="${done ? "Saved. Paste again to replace" : "Paste the job list link here"}" aria-label="Job list link for ${esc(r.company)}">` : ""}
+          ${done ? `<span class="okc">Saved</span>` : ""}</div>
+        ${r.hint && !done ? `<details class="tried"><summary>What the robot tried</summary>${esc(r.hint)}${r.detail ? "<br>" + esc(r.detail) : ""}</details>` : ""}
+      </li>`; }).join("") +
+      `</ol>
+      <div class="pager"><button id="prev"${S.page ? "" : " disabled"}>Previous</button><span>Page ${S.page + 1} of ${pages} · ${list.length} companies</span><button id="next"${S.page < pages - 1 ? "" : " disabled"}>Next 25</button></div>` +
       (S.admin ? `<div class="addco"><input id="nc" placeholder="Add a company (name)"><input id="nd" placeholder="website (acme.com)"><input id="nh" placeholder="job board link (optional)"><button class="go" id="add">Add</button></div>` : "") +
       `</div>`;
   }
@@ -203,16 +248,35 @@
   }
 
   function wire(app, rows){
+    const rerender = (keepScroll) => { const y = scrollY; render(S.data); if (keepScroll) scrollTo(0, y); };
     const q = app.querySelector("#q");
-    q?.addEventListener("input", () => { S.q = q.value; const pos = q.selectionStart; render(S.data); const n = document.getElementById("q"); n.focus(); n.setSelectionRange(pos, pos); });
+    q?.addEventListener("input", () => { S.q = q.value; S.page = 0; const pos = q.selectionStart; render(S.data); const n = document.getElementById("q"); n.focus(); n.setSelectionRange(pos, pos); });
     app.querySelector("#csv")?.addEventListener("click", () => csv(rows));
-    app.querySelectorAll("button.save").forEach((b) => b.addEventListener("click", async () => {
-      const tr = b.closest("tr"), input = tr.querySelector("input"), id = tr.dataset.id, hint = input.value.trim();
-      if (!/^https?:\/\//i.test(hint)) { input.focus(); input.placeholder = "Needs a full link (https://…)"; return; }
-      b.disabled = true; b.textContent = "…";
-      try { await post({ id, hint }); S.saved.add(id); const r = S.data.rows.find((x) => x.id === id); if (r) { r.hint = hint; r.detail = "queued"; } render(S.data); }
-      catch (e) { b.disabled = false; b.textContent = "Save"; alert(e.message); }
-    }));
+    app.querySelector("#hs")?.addEventListener("change", (e) => { S.hideSaved = e.target.checked; S.page = 0; rerender(true); });
+    app.querySelectorAll("[data-tier]").forEach((b) => b.addEventListener("click", () => { S.tier = b.dataset.tier; S.page = 0; rerender(true); }));
+    app.querySelectorAll("[data-why]").forEach((b) => b.addEventListener("click", () => { S.why = b.dataset.why; S.page = 0; rerender(true); }));
+    const toTop = () => { render(S.data); document.getElementById("sheet")?.scrollIntoView({ block: "start" }); };
+    app.querySelector("#prev")?.addEventListener("click", () => { S.page--; toTop(); });
+    app.querySelector("#next")?.addEventListener("click", () => { S.page++; toTop(); });
+    // Open careers page → that row's paste box is ready when you come back to this tab
+    app.querySelectorAll("a.open").forEach((a) => a.addEventListener("click", () => { S.focus = a.closest("li").dataset.id; }));
+    async function save(input){
+      const li = input.closest("li"), id = li.dataset.id, hint = input.value.trim();
+      if (!/^https?:\/\/[^\s]+\.[^\s]+/i.test(hint)) { input.value = ""; input.placeholder = "That isn't a full link (https://…). Paste again"; return; }
+      input.disabled = true;
+      try {
+        await post({ id, hint });
+        if (!S.saved.has(id)) S.savedN++;
+        S.saved.add(id); const r = S.data.rows.find((x) => x.id === id); if (r) { r.hint = hint; r.detail = "queued"; }
+        const next = li.nextElementSibling?.dataset.id; S.focus = next || null;
+        rerender(true);
+        const n = S.focus && document.querySelector(`li[data-id="${CSS.escape(S.focus)}"] a.open`); n?.focus();
+      } catch (e) { input.disabled = false; input.placeholder = e.message; input.value = hint; }
+    }
+    app.querySelectorAll("input.paste").forEach((inp) => {
+      inp.addEventListener("paste", () => setTimeout(() => save(inp), 0));
+      inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); save(inp); } });
+    });
     app.querySelector("#add")?.addEventListener("click", async (ev) => {
       const b = ev.currentTarget, company = app.querySelector("#nc").value.trim(), domain = app.querySelector("#nd").value.trim(), hint = app.querySelector("#nh").value.trim();
       b.disabled = true;
@@ -221,6 +285,7 @@
     });
   }
 
+  addEventListener("focus", () => { const i = S.focus && document.querySelector(`li[data-id="${CSS.escape(S.focus)}"] input.paste`); if (i && !i.value) i.focus(); });
   load().catch((e) => { document.getElementById("app").innerHTML = `<div class="err">Coverage data isn't available yet (${esc(e.message)}).</div>`; });
   loadClerk();
 })();

@@ -309,7 +309,7 @@ export default async function handler(req, res) {
     } catch (e) { console.error("[discovery bots]", e); return res.status(500).json({ error: "Couldn't load the control room" }); }
   }
   try {
-    const rows = await db.selectAll("company_candidates?select=id,company,domain,hint,status,ats,detail,intern_count,attempts,checked_at,verified_at,source&order=company.asc,id.asc");
+    const rows = await db.selectAll("company_candidates?select=id,company,domain,hint,status,ats,detail,intern_count,attempts,checked_at,verified_at,source,priority&order=company.asc,id.asc");
     const counts = {};
     for (const r of rows) counts[r.status] = (counts[r.status] || 0) + 1;
     return res.status(200).json({
