@@ -65,7 +65,8 @@ let r = await fetchCompany({ id: "s-dr-horton", company: "D.R. Horton", ats: "ta
 assert.deepEqual(r.listings.map((l) => [l.title, l.state]), [["Summer 2027 Construction Intern", "AL"], ["2027 Intern - Program Master Scheduler", "MA,TX"]], "Canadian internship dropped");
 assert.ok(calls.some((u) => u.includes("portal=101430233")), "portal id read from the search page");
 r = await fetchCompany({ id: "s-trex", company: "Trex", ats: "ukg", ...U });
-assert.deepEqual(r.listings.map((l) => [l.title, l.state, l.field]), [["Summer 2027 Business Internship Opportunities", "VA", "other"]], "welder + Canada dropped");
+// Nov 26 (owner: all jobs you can get hired for): the Philadelphia welder is kept as hourly now; Canada still dropped
+assert.deepEqual(r.listings.map((l) => [l.title, l.state, l.field]).sort(), [["Summer 2027 Business Internship Opportunities", "VA", "other"], ["Welder B", "PA", "industrial"]], "welder kept, Canada dropped");
 assert.equal(r.raw, 3);
 // saved portal that went stale → looked up again
 calls.length = 0; let first = true;

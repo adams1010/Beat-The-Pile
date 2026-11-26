@@ -20,7 +20,7 @@ for (const [t, f] of Object.entries(hourly)) { assert.equal(kindOf(t), "hourly",
 
 // Careers at the same places are NOT part-time
 for (const t of ["Golf Course Superintendent", "PGA Golf Professional", "Head Golf Professional", "Banquet Manager", "Event Staff Accountant",
-  "Landscape Technician", "Assistant Golf Course Superintendent", "Kennel Supervisor"]) assert.notEqual(kindOf(t), "hourly", "not part-time: " + t);
+  "Assistant Golf Course Superintendent", "Kennel Supervisor"]) assert.notEqual(kindOf(t), "hourly", "not part-time: " + t);
 
 // Shadowing & volunteer
 const shadow = ["Job Shadow - Nursing", "Job Shadowing Program", "Physician Shadowing", "Clinical Observership", "Volunteer - Patient Escort",
@@ -64,4 +64,7 @@ for (const t of ["Electrician Apprentice", "Apprentice Plumber", "Apprenticeship
 assert.equal(kindOf("Senior Electrician Apprentice"), null);
 for (const t of ["Junior Volunteer", "Teen Volunteer", "Student Observer", "Police Explorer Program", "Ride Along", "Docent", "Pre-Apprenticeship Program", "Mentorship Program"]) assert.equal(kindOf(t), "shadow", "shadow: " + t);
 assert.ok(EARLY_QUERIES.includes("apprentice") && EARLY_QUERIES.includes("observer"));
+// Nov 26 (owner: all jobs you can get hired for): trades and technicians are hourly now
+for (const t of ["Landscape Technician", "Electrician", "Pipefitter", "CDL Class A Truck Driver", "Help Desk Technician", "Assembly Product Handler - 1st Shift"]) assert.equal(kindOf(t), "hourly", "hourly now: " + t);
+for (const t of ["Senior Electrician", "Lead Welder", "Physical Therapist – PRN", "Registered Nurse - PRN", "Day Shift Manager", "Technician II"]) assert.notEqual(kindOf(t), "hourly", "still out: " + t);
 console.log("✓ more jobs: golf, recreation, childcare, pets (part-time) + Shadowing & volunteer kind, categories, sync keeps them");

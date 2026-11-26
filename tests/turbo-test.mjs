@@ -63,7 +63,7 @@ console.log("✓ turbo sync: robot-only list + save, only enabled companies, com
   const { kindOf, isHourlyRole } = await import("../lib/fields.js");
   for (const t of ["Cashier", "Part Time Cashier", "Sales Associate", "Barista", "Crew Member", "Warehouse Associate", "Delivery Driver", "Lifeguard", "Overnight Stocker", "Server", "Seasonal Associate"])
     assert.equal(kindOf(t), "hourly", t);
-  for (const t of ["Store Manager", "Shift Supervisor", "Senior Sales Associate", "CDL-A Truck Driver", "Assistant Store Manager", "Server Administrator", "SQL Server Developer", "Network Security Officer", "Software Engineer"])
+  for (const t of ["Store Manager", "Shift Supervisor", "Senior Sales Associate", "Assistant Store Manager", "Server Administrator", "SQL Server Developer", "Network Security Officer", "Software Engineer"])
     assert.equal(kindOf(t), null, t);
   assert.equal(kindOf("Medical Assistant"), "fulltime", "entry-level stays entry-level");
   assert.equal(kindOf("Sales Associate Intern"), "intern");
