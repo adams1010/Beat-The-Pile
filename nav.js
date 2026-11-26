@@ -207,7 +207,7 @@
     game: '<rect x="3.5" y="7" width="17" height="10" rx="3"/><path d="M8 10.5v3M6.5 12h3"/><path d="M15.5 11h.01M17.5 13h.01"/>',
     tools: '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>',
   };
-  const TOOL_ICON = { "/internship/": "intern", "/grad/": "grad", "/companies/": "business", "/radar/": "radar", "/clubs/": "clubs", "/#quiz": "quiz", "/#interview": "mic", "/#resumebuilder": "doc", "/#score": "check", "/#wall": "community", "/demo/": "play", "/about/": "about", "/pay/": "pay", "/pulse/": "pulse", "/help/": "help", "/swipe/": "swipe", "/play/": "game" };
+  const TOOL_ICON = { "/internship/": "intern", "/grad/": "grad", "/companies/": "business", "/radar/": "radar", "/clubs/": "clubs", "/#quiz": "quiz", "/#interview": "mic", "/#resumebuilder": "doc", "/#score": "check", "/#wall": "community", "/demo/": "play", "/about/": "about", "/pay/": "pay", "/pulse/": "pulse", "/help/": "help", "/jobs/?mode=swipe": "swipe", "/play/": "game" };
   const svg = (k) => `<svg class="btpic" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[k]}</svg>`;
   // Account type (chosen once after sign-in on /start/ or in the welcome sheet below): "student" | "employer" | null
   let ROLE = null; try { ROLE = localStorage.getItem("btp_role"); } catch {}
@@ -229,7 +229,7 @@
     ["/internship/", "My Internship", "Got an offer? Prep, first weeks, wrap-up"],
     ["/companies/", "Companies", "Look up any company and follow it"],
     ["/radar/", "Opening Radar", "When each company usually opens internships"],
-    ["/swipe/", "Swipe jobs", "Right to save, left to skip, up to apply"],
+    ["/jobs/?mode=swipe", "Swipe jobs", "Right = Wishlist, left = dump, up = apply now"],
     ["/play/", "Pay Guess", "Daily game: guess what 5 real jobs pay"],
     ["/pay/", "Internship pay", "What internships really pay, from posted pay"],
     ["/pulse/", "Hiring pulse", "What opened this week, by area and company"],
