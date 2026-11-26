@@ -30,7 +30,8 @@ assert.ok(calls.keyword > 10, "big board keeps the keyword searches");
 assert.equal(calls.empty, 1, "big board: only the first count request");
 
 // New hospital support roles
-for (const t of ["Patient Transporter", "Environmental Services Technician", "Patient Sitter PRN", "Laundry Attendant", "Floor Care Specialist"]) assert.equal(kindOf(t), "fulltime", t);
+for (const t of ["Patient Transporter", "Environmental Services Technician", "Laundry Attendant", "Floor Care Specialist"]) assert.equal(kindOf(t), "fulltime", t);
+assert.equal(kindOf("Patient Sitter PRN"), "hourly");   // Nov 26: PRN / part-time / on-call = part-time
 for (const t of ["EVS Supervisor I", "Senior Environmental Services Technician", "Nutrition Services Manager", "Transportation Manager"]) assert.equal(kindOf(t), null, t);
 console.log("wdfull-test ok");
 

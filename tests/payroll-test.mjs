@@ -2,8 +2,8 @@
 import assert from "node:assert/strict";
 process.env.BTP_OFFLINE_TEST = "1";
 const D = await import("../lib/discover.js");
-for (const n of ["Primary Care Associates of Appleton", "Swickard Auto", "Farmers National Bank", "Jackson County Memorial Hospital Authority", "Red McCombs Toyota", "Quality Vision International"]) assert.ok(D.distinctiveName(n), n);
-for (const n of ["DSO", "EMCS", "SECURA", "Home Health Services", "Medical Group, Inc.", "The Company", "Primary Care", "AB LLC"]) assert.ok(!D.distinctiveName(n), n);
+for (const n of ["Primary Care Associates of Appleton", "Swickard Auto", "Farmers National Bank", "Jackson County Memorial Hospital Authority", "Red McCombs Toyota", "Quality Vision International", "Taco Bell - Hospitality Restaurant Group", "Open Positions at Start Early"]) assert.ok(D.distinctiveName(n), n);
+for (const n of ["DSO", "EMCS", "SECURA", "Home Health Services", "Medical Group, Inc.", "The Company", "Primary Care", "AB LLC", "Education Career Page", "Education", "Our Open Opportunities D37", "Jobs & Stellenangebote", "Home &raquo; Careers"]) assert.ok(!D.distinctiveName(n), n);
 const board = (title, jobs) => `<html><head><title>${title} - Job Opportunities</title></head><body><script>window.pageData = {"ModuleTitle":"${title}","Jobs":${JSON.stringify(jobs)}};\n</script></body></html>`;
 const jobs = [{ JobId: 1, JobTitle: "Summer Intern", LocationName: "Appleton, WI", PublishedDate: "2026-11-01" }];
 globalThis.fetch = async (u) => ({ ok: true, status: 200, headers: { get: () => "text/html" }, text: async () => board(String(u).includes("aaaaaaaa") ? "Swickard Auto" : "DSO", jobs) });
