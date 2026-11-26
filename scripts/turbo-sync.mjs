@@ -5,6 +5,7 @@
 //   node scripts/turbo-sync.mjs [--limit=N] [--minutes=M] [--dry]
 import { fetchCompany } from "../lib/fetchers/index.js";
 import { mapLimit } from "../lib/http.js";
+import { isPaused } from "../lib/fetchers/workday.js";
 
 const SITE = process.env.SITE || "https://www.beatthepile.com";
 const arg = (k, d) => { const a = process.argv.find((x) => x.startsWith(`--${k}=`)); return a ? +a.split("=")[1] : d; };
@@ -70,8 +71,10 @@ const flush = () => {
 const PAUSE = +process.env.TURBO_PAUSE_MS || 95e3;   // tests shorten it
 const PASSES = [[AT_ONCE, 0], [8, PAUSE], [4, PAUSE]];
 let retry = [];
+let paused = 0;
 const readOne = async (cfg, lastPass) => {
   if ((Date.now() - t0) / 6e4 > MINUTES) return;            // out of time: the rest go first next run (oldest first)
+  if (cfg.ats === "workday" && isPaused(cfg)) { paused++; return; }   // Nov 25: Workday cool-off, not even asked
   let res;
   try {
     const { raw, listings, partial } = await withTimeout(fetchCompany(cfg), PER_BOARD_S * 1000);
@@ -106,6 +109,6 @@ await flush();
 try { mkdirSync(".turbo-cache", { recursive: true }); writeFileSync(CACHE, JSON.stringify(sent)); } catch (e) { console.warn("couldn't keep fingerprints:", e.message); }
 
 const min = Math.round((Date.now() - t0) / 6e4);
-const summary = `Read ${read} job boards in ${min} min · ${skipped} unchanged (not re-sent) · ${kept.toLocaleString("en-US")} jobs kept in the rest${failed ? ` · ${failed} boards didn't answer` : ""}${retried ? ` · ${retried} busy boards retried, ${busy} still busy` : ""}`;
+const summary = `Read ${read} job boards in ${min} min · ${skipped} unchanged (not re-sent) · ${kept.toLocaleString("en-US")} jobs kept in the rest${failed ? ` · ${failed} boards didn't answer` : ""}${retried ? ` · ${retried} busy boards retried, ${busy} still busy` : ""}${paused ? ` · ${paused} Workday boards on a cool-off` : ""}`;
 console.log(summary);
-if (!ONLY.length) await botlog(read > 0 && failed < read, summary, { read, stored, kept, failed, busy, retried, skipped, minutes: min, of: companies.length });
+if (!ONLY.length) await botlog(read > 0 && failed < read, summary, { read, stored, kept, failed, busy, retried, paused, skipped, minutes: min, of: companies.length });

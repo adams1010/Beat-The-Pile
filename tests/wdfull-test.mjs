@@ -1,6 +1,6 @@
 // Nov 23: Turbo Sync reads whole Workday boards up to FULL_MAX jobs; bigger boards keep the keyword searches.
 import assert from "node:assert/strict";
-process.env.BTP_TURBO = "1";
+process.env.BTP_TURBO = "1"; process.env.WD_PAUSE = "off";
 const { fetchWorkday, FULL_MAX } = await import("../lib/fetchers/workday.js");
 const { kindOf } = await import("../lib/fields.js");
 assert.equal(FULL_MAX, 2000);
