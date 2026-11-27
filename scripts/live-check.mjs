@@ -33,7 +33,7 @@ try { const h = (await fetch(`${SITE}/jobs/?${bust}`)).headers; const miss = ["s
   if (miss.length) fail("security headers missing: " + miss.join(", ")); else ok("security headers"); } catch (e) { fail("security headers: " + e.message); }
 await api("/api/discovery?bots=1", (j) => (j?.bots?.length ? null : "no bot switches"), "bot switches");
 
-// 2) Pages in a real browser (phone-sized too)
+// 2) Pages in a real browser (phone-sized too). /jobs opens in Swipe mode since Nov 26, so swipe cards count as job cards.
 const PAGES = ["/", "/jobs/", "/jobs/?kind=fulltime", "/jobs/?kind=hourly", "/jobs/?kind=all&q=nurse", "/tracker/", "/companies/?q=boeing", "/season/", "/fair/", "/orbit/",
   "/u/", "/start/", "/radar/", "/majors/", "/demo/", "/business/", "/privacy/", "/terms/", "/cookies/", "/accessibility/"];
 const browser = await chromium.launch();
@@ -47,7 +47,7 @@ for (const vp of [{ width: 1280, height: 900, name: "desktop" }, { width: 390, h
       if (!r || r.status() >= 400) { fail(`${vp.name} ${path}: HTTP ${r?.status()}`); await page.close(); continue; }
       await page.waitForTimeout(path.startsWith("/jobs") ? 9000 : 3500);
       if (path.startsWith("/jobs")) {
-        const s = await page.evaluate(() => ({ cards: document.querySelectorAll("#list .title").length, err: document.querySelector("#list .err")?.textContent || "" }));
+        const s = await page.evaluate(() => ({ cards: document.querySelectorAll("#list .title, #swipeBox .swcard").length, err: document.querySelector("#list .err")?.textContent || "" }));
         if (s.err) fail(`${vp.name} ${path}: shows "couldn't load"`);
         else if (!s.cards) fail(`${vp.name} ${path}: no job cards`);
       }
