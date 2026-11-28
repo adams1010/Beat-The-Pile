@@ -207,6 +207,24 @@ async function hiringCompanies() {
   return new Map([...seen].map(([id, v]) => [id, v.company]));
 }
 
+async function liveSummary() {
+      const scan = await liveScan();
+      const hiringNow = scan ? scan.seen.size : null;
+      const top = scan ? [...scan.seen].sort((a, b) => b[1].n - a[1].n).slice(0, 8).map(([id, v]) => ({ id, company: v.company, n: v.n })) : [];
+      // the headline numbers stay internships; full-time / entry-level is counted on its own (all from the one scan above)
+      const rows = await scanAll();
+      let engineering = 0, me = 0, allMajors = 0, fulltime = 0, hourly = 0, shadow = 0;
+      for (const r of rows) { const n = r.n; if (r.kind === "fulltime") { fulltime += n; continue; } if (r.kind === "hourly") { hourly += n; continue; } if (r.kind === "shadow") { shadow += n; continue; } allMajors += n; if (r.match) engineering += n; if (r.match === "me") me += n; }
+      const [companies, lastRun] = await Promise.all([
+        db.count("company_candidates?status=eq.live"),
+        db.select("feed_runs?select=ran_at&order=ran_at.desc&limit=1"),
+      ]);
+      // companies = boards the robot proved + the hand-checked starter list
+      const out = { engineering, me, allMajors, fulltime, hourly, shadow, hiringNow, top, byField: scan?.byField || null, companies: companies + COMPANIES.length, lastSync: lastRun?.[0]?.ran_at || null, at: new Date().toISOString() };
+      await db.upsert("summary_cache", [{ id: "summary", data: out, at: out.at }]).catch(() => {});   // best effort: the fallback copy
+      return out;
+}
+
 const plain = (res, code, title, msg) => {
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   return res.status(code).send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>${title} · Beat the Pile</title><link rel="stylesheet" href="/d.css"></head><body style="margin:0;font-family:Geist,system-ui,sans-serif"><script src="/nav.js"></script><main style="max-width:640px;margin:0 auto;padding:56px 20px"><h1 style="font-weight:600;letter-spacing:-.02em">${title}</h1><p style="color:#55627A">${msg}</p><p><a href="/jobs/" style="color:#4A7000;font-weight:600">Browse internships →</a></p></main></body></html>`);
@@ -271,19 +289,16 @@ export default async function handler(req, res) {
   try {
     if (p.summary) {
       res.setHeader("Cache-Control", "s-maxage=1800, stale-while-revalidate=86400");
-      const scan = await liveScan();
-      const hiringNow = scan ? scan.seen.size : null;
-      const top = scan ? [...scan.seen].sort((a, b) => b[1].n - a[1].n).slice(0, 8).map(([id, v]) => ({ id, company: v.company, n: v.n })) : [];
-      // the headline numbers stay internships; full-time / entry-level is counted on its own (all from the one scan above)
-      const rows = await scanAll();
-      let engineering = 0, me = 0, allMajors = 0, fulltime = 0, hourly = 0, shadow = 0;
-      for (const r of rows) { const n = r.n; if (r.kind === "fulltime") { fulltime += n; continue; } if (r.kind === "hourly") { hourly += n; continue; } if (r.kind === "shadow") { shadow += n; continue; } allMajors += n; if (r.match) engineering += n; if (r.match === "me") me += n; }
-      const [companies, lastRun] = await Promise.all([
-        db.count("company_candidates?status=eq.live"),
-        db.select("feed_runs?select=ran_at&order=ran_at.desc&limit=1"),
-      ]);
-      // companies = boards the robot proved + the hand-checked starter list
-      return res.status(200).json({ engineering, me, allMajors, fulltime, hourly, shadow, hiringNow, top, byField: scan?.byField || null, companies: companies + COMPANIES.length, lastSync: lastRun?.[0]?.ran_at || null, at: new Date().toISOString() });
+      // Nov 27: the live count timed out under bot load (homepage said "Live numbers unavailable"). The last good totals live
+      // in summary_cache, so a failed count answers with those (stale:true, short cache) instead of an error.
+      try { return res.status(200).json(await liveSummary()); }
+      catch (e) {
+        console.error("[summary] live count failed, serving the last saved totals", e?.message || e);
+        const saved = await db.select("summary_cache?id=eq.summary&select=data,at").catch(() => null);
+        if (!saved?.[0]?.data) throw e;
+        res.setHeader("Cache-Control", "s-maxage=120, stale-while-revalidate=86400");
+        return res.status(200).json({ ...saved[0].data, stale: true });
+      }
     }
 
     if (p.names) {                                            // every company hiring right now, any major — small enough for a phone
