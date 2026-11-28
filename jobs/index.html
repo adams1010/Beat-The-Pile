@@ -1003,7 +1003,7 @@
       card.style.transform = dir === "up" ? "translateY(-130%)" : `translateX(${dir === "right" ? 140 : -140}%) rotate(${dir === "right" ? 14 : -14}deg)`; }
     SW.seen.add(j.id); swSave(); SW.hist.push({ id: j.id, dir });
     if (dir === "right" && !state.mine.saved.has(j.id)) toggle("saved", j.id);
-    if (dir === "up") { window.open(j.url, "_blank", "noopener"); pendingApply = { id: j.id, co: j.company, at: Date.now() }; }
+    if (dir === "up") { window.open(j.url, "_blank", "noopener"); pendingApply = { id: j.id, co: j.company, at: Date.now() }; keepOpened(j.id); }
     track("swipe", { dir: dir === "right" ? "wishlist" : dir === "left" ? "dump" : "apply", kind: j.kind, field: j.field || null, page: "jobs" });
     setTimeout(() => { if (state.swipe) paintSwipe(); }, reduce ? 0 : 200);
   }
@@ -1045,7 +1045,7 @@
   $("swipeBox").addEventListener("click", (e) => {
     if (e.target.closest("#swKeep")) swDecide("right"); else if (e.target.closest("#swDump")) swDecide("left"); else if (e.target.closest("#swApply")) swDecide("up");
     else if (e.target.closest("#swUndo")) swUndo();
-    else if (e.target.closest("[data-swapply]")) { const j = swDeck()[0]; if (j) pendingApply = { id: j.id, co: j.company, at: Date.now() }; }
+    else if (e.target.closest("[data-swapply]")) { const j = swDeck()[0]; if (j) { pendingApply = { id: j.id, co: j.company, at: Date.now() }; keepOpened(j.id); } }
     else if (e.target.closest("#swWish, #swOpenWish")) $("savedOnly").click();   // the Wishlist shows as a list; closing it brings the deck back
   });
   addEventListener("keydown", (e) => {
@@ -1346,7 +1346,14 @@
     const btn = card?.querySelector('[data-act="applied"]');
     if (!btn || btn.getAttribute("aria-pressed") === "true") return;
     pendingApply = { id: btn.dataset.id, co: a.dataset.co || "", at: Date.now() };
+    keepOpened(btn.dataset.id);
   }, true);
+  // Nov 28 (owners' Pro plan: only 4 of 49 students tracked anything): every job opened with Apply lands in the Wishlist,
+  // so it's never lost if the student skips "Did you apply?". Applied jobs are left alone; "Yes, track it" still marks applied.
+  function keepOpened(id){
+    if (!id || state.mine.saved.has(id) || state.mine.applied.has(id)) return;
+    Promise.resolve(toggle("saved", id)).catch(() => {});
+  }
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState !== "visible" || !pendingApply) return;
     const p = pendingApply; pendingApply = null;
@@ -1355,7 +1362,7 @@
     const box = document.createElement("div"); box.className = "askapp"; box.setAttribute("role", "dialog"); box.setAttribute("aria-label", "Did you apply?");
     box.innerHTML = `<span class="t"><b>Did you apply${p.co ? ` to <span data-noi18n>${esc(p.co)}</span>` : ""}?</b><br>We'll track it and remind you to follow up.</span><button type="button" class="y">Yes, track it</button><button type="button" class="n">Not yet</button>`;
     document.body.appendChild(box);
-    const close = () => box.remove(); const timer = setTimeout(close, 20000);
+    const close = () => box.remove(); const timer = setTimeout(close, 45000);
     box.querySelector(".n").onclick = () => { clearTimeout(timer); close(); };
     box.querySelector(".y").onclick = () => { clearTimeout(timer); close();
       const b = document.querySelector(`[data-act="applied"][data-id="${CSS.escape(p.id)}"]`);

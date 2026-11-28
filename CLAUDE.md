@@ -345,6 +345,8 @@ Measured: per 10k people the East Coast has 39 jobs and the central states 36. T
 
 **Live numbers safety net (Nov 27):** the homepage said "Live numbers unavailable" when `listing_groups` (avg 3.5 s, 8 s limit) timed out under bot writes; 137k of 158k rows were heap fetches (stale visibility map). Fixed: VACUUM + `listings` autovacuum at 2% (`supabase/summary_cache.sql`), and `liveSummary()` saves each good result to table `summary_cache`; a failed count answers 200 with the saved totals + `stale:true` (2 min cache). Tests `tests/summary-cache-test.mjs`.
 
+**Pro prep (Nov 28, owners' plan doc "Beat the Pile Pro: what to charge for", Docs artifact 5pkP8r1uY4L1oZRpcmjDZk):** free = every job + tracker + Orbit + fairs forever; Pro (from late January, not built yet) = unlimited AI prep + same-day alerts + Radar reminders + offer help, $24 Season Pass / $7.99 mo, 14-day reverse trial, founding 150 free. December prep shipped: (1) /jobs `keepOpened()` = every job opened with Apply (card, swipe up, swipe Apply) goes to the Wishlist unless already saved/applied, so nothing is lost if "Did you apply?" is skipped (prompt now stays 45 s); (2) /start/ step 3 has a ticked "Remind me by email when it's time to follow up" box → `onboard {remind}` → `remind_email` on, first sign-up only, never staff, only with RESEND_API_KEY; privacy page updated. Tests `tests/pro-prep-test.mjs`.
+
 ## Data model (Supabase)
 `company_candidates` (robot queue + results: status, ats, config, hint, priority, detail) · `listings` (match, field,
 first_seen, closed_at, link_ok, link_fails) · `feed_runs` + view `feed_last` · `user_jobs` (saved, applied, apps,

@@ -726,8 +726,12 @@ export default async function handler(req, res) {
         (await db.selectAsAdmin(`user_jobs?select=handle&handle=eq.${encodeURIComponent(ref)}&limit=1`).catch(() => [])).length > 0;
       const alertsOn = (r) => !profile.staff && body.alerts !== false && !r?.alert_major;
       const alertPatch = (r) => (alertsOn(r) ? { alert_on: true, alert_major: defaultAlertMajor(profile.major), remind_unsub: r?.remind_unsub || crypto.randomBytes(18).toString("base64url") } : {});
+      // Nov 28 (owners' Pro plan: "keep defaults on"): follow-up reminders ticked at sign-up, first sign-up only (no profile yet),
+      // never for faculty/staff; an untick wins, and a later Settings switch is never overridden.
+      const remindPatch = (r) => (!profile.staff && body.remind === true && !r?.profile && !r?.remind_email && process.env.RESEND_API_KEY
+        ? { remind_email: true, remind_unsub: r?.remind_unsub || crypto.randomBytes(18).toString("base64url") } : {});
       let out;
-      try { out = await mutate(uid, (r) => ({ profile: { ...profile, ...keepStaffVerified(r.profile, profile) }, handle, profile_public: pub, ...alertPatch(r), ...(refOk ? { referred_by: ref } : {}) })); }
+      try { out = await mutate(uid, (r) => ({ profile: { ...profile, ...keepStaffVerified(r.profile, profile) }, handle, profile_public: pub, ...alertPatch(r), ...remindPatch(r), ...(refOk ? { referred_by: ref } : {}) })); }
       catch (e) { if (/23505|duplicate key/i.test(String(e?.message))) return res.status(409).json({ error: "Try again in a moment" }); throw e; }
       // Nov 23: "How did you hear about Beat the Pile?" (optional dropdown). Set once: only while heard_from is still empty.
       // Its own write, best effort, so sign-up never fails over it (e.g. before supabase/heard.sql has run).
